@@ -1,0 +1,90 @@
+<project name="native" default="jar">
+    
+    <!-- properties -->
+    <property name="src" 			location="src/"/>
+    <property name="bin" 			location="bin/"/>
+	<property name="target" 		location="target/"/>
+	<property name="resources" 		location="${target}/resources"/>
+	<property name="coreJarfile" 	location="../core/target/core.jar"/>
+	<property name="windowsJarFile" location="../windows/target/windows.jar"/>
+    <property name="jarfile" 		value="native.jar"/>
+
+	<!-- begin by wcoux -->
+    <property name="linuxJarFile" 	 location="../linux/target/linux.jar"/>
+    <property name="libatspiJarFile" location="../linux/lib/libatspi.jar"/>
+
+    <condition property="is_windows">
+        <os family="windows"/>
+    </condition>
+    <condition property="is_linux">
+        <os family="unix"/>
+    </condition>
+    <!-- end by wcoux -->
+
+    <target name="all" depends="jar"/>
+
+    <!-- dependencies -->	
+	<target name="dependencies">
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarfile};${windowsJarFile};${linuxJarFile};${libatspiJarFile}" />
+	</target>	
+	
+	<!-- compile -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../windows" target="jar" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../linux" target="jar" inheritAll="false"/>
+        <mkdir dir="${bin}"/>
+        <javac classpath="${coreJarfile};${windowsJarFile};${linuxJarFile};${libatspiJarFile}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+               includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+	
+	<!-- jar_windows -->
+    <target name="jar_windows" depends="compile" if="is_windows">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/intermediate.jar"/>
+    	<zip destfile="${target}/${jarfile}">
+    	    <zipfileset src="${windowsJarFile}"/>
+    		<zipfileset src="${target}/intermediate.jar"/>
+		</zip>
+    	<delete file="${target}/intermediate.jar"/>
+    	<mkdir dir="${resources}"/>
+    	<copy file="../windows/resources/msvcp100.dll" todir="${resources}"/>
+    	<copy file="../windows/resources/msvcr100.dll" todir="${resources}"/>
+    </target>
+
+	<!-- jar_linux -->
+    <target name="jar_linux" depends="compile" if="is_linux">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/intermediate.jar"/>
+        <zip destfile="${target}/${jarfile}">
+            <zipfileset src="${linuxJarFile}"/>
+            <zipfileset src="${libatspiJarFile}"/>
+            <zipfileset src="${target}/intermediate.jar"/>
+        </zip>
+        <delete file="${target}/intermediate.jar"/>
+        <mkdir dir="${resources}"/>
+    </target>
+
+	<!-- jar (by wcoux) -->
+    <target name="jar" depends="jar_windows,jar_linux" />
+	
+	<!-- clean -->
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${doc}"/>    	
+        <delete dir="${target}"/>
+    </target>
+	
+	<!-- cleanall_windows -->
+    <target name="cleanall_windows" depends="dependencies, clean">
+        <ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
+    </target>	
+
+	<!-- cleanall_linux -->
+    <target name="cleanall_linux" depends="dependencies, clean">
+        <ant antfile="build.xml" dir="../linux" target="clean" inheritAll="false"/>
+    </target>	
+
+	<!-- cleanall -->
+    <target name="cleanall" depends="cleanall_windows, cleanall_linux" />
+	
+</project>

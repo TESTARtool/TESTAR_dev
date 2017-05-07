@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="core_main" target="1.8" />
+      <module name="core_test" target="1.8" />
+      <module name="graph_main" target="1.8" />
+      <module name="graph_test" target="1.8" />
+      <module name="linux_main" target="1.8" />
+      <module name="linux_test" target="1.8" />
+      <module name="native_main" target="1.8" />
+      <module name="native_test" target="1.8" />
+      <module name="testar_main" target="1.8" />
+      <module name="testar_test" target="1.8" />
+      <module name="windows_main" target="1.8" />
+      <module name="windows_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

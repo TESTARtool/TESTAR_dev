@@ -1,0 +1,46 @@
+- Graphical environment
+	-> Color = 32bit required
+		=> Using remote desktop with lower color (i.e. 16bit) will result on an "Unable to update layered window" error message (@console)
+
+- System Under Test (SUT)
+	-> Browsers support for Web applications
+		=> Internet explorer x86 (32 bit executable) will result on a "System is offline! I assume it crashed" error message (@console)
+			-> No widgets detected? Check (*) below
+		=> Mozilla Firefox: scrollbars not being detected (not compliant with Accessiblity API)
+		=> Google Chrome: web application widgets not being detected
+	-> Unsopported technologies (fix pending)
+		=> Java Swing: yet, Java AWT/SWT is supported
+		
+- Protocol
+	-> Editing
+		-> "ReferenceError: "ImportPackage" is not defined in <eval> at line number 2" error message
+			=> Just ignore the message (due to outdated library jsyntaxpane-0.9.5-b29)
+	-> Compilation
+		-> "JDK required (running inside of JRE) error" error message
+			=> make sure you are running TESTAR with Java JDK version (not JRE version)
+		
+- Console error messages
+	-> "System is offline! I assume it crashed"
+		=> Check whether the SUT is already running. In such a case, first close any SUT process beforehand.
+			-> TESTAR will automatically try to detect and kill any SUT running processes
+
+- Abstract graphs
+	-> sometimes the abstracted graphs are broken in several partitions
+		=> it happens whenever there are actions that from the same state S0, ends in different states S1, S2
+		=> such actions are represented as MUTATED in non-abstracted graphs
+		=> during abstraction, MUTATED actions are lost because of the clusterization (i.e. cluster S0->S1, but not S0->S2)
+		
+--
+
+(*)
+Issue:
+	Sometimes IE automation stops working because of oleacc.dll, which is a system windows DLL file responsible with Active Accessibility support.
+Fix:
+	To fix it you'll need to register oleacc.dll in windows registry using regsvr32.exe command line tool as explained below:
+		- open an elevated command line (cmd.exe with admin rights)
+		- execute command: regsvr32.exe oleacc.dll
+		
+Alternative:
+	IE automation can also fail because of security settings. On Windows server is very likely that IE has default security settings that prevents scripting. You have to allow active scripting for the site you want to automate like this: 
+Fix:
+	in IE Tools/Internet Options/Security tab/Custom level button/Scripting/Allow active scripting

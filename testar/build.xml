@@ -1,0 +1,348 @@
+<project name="testar" default="jar">
+
+	<!-- properties -->
+    <property name="src" 		   location="src/"/>
+    <property name="lib" 		   location="lib/"/>
+    <property name="doc" 		   location="doc/"/>
+    <property name="bin" 		   location="bin/"/>
+	<property name="target" 	   location="target/"/>
+	<property name="resources" 	   location="resources/"/>
+	<property name="coreJarFile"   location="../core/target/core.jar"/>
+	<property name="nativeJarFile" location="../native/target/native.jar"/> <!-- by urueda -->
+	<property name="graphJarFile"  location="../graph/target/graph.jar"/>
+    <property name="jarfile" 	   value="testar.jar"/>
+
+	<!-- begin by wcoux -->
+	<condition property="is_windows">
+		<os family="windows"/>
+	</condition>
+	<condition property="is_linux">
+		<os family="unix"/>
+	</condition>
+	<!-- end by wcoux -->
+
+    <target name="all" depends="jar, doc"/>
+
+    <!-- dependencies -->	
+	<target name="dependencies">
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${nativeJarFile};${graphJarFile}" />
+	</target>
+	
+	<!-- compile -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../native" target="jar" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../graph" target="jar" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../suts/swtcalc" target="jar" inheritAll="false"/>
+        <mkdir dir="${bin}"/>
+        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};${prologJarFile};${nativeJarFile};${graphJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    	<mkdir dir="${bin}/resources/icons"/>
+		<copy todir="${bin}/icons" >
+	   		<fileset dir="resources/icons/"/>
+		</copy>
+    	<!-- by urueda -->
+		<copy todir="${target}/icons" >
+	   		<fileset dir="resources/icons/"/>
+		</copy>
+    </target>
+
+	<!-- copy_Windows_files (by wcoux) -->
+	<target name="copy_windows_files" if="is_windows">
+		<copy file="../windows/target/resources/main/windows.dll" todir="${target}" />
+		<copy file="../windows/target/resources/main/windows.dll" todir="../native/target/" />
+	</target>
+
+	<!-- copy_Linux_files (by wcoux) -->
+	<target name="copy_linux_files" if="is_linux">
+		<copy file="../linux/target/linux.jar" todir="${target}" />
+		<copy file="../linux/target/linux.jar" todir="../native/target/" />
+		<copy file="../linux/lib/libatspi.jar" todir="${target}" />
+		<copy file="../linux/lib/libatspi.jar" todir="../native/target/" />
+	</target>
+
+	<!-- jar_independent -->
+    <target name="jar_independent" depends="compile">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/intermediate.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.fruit.monkey.Main"/>
+            </manifest>
+        </jar>
+    	<zip destfile="${target}/${jarfile}">
+    	    <zipfileset src="${coreJarFile}"/>
+    	    <zipfileset src="${nativeJarFile}"/>
+    		<zipfileset src="${graphJarFile}"/>
+    		<zipfileset src="../graph/lib/com.alexmerz.graphviz.jar"/>
+    		<zipfileset src="../graph/lib/jgrapht-jdk1.6.jar"/>
+    		<zipfileset src="../graph/lib/jiprolog-4.1.3.1.jar"/>
+    		<zipfileset src="../graph/lib/json-simple-1.1.1.jar"/>
+    		<zipfileset src = "${lib}/JNativeHook.jar"/>
+    		<zipfileset src = "${lib}/jsyntaxpane-0.9.5-b29.jar"/>
+    	    <zipfileset src="${target}/intermediate.jar"/>
+		</zip>
+    	<delete file="${target}/intermediate.jar"/>
+    	<copy file="resources/input_values.xml" todir="${target}"/>
+    	<copy file="resources/scripts/run.bat" todir="${target}"/>
+        <copy file="resources/scripts/batchrun.bat" todir="${target}"/>
+    	<copy file="resources/scripts/clean-output.bat" todir="${target}"/>
+        <copy file="resources/scripts/metricstats.bat" todir="${target}"/>
+        <copy file="resources/scripts/reportmetrics.bat" todir="${target}"/>
+		<copy file="resources/scripts/w10_run.bat" todir="${target}"/>
+		<copy file="resources/scripts/lux_run.sh" todir="${target}"/>
+    	
+    	<!-- start by urueda -->
+    	<copy file="resources/windows/x86_64/JNativeHook.dll" todir="${target}"/>
+    	<copy todir="${target}">
+    		<fileset dir="../native/target/resources/" />
+    	</copy>
+    	<copy todir="${target}/settings">
+	    	<fileset dir="resources/settings/"/>
+        </copy>
+    	<copy file="../LICENSE" todir="${target}"/>
+    	<copy file="../VERSION" todir="${target}"/>
+    	<copy file="../CHANGELOG" todir="${target}"/>
+    	<copy file="../KNOWN_ISSUES" todir="${target}"/>		
+    	<!-- end by urueda -->
+    	
+       <javac classpath="${target}/${jarfile}" sourcepath="${target}/settings/*.java" srcdir="${target}/settings/" destdir="${target}/settings/" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+
+    	<!-- wincalc -->
+		<!--
+    	<copy file="resources/SUT/wincalc/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/wincalc/CustomProtocol.java" todir="${target}"/>
+    	-->
+
+    	<!-- calc (on-purpose buggy crafted calculator) -->
+  		<!--
+    	<copy file="resources/SUT/calc/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/calc/CustomProtocol.java" todir="${target}"/>
+    	-->
+
+    	<!-- web (generic) -->
+		<!--
+    	<copy file="resources/SUT/web_genetest.settingsings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/web_generic/WebProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- Odoo (web) -->
+		<!--
+    	<copy file="resources/SUT/odoo/test.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/odoo/WebProtocol.java" todir="${target}"/>
+    	-->	
+    	
+    	<!-- Microsoft Powerpoint -->
+    	<!--
+    	<copy file="resources/SUT/MicrosoftOffice/powerpoint/powerpoint.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/MicrosoftOffice/powerpoint/PowerPointProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- Microsoft Excel -->
+    	<!--
+    	<copy file="resources/SUT/MicrosoftOffice/excel/excel.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/MicrosoftOffice/excel/ExcelProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/MicrosoftOffice/excel/ProtocolFilter.idx" todir="${target}"/>
+		-->
+    	
+    	<!-- Microsoft Word -->
+    	<!--
+    	<copy file="resources/SUT/MicrosoftOffice/word/word.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/MicrosoftOffice/word/WordProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/MicrosoftOffice/word/ProtocolFilter.idx" todir="${target}"/>
+		-->
+    	
+       	<!-- bitrix24 -->
+    	<!--
+    	<copy file="resources/SUT/Bitrix24//bitrix24.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/Bitrix24/Bitrix24Protocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/Bitrix24/protocol_filter.xml" todir="${target}"/>		
+		-->
+
+		<!-- UPV suts .......................................................................... -->
+    	
+    	<!-- Agencia Fotografica (ACG 2016) -->
+		<!--
+    	<copy file="resources/SUT/acg2016/test.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/acg2016/WebProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/acg2016/protocol_filter.xml" todir="${target}"/>		
+    	<copy file="resources/SUT/acg2016/input_values.xml" todir="${target}"/>		
+    	-->
+    	
+    	<!-- EVERIS -->
+		<!--
+    	<copy file="resources/SUT/everis/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/everis/CustomProtocol.java" todir="${target}"/>
+    	-->
+
+    	<!-- TESTAR PdC 2015 ................................................................... -->
+    	
+    	<!-- clavei -->
+    	<!--
+    	<copy file="resources/SUT/pdc2015/clavei/clavei.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/pdc2015/clavei/ClaveiProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/pdc2015/clavei/ProtocolFilter.idx" todir="${target}"/>
+		-->
+    	
+    	<!-- ADDinformatica -->
+    	<!--
+    	<copy file="resources/SUT/pdc2015/addinformatica/addinformatica.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/pdc2015/addinformatica/ADDinformaticaProtocol.java" todir="${target}"/>
+		-->
+
+    	<!-- indenova -->
+    	<!--
+    	<copy file="resources/SUT/pdc2015/indenova/indenova.settings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/pdc2015/indenova/IndenovaProtocol.java" todir="${target}"/>    	
+    	-->
+    	
+		<!-- ............................................................ TESTAR PdC 2015 -->    	
+    	
+    	
+    	<!-- Hacklab 2015 (@Zaragoza) ................................................................ --> 
+    	
+    	<!-- alcura (health) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/alcura/alcura_heatest.settingsings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/alcura/alcura_health/WebProtocol.java" todir="${target}"/>
+    	-->	
+    	
+    	<!-- alcura (alphega_pharmacie) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/alcura/alphega_pharmatest.settingsings" tofile="${target}/test.settings"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/alcura/alphega_pharmacie/WebProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- keensoft - Ayuntamiento Zaragoza -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/keensoft/ayuntamiento_zaragoza/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/keensoft/ayuntamiento_zaragoza/WebProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- keensoft - DARA -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/keensoft/dara/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/keensoft/dara/WebProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- clearone - spontania (moderador) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_moderador/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_moderador/WebProtocol.java" todir="${target}"/>
+		-->
+    	
+    	<!-- clearone - spontania (participante) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_participante/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_participante/WebProtocol.java" todir="${target}"/>
+    	-->
+
+    	<!-- endalia - testea (web) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_web/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_web/WebProtocol.java" todir="${target}"/>
+    	-->
+    	
+    	<!-- endalia - testea (desktop) -->
+		<!--
+    	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/CustomProtocol.java" todir="${target}"/>
+		<copy todir="${target}" >
+			<fileset dir="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/app/EndaliaORH_TESTEA/"/>
+		</copy>    	
+    	-->
+
+    	<!-- ................................................... Hacklab 2015 (@Zaragoza) --> 
+    	    	
+    	<!-- end by urueda -->    	
+		
+    	<!-- TFM (@fraalpe2) ................................................................ -->
+    	
+    	<!-- PowerPoint -->
+    	<!--
+    	<copy file="resources/SUT/TFM-Paco/power point/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/power point/PowerPointProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/power point/protocol_filter.xml" todir="${target}"/>
+		-->
+    	<!--  Testona -->
+    	<!--
+    	<copy file="resources/SUT/TFM-Paco/testona/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/testona/TestonaProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/testona/protocol_filter.xml" todir="${target}"/>
+    	-->
+    	
+    	<!-- Odoo -->
+    	<!--
+    	<copy file="resources/SUT/TFM-Paco/odoo/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/odoo/OdooProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/odoo/protocol_filter.xml" todir="${target}"/> 
+    	-->
+    	
+    	<!-- Clikeen -->
+    	<!--
+    	<copy file="resources/SUT/TFM-Paco/clikeen/test.settings" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/clikeen/ClikeenProtocol.java" todir="${target}"/>
+    	<copy file="resources/SUT/TFM-Paco/clikeen/protocol_filter.xml" todir="${target}"/>
+    	-->
+    	
+    	<!-- ................................................... TFM (@fraalpe2) --> 		
+    	
+       <javac classpath="${target}/${jarfile}" sourcepath="${target}/*.java" srcdir="${target}" destdir="${target}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+
+    	<mkdir dir="${target}/resources"/>
+        <mkdir dir="${target}/output"/>
+        <mkdir dir="${target}/output/temp"/>
+    	<mkdir dir="${target}/output/scrshots"/>
+    	<mkdir dir="${target}/output/graphs"/>
+    	<mkdir dir="${target}/output/logs"/>
+    	<mkdir dir="${target}/output/metrics"/>
+		<copy todir="${target}/output" >
+			<fileset dir="resources/output" includes="sequence?"/>
+		</copy>
+    	    	
+        <mkdir dir="${target}/suts"/>
+    	<copy file="../suts/swtcalc/target/calc.jar" todir="${target}/suts"/>
+
+    </target>
+
+	<!-- jar (by wcoux) -->
+	<target name="jar" depends="jar_independent, copy_windows_files, copy_linux_files" />
+	
+	<!-- run -->
+    <target name="run" depends="jar">
+        <exec dir="${target}" executable="cmd" failonerror="true">
+            <arg value="/q"/>
+            <arg value="/c"/>
+            <arg value="run.bat"/>
+        </exec>
+    </target>
+
+	<!-- doc -->
+    <target name="doc">
+        <javadoc destdir= "${doc}"
+                 access="public"
+                 windowtitle="Testar"
+                 >
+        <fileset dir="src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+        </fileset>
+        </javadoc>
+    </target>
+
+	<!-- clean -->
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${doc}"/>
+    	<delete dir="${target}"/>
+    </target>
+	
+	<!-- cleanall (by urueda) -->
+	<target name="cleanall" depends="clean">
+        <ant antfile="build.xml" dir="../core" target="clean" inheritAll="false"/>
+        <ant antfile="build.xml" dir="../native" target="clean" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../graph" target="clean" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../linux" target="clean" inheritAll="false"/>
+    	<ant antfile="build.xml" dir="../suts/swtcalc" target="clean" inheritAll="false"/>
+	</target>
+	
+</project>

@@ -1,0 +1,60 @@
+apply plugin: 'application'
+
+sourceSets {
+    main {
+        resources {
+            srcDirs=['resources']
+        }
+    }
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':native')
+    compile project(':graph')
+    compile files('./lib/jsyntaxpane-0.9.5-b29.jar')
+    compile files('./lib/JNativeHook.jar')
+    runtime project(':windows')
+    runtime files('../graph/lib/jiprolog-4.1.3.1.jar')
+    runtime group: 'org.jgrapht', name: 'jgrapht-core', version: '1.0.1'
+    runtime files('../graph/lib/com.alexmerz.graphviz.jar')
+    runtime files('../graph/lib/json-simple-1.1.1.jar')
+}
+
+task prepareSettings(type: Copy) {
+    from 'resources/settings'
+    into 'target/scripts/settings'
+}
+
+task prepareDesktopTest(type: Copy) {
+    from 'resources/SUT/desktop'
+    into 'target/scripts'
+}
+
+/*task prepareWebTest(type: Copy) {
+    from 'resources/SUT/web_generic'
+    into 'target/scripts'
+}*/
+
+task prepareOutputFolder(type: Copy) {
+    from 'resources/output'
+    into 'target/scripts/output'
+}
+
+task prepareWindowsDLL(type: Copy) {
+    from '../windows/target/resources/main'
+    into 'target/scripts'
+    include '**/*.dll'
+}
+
+task prepareNativeDLL(type: Copy) {
+    from 'resources/windows/x86_64'
+    into 'target/scripts'
+}
+
+startScripts.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('prepare')}
+}
+
+mainClassName='org.fruit.monkey.Main'
+

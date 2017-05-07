@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":windows:main" external.linked.project.path="$MODULE_DIR$/../../../windows" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="src" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/../../../windows/target/classes/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../windows/resources">
+      <sourceFolder url="file://$MODULE_DIR$/../../../windows/resources" type="java-resource" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../windows/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../../windows/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="core_main" />
+  </component>
+</module>

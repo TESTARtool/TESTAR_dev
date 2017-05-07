@@ -1,0 +1,1 @@
+powershell ".\py.bat | tee out.txt"

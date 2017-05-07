@@ -1,0 +1,45 @@
+<project name="graph" default="jar">
+    
+    <!-- properties -->
+    <property name="src" 		   location="src/"/>
+    <property name="bin" 		   location="bin/"/>
+	<property name="doc" 		   location="doc/"/>
+	<property name="target" 	   location="target/"/>
+	<property name="coreJarFile"   location="../core/target/core.jar"/>
+	<property name="nativeJarFile" location="../native/target/native.jar"/>
+	<property name="graphviz" 	   location="lib/com.alexmerz.graphviz.jar"/>
+	<property name="jgrapht" 	   location="lib/jgrapht-jdk1.6.jar"/>
+	<property name="jiprologLib"   location="lib/jiprolog-4.1.3.1.jar"/>
+	<property name="json" 		   location="lib/json-simple-1.1.1.jar"/> <!-- by fraalpe2 -->
+    <property name="jarfile" 	   value="graph.jar"/>
+
+	<target name="all" depends="jar"/>
+
+    <!-- dependencies -->	
+	<target name="dependencies">
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath="${coreJarFile};${nativeJarFile};${graphviz};${jgrapht};${jiprologLib};${json}" />
+	</target>	
+	
+    <!-- compile -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>	
+        <ant antfile="build.xml" dir="../native" target="jar" inheritAll="false"/>	
+        <mkdir dir="${bin}"/>
+        <javac classpath="${coreJarFile};${nativeJarFile};${graphviz};${jgrapht};${jiprologLib};${json}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+	<!-- jar -->
+    <target name="jar" depends="compile">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/${jarfile}"/>
+    </target>
+
+	<!-- clean -->
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${doc}"/>
+        <delete dir="${target}"/>
+    </target>
+	
+</project>
