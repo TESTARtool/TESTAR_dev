@@ -48,7 +48,8 @@ class UIAElement implements Serializable {
 		scrollPattern, hScroll, vScroll; // by urueda
 	long ctrlId, orientation, hwnd, wndInteractionState, wndVisualState;
 	Rect rect;
-	String name, helpText, automationId, className, providerDesc, frameworkId;
+	String name, helpText, automationId, className, providerDesc, frameworkId,
+		acceleratorKey, accessKey;
 	double zindex,
 		   hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
 	//int[] scrollbarInfo, scrollbarInfoH, scrollbarInfoV; // by urueda

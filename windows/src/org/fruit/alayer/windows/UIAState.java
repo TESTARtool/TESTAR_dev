@@ -188,6 +188,10 @@ final class UIAState extends UIAWidget implements State {
 			ret = w.element.wndVisualState;
 		}else if(t.equals(UIATags.UIAAutomationId)){
 			ret = w.element.automationId;
+		}else if(t.equals(UIATags.UIAAcceleratorKey)){
+			ret = w.element.acceleratorKey;
+		}else if(t.equals(UIATags.UIAAccessKey)){
+			ret = w.element.accessKey;
 		}
 		
 		cacheTag(w, t, ret);
