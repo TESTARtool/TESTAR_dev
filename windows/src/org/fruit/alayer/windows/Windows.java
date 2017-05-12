@@ -794,6 +794,8 @@ public final class Windows{
 
 	public static native String IUIAutomationElement_get_AutomationId(long pElement, boolean fromCache);	
 	public static native long[] IUIAutomationElement_GetRuntimeId(long pElement);
+	public static native String IUIAutomationElement_get_AcceleratorKey(long pElement, boolean fromCache);
+	public static native String IUIAutomationElement_get_AccessKey(long pElement, boolean fromCache);
 	public static native String IUIAutomationElement_get_HelpText(long pElement, boolean fromCache);
 	public static native String IUIAutomationElement_get_ClassName(long pElement, boolean fromCache);
 	public static native String IUIAutomationElement_get_Name(long pElement, boolean fromCache);

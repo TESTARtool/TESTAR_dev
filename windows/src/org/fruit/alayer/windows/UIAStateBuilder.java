@@ -96,6 +96,8 @@ public final class UIAStateBuilder implements StateBuilder {
 
 		// cache properties
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NamePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AcceleratorKeyPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AccessKeyPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AutomationIdPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_BoundingRectanglePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClassNamePropertyId);
@@ -341,6 +343,8 @@ public final class UIAStateBuilder implements StateBuilder {
 			el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
 			el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
 			el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
+			el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
+			el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
 
 			parent.root.hwndMap.put(el.hwnd, el);
 
