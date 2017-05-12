@@ -1407,6 +1407,34 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1GetRootElement)) (JNIEnv * env, jclass,
 	return (jlong)root;
 }
 
+/* IUIAutomationElement_get_AcceleratorKey */
+JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AcceleratorKey)) (JNIEnv * env, jclass,
+		jlong pIUIAutomationElement, jboolean fromCache){
+	BSTR value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedAcceleratorKey(&value) : el->get_CurrentAcceleratorKey(&value);
+	if (FAILED(hr))
+		return 0;
+
+	jstring ret = env->NewStringUTF(_com_util::ConvertBSTRToString(value));
+	SysFreeString(value);
+	return ret;
+}
+
+/* IUIAutomationElement_get_AccessKey */
+JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AccessKey)) (JNIEnv * env, jclass,
+		jlong pIUIAutomationElement, jboolean fromCache){
+	BSTR value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedAccessKey(&value) : el->get_CurrentAccessKey(&value);
+	if (FAILED(hr))
+		return 0;
+
+	jstring ret = env->NewStringUTF(_com_util::ConvertBSTRToString(value));
+	SysFreeString(value);
+	return ret;
+}
+
 /* IUIAutomationElement_get_HelpText */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1HelpText)) (JNIEnv * env, jclass,
 		jlong pIUIAutomationElement, jboolean fromCache){
@@ -1691,7 +1719,9 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromPoint)) (JNIEnv * env, jclass
 		jlong pIUIAutomation, jlong x, jlong y){
 	IUIAutomationElement* el;
 	IUIAutomation* uia = (IUIAutomation*) pIUIAutomation;
-	POINT p = {x, y};
+	POINT p;
+	p.x = x;
+	p.y = y;
 	HRESULT hr = uia->ElementFromPoint(p, &el);
 	if (FAILED(hr))
 		return 0;

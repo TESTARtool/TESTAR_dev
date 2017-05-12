@@ -135,6 +135,16 @@ public final class UIATags{
 	 * Whether this widget can be focused, such that it will receive keyboard input
 	 */
 	public static final Tag<Boolean> UIAIsKeyboardFocusable = from("UIAIsKeyboardFocusable", Boolean.class);
+	
+	/**
+	 * Accelerator key of a widget.
+	 */
+	public static final Tag<String> UIAAcceleratorKey = from("UIAAcceleratorKey", String.class);
+	
+	/**
+	 * Access key of a widget.
+	 */
+	public static final Tag<String> UIAAccessKey = from("UIAAccessKey", String.class);
 
 	private static <T> Tag<T> from(String name, Class<T> valueType){
 		Tag<T> ret = Tag.from(name, valueType);
