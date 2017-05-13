@@ -35,20 +35,11 @@ import org.fruit.alayer.Verdict;
  */
 public abstract class AbstractGuideline extends ItemBase {
 	
-	private final Principle parent;
-	private final List<SuccessCriterion> successCriteria = new ArrayList<SuccessCriterion>();
+	protected final Principle parent;
 
 	protected AbstractGuideline(int nr, String name, Principle parent) {
 		super(nr, name);
 		this.parent = parent;
-	}
-	
-	void addSuccessCriterion(SuccessCriterion criterion) {
-		successCriteria.add(criterion);
-	}
-	
-	public List<SuccessCriterion> getSuccessCriteria() {
-		return Collections.unmodifiableList(successCriteria);
 	}
 	
 	@Override

@@ -24,8 +24,8 @@ package org.fruit.a11y.wcag;
  */
 public class SuccessCriterion extends ItemBase {
 	
-	private final AbstractGuideline parent;
-	private final Level level;
+	protected final AbstractGuideline parent;
+	protected final Level level;
 	
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
 		super(nr, name);
