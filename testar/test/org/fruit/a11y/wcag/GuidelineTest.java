@@ -4,12 +4,13 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class PrincipleTest {
+public class GuidelineTest {
 
 	@Test
 	public void testGetNr() {
 		Principle p = new Principle(1, "Foo");
-		assertEquals(p.getNr(), "1");
+		AbstractGuideline g = new KeyboardAccessibleGuideline(2, p);
+		assertEquals(g.getNr(), "1.2");
 	}
 
 }
