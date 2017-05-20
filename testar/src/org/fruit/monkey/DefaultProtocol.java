@@ -305,15 +305,15 @@ public class DefaultProtocol extends AbstractProtocol{
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(Verdict.SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+			return new Verdict(SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false))
-			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+			return new Verdict(SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 
-        //------------------------
+		//------------------------
 		// ORACLES ALMOST FOR FREE
-        //------------------------
+		//------------------------
 		
 		String titleRegEx = settings().get(ConfigTags.SuspiciousTitles);
 		// search all widgets for suspicious titles
@@ -324,13 +324,13 @@ public class DefaultProtocol extends AbstractProtocol{
 				// visualize the problematic widget, by marking it with a red box
 				if(w.get(Tags.Shape, null) != null)
 					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-				return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
+				return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
 			}
 		}
 		
 		if (this.nonSuitableAction){ // by urueda
 			this.nonSuitableAction = false;
-			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
+			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
 		}
 		
 		// if everything was OK ...
