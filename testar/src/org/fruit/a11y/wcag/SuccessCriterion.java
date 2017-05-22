@@ -42,4 +42,9 @@ public class SuccessCriterion extends ItemBase {
 		return level;
 	}
 	
+	@Override
+	public String toString() {
+		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
+	}
+	
 }

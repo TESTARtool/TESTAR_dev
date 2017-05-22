@@ -13,5 +13,13 @@ public class SuccessCriterionTest {
 		SuccessCriterion s = new SuccessCriterion(3, "Bar", g, Level.A);
 		assertEquals(s.getNr(), "1.2.3");
 	}
+	
+	@Test
+	public void testToString() {
+		Principle p = new Principle(1, "Foo");
+		AbstractGuideline g = new KeyboardAccessibleGuideline(2, p);
+		SuccessCriterion s = new SuccessCriterion(3, "Bar", g, Level.A);
+		assertEquals(s.toString(), "1.2.3 Bar (Level A)");
+	}
 
 }
