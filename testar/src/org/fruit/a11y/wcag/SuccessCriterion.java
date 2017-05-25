@@ -17,6 +17,8 @@
 
 package org.fruit.a11y.wcag;
 
+import org.fruit.alayer.Verdict;
+
 /**
  * A WCAG success criterion
  * @author Davy Kager
@@ -26,6 +28,8 @@ public class SuccessCriterion extends ItemBase {
 	
 	protected final AbstractGuideline parent;
 	protected final Level level;
+	
+	private static final int NLEVELS = Level.values().length;
 	
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
 		super(nr, name);
@@ -40,6 +44,11 @@ public class SuccessCriterion extends ItemBase {
 
 	public Level getLevel() {
 		return level;
+	}
+	
+	public double getVerdictPriority() {
+		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
+		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
 	}
 	
 	@Override
