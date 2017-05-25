@@ -2,7 +2,10 @@ LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib Msim
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
-          /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.14393.0\um"
+		  # vcvarsall.bat adds the Windows SDK directories to the INCLUDE environment variable,
+		  # which is automatically used by the compiler.
+		  # So it is not necessary to manually specify the path here.
+		  # /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.14393.0\um"
 
 
 DLLFILE="..\target\resources\main\windows.dll"

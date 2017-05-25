@@ -21,7 +21,17 @@ task buildWindows(type:Exec) {
     }
 }
 
+task cleanWindows(type:Exec) {
+    if( System.getProperty('os.name').toLowerCase().contains('windows')) {
+        workingDir 'native_src'
+        commandLine 'cmd', '/c', 'clean_w10.bat'
+    } else  {
+        commandLine './dummy.sh'
+    }
+}
+
 buildWindows.dependsOn processResources
 
 build.dependsOn buildWindows
+clean.dependsOn cleanWindows
 
