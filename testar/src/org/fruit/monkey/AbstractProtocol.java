@@ -1084,8 +1084,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
 
+			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
-			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", "")).intValue();
+			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
 			// begin by urueda
 
 			sutRAMbase = Double.MAX_VALUE; sutRAMpeak = 0.0; sutCPUpeak = 0.0; testRAMpeak = 0.0; testCPUpeak = 0.0;
@@ -1106,8 +1107,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				setMode(Modes.Spy);
 			jipWrapper = new JIPrologWrapper();
 			Grapher.grapher(generatedSequence,
-							settings.get(ConfigTags.SequenceLength).intValue(),
-							settings.get(ConfigTags.AlgorithmFormsFilling).booleanValue(),
+							settings.get(ConfigTags.SequenceLength),
+							settings.get(ConfigTags.AlgorithmFormsFilling),
 							settings.get(ConfigTags.TestGenerator),
 							settings.get(ConfigTags.MaxReward),
 							settings.get(ConfigTags.Discount),
@@ -1418,10 +1419,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				ps.print(metrics);
 				ps.close();
 				System.out.println(heading + "\n" + metrics);
-			} catch (NoSuchTagException e) {
+			} catch (NoSuchTagException | FileNotFoundException e) {
 				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-			} catch (FileNotFoundException e) {
-				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			//} catch (FileNotFoundException e) {
+			//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
 			}
 		}
 	}

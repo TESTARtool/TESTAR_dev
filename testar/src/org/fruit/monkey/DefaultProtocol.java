@@ -200,10 +200,10 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	// by urueda
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
-		Assert.hasText(processName);;
+		Assert.hasText(processName);
 		List<SUT> suts = null;
 		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
+		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
 		do{
 			Util.pauseMs(100);
 			suts = NativeLinker.getNativeProcesses();
