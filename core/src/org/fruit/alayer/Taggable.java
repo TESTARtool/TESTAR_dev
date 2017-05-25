@@ -81,4 +81,6 @@ public interface Taggable {
      * @param tag tag to remove
      */
     void remove(Tag<?> tag);
+
+    //String getJSON();
 }
