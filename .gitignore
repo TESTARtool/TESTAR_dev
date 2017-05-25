@@ -1,12 +1,8 @@
 .idea
 .gradle/
-<<<<<<< HEAD
-target
-
-=======
 bin/
 target/
 *.obj
 /windows/native_src/windows.h
->>>>>>> refs/remotes/origin/master
+
 
