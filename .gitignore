@@ -4,5 +4,4 @@ bin/
 target/
 *.obj
 /windows/native_src/windows.h
-/windows/native_src/clean_w10.bat
-/windows/native_src/compile_w10.bat
+
