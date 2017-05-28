@@ -1330,7 +1330,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
-		double sev = verdict.severity();
+		final double sev = verdict.severity();
 		if (sev == Verdict.SEVERITY_OK)
 			targetFolder = "sequences_ok";
 		else if (sev ==  Verdict.SEVERITY_WARNING)

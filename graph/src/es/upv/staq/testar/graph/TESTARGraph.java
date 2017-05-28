@@ -130,8 +130,13 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 			return this.graphStates.values();
 		}
 	}
-	
-	public boolean addVertex(IEnvironment env, IGraphState v){
+
+   /**
+    * Add Vertex to the graph and update LongestPath.
+    * @param v Vertex to add.
+    * @return
+    */
+	public boolean addVertex(IGraphState v){
 		updateLongestPath(v);
 		synchronized(vertexSem){
 			if (this.graphStates.containsKey(v.getConcreteID())){

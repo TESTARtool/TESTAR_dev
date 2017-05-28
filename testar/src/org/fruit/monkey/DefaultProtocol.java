@@ -394,7 +394,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		Set<Widget> topWidgets = new HashSet<Widget>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state){
-			if (w.get(Tags.ZIndex).doubleValue() == maxZIndex)
+			if (w.get(Tags.ZIndex) == maxZIndex)
 				topWidgets.add(w);
 		}
 		return topWidgets;
