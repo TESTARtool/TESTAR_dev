@@ -1,0 +1,46 @@
+package org.fruit.alayer;
+
+import static org.junit.Assert.*;
+
+import org.fruit.Util;
+import org.junit.Test;
+
+public class VerdictTest {
+	
+	private final double DELTA = 0;
+	
+	private final Visualizer dummyVisualizer = new Visualizer(){
+		private static final long serialVersionUID = -7830649624698071090L;
+		public void run(State s, Canvas c, Pen pen) {}	
+	};
+
+	@Test
+	public void testToString() {
+		Verdict v = new Verdict(0.0, "This is a test verdict");
+		assertEquals("The string representation of a Verdict shall include its severity and its info",
+				v.toString(), "severity: 0.0 info: This is a test verdict");
+	}
+
+	@Test
+	public void testJoin() {
+		Verdict v1 = new Verdict(Verdict.SEVERITY_OK, "Foo Bar"),
+				v2 = new Verdict(Verdict.SEVERITY_MAX, "Bar"),
+				v3 = new Verdict(Verdict.SEVERITY_MIN, "Baz", dummyVisualizer);
+		assertTrue("Joining two Verdicts shall create a new Verdict",
+				v1 != v1.join(v2));
+		assertEquals("Joining two Verdicts shall set the severity to the maximum of both",
+				v3.join(v2).severity(), Verdict.SEVERITY_MAX, DELTA);
+		assertEquals("If a Verdict's info contains the info of the Verdict to be joined with, " +
+				"then only the containing info shall be used",
+				v1.join(v2).info(), "Foo Bar");
+		assertEquals("If a Verdict is OK and its info does not contain the info of the Verdict to be joined with, " +
+				"then the containing info shall be discarded",
+				v1.join(v3).info(), "Baz");
+		assertEquals("If a Verdict is not OK and its info does not contain the info of the Verdict to be joined with, " +
+				"then both infos shall be included separated by a line break",
+				v2.join(v3).info(), "Bar\nBaz");
+		assertTrue("Joining two Verdicts shall reset the Visualizer to the NullVisualizer",
+				v3.join(v1).visualizer() == Util.NullVisualizer);
+	}
+
+}

@@ -46,24 +46,16 @@ public final class Verdict implements Serializable {
 	public static final double SEVERITY_MIN = 0.0;
 	public static final double SEVERITY_MAX = 1.0;
 	
-	// PASS
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
-	public static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
-	// FAIL
-	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
 	
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
-	public static final Verdict FAIL = new Verdict(SEVERITY_MAX, "SUT failed.", Util.NullVisualizer);
+	public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
 	
 	// end by urueda
 		
-	//private final String info;
-	private String info; // by urueda (enable joins)
-	//private final double severity;
-	private double severity; // by urueda (enable joins)
+	private final String info;
+	private final double severity;
 	private final Visualizer visualizer;
 	
 	public Verdict(double severity, String info){
@@ -98,12 +90,13 @@ public final class Verdict implements Serializable {
 	 * @return the visualizer which is guaranteed to be non-null
 	 */
 	public Visualizer visualizer(){ return visualizer; }
+	
 	public String toString(){ return "severity: " + severity + " info: " + info; }
 	
 	/**
 	 * Retrieves the verdict result of joining two verdicts.
 	 * @param verdict A verdict to join with current verdict.
-	 * @return The joined verdict.
+	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 * @author: urueda
 	 */
 	public Verdict join(Verdict verdict){		

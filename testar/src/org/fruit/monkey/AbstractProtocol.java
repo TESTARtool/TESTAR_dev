@@ -140,6 +140,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	// begin by urueda
 	
+	// Verdict severities
+	// PASS
+	protected static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	protected static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
+	// FAIL
+	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
+	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
+	
 	protected double passSeverity = Verdict.SEVERITY_OK;
 	private int generatedSequenceNumber = -1;
 	private Object[] userEvent = null;
@@ -149,17 +157,17 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected EventHandler eventHandler;
 	protected Canvas cv;
 	protected JIPrologWrapper jipWrapper;
-    private double delay = Double.MIN_VALUE;
-    private final static double SLOW_MOTION = 2.0;
+	private double delay = Double.MIN_VALUE;
+	private final static double SLOW_MOTION = 2.0;
     
-    protected String forceKillProcess = null;
-    protected boolean forceToForeground = false,
-    				  forceNextActionESC = false;
+	protected String forceKillProcess = null;
+	protected boolean forceToForeground = false,
+			forceNextActionESC = false;
     
-    private boolean forceToSequenceLengthAfterFail = false;
-    private int testFailTimes = 0;
+	private boolean forceToSequenceLengthAfterFail = false;
+	private int testFailTimes = 0;
     
-    protected boolean nonSuitableAction = false;
+	protected boolean nonSuitableAction = false;
     
 	protected class ProcessInfo{
 		public SUT sut;
@@ -1332,13 +1340,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		double sev = verdict.severity();
 		if (sev == Verdict.SEVERITY_OK)
 			targetFolder = "sequences_ok";
-		else if (sev ==  Verdict.SEVERITY_WARNING)
+		else if (sev == SEVERITY_WARNING)
 			targetFolder = "sequences_warning";
-		else if (sev == Verdict.SEVERITY_SUSPICIOUS_TITLE)
+		else if (sev == SEVERITY_SUSPICIOUS_TITLE)
 			targetFolder = "sequences_suspicioustitle";
-		else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
+		else if (sev == SEVERITY_NOT_RESPONDING)
 			targetFolder = "sequences_unresponsive";
-		else if (sev == Verdict.SEVERITY_NOT_RUNNING)
+		else if (sev == SEVERITY_NOT_RUNNING)
 			targetFolder = "sequences_unexpectedclose";
 		else if (sev == Verdict.SEVERITY_FAIL)
 			targetFolder = "sequencces_fail";
