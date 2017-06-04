@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test to validate the storage of State objects
- * A State will be stored ones. Everytime the same state is stored a flag visited is updated.
+ * A State will be stored ones. Every time the same state is stored a flag visited is updated.
  * Created by florendegier on 03/06/2017.
  */
 public class OrientDBRepositoryTest {
