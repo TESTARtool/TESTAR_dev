@@ -67,20 +67,18 @@ public interface Taggable {
 	 * Returns an <code>Iterable</code> over all tags currently attached to this object.
 	 * @return Iterable over all attached tags
 	 */
-    Iterable<Tag<?>> tags();
+	Iterable<Tag<?>> tags();
     
-    /**
-     * Attach <code>tag</code> to this object and associate it with <code>value</code>
-     * @param tag tag to attach to this object
-     * @param value the value to associate with <code>tag</code>
-     */
-    <T> void set(Tag<T> tag, T value);
+	/**
+	 * Attach <code>tag</code> to this object and associate it with <code>value</code>
+	 * @param tag tag to attach to this object
+	 * @param value the value to associate with <code>tag</code>
+	 */
+	<T> void set(Tag<T> tag, T value);
     
-    /**
-     * Removes <code>tag</code> and its value from this object
-     * @param tag tag to remove
-     */
-    void remove(Tag<?> tag);
-
-    //String getJSON();
+	/**
+	 * Removes <code>tag</code> and its value from this object
+	 * @param tag tag to remove
+	 */
+	void remove(Tag<?> tag);
 }

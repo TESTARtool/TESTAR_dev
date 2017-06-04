@@ -18,7 +18,7 @@ OBJFILES= main_w10.obj\
 HPPFILES= windows.h\
 
 
-CPPFLAGS= /EHsc /O2 /MD
+CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
 
 
 all: windows.h $(DLLFILE)
