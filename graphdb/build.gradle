@@ -1,5 +1,5 @@
 
 dependencies {
     compile project(':core')
-    compile group: 'com.orientechnologies', name: 'orientdb-client', version: '2.2.15'
+    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '2.2.15'
 }
