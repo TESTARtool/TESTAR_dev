@@ -3,7 +3,7 @@ package org.fruit.monkey;
 import javax.swing.*;
 
 /**
- * Panel with settings for graph database.
+ * Panel with settings for the graph database.
  * Created by floren on 5-6-2017.
  */
 class GraphDBPanel extends JPanel {

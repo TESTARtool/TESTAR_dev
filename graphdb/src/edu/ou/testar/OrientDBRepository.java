@@ -54,7 +54,7 @@ public class OrientDBRepository {
      */
     private void createStateVertex(final State state, final OrientGraph graph){
         Vertex vertex = graph.addVertex("class:State");
-        state.tags().forEach(t -> vertex.setProperty(t.name(), state.get(t)));
+        state.tags().forEach(t -> vertex.setProperty(t.name().replace(',', '_'), state.get(t)));
         vertex.setProperty("visited", 1);
     }
 

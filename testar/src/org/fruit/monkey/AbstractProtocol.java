@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
+import edu.ou.testar.GraphDB;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -166,6 +167,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
     
 	private boolean forceToSequenceLengthAfterFail = false;
 	private int testFailTimes = 0;
+
+	private GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
     
@@ -1082,7 +1085,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// by urueda (refactor run() method)
-	private void runTest(){		
+	private void runTest(){
 		// begin by urueda
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
@@ -1194,6 +1197,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				beginSequence();
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
+				graphDB.addState(state);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 	
@@ -1231,6 +1235,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						// end by urueda
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 						state = getState(system);
+						graphDB.addState(state);
 						if (faultySequence) problems = true; // by urueda
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){ // by urueda
@@ -1441,6 +1446,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		mode = settings.get(ConfigTags.Mode);
 		initialize(settings);
 		eventHandler = new EventHandler(this); // by urueda
+
+		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+				settings.get(ConfigTags.GraphDBUrl),
+				settings.get(ConfigTags.GraphDBUser),
+				settings.get(ConfigTags.GraphDBPassword));
 		
 		try {
 			LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
