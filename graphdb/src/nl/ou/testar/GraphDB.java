@@ -1,6 +1,5 @@
-package edu.ou.testar;
+package nl.ou.testar;
 
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;

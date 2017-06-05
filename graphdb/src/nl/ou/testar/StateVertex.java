@@ -1,4 +1,4 @@
-package edu.ou.testar;
+package nl.ou.testar;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;

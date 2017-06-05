@@ -1,4 +1,4 @@
-package edu.ou.testar;
+package nl.ou.testar;
 
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
@@ -54,7 +54,9 @@ public class OrientDBRepository {
      */
     private void createStateVertex(final State state, final OrientGraph graph){
         Vertex vertex = graph.addVertex("class:State");
-        state.tags().forEach(t -> vertex.setProperty(t.name().replace(',', '_'), state.get(t)));
+        state.tags().forEach(t -> vertex.setProperty(
+                t.name().replace(',', '_'),
+                state.get(t).toString()));
         vertex.setProperty("visited", 1);
     }
 

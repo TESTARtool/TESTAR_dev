@@ -60,7 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import edu.ou.testar.GraphDB;
+import nl.ou.testar.GraphDB;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;

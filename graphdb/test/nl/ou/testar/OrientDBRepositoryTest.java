@@ -1,4 +1,4 @@
-package edu.ou.testar;
+package nl.ou.testar;
 
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
