@@ -12,6 +12,7 @@ dependencies {
     compile project(':core')
     compile project(':native')
     compile project(':graph')
+    compile project(':graphdb')
     compile files('./lib/jsyntaxpane-0.9.5-b29.jar')
     compile files('./lib/JNativeHook.jar')
     runtime project(':windows')
