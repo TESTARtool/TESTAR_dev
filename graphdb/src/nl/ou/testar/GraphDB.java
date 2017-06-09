@@ -1,6 +1,6 @@
 package nl.ou.testar;
 
-import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
@@ -14,28 +14,43 @@ import javax.naming.OperationNotSupportedException;
 public class GraphDB {
 
 
-    private boolean enabled;
-    private OrientDBRepository repository;
+    private final boolean enabled;
+    private GraphDBRepository repository;
 
     public GraphDB(final boolean enabled, final String url, final String userName, final String password) {
         this.enabled = enabled;
-        OrientGraphFactory factory = new OrientGraphFactory(url,userName,"orientdb");
-        repository = new OrientDBRepository(factory);
+        repository = new OrientDBRepository(url,userName,"orientdb");
     }
 
-
+    /**
+     * Store the State in the graph database.
+     * @param state state to store.
+     */
     public void addState(final State state) {
         if(enabled) {
             repository.addState(state);
         }
     }
 
-    public void addWidget(final Widget widget) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Function is not implemented yet");
+
+    /**
+     * Store an action in the graph database.
+     * @param fromStateId state on which the action will be applied
+     * @param action the action performed
+     * @param toStateId the new state.
+     */
+    public void addAction(final String fromStateId, final Action action, final String toStateId) {
+        if(enabled) {
+            repository.addAction(fromStateId, action, toStateId);
+        }
     }
 
-    public void addAction(final Action action) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Function is not implemented yet");
+    /**
+     * Setter only used in test.
+     * @param repo Mock repository
+     */
+    void setRepository(GraphDBRepository repo) {
+        repository = repo;
     }
 
 }
