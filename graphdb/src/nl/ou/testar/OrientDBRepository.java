@@ -67,6 +67,7 @@ class OrientDBRepository implements GraphDBRepository {
                 throw new GraphDBException("toState not found in database");
             }
             createActionEdge(vertexFrom, action, vertexTo, graph);
+            graph.commit();
         } finally {
             graph.shutdown();
         }
@@ -77,15 +78,20 @@ class OrientDBRepository implements GraphDBRepository {
     @Override
     public void addWidget(String stateID, Widget w) {
         OrientGraph graph = graphFactory.getTx();
-        Vertex state = getStateVertex(stateID, graph);
-        if (state == null) {
-            throw new GraphDBException("state not found in database");
-        }
-        Vertex widget = getWidgetVertex(w.get(Tags.ConcreteID),graph);
-        if(widget == null) {
-            createWidgetVertex(stateID, w,graph);
-        } else {
-            //nothing for now
+        try {
+            Vertex state = getStateVertex(stateID, graph);
+            if (state == null) {
+                throw new GraphDBException("state not found in database");
+            }
+            Vertex widget = getWidgetVertex(w.get(Tags.ConcreteID), graph);
+            if (widget == null) {
+                createWidgetVertex(stateID, w, graph);
+            } else {
+                //nothing for now
+            }
+            graph.commit();
+        } finally {
+            graph.shutdown();
         }
     }
 
