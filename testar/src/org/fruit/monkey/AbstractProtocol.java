@@ -1061,6 +1061,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 		
 		lastExecutedAction = actionStatus.getAction(); // by urueda
+
+		State newState = getState(system);
+		graphDB.addState(newState);
+		//TODO fix
+		graphDB.addAction(lastExecutedAction.get(Tags.TargetID),lastExecutedAction,newState.get(Tags.ConcreteID));
 		
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
@@ -1197,6 +1202,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				beginSequence();
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
+				//Store ( initial )state
 				graphDB.addState(state);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
@@ -1622,6 +1628,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
 		Grapher.PROLOG_ACTIVATED = prologActivated;
 		// end by urueda		
+	}
+
+	protected void storeWidget(String stateID, Widget widget) {
+		graphDB.addWidget(stateID, widget);
 	}
 	
 	// by urueda

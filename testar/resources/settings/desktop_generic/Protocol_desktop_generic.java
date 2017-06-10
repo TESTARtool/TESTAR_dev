@@ -196,15 +196,17 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 						
 						// left clicks
 						if(whiteListed(w) || isClickable(w))
+							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.leftClickAt(w));
 		
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w))
+							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 
 						// slides
 						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
-					
+
 					}
 				}
 			}			

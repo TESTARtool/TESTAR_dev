@@ -33,6 +33,12 @@ public class GraphDB {
     }
 
 
+    public void addWidget(final String statedID, final Widget widget) {
+        if(enabled) {
+            repository.addWidget(statedID,widget);
+        }
+    }
+
     /**
      * Store an action in the graph database.
      * @param fromStateId state on which the action will be applied

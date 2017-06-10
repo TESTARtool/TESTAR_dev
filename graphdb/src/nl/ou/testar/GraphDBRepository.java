@@ -2,6 +2,7 @@ package nl.ou.testar;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Widget;
 
 /**
  * Repository API
@@ -24,4 +25,6 @@ public interface GraphDBRepository {
      * @param toStateID   ConcreteID of the new State
      */
     void addAction(final String fromStateID, final Action action, final String toStateID);
+
+    void addWidget(final String stateID, Widget w);
 }

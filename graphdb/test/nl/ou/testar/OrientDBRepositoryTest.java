@@ -2,11 +2,8 @@ package nl.ou.testar;
 
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StdState;
-import org.fruit.alayer.Action;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.Tags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,15 +78,21 @@ public class OrientDBRepositoryTest {
 
         Action action  = new NOP();
         action.set(Tags.ConcreteID,"0xDAAD");
+        action.set(Tags.TargetID,"0xDADA");
+        action.set(Tags.Desc,"test");
         State  from = new StdState();
         from.set(Tags.ConcreteID, "0xDEAD");
         State  to = new StdState();
         to.set(Tags.ConcreteID, "0xCAFE");
 
+        Widget widget = new StdWidget();
+        widget.set(Tags.ConcreteID,"0xDADA");
+
         sut.addState(from);
+        sut.addWidget("0xDEAD",widget);
         sut.addState(to);
 
-        sut.addAction("0xDEAD",action,"0xCAFE");
+        sut.addAction("0xDADA",action,"0xCAFE");
 
     }
 
@@ -97,7 +100,9 @@ public class OrientDBRepositoryTest {
     public void testAddActionWithMissingFromState() {
         try {
             Action action  = new NOP();
+            action.set(Tags.Desc,"test");
             action.set(Tags.ConcreteID,"0xDAAD");
+            action.set(Tags.TargetID,"0xCAFE");
             State  to = new StdState();
             to.set(Tags.ConcreteID, "0xCAFE");
 
@@ -114,7 +119,9 @@ public class OrientDBRepositoryTest {
     public void testAddActionWithMissingToState() {
         try {
             Action action  = new NOP();
+            action.set(Tags.Desc,"test");
             action.set(Tags.ConcreteID,"0xDAAD");
+            action.set(Tags.TargetID,"0xCAFE");
             State  from = new StdState();
             from.set(Tags.ConcreteID, "0xCAFE");
 
