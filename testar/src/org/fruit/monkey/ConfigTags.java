@@ -102,9 +102,9 @@ public final class ConfigTags {
     // end by urueda
 
     // begin by florendegier
-    static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
-    static final Tag<String>  GraphDBUrl = Tag.from("GraphDBUrl", String.class);
-    static final Tag<String>  GraphDBUser = Tag.from("GraphDBUser", String.class);
-    static final Tag<String>  GraphDBPassword = Tag.from("GraphDBPassword",String.class);
+    public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
+    public static final Tag<String>  GraphDBUrl = Tag.from("GraphDBUrl", String.class);
+    public static final Tag<String>  GraphDBUser = Tag.from("GraphDBUser", String.class);
+    public static final Tag<String>  GraphDBPassword = Tag.from("GraphDBPassword",String.class);
 
 }

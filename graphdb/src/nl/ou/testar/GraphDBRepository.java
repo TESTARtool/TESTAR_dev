@@ -18,13 +18,27 @@ public interface GraphDBRepository {
     void addState(final State state);
 
     /**
-     * Add Action to the graph database as Edge
+     * Add Action on a widget to the graph database as Edge
      *
-     * @param fromStateID ConcreteID of the original State
      * @param action      The performed action
      * @param toStateID   ConcreteID of the new State
      */
-    void addAction(final String fromStateID, final Action action, final String toStateID);
+    void addAction( final Action action, final String toStateID);
 
+    /**
+     * Add Action on a State to the graph database as Edge
+     *
+     * @param stateId id of the state on which the action is performed.
+     * @param action the action.
+     * @param toStateID the resulting state
+     */
+    void addActionOnState(final String stateId, final Action action, final String toStateID);
+
+
+    /**
+     * Add a widget to the datamodel.
+     * @param stateID State to which the widget belongs
+     * @param w The widget object
+     */
     void addWidget(final String stateID, Widget w);
 }

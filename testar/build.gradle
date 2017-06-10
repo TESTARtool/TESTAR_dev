@@ -20,6 +20,7 @@ dependencies {
     runtime files('../graph/lib/jgrapht-jdk1.6.jar')
     runtime files('../graph/lib/com.alexmerz.graphviz.jar')
     runtime files('../graph/lib/json-simple-1.1.1.jar')
+    //runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
 
 task prepareSettings(type: Copy) {

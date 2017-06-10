@@ -31,7 +31,7 @@ In order to use the graphdb feature. A database must be created in orientdb
 
 After starting Testar, it's required to configure the database settings in the tab "GraphDB".
 - url : remote:<hostname>/&lt;database name>
-- user: root
-- password: The value of this field is not important right now.
+- user: admin
+- password: admin
 - Check the checkbox.
 

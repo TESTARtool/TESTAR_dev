@@ -1,8 +1,6 @@
 package nl.ou.testar;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StdState;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.NOP;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,8 +39,10 @@ public class GraphDBTest {
     public void addActionOnEnabledRepository()  {
         GraphDB sut =create(true);
         Action action = new NOP();
-        sut.addAction("",action,"");
-        Mockito.verify(repository,Mockito.times(1)).addAction("",
+        sut.addAction(action,"");
+        sut.addActionOnState("",action,"");
+        Mockito.verify(repository,Mockito.times(1)).addAction(action,"");
+        Mockito.verify(repository,Mockito.times(1)).addActionOnState("",
                 action,"");
     }
 
@@ -50,9 +50,29 @@ public class GraphDBTest {
     public void addActionOnDisabledRepository()  {
         GraphDB sut =create(false);
         Action action = new NOP();
-        sut.addAction("",action,"");
-        Mockito.verify(repository,Mockito.times(0)).addAction("",
+        sut.addAction(action,"");
+        sut.addActionOnState("",action,"");
+        Mockito.verify(repository,Mockito.times(0)).addAction(action,"");
+        Mockito.verify(repository,Mockito.times(0)).addActionOnState("",
                 action,"");
+    }
+
+    @Test
+    public void addWidgetOnEnabledRepository()  {
+        GraphDB sut =create(true);
+        Widget widget = new StdWidget();
+        sut.addWidget("",widget);
+        Mockito.verify(repository,Mockito.times(1)).addWidget("",
+                widget);
+    }
+
+    @Test
+    public void addWidgetOnDisabledRepository()  {
+        GraphDB sut =create(false);
+        Widget widget = new StdWidget();
+        sut.addWidget("",widget);
+        Mockito.verify(repository,Mockito.times(0)).addWidget("",
+                widget);
     }
 
     private GraphDB create(boolean isEnabled) {

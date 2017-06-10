@@ -35,30 +35,54 @@ class OrientDBRepository implements GraphDBRepository {
     public void addState(final State state) {
         LOGGER.info("Store state {}", state.get(Tags.ConcreteID));
         OrientGraph graph = graphFactory.getTx();
-        try {
-            Vertex v = getStateVertex(state.get(Tags.ConcreteID), graph);
-            if (v == null) {
-                createStateVertex(state, graph);
-            } else {
-                int i = v.getProperty("visited");
-                v.setProperty("visited", i + 1);
-            }
-            graph.commit();
-        } finally {
-            graph.shutdown();
+
+        Vertex v = getStateVertex(state.get(Tags.ConcreteID), graph);
+        if (v == null) {
+            createStateVertex(state, graph);
+        } else {
+            int i = v.getProperty("visited");
+            v.setProperty("visited", i + 1);
         }
+        graph.commit();
+
+        graph.shutdown();
+
         LOGGER.info("state {} stored", state.get(Tags.ConcreteID));
     }
 
     @Override
-    public void addAction(final String fromStateID, final Action action, final String toStateID) {
+    public void addAction(final Action action, final String toStateID) {
 
-        LOGGER.info("Store Action {} from {} to {}",
-                action.get(Tags.ConcreteID), action.get(Tags.TargetID), toStateID);
+        LOGGER.info("Store Action {} ({}) from {} to {}",
+                action.get(Tags.ConcreteID), action.get(Tags.Desc), action.get(Tags.TargetID), toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
             Vertex vertexFrom = getWidgetVertex(action.get(Tags.TargetID), graph);
+            if (vertexFrom == null) {
+                throw new GraphDBException("Wiget not found " + action.get(Tags.TargetID));
+            }
+            Vertex vertexTo = getStateVertex(toStateID, graph);
+            if (vertexTo == null) {
+                throw new GraphDBException("toState not found in database");
+            }
+            createActionEdge(vertexFrom, action, vertexTo, graph);
+            graph.commit();
+        } finally {
+            graph.shutdown();
+        }
+
+        LOGGER.info("Action {} stored", action.get(Tags.ConcreteID));
+    }
+
+    @Override
+    public void addActionOnState(String stateId, Action action, String toStateID) {
+        LOGGER.info("Store Action {} ({}) from {} to {}",
+                action.get(Tags.ConcreteID), action.get(Tags.Desc), stateId, toStateID);
+
+        OrientGraph graph = graphFactory.getTx();
+        try {
+            Vertex vertexFrom = getStateVertex(stateId, graph);
             if (vertexFrom == null) {
                 throw new GraphDBException("fromState not found in database");
             }
@@ -77,6 +101,7 @@ class OrientDBRepository implements GraphDBRepository {
 
     @Override
     public void addWidget(String stateID, Widget w) {
+        LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc), w.get(Tags.ConcreteID), stateID);
         OrientGraph graph = graphFactory.getTx();
         try {
             Vertex state = getStateVertex(stateID, graph);
@@ -93,6 +118,8 @@ class OrientDBRepository implements GraphDBRepository {
         } finally {
             graph.shutdown();
         }
+        LOGGER.error("Widget {} stored ", w.get(Tags.ConcreteID));
+
     }
 
     /**
@@ -109,16 +136,14 @@ class OrientDBRepository implements GraphDBRepository {
         vertex.setProperty("visited", 1);
     }
 
-    private void createWidgetVertex(final String stateId, final Widget w, final OrientGraph graph) {
+    private void createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
         Vertex vertex = graph.addVertex("class:Widget");
         w.tags().forEach(t -> vertex.setProperty(
                 t.name().replace(',', '_'),
                 w.get(t).toString()));
-        Vertex state = getStateVertex(stateId,graph);
-        if( state == null ) {
-            throw new GraphDBException("Could not find state for widget");
-        }
-        graph.addEdge(null,state ,vertex,"has");
+        Vertex state = getStateVertex(widgetId, graph);
+        Edge edge = graph.addEdge(null, state, vertex, "has");
+        LOGGER.info("Widget {} Vertex created and connected to state via Edge {} ", vertex.getId(), edge.getId());
     }
 
     /**
@@ -128,7 +153,7 @@ class OrientDBRepository implements GraphDBRepository {
      * @param graph     handle to the graph database
      * @return the vertex of for the State object or null if the state is not found.
      */
-    private Vertex getStateVertex(String concrteID,  OrientGraph graph) {
+    private Vertex getStateVertex(String concrteID, OrientGraph graph) {
         try {
             Iterable<Vertex> vertices = graph.getVertices("State." + Tags.ConcreteID, concrteID);
             Vertex vertex = vertices.iterator().next();

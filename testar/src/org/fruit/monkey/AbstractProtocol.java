@@ -1056,7 +1056,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				try {
 					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
 					protocolUtil.adhocTestServerWriter.flush();
-				} catch (Exception e) {} // AdhocTest client disconnected?
+				} catch (Exception e) {
+					LogSerialiser.log("protocolUtil Failed!\n");
+				} // AdhocTest client disconnected?
 			}				
 		}
 		
@@ -1064,9 +1066,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		State newState = getState(system);
 		graphDB.addState(newState);
-		//TODO fix
-		graphDB.addAction(lastExecutedAction.get(Tags.TargetID),lastExecutedAction,newState.get(Tags.ConcreteID));
-		
+
+		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
+			System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc));
+			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
+		} else {
+			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
+		}
+
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;

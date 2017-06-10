@@ -48,6 +48,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import nl.ou.testar.GraphDBPanel;
 import org.fruit.Pair;
 import org.fruit.Util;
 
