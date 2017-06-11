@@ -10,7 +10,7 @@ public class GuidelineTest {
 	public void testGetNr() {
 		Principle p = new Principle(1, "Foo");
 		AbstractGuideline g = new KeyboardAccessibleGuideline(2, p);
-		assertEquals(g.getNr(), "1.2");
+		assertEquals("1.2", g.getNr());
 	}
 
 }

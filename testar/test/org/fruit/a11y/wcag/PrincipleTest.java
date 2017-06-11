@@ -9,7 +9,7 @@ public class PrincipleTest {
 	@Test
 	public void testGetNr() {
 		Principle p = new Principle(1, "Foo");
-		assertEquals(p.getNr(), "1");
+		assertEquals("1", p.getNr());
 	}
 
 }
