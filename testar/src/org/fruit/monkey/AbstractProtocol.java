@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
+import nl.ou.testar.GraphDB;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -166,6 +167,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
     
 	private boolean forceToSequenceLengthAfterFail = false;
 	private int testFailTimes = 0;
+
+	private GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
     
@@ -1053,12 +1056,24 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				try {
 					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
 					protocolUtil.adhocTestServerWriter.flush();
-				} catch (Exception e) {} // AdhocTest client disconnected?
+				} catch (Exception e) {
+					LogSerialiser.log("protocolUtil Failed!\n");
+				} // AdhocTest client disconnected?
 			}				
 		}
 		
 		lastExecutedAction = actionStatus.getAction(); // by urueda
-		
+
+		State newState = getState(system);
+		graphDB.addState(newState);
+
+		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
+			System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc));
+			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
+		} else {
+			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
+		}
+
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1082,7 +1097,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// by urueda (refactor run() method)
-	private void runTest(){		
+	private void runTest(){
 		// begin by urueda
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
@@ -1092,8 +1107,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
 
+			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
-			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", "")).intValue();
+			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
 			// begin by urueda
 
 			sutRAMbase = Double.MAX_VALUE; sutRAMpeak = 0.0; sutCPUpeak = 0.0; testRAMpeak = 0.0; testCPUpeak = 0.0;
@@ -1114,8 +1130,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				setMode(Modes.Spy);
 			jipWrapper = new JIPrologWrapper();
 			Grapher.grapher(generatedSequence,
-							settings.get(ConfigTags.SequenceLength).intValue(),
-							settings.get(ConfigTags.AlgorithmFormsFilling).booleanValue(),
+							settings.get(ConfigTags.SequenceLength),
+							settings.get(ConfigTags.AlgorithmFormsFilling),
 							settings.get(ConfigTags.TestGenerator),
 							settings.get(ConfigTags.MaxReward),
 							settings.get(ConfigTags.Discount),
@@ -1193,6 +1209,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				beginSequence();
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
+				//Store ( initial )state
+				graphDB.addState(state);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 	
@@ -1230,6 +1248,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						// end by urueda
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 						state = getState(system);
+						graphDB.addState(state);
 						if (faultySequence) problems = true; // by urueda
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){ // by urueda
@@ -1337,7 +1356,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
-		double sev = verdict.severity();
+		final double sev = verdict.severity();
 		if (sev == Verdict.SEVERITY_OK)
 			targetFolder = "sequences_ok";
 		else if (sev == SEVERITY_WARNING)
@@ -1426,10 +1445,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				ps.print(metrics);
 				ps.close();
 				System.out.println(heading + "\n" + metrics);
-			} catch (NoSuchTagException e) {
+			} catch (NoSuchTagException | FileNotFoundException e) {
 				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-			} catch (FileNotFoundException e) {
-				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			//} catch (FileNotFoundException e) {
+			//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
 			}
 		}
 	}
@@ -1440,6 +1459,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		mode = settings.get(ConfigTags.Mode);
 		initialize(settings);
 		eventHandler = new EventHandler(this); // by urueda
+
+		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+				settings.get(ConfigTags.GraphDBUrl),
+				settings.get(ConfigTags.GraphDBUser),
+				settings.get(ConfigTags.GraphDBPassword));
 		
 		try {
 			LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
@@ -1611,6 +1635,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
 		Grapher.PROLOG_ACTIVATED = prologActivated;
 		// end by urueda		
+	}
+
+	protected void storeWidget(String stateID, Widget widget) {
+		graphDB.addWidget(stateID, widget);
 	}
 	
 	// by urueda

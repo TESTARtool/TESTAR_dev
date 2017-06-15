@@ -98,7 +98,7 @@ public final class WinProcess extends SUTBase {
 	
 	// by urueda
 	public static List<SUT> fromAll(){
-		List<WinProcHandle> processes = runningProcesses();;
+		List<WinProcHandle> processes = runningProcesses();
 		if (processes == null || processes.isEmpty())
 			return null;
 		List<SUT> suts = new ArrayList<SUT>();

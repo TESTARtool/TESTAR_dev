@@ -64,7 +64,7 @@ public class TESTAREnvironment implements IEnvironment {
 		this.explorationCurve = new ArrayList<int[]>();
 	}
 	
-	public TESTAREnvironment(TESTARGraph g){
+	private TESTAREnvironment(TESTARGraph g){
 		this.g = g;
 	}
 	
@@ -165,8 +165,8 @@ public class TESTAREnvironment implements IEnvironment {
 	@Override
 	public void populateEnvironment(IGraphState fromState, IGraphAction action, IGraphState toState) {
 		if (fromState.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY)) // is graph starting?
-			g.addVertex(this,fromState);
-		if (g.addVertex(this,toState))
+			g.addVertex(fromState);
+		if (g.addVertex(toState))
 			updateCluster(toState);
 		updateAvailableActions(toState);
 		if (g.addEdge(this, fromState, toState, action))
@@ -358,9 +358,9 @@ public class TESTAREnvironment implements IEnvironment {
 			populateEnvironment(lastState,lastAction,weState);
 		}
 		if (!this.stateAtGraph(weState))
-			g.addVertex(this, weState);
+			g.addVertex(weState);
 		IGraphState v = new GraphState(walkStatus ? Grapher.GRAPH_NODE_PASS : Grapher.GRAPH_NODE_FAIL);
-		g.addVertex(this, v);
+		g.addVertex(v);
 		g.addEdge(this, weState, v, new GraphAction(Grapher.GRAPH_ACTION_STOP));
 	}
 	

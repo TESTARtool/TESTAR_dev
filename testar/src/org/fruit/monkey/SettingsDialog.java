@@ -44,24 +44,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.imageio.ImageIO;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
+import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.ToolTipManager;
 
+import nl.ou.testar.GraphDBPanel;
 import org.fruit.Pair;
 import org.fruit.Util;
 
@@ -79,30 +66,27 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 	private static final long serialVersionUID = 5156320008281200950L;
 
-	public static final String TESTAR_VERSION = "v1.3";
+	static final String TESTAR_VERSION = "v1.3";
 
-	String settingsFile;
-	Settings settings, ret;
+	private String settingsFile;
+	private Settings settings, ret;
 
-	public SettingsDialog() throws IOException {
+	/**
+	 * Starts the settings Dialog.
+	 * @throws IOException when Icons cannot be found.
+	 */
+	SettingsDialog() throws IOException {
 		getContentPane().setBackground(Color.WHITE);
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					UIManager.setLookAndFeel(info.getClassName());
 					break;
 				}
 			}
-		} catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
 			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
-
 		//By: mimarmu1
 		this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
 
@@ -133,6 +117,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		return ret;
 	}
+
 
 	private Image loadIcon(String path) throws IOException{
 		return ImageIO.read(this.getClass().getResourceAsStream(path));
@@ -271,6 +256,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 			tblDelete.setValueAt(f, i, 0);
 			i++;
 		}
+		graphDBPanel.populateFrom(settings);
 	}
 
 	public void extractInformation(Settings settings){
@@ -318,6 +304,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 				delete.add(value); 
 		}
 		settings.set(ConfigTags.Delete, delete);
+		graphDBPanel.extractInformation(settings);
 	}
 
 
@@ -1067,6 +1054,11 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		jTabbedPane1.addTab("Misc", jPanelMisc);
 
+		graphDBPanel = GraphDBPanel.createGraphDBPanel();
+		jTabbedPane1.addTab("GraphDB",graphDBPanel);
+
+		//graphDBPanel.updateUI();
+
 		jTabbedPane1.setSelectedComponent(jPanelGeneral); // by urueda
 		
 		comboBoxProtocol = new JComboBox<String>();
@@ -1395,4 +1387,5 @@ public class SettingsDialog extends javax.swing.JFrame {
 	private JCheckBox offlineGraphConversionCheckBox;
 	private JComboBox<String> cboxSUTconnector;
 	private JComboBox<String> comboBoxProtocol;
+	private GraphDBPanel graphDBPanel;
 }

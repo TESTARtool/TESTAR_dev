@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fruit.Assert;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,7 +56,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
-public class TESTARGraph extends DirectedMultigraph<String, String> { // state concrete ID x action concrete ID
+public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state concrete ID x action concrete ID
 
 	private static final long serialVersionUID = -6766749840561297953L;
 	
@@ -129,8 +130,13 @@ public class TESTARGraph extends DirectedMultigraph<String, String> { // state c
 			return this.graphStates.values();
 		}
 	}
-	
-	public boolean addVertex(IEnvironment env, IGraphState v){
+
+   /**
+    * Add Vertex to the graph and update LongestPath.
+    * @param v Vertex to add.
+    * @return
+    */
+	public boolean addVertex(IGraphState v){
 		updateLongestPath(v);
 		synchronized(vertexSem){
 			if (this.graphStates.containsKey(v.getConcreteID())){
@@ -241,7 +247,7 @@ public class TESTARGraph extends DirectedMultigraph<String, String> { // state c
 					if (added)
 						this.graphActions.put(ga.getConcreteID(),ga);
 					return added;
-				} catch(Exception ex){
+				} catch(NullPointerException ex){
 					ex.printStackTrace();
 					return false;
 				}

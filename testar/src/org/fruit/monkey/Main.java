@@ -318,6 +318,10 @@ public class Main {
 			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
 			defaults.add(Pair.from(OfflineGraphConversion, true));
 			// end by urueda
+			defaults.add(Pair.from(GraphDBEnabled, false));
+			defaults.add(Pair.from(GraphDBUrl, ""));
+			defaults.add(Pair.from(GraphDBUser, ""));
+			defaults.add(Pair.from(GraphDBPassword, ""));
 			
 			return Settings.fromFile(defaults, file);
 		}catch(IOException ioe){
