@@ -200,10 +200,10 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	// by urueda
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
-		Assert.hasText(processName);;
+		Assert.hasText(processName);
 		List<SUT> suts = null;
 		long now = System.currentTimeMillis();
-		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
+		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
 		do{
 			Util.pauseMs(100);
 			suts = NativeLinker.getNativeProcesses();
@@ -394,7 +394,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		Set<Widget> topWidgets = new HashSet<Widget>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state){
-			if (w.get(Tags.ZIndex).doubleValue() == maxZIndex)
+			if (w.get(Tags.ZIndex) == maxZIndex)
 				topWidgets.add(w);
 		}
 		return topWidgets;
@@ -409,6 +409,7 @@ public class DefaultProtocol extends AbstractProtocol{
 					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
 				));
+				//storeWidget(state.get(Tags.ConcreteID), w);
 			}
 	    }
 	}

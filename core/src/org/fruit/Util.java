@@ -842,7 +842,7 @@ public final class Util {
 
 	public static <T> ArrayList<T> newArrayList(T...elements){
 		Assert.notNull(elements);
-		ArrayList<T> ret = new ArrayList<T>();
+		ArrayList<T> ret = new ArrayList<>();
 		for(T el : elements)
 			ret.add(el);
 		return ret;
