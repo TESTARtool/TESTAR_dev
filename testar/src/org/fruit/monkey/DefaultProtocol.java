@@ -409,7 +409,7 @@ public class DefaultProtocol extends AbstractProtocol{
 					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
 				));
-				//storeWidget(state.get(Tags.ConcreteID), w);
+				storeWidget(state.get(Tags.ConcreteID), w);
 			}
 	    }
 	}

@@ -18,7 +18,11 @@ close the dialog. The protocol .class is now available.
 
 ## GraphDb support
 This version of Testar supports the output of data to an orientdb database.
-Currently only the state in each step is exported. 
+Currently State, Widgets (as Vertex) and Actions (as Edges ) are stored.
+
+### OrientDb
+
+The current implementation contains a backend for orientdb
 
 ### Configuring graphdb
 In order to use the graphdb it's advised to install graphdb on your machine You can download the
