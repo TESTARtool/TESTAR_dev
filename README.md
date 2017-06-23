@@ -1,4 +1,4 @@
-r## README
+## README
 
 This is the github development root folder for TESTAR development. 
 The software can be build with both ant and gradle.
