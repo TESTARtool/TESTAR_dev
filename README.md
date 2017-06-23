@@ -11,6 +11,10 @@ To build the gradle project and run it execute the following procedure;
 2. change directory to testar/target/install/bin
 3. run testar.bat
 
+#### Running Gradle in Eclipse
+Om Gradle in Eclipse te gebruiken moet er 
+[eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html)
+
 ## Known issue
 - The protocol needs to be compiled. Therefor choose edit protocol, compile and
 close the dialog. The protocol .class is now available.
