@@ -7,3 +7,6 @@ target/
 compile_w10.bat
 clean_w10.bat
 *.iml
+.project
+*/.classpath
+.settings

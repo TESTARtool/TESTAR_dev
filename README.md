@@ -12,8 +12,18 @@ To build the gradle project and run it execute the following procedure;
 3. run testar.bat
 
 #### Running Gradle in Eclipse
-Om Gradle in Eclipse te gebruiken moet er 
-[eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html)
+To use Gradle within Eclipse the
+[eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html) is added to the root project. The following
+steps need to be performed to start development in Eclipse;
+1. Open a command prompt in the root of the project
+2. Execute gradle eclipse (this will generate the required Eclipse information)
+3. Open Eclipse and choose File -&gt; Import existing project into workspace
+4. Browse to the directory where the Testar souces are located and import the project
+5. Right-Click on the project -&gt; Select Configure -&gt; Add gradle nature.
+
+After these steps it is possible to execute gradle tasks. A separate view for Gradle is available.
+
+The procedure presented in this chapter requires the installation of the [buildship](https://projects.eclipse.org/projects/tools.buildship) plugin.
 
 ## Known issue
 - The protocol needs to be compiled. Therefor choose edit protocol, compile and
