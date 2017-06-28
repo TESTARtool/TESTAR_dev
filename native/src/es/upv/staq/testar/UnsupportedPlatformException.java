@@ -19,6 +19,8 @@ package es.upv.staq.testar;
 
 public class UnsupportedPlatformException extends RuntimeException {
 
+	private static final long serialVersionUID = -763558210570361617L;
+
 	public UnsupportedPlatformException() {
 		super();
 	}

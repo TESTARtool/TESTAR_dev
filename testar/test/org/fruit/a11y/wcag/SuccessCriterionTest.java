@@ -30,6 +30,7 @@ public class SuccessCriterionTest {
 		assertEquals("1.2.3 Bar (Level A)", s.toString());
 	}
 	
+	@SuppressWarnings("unused")
 	@Test
 	public void testGetVerdictPriority() {
 		if (PRIO_AAA < Verdict.SEVERITY_MIN || PRIO_A > Verdict.SEVERITY_MAX) {
