@@ -5,18 +5,18 @@ The software can be build with both ant and gradle.
 
 ### Gradle build
 
-To build the gradle project and run it execute the following procedure;
+To build the Gradle project and run it execute the following procedure;
 
-1. run gradle installDist in the root of the project
-2. change directory to testar/target/install/bin
-3. run testar.bat
+1. Run `gradlew installDist` in the root of the project
+2. Change directory to testar/target/install/bin
+3. Run testar.bat
 
 #### Running Gradle in Eclipse
 To use Gradle within Eclipse the
 [eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html) is added to the root project. The following
 steps need to be performed to start development in Eclipse;
 1. Open a command prompt in the root of the project
-2. Execute `gradle eclipse` (this will generate the required Eclipse information)
+2. Execute `gradlew eclipse` (this will generate the required Eclipse information)
 3. Open Eclipse (make sure the workspace folder is outside the project folder) and choose File -&gt; Import existing project into workspace
 4. Browse to the directory where the Testar souces are located and import the project
 5. Right-Click on the project -&gt; Select Configure -&gt; Add gradle nature.
