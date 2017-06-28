@@ -26,8 +26,7 @@ After these steps it is possible to execute gradle tasks. A separate view for Gr
 The procedure presented in this chapter requires the installation of the [buildship](https://projects.eclipse.org/projects/tools.buildship) plugin. This plugin comes pre-installed with Eclipse Neon.
 
 ## Known issue
-- The protocol needs to be compiled. Therefor choose edit protocol, compile and
-close the dialog. The protocol .class is now available.
+- The protocol needs to be compiled, see the issue report [here](https://github.com/florendg/testar_floren/issues/10). Therefor choose edit protocol, compile and close the dialog. The protocol .class is now available.
 - Testar hangs at the end of the execution.
 
 ## GraphDb support
