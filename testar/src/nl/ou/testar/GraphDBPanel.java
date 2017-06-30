@@ -11,7 +11,8 @@ import javax.swing.*;
  */
 public class GraphDBPanel extends JPanel {
 
-    private JCheckBox graphDBEnabledChkBox = new JCheckBox();
+	private static final long serialVersionUID = -2815422165938356237L;
+	private JCheckBox graphDBEnabledChkBox = new JCheckBox();
     private JLabel label1 = new JLabel("Enabled");
     private JLabel label2 = new JLabel("url");
     private JLabel label3 = new JLabel("username");
