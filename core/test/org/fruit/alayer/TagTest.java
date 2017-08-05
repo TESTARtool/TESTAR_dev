@@ -30,13 +30,13 @@ public class TagTest {
       assertNotNull("Tag should return a proper value", tag1);
 
       assertEquals("The name of the tag shall be identical to the provided name",
-         tag1.name(), "Boolean");
+         "Boolean", tag1.name());
 
 
       Tag<Boolean> tag2 = Tag.from("Boolean", Boolean.class);
       assertEquals("There should be one object", tag1, tag2);
 
-      assertEquals("Type should be a boolean", tag2.type(), Boolean.class);
+      assertEquals("Type should be a boolean", Boolean.class, tag2.type());
 
    }
 
