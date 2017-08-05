@@ -1,8 +1,12 @@
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import nl.ou.testar.a11y.wcag.AbstractGuideline;
+import nl.ou.testar.a11y.wcag.KeyboardAccessibleGuideline;
+import nl.ou.testar.a11y.wcag.Principle;
 
 public class GuidelineTest {
 

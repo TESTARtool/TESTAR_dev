@@ -15,34 +15,45 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
 /**
- * A WCAG guideline
+ * A WCAG success criterion
  * @author Davy Kager
  *
  */
-public class KeyboardAccessibleGuideline extends AbstractGuideline {
+public class SuccessCriterion extends ItemBase {
 	
-	private final SuccessCriterion scKeyboard;
+	protected final AbstractGuideline parent;
+	protected final Level level;
 	
-	KeyboardAccessibleGuideline(int nr, Principle parent) {
-		super(nr, "Keyboard Accessible", parent);
-		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
+	private static final int NLEVELS = Level.values().length;
+	
+	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
+		super(nr, name);
+		this.parent = parent;
+		this.level = level;
 	}
 	
-	protected Verdict getVerdict(State state) { return null; }
+	@Override
+	public String getNr() {
+		return parent.getNr() + "." + nr;
+	}
+
+	public Level getLevel() {
+		return level;
+	}
 	
-	protected Set<Action> deriveActions(State state) { return null; }
+	public double getVerdictPriority() {
+		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
+		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
+	}
+	
+	@Override
+	public String toString() {
+		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
+	}
 	
 }

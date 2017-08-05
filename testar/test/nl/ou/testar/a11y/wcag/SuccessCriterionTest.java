@@ -1,10 +1,16 @@
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
 import static org.junit.Assert.*;
 
 import org.fruit.alayer.Verdict;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import nl.ou.testar.a11y.wcag.AbstractGuideline;
+import nl.ou.testar.a11y.wcag.KeyboardAccessibleGuideline;
+import nl.ou.testar.a11y.wcag.Level;
+import nl.ou.testar.a11y.wcag.Principle;
+import nl.ou.testar.a11y.wcag.SuccessCriterion;
 
 public class SuccessCriterionTest {
 	

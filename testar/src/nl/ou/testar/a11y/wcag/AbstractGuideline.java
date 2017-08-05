@@ -15,31 +15,39 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import org.fruit.alayer.Action;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Verdict;
 
 /**
- * A WCAG principle
+ * An abstract WCAG guideline
+ * Subclasses implement specific guideline behavior.
  * @author Davy Kager
  *
  */
-public class Principle extends ItemBase {
+public abstract class AbstractGuideline extends ItemBase {
 	
-	private final List<AbstractGuideline> guidelines = new ArrayList<AbstractGuideline>();
+	protected final Principle parent;
 
-	Principle(int nr, String name) {
+	protected AbstractGuideline(int nr, String name, Principle parent) {
 		super(nr, name);
-	}
-
-	public List<AbstractGuideline> getGuidelines() {
-		return Collections.unmodifiableList(guidelines);
+		this.parent = parent;
 	}
 	
-	void addGuideline(AbstractGuideline guideline) {
-		guidelines.add(guideline);
+	@Override
+	public String getNr() {
+		return parent.getNr() + "." + nr;
 	}
-		
+	
+	protected abstract Verdict getVerdict(State state);
+	protected abstract Set<Action> deriveActions(State state);
+	
 }

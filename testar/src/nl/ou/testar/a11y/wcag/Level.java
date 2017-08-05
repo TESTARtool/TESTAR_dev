@@ -15,32 +15,15 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
-
-import org.fruit.Assert;
+package nl.ou.testar.a11y.wcag;
 
 /**
- * Base class for a WCAG item (principle, guideline, success criterion)
+ * WCAG success criterion conformance levels
  * @author Davy Kager
  *
  */
-abstract class ItemBase {
-	
-	protected final int nr;
-	protected final String name;
-	
-	protected ItemBase(int nr, String name) {
-		Assert.hasText(name);
-		this.nr = nr;
-		this.name = name;
-	}
-
-	public String getNr() {
-		return Integer.toString(nr);
-	}
-
-	public String getName() {
-		return name;
-	}
-	
+public enum Level {
+	A,
+	AA,
+	AAA;
 }

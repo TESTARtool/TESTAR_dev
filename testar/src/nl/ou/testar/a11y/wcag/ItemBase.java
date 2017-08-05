@@ -15,39 +15,32 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.fruit.Assert;
 
 /**
- * An abstract WCAG guideline
- * Subclasses implement specific guideline behavior.
+ * Base class for a WCAG item (principle, guideline, success criterion)
  * @author Davy Kager
  *
  */
-public abstract class AbstractGuideline extends ItemBase {
+abstract class ItemBase {
 	
-	protected final Principle parent;
+	protected final int nr;
+	protected final String name;
+	
+	protected ItemBase(int nr, String name) {
+		Assert.hasText(name);
+		this.nr = nr;
+		this.name = name;
+	}
 
-	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name);
-		this.parent = parent;
-	}
-	
-	@Override
 	public String getNr() {
-		return parent.getNr() + "." + nr;
+		return Integer.toString(nr);
 	}
-	
-	protected abstract Verdict getVerdict(State state);
-	protected abstract Set<Action> deriveActions(State state);
+
+	public String getName() {
+		return name;
+	}
 	
 }
