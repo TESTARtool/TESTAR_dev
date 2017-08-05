@@ -26,22 +26,18 @@ import org.fruit.alayer.Verdict;
  */
 public class SuccessCriterion extends ItemBase {
 	
-	protected final AbstractGuideline parent;
+	/**
+	 * The conformance level of this success criterion
+	 */
 	protected final Level level;
 	
 	private static final int NLEVELS = Level.values().length;
 	
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
-		super(nr, name);
-		this.parent = parent;
+		super(nr, name, parent);
 		this.level = level;
 	}
 	
-	@Override
-	public String getNr() {
-		return parent.getNr() + "." + nr;
-	}
-
 	public Level getLevel() {
 		return level;
 	}

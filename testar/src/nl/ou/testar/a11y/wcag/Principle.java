@@ -34,7 +34,7 @@ public class Principle extends ItemBase {
 		super(nr, name);
 	}
 
-	public List<AbstractGuideline> getGuidelines() {
+	List<AbstractGuideline> getGuidelines() {
 		return Collections.unmodifiableList(guidelines);
 	}
 	

@@ -23,7 +23,16 @@ package nl.ou.testar.a11y.wcag;
  *
  */
 public enum Level {
+	/**
+	 * Level A: minimum conformance / highest priority guidelines.
+	 */
 	A,
+	/**
+	 * Level AA: medium priority guidelines.
+	 */
 	AA,
+	/**
+	 * Level AAA: maximum conformance / lowest priority guidelines.
+	 */
 	AAA;
 }

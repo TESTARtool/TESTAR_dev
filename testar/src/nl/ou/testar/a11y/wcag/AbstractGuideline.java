@@ -35,16 +35,8 @@ import org.fruit.alayer.Verdict;
  */
 public abstract class AbstractGuideline extends ItemBase {
 	
-	protected final Principle parent;
-
 	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name);
-		this.parent = parent;
-	}
-	
-	@Override
-	public String getNr() {
-		return parent.getNr() + "." + nr;
+		super(nr, name, parent);
 	}
 	
 	protected abstract Verdict getVerdict(State state);

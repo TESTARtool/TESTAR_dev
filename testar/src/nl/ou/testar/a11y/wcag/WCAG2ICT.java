@@ -27,40 +27,48 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
-public final class WCAG2Dot0 {
+/**
+ * Specification of WCAG 2.0 according to WCAG2ICT
+ * @author Davy Kager
+ *
+ */
+public final class WCAG2ICT {
 	
 	private final List<Principle> principles = new ArrayList<Principle>();
 	
-	public WCAG2Dot0() {
+	/**
+	 * Constructs the WCAG 2.0 specification
+	 */
+	public WCAG2ICT() {
 		init();
 	}
 	
 	private void init() {
 		Principle p; AbstractGuideline g;
 		
-		// principle 1
+		// Principle 1: Perceivable
 		p = new Principle(1, "Perceivable");
 		principles.add(p);
 		
-		// principle 2
+		// Principle 2: Operable
 		p = new Principle(2, "Operable");
 		g = new KeyboardAccessibleGuideline(1, p);
 		p.addGuideline(g);
 		principles.add(p);
 		
-		// principle 3
+		// Principle 3: Understandable
 		p = new Principle(3, "Understandable");
 		principles.add(p);
 		
-		// principle 4
+		// Principle 4: Robust
 		p = new Principle(4, "Robust");
 		principles.add(p);
 	}
-
-	public List<Principle> getPrinciples() {
+	
+	List<Principle> getPrinciples() {
 		return principles;
 	}
-	
+
 	public List<Verdict> getVerdicts(State state) {
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		for (Principle p : getPrinciples())
