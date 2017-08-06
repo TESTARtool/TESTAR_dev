@@ -181,10 +181,6 @@ public class TreeWalkerTests {
             a.retrieveAccessibleInfoTree();
         }
 
-        if (applicationNodes == null) {
-
-        }
-
     }
 
 

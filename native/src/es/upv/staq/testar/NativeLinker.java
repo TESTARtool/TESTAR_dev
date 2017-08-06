@@ -66,7 +66,6 @@ import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcHandle;
 import org.fruit.alayer.windows.WinProcess;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import static org.fruit.alayer.linux.AtSpiRolesWrapper.*; // by wcoux
 
 /**
@@ -118,7 +117,7 @@ public class NativeLinker {
 			}
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new AtSpiStateBuilder(timeToFreeze);
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -136,7 +135,7 @@ public class NativeLinker {
 			return new GdkScreenCanvas();
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
 		}
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -157,7 +156,7 @@ public class NativeLinker {
 			}
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return LinuxProcess.fromExecutable(executableCommand);
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -170,7 +169,7 @@ public class NativeLinker {
 			return WinProcess.fromAll();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return LinuxProcess.fromAll();
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 	
 	public static SUT getNativeProcess(String processName){
@@ -178,7 +177,7 @@ public class NativeLinker {
 			return WinProcess.fromProcName(processName);		
 		//else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			// TODO
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 	
 	public static ProcessHandle getNativeProcessHandle(long processPID){
@@ -186,7 +185,7 @@ public class NativeLinker {
 			return new WinProcHandle(processPID);
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new LinuxProcessHandle(processPID);
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 	
 	/** Gets the memory usage for a SUT.
@@ -198,7 +197,7 @@ public class NativeLinker {
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 	
 	
@@ -219,7 +218,7 @@ public class NativeLinker {
 					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT)),
 					(long)(LinuxProcess.getCpuUsage((LinuxProcess)nativeSUT))};
 		}
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 	public static Collection<Role> getNativeRoles(){
@@ -227,7 +226,7 @@ public class NativeLinker {
 			return UIARoles.rolesSet();
 		// else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			// TODO
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 	
 	public static Role getNativeRole(String roleName){
@@ -259,7 +258,7 @@ public class NativeLinker {
 			return UIARoles.UIAWindow;
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiRolesWrapper.AtSpiWindow;
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -271,7 +270,7 @@ public class NativeLinker {
 			return UIARoles.UIAButton;
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiRolesWrapper.AtSpiPushButton;
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -283,7 +282,7 @@ public class NativeLinker {
 			return UIARoles.UIAMenuItem;
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiMenuItem;
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 	/**
@@ -295,7 +294,7 @@ public class NativeLinker {
 			return UIATags.tagSet();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiTags.tagSet();
-		throw new NotImplementedException();		
+		throw new UnsupportedPlatformException();		
 	}
 	
 	/**
@@ -344,7 +343,7 @@ public class NativeLinker {
 			AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
 			AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
 		}
-		throw new NotImplementedException();	
+		throw new UnsupportedPlatformException();	
 	}
 
 
@@ -358,7 +357,7 @@ public class NativeLinker {
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new Role[]{AtSpiPasswordText, AtSpiText, AtSpiDocumentText, AtSpiDocumentWeb,
 							  AtSpiDocumentEmail};
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 
@@ -372,7 +371,7 @@ public class NativeLinker {
 			return w.get(UIATags.UIAIsKeyboardFocusable);
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return w.get(AtSpiTags.AtSpiIsFocusable);
-		throw new NotImplementedException();
+		throw new UnsupportedPlatformException();
 	}
 
 }

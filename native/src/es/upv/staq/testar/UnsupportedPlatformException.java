@@ -1,6 +1,8 @@
+package es.upv.staq.testar;
+
 /*****************************************************************************************
  *                                                                                       *
- * COPYRIGHT (2017):                                                                     *
+ * COPYRIGHT (2015):                                                                     *
  * Universitat Politecnica de Valencia                                                   *
  * Camino de Vera, s/n                                                                   *
  * 46022 Valencia, Spain                                                                 *
@@ -10,37 +12,34 @@
  * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
  * in the context of the TESTAR Proof of Concept project:                                *
  *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
- * This sample is distributed FREE of charge under the TESTAR license, as an open        *
+ * This software is distributed FREE of charge under the TESTAR license, as an open        *
  * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+public class UnsupportedPlatformException extends RuntimeException {
 
-import org.fruit.Assert;
+	private static final long serialVersionUID = -763558210570361617L;
 
-/**
- * Base class for a WCAG item (principle, guideline, success criterion)
- * @author Davy Kager
- *
- */
-abstract class ItemBase {
-	
-	protected final int nr;
-	protected final String name;
-	
-	protected ItemBase(int nr, String name) {
-		Assert.hasText(name);
-		this.nr = nr;
-		this.name = name;
+	public UnsupportedPlatformException() {
+		super();
 	}
 
-	public String getNr() {
-		return Integer.toString(nr);
+	public UnsupportedPlatformException(String message) {
+		super(message);
 	}
 
-	public String getName() {
-		return name;
+	public UnsupportedPlatformException(Throwable cause) {
+		super(cause);
 	}
-	
+
+	public UnsupportedPlatformException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public UnsupportedPlatformException(String message, Throwable cause, boolean enableSuppression,
+			boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
 }

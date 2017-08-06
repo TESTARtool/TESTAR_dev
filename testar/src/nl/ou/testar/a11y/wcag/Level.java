@@ -15,31 +15,24 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package nl.ou.testar.a11y.wcag;
 
 /**
- * A WCAG principle
+ * WCAG success criterion conformance levels
  * @author Davy Kager
  *
  */
-public class Principle extends ItemBase {
-	
-	private final List<AbstractGuideline> guidelines = new ArrayList<AbstractGuideline>();
-
-	Principle(int nr, String name) {
-		super(nr, name);
-	}
-
-	public List<AbstractGuideline> getGuidelines() {
-		return Collections.unmodifiableList(guidelines);
-	}
-	
-	void addGuideline(AbstractGuideline guideline) {
-		guidelines.add(guideline);
-	}
-		
+public enum Level {
+	/**
+	 * Level A: minimum conformance / highest priority guidelines.
+	 */
+	A,
+	/**
+	 * Level AA: medium priority guidelines.
+	 */
+	AA,
+	/**
+	 * Level AAA: maximum conformance / lowest priority guidelines.
+	 */
+	AAA;
 }

@@ -15,34 +15,71 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.fruit.Assert;
 
 /**
- * A WCAG guideline
+ * Base class for a WCAG item (principle, guideline, success criterion)
  * @author Davy Kager
  *
  */
-public class KeyboardAccessibleGuideline extends AbstractGuideline {
+abstract class ItemBase {
 	
-	private final SuccessCriterion scKeyboard;
+	/**
+	 * This item's numbe
+	 */
+	protected final int nr;
 	
-	KeyboardAccessibleGuideline(int nr, Principle parent) {
-		super(nr, "Keyboard Accessible", parent);
-		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
+	/**
+	 * This item's name.
+	 */
+	protected final String name;
+	
+	/**
+	 * This item's parent
+	 * This can be null if the item has no parent.
+	 */
+	protected final ItemBase parent;
+	
+	/**
+	 * Constructs a new item
+	 * @param nr Item number
+	 * @param name Item name
+	 */
+	protected ItemBase(int nr, String name) {
+		this(nr, name, null);
 	}
 	
-	protected Verdict getVerdict(State state) { return null; }
-	
-	protected Set<Action> deriveActions(State state) { return null; }
+	/**
+	 * Constructs a new item
+	 * @param nr Item number
+	 * @param name Item name
+	 * @param parent The parent, may be null
+	 */
+	protected ItemBase(int nr, String name, ItemBase parent) {
+		Assert.hasText(name);
+		this.nr = nr;
+		this.name = name;
+		this.parent = parent;
+	}
+
+	/**
+	 * Gets the number
+	 * If the item is not at the top of the hierarchy, this will also include the parent's number.
+	 * For example: 1.2.3
+	 * @return This item's number as a String
+	 */
+	public String getNr() {
+		return parent == null ? Integer.toString(nr) : parent.getNr() + "." + nr;
+	}
+
+	/**
+	 * Gets the name
+	 * @return The name
+	 */
+	public String getName() {
+		return name;
+	}
 	
 }

@@ -15,39 +15,41 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
 /**
- * An abstract WCAG guideline
- * Subclasses implement specific guideline behavior.
+ * A WCAG success criterion
  * @author Davy Kager
  *
  */
-public abstract class AbstractGuideline extends ItemBase {
+public class SuccessCriterion extends ItemBase {
 	
-	protected final Principle parent;
-
-	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name);
-		this.parent = parent;
+	/**
+	 * The conformance level of this success criterion
+	 */
+	protected final Level level;
+	
+	private static final int NLEVELS = Level.values().length;
+	
+	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
+		super(nr, name, parent);
+		this.level = level;
+	}
+	
+	public Level getLevel() {
+		return level;
+	}
+	
+	public double getVerdictPriority() {
+		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
+		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
 	}
 	
 	@Override
-	public String getNr() {
-		return parent.getNr() + "." + nr;
+	public String toString() {
+		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
 	}
-	
-	protected abstract Verdict getVerdict(State state);
-	protected abstract Set<Action> deriveActions(State state);
 	
 }

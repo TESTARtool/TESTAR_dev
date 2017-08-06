@@ -15,7 +15,7 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,54 +27,19 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
-public final class WCAG2Dot0 {
+/**
+ * An abstract WCAG guideline
+ * Subclasses implement specific guideline behavior.
+ * @author Davy Kager
+ *
+ */
+public abstract class AbstractGuideline extends ItemBase {
 	
-	private final List<Principle> principles = new ArrayList<Principle>();
-	
-	public WCAG2Dot0() {
-		init();
+	protected AbstractGuideline(int nr, String name, Principle parent) {
+		super(nr, name, parent);
 	}
 	
-	private void init() {
-		Principle p; AbstractGuideline g;
-		
-		// principle 1
-		p = new Principle(1, "Perceivable");
-		principles.add(p);
-		
-		// principle 2
-		p = new Principle(2, "Operable");
-		g = new KeyboardAccessibleGuideline(1, p);
-		p.addGuideline(g);
-		principles.add(p);
-		
-		// principle 3
-		p = new Principle(3, "Understandable");
-		principles.add(p);
-		
-		// principle 4
-		p = new Principle(4, "Robust");
-		principles.add(p);
-	}
-
-	public List<Principle> getPrinciples() {
-		return principles;
-	}
-	
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<Verdict>();
-		for (Principle p : getPrinciples())
-			for (AbstractGuideline g : p.getGuidelines())
-				verdicts.add(g.getVerdict(state));
-		return verdicts;
-	}
-	
-	public Set<Action> deriveActions(State state) {
-		Set<Action> actions = Collections.emptySet();
-		for (Principle p : getPrinciples())
-			for (AbstractGuideline g : p.getGuidelines())
-				actions.addAll(g.deriveActions(state));
-		return actions;
-	}
+	protected abstract Verdict getVerdict(State state);
+	protected abstract Set<Action> deriveActions(State state);
 	
 }
