@@ -58,4 +58,12 @@ When Testar finishes, the data be inspected in the database. The easiest way to 
 graph is to type the following query in the graph tab "Select * From E". This will display the complete
 graph.
 
+### Exploring the graph database with Gremlin.
+
+[Gremlin](http://tinkerpop.apache.org/docs/current/reference/#_tinkerpop3) is a graph traversel engine which can be used 
+to query a graph database. OrientDB supports Gremlin and provides an implementation of the traversal engine in it's 
+community release.
+
+To start Gremlin run the following command.
+
 See the manuals of orientdb to learn about the possibilities to query the model.
