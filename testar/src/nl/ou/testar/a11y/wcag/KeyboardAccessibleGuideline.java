@@ -27,6 +27,8 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
+import nl.ou.testar.a11y.wcag.SuccessCriterion.Level;
+
 /**
  * A WCAG guideline
  * @author Davy Kager

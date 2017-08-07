@@ -27,6 +27,26 @@ import org.fruit.alayer.Verdict;
 public class SuccessCriterion extends ItemBase {
 	
 	/**
+	 * WCAG success criterion conformance levels
+	 */
+	public enum Level {
+		/**
+		 * Level A: minimum conformance / highest priority guidelines.
+		 */
+		A,
+		
+		/**
+		 * Level AA: medium priority guidelines.
+		 */
+		
+		AA,
+		/**
+		 * Level AAA: maximum conformance / lowest priority guidelines.
+		 */
+		AAA;
+	}
+	
+	/**
 	 * The conformance level of this success criterion
 	 */
 	protected final Level level;

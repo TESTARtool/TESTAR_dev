@@ -8,9 +8,9 @@ import org.junit.Test;
 
 import nl.ou.testar.a11y.wcag.AbstractGuideline;
 import nl.ou.testar.a11y.wcag.KeyboardAccessibleGuideline;
-import nl.ou.testar.a11y.wcag.Level;
 import nl.ou.testar.a11y.wcag.Principle;
 import nl.ou.testar.a11y.wcag.SuccessCriterion;
+import nl.ou.testar.a11y.wcag.SuccessCriterion.Level;
 
 public class SuccessCriterionTest {
 	
