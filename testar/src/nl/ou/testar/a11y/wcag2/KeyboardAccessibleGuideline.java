@@ -15,61 +15,36 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.fruit.alayer.Action;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
- * A WCAG success criterion
+ * A WCAG guideline
  * @author Davy Kager
  *
  */
-public class SuccessCriterion extends ItemBase {
+public class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
-	/**
-	 * WCAG success criterion conformance levels
-	 */
-	public enum Level {
-		/**
-		 * Level A: minimum conformance / highest priority guidelines.
-		 */
-		A,
-		
-		/**
-		 * Level AA: medium priority guidelines.
-		 */
-		
-		AA,
-		/**
-		 * Level AAA: maximum conformance / lowest priority guidelines.
-		 */
-		AAA;
+	private final SuccessCriterion scKeyboard;
+	
+	KeyboardAccessibleGuideline(int nr, Principle parent) {
+		super(nr, "Keyboard Accessible", parent);
+		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
 	}
 	
-	/**
-	 * The conformance level of this success criterion
-	 */
-	protected final Level level;
+	protected EvaluationResults evaluate(State state) { return null; }
 	
-	private static final int NLEVELS = Level.values().length;
-	
-	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
-		super(nr, name, parent);
-		this.level = level;
-	}
-	
-	public Level getLevel() {
-		return level;
-	}
-	
-	public double getVerdictPriority() {
-		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
-		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
-	}
-	
-	@Override
-	public String toString() {
-		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
-	}
+	protected Set<Action> deriveActions(State state) { return null; }
 	
 }

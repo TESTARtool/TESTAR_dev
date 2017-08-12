@@ -15,13 +15,14 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -36,10 +37,10 @@ import org.fruit.alayer.Verdict;
 public abstract class AbstractGuideline extends ItemBase {
 	
 	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name, parent);
+		super(nr, name, Assert.notNull(parent));
 	}
 	
-	protected abstract Verdict getVerdict(State state);
+	protected abstract EvaluationResults evaluate(State state);
 	protected abstract Set<Action> deriveActions(State state);
 	
 }

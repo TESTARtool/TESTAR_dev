@@ -15,11 +15,16 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import org.fruit.Assert;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
 
 /**
  * A WCAG principle
@@ -39,7 +44,22 @@ public class Principle extends ItemBase {
 	}
 	
 	void addGuideline(AbstractGuideline guideline) {
-		guidelines.add(guideline);
+		guidelines.add(Assert.notNull(guideline));
+	}
+	
+	EvaluationResults evaluate(State state) {
+		EvaluationResults results = new EvaluationResults();
+		for (AbstractGuideline g : guidelines)
+			for (EvaluationResult result : g.evaluate(state).getResults())
+				results.add(result);
+		return results;
+	}
+	
+	Set<Action> deriveActions(State state) {
+		Set<Action> actions = Collections.emptySet();
+		for (AbstractGuideline g : guidelines)
+			actions.addAll(g.deriveActions(state));
+		return actions;
 	}
 		
 }

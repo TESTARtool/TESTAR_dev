@@ -1,10 +1,10 @@
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import nl.ou.testar.a11y.wcag.Principle;
+import nl.ou.testar.a11y.wcag2.Principle;
 
 public class PrincipleTest {
 
