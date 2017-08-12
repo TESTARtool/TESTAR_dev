@@ -39,6 +39,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -108,14 +109,13 @@ public class AWTCanvas implements Image, Canvas {
 		return fromScreenshot(r, StorageFormat.PNG, 1);
 	}
 
-	public static AWTCanvas fromScreenshot(Rect r, 
-			StorageFormat format, double quality){
+	public static AWTCanvas fromScreenshot(Rect r, StorageFormat format, double quality){
 		Assert.notNull(r, format);
 		Assert.isTrue(quality > 0 && quality <= 1);
 		try{
 			// the rectangle may capture multiple screens!
-			Rectangle rect = new Rectangle((int)r.x(), (int)r.y(), 
-					(int)r.width(), (int)r.height());
+			Rectangle rect = new Rectangle((int)r.x(), 	   (int)r.y(), 
+										   (int)r.width(), (int)r.height());
 			return new AWTCanvas(r.x(), r.y(), new Robot().createScreenCapture(rect), format, quality);
 		} catch (AWTException awte) {
 			throw new RuntimeException(awte);
@@ -333,7 +333,7 @@ public class AWTCanvas implements Image, Canvas {
 		saveAsPng(img, os);
 	}
 
-	public void saveAsPng(String file) throws IOException{
+	public void saveAsPng(String file) throws IOException{		
 		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(file)));
 
 		try{
@@ -398,6 +398,37 @@ public class AWTCanvas implements Image, Canvas {
 		else
 			gr.drawPolygon(pol);
 	}
+	
+	/**
+	 * @return Similarity percentage as 0.0 (different) .. 1.0 (equal).
+	 * @author urueda
+	 */
+	public float compareImage(AWTCanvas img) {
+		//long now = System.currentTimeMillis();		
+		DataBuffer dbThis = this.img.getData().getDataBuffer(),
+				   dbImg = img.img.getData().getDataBuffer();
+		int sizeThis = dbThis.getSize(),
+			sizeImg = dbImg.getSize();
+		if (sizeThis == 0 || sizeImg == 0)
+			return 0f;
+		float sizeSimilarity;
+		if (sizeThis == sizeImg)
+			sizeSimilarity = 1.0f;
+		else if (sizeThis < sizeImg)
+			sizeSimilarity = sizeThis / sizeImg;
+		else // sizeThis > sizeImg
+			sizeSimilarity = sizeImg / sizeThis;
+		int equalPixels = 0, i = 0;
+		while (i < sizeThis && i < sizeImg){
+			if (dbThis.getElem(i) == dbImg.getElem(i))
+				equalPixels++;
+			i++;
+		}
+		float meanSize = (sizeThis + sizeImg) / 2;
+		float percent = sizeSimilarity - (1.0f - (equalPixels / meanSize));
+		//System.out.println("Image comparison took : " + (System.currentTimeMillis() - now) + " ms");
+		return (percent < 0f ? 0f : (percent > 1f ? 1f : percent));
+	}	
 
 	public void release() {}
 	

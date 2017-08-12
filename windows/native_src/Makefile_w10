@@ -1,7 +1,9 @@
-LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib Msimg32.lib GDIplus.lib kernel32.lib psapi.lib
+LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib\
+      Msimg32.lib GDIplus.lib kernel32.lib psapi.lib
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
+		  /I AccessBridge
 		  # vcvarsall.bat adds the Windows SDK directories to the INCLUDE environment variable,
 		  # which is automatically used by the compiler.
 		  # So it is not necessary to manually specify the path here.
@@ -14,6 +16,8 @@ JAVA_CLASSFILE = "..\target\classes\main\org\fruit\alayer\windows\Windows.class"
 JAVA_CLASS = org.fruit.alayer.windows.Windows
 
 OBJFILES= main_w10.obj\
+# by urueda
+		  AccessBridgeCalls.obj
 
 HPPFILES= windows.h\
 
@@ -29,7 +33,10 @@ windows.h: $(JAVA_CLASSFILE)
 $(OBJFILES): windows.h
 
 .cpp.obj:
-	cl $(CPPFLAGS) /c $*.cpp $(INCLUDES)
+# cl $(CPPFLAGS) /c $*.cpp $(INCLUDES)
+# by urueda
+	cl $(CPPFLAGS) /c "AccessBridge\AccessBridgeCalls.c" $*.cpp $(INCLUDES)
+
 
 $(DLLFILE): $(OBJFILES)
 	cl $(OBJFILES) /link $(LIBS) /DLL /OUT:$(DLLFILE)

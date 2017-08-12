@@ -17,6 +17,8 @@
 
 package es.upv.staq.testar.graph;
 
+import java.util.Set;
+
 /**
  * Graph action/edge.
  * 
@@ -50,21 +52,26 @@ public interface IGraphAction {
 	public String getDetailedName();
 	public void setDetailedName(String detailedName);
 
-	public String getTargetID();
-	public void setTargetID(String targetID);
+	public String getTargetWidgetID();
+	public void setTargetWidgetID(String targetWidgetID);
+	
+	public String getSourceStateID();
+	public void setSourceStateID(String SourceStateID);
+	public Set<String> getTargetStateIDs();
+	public void addTargetStateID(String targetStateID);
 	
 	public int getCount();
 	public void setCount(int count);	
 	public void incCount();
 
-	public String getOrder();
-	public void addOrder(String order);
-	public String getLastOrder();
-	
-	public IGraphAction clone(String clonName);
-	
+	public String getOrder(String targetStateID);
+	public String getOrder(Set<String> targetStatesID);
+	public void addOrder(String targetStateID, String order);
+	public String getLastOrder(String targetStateID);
+		
 	public void knowledge(boolean k);
 	public boolean knowledge();
+	public void revisited(boolean r);
 	public boolean revisited();
 	
 }

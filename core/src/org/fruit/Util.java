@@ -40,7 +40,10 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +86,8 @@ import org.fruit.alayer.WidgetIterator;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
+
+import sun.nio.cs.StandardCharsets;
 
 /**
  * Utility methods.
@@ -474,9 +479,10 @@ public final class Util {
 	public static Set<Widget> widgetsFromPoint(State state, double x, double y){
 		Set<Widget> ret = new HashSet<Widget>();
 		for(Widget w : Assert.notNull(state)){			
-			if(w.get(Tags.HitTester, Util.FalseTester).apply(x, y))
+			if(w.get(Tags.HitTester, Util.FalseTester).apply(x, y)){
 				ret.add(w);
-		}    	
+			}
+		}
 		return ret;
 	}
 	
@@ -548,8 +554,8 @@ public final class Util {
 
     public static String readFile(File path) {
         try {
-            //return new Scanner(path, "UTF-8").useDelimiter("\\A").next();
-            return new Scanner(path, Charset.defaultCharset().name()).useDelimiter("\\A").next(); // by urueda
+            return new Scanner(path, "UTF-8").useDelimiter("\\A").next();
+            //return new Scanner(path, Charset.defaultCharset().name()).useDelimiter("\\A").next();
         } catch (FileNotFoundException ex) {
             return null;
         }
@@ -612,7 +618,7 @@ public final class Util {
 		}*/		
 		// begin by urueda
 		FileOutputStream fos = new FileOutputStream(file);
-		OutputStreamWriter osw = new OutputStreamWriter(fos, Charset.defaultCharset().name());
+		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8"); // Charset.defaultCharset().name());
 		Writer out = new BufferedWriter(osw);
 		try {
 			out.write(content);
@@ -827,6 +833,24 @@ public final class Util {
 		Assert.notNull(format);
 		DateFormat dateFormat = new SimpleDateFormat(format);
 		return dateFormat.format(new Date());
+	}
+
+	// by urueda
+	public static String diffDateString(String format, String fromDate, String toDate){
+		Assert.notNull(format);
+		DateFormat dateFormat = new SimpleDateFormat(format);
+		try {
+			Date from = dateFormat.parse(fromDate),
+				 to = dateFormat.parse(toDate);
+			long ms = to.getTime() - from.getTime();
+			return new Long(ms / 1000).toString() + " seconds or " +
+				   new Long(ms / 60000).toString() + " minutes or " +
+				   new Long(ms / 3600000).toString() + " hours";
+		} catch (ParseException e) {
+			System.out.println("Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
+			e.printStackTrace();
+			return e.getMessage();
+		}
 	}
 
 	public static boolean stop(SUT system){

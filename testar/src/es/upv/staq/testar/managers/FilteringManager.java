@@ -64,7 +64,7 @@ import es.upv.staq.testar.protocols.ProtocolUtil;
  */
 public class FilteringManager {
 
-	public static final String XML_UI_FILTER_VERSION = "1.0.20160407";
+	public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
     public static final String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
 
 	private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",
@@ -132,9 +132,9 @@ public class FilteringManager {
 			writer.write("<" + XML_TAG_UI_FILTER_ROOT + " version=\"" + XML_UI_FILTER_VERSION + "\">\n");
 			// coding types
 			writer.write("\t<coding_types>\n");
-			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_ID + "\" desc=\"abstract\"/>\n");
-			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_ID + "\" desc=\"concrete\"/>\n");
-			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_P_ID + "\" desc=\"precise\"/>\n");
+			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_ID + "\" desc=\"ROLE property\"/>\n");
+			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_ID + "\" desc=\"ROLE and TITLE properties\"/>\n");
+			writer.write("\t\t<coding type=\"" + CodingManager.ABSTRACT_R_T_P_ID + "\" desc=\"ROLE, TITLE and PATH properties\"/>\n");
 			writer.write("\t</coding_types>\n");
 			// filterING types
 			writer.write("\t<" + XML_TAG_UI_FILTERING_TYPES +  ">\n");
@@ -377,7 +377,7 @@ public class FilteringManager {
 			if (height < 1) height = 1;
 			shape = Rect.from(shape.x() + 3, shape.y() + 3, width, height);
 		}
-		new ShapeVisualizer(pen, shape, "", 0.5, 0.5).run(state, canvas, Pen.PEN_IGNORE);    	
+		new ShapeVisualizer(pen, shape, "", 0.5, 0.5).run(state, canvas, Pen.PEN_IGNORE);
     }    
     
 }

@@ -26,6 +26,7 @@ import static org.fruit.alayer.windows.UIARoles.UIAEdit;
 import static org.fruit.alayer.windows.UIARoles.UIAHyperlink;
 import static org.fruit.alayer.windows.UIARoles.UIAList;
 import static org.fruit.alayer.windows.UIARoles.UIAListItem;
+import static org.fruit.alayer.windows.UIARoles.UIAMenu;
 import static org.fruit.alayer.windows.UIARoles.UIAMenuItem;
 import static org.fruit.alayer.windows.UIARoles.UIARadioButton;
 import static org.fruit.alayer.windows.UIARoles.UIAScrollBar;
@@ -65,6 +66,7 @@ import org.fruit.alayer.windows.UIAStateBuilder;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcHandle;
 import org.fruit.alayer.windows.WinProcess;
+import org.fruit.alayer.windows.Windows;
 
 import static org.fruit.alayer.linux.AtSpiRolesWrapper.*; // by wcoux
 
@@ -105,15 +107,19 @@ public class NativeLinker {
 	/**
 	 * Retrieves a StateBuilder instance which will be used to determine the state of the application.
 	 * @param timeToFreeze The time after which requesting the state of an application will time out.
+	 * @param accessBridgeEnabled Whether to activate the AccessBridge (Java/Swing SUTs).
+	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze){
+	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
+													 boolean accessBridgeEnabled,
+													 String SUTProcesses){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
-				return new UIAStateBuilder(timeToFreeze);
+				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				// TODO: a win10 state builder might make use of the new CUI8 Automation object.
-				return new UIAStateBuilder(timeToFreeze);
+				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			}
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new AtSpiStateBuilder(timeToFreeze);
@@ -294,7 +300,7 @@ public class NativeLinker {
 			return UIATags.tagSet();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiTags.tagSet();
-		throw new UnsupportedPlatformException();		
+		throw new UnsupportedPlatformException();
 	}
 	
 	/**
@@ -333,7 +339,7 @@ public class NativeLinker {
 	 */
 	public static Role[] getNativeClickable(){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-			return new Role[]{UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
+			return new Role[]{UIAMenu, UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
 							  UIAComboBox, UIAList, UIAListItem,
 							  UIATabItem, UIAHyperlink, UIADataItem, UIATree, UIATreeItem,
 							  UIASlider, UIASpinner, UIAScrollBar, UIASplitButton,
@@ -343,7 +349,7 @@ public class NativeLinker {
 			AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
 			AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
 		}
-		throw new UnsupportedPlatformException();	
+		throw new UnsupportedPlatformException();
 	}
 
 

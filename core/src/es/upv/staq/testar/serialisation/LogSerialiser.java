@@ -89,7 +89,7 @@ public class LogSerialiser extends Thread {
 		log.flush();
 		log.close();
 		synchronized(log){
-			System.out.println("LogSerialiser finished");
+			System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
 			singletonLogSerialiser = null;
 			log.notifyAll();
 		}
@@ -128,6 +128,7 @@ public class LogSerialiser extends Thread {
 	
 	public static void exit(){
 		if (singletonLogSerialiser != null){
+			LogSerialiser.finish();
 			try {
 				synchronized(log){
 					while (singletonLogSerialiser != null){

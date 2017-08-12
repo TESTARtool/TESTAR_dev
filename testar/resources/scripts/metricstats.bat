@@ -6,7 +6,7 @@ if "%2"=="" GOTO MISS
 GOTO AVG
 :MISS
 echo Argument missing
-echo Use: avgmetric foldername %%?
+echo Use: metricstats foldername %%?
 echo where ? is oneof:
 REM echo A == verdict
 echo B == FAILS

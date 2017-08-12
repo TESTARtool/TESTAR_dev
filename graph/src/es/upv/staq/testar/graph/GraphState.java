@@ -52,8 +52,8 @@ public class GraphState implements IGraphState {
 	
 	private Verdict verdict;
 
-	private boolean knowledge = false;
-	private boolean revisited = false;
+	private boolean knowledge = false,
+					revisited = false;
 
 	public GraphState(String id){
 		this.concreteID = id;
@@ -171,7 +171,6 @@ public class GraphState implements IGraphState {
 	@Override
 	public void incCount(){
 		this.count++;
-		this.revisited = true;
 	}
 
 	@Override
@@ -204,6 +203,33 @@ public class GraphState implements IGraphState {
 	public Verdict getVerdict(){
 		return this.verdict;
 	}
+		
+	@Override
+	public void actionExecuted(String targetWidgetID){
+		Integer wc = this.stateWidgetsExecCount.get(targetWidgetID);
+		if (wc != null)
+			this.stateWidgetsExecCount.put(targetWidgetID, new Integer(wc.intValue() + 1));
+	}
+	
+	@Override
+	public void knowledge(boolean k){
+		this.knowledge = k;
+	}
+
+	@Override
+	public boolean knowledge(){
+		return this.knowledge;
+	}
+	
+	@Override
+	public void revisited(boolean r){
+		this.revisited = r;
+	}
+	
+	@Override
+	public boolean revisited(){
+		return this.revisited;
+	}
 	
 	@Override
 	public int hashCode(){
@@ -215,30 +241,13 @@ public class GraphState implements IGraphState {
 		return this.concreteID;
 	}
 
+	@Override
 	public boolean equals(Object o){
 		if(this == o)
 			return true;
 		if(!(o instanceof GraphState))
 			return false;
-		return concreteID.equals(((GraphState)o).getConcreteID());
-	}
+		return this.concreteID.equals(((GraphState)o).getConcreteID());
+	}	
 	
-	public void actionExecuted(String targetWidgetID){
-		Integer wc = this.stateWidgetsExecCount.get(targetWidgetID);
-		if (wc != null)
-			this.stateWidgetsExecCount.put(targetWidgetID, new Integer(wc.intValue() + 1));
-	}
-	
-	public void knowledge(boolean k){
-		this.knowledge = k;
-	}
-
-	public boolean knowledge(){
-		return this.knowledge;
-	}
-	
-	public boolean revisited(){
-		return this.revisited;
-	}
-		
 }

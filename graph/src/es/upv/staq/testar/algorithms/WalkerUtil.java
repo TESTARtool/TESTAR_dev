@@ -39,14 +39,16 @@ public class WalkerUtil {
 			List<IGraphState> pathTargetState = null;
 			IGraphState cgs = env.get(currentState);
 			if (cgs == null || !env.stateAtGraph(cgs)){
-				System.out.println("[WalkerUtil] Unexplored state trying to get a path to less explored!");
+				System.out.println("[WalkerUtil] Unexplored state found while trying to get a path to less explored!");
 				return null;
 			}
 			System.out.println("[WalkerUtil] Trying to get a path to less explored");
 			
 			Collection<IGraphState> statesSet = env.getGraphStates();
-			if (statesSet == null || statesSet.isEmpty())
+			if (statesSet == null || statesSet.isEmpty()){
+				System.out.println("[WalkerUtil] Empty graph - no graph states");
 				return null;
+			}
 			
 			IGraphState[] states = statesSet.toArray(new IGraphState[statesSet.size()]);
 			System.out.println("[WalkerUtil] Sorting <" + states.length + "> graph states");
@@ -59,7 +61,7 @@ public class WalkerUtil {
 						return 1;
 					else
 						return 0;
-					}			
+					}
 			});			
 			System.out.println("[WalkerUtil] Sorted <" + states.length + "> graph states");
 			
@@ -78,7 +80,8 @@ public class WalkerUtil {
 				pathTargetState.add(0, cgs);
 			return pathTargetState;
 		} catch (Exception e){
-			System.out.println("WalkerUtil exception ... did Grapher reset?");
+			System.out.println("WalkerUtil exception:");
+			e.printStackTrace();
 			return null;
 		}
 	}
