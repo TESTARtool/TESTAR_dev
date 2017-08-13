@@ -873,13 +873,7 @@ public final class Windows{
 
 	static{
 		try{
-			/*loadLib("msvcr100.dll");
-			loadLib("msvcp100.dll");
-			loadLib("windows.dll");*/
-			// begin by urueda
-			loadExternalLib("lib/msvcr100.dll");
-			loadExternalLib("lib/msvcp100.dll");
-			loadExternalLib("lib/windows.dll");
+			loadExternalLib("windows.dll");
 			// end by urueda
 		}catch(IOException ioe){
 			throw new RuntimeException(ioe);
