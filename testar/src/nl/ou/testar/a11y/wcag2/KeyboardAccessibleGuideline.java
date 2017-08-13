@@ -43,10 +43,4 @@ public class KeyboardAccessibleGuideline extends AbstractGuideline {
 		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
 	}
 	
-	@Override
-	protected EvaluationResults evaluate(State state) { return null; }
-	
-	@Override
-	protected Set<Action> deriveActions(State state) { return null; }
-	
 }

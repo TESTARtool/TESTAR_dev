@@ -52,7 +52,9 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @param state The state.
 	 * @return The results of the evaluation.
 	 */
-	protected abstract EvaluationResults evaluate(State state);
+	protected EvaluationResults evaluate(State state) {
+		return new EvaluationResults();
+	}
 	
 	/**
 	 * Derives the follow-up actions from the given state
@@ -61,6 +63,8 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @param state The state.
 	 * @return The set of actions.
 	 */
-	protected abstract Set<Action> deriveActions(State state);
+	protected Set<Action> deriveActions(State state) {
+		return Collections.emptySet();
+	}
 	
 }
