@@ -36,11 +36,31 @@ import org.fruit.alayer.Verdict;
  */
 public abstract class AbstractGuideline extends ItemBase {
 	
+	/**
+	 * Constructs a new guideline
+	 * @param nr The number of the guideline.
+	 * @param name The name of the guideline.
+	 * @param parent The principle (parent) this guideline belongs to.
+	 */
 	protected AbstractGuideline(int nr, String name, Principle parent) {
 		super(nr, name, Assert.notNull(parent));
 	}
 	
+	/**
+	 * Evaluates the accessibility of the given state
+	 * This will typically include one or more evaluation results for each success criterion that belong to this guideline.
+	 * @param state The state.
+	 * @return The results of the evaluation.
+	 */
 	protected abstract EvaluationResults evaluate(State state);
+	
+	/**
+	 * Derives the follow-up actions from the given state
+	 * This will typically include actions from all success criteria that belong to this guideline.
+	 * The actions are specific to accessibility.
+	 * @param state The state.
+	 * @return The set of actions.
+	 */
 	protected abstract Set<Action> deriveActions(State state);
 	
 }

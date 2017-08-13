@@ -47,23 +47,38 @@ public class SuccessCriterion extends ItemBase {
 		AAA;
 	}
 	
-	/**
-	 * The conformance level of this success criterion
-	 */
 	private final Level level;
 	
 	private static final int NLEVELS = 3;
 	private static final double SEVERITY_STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
 	
+	/**
+	 * Constructs a new success criterion
+	 * @param nr The number of the success criterion.
+	 * @param name The name (description) of the success criterion.
+	 * @param parent The guideline (parent) this success criterion belongs to.
+	 * @param level The level of the success criterion.
+	 */
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
 		super(nr, name, Assert.notNull(parent));
 		this.level = level;
 	}
 	
+	/**
+	 * Gets the conformance level of this success criterion
+	 * @return The conformance level.
+	 */
 	public Level getLevel() {
 		return level;
 	}
 	
+	/**
+	 * Gets the severity of violating this success criterion as used in verdicts
+	 * The severity depends on the conformance level of the success criterion.
+	 * A low level (A) corresponds to a high severity
+	 * and a high level (AAA) to a low severity.
+	 * @return The severity.
+	 */
 	public double getVerdictSeverity() {
 		return Verdict.SEVERITY_MAX - (level.ordinal() * SEVERITY_STEP);
 	}

@@ -30,7 +30,7 @@ import org.fruit.alayer.Verdict;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
- * A WCAG guideline
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
@@ -43,8 +43,10 @@ public class KeyboardAccessibleGuideline extends AbstractGuideline {
 		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
 	}
 	
+	@Override
 	protected EvaluationResults evaluate(State state) { return null; }
 	
+	@Override
 	protected Set<Action> deriveActions(State state) { return null; }
 	
 }

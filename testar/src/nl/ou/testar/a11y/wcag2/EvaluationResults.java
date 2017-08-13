@@ -18,6 +18,7 @@ public class EvaluationResults {
 	 */
 	public static final double SEVERITY_GENERAL =
 			Verdict.SEVERITY_MIN + ((Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / 20.0);
+	
 	/**
 	 * The severity of a warning
 	 */
@@ -26,6 +27,11 @@ public class EvaluationResults {
 	// The severity of an error is computed, see getOverallVerdict().
 	
 	private final List<EvaluationResult> results = new ArrayList<EvaluationResult>();
+	
+	/**
+	 * Constructs a new container for evaluation results
+	 */
+	EvaluationResults() {}
 
 	/**
 	 * Add an evaluation result to the list of results
@@ -39,7 +45,7 @@ public class EvaluationResults {
 	 * Get a list of all evaluation results
 	 * @return The list of results.
 	 */
-	List<EvaluationResult> getResults() {
+	public List<EvaluationResult> getResults() {
 		return results;
 	}
 	

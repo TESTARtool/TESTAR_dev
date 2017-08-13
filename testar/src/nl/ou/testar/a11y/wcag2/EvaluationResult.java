@@ -41,7 +41,7 @@ public class EvaluationResult {
 	 * @param criterion The associated success criterion.
 	 * @param type The problem type.
 	 */
-	public EvaluationResult(SuccessCriterion criterion, Type type) {
+	EvaluationResult(SuccessCriterion criterion, Type type) {
 		this.criterion = criterion;
 		this.type = type;
 	}

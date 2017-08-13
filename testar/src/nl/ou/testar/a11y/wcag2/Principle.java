@@ -35,18 +35,37 @@ public class Principle extends ItemBase {
 	
 	private final List<AbstractGuideline> guidelines = new ArrayList<AbstractGuideline>();
 
+	/**
+	 * Constructs a new principle
+	 * @param nr The number of the principle.
+	 * @param name The name of the principle.
+	 */
 	Principle(int nr, String name) {
 		super(nr, name);
 	}
 
+	/**
+	 * Gets all guidelines that belong to this principle
+	 * @return The list of guidelines.
+	 */
 	List<AbstractGuideline> getGuidelines() {
 		return Collections.unmodifiableList(guidelines);
 	}
 	
+	/**
+	 * Adds a guideline to this principle
+	 * @param guideline The guideline.
+	 */
 	void addGuideline(AbstractGuideline guideline) {
 		guidelines.add(Assert.notNull(guideline));
 	}
 	
+	/**
+	 * Evaluates the accessibility of the given state
+	 * This will collect evaluation results from all guidelines that belong to this principle.
+	 * @param state The state.
+	 * @return The results of the evaluation.
+	 */
 	EvaluationResults evaluate(State state) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractGuideline g : guidelines)
@@ -55,6 +74,13 @@ public class Principle extends ItemBase {
 		return results;
 	}
 	
+	/**
+	 * Derives the follow-up actions from the given state
+	 * This will collect actions from all guidelines that belong to this principle.
+	 * The actions are specific to accessibility.
+	 * @param state The state.
+	 * @return The set of actions.
+	 */
 	Set<Action> deriveActions(State state) {
 		Set<Action> actions = Collections.emptySet();
 		for (AbstractGuideline g : guidelines)

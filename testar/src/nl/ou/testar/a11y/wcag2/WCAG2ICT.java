@@ -65,6 +65,12 @@ public final class WCAG2ICT {
 		principles.add(p);
 	}
 	
+	/**
+	 * Evaluates the accessibility of the given state
+	 * This will collect evaluation results from all principles.
+	 * @param state The state.
+	 * @return The results of the evaluation.
+	 */
 	public EvaluationResults evaluate(State state) {
 		EvaluationResults results = new EvaluationResults();
 		for (Principle p : principles)
@@ -73,6 +79,13 @@ public final class WCAG2ICT {
 		return results;
 	}
 	
+	/**
+	 * Derives the follow-up actions from the given state
+	 * This will collect actions from all principles.
+	 * The actions are specific to accessibility.
+	 * @param state The state.
+	 * @return The set of actions.
+	 */
 	public Set<Action> deriveActions(State state) {
 		Set<Action> actions = Collections.emptySet();
 		for (Principle p : principles)
