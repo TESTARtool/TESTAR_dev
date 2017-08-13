@@ -46,24 +46,27 @@ final class UIARootElement extends UIAElement {
 		root = this;
 		hwndMap = Util.newHashMap();
 		tlc = ElementMap.newBuilder().build();
+		isForeground = false; // by urueda
 	}
 
 	public UIAElement at(double x, double y){
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean visibleAt(UIAElement el, double x, double y){
+	public boolean visibleAt(UIAElement el, double x, double y){		
 		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
 			return false;
-		UIAElement topLevelContainer = tlc.at(x, y);
+		
+		UIAElement topLevelContainer = tlc.at(x, y);				
 		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
 	}
 
 	// begin by urueda
 	
-	public boolean visibleAt(UIAElement el, double x, double y, boolean obscuredByChildFeature){
+	public boolean visibleAt(UIAElement el, double x, double y, boolean obscuredByChildFeature){		
 		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
 			return false;
+				
 		UIAElement topLevelContainer = tlc.at(x, y);
 		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
 				!obscuredByChildFeature || !obscuredByChildren(el, x, y));
@@ -71,7 +74,7 @@ final class UIARootElement extends UIAElement {
 	
 	// end by urueda
 
-	boolean obscuredByChildren(UIAElement el, double x, double y){
+	boolean obscuredByChildren(UIAElement el, double x, double y){		
 		for(int i = 0; i < el.children.size(); i++){
 			UIAElement child = el.children.get(i);
 			if(child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex)

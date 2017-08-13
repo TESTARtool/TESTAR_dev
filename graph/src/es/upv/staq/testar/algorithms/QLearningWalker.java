@@ -23,7 +23,6 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
-import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphAction;
 import es.upv.staq.testar.graph.IGraphState;
@@ -57,12 +56,18 @@ public class QLearningWalker extends AbstractWalker { // Q = Reward
 	}
 	
 	@Override
-	public double getStateReward(IEnvironment env, IGraphState state){
-		double r = super.getStateReward(env, state);
+	public double calculateRewardForState(IEnvironment env, IGraphState state){
+		double r = super.calculateRewardForState(env, state);
 		if (r == getBaseReward())
 			return r;
 		else
-			return (discount * state.getCount()) * r;
+			return r / Math.log(state.getCount() + Math.E - 1);
+	}
+
+	@Override
+	protected double calculateRewardForAction(IEnvironment env, IGraphAction action){
+		double r = super.calculateRewardForAction(env, action);
+		return discount * r;
 	}
 		
 }

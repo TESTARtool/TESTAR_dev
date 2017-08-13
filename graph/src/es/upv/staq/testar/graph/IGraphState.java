@@ -67,6 +67,7 @@ public interface IGraphState {
 	
 	public void knowledge(boolean k);
 	public boolean knowledge();
+	public void revisited(boolean r);
 	public boolean revisited();
 	
 }

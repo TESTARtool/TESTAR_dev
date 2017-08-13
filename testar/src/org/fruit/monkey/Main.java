@@ -27,9 +27,62 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.monkey.ConfigTags.*;
+import static org.fruit.monkey.ConfigTags.AccessBridgeEnabled;
+import static org.fruit.monkey.ConfigTags.ActionDuration;
+import static org.fruit.monkey.ConfigTags.AlgorithmFormsFilling;
+import static org.fruit.monkey.ConfigTags.ClickFilter;
+import static org.fruit.monkey.ConfigTags.CopyFromTo;
+import static org.fruit.monkey.ConfigTags.Delete;
+import static org.fruit.monkey.ConfigTags.Discount;
+import static org.fruit.monkey.ConfigTags.DrawWidgetInfo;
+import static org.fruit.monkey.ConfigTags.DrawWidgetTree;
+import static org.fruit.monkey.ConfigTags.DrawWidgetUnderCursor;
+import static org.fruit.monkey.ConfigTags.ExecuteActions;
+import static org.fruit.monkey.ConfigTags.ExplorationSampleInterval;
+import static org.fruit.monkey.ConfigTags.FaultThreshold;
+import static org.fruit.monkey.ConfigTags.ForceForeground;
+import static org.fruit.monkey.ConfigTags.ForceToSequenceLength;
+import static org.fruit.monkey.ConfigTags.GraphResuming;
+import static org.fruit.monkey.ConfigTags.GraphsActivated;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.MaxReward;
+import static org.fruit.monkey.ConfigTags.MaxTime;
+import static org.fruit.monkey.ConfigTags.Mode;
+import static org.fruit.monkey.ConfigTags.MyClassPath;
+import static org.fruit.monkey.ConfigTags.NonReactingUIThreshold;
+import static org.fruit.monkey.ConfigTags.OfflineGraphConversion;
+import static org.fruit.monkey.ConfigTags.OnlySaveFaultySequences;
+import static org.fruit.monkey.ConfigTags.OutputDir;
+import static org.fruit.monkey.ConfigTags.PathToReplaySequence;
+import static org.fruit.monkey.ConfigTags.ProcessesToKillDuringTest;
+import static org.fruit.monkey.ConfigTags.PrologActivated;
+import static org.fruit.monkey.ConfigTags.ProtocolClass;
+import static org.fruit.monkey.ConfigTags.ReplayRetryTime;
+import static org.fruit.monkey.ConfigTags.SUTConnector;
+import static org.fruit.monkey.ConfigTags.SUTConnectorValue;
+import static org.fruit.monkey.ConfigTags.SequenceLength;
+import static org.fruit.monkey.ConfigTags.Sequences;
+import static org.fruit.monkey.ConfigTags.ShowSettingsAfterTest;
+import static org.fruit.monkey.ConfigTags.ShowVisualSettingsDialogOnStartup;
+import static org.fruit.monkey.ConfigTags.StartupTime;
+import static org.fruit.monkey.ConfigTags.StateScreenshotSimilarityThreshold;
+import static org.fruit.monkey.ConfigTags.StopGenerationOnFault;
+import static org.fruit.monkey.ConfigTags.SuspiciousTitles;
+import static org.fruit.monkey.ConfigTags.SUTProcesses;
+import static org.fruit.monkey.ConfigTags.TempDir;
+import static org.fruit.monkey.ConfigTags.TestGenerator;
+import static org.fruit.monkey.ConfigTags.TimeToFreeze;
+import static org.fruit.monkey.ConfigTags.TimeToWaitAfterAction;
+import static org.fruit.monkey.ConfigTags.TypingTextsForExecutedAction;
+import static org.fruit.monkey.ConfigTags.UnattendedTests;
+import static org.fruit.monkey.ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay;
+import static org.fruit.monkey.ConfigTags.VisualizeActions;
+import static org.fruit.monkey.ConfigTags.VisualizeSelectedAction;
+import static org.fruit.monkey.ConfigTags.GraphDBEnabled;
+import static org.fruit.monkey.ConfigTags.GraphDBPassword;
+import static org.fruit.monkey.ConfigTags.GraphDBUrl;
+import static org.fruit.monkey.ConfigTags.GraphDBUser;
 
-import java.awt.event.KeyEvent;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,7 +97,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -53,13 +105,8 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
-import org.fruit.alayer.Widget;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.*;
-import es.upv.staq.testar.protocols.ProtocolUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
@@ -118,7 +165,44 @@ public class Main {
 		if (p != null){
 			settings.set(ConfigTags.ForceToSequenceLength, new Boolean(p).booleanValue());
 			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">",LogSerialiser.LogLevel.Critical);				
-		}				
+		}
+		// TypingTextsForExecutedAction
+		pS = ConfigTags.TypingTextsForExecutedAction.name();
+		p = System.getProperty(pS,null);
+		if (p == null)
+			p = System.getProperty("TT",null); // mnemonic
+		if (p != null){
+			try{
+				Integer tt = new Integer(p);
+				settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">",LogSerialiser.LogLevel.Critical);
+			} catch (NumberFormatException e) {
+				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",LogSerialiser.LogLevel.Critical);
+			}
+		}
+		// StateScreenshotSimilarityThreshold
+		pS = ConfigTags.StateScreenshotSimilarityThreshold.name();
+		p = System.getProperty(pS,null);
+		if (p == null)
+			p = System.getProperty("SST",null); // mnemonic
+		if (p != null){
+			try{
+				Float sst = new Float(p);
+				settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">",LogSerialiser.LogLevel.Critical);
+			} catch (NumberFormatException e) {
+				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",LogSerialiser.LogLevel.Critical);
+			}
+		}
+		// UnattendedTests
+		pS = ConfigTags.UnattendedTests.name();
+		p = System.getProperty(pS,null);
+		if (p == null)
+			p= System.getProperty("UT",null); // mnemonic
+		if (p != null){
+			settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
+			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">",LogSerialiser.LogLevel.Critical);
+		}
 	}
 	
 	// begin by urueda
@@ -138,7 +222,9 @@ public class Main {
 			System.out.println("No SUT settings found!");
 		else{
 	        Object[] options = sutSettings.toArray();
-	    	String s = (String) JOptionPane.showInputDialog(new JFrame(), "SUT setting:", "Test setting selection",
+	        JFrame settingsSelectorDialog = new JFrame();
+	        settingsSelectorDialog.setAlwaysOnTop(true);
+	    	String s = (String) JOptionPane.showInputDialog(settingsSelectorDialog, "SUT setting:", "Test setting selection",
 	    													JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 	    	if (s == null){
 	    		SSE_ACTIVATED = null;
@@ -169,7 +255,7 @@ public class Main {
 		});		
 	}
 	
-	public static void main(String[] args) throws IOException{		
+	public static void main(String[] args) throws IOException{
 		Settings settings = null;
 		//by fraalpe2
 		Locale.setDefault(Locale.ENGLISH);
@@ -192,11 +278,15 @@ public class Main {
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
 		System.out.println("Test settings is <" + testSettings + ">");
+		URLClassLoader loader = null;
 		// end by urueda
 			
 		try{
 			settings = loadSettings(args, testSettings);
 			overrideWithUserProperties(settings); // by urueda
+			Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+			if (SST != null)
+				System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
 
 			if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 				if((settings = new SettingsDialog().run(settings, testSettings)) == null)
@@ -227,7 +317,7 @@ public class Main {
 			URL[] classPath = new URL[cp.size()];
 			for(int i = 0; i < cp.size(); i++)
 				classPath[i] = new File(cp.get(i)).toURI().toURL();
-			URLClassLoader loader = new URLClassLoader(classPath);
+			loader = new URLClassLoader(classPath);
 
 			//logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
 			String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
@@ -260,6 +350,8 @@ public class Main {
 			ScreenshotSerialiser.exit();
 			LogSerialiser.exit();
 			Grapher.exit();
+			if (loader != null)
+				try { loader.close(); } catch (IOException e) { e.printStackTrace(); }
 			// end by urueda
 			System.exit(0);
 		}
@@ -308,7 +400,8 @@ public class Main {
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
 			defaults.add(Pair.from(Discount, .95));
-			defaults.add(Pair.from(AlgorithmFormsFilling, false));		
+			defaults.add(Pair.from(AlgorithmFormsFilling, false));
+			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
 			defaults.add(Pair.from(DrawWidgetTree,false));
 			defaults.add(Pair.from(ExplorationSampleInterval, 1));
 			defaults.add(Pair.from(GraphsActivated, true));
@@ -317,12 +410,16 @@ public class Main {
 			defaults.add(Pair.from(ForceToSequenceLength, true));
 			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
 			defaults.add(Pair.from(OfflineGraphConversion, true));
+			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
+			defaults.add(Pair.from(UnattendedTests, false)); // disabled
+			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(SUTProcesses, ""));
 			// end by urueda
 			defaults.add(Pair.from(GraphDBEnabled, false));
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
-			
+
 			return Settings.fromFile(defaults, file);
 		}catch(IOException ioe){
 			throw new ConfigException("Unable to load configuration file!", ioe);

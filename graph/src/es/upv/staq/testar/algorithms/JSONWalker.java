@@ -40,6 +40,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import es.upv.staq.testar.graph.GraphEdge;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphAction;
 import es.upv.staq.testar.graph.IGraphState;
@@ -316,10 +317,23 @@ public class JSONWalker extends AbstractWalker {
 				case JSON_FUNCTION_pickAnyUnexecuted:
 					sourceActions = getSourceActions(jsonActionTags[1], false);
 					if (sourceActions != null && !sourceActions.isEmpty()){
-						Collection<String> execStateActions = env.getOutgoingActions(this.env.get(this.currentState));
-						if (execStateActions != null && !execStateActions.isEmpty()){
+						IGraphState gs = this.env.get(this.currentState);
+						Collection<GraphEdge> execStateEdges = env.getOutgoingActions(gs);
+						if (execStateEdges != null && !execStateEdges.isEmpty()){
+							Set<String> execStateActions = new HashSet<String>();
+							for (GraphEdge edge : execStateEdges)
+								execStateActions.add(edge.getActionID());
 							Set<Action> unexecutedActions = new HashSet<Action>();
+							String targetW;
 							for (Action a : sourceActions){
+								targetW = this.env.get(a).getTargetWidgetID();
+								if (targetW != null){
+									Integer tc = gs.getStateWidgetsExecCount().get(targetW);
+									if (tc != null){
+										if (tc.intValue() > 9) // todo: apply -DTT parameter
+											continue; // e.g. prevent too many typing actions with different texts
+									}
+								}
 								if (!execStateActions.contains(a.get(Tags.ConcreteID)))
 									unexecutedActions.add(a);
 							}

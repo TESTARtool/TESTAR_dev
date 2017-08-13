@@ -36,6 +36,12 @@ import org.fruit.alayer.State;
 public interface IEnvironment {
 	
 	/**
+	 * Sets the starting graph node.
+	 * @param startNode The start node.
+	 */
+	public void setStartingNode(IGraphState startNode);
+	
+	/**
 	 * Retrieves next movement.
 	 * @return The movement.
 	 */
@@ -102,25 +108,25 @@ public interface IEnvironment {
 	public IGraphState getSourceState(IGraphAction action);
 
 	/**
-	 * Retrieves the target state of an action.
+	 * Retrieves the target states of an action.
 	 * @param action A graph action.
-	 * @return The target graph state or 'null' if the action is not at graph.
+	 * @return The target graph states or 'null' if the action is not at graph.
 	 */
-	public IGraphState getTargetState(IGraphAction action);
+	public IGraphState[] getTargetStates(IGraphAction action);
 	
 	/**
 	 * Retrieves the incoming edges to a graph state.
 	 * @param state A graph state.
-	 * @return The incoming edges ids.
+	 * @return The incoming edges.
 	 */
-	public Collection<String> getIncomingActions(IGraphState state);
+	public Collection<GraphEdge> getIncomingActions(IGraphState state);
 	
 	/**
 	 * Retrieves the outgoing edges from a graph state.
 	 * @param state A graph state.
-	 * @return The outgoing edges ids.
+	 * @return The outgoing edges.
 	 */
-	public Collection<String> getOutgoingActions(IGraphState state);
+	public Collection<GraphEdge> getOutgoingActions(IGraphState state);
 
 	/**
 	 * Computes the number of times an abstract action was executed.
@@ -167,21 +173,21 @@ public interface IEnvironment {
 	 *  * Single element: 1 &lt;= fromOrder = toOrder &lt;= executed_actions_number.
 	 * @param fromOrder Retrieves the list from:  1 .. executed_actions_number.
 	 * @param toOrder Retrieves the list to: fromOrder .. executed_actions_number.
-	 * @return The list of actions.
+	 * @return The list of actions (by concrete ID).
 	 */
-	public IGraphAction[] getSortedActionsByOrder(int fromOrder, int toOrder);
+	public GraphEdge[] getSortedActionsByOrder(int fromOrder, int toOrder);
 	
 	/**
 	 * Retrieves a list of incrementally ordered actions by their test execution order.
 	 * @return A forward iterator.
 	 */
-	public Iterator<IGraphAction> getForwardActions();
+	public Iterator<GraphEdge> getForwardActions();
 	
 	/**
-	 * Retrieves a list of decrementally ordered actions by their test execution order.
+	 * Retrieves a list of decreasing ordered actions by their test execution order.
 	 * @return A backward iterator.
 	 */
-	public ListIterator<IGraphAction> getBackwardActions();
+	public ListIterator<GraphEdge> getBackwardActions();
 	
 	/**
 	 * Checks whether the graph already contains a state.
@@ -199,7 +205,7 @@ public interface IEnvironment {
 	
 	/**
 	 * Retrieves graph states grouped by clusters.
-	 * @return Clusters of related UI states.
+	 * @return Clusters of related UI states (abstract_R -> Set<concrete>).
 	 */
 	public HashMap<String,Set<String>> getGraphStateClusters();
 
@@ -232,7 +238,17 @@ public interface IEnvironment {
 	
 	/**
 	 * Retrieves data for the exploration curve.
-	 * @return [0] unique_states, [1] unique_actions, [2] abstract_states, [3] abstract_actions
+	 * return Metrics:
+	 * [0] states number
+	 * [1] actions number
+	 * [2] abstract states number
+	 * [3] abstract actions number
+	 * [4] unexplored (known) actions number
+	 * [5] longestPath
+	 * [6] minCvg
+	 * [7] maxCvg
+	 * [8] KCVG - CVG value (coverage of known UI space)
+	 * [9] KCVG - K value (known UI space scale)
   	 */
 	public List<int[]> getExplorationCurve();
 	
@@ -254,6 +270,13 @@ public interface IEnvironment {
 	 */
 	public int getExplorationCurveSampleScale();
 
+	/**
+	 * Converts the K value of KCVG to a short string.
+	 * @param k Known UI space (total numbers of discovered UI actions from all discovered UI states).
+	 * @return A short string representation with 3 chars.
+	 */
+	public String convertKCVG(int k);
+	
 	/**
 	 * Retrieves the current longest path in the GUI explored space.
 	 * @return A text representation of the list of states in the longest path.
@@ -317,5 +340,11 @@ public interface IEnvironment {
 	 * @return Number of graph movements from the loaded graph.
 	 */
 	public int loadFromXML(String xmlPath);
+	
+	/**
+	 * Get the test report.
+	 * @return null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+	 */
+	public String[] getReport(int firstSequenceActionNumber);
 	
 }

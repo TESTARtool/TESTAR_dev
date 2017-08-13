@@ -95,4 +95,15 @@ public final class Rect implements Shape {
 	public void paint(Canvas canvas, Pen pen) {
 		canvas.rect(pen, x, y, width, height);
 	}
+	
+	// by urueda
+	@Override
+	public boolean equals(Object o){
+		if (o == this) return true;
+		if (o == null) return false;
+		if (!(o instanceof Rect)) return false;
+		Rect r = (Rect) o;
+		return r.x == this.x && r.y == this.y && r.width == this.width && r.height == this.height;
+	}
+	
 }

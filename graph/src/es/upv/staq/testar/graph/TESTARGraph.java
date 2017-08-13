@@ -1,13 +1,13 @@
 /*****************************************************************************************
  *                                                                                       *
- * COPYRIGHT (2015):                                                                     *
+ * COPYRIGHT (2017):                                                                     *
  * Universitat Politecnica de Valencia                                                   *
  * Camino de Vera, s/n                                                                   *
  * 46022 Valencia, Spain                                                                 *
  * www.upv.es                                                                            *
  *                                                                                       * 
  * D I S C L A I M E R:                                                                  *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
+ * This software started its development by the Universitat Politecnica de Valencia (UPV)*
  * in the context of the TESTAR Proof of Concept project:                                *
  *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
  * This graph project is distributed FREE of charge under the TESTAR license, as an open *
@@ -19,7 +19,6 @@ package es.upv.staq.testar.graph;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,19 +27,20 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.fruit.Assert;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.DirectedPseudograph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,29 +51,27 @@ import es.upv.staq.testar.ProgressFileInputStream;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
 /**
- * Graph representation for TESTAR.
+ * A directed pseudo graph (loops and multiple edges) that represents TESTAR tests.
+ * Edges can be n-ary, from one source state to n-target states.
  * 
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
-public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state concrete ID x action concrete ID
+public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // state concrete ID x < action concrete ID , target state concrete ID >
 
 	private static final long serialVersionUID = -6766749840561297953L;
-	
-	private Boolean vertexSem = new Boolean(true);
-	private Boolean edgeSem = new Boolean(false);
-	
+
 	private Map<String,IGraphState> graphStates; // state concreteID -> graph state
 	private Map<String,IGraphAction> graphActions; // action concreteID -> graph action	
 	
-	List<IGraphAction> orderedSequenceActions;
-	int actionOrder = -1;
-		
-	// begin by fraalpe2
-	private int longestPathSize = 0; // how deep from START graph state?
-	private List<IGraphState> currentPath; 
-	// end by fraalpe2
-	private List<IGraphState> longestPath = null; // by urueda
+	private HashMap<String,Set<String>> stateClusters; // abstract_R -> Set<concrete>
+	private HashMap<String,Set<String>> actionClusters; // abstract -> Set<concrete>
+
+	private List<GraphEdge> orderedSequenceActions; // < action concrete ID , target state concrete ID >
+	private int actionOrder = -1;
+
+	private List<String> currentPath, // states ID
+						 longestPath = null; // how deep from START graph state?
 	
 	private static String syncXMLGraph = "";
 
@@ -83,184 +81,242 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 							   XML_TAG_GRAPH_ACTIONS = "graph_actions",
 							   XML_TAG_STATE = "state",
 							   XML_TAG_ACTION = "action",
-							   XML_ATTRIBUTE_STATE_WID = "wid",
-							   XML_ATTRIBUTE_STATE_ABS_WID = "abswid", // abstract id
+							   XML_ATTRIBUTE_STATE_ID = "id", // concrete id
+							   XML_ATTRIBUTE_STATE_ABS_ID = "aid", // abstract id
 							   XML_ATTRIBUTE_STATE_VISITED = "visited",
 							   XML_ATTRIBUTE_STATE_WIDGET_COUNT = "wcount",
 							   XML_ATTRIBUTE_STATE_WIDGETS = "widgets",
 							   XML_ATTRIBUTE_STATE_UNEXECUTED = "unexecuted",
 							   XML_ATTRIBUTE_ACTION_ORDER = "order",
-							   XML_ATTRIBUTE_ACTION_AID = "aid",
+							   XML_ATTRIBUTE_ACTION_ID = "id", // concrete id
+							   XML_ATTRIBUTE_ACTION_ABS_ID = "aid", // abstract id
 							   XML_ATTRIBUTE_ACTION_VISITED = "visited",
 							   XML_ATTRIBUTE_ACTION_FROM = "from",
 							   XML_ATTRIBUTE_ACTION_TO = "to";
 	
 	private TESTARGraph() {
-		super(String.class);
+		super(GraphEdge.class);
 		this.graphStates = new HashMap<String,IGraphState>();
-		this.graphActions = new HashMap<String,IGraphAction>();		
-		orderedSequenceActions = new ArrayList<IGraphAction>();
+		this.graphActions = new HashMap<String,IGraphAction>();
+		this.stateClusters = new HashMap<String,Set<String>>();
+		this.actionClusters = new HashMap<String,Set<String>>();
+		orderedSequenceActions = new ArrayList<GraphEdge>();
 		actionOrder = 0;
-		longestPathSize = 0;
-		currentPath = new ArrayList<IGraphState>();
+		currentPath = new ArrayList<String>();
+		longestPath = new ArrayList<String>();
+
+		//buildSampleGraph();
+
 	}
 
 	public static TESTARGraph buildEmptyGraph(){
 		return new TESTARGraph();		
 	}
-	
+
+	private void buildSampleGraph(){
+		String vx = "x", vy = "y", vz = "z";
+		IGraphState gs1 = new GraphState(vx),
+					gs2 = new GraphState(vy),
+					gs3 = new GraphState(vz);
+		super.addVertex(vx); super.addVertex(vy); super.addVertex(vz);
+		this.graphStates.put(vx, gs1);
+		this.graphStates.put(vy, gs2);
+		this.graphStates.put(vz, gs3);
+		this.updateCluster(gs1); this.updateCluster(gs2); this.updateCluster(gs3);
+
+		GraphEdge e1 = new GraphEdge(vx, vy);
+		GraphEdge e2 = new GraphEdge(vx, vz);
+		super.addEdge(vx, vy, e1); super.addEdge(vx, vz, e2);
+		GraphAction ga = new GraphAction(vx); ga.setSourceStateID(vx); ga.addTargetStateID(vy);; ga.addTargetStateID(vz);; ga.setCount(2);
+		this.graphActions.put(vx, ga);
+		this.updateCluster(ga);
+
+		this.edgeAdded(ga, e1); this.edgeAdded(ga, e2);
+		this.orderedSequenceActions.add(e1);
+		this.orderedSequenceActions.add(e2);
+	}
+
 	public boolean stateAtGraph(String stateID){
-		synchronized(vertexSem){
+		synchronized(this.graphStates){
 			return this.graphStates.containsKey(stateID);
 		}
 	}
 	
 	public IGraphState getState(String stateID){
-		synchronized(vertexSem){
+		if (stateID == null)
+			return null;
+		synchronized(this.graphStates){
 			return this.graphStates.get(stateID);
 		}
 	}
 
 	public boolean stateAtGraph(IGraphState gs){
+		if (gs == null) return false;
 		return stateAtGraph(gs.getConcreteID());
 	}
 
 	public Collection<IGraphState> vertexStates(){
-		synchronized(vertexSem){			
+		synchronized(this.graphStates){
 			return this.graphStates.values();
 		}
 	}
+	
+	private void updateCluster(IGraphState gs){
+		String id = gs.getConcreteID();
+		if (id.equals(Grapher.GRAPH_NODE_ENTRY) ||
+			id.equals(Grapher.GRAPH_NODE_PASS) ||
+			id.equals(Grapher.GRAPH_NODE_FAIL))
+			return;
+		Set<String> c = this.stateClusters.get(gs.getAbstract_R_ID());
+		if (c == null){
+			c = new HashSet<String>();
+			this.stateClusters.put(gs.getAbstract_R_ID(), c);
+		}
+		c.add(gs.getConcreteID());
+	}
 
-   /**
-    * Add Vertex to the graph and update LongestPath.
-    * @param v Vertex to add.
-    * @return
-    */
-	public boolean addVertex(IGraphState v){
+	private void updateCluster(IGraphAction ga){
+		if (ga.getConcreteID().equals(Grapher.GRAPH_ACTION_START) ||
+			ga.getConcreteID().equals(Grapher.GRAPH_ACTION_STOP))
+			return;
+		Set<String> c = this.actionClusters.get(ga.getAbstractID());
+		if (c == null){
+			c = new HashSet<String>();
+			this.actionClusters.put(ga.getAbstractID(), c);
+		}
+		c.add(ga.getConcreteID());
+	}
+
+	public HashMap<String,Set<String>> getStateClusters(){
+		return this.stateClusters;
+	}
+
+	public HashMap<String,Set<String>> getActionClusters(){
+		return this.actionClusters;
+	}
+
+	public void addVertex(IEnvironment env, IGraphState v){
 		updateLongestPath(v);
-		synchronized(vertexSem){
-			if (this.graphStates.containsKey(v.getConcreteID())){
+		synchronized(this.graphStates){
+			if (this.graphStates.containsKey(v.getConcreteID()))
 				v.incCount();
-				return false;
-			} else{
-				boolean added = super.addVertex(v.getConcreteID());
-				if (added)
+			else {
+				if (super.addVertex(v.getConcreteID())){
 					this.graphStates.put(v.getConcreteID(),v);
-				return added;
+					updateCluster(v);
+				} else
+					System.out.println("WARNING - failed to add new state vertex to graph: " + v.toString());
 			}
 		}
 	}
 	
-	//by fraalpe2
-	public void updateLongestPath(IGraphState v){
-		// begin by urueda
-		if(v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) || v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL))
+	public void updateLongestPath(IGraphState v){ // note: longest path is not found in all cases!
+		String id = v.getConcreteID();
+		if(id.equals(Grapher.GRAPH_NODE_PASS) || id.equals(Grapher.GRAPH_NODE_FAIL))
 			return;
-		int idx = currentPath.indexOf(v);
-		if (idx != -1){
+		int idx = currentPath.indexOf(id);
+		if (idx == -1){ // not found
+			currentPath.add(id);
+			if(currentPath.size() > longestPath.size())
+				longestPath = new ArrayList<String>(currentPath);
+		} else
 			currentPath.subList(idx + 1, currentPath.size()).clear(); // remove loop
-		// end by urueda
-		} else{
-			currentPath.add(v);
-			if(currentPath.size() > longestPathSize){
-				longestPathSize = currentPath.size();
-				longestPath = new ArrayList<IGraphState>(currentPath);
-			}
-		}
 	}
 	
 	public String getLongestPath(){
 		String returnS = "Longest path (";
 		if (longestPath != null){
 			returnS += longestPath.size() + ") = ";
-			for(IGraphState gs : longestPath)
-				returnS += gs.getConcreteID() + " ";
+			for(String id : longestPath)
+				returnS += id + " ";
 		} else
 			returnS += "NULL)";
 		return returnS;
 	}
 	
-	public List<IGraphState> getLongestPathArray(){
+	public List<String> getLongestPathArray(){
 		if (longestPath != null)
 			return longestPath;
 		else
-			return new ArrayList<IGraphState>(); // empty list
-	}
-	
-	private void edgeAdded(IGraphAction e){
-		actionOrder++;
-		e.addOrder(new Integer(actionOrder).toString());
-		orderedSequenceActions.add(e);
+			return new ArrayList<String>(); // empty list
 	}
 
 	public boolean actionAtGraph(String actionID){
-		synchronized(edgeSem){
+		synchronized(this.graphActions){
 			return this.graphActions.containsKey(actionID);
 		}
 	}
 
 	public boolean actionAtGraph(IGraphAction ga){
+		if (ga == null) return false;
 		return actionAtGraph(ga.getConcreteID());
 	}
 	
 	public IGraphAction getAction(String actionID){
-		synchronized(edgeSem){
+		synchronized(this.graphActions){
 			return this.graphActions.get(actionID);
 		}
 	}
 		
 	public Collection<IGraphAction> edgeActions(){
-		synchronized(edgeSem){
+		synchronized(this.graphActions){
 			return this.graphActions.values();
 		}
 	}
 	
-	private int mutationIdx = 1;
+	private void edgeAdded(IGraphAction ga, GraphEdge edge){
+		String actionID = ga.getConcreteID();
+		if (actionID.equals(Grapher.GRAPH_ACTION_START) || actionID.equals(Grapher.GRAPH_ACTION_STOP))
+			return;
+		actionOrder++;
+		ga.addOrder(edge.getTargetStateID(), new Integer(actionOrder).toString());
+		orderedSequenceActions.add(edge);
+	}
 	
 	/**
 	 * Note: edge nodes must be added first.
 	 * see addVertex(IEnvironment env, GraphState v)
 	 */
-	public boolean addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
-		synchronized(edgeSem){
-			boolean edgeAtGraph = true, edgeMutated = false;
-			if (this.graphActions.containsKey(e.getConcreteID())){ // the edge already exists at graph?
-				edgeAtGraph &= getEdgeSource(e.getConcreteID()).equals(from.toString()); // and the edge source state is the same?
-				edgeAtGraph &= getEdgeTarget(e.getConcreteID()).equals(to.toString()); // and the edge target state is the same? 
-				if (!edgeAtGraph)
-					edgeMutated = true; // linked states changed! (maybe the SUT did not react on time to actions)	
-			} else
-				edgeAtGraph = false;
-			e.incCount();
-			if (edgeAtGraph){
-				edgeAdded(e);
-				return false;
+	public void addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
+		if (!this.containsVertex(from.getConcreteID())){
+			System.out.println("WARNING - Adding missing vertex: " + from.getConcreteID());
+			this.addVertex(env, from);
+		}
+		if (!this.containsVertex(to.getConcreteID())){
+			System.out.println("WARNING - Adding missing vertex: " + to.getConcreteID());
+			this.addVertex(env, to);
+		}
+		GraphEdge edge = new GraphEdge(e.getConcreteID(),to.getConcreteID());
+		synchronized(this.graphActions){
+			if (super.containsEdge(edge)){
+				e.incCount();
+				edgeAdded(e,edge);
+			} else if (this.graphActions.containsKey(e.getConcreteID())){ // action is at graph, but the edge not => this is multi-target
+				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
+					e.incCount();
+					edgeAdded(e,edge);
+					e.addTargetStateID(to.getConcreteID());
+				} else
+					System.out.println("WARNING - failed to add multi-target edge to graph: " + edge.toString());
 			} else{
-				IGraphAction ga = edgeMutated ? e.clone("_MUTATED_" + mutationIdx++) // keep the graph completely connected
-											  : e;
-				if (!e.getConcreteID().equals(Grapher.GRAPH_ACTION_START) && !e.getConcreteID().equals(Grapher.GRAPH_ACTION_STOP))
-					edgeAdded(ga);
-				try{
-					Assert.isTrue(this.graphStates.containsKey(from.getConcreteID()));
-					Assert.isTrue(this.graphStates.containsKey(to.getConcreteID()));
-					boolean added = super.addEdge(from.getConcreteID(), to.getConcreteID(), ga.getConcreteID());
-					if (added)
-						this.graphActions.put(ga.getConcreteID(),ga);
-					return added;
-				} catch(NullPointerException ex){
-					ex.printStackTrace();
-					return false;
-				}
+				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
+					edgeAdded(e,edge);
+					e.setSourceStateID(from.getConcreteID());
+					e.addTargetStateID(to.getConcreteID());
+					this.graphActions.put(e.getConcreteID(),e);
+					updateCluster(e);
+				} else
+					System.out.println("WARNING - failed to add new action edge to graph: " + edge.toString());
 			}
 		}
 	}
 
-	public List<IGraphAction> getOrderedActions(){
+	public List<GraphEdge> getOrderedActions(){
 		return this.orderedSequenceActions;
 	}
 	
-	public IGraphAction[] getSortedActionsByOrder(int fromOrder, int toOrder) {
-		List<IGraphAction> orderedSequenceActions = this.getOrderedActions();
+	public GraphEdge[] getSortedActionsByOrder(int fromOrder, int toOrder) {
+		List<GraphEdge> orderedSequenceActions = this.getOrderedActions();
 		int low = fromOrder >= orderedSequenceActions.size() ?
 				orderedSequenceActions.size() - 1 :
 				fromOrder < 0 ? 0 : fromOrder;
@@ -268,17 +324,17 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 			return null;
 		int high = toOrder >= orderedSequenceActions.size() ? orderedSequenceActions.size() - 1 : toOrder;
 		int actionsN = high - low + 1;
-		IGraphAction[] gas = new IGraphAction[actionsN];
+		GraphEdge[] gas = new GraphEdge[actionsN];
 		for (int i=0; i < actionsN; i++)
 			gas[i] = orderedSequenceActions.get(low + i);
 		return gas;
 	}	
 	
-	public Iterator<IGraphAction> getForwardActions(){
+	public Iterator<GraphEdge> getForwardActions(){
 		return this.orderedSequenceActions.iterator();
 	}
 	
-	public ListIterator<IGraphAction> getBackwardActions(){
+	public ListIterator<GraphEdge> getBackwardActions(){
 		return  this.orderedSequenceActions.listIterator(this.orderedSequenceActions.size());
 	}
 	
@@ -296,7 +352,7 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 		System.out.println("synced");
 	}
 	
-	public void saveToXML(String xmlPath){
+	public void saveToXML(IEnvironment env, String xmlPath){
 		syncXMLGraph(xmlPath);
 		PrintWriter writer = null;
  		try {
@@ -309,24 +365,27 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 				stateID = gs.getConcreteID();
 				if (!stateID.equals(Grapher.GRAPH_NODE_ENTRY) &&
 					!stateID.equals(Grapher.GRAPH_NODE_PASS) && !stateID.equals(Grapher.GRAPH_NODE_FAIL)){
-					writer.write("\t\t<" + XML_TAG_STATE + " " + XML_ATTRIBUTE_STATE_WID + "=\"" + gs.getConcreteID() + "\"");
-					writer.write(" " + XML_ATTRIBUTE_STATE_ABS_WID + "=\"" + gs.getAbstract_R_ID() + "\"");
-					writer.write(" " + XML_ATTRIBUTE_STATE_VISITED + "=\"" + gs.getCount() + "\"");
-					writer.write(" " + XML_ATTRIBUTE_STATE_WIDGET_COUNT + "=\"" + gs.getStateWidgetsExecCount().size() + "\"");
-					writer.write(" " + XML_ATTRIBUTE_STATE_WIDGETS + "=\"" + gs.getStateWidgetsExecCount() + "\"");
-					writer.write(" " + XML_ATTRIBUTE_STATE_UNEXECUTED + "=\"" + gs.getUnexploredActionsString() + "\"");
-					writer.write("/>\n");
+					writer.write("\t\t<" + XML_TAG_STATE + " " + XML_ATTRIBUTE_STATE_ID + "=\"" + gs.getConcreteID() + "\" " +
+								 XML_ATTRIBUTE_STATE_ABS_ID + "=\"" + gs.getAbstract_R_ID() + "\" " +
+								 XML_ATTRIBUTE_STATE_VISITED + "=\"" + gs.getCount() + "\" " +
+								 XML_ATTRIBUTE_STATE_WIDGET_COUNT + "=\"" + gs.getStateWidgetsExecCount().size() + "\" " +
+								 XML_ATTRIBUTE_STATE_WIDGETS + "=\"" + gs.getStateWidgetsExecCount() + "\" " +
+								 XML_ATTRIBUTE_STATE_UNEXECUTED + "=\"" + gs.getUnexploredActionsString() + "\"/>\n");
 				}
 			}
 			writer.write("\t</" + XML_TAG_GRAPH_STATES + ">\n");
 			writer.write("\t<" +  XML_TAG_GRAPH_ACTIONS + ">\n");
 			int idx = 1;
-			IGraphAction[] orderedActions = this.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
-			for (IGraphAction ga : orderedActions){
-				writer.write("\t\t<" + XML_TAG_ACTION + " " + XML_ATTRIBUTE_ACTION_ORDER + "=\"" + idx++ + "\" " + XML_ATTRIBUTE_ACTION_AID + "=\"" + ga.getConcreteID() + "\"");				
-				writer.write(" " + XML_ATTRIBUTE_ACTION_VISITED + "=\"" + ga.getCount() +  "\"");
-				writer.write(" " + XML_ATTRIBUTE_ACTION_FROM + "=\"" + this.getEdgeSource(ga.getConcreteID()) +  "\"");
-				writer.write(" " + XML_ATTRIBUTE_ACTION_TO + "=\"" + this.getEdgeTarget(ga.getConcreteID()) +  "\"/>\n");
+			IGraphAction ga;
+			GraphEdge[] orderedActions = this.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
+			for (GraphEdge edge : orderedActions){
+				ga = env.getAction(edge.getActionID());
+				writer.write("\t\t<" + XML_TAG_ACTION + " " + XML_ATTRIBUTE_ACTION_ORDER + "=\"" + idx++ + "\" " +
+							  XML_ATTRIBUTE_ACTION_ID + "=\"" + ga.getConcreteID() + "\" " +
+							  XML_ATTRIBUTE_ACTION_ABS_ID + "=\"" + ga.getAbstractID() + "\" " +
+							  XML_ATTRIBUTE_ACTION_VISITED + "=\"" + ga.getCount() +  "\" " +
+							  XML_ATTRIBUTE_ACTION_FROM + "=\"" + ga.getSourceStateID() +  "\" " +
+							  XML_ATTRIBUTE_ACTION_TO + "=\"" + edge.getTargetStateID() +  "\"/>\n");
 			}
 			writer.write("\t</" + XML_TAG_GRAPH_ACTIONS + ">\n");
 			writer.write("</" + XML_TAG_TESTAR_GRAPH + ">\n");
@@ -336,9 +395,9 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 			e.printStackTrace();
 		} finally {
 			if (writer != null) writer.close();
-		}
-		synchronized(TESTARGraph.syncXMLGraph){
-			TESTARGraph.syncXMLGraph = "";
+			synchronized(TESTARGraph.syncXMLGraph){
+				TESTARGraph.syncXMLGraph = "";
+			}
 		}
 	}
 
@@ -384,8 +443,10 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 				LogSerialiser.log("Exception loading graph filet: " + xmlPath, LogSerialiser.LogLevel.Critical);
 			else{
 				
-				GraphState gs; GraphAction ga;
-				Map<String,GraphState> graphStates = new HashMap<String,GraphState>();
+				Grapher.getWalker().enablePreviousWalk();
+
+				IGraphState gs; GraphAction ga;
+				Map<String,IGraphState> graphStates = new HashMap<String,IGraphState>();
 				
 				Node node; Element element;
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_STATE);
@@ -396,8 +457,8 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 		        	node = nList.item(nidx);
 		        	if (node.getNodeType() == Node.ELEMENT_NODE){
 		        		element = (Element) node;
-		        		String wid = element.getAttribute(XML_ATTRIBUTE_STATE_WID),
-		        			   abswid = element.getAttribute(XML_ATTRIBUTE_STATE_ABS_WID);
+		        		String wid = element.getAttribute(XML_ATTRIBUTE_STATE_ID),
+		        			   abswid = element.getAttribute(XML_ATTRIBUTE_STATE_ABS_ID);
 		        		gs = new GraphState(wid,abswid);
 		        		String visited = element.getAttribute(XML_ATTRIBUTE_STATE_VISITED);
 		        		try{
@@ -434,38 +495,43 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 			        		while (st.hasMoreTokens())
 			        			gs.actionUnexplored(st.nextToken());
 		        		}
-		        		
-		        		gs.knowledge(true);
+
 		        		graphStates.put(wid,gs);
+		        		//Grapher.notify(gs,null);
 		        	}
 		        }
 		        
 				int graphActionsCount = 0;
 		        nList = doc.getElementsByTagName(XML_TAG_ACTION);
 		        lastProgress = 0; System.out.println("Loading graph edge nodes [" + nList.getLength() + "]:");
+		        String wid, absid, from, to = null;
 		        nListLength = nList.getLength();
 		        for (int nidx = 0; nidx < nListLength; nidx++){
 		        	printGraphLoadingProgress((float)nidx,(float)nListLength);
 		        	node = nList.item(nidx);
 		        	if (node.getNodeType() == Node.ELEMENT_NODE){
 		        		element = (Element) node;
-		        		String wid = element.getAttribute(XML_ATTRIBUTE_ACTION_AID);
-		        		String from = element.getAttribute(XML_ATTRIBUTE_ACTION_FROM);
-		        		String to = element.getAttribute(XML_ATTRIBUTE_ACTION_TO);
-		        		ga = new GraphAction(wid);
+		        		wid = element.getAttribute(XML_ATTRIBUTE_ACTION_ID);
+		        		absid = element.getAttribute(XML_ATTRIBUTE_ACTION_ABS_ID);
+		        		from = element.getAttribute(XML_ATTRIBUTE_ACTION_FROM);
+		        		to = element.getAttribute(XML_ATTRIBUTE_ACTION_TO);
+		        		ga = new GraphAction(wid,absid);
 		        		String visited = element.getAttribute(XML_ATTRIBUTE_ACTION_VISITED);
 		        		try{
 		        			int v = new Integer(visited).intValue();
 		        			ga.setCount(v);
 		        		} catch (NumberFormatException nfe){}
-		        		ga.addOrder("0");
-		        		ga.knowledge(true);		        
-		        		Grapher.notify(graphStates.get(from),ga);
+		        		gs = graphStates.get(from);
+		        		Grapher.notify(gs, ga);
 		        		graphMovements++;
 		        		graphActionsCount++;
 		        	}
 		        }
-		        
+		        if (to != null)
+		        	Grapher.notify(graphStates.get(to),null); // ending state
+		        else
+		        	System.out.println("End state missing at XML loading");
+
 				System.out.println("\tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
 			}
 		} else
@@ -473,6 +539,11 @@ public class TESTARGraph extends DefaultDirectedGraph<String, String> { // state
 		synchronized(TESTARGraph.syncXMLGraph){
 			TESTARGraph.syncXMLGraph = "";
 		}
+
+		Grapher.syncMovements(); // synchronize graph movements consumption for consistent XML loading
+
+		Grapher.getWalker().disablePreviousWalk();
+
 		return graphMovements;
 	}
 	

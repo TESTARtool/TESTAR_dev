@@ -30,7 +30,7 @@ import org.fruit.alayer.Widget;
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
-public class FactsState {
+public class FactsUIStates {
   
 	public static final String FACT_STATE = "state"; 		// state(S)			:  S = SUT state/widget-tree 
 	public static final String FACT_NOWSTATE = "nowstate";	// nowstate(Sn)		: Sn = Current SUT state
