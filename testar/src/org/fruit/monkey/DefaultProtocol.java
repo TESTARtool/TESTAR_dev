@@ -28,20 +28,16 @@
 package org.fruit.monkey;
 
 import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.Title;
-import static org.fruit.monkey.ConfigTags.ClickFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.fruit.Assert;
 import org.fruit.Drag;
@@ -49,6 +45,7 @@ import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.AutomationCache;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;
@@ -68,13 +65,10 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.monkey.AbstractProtocol.Modes;
-import org.fruit.monkey.AbstractProtocol.ProcessInfo;
 
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
@@ -102,7 +96,11 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	protected void initialize(Settings settings){
 		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
-		builder = NativeLinker.getNativeStateBuilder(settings.get(ConfigTags.TimeToFreeze)); // by urueda
+		builder = NativeLinker.getNativeStateBuilder(
+			settings.get(ConfigTags.TimeToFreeze),
+			settings.get(ConfigTags.AccessBridgeEnabled),
+			settings.get(ConfigTags.SUTProcesses)
+			); // by urueda
 	}
 	
 	protected Canvas buildCanvas() {
@@ -159,17 +157,18 @@ public class DefaultProtocol extends AbstractProtocol{
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
+			sut.setNativeAutomationCache();
 			//Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
 					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 			State state;
 			do{
 				if (sut.isRunning()){
-					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms; waiting SUT to be ready ...");
+					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 					state = builder.apply(sut);
 					if (state != null && state.childCount() > 0){
 						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-						System.out.println("SUT ready after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+						System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 						return sut;
 					}
 				}
@@ -194,8 +193,8 @@ public class DefaultProtocol extends AbstractProtocol{
 			// retry start system
 			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
-		} else
-			throw new SystemStartException("SUT not running after <" + pendingEngageTime + "> miliseconds!");							
+		} else // unable to kill SUT
+			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
 	}
 
 	// by urueda
@@ -280,8 +279,8 @@ public class DefaultProtocol extends AbstractProtocol{
 		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
 
 		double minZIndex = Double.MAX_VALUE,
-				maxZIndex = Double.MIN_VALUE,
-				zindex;
+			   maxZIndex = Double.MIN_VALUE,
+			   zindex;
 		for (Widget w : state){
 			zindex = w.get(Tags.ZIndex).doubleValue();
 			if (zindex < minZIndex)
@@ -292,7 +291,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		state.set(Tags.MinZIndex, minZIndex);
 		state.set(Tags.MaxZIndex, maxZIndex);
 		// end by urueda
-		
+
 		return state;
 	}
 
@@ -315,16 +314,29 @@ public class DefaultProtocol extends AbstractProtocol{
 		// ORACLES ALMOST FOR FREE
 		//------------------------
 		
-		String titleRegEx = settings().get(ConfigTags.SuspiciousTitles);
+		// begin by urueda
+		if (this.suspiciousTitlesPattern == null)
+			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
+		Matcher m;
+		// end by urueda
 		// search all widgets for suspicious titles
 		for(Widget w : state){
 			String title = w.get(Title, "");
-			if (title != null && !title.isEmpty() && title.matches(titleRegEx)){ // by urueda
-				Visualizer visualizer = Util.NullVisualizer;
-				// visualize the problematic widget, by marking it with a red box
-				if(w.get(Tags.Shape, null) != null)
-					visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-				return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
+			if (title != null && !title.isEmpty()){
+				// begin by urueda
+				m = this.suspiciousTitlesMatchers.get(title);
+				if (m == null){
+					m = this.suspiciousTitlesPattern.matcher(title);
+					this.suspiciousTitlesMatchers.put(title, m);
+				}
+				if (m.matches()){ // end by urueda
+					Visualizer visualizer = Util.NullVisualizer;
+					// visualize the problematic widget, by marking it with a red box
+					if(w.get(Tags.Shape, null) != null)
+						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+					return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
+				}
 			}
 		}
 		
@@ -416,10 +428,20 @@ public class DefaultProtocol extends AbstractProtocol{
 	
 	// by urueda
 	protected boolean isUnfiltered(Widget w){
-		if(Util.hitTest(w, 0.5, 0.5) && !w.get(Title, "").matches(settings().get(ClickFilter)))
-			return true;
-		else
+		if(!Util.hitTest(w, 0.5, 0.5))
 			return false;
+		if (this.clickFilterPattern == null)
+			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+		// System.out.println(this.clickFilterMatchers.size() + " clickFilter matchers");
+		String title = w.get(Title, "");
+		if (title == null || title.isEmpty())
+			return true;
+		Matcher m = this.clickFilterMatchers.get(title);
+		if (m == null){
+			m = this.clickFilterPattern.matcher(title);
+			this.clickFilterMatchers.put(title, m);
+		}
+		return !m.matches();
 	}
 	
 	// by urueda
@@ -442,7 +464,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
-				actionCount() <= settings().get(ConfigTags.SequenceLength) && // by urueda
+				actionCount() <= lastSequenceActionNumber && // by urueda
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
@@ -474,6 +496,12 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	// by urueda
 	@Override
-	protected void stopSystem(SUT system) {}
+	protected void stopSystem(SUT system) {
+		if (system != null){
+			AutomationCache ac = system.getNativeAutomationCache();
+			if (ac != null)
+				ac.releaseCachedAutomationElements();
+		}
+	}
 		
 }

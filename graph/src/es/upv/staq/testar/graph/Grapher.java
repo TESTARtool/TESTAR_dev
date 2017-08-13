@@ -86,6 +86,8 @@ public class Grapher implements Runnable {
 	
 	public static boolean FORMS_TYPING_ENHANCEMENT;
 	
+	public static int TYPING_TEXTS_FOR_EXECUTED_ACTION;
+	
 	private static Grapher singletonGrapher = new Grapher();	
 			
 	private static LinkedList<Movement> movementsFIFO = new LinkedList<Movement>();
@@ -125,7 +127,7 @@ public class Grapher implements Runnable {
 	 * Run a new TESTAR grapher.
 	 * @param testGenerator A valid generator is expected.
 	 */
-	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling,
+	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling, int typingTexts,
 							   String testGenerator, Double maxReward, Double discount,
 							   Integer explorationSampleInterval, boolean graphsActivated, boolean prologActivated,
 							   boolean graphResumingActivated, boolean offlineGraphConversion,
@@ -144,6 +146,7 @@ public class Grapher implements Runnable {
 		Grapher.testSequencePath = testSequencePath;
 		Grapher.testSequenceLength = sequenceLength;
 		Grapher.FORMS_TYPING_ENHANCEMENT = formsFilling;
+		Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION = typingTexts;
 		if (!graphsActivated && !testGenerator.equals(Grapher.RANDOM_GENERATOR)){
 			System.out.println("Cannot use <" + testGenerator + "> test generator as GRAPHS are not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
 			Grapher.testGenerator = Grapher.RANDOM_GENERATOR;			
@@ -314,7 +317,7 @@ public class Grapher implements Runnable {
 		}
 		while(graphing){
 			try {
-				TimeUnit.MILLISECONDS.sleep(10);
+				TimeUnit.MILLISECONDS.sleep(1);
 			} catch (InterruptedException e) {}
 		}
 		return;
@@ -378,15 +381,7 @@ public class Grapher implements Runnable {
 		GraphReporter.useGraphData(graphTime,testSequencePath);
 		//WalkReport wr = new WalkReport("Q-Learning", 0, 0, 0, 0, 0, 0);
 		//System.out.println(wr);
-		if (Grapher.GRAPHS_ACTIVATED){
-			Grapher.GRAPH_LOADING_TASK = Grapher.GRAPH_RESUMING_ACTIVATED;
-			if (Grapher.GRAPH_RESUMING_ACTIVATED){
-				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
-				Grapher.graphLoadingMovement = 0;
-			}
-			env = new TESTAREnvironment(testSequencePath);
-			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
-		}
+		
 		if (testGenerator.equals(QLEARNING_GENERATOR)){
 			if (QLEARNING_CALIBRATION){
 				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
@@ -414,6 +409,17 @@ public class Grapher implements Runnable {
 			walker = new RandomWalker(new Random(graphTime));
 			System.out.println("<Random> test generator enabled");			
 		}
+
+		if (Grapher.GRAPHS_ACTIVATED){
+			Grapher.GRAPH_LOADING_TASK = Grapher.GRAPH_RESUMING_ACTIVATED;
+			if (Grapher.GRAPH_RESUMING_ACTIVATED){
+				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
+				Grapher.graphLoadingMovement = 0;
+			}
+			env = new TESTAREnvironment(testSequencePath);
+			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
+		}
+		
 		if (PROLOG_ACTIVATED)
 			walker.setProlog(jipWrapper);
 		if (Grapher.GRAPHS_ACTIVATED){
@@ -422,32 +428,46 @@ public class Grapher implements Runnable {
 		}
 	}
 	
-	public static String getReport(){
-		if (Grapher.GRAPHS_ACTIVATED){
-			System.out.println("TESTAR sequence graph dump on way ...");
-			String report = "Premature test end ... graph-report is NULL";
-			try {
-				while (walkStopper != null && walkStopper.continueWalking()){
-					synchronized(walkStopper){
-						try {
-							walkStopper.wait(100); // ms
-						} catch (InterruptedException e) {}
-					}
+	/**
+	 * Retrieves the active walker.
+	 * @return The walker.
+	 */
+	public static IWalker getWalker(){
+		return Grapher.walker;		
+	}
+	
+	// null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+	public static String[] getReport(int firstSequenceActionNumber){
+		if (!Grapher.GRAPHS_ACTIVATED)
+			return null;
+		System.out.println("TESTAR sequence graph dump on way ...");
+		try {
+			while (walkStopper != null && walkStopper.continueWalking()){
+				synchronized(walkStopper){
+					try {
+						walkStopper.wait(100); // ms
+					} catch (InterruptedException e) {}
 				}
-				report = env.toString();
-		        // begin - sync with following test sequence grapher (if any)
-		    	IEnvironment notifyEnv = env;	        
+			}
+			String[] report = env.getReport(firstSequenceActionNumber);
+			System.out.println("... finished TESTAR sequence graph dump");			
+			return report;
+		} catch(java.lang.NullPointerException npe){ // premature test end <- env == null
+			System.out.println("Grapher exception caught:");
+			npe.printStackTrace();
+			//resetGrapherFields();
+			return null;
+		} finally {
+	        // begin - sync with following test sequence grapher (if any)
+			if (env != null){
+		    	IEnvironment notifyEnv = env;    
 				resetGrapherFields(); // env = null; // let next test sequence grapher start
 		    	synchronized(notifyEnv){
 		    		notifyEnv.notifyAll();
 		    	}
-		    	// end - sync
-				//resetGrapherFields();
-			} catch(java.lang.NullPointerException npe){} // premature test end <- env == null
-			System.out.println("... finished TESTAR sequence graph dump");			
-			return report;
-		} else
-			return "Graphs report unavailable as GRAPHS are not activated";
+			}
+		    // end - sync				
+		}
 	}
 	
 	public static IEnvironment getEnvironment(){

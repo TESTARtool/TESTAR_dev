@@ -64,7 +64,7 @@ public class MaxCoverageWalker extends AbstractWalker {
 			ga = env.get(a);
 			flag = false;
 			if (!env.actionAtGraph(ga)){
-				targetWidgetID = ga.getTargetID();
+				targetWidgetID = ga.getTargetWidgetID();
 				if (targetWidgetID == null)
 					flag = true;
 				else {
@@ -82,13 +82,18 @@ public class MaxCoverageWalker extends AbstractWalker {
 			return new ArrayList<Action>(unexploredActions).get(rnd.nextInt(unexploredActions.size()));
 
 		// check target states
-		IGraphState ts;
+		boolean allStatesUnexplored = true;
 		for(Action a : actions){
 			ga = env.get(a);
 			if (env.actionAtGraph(ga)){
-				ts = env.getTargetState(ga);
-				if (ts.getUnexploredActionsSize() > 0){
-					System.out.println("[MaxCoverageWalker] Moving to unexplored state: " + ts.getConcreteID());
+				for (IGraphState gs : env.getTargetStates(ga)){
+					if (gs.getUnexploredActionsSize() == 0){
+						allStatesUnexplored = false;
+						break;
+					}
+				}
+				if (allStatesUnexplored){
+					System.out.println("[MaxCoverageWalker] Moving to unexplored state from >" + state.get(Tags.ConcreteID) + "> through <" + ga.getConcreteID() + ">");
 					return a;
 				}
 			}
@@ -112,18 +117,18 @@ public class MaxCoverageWalker extends AbstractWalker {
 	}
 
 	@Override
-	public double getActionReward(IEnvironment env, IGraphAction action) {
+	public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
 		RestartsWalkerUtil.notifyRewardCalculation(env, action);
-		return super.getActionReward(env, action);
+		return super.calculateRewardForAction(env, action);
 	}
 	
 	@Override
-	public double getStateReward(IEnvironment env, IGraphState targetState){
+	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
 		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
 		if (r != Double.MIN_VALUE)
 			return r;
 		else
-			return super.getStateReward(env, targetState);
+			return super.calculateRewardForState(env, targetState);
 	}		
 		
 }

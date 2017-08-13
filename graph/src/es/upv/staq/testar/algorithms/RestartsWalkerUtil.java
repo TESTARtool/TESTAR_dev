@@ -16,6 +16,7 @@
 
 package es.upv.staq.testar.algorithms;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.fruit.alayer.State;
@@ -152,11 +153,16 @@ public class RestartsWalkerUtil {
 
 	public static void notifyRewardCalculation(IEnvironment env, IGraphAction action) {
 		if (pathTargetState != null){
-			if (pathTargetState.indexOf(env.getTargetState(action)) == pathTargetState.size() - 1){ // target state
+						
+			IGraphState[] targetStates = env.getTargetStates(action);
+			if (targetStates != null &&
+			    Arrays.stream(targetStates).anyMatch(pathTargetState.get(pathTargetState.size() - 1)::equals)){ // path target state
+			
 				pathTargetState.clear(); // target state reached!
 				pathTargetState = null;
 				restartWindowCounter = -1;
 				System.out.println("[RestartsWalkerUtil] Walker restart successful!");
+
 			}
 		}
 	}

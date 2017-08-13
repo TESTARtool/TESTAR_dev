@@ -14,6 +14,13 @@
 #include <comutil.h>
 #include <Psapi.h>
 
+ /* by ferpasri & urueda */
+#include <AccessBridgeCalls.h>
+
+// by urueda
+#ifndef uint
+#define uint unsigned int
+#endif
 
 const int ERROR_BUFFER_LEN = 2000;
 TCHAR ErrorBuffer[ERROR_BUFFER_LEN];
@@ -2365,6 +2372,198 @@ JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong p
 	 
 	jlongArray ret = env->NewLongArray(2);
 	env->SetLongArrayRegion(ret, 0, 2, cpu);
+	return ret;
+
+}
+
+/**
+  * InitializeAccessBridge
+  * by ferpasri & urueda */
+JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
+
+	MSG msg;
+	BOOL result = initializeAccessBridge();
+
+    if (result != FALSE) {
+		
+        while (GetMessage(&msg, NULL, 0, 0)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        shutdownAccessBridge();
+		
+    }
+
+	return result;
+	
+}
+
+/**
+  * GetAccessibleContext
+  * by urueda (based on ferpasri) */
+JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd){
+	
+	HWND window = (HWND)hwnd;
+	jlongArray ret = 0;
+
+	if (IsJavaWindow(window)){
+
+		long vmid;
+		AccessibleContext ac;
+	
+		if (GetAccessibleContextFromHWND(window, &vmid, &ac)) {
+				
+			jlong vmidAC[2];
+			
+			vmidAC[0] = (jlong) vmid;
+			vmidAC[1] = (jlong) ac;
+						
+			ret = env->NewLongArray(2); // vmid x ac
+			env->SetLongArrayRegion(ret, (jsize)0, (jsize)2, (jlong*)&vmidAC[0]); 
+		
+		}
+	
+	}
+	
+	return ret;
+	
+}
+
+/**
+  * GetHWNDFromAccessibleContext
+  * by urueda */
+JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+    HWND window = getHWNDFromAccessibleContext((long) vmid, (long) ac);
+
+	return (jlong) window;
+	
+}
+ 
+ /**
+  * GetVisibleChildrenCount
+  * by urueda */
+/*JNI_SIG(jint, WINAPI_NS(GetVisibleChildrenCount)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+	
+	return (jint) getVisibleChildrenCount((long)vmid, (AccessibleContext)ac);
+	
+}*/
+
+/**
+  * GetVisibleChildren
+  * by urueda */
+/*JNI_SIG(jlongArray, WINAPI_NS(GetVisibleChildren)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	VisibleChildrenInfo visibleChildrenInfo;
+	
+	jlongArray ret = 0;
+	
+	if (getVisibleChildren((long)vmid, (AccessibleContext)ac, 0, &visibleChildrenInfo)){
+				
+		ret = env->NewLongArray(2); // visibleChildren
+		env->SetLongArrayRegion(ret, (jsize)0, (jsize)1, (jlong*)visibleChildrenInfo.children);
+		
+	}
+	
+	return ret;
+
+}*/
+
+/**
+  * GetAccessibleChildFromContext
+  * by urueda */
+JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i){
+
+	AccessibleContext child = GetAccessibleChildFromContext(vmid, ac, (int)i);
+		
+	return (jlong) child;
+
+}
+
+/**
+  * by urueda */			   
+char* wchart2String(JNIEnv * env, wchar_t *value){
+
+	char bf[sizeof(value)/sizeof(wchar_t)];
+		
+	sprintf(bf, "%ws", value);
+	
+	return bf;
+	
+}
+
+/**
+  * by urueda */			   
+char* jint2String(JNIEnv * env, jint value){
+
+	char bf[64];
+	
+	sprintf(bf, "%d", value);
+	
+	return bf;
+	
+}
+
+/**
+  * GetAccessibleContextProperties
+  * by urueda */
+JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+	
+	jobjectArray ret = 0;
+	
+	AccessibleContextInfo info;
+
+	if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)ac, &info)){
+		
+		const int ACCESSIBLE_PROPERTIES = 9;
+		
+		ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
+		
+		env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.role)));
+		env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.name)));
+		env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.description)));
+		env->SetObjectArrayElement(ret, 3, env->NewStringUTF(jint2String(env, info.x)));
+		env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.y)));
+		env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.width)));
+		env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.height)));
+		env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.indexInParent)));
+		env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.childrenCount)));
+	
+	}
+	
+	return ret;
+	
+}
+
+/**
+  * GetProcessNameFromHWND
+  * by urueda */
+JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
+
+	HWND window = (HWND) hwnd;
+	DWORD  pid;
+	HANDLE handle;
+	
+	TCHAR processName[256];	
+	jstring ret = 0;
+
+	GetWindowThreadProcessId(window, &pid);
+	handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+
+	if (handle) {
+
+		DWORD nameSize = ARRAYSIZE(processName);
+		
+		if (QueryFullProcessImageName(handle, 0, processName, &nameSize)){
+
+			ret = env->NewStringUTF(processName);
+		
+		}	
+		
+		CloseHandle(handle);
+	
+	}
+	
 	return ret;
 
 }

@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.accessibility.AccessibleContext;
+
 
 /**
  * Provides access to the classic native WinApi Functions.
@@ -715,8 +717,19 @@ public final class Windows{
 	public static native void Gdiplus_FontFamily_Destroy(long pFontFamily) throws GDIException;
 
 	// begin by urueda
-	public static native long GetProcessMemoryInfo(long processID);
+	public static native long   GetProcessMemoryInfo(long processID);
 	public static native long[] GetProcessTimes(long processID);
+	public static native String	GetProcessNameFromHWND(long hwnd);
+	// end by urueda
+
+	public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
+	// begin by urueda
+	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
+	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
+	//public static native int	  GetVisibleChildrenCount(long vmid, long ac);
+	//public static native long[]   GetVisibleChildren(long vmid, long ac);
+	public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);
+	public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
 	// end by urueda
 
 	public static String Gdiplus_Status2String(int statusCode){
@@ -864,9 +877,9 @@ public final class Windows{
 			loadLib("msvcp100.dll");
 			loadLib("windows.dll");*/
 			// begin by urueda
-			loadExternalLib("msvcr100.dll");
-			loadExternalLib("msvcp100.dll");
-			loadExternalLib("windows.dll");
+			loadExternalLib("lib/msvcr100.dll");
+			loadExternalLib("lib/msvcp100.dll");
+			loadExternalLib("lib/windows.dll");
 			// end by urueda
 		}catch(IOException ioe){
 			throw new RuntimeException(ioe);

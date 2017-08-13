@@ -46,18 +46,18 @@ public class QLearningRestartsWalker extends QLearningWalker {
 	}
 
 	@Override
-	public double getActionReward(IEnvironment env, IGraphAction action) {
+	public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
 		RestartsWalkerUtil.notifyRewardCalculation(env, action);
-		return super.getActionReward(env, action);
+		return super.calculateRewardForAction(env, action);
 	}
 
 	@Override
-	public double getStateReward(IEnvironment env, IGraphState targetState){
+	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
 		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
 		if (r != Double.MIN_VALUE)
 			return r;
 		else
-			return super.getStateReward(env, targetState);
+			return super.calculateRewardForState(env, targetState);
 	}	
 	
 }

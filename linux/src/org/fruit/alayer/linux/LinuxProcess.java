@@ -1,5 +1,13 @@
 package org.fruit.alayer.linux;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Util;
@@ -17,15 +25,6 @@ import org.fruit.alayer.linux.atspi.AtSpiAccessible;
 import org.fruit.alayer.linux.atspi.TreeWalker;
 import org.fruit.alayer.linux.util.JavaHelper;
 import org.fruit.alayer.linux.util.xdotools;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 
 /**
  * Represents a Linux process.
@@ -827,5 +826,9 @@ public class LinuxProcess extends SUTBase {
 
     //endregion
 
+    /**
+     * @author: urueda
+     */
+	@Override public void setNativeAutomationCache() {}
 
 }

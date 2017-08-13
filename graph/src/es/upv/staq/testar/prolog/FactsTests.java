@@ -24,6 +24,7 @@ import java.util.WeakHashMap;
 
 import org.fruit.alayer.Tags;
 
+import es.upv.staq.testar.graph.GraphEdge;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphAction;
@@ -35,7 +36,7 @@ import es.upv.staq.testar.graph.IGraphState;
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
-public class FactsEnvironment {
+public class FactsTests {
 
 	public static final String FACT_ACTION_SOURCE = "source"; // source(S,A) : S source state of action A
 	public static final String FACT_ACTION_TARGET = "target"; // target(S,A) : S target state of action A
@@ -57,25 +58,28 @@ public class FactsEnvironment {
     			facts.addAll(cached);
     		else{
 	       		if (!gsid.equals(Grapher.GRAPH_NODE_ENTRY)){
-	    			facts.add(FactsState.FACT_STATE + "('" + gsid + "')."); // state(S)
+	    			facts.add(FactsUIStates.FACT_STATE + "('" + gsid + "')."); // state(S)
 	    			facts.addAll(getVertexAtoms(gs,gsid));
 	    		}
     		}
     	}
     	int order = 1;
-    	String gaid, sourceID, targetID;
-    	for (IGraphAction ga : env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE)){
-    		gaid = ga.getConcreteID();
-    		cached = actionFactsCache.get(gaid);
+    	String sourceID, targetID;
+    	IGraphAction ga;
+    	for (GraphEdge edge : env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE)){
+    		ga = env.getAction(edge.getActionID());
+    		cached = actionFactsCache.get(edge);
     		if (cached != null)
     			facts.addAll(cached);
     		else{
-	    		sourceID = env.getSourceState(ga).getConcreteID();
-	    		targetID = env.getTargetState(ga).getConcreteID();
-	    		facts.add(FactsAction.FACT_ACTION + "('" + gaid + "','" + sourceID + "','" +
-	    				  ga.getTargetID() + "','" + ga.getRole() + "'," + (order++) + ")."); // action(A,S,W,T,O)
-	    		facts.add(FACT_ACTION_SOURCE + "('" + sourceID + "','" + ga.getConcreteID() + "')."); // source(S,A)
-	    		facts.add(FACT_ACTION_TARGET + "('" + targetID + "','" + ga.getConcreteID() + "')."); // target(S,A)
+	    		sourceID = ga.getSourceStateID();	    		
+	    		for (IGraphState gs : env.getTargetStates(ga)){
+		    		targetID = edge.getTargetStateID();
+		    		facts.add(FactsUIActions.FACT_ACTION + "('" + edge.getActionID() + "','" + sourceID + "','" +
+		    				  ga.getTargetWidgetID() + "','" + ga.getRole() + "'," + (order++) + ")."); // action(A,S,W,T,O)
+		    		facts.add(FACT_ACTION_SOURCE + "('" + sourceID + "','" + edge.getActionID() + "')."); // source(S,A)
+		    		facts.add(FACT_ACTION_TARGET + "('" + targetID + "','" + edge.getActionID() + "')."); // target(S,A)	    			
+	    		}	    			
     		}
     	}
     	
@@ -88,17 +92,17 @@ public class FactsEnvironment {
     	String property;
     	Map<String,String> widgetProperties;
     	for (String w : gs.getStateWidgetsExecCount().keySet()){
-    		facts.add(FactsState.FACT_WIDGET + "('" + w + "','" + vertex + "')."); // widget(W,S)
-    		facts.add(FactsState.FACT_PARENT + "('" + gs.getParent(w) + "','" + w + "')."); // parent(Wp,Wc)
+    		facts.add(FactsUIStates.FACT_WIDGET + "('" + w + "','" + vertex + "')."); // widget(W,S)
+    		facts.add(FactsUIStates.FACT_PARENT + "('" + gs.getParent(w) + "','" + w + "')."); // parent(Wp,Wc)
     		widgetProperties = gs.getWidgetProperties(w);
     		
     		for (String p : widgetProperties.keySet()){
     			if (p.equals(Tags.Role.name()))
-    				property = FactsState.FACT_ROLE;
+    				property = FactsUIStates.FACT_ROLE;
     			else if (p.equals(Tags.Title.name()))
-    				property = FactsState.FACT_TITLE;
+    				property = FactsUIStates.FACT_TITLE;
     			else if (p.equals(Tags.Path.name()))
-    				property = FactsState.FACT_PATH;
+    				property = FactsUIStates.FACT_PATH;
     			else
     				property = null;
     			if (property != null)
