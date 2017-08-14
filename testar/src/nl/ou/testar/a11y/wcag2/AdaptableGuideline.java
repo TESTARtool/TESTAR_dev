@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,9 @@ public final class AdaptableGuideline extends AbstractGuideline {
 
 	AdaptableGuideline(int nr, Principle parent) {
 		super(nr, "Adaptable", parent);
+		criteria.add(new SuccessCriterion(1, "Info and Relationships", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Meaningful Sequence", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Sensory Characteristics", this, Level.A));
 	}
 
 }

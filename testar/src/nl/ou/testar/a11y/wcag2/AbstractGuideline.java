@@ -36,6 +36,8 @@ import org.fruit.alayer.Verdict;
  */
 public abstract class AbstractGuideline extends ItemBase {
 	
+	protected final List<SuccessCriterion> criteria = new ArrayList<>();
+	
 	/**
 	 * Constructs a new guideline
 	 * @param nr The number of the guideline.

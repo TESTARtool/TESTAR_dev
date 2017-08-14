@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,8 @@ public final class EnoughTimeGuideline extends AbstractGuideline {
 
 	EnoughTimeGuideline(int nr, Principle parent) {
 		super(nr, "Enough Time", parent);
+		criteria.add(new SuccessCriterion(1, "Timing Adjustable", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Pause, Stop, Hide", this, Level.A));
 	}
 
 }

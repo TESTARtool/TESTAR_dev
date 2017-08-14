@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,8 @@ public final class CompatibleGuideline extends AbstractGuideline {
 
 	CompatibleGuideline(int nr, Principle parent) {
 		super(nr, "Compatible", parent);
+		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
 	}
 
 }

@@ -17,15 +17,18 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
 public final class TextAlternativesGuideline extends AbstractGuideline {
-
+	
 	TextAlternativesGuideline(int nr, Principle parent) {
 		super(nr, "Text Alternatives", parent);
+		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
 	}
 
 }

@@ -33,7 +33,7 @@ import org.fruit.alayer.State;
  */
 public class Principle extends ItemBase {
 	
-	private final List<AbstractGuideline> guidelines = new ArrayList<AbstractGuideline>();
+	private final List<AbstractGuideline> guidelines = new ArrayList<>();
 
 	/**
 	 * Constructs a new principle

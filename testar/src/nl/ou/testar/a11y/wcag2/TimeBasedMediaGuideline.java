@@ -17,15 +17,22 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
 public final class TimeBasedMediaGuideline extends AbstractGuideline {
-
+	
 	TimeBasedMediaGuideline(int nr, Principle parent) {
 		super(nr, "Time-based Media", parent);
+		criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Captions (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Audio Description or Media Alternative (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(4, "Captions (Live)", this, Level.AA));
+		criteria.add(new SuccessCriterion(5, "Audio Description (Prerecorded)", this, Level.AA));
 	}
 
 }

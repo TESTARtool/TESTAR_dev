@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,13 @@ public final class NavigableGuideline extends AbstractGuideline {
 
 	NavigableGuideline(int nr, Principle parent) {
 		super(nr, "Navigable", parent);
+		criteria.add(new SuccessCriterion(1, "Bypass Blocks", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Page Titled", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Focus Order", this, Level.A));
+		criteria.add(new SuccessCriterion(4, "Link Purpose (In Context)", this, Level.A));
+		criteria.add(new SuccessCriterion(5, "Multiple Ways", this, Level.AA));
+		criteria.add(new SuccessCriterion(6, "Headings and Labels", this, Level.AA));
+		criteria.add(new SuccessCriterion(7, "Focus Visible", this, Level.AA));
 	}
 
 }

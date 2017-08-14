@@ -34,7 +34,7 @@ import org.fruit.alayer.Verdict;
  */
 public final class WCAG2ICT {
 	
-	private final List<Principle> principles = new ArrayList<Principle>();
+	private final List<Principle> principles = new ArrayList<>();
 	
 	/**
 	 * Constructs the WCAG 2.0 specification

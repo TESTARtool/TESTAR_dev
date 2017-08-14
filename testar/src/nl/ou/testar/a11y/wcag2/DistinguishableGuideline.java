@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,11 @@ public final class DistinguishableGuideline extends AbstractGuideline {
 
 	DistinguishableGuideline(int nr, Principle parent) {
 		super(nr, "Distinguishable", parent);
+		criteria.add(new SuccessCriterion(1, "Use of Color", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Audio Control", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Contrast (Minimum)", this, Level.AA));
+		criteria.add(new SuccessCriterion(4, "Resize Text", this, Level.AA));
+		criteria.add(new SuccessCriterion(5, "Images of Text", this, Level.AA));
 	}
 
 }

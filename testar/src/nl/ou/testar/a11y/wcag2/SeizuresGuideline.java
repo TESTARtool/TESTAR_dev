@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
@@ -26,6 +28,7 @@ public final class SeizuresGuideline extends AbstractGuideline {
 
 	SeizuresGuideline(int nr, Principle parent) {
 		super(nr, "Seizures", parent);
+		criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold", this, Level.A));
 	}
 
 }
