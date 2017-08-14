@@ -40,28 +40,41 @@ public final class WCAG2ICT {
 	 * Constructs the WCAG 2.0 specification
 	 */
 	public WCAG2ICT() {
-		init();
+		initP1();
+		initP2();
+		initP3();
+		initP4();
 	}
 	
-	private void init() {
-		Principle p; AbstractGuideline g;
-		
-		// Principle 1: Perceivable
-		p = new Principle(1, "Perceivable");
+	private void initP1() {
+		Principle p = new Principle(1, "Perceivable");
+		p.addGuideline(new TextAlternativesGuideline(1, p));
+		p.addGuideline(new TimeBasedMediaGuideline(2, p));
+		p.addGuideline(new AdaptableGuideline(3, p));
+		p.addGuideline(new DistinguishableGuideline(4, p));
 		principles.add(p);
+	}
 		
-		// Principle 2: Operable
-		p = new Principle(2, "Operable");
-		g = new KeyboardAccessibleGuideline(1, p);
-		p.addGuideline(g);
+	private void initP2() {
+		Principle p = new Principle(2, "Operable");
+		p.addGuideline(new KeyboardAccessibleGuideline(1, p));
+		p.addGuideline(new EnoughTimeGuideline(2, p));
+		p.addGuideline(new SeizuresGuideline(3, p));
+		p.addGuideline(new NavigableGuideline(4, p));
 		principles.add(p);
+	}
 		
-		// Principle 3: Understandable
-		p = new Principle(3, "Understandable");
+	private void initP3() {
+		Principle p = new Principle(3, "Understandable");
+		p.addGuideline(new ReadableGuideline(1, p));
+		p.addGuideline(new PredictableGuideline(2, p));
+		p.addGuideline(new InputAssistanceGuideline(3, p));
 		principles.add(p);
+	}
 		
-		// Principle 4: Robust
-		p = new Principle(4, "Robust");
+	private void initP4() {
+		Principle p = new Principle(4, "Robust");
+		p.addGuideline(new CompatibleGuideline(1, p));
 		principles.add(p);
 	}
 	

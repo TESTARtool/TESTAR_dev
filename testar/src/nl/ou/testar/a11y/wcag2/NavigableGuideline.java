@@ -17,20 +17,15 @@
 
 package nl.ou.testar.a11y.wcag2;
 
-import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
-
 /**
  * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public final class KeyboardAccessibleGuideline extends AbstractGuideline {
-	
-	private final SuccessCriterion scKeyboard;
-	
-	KeyboardAccessibleGuideline(int nr, Principle parent) {
-		super(nr, "Keyboard Accessible", parent);
-		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
+public final class NavigableGuideline extends AbstractGuideline {
+
+	NavigableGuideline(int nr, Principle parent) {
+		super(nr, "Navigable", parent);
 	}
-	
+
 }

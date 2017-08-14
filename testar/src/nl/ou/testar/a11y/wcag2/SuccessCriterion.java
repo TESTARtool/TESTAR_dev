@@ -55,7 +55,7 @@ public class SuccessCriterion extends ItemBase {
 	/**
 	 * Constructs a new success criterion
 	 * @param nr The number of the success criterion.
-	 * @param name The name (description) of the success criterion.
+	 * @param name The name (short description) of the success criterion.
 	 * @param parent The guideline (parent) this success criterion belongs to.
 	 * @param level The level of the success criterion.
 	 */
