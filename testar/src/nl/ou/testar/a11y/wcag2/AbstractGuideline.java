@@ -24,9 +24,7 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
 
 /**
  * An abstract WCAG guideline

@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 

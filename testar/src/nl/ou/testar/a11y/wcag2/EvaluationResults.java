@@ -26,7 +26,7 @@ public class EvaluationResults {
 			Verdict.SEVERITY_MIN + ((Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / 10.0);
 	// The severity of an error is computed, see getOverallVerdict().
 	
-	private final List<EvaluationResult> results = new ArrayList<EvaluationResult>();
+	private final List<EvaluationResult> results = new ArrayList<>();
 	
 	/**
 	 * Constructs a new container for evaluation results

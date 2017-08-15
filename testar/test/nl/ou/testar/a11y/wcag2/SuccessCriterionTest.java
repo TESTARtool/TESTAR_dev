@@ -3,21 +3,18 @@ package nl.ou.testar.a11y.wcag2;
 import static org.junit.Assert.*;
 
 import org.fruit.alayer.Verdict;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import nl.ou.testar.a11y.wcag2.AbstractGuideline;
-import nl.ou.testar.a11y.wcag2.KeyboardAccessibleGuideline;
 import nl.ou.testar.a11y.wcag2.AbstractPrinciple;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 public class SuccessCriterionTest {
 	
-	private final int NLEVELS = 3; // A, AA, AAA
-	private final double PRIO_A = 1.0, // high/error
-			PRIO_AA = 0.666, // medium/warning
-			PRIO_AAA = 0.333, // low/notice
+	private final double PRIO_A = 1.0, // high
+			PRIO_AA = 0.666, // medium
+			PRIO_AAA = 0.333, // low
 			DELTA = 0.1;
 	
 	@Test

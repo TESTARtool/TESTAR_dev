@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
 
 /**
  * Specification of WCAG 2.0 according to WCAG2ICT
