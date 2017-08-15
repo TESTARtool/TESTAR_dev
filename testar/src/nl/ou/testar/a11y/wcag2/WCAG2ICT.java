@@ -47,8 +47,16 @@ public final class WCAG2ICT {
 	}
 	
 	/**
+	 * Gets all principles in WCAG2ICT
+	 * @return The list of principles.
+	 */
+	public List<AbstractPrinciple> getPrinciples() {
+		return Collections.unmodifiableList(principles);
+	}
+	
+	/**
 	 * Evaluates the accessibility of the given state
-	 * This will collect evaluation results from all principles.
+	 * This will collect evaluation results from all principles in WCAG2ICT.
 	 * @param state The state.
 	 * @return The results of the evaluation.
 	 */
@@ -62,7 +70,7 @@ public final class WCAG2ICT {
 	
 	/**
 	 * Derives the follow-up actions from the given state
-	 * This will collect actions from all principles.
+	 * This will collect actions from all principles in WCAG2ICT.
 	 * The actions are specific to accessibility.
 	 * @param state The state.
 	 * @return The set of actions.

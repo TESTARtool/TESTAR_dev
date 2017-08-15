@@ -45,20 +45,20 @@ public abstract class AbstractPrinciple extends ItemBase {
 	}
 
 	/**
-	 * Gets all guidelines that belong to this principle
+	 * Gets all guidelines in this principle
 	 * @return The list of guidelines.
 	 */
-	List<AbstractGuideline> getGuidelines() {
+	public List<AbstractGuideline> getGuidelines() {
 		return Collections.unmodifiableList(guidelines);
 	}
 	
 	/**
 	 * Evaluates the accessibility of the given state
-	 * This will collect evaluation results from all guidelines that belong to this principle.
+	 * This will collect evaluation results from all guidelines in this principle.
 	 * @param state The state.
 	 * @return The results of the evaluation.
 	 */
-	EvaluationResults evaluate(State state) {
+	public EvaluationResults evaluate(State state) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractGuideline g : guidelines)
 			for (EvaluationResult result : g.evaluate(state).getResults())
@@ -68,12 +68,12 @@ public abstract class AbstractPrinciple extends ItemBase {
 	
 	/**
 	 * Derives the follow-up actions from the given state
-	 * This will collect actions from all guidelines that belong to this principle.
+	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
 	 * @param state The state.
 	 * @return The set of actions.
 	 */
-	Set<Action> deriveActions(State state) {
+	public Set<Action> deriveActions(State state) {
 		Set<Action> actions = Collections.emptySet();
 		for (AbstractGuideline g : guidelines)
 			actions.addAll(g.deriveActions(state));

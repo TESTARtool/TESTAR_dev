@@ -49,8 +49,16 @@ public abstract class AbstractGuideline extends ItemBase {
 	}
 	
 	/**
+	 * Gets all success criteria in this guideline
+	 * @return The list of success criteria.
+	 */
+	public List<SuccessCriterion> getSuccessCriteria() {
+		return Collections.unmodifiableList(criteria);
+	}
+	
+	/**
 	 * Evaluates the accessibility of the given state
-	 * This will typically include one or more evaluation results for each success criterion that belong to this guideline.
+	 * This will typically include one or more evaluation results for each success criterion in this guideline.
 	 * @param state The state.
 	 * @return The results of the evaluation.
 	 */
@@ -60,7 +68,7 @@ public abstract class AbstractGuideline extends ItemBase {
 	
 	/**
 	 * Derives the follow-up actions from the given state
-	 * This will typically include actions from all success criteria that belong to this guideline.
+	 * This will typically include actions from all success criteria in this guideline.
 	 * The actions are specific to accessibility.
 	 * @param state The state.
 	 * @return The set of actions.
