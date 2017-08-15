@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class EnoughTimeGuideline extends AbstractGuideline {
 
-	EnoughTimeGuideline(int nr, Principle parent) {
-		super(nr, "Enough Time", parent);
+	EnoughTimeGuideline(AbstractPrinciple parent) {
+		super(2, "Enough Time", parent);
 		criteria.add(new SuccessCriterion(1, "Timing Adjustable", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Pause, Stop, Hide", this, Level.A));
 	}

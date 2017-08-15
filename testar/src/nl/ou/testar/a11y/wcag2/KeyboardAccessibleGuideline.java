@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
-	KeyboardAccessibleGuideline(int nr, Principle parent) {
-		super(nr, "Keyboard Accessible", parent);
+	KeyboardAccessibleGuideline(AbstractPrinciple parent) {
+		super(1, "Keyboard Accessible", parent);
 		criteria.add(new SuccessCriterion(1, "Keyboard", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "No Keyboard Trap", this, Level.A));
 	}

@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class TextAlternativesGuideline extends AbstractGuideline {
 	
-	TextAlternativesGuideline(int nr, Principle parent) {
-		super(nr, "Text Alternatives", parent);
+	TextAlternativesGuideline(AbstractPrinciple parent) {
+		super(1, "Text Alternatives", parent);
 		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
 	}
 

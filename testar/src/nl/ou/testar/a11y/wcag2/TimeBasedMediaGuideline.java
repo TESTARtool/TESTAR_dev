@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class TimeBasedMediaGuideline extends AbstractGuideline {
 	
-	TimeBasedMediaGuideline(int nr, Principle parent) {
-		super(nr, "Time-based Media", parent);
+	TimeBasedMediaGuideline(AbstractPrinciple parent) {
+		super(2, "Time-based Media", parent);
 		criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Captions (Prerecorded)", this, Level.A));
 		criteria.add(new SuccessCriterion(3, "Audio Description or Media Alternative (Prerecorded)", this, Level.A));

@@ -34,48 +34,16 @@ import org.fruit.alayer.Verdict;
  */
 public final class WCAG2ICT {
 	
-	private final List<Principle> principles = new ArrayList<>();
+	private final List<AbstractPrinciple> principles = new ArrayList<>();
 	
 	/**
 	 * Constructs the WCAG 2.0 specification
 	 */
 	public WCAG2ICT() {
-		initP1();
-		initP2();
-		initP3();
-		initP4();
-	}
-	
-	private void initP1() {
-		Principle p = new Principle(1, "Perceivable");
-		p.addGuideline(new TextAlternativesGuideline(1, p));
-		p.addGuideline(new TimeBasedMediaGuideline(2, p));
-		p.addGuideline(new AdaptableGuideline(3, p));
-		p.addGuideline(new DistinguishableGuideline(4, p));
-		principles.add(p);
-	}
-		
-	private void initP2() {
-		Principle p = new Principle(2, "Operable");
-		p.addGuideline(new KeyboardAccessibleGuideline(1, p));
-		p.addGuideline(new EnoughTimeGuideline(2, p));
-		p.addGuideline(new SeizuresGuideline(3, p));
-		p.addGuideline(new NavigableGuideline(4, p));
-		principles.add(p);
-	}
-		
-	private void initP3() {
-		Principle p = new Principle(3, "Understandable");
-		p.addGuideline(new ReadableGuideline(1, p));
-		p.addGuideline(new PredictableGuideline(2, p));
-		p.addGuideline(new InputAssistanceGuideline(3, p));
-		principles.add(p);
-	}
-		
-	private void initP4() {
-		Principle p = new Principle(4, "Robust");
-		p.addGuideline(new CompatibleGuideline(1, p));
-		principles.add(p);
+		principles.add(new PerceivablePrinciple());
+		principles.add(new OperablePrinciple());
+		principles.add(new UnderstandablePrinciple());
+		principles.add(new RobustPrinciple());
 	}
 	
 	/**
@@ -86,7 +54,7 @@ public final class WCAG2ICT {
 	 */
 	public EvaluationResults evaluate(State state) {
 		EvaluationResults results = new EvaluationResults();
-		for (Principle p : principles)
+		for (AbstractPrinciple p : principles)
 			for (EvaluationResult result : p.evaluate(state).getResults())
 				results.add(result);
 		return results;
@@ -101,7 +69,7 @@ public final class WCAG2ICT {
 	 */
 	public Set<Action> deriveActions(State state) {
 		Set<Action> actions = Collections.emptySet();
-		for (Principle p : principles)
+		for (AbstractPrinciple p : principles)
 			actions.addAll(p.deriveActions(state));
 		return actions;
 	}

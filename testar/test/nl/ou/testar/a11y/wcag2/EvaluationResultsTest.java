@@ -14,11 +14,11 @@ public class EvaluationResultsTest {
 
 	@Test
 	public void testGetOverallVerdict() {
-		Principle p = new Principle(1, "Foo");
-		AbstractGuideline g = new KeyboardAccessibleGuideline(1, p);
-		SuccessCriterion s1 = new SuccessCriterion(1, "Bar", g, Level.A),
-				s2 = new SuccessCriterion(2, "Baz", g, Level.AA),
-				s3 = new SuccessCriterion(3, "Bat", g, Level.AAA);
+		AbstractPrinciple p = new PerceivablePrinciple();
+		AbstractGuideline g = new TextAlternativesGuideline(p);
+		SuccessCriterion s1 = new SuccessCriterion(1, "Foo", g, Level.A),
+				s2 = new SuccessCriterion(2, "Bar", g, Level.AA),
+				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA);
 		EvaluationResult r1 = new EvaluationResult(s1, Type.OK),
 				r2 = new EvaluationResult(s2, Type.GENERAL),
 				r3 = new EvaluationResult(s2, Type.WARNING),

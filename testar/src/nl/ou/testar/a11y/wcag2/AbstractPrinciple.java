@@ -31,16 +31,16 @@ import org.fruit.alayer.State;
  * @author Davy Kager
  *
  */
-public class Principle extends ItemBase {
+public abstract class AbstractPrinciple extends ItemBase {
 	
-	private final List<AbstractGuideline> guidelines = new ArrayList<>();
+	protected final List<AbstractGuideline> guidelines = new ArrayList<>();
 
 	/**
 	 * Constructs a new principle
 	 * @param nr The number of the principle.
 	 * @param name The name of the principle.
 	 */
-	Principle(int nr, String name) {
+	protected AbstractPrinciple(int nr, String name) {
 		super(nr, name);
 	}
 
@@ -50,14 +50,6 @@ public class Principle extends ItemBase {
 	 */
 	List<AbstractGuideline> getGuidelines() {
 		return Collections.unmodifiableList(guidelines);
-	}
-	
-	/**
-	 * Adds a guideline to this principle
-	 * @param guideline The guideline.
-	 */
-	void addGuideline(AbstractGuideline guideline) {
-		guidelines.add(Assert.notNull(guideline));
 	}
 	
 	/**

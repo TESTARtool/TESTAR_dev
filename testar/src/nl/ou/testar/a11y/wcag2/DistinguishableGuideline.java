@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class DistinguishableGuideline extends AbstractGuideline {
 
-	DistinguishableGuideline(int nr, Principle parent) {
-		super(nr, "Distinguishable", parent);
+	DistinguishableGuideline(AbstractPrinciple parent) {
+		super(4, "Distinguishable", parent);
 		criteria.add(new SuccessCriterion(1, "Use of Color", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Audio Control", this, Level.A));
 		criteria.add(new SuccessCriterion(3, "Contrast (Minimum)", this, Level.AA));

@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class CompatibleGuideline extends AbstractGuideline {
 
-	CompatibleGuideline(int nr, Principle parent) {
-		super(nr, "Compatible", parent);
+	CompatibleGuideline(AbstractPrinciple parent) {
+		super(1, "Compatible", parent);
 		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
 	}

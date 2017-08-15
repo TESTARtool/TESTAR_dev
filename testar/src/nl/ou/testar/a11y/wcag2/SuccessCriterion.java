@@ -25,7 +25,7 @@ import org.fruit.alayer.Verdict;
  * @author Davy Kager
  *
  */
-public class SuccessCriterion extends ItemBase {
+public final class SuccessCriterion extends ItemBase {
 	
 	/**
 	 * WCAG success criterion conformance levels

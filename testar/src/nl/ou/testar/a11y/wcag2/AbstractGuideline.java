@@ -44,7 +44,7 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @param name The name of the guideline.
 	 * @param parent The principle (parent) this guideline belongs to.
 	 */
-	protected AbstractGuideline(int nr, String name, Principle parent) {
+	protected AbstractGuideline(int nr, String name, AbstractPrinciple parent) {
 		super(nr, name, Assert.notNull(parent));
 	}
 	

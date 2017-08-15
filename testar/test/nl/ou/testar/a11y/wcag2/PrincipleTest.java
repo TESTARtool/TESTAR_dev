@@ -4,13 +4,13 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import nl.ou.testar.a11y.wcag2.Principle;
+import nl.ou.testar.a11y.wcag2.AbstractPrinciple;
 
 public class PrincipleTest {
 
 	@Test
 	public void testGetNr() {
-		Principle p = new Principle(1, "Foo");
+		AbstractPrinciple p = new PerceivablePrinciple();
 		assertEquals("1", p.getNr());
 	}
 

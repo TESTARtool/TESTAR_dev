@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class SeizuresGuideline extends AbstractGuideline {
 
-	SeizuresGuideline(int nr, Principle parent) {
-		super(nr, "Seizures", parent);
+	SeizuresGuideline(AbstractPrinciple parent) {
+		super(3, "Seizures", parent);
 		criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold", this, Level.A));
 	}
 

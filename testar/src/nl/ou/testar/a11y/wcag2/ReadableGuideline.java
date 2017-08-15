@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class ReadableGuideline extends AbstractGuideline {
 
-	ReadableGuideline(int nr, Principle parent) {
-		super(nr, "Readable", parent);
+	ReadableGuideline(AbstractPrinciple parent) {
+		super(1, "Readable", parent);
 		criteria.add(new SuccessCriterion(1, "Language of Page", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Language of Parts", this, Level.AA));
 	}

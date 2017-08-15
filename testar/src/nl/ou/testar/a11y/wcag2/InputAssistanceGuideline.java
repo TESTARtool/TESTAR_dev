@@ -26,8 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class InputAssistanceGuideline extends AbstractGuideline {
 
-	InputAssistanceGuideline(int nr, Principle parent) {
-		super(nr, "Input Assistance", parent);
+	InputAssistanceGuideline(AbstractPrinciple parent) {
+		super(3, "Input Assistance", parent);
 		criteria.add(new SuccessCriterion(1, "Error Identification", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Labels or Instructions", this, Level.A));
 		criteria.add(new SuccessCriterion(3, "Error Suggestion", this, Level.AA));
