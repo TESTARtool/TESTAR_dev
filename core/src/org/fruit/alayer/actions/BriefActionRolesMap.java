@@ -27,11 +27,14 @@ import java.util.HashMap;
  */
 public class BriefActionRolesMap {
 
-	@SuppressWarnings("serial")
-	public static final HashMap<String,String> map = new HashMap<String,String>(){{
-		put("LeftClickAt","LC"); // ActionRoles.LeftClickAt
-		put("RightClickAt","RC"); // ActionRoles.RightClickAt
-		put("ClickTypeInto","T"); // ActionRoles.ClickTypeInto
-	}};
+	public static final HashMap<String,String> map = new HashMap<String,String>() {
+		private static final long serialVersionUID = 4653256125166285524L;
+
+		{
+			put("LeftClickAt","LC"); // ActionRoles.LeftClickAt
+			put("RightClickAt","RC"); // ActionRoles.RightClickAt
+			put("ClickTypeInto","T"); // ActionRoles.ClickTypeInto
+		}
+	};
 	
 }
