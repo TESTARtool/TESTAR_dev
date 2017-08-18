@@ -87,9 +87,6 @@ import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
-// This package is nto part of the public Java API.
-//import sun.nio.cs.StandardCharsets;
-
 /**
  * Utility methods.
  */

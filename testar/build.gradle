@@ -46,7 +46,7 @@ task prepareOutputFolder(type: Copy) {
 task prepareWindowsDLL(type: Copy) {
     from '../windows/target/resources/main'
     into 'target/scripts'
-    include '**/*.dll'
+    include 'windows.dll'
 }
 
 task prepareNativeDLL(type: Copy) {

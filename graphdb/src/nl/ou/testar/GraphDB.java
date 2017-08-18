@@ -17,7 +17,9 @@ public class GraphDB {
 
     public GraphDB(final boolean enabled, final String url, final String userName, final String password) {
         this.enabled = enabled;
-        repository = new OrientDBRepository(url,userName, password);
+        if(enabled) {
+            repository = new OrientDBRepository(url, userName, password);
+        }
     }
 
     /**
