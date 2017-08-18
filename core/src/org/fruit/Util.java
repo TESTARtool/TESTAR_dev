@@ -87,7 +87,6 @@ import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
-import sun.nio.cs.StandardCharsets;
 
 /**
  * Utility methods.
