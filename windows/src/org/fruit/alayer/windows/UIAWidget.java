@@ -208,10 +208,10 @@ class UIAWidget implements Widget, Serializable {
 	 */
 	public String getRepresentation(String tab){
 		StringBuffer repr = new StringBuffer();
-		repr.append(tab + "WIDGET = CONCRETE = " + this.get(Tags.ConcreteID) +
-								  " ABSTRACT(R) = " + this.get(Tags.Abstract_R_ID) +
-								  " ABSTRACT(R,T) = " + this.get(Tags.Abstract_R_T_ID) +
-								  " ABSTRACT(R,T,P) = " + this.get(Tags.Abstract_R_T_P_ID) + "\n");
+		repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
+								  		this.get(Tags.Abstract_R_ID) + ", " +
+								  		this.get(Tags.Abstract_R_T_ID) + ", " +
+								  		this.get(Tags.Abstract_R_T_P_ID) + "\n");
 		repr.append(getPropertiesRepresentation(tab));
 		return repr.toString();
 	}

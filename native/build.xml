@@ -47,8 +47,8 @@
 		</zip>
     	<delete file="${target}/intermediate.jar"/>
     	<mkdir dir="${resources}"/>
-    	<copy file="../windows/resources/msvcp100.dll" todir="${resources}"/>
-    	<copy file="../windows/resources/msvcr100.dll" todir="${resources}"/>
+    	<!--<copy file="../windows/resources/msvcp100.dll" todir="${resources}"/>
+    	<copy file="../windows/resources/msvcr100.dll" todir="${resources}"/>-->
     </target>
 
 	<!-- jar_linux -->

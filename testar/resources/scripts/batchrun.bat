@@ -11,6 +11,6 @@ echo Use: batchrun number_of_runs
 :GO
 @for /L %%i in (1,1,%1) do (
 	@echo Starting RUN %%i - out of %1 -
-	@run.bat -Dheadless=true
+	@run.bat -Dheadless=true -DF2SL=true -DGRA=false -DUT=true
 	@echo finished RUN %%i - out of %1 -
 )

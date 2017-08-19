@@ -29,6 +29,7 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
 
@@ -42,8 +43,8 @@ import es.upv.staq.testar.managers.FilteringManager;
 
 public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerProtocol {
 
-    private boolean preciseCoding = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK); // CodingManager.ABSTRACT_R_T_P_ID
-    private boolean displayWhiteTabu = false;
+    private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
+    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
     private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
 
@@ -61,11 +62,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
 		filteringManager = new FilteringManager();
 		dataManager = new DataManager();
 		filteringManager.loadFilters();
-		dataManager.loadInputValues();
+		dataManager.loadInputValues();		
 	}
 	
     @Override
-    public void keyDown(KBKeys key) {
+    public void keyDown(KBKeys key) {    	
         super.keyDown(key);        
         if (mode() == Modes.Spy){ 
         	if (key == KBKeys.VK_CAPS_LOCK)
@@ -87,7 +88,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     }
 
     @Override
-    public void keyUp(KBKeys key) {
+    public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
         if (mode() == Modes.Spy){
         	if (key == KBKeys.VK_SHIFT)

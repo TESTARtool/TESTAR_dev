@@ -37,7 +37,6 @@ public class GraphStateExploration {
 
 	private Set<String> unexploredActions; // actions IDs (abstract)
 	
-	public static final int MAX_REPEATED_WIDGET_TYPING_ACTIONS = 10;
 	// textbox fields => typing actions with oo texts parameter => huge set population	
 	private Map<String,Integer> unexploredTypings; // action ID (abstract) x typed count
 
@@ -76,7 +75,7 @@ public class GraphStateExploration {
 			if (typedCount == null)
 				this.unexploredActions.remove(aid);
 			else{
-				if (typedCount.intValue() + 1 >= MAX_REPEATED_WIDGET_TYPING_ACTIONS)
+				if (typedCount.intValue() + 1 >= Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION)
 					this.unexploredActions.remove(aid);
 				else
 					this.unexploredTypings.put(aid, new Integer(typedCount.intValue() + 1));

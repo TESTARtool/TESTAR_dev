@@ -46,30 +46,26 @@ import java.util.zip.GZIPInputStream;
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
-import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;
 import org.fruit.alayer.Finder;
 import org.fruit.alayer.Image;
 import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Position;
+import org.fruit.alayer.Rect;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.Rect;
 import org.fruit.alayer.StdState;
+import org.fruit.alayer.Taggable;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.visualizers.EllipseVisualizer;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
 
-public class SequenceViewer extends java.awt.Frame {
+public class SequenceViewer extends javax.swing.JFrame{
 
 	private static final long serialVersionUID = -7545369239319448135L;
 	ObjectInputStream stream;
@@ -90,11 +86,11 @@ public class SequenceViewer extends java.awt.Frame {
 		this.setTitle("Sequence viewer"); // by urueda
 		cachedSequence = new ArrayList<Taggable>();
 		sequenceViewIndex = -1; stateCount = -1;
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		// end by urueda
 	}
 
 	private void initComponents() {
-		canvas1 = new java.awt.Canvas();
 		panel1 = new java.awt.Panel();
 		btnBegin = new java.awt.Button(); // by urueda
 		btnPrev = new java.awt.Button(); // by urueda
@@ -107,6 +103,8 @@ public class SequenceViewer extends java.awt.Frame {
 		display = new Canvas(){
 			private static final long serialVersionUID = 5259423015295162447L;
 			public void paint(Graphics g){
+				g.setColor(java.awt.Color.BLACK);
+				g.fillRect(0, 0, display.getWidth(), display.getHeight());
 				double wfactor = (double)(display.getWidth()) / (double)buffer.getWidth();
 				double hfactor = (double)(display.getHeight()) / (double)buffer.getHeight();
 				double factor = Math.min(1.0, Math.min(wfactor, hfactor));					
@@ -118,13 +116,6 @@ public class SequenceViewer extends java.awt.Frame {
 		addComponentListener(new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
-			}
-		});
-
-
-		addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent evt) {
-				exitForm(evt);
 			}
 		});
 
@@ -205,10 +196,6 @@ public class SequenceViewer extends java.awt.Frame {
 		//updateInfo("");
 	}                      
 
-	private void exitForm(java.awt.event.WindowEvent evt) {                          
-		setVisible(false);
-	}
-	
 	// refactor by urueda
 	private void postActionPerformed(){
 		display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
@@ -422,16 +409,17 @@ public class SequenceViewer extends java.awt.Frame {
 
 	Settings settings;
 
+	// prevent thread finish while dialog is visible
 	public void run() {
-		while(isShowing())
+		while(isShowing()){
 			Util.pause(1);
+		}
 	}
 
 	private java.awt.Button btnBegin; // by urueda
 	private java.awt.Button btnPrev; // by urueda
 	private java.awt.Button btnNext;
 	private java.awt.Button btnEnd; // by urueda
-	private java.awt.Canvas canvas1;
 	private java.awt.Canvas display;
 	private java.awt.Label lblInfo;
 	private java.awt.Panel panel1;
