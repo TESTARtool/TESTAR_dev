@@ -3,9 +3,19 @@ apply plugin: 'application'
 sourceSets {
     main {
         resources {
-            srcDirs=['resources']
+            srcDirs = ['resources']
         }
     }
+
+   oracle {
+
+       java {
+           srcDirs =['resources/settings']
+       }
+
+       compileClasspath += main.output
+       compileClasspath += main.compileClasspath
+   }
 }
 
 dependencies {
@@ -28,15 +38,10 @@ task prepareSettings(type: Copy) {
     into 'target/scripts/settings'
 }
 
-task prepareDesktopTest(type: Copy) {
-    from 'resources/SUT/desktop'
-    into 'target/scripts'
+task prepareOracles(type: Copy) {
+    from 'target/classes/oracle'
+    into 'target/scripts/settings'
 }
-
-/*task prepareWebTest(type: Copy) {
-    from 'resources/SUT/web_generic'
-    into 'target/scripts'
-}*/
 
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
@@ -53,6 +58,8 @@ task prepareNativeDLL(type: Copy) {
     from 'resources/windows/x86_64'
     into 'target/scripts'
 }
+
+prepareOracles.dependsOn oracleClasses
 
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
