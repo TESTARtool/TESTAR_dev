@@ -126,9 +126,6 @@ public final class Tags {
 	/** Usually attached to sliders or scrollbars. Determines the orientation (horizontal, vertical or an arbitrary angle) */
 	public static final Tag<Double> Angle = from("Angle", Double.class);
 	
-	/** Whether a widget (e.g. a text box) has keyboard focus and will receive keyboard input */
-	public static final Tag<Boolean> KeyboardFocus = from("KeyboardFocus", Boolean.class);
-	
 	/** The text of a widget (e.g. the text within a text box) */
 	public static final Tag<String> Text = from("Text", String.class);
 

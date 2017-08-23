@@ -37,7 +37,7 @@ public final class WidgetIterator implements java.util.Iterator<Widget> {
 	private final Navigator navi;
 	
 	public WidgetIterator(Widget start){
-        this(start, new BFNavigator());
+		this(start, new BFNavigator());
 	}
 
 	public WidgetIterator(Widget start, Navigator navi){

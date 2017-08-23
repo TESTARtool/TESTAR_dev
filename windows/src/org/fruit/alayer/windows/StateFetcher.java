@@ -277,8 +277,7 @@ public class StateFetcher implements Callable<UIAState>{
 			buildTLCMap(builder, el.children.get(i));
 	}
 
-	//void uiaDescend(long uiaPtr, UIAElement parent){
-	private UIAElement uiaDescend(long hwnd, long uiaPtr, UIAElement parent){ // by urueda (returns a modal widget if detectsed)
+	private UIAElement uiaDescend(long hwnd, long uiaPtr, UIAElement parent){ // by urueda (returns a modal widget if detected)
 		if(uiaPtr == 0)
 			//return;
 			return null; // by urueda
@@ -304,6 +303,8 @@ public class StateFetcher implements Callable<UIAState>{
 		el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaPtr, true); 
 		el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaPtr, true); 
 		el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
+		el.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaPtr, true);
+		el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaPtr, true);
 		el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
 		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
 
@@ -363,10 +364,9 @@ public class StateFetcher implements Callable<UIAState>{
 				for(int i = 0; i < count; i++){
 					long ptrChild = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPtr, i);
 					if(ptrChild != 0){
-						//uiaDescend(ptrChild, el);
 						// begin by urueda
-						UIAElement modalE;
-						if ((modalE = uiaDescend(hwnd, ptrChild, el)) != null && modalElement == null) // parent-modal is preferred to child-modal
+						UIAElement modalE = uiaDescend(hwnd, ptrChild, el);
+						if (modalE != null && modalElement == null) // parent-modal is preferred to child-modal
 							modalElement = modalE;
 						// end by urueda							
 					}

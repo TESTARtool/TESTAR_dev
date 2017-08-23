@@ -862,6 +862,7 @@ public final class Util {
 		}
 	}
 
+	@SafeVarargs
 	public static <T> ArrayList<T> newArrayList(T...elements){
 		Assert.notNull(elements);
 		ArrayList<T> ret = new ArrayList<>();

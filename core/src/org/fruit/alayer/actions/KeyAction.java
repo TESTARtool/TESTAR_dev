@@ -53,13 +53,13 @@ public abstract class KeyAction extends TaggableBase implements Action {
 				key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
 				altNumpad(system,new Integer(key.code()).toString());
 			else
-				keyAction(system,key);
+				performKeyAction(system,key);
 		}catch(NoSuchTagException tue){
 			throw new ActionFailedException(tue);
 		}
 	}
 	
-	protected abstract void keyAction(SUT system, KBKeys key);
+	protected abstract void performKeyAction(SUT system, KBKeys key);
 	
 	protected void altNumpad(SUT system, String numpadCodes){
 		if (numpadCodes == null || !numpadCodes.matches("^\\d+$")){
@@ -108,5 +108,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 	public String toParametersString(){
 		return "(" + key.toString() + ")";
 	}
+	
+	public abstract boolean equals(Object o);
 	
 }

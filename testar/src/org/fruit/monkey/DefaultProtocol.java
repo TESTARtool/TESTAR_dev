@@ -396,10 +396,10 @@ public class DefaultProtocol extends AbstractProtocol{
 		return actions;
 	}
 	
-    // by urueda (random inputs)	
-    protected String getRandomText(Widget w){
-    	return DataManager.getRandomData();
-    }
+	// by urueda (random inputs)	
+	protected String getRandomText(Widget w){
+		return DataManager.getRandomData();
+	}
 	
 	// by urueda
 	protected Set<Widget> getTopWidgets(State state){
@@ -447,17 +447,14 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickable()))
+		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
 			return isUnfiltered(w);
 		return false;
 	}
 	
 	//by urueda
 	protected boolean isTypeable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeTypeable()) && NativeLinker.isNativeTypeable(w))
-			return isUnfiltered(w);
-		return false;
+		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
 
 	protected boolean moreActions(State state) {

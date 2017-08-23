@@ -1592,6 +1592,17 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1NativeWindowHandle)) (JNIEnv
 }
 
 
+/* IUIAutomationElement_get_IsContentElement */
+JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsContentElement)) (JNIEnv * env, jclass, 
+		jlong pIUIAutomationElement, jboolean fromCache){
+	BOOL value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedIsContentElement(&value) : el->get_CurrentIsContentElement(&value);
+	if (FAILED(hr))
+		return 0;
+	return (jboolean) value;
+}
+
 /* IUIAutomationElement_get_IsControlElement */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsControlElement)) (JNIEnv * env, jclass, 
 		jlong pIUIAutomationElement, jboolean fromCache){

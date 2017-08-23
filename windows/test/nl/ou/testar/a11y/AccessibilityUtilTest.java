@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
+
 public class AccessibilityUtilTest {
 
 	@Test

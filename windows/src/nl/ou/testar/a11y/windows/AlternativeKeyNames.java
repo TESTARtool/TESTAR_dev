@@ -15,7 +15,7 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y;
+package nl.ou.testar.a11y.windows;
 
 import java.util.HashMap;
 import java.util.Map;
