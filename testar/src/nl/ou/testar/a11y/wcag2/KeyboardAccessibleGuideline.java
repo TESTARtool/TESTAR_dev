@@ -30,6 +30,7 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 
 import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -54,14 +55,21 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	public Set<Action> deriveActions(State state) {
 		Set<Action> actions = Collections.emptySet();
 		StdActionCompiler compiler = new StdActionCompiler();
+		Widget prevHasKeyboardFocus = null;
 		deriveStandardActions(actions, compiler);
 		for (Widget w : state) {
 			// skip disabled widgets
 			if (!AccessibilityUtil.isEnabled(w))
 				continue;
 			deriveActionsAll(actions, compiler, w);
-			if (AccessibilityUtil.hasKeyboardFocus(w))
+			if (AccessibilityUtil.hasKeyboardFocus(w)) {
+				// catch inconsistent keyboard focus reporting
+				if (prevHasKeyboardFocus != null)
+					LogSerialiser.log("Widgets " + prevHasKeyboardFocus + " and " + w
+							+ " both claim to have keyboard focus");
 				deriveActionsFocus(actions, compiler, w);
+				prevHasKeyboardFocus = w;
+			}
 		}
 		if (actions.isEmpty())
 			deriveFallbackActions(actions, compiler);
