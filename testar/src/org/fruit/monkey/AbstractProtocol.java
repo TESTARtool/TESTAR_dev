@@ -70,7 +70,6 @@ import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;

@@ -26,10 +26,8 @@ import org.fruit.alayer.Canvas;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.devices.KBKeys;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
 

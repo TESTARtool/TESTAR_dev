@@ -374,7 +374,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		// if the system is in the background force it into the foreground!
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			//actions.add(ac.activateSystem());
-			this.forceToForeground = true; // bu urueda
+			this.forceToForeground = true; // by urueda
 			return actions;
 		}
 		
@@ -415,15 +415,15 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
 		Drag[] drags = null;
-	    if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
 			for (Drag drag : drags){
 				actions.add(ac.slideFromTo(
-					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+					));
 				storeWidget(state.get(Tags.ConcreteID), w);
 			}
-	    }
+		}
 	}
 	
 	// by urueda
@@ -452,7 +452,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		return false;
 	}
 	
-	//by urueda
+	// by urueda
 	protected boolean isTypeable(Widget w){
 		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
@@ -477,7 +477,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
 		else if (this.lastState != null && state != null &&
-				 this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
+				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
 			this.nonReactingActionNumber++;			
 		this.lastState = state;
 		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){

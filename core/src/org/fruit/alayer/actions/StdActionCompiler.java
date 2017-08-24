@@ -27,8 +27,6 @@
  */
 package org.fruit.alayer.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 import org.fruit.Assert;

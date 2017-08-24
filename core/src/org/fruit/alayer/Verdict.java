@@ -105,5 +105,18 @@ public final class Verdict implements Serializable {
 						    (this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())												
 		);		
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o instanceof Verdict) {
+			Verdict other = (Verdict)o;
+			return this.severity == other.severity
+					&& this.info.equals(other.info)
+					&& this.visualizer.equals(other.visualizer);
+		}
+		return false;
+	}
 
 }
