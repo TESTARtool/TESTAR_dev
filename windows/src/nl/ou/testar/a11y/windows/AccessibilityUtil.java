@@ -113,9 +113,15 @@ public class AccessibilityUtil {
 	}
 	
 	public static boolean canUseEditCommands(Widget w) {
+		// this is like NativeLinker.getNativeTypeable()
+		// put here for consistency and to avoid coupling
+		Role r = getRole(w);
 		// TODO: also check if the widget is read-only
-		return hasKeyboardFocus(w) 
-				&& Role.isOneOf(getRole(w), new Role[] {UIADocument, UIAEdit, UIAText});
+		return Role.isOneOf(r, new Role[] {UIADocument, UIAEdit})
+				// static text is not editable according to UIA documentation,
+				// but sometimes it is, e.g. Windows Calculator
+				// static text can only be edited when it can have keyboard focus
+				|| (r.isA(UIAText) && isKeyboardFocusable(w));
 	}
 	
 	public static boolean canUseShortcutKeys(Widget w) {
