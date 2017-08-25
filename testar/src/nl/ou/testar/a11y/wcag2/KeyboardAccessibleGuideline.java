@@ -73,8 +73,10 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				deriveActionsNoFocus(actions, compiler, w);
 			}
 		}
-		if (actions.isEmpty())
+		if (actions.isEmpty()) {
+			LogSerialiser.log("Found no keyboard actions, adding fallback keyboard actions");
 			deriveFallbackActions(actions, compiler);
+		}
 		return actions;
 	}
 	
@@ -100,7 +102,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		if (shortcutKey != null && !shortcutKey.isEmpty()) {
 			Action a = AccessibilityUtil.parseShortcutKey(shortcutKey);
 			if (a != null)
-				addShortcutKey(a); // added to aactions below
+				addShortcutKey(a); // added to aactions in deriveActionsFocus()
 		}
 		
 		// find access keys
