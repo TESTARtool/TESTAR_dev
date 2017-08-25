@@ -19,6 +19,7 @@ package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @return The set of actions.
 	 */
 	protected Set<Action> deriveActions(State state) {
-		return Collections.emptySet();
+		return new HashSet<>();
 	}
 	
 }

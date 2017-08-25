@@ -17,8 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
-import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	@Override
 	public Set<Action> deriveActions(State state) {
-		Set<Action> actions = Collections.emptySet();
+		Set<Action> actions = new HashSet<>();
 		StdActionCompiler compiler = new StdActionCompiler();
 		Widget prevHasKeyboardFocus = null;
 		deriveStandardActions(actions, compiler);

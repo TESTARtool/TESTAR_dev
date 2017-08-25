@@ -19,6 +19,7 @@ package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +75,7 @@ public final class WCAG2ICT {
 	 * @return The set of actions.
 	 */
 	public Set<Action> deriveActions(State state) {
-		Set<Action> actions = Collections.emptySet();
+		Set<Action> actions = new HashSet<>();
 		for (AbstractPrinciple p : principles)
 			actions.addAll(p.deriveActions(state));
 		return actions;
