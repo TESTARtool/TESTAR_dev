@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.accessibility.AccessibleContext;
-
 
 /**
  * Provides access to the classic native WinApi Functions.
