@@ -131,7 +131,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		// find the appropriate additional actions for the widget
 		if (AccessibilityUtil.canUseEditCommands(w)) {
 			// if the widget appears to support editing commands, try to manipulate its text
-			actions.add(compiler.clickTypeInto(w, DataManager.getRandomData()));
+			//actions.add(compiler.clickTypeInto(w, DataManager.getRandomData()));
 			actions.add(compiler.hitKey(KBKeys.VK_DELETE));
 			actions.add(compiler.hitKey(KBKeys.VK_BACK_SPACE));
 		} else {
