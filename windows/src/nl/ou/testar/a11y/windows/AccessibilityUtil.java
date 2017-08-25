@@ -105,7 +105,7 @@ public class AccessibilityUtil {
 	}
 	
 	public static boolean canUseUpDown(Widget w) {
-		return Role.isOneOf(getRole(w), new Role[] {UIAComboBox, UIADocument, UIAEdit, UIAListItem, UIAMenuItem, UIARadioButton, UIASlider, UIASpinner, UIATreeItem});
+		return Role.isOneOf(getRole(w), new Role[] {UIAComboBox, UIADocument, UIAEdit, UIAListItem, UIAMenu, UIAMenuItem, UIARadioButton, UIASlider, UIASpinner, UIATreeItem});
 	}
 	
 	public static boolean canUseLeftRight(Widget w) {
