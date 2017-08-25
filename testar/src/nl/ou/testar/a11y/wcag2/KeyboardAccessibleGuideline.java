@@ -69,6 +69,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 							+ " both claim to have keyboard focus");
 				deriveActionsFocus(actions, compiler, w);
 				prevHasKeyboardFocus = w;
+			} else { // !hasKeyboardFocus(w)
+				deriveActionsNoFocus(actions, compiler, w);
 			}
 		}
 		if (actions.isEmpty())
@@ -87,12 +89,6 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		
 	private void deriveActionsAll(Set<Action> actions, StdActionCompiler compiler,
 			Widget w) {
-		// if there is a menu bar, try to focus it
-		if (AccessibilityUtil.isMenuBar(w))
-			actions.add(AccessibilityUtil.ACTIVATE_MENU_BAR);
-		else if (AccessibilityUtil.isAppBar(w))
-			actions.add(AccessibilityUtil.ACTIVATE_APP_BAR);
-		
 		// if there are tabs, try to switch between them
 		if (AccessibilityUtil.isTabItem(w)) {
 			actions.add(AccessibilityUtil.NAVIGATE_NEXT_TAB);
@@ -143,6 +139,15 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		if (AccessibilityUtil.canUseShortcutKeys(w))
 			for (Action a : shortcutKeysCache)
 				actions.add(a);
+	}
+	
+	private void deriveActionsNoFocus(Set<Action> actions, StdActionCompiler compiler,
+			Widget w) {
+		// if there is a menu bar, try to focus it
+		if (AccessibilityUtil.isMenuBar(w))
+			actions.add(AccessibilityUtil.ACTIVATE_MENU_BAR);
+		else if (AccessibilityUtil.isAppBar(w))
+			actions.add(AccessibilityUtil.ACTIVATE_APP_BAR);
 	}
 	
 	private void deriveFallbackActions(Set<Action> actions, StdActionCompiler compiler) {
