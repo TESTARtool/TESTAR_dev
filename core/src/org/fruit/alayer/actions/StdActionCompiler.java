@@ -270,10 +270,9 @@ public class StdActionCompiler {
 	public Action hitShortcutKey(List<KBKeys> keys){
 		CompoundAction.Builder builder = new CompoundAction.Builder();
 		for (int i = 0; i < keys.size(); i++)
-			builder.add(new KeyDown(keys.get(i)), 0.1);
-		builder.add(NOP, 0.2);
+			builder.add(new KeyDown(keys.get(i)), 1.0);
 		for (int i = keys.size() - 1; i >= 0; i--)
-			builder.add(new KeyUp(keys.get(i)), 0.1);
+			builder.add(new KeyUp(keys.get(i)), 1.0);
 		builder.add(NOP, 1.0);
 		return builder.build();
 	}
