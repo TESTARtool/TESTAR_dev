@@ -42,10 +42,10 @@ class UIAElement implements Serializable {
 	UIAElement parent;
 	UIARootElement root;
 	UIAWidget backRef;
-	boolean blocked, enabled, ignore, isTopmostWnd, isModal,
+	boolean blocked, enabled, ignore, isModal,
 		isContentElement, isControlElement,
 		hasKeyboardFocus, isKeyboardFocusable,
-		isWndTopMost, isTopLevelContainer,
+		isTopmostWnd, isTopLevelContainer,
 		scrollPattern, hScroll, vScroll; // by urueda
 	long ctrlId, orientation, hwnd, wndInteractionState, wndVisualState;
 	Rect rect;

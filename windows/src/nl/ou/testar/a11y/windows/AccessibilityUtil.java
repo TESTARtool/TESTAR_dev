@@ -22,11 +22,14 @@ import java.util.List;
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 import static org.fruit.alayer.windows.UIARoles.*;
+
 import org.fruit.alayer.windows.UIATags;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -42,17 +45,26 @@ public class AccessibilityUtil {
 	private static final String VIRTUAL_KEY_PREFIX = "VK_";
 	private static final StdActionCompiler compiler = new StdActionCompiler();
 	
-	public static final String ACCESS_KEY_MODIFIER = "Alt";
 	public static final Action
+		ACTIVATE_WIDGET = parseShortcutKey("Enter"),
 		ACTIVATE_CONTEXT_MENU = parseShortcutKey("Shift+F10"),
-		ACTIVATE_APP_BAR = parseShortcutKey("Windows+Z"),
-		ACTIVATE_MENU_BAR = parseShortcutKey("Alt"),
+		CANCEL = parseShortcutKey("Escape"),
+		DELETE_FORWARD = parseShortcutKey("Delete"),
+		DELETE_BACKWARD = parseShortcutKey("Backspace"),
+		NAVIGATE_LEFT = parseShortcutKey("Left"),
+		NAVIGATE_RIGHT = parseShortcutKey("Right"),
+		NAVIGATE_UP = parseShortcutKey("Up"),
+		NAVIGATE_DOWN = parseShortcutKey("Down"),
 		NAVIGATE_NEXT_WIDGET = parseShortcutKey("Tab"),
 		NAVIGATE_PREVIOUS_WIDGET = parseShortcutKey("Shift+Tab"),
 		NAVIGATE_NEXT_TAB = parseShortcutKey("Ctrl+Tab"),
 		NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab"),
 		NAVIGATE_NEXT_AREA = parseShortcutKey("F6"),
-		NAVIGATE_PREVIOUS_AREA = parseShortcutKey("Shift+F6");
+		NAVIGATE_PREVIOUS_AREA = parseShortcutKey("Shift+F6"),
+		EXPAND_COMBO_BOX = parseShortcutKey("Alt+Down"),
+		COLLAPSE_COMBO_BOX = parseShortcutKey("Alt+Up");
+	
+	public static final String LOG_PREFIX = "[a11y]";
 	
 	private AccessibilityUtil() {}
 	
@@ -67,13 +79,13 @@ public class AccessibilityUtil {
 		Assert.hasText(combination);
 		String[] keyStrings = combination.trim().split(KEY_SEP_REGEX);
 		if (keyStrings.length == 0) {
-			LogSerialiser.log("Failed to parse shortcut key " + combination);
+			logA11y("Failed to parse shortcut key <" + combination + ">");
 			return null;
 		}
 		List<KBKeys> keys = new ArrayList<>();
 		for (String keyString : keyStrings) {
 			if (keyString.isEmpty()) {
-				LogSerialiser.log("Failed to parse part of shortcut key " + combination);
+				logA11y("Failed to parse part of shortcut key <" + combination + ">");
 				return null;
 			}
 			keyString = keyString.toUpperCase();
@@ -81,7 +93,7 @@ public class AccessibilityUtil {
 				keyString = AlternativeKeyNames.map.get(keyString);
 			String vkString = VIRTUAL_KEY_PREFIX + keyString;
 			if (!KBKeys.contains(vkString)) {
-				LogSerialiser.log("Failed to parse part " + keyString + " of shortcut key " + combination);
+				logA11y("Failed to parse part <" + keyString + "> of shortcut key <" + combination + ">");
 				return null;
 			}
 			keys.add(KBKeys.valueOf(vkString));
@@ -94,14 +106,25 @@ public class AccessibilityUtil {
 	// for the UIA properties in the other accessibility APIs.
 	
 	public static String getAccessKey(Widget w) {
-		String key = w.get(UIATags.UIAAccessKey, "");
-		if (key != null && !key.isEmpty())
-			return ACCESS_KEY_MODIFIER + "+" + key;
-		return "";
+		return w.get(UIATags.UIAAccessKey, "");
 	}
 	
 	public static String getShortcutKey(Widget w) {
-		return w.get(UIATags.UIAAcceleratorKey, "");
+		String key = w.get(UIATags.UIAAcceleratorKey, "");
+		if (key != null && !key.isEmpty())
+			return key;
+		if (getRole(w).isA(UIAMenuItem)) {
+			// many menu items contain a shortcut key even if the accelerator key is not set
+			// find these by pattern matching (may return the wrong thing, but better than nothing)
+			String name = w.get(UIATags.UIAName, "");
+			int index = name.lastIndexOf("\t");
+			if (index != -1) {
+				key = name.substring(index+1);
+				logA11y("Discovered shortcut key <" + key + "> in <" + name + ">");
+				return key;
+			}
+		}
+		return "";
 	}
 	
 	public static boolean canUseUpDown(Widget w) {
@@ -125,13 +148,14 @@ public class AccessibilityUtil {
 	}
 	
 	public static boolean canUseShortcutKeys(Widget w) {
-		if (w.root().get(UIATags.UIAIsWindowModal, false))
-			return true;
-		// TODO: set a tag on the root widget instead of walking all widgets in search of a menu bar
-		for (Widget child : w.root())
-			if (isMenuBar(child))
-				return true;
-		return false;
+		return !w.root().get(UIATags.UIAIsWindowModal, false)
+				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
+	}
+	
+	public static boolean isRelevant(Widget w) {
+		return !(w instanceof State) // filter out the root of the widget tree
+				&& w.get(UIATags.UIAIsContentElement, true)
+				&& w.get(UIATags.UIAIsEnabled, true);
 	}
 	
 	public static boolean hasKeyboardFocus(Widget w) {
@@ -142,16 +166,8 @@ public class AccessibilityUtil {
 		return w.get(UIATags.UIAIsKeyboardFocusable, false);
 	}
 	
-	public static boolean isEnabled(Widget w) {
-		return w.get(UIATags.UIAIsEnabled, true);
-	}
-	
-	public static boolean isAppBar(Widget w) {
-		return getRole(w).isA(UIAAppBar);
-	}
-	
-	public static boolean isMenuBar(Widget w) {
-		return getRole(w).isA(UIAMenuBar);
+	public static boolean isComboBox(Widget w) {
+		return getRole(w).isA(UIAComboBox);
 	}
 	
 	public static boolean isTabItem(Widget w) {
@@ -161,6 +177,42 @@ public class AccessibilityUtil {
 	private static Role getRole(Widget w) {
 		Assert.notNull(w);
 		return w.get(Tags.Role, UIAWidget);
+	}
+	
+	// debugging
+	
+	/**
+	 * Prints debug info about a widget that is useful for evaluating accessibility
+	 * @param w The widget.
+	 */
+	public static void printWidgetDebugInfo(Widget w) {
+		logA11y("Widget: <" + w.get(Tags.Title, "unknown widget")
+				+ ">@" + w.get(Tags.ZIndex) + "/" + w.root().get(Tags.MaxZIndex)
+				+ " (" + w.get(Tags.Role, Roles.Invalid) + ")"
+				+ ": <" + w.get(UIATags.UIAAccessKey, "no access key")
+				+ "> - <" + w.get(UIATags.UIAAcceleratorKey, "no accelerator key") + ">",
+				LogSerialiser.LogLevel.Debug);
+	}
+	
+	/**
+	 * Logs a message about accessibility
+	 * An identifying prefix <code>LOG_PREFIX)</code> is added to the message,
+	 * and a newline character is appended.
+	 * @param msg The message to log.
+	 */
+	public static void logA11y(String msg) {
+		logA11y(msg, LogSerialiser.LogLevel.Info);
+	}
+	
+	/**
+	 * Logs a message about accessibility
+	 * An identifying prefix <code>LOG_PREFIX)</code> is added to the message,
+	 * and a newline character is appended.
+	 * @param msg The message to log.
+	 * @param logLevel The log level.
+	 */
+	public static void logA11y(String msg, LogSerialiser.LogLevel logLevel) {
+		LogSerialiser.log(LOG_PREFIX + " " + msg + "\n", logLevel);
 	}
 	
 }

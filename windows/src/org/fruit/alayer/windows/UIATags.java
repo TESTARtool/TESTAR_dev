@@ -100,6 +100,16 @@ public final class UIATags{
 	public static final Tag<long[]> UIARuntimeId = from("UIARuntimeId", long[].class);
 	
 	/**
+	 * Whether a widget is a content element.
+	 */
+	public static final Tag<Boolean> UIAIsContentElement = from("UIAIsContentElement", Boolean.class);
+	
+	/**
+	 * Whether a widget is a control element.
+	 */
+	public static final Tag<Boolean> UIAIsControlElement = from("UIAIsControlElement", Boolean.class);
+	
+	/**
 	 * If the widget is a window, this tells whether it is the top-most window
 	 */
 	public static final Tag<Boolean> UIAIsTopmostWindow = from("UIAIsTopmostWindow", Boolean.class);

@@ -307,6 +307,8 @@ public class StateFetcher implements Callable<UIAState>{
 		el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaPtr, true);
 		el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
 		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
+		el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
+		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
 
 		parent.root.hwndMap.put(el.hwnd, el);
 
@@ -317,7 +319,7 @@ public class StateFetcher implements Callable<UIAState>{
 			if(uiaWndPtr != 0){
 				el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWndPtr, true);
 				el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
-				el.isWndTopMost = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWndPtr, true);
+				el.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWndPtr, true);
 				el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWndPtr, true);
 				Windows.IUnknown_Release(uiaWndPtr);
 			}

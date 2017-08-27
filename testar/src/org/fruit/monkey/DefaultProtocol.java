@@ -279,8 +279,8 @@ public class DefaultProtocol extends AbstractProtocol{
 		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
 
 		double minZIndex = Double.MAX_VALUE,
-			   maxZIndex = Double.MIN_VALUE,
-			   zindex;
+				maxZIndex = Double.MIN_VALUE,
+				zindex;
 		for (Widget w : state){
 			zindex = w.get(Tags.ZIndex).doubleValue();
 			if (zindex < minZIndex)

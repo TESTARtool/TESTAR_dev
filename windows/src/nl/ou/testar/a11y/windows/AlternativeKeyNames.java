@@ -39,6 +39,10 @@ public final class AlternativeKeyNames {
 			put("CTRL", "CONTROL");
 			put("WIN", "WINDOWS");
 			put("SPACEBAR", "SPACE");
+			put("LEFT ARROW", "LEFT");
+			put("RIGHT ARROW", "RIGHT");
+			put("UP ARROW", "UP");
+			put("DOWN ARROW", "DOWN");
 			put("RETURN", "ENTER");
 			put("BACKSPACE", "BACK_SPACE");
 			put(",", "COMMA");
