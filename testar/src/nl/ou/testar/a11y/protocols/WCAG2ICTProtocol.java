@@ -23,6 +23,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.DefaultProtocol;
 
@@ -37,6 +38,12 @@ import nl.ou.testar.a11y.wcag2.WCAG2ICT;
 public class WCAG2ICTProtocol extends DefaultProtocol {
 	
 	private final WCAG2ICT wcag;
+	
+	/**
+	 * The set of topmost widgets
+	 * This needs to be updated after every state change.
+	 */
+	protected Set<Widget> topWidgets;
 
 	/**
 	 * Constructs a new WCAG2ICT test protocol
@@ -53,7 +60,9 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 			// something went wrong upstream
 			return verdict;
 		}
-		EvaluationResults results = wcag.evaluate(getTopWidgets(state));
+		// safe the topmost widgets to use when deriving actions
+		topWidgets = getTopWidgets(state);
+		EvaluationResults results = wcag.evaluate(topWidgets);
 		return results.getOverallVerdict();
 	}
 
@@ -62,7 +71,7 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
-			actions = wcag.deriveActions(getTopWidgets(state));
+			actions = wcag.deriveActions(topWidgets);
 		}
 		return actions;
 	}
