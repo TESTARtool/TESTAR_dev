@@ -66,7 +66,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					reportDoubleFocus(prevHasKeyboardFocus, w);
 				deriveActionsFocus(actions, compiler, w);
 				prevHasKeyboardFocus = w;
-			} else { // !hasKeyboardFocus(w)
+			}
+			else { // !hasKeyboardFocus(w)
 				deriveActionsNoFocus(actions, compiler, w);
 			}
 		}
@@ -75,6 +76,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	private void deriveStandardActions(Set<Action> actions, StdActionCompiler compiler) {
 		// standard keys
+		actions.add(AccessibilityUtil.ACTIVATE_WIDGET);
 		actions.add(AccessibilityUtil.NAVIGATE_NEXT_WIDGET);
 		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_WIDGET);
 		actions.add(AccessibilityUtil.NAVIGATE_NEXT_AREA);
@@ -122,15 +124,11 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 			actions.add(AccessibilityUtil.NAVIGATE_DOWN);
 		}
 		
-		// find the appropriate additional actions for the widget
+		// if the widget appears to support editing commands, try to manipulate its text
 		if (AccessibilityUtil.canUseEditCommands(w)) {
-			// if the widget appears to support editing commands, try to manipulate its text
 			//actions.add(compiler.clickTypeInto(w, DataManager.getRandomData()));
 			actions.add(AccessibilityUtil.DELETE_FORWARD);
 			actions.add(AccessibilityUtil.DELETE_BACKWARD);
-		} else {
-			// for all other widgets, try to activate the widget
-			actions.add(AccessibilityUtil.ACTIVATE_WIDGET);
 		}
 		
 		// if the widget is a combo box, try to expand or collapse it
