@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
+import org.fruit.alayer.Widget;
 
 /**
  * Specification of WCAG 2.0 according to WCAG2ICT
@@ -56,13 +56,13 @@ public final class WCAG2ICT {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * @param state The state.
+	 * @param topWidgets The set of topmost widgets.
 	 * @return The results of the evaluation.
 	 */
-	public EvaluationResults evaluate(State state) {
+	public EvaluationResults evaluate(Set<Widget> topWidgets) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.evaluate(state).getResults())
+			for (EvaluationResult result : p.evaluate(topWidgets).getResults())
 				results.add(result);
 		return results;
 	}
@@ -71,13 +71,13 @@ public final class WCAG2ICT {
 	 * Derives the follow-up actions from the given state
 	 * This will collect actions from all principles in WCAG2ICT.
 	 * The actions are specific to accessibility.
-	 * @param state The state.
+	 * @param topWidgets The set of topmost widgets.
 	 * @return The set of actions.
 	 */
-	public Set<Action> deriveActions(State state) {
+	public Set<Action> deriveActions(Set<Widget> topWidgets) {
 		Set<Action> actions = new HashSet<>();
 		for (AbstractPrinciple p : principles)
-			actions.addAll(p.deriveActions(state));
+			actions.addAll(p.deriveActions(topWidgets));
 		return actions;
 	}
 	

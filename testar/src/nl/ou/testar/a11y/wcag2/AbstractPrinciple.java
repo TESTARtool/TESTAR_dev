@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
+import org.fruit.alayer.Widget;
 
 /**
  * A WCAG principle
@@ -55,13 +55,13 @@ public abstract class AbstractPrinciple extends ItemBase {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all guidelines in this principle.
-	 * @param state The state.
+	 * @param topWidgets The set of topmost widgets.
 	 * @return The results of the evaluation.
 	 */
-	public EvaluationResults evaluate(State state) {
+	public EvaluationResults evaluate(Set<Widget> topWidgets) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractGuideline g : guidelines)
-			for (EvaluationResult result : g.evaluate(state).getResults())
+			for (EvaluationResult result : g.evaluate(topWidgets).getResults())
 				results.add(result);
 		return results;
 	}
@@ -70,13 +70,13 @@ public abstract class AbstractPrinciple extends ItemBase {
 	 * Derives the follow-up actions from the given state
 	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
-	 * @param state The state.
+	 * @param topWidgets The set of topmost widgets.
 	 * @return The set of actions.
 	 */
-	public Set<Action> deriveActions(State state) {
+	public Set<Action> deriveActions(Set<Widget> topWidgets) {
 		Set<Action> actions = new HashSet<>();
 		for (AbstractGuideline g : guidelines)
-			actions.addAll(g.deriveActions(state));
+			actions.addAll(g.deriveActions(topWidgets));
 		return actions;
 	}
 		

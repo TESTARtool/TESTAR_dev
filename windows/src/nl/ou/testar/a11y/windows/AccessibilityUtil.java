@@ -105,26 +105,10 @@ public class AccessibilityUtil {
 	// This has not yet been done because it requires finding appropriate equivalents
 	// for the UIA properties in the other accessibility APIs.
 	
-	public static String getAccessKey(Widget w) {
-		return w.get(UIATags.UIAAccessKey, "");
-	}
-	
-	public static String getShortcutKey(Widget w) {
-		String key = w.get(UIATags.UIAAcceleratorKey, "");
-		if (key != null && !key.isEmpty())
-			return key;
-		if (getRole(w).isA(UIAMenuItem)) {
-			// many menu items contain a shortcut key even if the accelerator key is not set
-			// find these by pattern matching (may return the wrong thing, but better than nothing)
-			String name = w.get(UIATags.UIAName, "");
-			int index = name.lastIndexOf("\t");
-			if (index != -1) {
-				key = name.substring(index+1);
-				logA11y("Discovered shortcut key <" + key + "> in <" + name + ">");
-				return key;
-			}
-		}
-		return "";
+	public static boolean isRelevant(Widget w) {
+		return !(w instanceof State) // filter out the root of the widget tree
+				&& w.get(UIATags.UIAIsContentElement, true)
+				&& w.get(UIATags.UIAIsEnabled, true);
 	}
 	
 	public static boolean canUseUpDown(Widget w) {
@@ -147,23 +131,39 @@ public class AccessibilityUtil {
 				|| (r.isA(UIAText) && isKeyboardFocusable(w));
 	}
 	
-	public static boolean canUseShortcutKeys(Widget w) {
-		return !w.root().get(UIATags.UIAIsWindowModal, false)
-				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
-	}
-	
-	public static boolean isRelevant(Widget w) {
-		return !(w instanceof State) // filter out the root of the widget tree
-				&& w.get(UIATags.UIAIsContentElement, true)
-				&& w.get(UIATags.UIAIsEnabled, true);
-	}
-	
 	public static boolean hasKeyboardFocus(Widget w) {
 		return w.get(UIATags.UIAHasKeyboardFocus, false);
 	}
 	
 	public static boolean isKeyboardFocusable(Widget w) {
 		return w.get(UIATags.UIAIsKeyboardFocusable, false);
+	}
+	
+	public static String getAccessKey(Widget w) {
+		return w.get(UIATags.UIAAccessKey, "");
+	}
+	
+	public static String getShortcutKey(Widget w) {
+		String key = w.get(UIATags.UIAAcceleratorKey, "");
+		if (key != null && !key.isEmpty())
+			return key;
+		if (getRole(w).isA(UIAMenuItem)) {
+			// many menu items contain a shortcut key even if the accelerator key is not set
+			// find these by pattern matching (may return the wrong thing, but better than nothing)
+			String name = w.get(UIATags.UIAName, "");
+			int index = name.lastIndexOf("\t");
+			if (index != -1) {
+				key = name.substring(index+1);
+				logA11y("Discovered shortcut key <" + key + "> in <" + name + ">");
+				return key;
+			}
+		}
+		return "";
+	}
+	
+	public static boolean canUseShortcutKeys(Widget w) {
+		return !w.root().get(UIATags.UIAIsWindowModal, false)
+				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
 	}
 	
 	public static boolean isComboBox(Widget w) {

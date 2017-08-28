@@ -24,7 +24,6 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -49,12 +48,12 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	}
 	
 	@Override
-	public Set<Action> deriveActions(State state) {
+	public Set<Action> deriveActions(Set<Widget> topWidgets) {
 		Set<Action> actions = new HashSet<>();
 		StdActionCompiler compiler = new StdActionCompiler();
 		Widget prevHasKeyboardFocus = null;
 		deriveStandardActions(actions, compiler);
-		for (Widget w : state) {
+		for (Widget w : topWidgets) {
 			// skip irrelevant widgets
 			if (!AccessibilityUtil.isRelevant(w))
 				continue;

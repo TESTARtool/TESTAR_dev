@@ -53,7 +53,7 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 			// something went wrong upstream
 			return verdict;
 		}
-		EvaluationResults results = wcag.evaluate(state);
+		EvaluationResults results = wcag.evaluate(getTopWidgets(state));
 		return results.getOverallVerdict();
 	}
 
@@ -62,7 +62,7 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
-			actions = wcag.deriveActions(state);
+			actions = wcag.deriveActions(getTopWidgets(state));
 		}
 		return actions;
 	}
