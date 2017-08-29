@@ -59,8 +59,8 @@ public class AccessibilityUtil {
 		NAVIGATE_PREVIOUS_WIDGET = parseShortcutKey("Shift+Tab"),
 		NAVIGATE_NEXT_TAB = parseShortcutKey("Ctrl+Tab"),
 		NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab"),
-		NAVIGATE_NEXT_AREA = parseShortcutKey("F6"),
-		NAVIGATE_PREVIOUS_AREA = parseShortcutKey("Shift+F6"),
+		NAVIGATE_NEXT_GUI_AREA = parseShortcutKey("F6"),
+		NAVIGATE_PREVIOUS_GUI_AREA = parseShortcutKey("Shift+F6"),
 		EXPAND_COMBO_BOX = parseShortcutKey("Alt+Down"),
 		COLLAPSE_COMBO_BOX = parseShortcutKey("Alt+Up");
 	

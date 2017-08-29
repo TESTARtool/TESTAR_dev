@@ -78,8 +78,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		actions.add(AccessibilityUtil.ACTIVATE_WIDGET);
 		actions.add(AccessibilityUtil.NAVIGATE_NEXT_WIDGET);
 		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_WIDGET);
-		actions.add(AccessibilityUtil.NAVIGATE_NEXT_AREA);
-		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_AREA);
+		actions.add(AccessibilityUtil.NAVIGATE_NEXT_GUI_AREA);
+		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_GUI_AREA);
 		actions.add(AccessibilityUtil.CANCEL);
 		
 		// shortcut keys
