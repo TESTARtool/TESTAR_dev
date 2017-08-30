@@ -266,6 +266,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 		
 		// begin by urueda
+		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
@@ -277,19 +278,6 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 
 		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
-
-		double minZIndex = Double.MAX_VALUE,
-				maxZIndex = Double.MIN_VALUE,
-				zindex;
-		for (Widget w : state){
-			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
-				minZIndex = zindex;
-			if (zindex > maxZIndex)
-				maxZIndex = zindex;
-		}
-		state.set(Tags.MinZIndex, minZIndex);
-		state.set(Tags.MaxZIndex, maxZIndex);
 		// end by urueda
 
 		return state;
@@ -401,14 +389,29 @@ public class DefaultProtocol extends AbstractProtocol{
 		return DataManager.getRandomData();
 	}
 	
+	// by urueda (refactored)
+	protected void calculateZIndices(State state) {
+		double minZIndex = Double.MAX_VALUE,
+				maxZIndex = Double.MIN_VALUE,
+				zindex;
+		for (Widget w : state){
+			zindex = w.get(Tags.ZIndex).doubleValue();
+			if (zindex < minZIndex)
+				minZIndex = zindex;
+			if (zindex > maxZIndex)
+				maxZIndex = zindex;
+		}
+		state.set(Tags.MinZIndex, minZIndex);
+		state.set(Tags.MaxZIndex, maxZIndex);
+	}
+	
 	// by urueda
 	protected Set<Widget> getTopWidgets(State state){
-		Set<Widget> topWidgets = new HashSet<Widget>();
+		Set<Widget> topWidgets = new HashSet<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state){
+		for (Widget w : state)
 			if (w.get(Tags.ZIndex) == maxZIndex)
 				topWidgets.add(w);
-		}
 		return topWidgets;
 	}
 	
