@@ -18,6 +18,7 @@
 package nl.ou.testar.a11y.windows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
@@ -45,24 +46,45 @@ public class AccessibilityUtil {
 	private static final String VIRTUAL_KEY_PREFIX = "VK_";
 	private static final StdActionCompiler compiler = new StdActionCompiler();
 	
+	private static final List<Action> AC_LEFT_RIGHT = Arrays.asList(
+			parseShortcutKey("Left"),	parseShortcutKey("Right"));
+	private static final Role[] R_LEFT_RIGHT = new Role[] {
+			UIAMenuItem, UIATabItem, UIATreeItem,
+			UIADocument, UIAEdit,
+			UIARadioButton, UIASlider
+	};
+	
+	private static final List<Action> AC_UP_DOWN = Arrays.asList(
+			parseShortcutKey("Up"),	parseShortcutKey("Down"));
+	private static final Role[] R_UP_DOWN = new Role[] {
+			UIAListItem, UIAMenu, UIAMenuItem, UIATreeItem,
+			UIADocument, UIAEdit,
+			UIAComboBox, UIARadioButton, UIASlider, UIASpinner
+	};
+	
+	private static final List<Action> AC_HOME_END = Arrays.asList(
+			parseShortcutKey("Home"),	parseShortcutKey("End"),
+			parseShortcutKey("Ctrl+Home"),	parseShortcutKey("Ctrl+End"));
+	private static final Role[] R_HOME_END = new Role[] {
+			UIADocument, UIAEdit
+	};
+	
+	private static final List<Action> AC_DELETE = Arrays.asList(
+			parseShortcutKey("Delete"),	parseShortcutKey("Backspace"));
+	private static final Role[] R_DELETE = new Role[] {
+			UIADocument, UIAEdit, UIAText
+	};
+	
 	public static final Action
-		ACTIVATE_WIDGET = parseShortcutKey("Enter"),
-		ACTIVATE_CONTEXT_MENU = parseShortcutKey("Shift+F10"),
-		CANCEL = parseShortcutKey("Escape"),
-		DELETE_FORWARD = parseShortcutKey("Delete"),
-		DELETE_BACKWARD = parseShortcutKey("Backspace"),
-		NAVIGATE_LEFT = parseShortcutKey("Left"),
-		NAVIGATE_RIGHT = parseShortcutKey("Right"),
-		NAVIGATE_UP = parseShortcutKey("Up"),
-		NAVIGATE_DOWN = parseShortcutKey("Down"),
-		NAVIGATE_NEXT_WIDGET = parseShortcutKey("Tab"),
-		NAVIGATE_PREVIOUS_WIDGET = parseShortcutKey("Shift+Tab"),
-		NAVIGATE_NEXT_TAB = parseShortcutKey("Ctrl+Tab"),
-		NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab"),
-		NAVIGATE_NEXT_GUI_AREA = parseShortcutKey("F6"),
-		NAVIGATE_PREVIOUS_GUI_AREA = parseShortcutKey("Shift+F6"),
-		EXPAND_COMBO_BOX = parseShortcutKey("Alt+Down"),
-		COLLAPSE_COMBO_BOX = parseShortcutKey("Alt+Up");
+		AC_ACTIVATE_WIDGET = parseShortcutKey("Enter"),
+		AC_CANCEL = parseShortcutKey("Escape"),
+		AC_OPEN_CONTEXT_MENU = parseShortcutKey("ContextMenu"),
+		AC_NAVIGATE_NEXT_WIDGET = parseShortcutKey("Tab"),
+		AC_NAVIGATE_PREVIOUS_WIDGET = parseShortcutKey("Shift+Tab"),
+		AC_NAVIGATE_NEXT_GUI_AREA = parseShortcutKey("F6"),
+		AC_NAVIGATE_PREVIOUS_GUI_AREA = parseShortcutKey("Shift+F6"),
+		AC_NAVIGATE_NEXT_TAB = parseShortcutKey("Ctrl+Tab"),
+		AC_NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab");
 	
 	public static final String LOG_PREFIX = "[a11y]";
 	
@@ -109,6 +131,20 @@ public class AccessibilityUtil {
 		return !(w instanceof State) // filter out the root of the widget tree
 				&& w.get(UIATags.UIAIsContentElement, true)
 				&& w.get(UIATags.UIAIsEnabled, true);
+	}
+	
+	public static List<Action> getApplicableActions(Widget w) {
+		Role r = getRole(w);
+		List<Action> actions = new ArrayList<>();
+		if (Role.isOneOf(r, R_LEFT_RIGHT))
+			actions.addAll(AC_LEFT_RIGHT);
+		if (Role.isOneOf(r, R_UP_DOWN))
+			actions.addAll(AC_UP_DOWN);
+		if (Role.isOneOf(r, R_HOME_END))
+			actions.addAll(AC_HOME_END);
+		if (Role.isOneOf(r, R_DELETE))
+			actions.addAll(AC_DELETE);
+		return actions;
 	}
 	
 	public static boolean canUseUpDown(Widget w) {
@@ -164,10 +200,6 @@ public class AccessibilityUtil {
 	public static boolean canUseShortcutKeys(Widget w) {
 		return !w.root().get(UIATags.UIAIsWindowModal, false)
 				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
-	}
-	
-	public static boolean isComboBox(Widget w) {
-		return getRole(w).isA(UIAComboBox);
 	}
 	
 	public static boolean isTabItem(Widget w) {

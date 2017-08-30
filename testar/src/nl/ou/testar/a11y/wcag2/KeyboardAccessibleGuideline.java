@@ -55,6 +55,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		deriveStandardActions(actions, compiler);
 		for (Widget w : topWidgets) {
 			// skip irrelevant widgets
+			// NOTE: not all APIs accurately report the isKeyboardFocusable property,
+			// so don't use it when filtering out irrelevant widgets.
 			if (!AccessibilityUtil.isRelevant(w))
 				continue;
 			AccessibilityUtil.printWidgetDebugInfo(w);	
@@ -75,23 +77,26 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	private void deriveStandardActions(Set<Action> actions, StdActionCompiler compiler) {
 		// standard keys
-		actions.add(AccessibilityUtil.ACTIVATE_WIDGET);
-		actions.add(AccessibilityUtil.NAVIGATE_NEXT_WIDGET);
-		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_WIDGET);
-		actions.add(AccessibilityUtil.NAVIGATE_NEXT_GUI_AREA);
-		actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_GUI_AREA);
-		actions.add(AccessibilityUtil.CANCEL);
-		
-		// shortcut keys
-		addShortcutKey(AccessibilityUtil.ACTIVATE_CONTEXT_MENU);
+		actions.add(AccessibilityUtil.AC_ACTIVATE_WIDGET);
+		actions.add(AccessibilityUtil.AC_NAVIGATE_NEXT_WIDGET);
+		actions.add(AccessibilityUtil.AC_NAVIGATE_PREVIOUS_WIDGET);
+		actions.add(AccessibilityUtil.AC_NAVIGATE_NEXT_GUI_AREA);
+		actions.add(AccessibilityUtil.AC_NAVIGATE_PREVIOUS_GUI_AREA);
+		actions.add(AccessibilityUtil.AC_OPEN_CONTEXT_MENU);
+		actions.add(AccessibilityUtil.AC_CANCEL);
 	}
 		
 	private void deriveActionsAll(Set<Action> actions, StdActionCompiler compiler,
 			Widget w) {
+		// if there is a menu bar, try to focus it
+		// NOTE: menu bars are somewhat hard to detect, because not all menus are menu bars
+		// and some menu bars (e.g. ribbons) are not menus.
+		// However, most menu bars have an access key property, so they don't need to be explicitly detected.
+		
 		// if there are tabs, try to switch between them
 		if (AccessibilityUtil.isTabItem(w)) {
-			actions.add(AccessibilityUtil.NAVIGATE_NEXT_TAB);
-			actions.add(AccessibilityUtil.NAVIGATE_PREVIOUS_TAB);
+			actions.add(AccessibilityUtil.AC_NAVIGATE_NEXT_TAB);
+			actions.add(AccessibilityUtil.AC_NAVIGATE_PREVIOUS_TAB);
 		}
 		
 		// find shortcut keys
@@ -113,29 +118,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		
 	private void deriveActionsFocus(Set<Action> actions, StdActionCompiler compiler,
 			Widget w) {
-		// many widgets accept arrow keys
-		if (AccessibilityUtil.canUseLeftRight(w)) {
-			actions.add(AccessibilityUtil.NAVIGATE_LEFT);
-			actions.add(AccessibilityUtil.NAVIGATE_RIGHT);
-		}
-		if (AccessibilityUtil.canUseUpDown(w)) {
-			actions.add(AccessibilityUtil.NAVIGATE_UP);
-			actions.add(AccessibilityUtil.NAVIGATE_DOWN);
-		}
-		
-		// if the widget appears to support editing commands, try to manipulate its text
-		if (AccessibilityUtil.canUseEditCommands(w)) {
-			//actions.add(compiler.clickTypeInto(w, DataManager.getRandomData()));
-			actions.add(AccessibilityUtil.DELETE_FORWARD);
-			actions.add(AccessibilityUtil.DELETE_BACKWARD);
-		}
-		
-		// if the widget is a combo box, try to expand or collapse it
-		if (AccessibilityUtil.isComboBox(w)) {
-			// TODO: check expanded/collapsed state
-			actions.add(AccessibilityUtil.EXPAND_COMBO_BOX);
-			actions.add(AccessibilityUtil.COLLAPSE_COMBO_BOX);
-		}
+		// get the applicable keys for this widget
+		for (Action a : AccessibilityUtil.getApplicableActions(w))
+			actions.add(a);
 		
 		// if shortcut keys are not blocked, e.g. by a modal window, try to use one
 		if (AccessibilityUtil.canUseShortcutKeys(w))
