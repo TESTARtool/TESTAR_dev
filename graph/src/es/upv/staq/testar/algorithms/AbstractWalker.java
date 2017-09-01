@@ -108,7 +108,6 @@ public abstract class AbstractWalker implements IWalker {
 				lastS = s; lastA = a;
 				if (s != null && a != null)
 					movementNumber++;
-				if (movementNumber % MOVEMENT_FEEDBACK_STEP == 0) System.out.println("Reached Movement: <" + movementNumber + ">"); // useful feedback for graph loadings
 			}
 		}
 		env.finishGraph(walkStopper.walkStatus(), lastS, lastA, walkStopper.walkEndState());
