@@ -218,7 +218,8 @@ public class AccessibilityUtil {
 	 * @param w The widget.
 	 */
 	public static void printWidgetDebugInfo(Widget w) {
-		logA11y("Widget: <" + w.get(Tags.Title, "unknown widget")
+		logA11y("Widget" + (w.get(UIATags.UIAHasKeyboardFocus, false) ? "[focus]" : "")  
+				+ ": <" + w.get(Tags.Title, "unknown widget")
 				+ ">@" + w.get(Tags.ZIndex) + "/" + w.root().get(Tags.MaxZIndex)
 				+ " (" + w.get(Tags.Role, Roles.Invalid) + ")"
 				+ ": <" + w.get(UIATags.UIAAccessKey, "no access key")
