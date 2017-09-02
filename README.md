@@ -3,6 +3,16 @@
 This is the github development root folder for TESTAR development. 
 The software can be build with both ant and gradle.
 
+### Required tools to build the software
+
+In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
+These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
+
+After installation of these tools  the file compile_w10.bat and clean_w10.bat need to be adapted.
+CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
+
+Path needs to be set to the folder where the tools are installed.
+
 ### Gradle build
 
 To build the Gradle project and run it execute the following procedure;
