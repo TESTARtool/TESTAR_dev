@@ -103,7 +103,7 @@ public final class Tags {
 	/** Maximum observed ZIndex for a UI state */
 	public static final Tag<Double> MaxZIndex = from("MaxZIndex", Double.class);
 	/** Minimum observed ZIndex for a UI state */
-	public static final Tag<Double> MinZIndex = from("MaxZIndex", Double.class);
+	public static final Tag<Double> MinZIndex = from("MinZIndex", Double.class);
 	
 	/** Related to slides (from_Position -&lt; to_Position) */
 	public static final Tag<Position[]> Slider = from("Slider", Position[].class);;

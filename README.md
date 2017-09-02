@@ -11,6 +11,17 @@ To build the Gradle project and run it execute the following procedure;
 2. Change directory to testar/target/install/bin
 3. Run testar.bat
 
+It is also possible to generate a zip file containing TESTAR. This zip can be extracted on any other machine
+that has a 64-bit Windows operating system and Visual Studio redistributable installed. A proper way of using
+TESTAR is to run the tool in a virtual-machine.
+To build the zip execute the following command.
+
+1. Run `gradlew distZip` in the root of the project. 
+2. Extract the zip on the machine where TESTAR is used.
+
+NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
+ [link](https://go.microsoft.com/fwlink/?LinkId=746572) .Also a JAVA 1.8 JDK is required.
+
 #### Running Gradle in Eclipse
 To use Gradle within Eclipse the
 [eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html) is added to the root project. The following
@@ -26,7 +37,6 @@ After these steps it is possible to execute gradle tasks. A separate view for Gr
 The procedure presented in this chapter requires the installation of the [buildship](https://projects.eclipse.org/projects/tools.buildship) plugin. This plugin comes pre-installed with Eclipse Neon.
 
 ## Known issue
-- The protocol needs to be compiled, see the issue report [here](https://github.com/florendg/testar_floren/issues/10). Therefor choose edit protocol, compile and close the dialog. The protocol .class is now available.
 - Testar hangs at the end of the execution.
 
 ## GraphDb support

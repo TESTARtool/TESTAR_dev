@@ -35,7 +35,7 @@ public class ScreenshotSerialiser extends Thread {
 	private static final String OUT_DIR = "output/scrshots/";	
 	private static String testSequenceFolder = null;
 	private static LinkedList<ScrshotRecord> scrshotSavingQueue =  new LinkedList<ScrshotRecord>();
-	private static final int QUEUE_LIMIT = 32;
+	private static final int QUEUE_LIMIT = 16; //32;
 	private static ScreenshotSerialiser singletonScreenshotSerialiser;
 	private static boolean alive, queueBoost;
 
@@ -76,7 +76,7 @@ public class ScreenshotSerialiser extends Thread {
 				if (!queueBoost && scrshotSavingQueue.size() > QUEUE_LIMIT){
 					this.setPriority(NORM_PRIORITY);
 					queueBoost = true;
-				} else if (queueBoost && scrshotSavingQueue.size() < 10){
+				} else if (queueBoost && scrshotSavingQueue.size() < QUEUE_LIMIT/2){ //10){
 					this.setPriority(MIN_PRIORITY);
 					queueBoost = false;
 				}
@@ -122,6 +122,7 @@ public class ScreenshotSerialiser extends Thread {
 	
 	public static void exit(){
 		if (singletonScreenshotSerialiser != null){
+			ScreenshotSerialiser.finish();
 			try {
 				synchronized(testSequenceFolder){
 					while (singletonScreenshotSerialiser != null){

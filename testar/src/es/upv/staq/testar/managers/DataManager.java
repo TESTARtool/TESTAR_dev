@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  */
 public class DataManager {
 
-	public static final String XML_UI_FILTER_VERSION = "1.0.20160412";
+	public static final String XML_UI_FILTER_VERSION = "1.0.20170322";
     public static final String DATA_FILE = "input_values.xml";	
 	
 	// Widget filter types / data types

@@ -45,6 +45,9 @@ import es.upv.staq.testar.graph.IEnvironment;
  */
 public class JIPrologWrapper{ // implements JIPEventListener{
 	
+	private boolean DEBUG_FACTS_N_RULES = false,
+					DEBUG_QUERIES = false;
+
 	private JIPEngine jipEngine = null;
 	//private int queryHandle = -1;
 
@@ -58,7 +61,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 	
 	private AbstractMap<String,Set<String>> stateFactsCache = null;
 	private boolean queryBaseSync = false;
-
+	
 	public JIPrologWrapper(){
 		this.jipEngine = new JIPEngine();
 		//this.jipEngine.addEventListener(this);
@@ -69,11 +72,11 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 	}
 	
 	private Set<String> getStateRules(){
-		return FactsState.getRules();
+		return FactsUIStates.getRules();
 	}
 	
 	public Set<String> getActionsRules(){
-		return FactsAction.getRules();
+		return FactsUIActions.getRules();
 	}
 	
 	private Set<String> getFacts(State state){
@@ -82,7 +85,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 		if (facts != null)
 			return facts;
 		else{
-			facts = FactsState.getFacts(state);
+			facts = FactsUIStates.getFacts(state);
 			this.stateFactsCache.put(sid,facts);
 			return facts;
 		}
@@ -93,10 +96,10 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 		return getFacts(state,actions);
 	}
 	private Set<String> getFacts(State state, Set<Action> actions){
-		return FactsAction.getFacts(state,actions);
+		return FactsUIActions.getFacts(state,actions);
 	}
 	private Set<String> getFacts(IEnvironment env){
-		return FactsEnvironment.getFacts(env);
+		return FactsTests.getFacts(env);
 	}	
 
 	public void setStateRules(Set<String> prologRules){
@@ -186,7 +189,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 				System.out.println(s);
 		}
 	}
-
+	
 	private void debugActionFactsNrules(){    	
 		System.out.println(">>> Action-Rules <<<\n--------------------\n");
 		if (this.prologBase.actionRules != null){
@@ -215,27 +218,28 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 
 	public void updatePrologFactsNrules(){
 		synchronized(this.prologBase){
-			// debug facts and rules
-			//this.debugStateFactsNrules();
-			//this.debugActionFactsNrules();
-			//this.debugEnvironmentFactsNrules();
+			if (DEBUG_FACTS_N_RULES){
+				this.debugStateFactsNrules();
+				this.debugActionFactsNrules();
+				this.debugEnvironmentFactsNrules();
+			}
 	
 			String prologString = PrologUtil.setToString(
 					this.prologBase.stateRules,this.prologBase.actionRules,this.prologBase.envRules,
 					this.prologBase.stateFacts, this.prologBase.actionFacts, this.prologBase.envFacts,
 					this.prologBase.factsNrules);
-			//System.out.println("Prolog-base:\n" + prologString);
+			if (DEBUG_FACTS_N_RULES || DEBUG_QUERIES) System.out.println("Prolog-base:\n" + prologString);
 			setPrologFactsNrules(prologString);
 	
-			// debug queries
-			//FactsState.debugQueries(this);
-			//FactsAction.debugQueries(this);
-			//FactsEnvironment.debugQueries(this);
-	
-			// advanced queries
-			//debugQuery("write('hello world'), nl.");
-			//debugQuery("findall(W,widget(W,S),Z), length(Z,N)."); // N = widgets count in state S
-			//debugQuery("findall(W,widget(W,S),Z1), length(Z1,N1), findall(A,action(A,T),Z2), length(Z2,N2), >(N1,N2).");
+			if (DEBUG_QUERIES){
+				FactsUIStates.debugQueries(this);
+				FactsUIActions.debugQueries(this);
+				FactsTests.debugQueries(this);
+				// advanced queries
+				debugQuery("write('hello world'), nl.");
+				debugQuery("findall(W,widget(W,S),Z), length(Z,N)."); // N = widgets count in state S
+				debugQuery("findall(W,widget(W,S),Z1), length(Z1,N1), findall(A,action(A,T),Z2), length(Z2,N2), >(N1,N2).");
+			}
 		}
 	}
 

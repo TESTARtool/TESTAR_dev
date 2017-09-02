@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -45,22 +46,26 @@ public class TESTAREnvironment implements IEnvironment {
 		
 	private HashMap<String,Set<Action>> discoveredStateActions; // Concrete state ID -> actions
 	
-	private WeakHashMap<String,IGraphState> cachedGetStates = null;
-	private WeakHashMap<String,IGraphAction> cachedGetActions = null;
-	
-	private HashMap<String,Set<String>> stateClusters; // abstract_R -> Set<concrete>
-	private HashMap<String,Set<String>> actionClusters; // abstract -> Set<concrete>
+	private Map<String,IGraphState> cachedGetStates = null;
+	private Map<String,IGraphAction> cachedGetActions = null;
 		
-	// [0] unique_states, [1] unique_actions, [2] abstract_states, [3] abstract_actions, [4] longestPath, [5] minCvg, [6] maxCvg
+	// [0] states number
+	// [1] actions number
+	// [2] abstract states number
+	// [3] abstract actions number
+	// [4] unexplored (known) actions number
+	// [5] longestPath
+	// [6] minCvg
+	// [7] maxCvg
+	// [8] KCVG - CVG value (coverage of known UI space)
+	// [9] KCVG - K value (known UI space scale)
 	private List<int[]> explorationCurve;
-	
+
 	public TESTAREnvironment(String testSequencePath){
 		this(TESTARGraph.buildEmptyGraph());
 		this.discoveredStateActions = new HashMap<String,Set<Action>>();
-		this.cachedGetStates = new WeakHashMap<String,IGraphState>();;
-		this.cachedGetActions = new WeakHashMap<String,IGraphAction>();;
-		this.stateClusters = new HashMap<String,Set<String>>();
-		this.actionClusters = new HashMap<String,Set<String>>();
+		this.cachedGetStates = new WeakHashMap<String,IGraphState>();
+		this.cachedGetActions = new WeakHashMap<String,IGraphAction>();
 		this.explorationCurve = new ArrayList<int[]>();
 	}
 	
@@ -136,41 +141,22 @@ public class TESTAREnvironment implements IEnvironment {
 		if (actions != null){
 			Set<String> exploredActions = new HashSet<String>();
 			for (Object aid : g.outgoingEdgesOf(graphState.getConcreteID()).toArray())
-				exploredActions.add(this.getAction((String)aid).getAbstractID());
+				exploredActions.add(this.getAction(((GraphEdge)aid).getActionID()).getAbstractID());
 			graphState.updateUnexploredActions(this, actions, exploredActions);
 			discoveredStateActions.remove(graphState.getConcreteID());
 		}		
 	}
 
-	private void updateCluster(IGraphState gs){
-		Set<String> c = this.stateClusters.get(gs.getAbstract_R_ID());
-		if (c == null){
-			c = new HashSet<String>();
-			this.stateClusters.put(gs.getAbstract_R_ID(), c);
-		}
-		c.add(gs.getConcreteID());
-	}
-	
-	private void updateCluster(IGraphAction ga){
-		if (ga.getConcreteID().equals(Grapher.GRAPH_ACTION_START))
-			return;
-		Set<String> c = this.actionClusters.get(ga.getAbstractID());
-		if (c == null){
-			c = new HashSet<String>();
-			this.actionClusters.put(ga.getAbstractID(), c);
-		}
-		c.add(ga.getConcreteID());
+	@Override
+	public void setStartingNode(IGraphState startNode){
+		g.addVertex(this,startNode);
 	}
 
 	@Override
 	public void populateEnvironment(IGraphState fromState, IGraphAction action, IGraphState toState) {
-		if (fromState.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY)) // is graph starting?
-			g.addVertex(fromState);
-		if (g.addVertex(toState))
-			updateCluster(toState);
+		g.addVertex(this,toState);
 		updateAvailableActions(toState);
-		if (g.addEdge(this, fromState, toState, action))
-			updateCluster(action);
+		g.addEdge(this, fromState, toState, action);
 		fromState.actionExplored(action.getAbstractID());
 		if (!Grapher.GRAPH_LOADING_TASK) sampleExploration();		
 	}	
@@ -195,34 +181,44 @@ public class TESTAREnvironment implements IEnvironment {
 	
 	@Override
 	public IGraphState getSourceState(IGraphAction action){
-		if (g.containsEdge(action.getConcreteID()))
-			return g.getState(g.getEdgeSource(action.getConcreteID()));
-		else
-			return null;
+		return this.g.getState(action.getSourceStateID());
 	}
 	
 	@Override
-	public IGraphState getTargetState(IGraphAction action){
-		if (g.containsEdge(action.getConcreteID()))
-			return g.getState(g.getEdgeTarget(action.getConcreteID()));
-		else
-			return null;
+	public IGraphState[] getTargetStates(IGraphAction action){
+		Set<String> targetStates = action.getTargetStateIDs();
+		if (targetStates.isEmpty())
+			return new IGraphState[]{}; // empty;
+		Set<IGraphState> graphStates = new HashSet<IGraphState>();
+		IGraphState gs;
+		for (String ts : targetStates){
+			gs = this.g.getState(ts);
+			if (gs != null)
+				graphStates.add(gs);
+		}
+		if (graphStates.size() < targetStates.size()){
+			System.out.println("WARNING - action <" + action.getConcreteID() +
+							   "> from <" + action.getSourceStateID() +
+							   "> has <" + (targetStates.size() - graphStates.size()) +
+							   "> null targets: " + targetStates.toString());
+		}
+		return graphStates.toArray(new IGraphState[graphStates.size()]);
 	}
 
 	@Override
-	public Collection<String> getIncomingActions(IGraphState state){
+	public Collection<GraphEdge> getIncomingActions(IGraphState state){
 		if (g.containsVertex(state.getConcreteID()))		
 			return g.incomingEdgesOf(state.getConcreteID());
 		else
-			return new ArrayList<String>();
+			return new ArrayList<GraphEdge>();
 	}
 	
 	@Override
-	public Collection<String> getOutgoingActions(IGraphState state){
+	public Collection<GraphEdge> getOutgoingActions(IGraphState state){
 		if (g.containsVertex(state.getConcreteID()))
 			return g.outgoingEdgesOf(state.getConcreteID());
 		else
-			return new ArrayList<String>();
+			return new ArrayList<GraphEdge>();
 	}
 	
 	@Override
@@ -230,8 +226,8 @@ public class TESTAREnvironment implements IEnvironment {
 		String absID = graphAction.getAbstractID();
 		IGraphAction outGA;
 		int c = 0;
-		for (String outActionID : this.getOutgoingActions(graphState)){
-			outGA = g.getAction(outActionID);
+		for (GraphEdge edge : this.getOutgoingActions(graphState)){
+			outGA = g.getAction(edge.getActionID());
 			if (absID.equals(outGA.getAbstractID()))
 				c++;
 		}
@@ -243,7 +239,7 @@ public class TESTAREnvironment implements IEnvironment {
 		int[] walkC = new int[2];
 		walkC[0] = action.getCount();
 		walkC[1] = 0;
-		Set<String> c = actionClusters.get(action.getAbstractID());
+		Set<String> c = this.g.getActionClusters().get(action.getAbstractID());
 		if (c != null)			
 			walkC[1] = c.size();		
 		return walkC;
@@ -252,8 +248,8 @@ public class TESTAREnvironment implements IEnvironment {
 	private int getActionsNumber(Set<String> actionTypes, IGraphState state){
 		int an = 0;
 		if (g.containsVertex(state.getConcreteID())){
-			for (String actionID : this.getOutgoingActions(state)){
-				if (actionTypes.contains(this.getAction(actionID).getRole()))
+			for (GraphEdge edge : this.getOutgoingActions(state)){
+				if (actionTypes.contains(this.getAction(edge.getActionID()).getRole()))
 					an++;
 			}
 		}
@@ -297,15 +293,17 @@ public class TESTAREnvironment implements IEnvironment {
 	}*/
 	
 	@Override
-	public IGraphAction[] getSortedActionsByOrder(int fromOrder, int toOrder) {
+	public GraphEdge[] getSortedActionsByOrder(int fromOrder, int toOrder) {
 		return g.getSortedActionsByOrder(fromOrder,toOrder);
 	}
 	
-	public Iterator<IGraphAction> getForwardActions(){
+	@Override
+	public Iterator<GraphEdge> getForwardActions(){
 		return g.getForwardActions();
 	}
 	
-	public ListIterator<IGraphAction> getBackwardActions(){
+	@Override
+	public ListIterator<GraphEdge> getBackwardActions(){
 		return g.getBackwardActions();
 	}
 	
@@ -337,12 +335,12 @@ public class TESTAREnvironment implements IEnvironment {
 
 	@Override
 	public HashMap<String,Set<String>> getGraphStateClusters(){
-		return this.stateClusters;
+		return this.g.getStateClusters();
 	}
 		
 	@Override
 	public HashMap<String,Set<String>> getGraphActionClusters(){
-		return this.actionClusters;
+		return this.g.getActionClusters();
 	}	
 	
 	@Override
@@ -358,9 +356,9 @@ public class TESTAREnvironment implements IEnvironment {
 			populateEnvironment(lastState,lastAction,weState);
 		}
 		if (!this.stateAtGraph(weState))
-			g.addVertex(weState);
+			g.addVertex(this, weState);
 		IGraphState v = new GraphState(walkStatus ? Grapher.GRAPH_NODE_PASS : Grapher.GRAPH_NODE_FAIL);
-		g.addVertex(v);
+		g.addVertex(this, v);
 		g.addEdge(this, weState, v, new GraphAction(Grapher.GRAPH_ACTION_STOP));
 	}
 	
@@ -406,7 +404,8 @@ public class TESTAREnvironment implements IEnvironment {
 			   knownSpaceScale = 0.0;
 		if (totalKnownActions > 0){
 			knownSpaceCvgs = (int) (totalKnownExecutedActions * 100.0 / totalKnownActions);
-			knownSpaceScale = Math.log10((double)totalKnownActions) / LOG10_2; // log base 2
+			//knownSpaceScale = Math.log10((double)totalKnownActions) / LOG10_2; // log base 2
+			knownSpaceScale = totalKnownActions;
 		}
 		return new double[]{minCoverage * 100, maxCoverage * 100, knownSpaceCvgs, knownSpaceScale, totalKnownUnexploredActions};
 		// end by urueda
@@ -484,6 +483,27 @@ public class TESTAREnvironment implements IEnvironment {
 	}
 	
 	@Override
+	public String convertKCVG(int k){
+		if (k < 100)
+			return k + "";
+		if (k < 1000) // 1K
+			return k/10 + "a"; // x 10
+		if (k < 10000) // 10K
+			return k/100 + "b"; // x 100
+		if (k < 100000) // 100K
+			return k/1000 + "c"; // x 1000 (1K)
+		if (k < 1000000) // 1M
+			return k/10000 + "d"; // x 10000 (10K)
+		if (k < 10000000) // 10M
+			return k/100000 + "e"; // x 100000 (100K)
+		if (k < 100000000) // 100M
+			return k/1000000 + "f"; // x 1000000 (1M)
+		if (k < 1000000000) // 1G
+			return k/10000000 + "g"; // x 10000000 (10M)
+		return k + "o"; // overflow
+	}
+
+	@Override
 	public String getLongestPath(){
 		return g.getLongestPath();
 	}
@@ -497,27 +517,25 @@ public class TESTAREnvironment implements IEnvironment {
 	public List<IGraphState> getPath(IGraphState from, IGraphState to){
 		if (!g.containsVertex(from.getConcreteID()) || !g.containsVertex(to.getConcreteID()))
 			return null;
-		Set<String> edges = this.g.getAllEdges(from.getConcreteID(),to.getConcreteID());
+		Set<GraphEdge> edges = this.g.getAllEdges(from.getConcreteID(),to.getConcreteID());
 		if (edges == null || edges.isEmpty())
 			return null;
 		else {
-			List<IGraphAction> path = new ArrayList<IGraphAction>();
+			List<GraphEdge> path = new ArrayList<GraphEdge>();
 			IGraphState cs = from;
-			IGraphAction ga;
 			while (cs != to){
-				for (String gaID : this.g.outgoingEdgesOf(cs.getConcreteID())){
-					if (edges.contains(gaID)){
-						ga = g.getAction(gaID);
-						path.add(ga);
-						edges.remove(ga);
-						cs = g.getState(this.g.getEdgeTarget(gaID));
+				for (GraphEdge edge : this.g.outgoingEdgesOf(cs.getConcreteID())){
+					if (edges.contains(edge)){
+						path.add(edge);
+						edges.remove(edge);
+						cs = g.getState(this.g.getEdgeTarget(edge));
 						break;
 					}
 				}
 			}
 			List<IGraphState> pathStates = new ArrayList<IGraphState>();
-			for (IGraphAction pga : path)
-				pathStates.add(g.getState(g.getEdgeTarget(pga.getConcreteID())));
+			for (GraphEdge p : path)
+				pathStates.add(g.getState(g.getEdgeTarget(p)));
 			return pathStates;
 		}
 	}
@@ -526,12 +544,12 @@ public class TESTAREnvironment implements IEnvironment {
 	public IGraphState getPrevious(IGraphState graphState){
 		if (!g.containsVertex(graphState.getConcreteID()))
 			return null;
-		Collection<String> inActions = this.getIncomingActions(graphState);
+		Collection<GraphEdge> inActions = this.getIncomingActions(graphState);
 		String lastOrder, maxOrder = "0";
 		IGraphAction lastAction = null, ga;
-		for (String gaID : inActions){
-			ga = g.getAction(gaID);
-			lastOrder = ga.getLastOrder();
+		for (GraphEdge edge : inActions){
+			ga = g.getAction(edge.getActionID());
+			lastOrder = ga.getLastOrder(edge.getTargetStateID());
 			if (lastOrder != null){
 				if (lastOrder.compareTo(maxOrder) > 0){
 					maxOrder = lastOrder;
@@ -542,7 +560,7 @@ public class TESTAREnvironment implements IEnvironment {
 		if (lastAction == null)
 			return null;
 		else
-			return this.g.getState(g.getEdgeSource(lastAction.getConcreteID()));
+			return this.g.getState(lastAction.getSourceStateID());
 	}
 	
 	@Override
@@ -572,15 +590,16 @@ public class TESTAREnvironment implements IEnvironment {
 	public int getUnexecutedActionNumber(IGraphState graphState){
 		return graphState.getUnexploredActionsSize();
 	}
-	
-	@Override
-	public String toString(){
-		return GraphReporter.PrintResults(this, g);
-	}
 
 	@Override
 	public int loadFromXML(String xmlPath){
 		return this.g.loadFromXML(xmlPath, this);
 	}
-	
+
+	@Override
+	public String[] getReport(int firstSequenceActionNumber) {
+		 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+		return GraphReporter.getReport(this, g, firstSequenceActionNumber);
+	}
+
 }

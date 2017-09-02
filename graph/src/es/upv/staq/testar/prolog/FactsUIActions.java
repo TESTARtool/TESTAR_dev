@@ -33,7 +33,7 @@ import es.upv.staq.testar.NativeLinker;
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
-public class FactsAction {
+public class FactsUIActions {
 	
 	// action(A,S,W,T,O) 			: A = UI action, number 'O' in the test sequence, of type T over widget W in state S
 	// 					   			  O = 0 if it is a discovered action (not executed)

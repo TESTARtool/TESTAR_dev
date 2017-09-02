@@ -69,4 +69,16 @@ public interface SUT extends Taggable {
 	 */
 	List<Pair<Long, String>> getRunningProcesses();
 	
+	/**
+	 * Sets a native automation cache.
+	 * @author: urueda
+	 */
+	void setNativeAutomationCache();
+	
+	/**
+	 * Returns the native automation cache.
+	 * @return
+	 */
+	AutomationCache getNativeAutomationCache();
+	
 }
