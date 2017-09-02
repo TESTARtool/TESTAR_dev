@@ -128,6 +128,8 @@ public class AccessibilityUtil {
 	// for the UIA properties in the other accessibility APIs.
 	
 	public static boolean isRelevant(Widget w) {
+		// NOTE: UIA doesn't accurately report the isKeyboardFocusable property,
+		// so don't use it when filtering out irrelevant widgets.
 		return !(w instanceof State) // filter out the root of the widget tree
 				&& w.get(UIATags.UIAIsContentElement, true)
 				&& w.get(UIATags.UIAIsEnabled, true);

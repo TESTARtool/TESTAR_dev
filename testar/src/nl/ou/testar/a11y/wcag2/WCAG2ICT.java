@@ -56,13 +56,13 @@ public final class WCAG2ICT {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * @param topWidgets The set of topmost widgets.
+	 * @param widgets The set of widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	public EvaluationResults evaluate(Set<Widget> topWidgets) {
+	public EvaluationResults evaluate(Set<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.evaluate(topWidgets).getResults())
+			for (EvaluationResult result : p.evaluate(widgets).getResults())
 				results.add(result);
 		return results;
 	}
@@ -71,13 +71,13 @@ public final class WCAG2ICT {
 	 * Derives the follow-up actions from the given state
 	 * This will collect actions from all principles in WCAG2ICT.
 	 * The actions are specific to accessibility.
-	 * @param topWidgets The set of topmost widgets.
+	 * @param widgets The set of widgets to consider.
 	 * @return The set of actions.
 	 */
-	public Set<Action> deriveActions(Set<Widget> topWidgets) {
+	public Set<Action> deriveActions(Set<Widget> widgets) {
 		Set<Action> actions = new HashSet<>();
 		for (AbstractPrinciple p : principles)
-			actions.addAll(p.deriveActions(topWidgets));
+			actions.addAll(p.deriveActions(widgets));
 		return actions;
 	}
 	

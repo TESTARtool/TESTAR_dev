@@ -48,17 +48,18 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	}
 	
 	@Override
-	public Set<Action> deriveActions(Set<Widget> topWidgets) {
+	public EvaluationResults evaluate(Set<Widget> widgets) {
+		// todo
+		return null;
+	}
+	
+	@Override
+	public Set<Action> deriveActions(Set<Widget> widgets) {
 		Set<Action> actions = new HashSet<>();
 		StdActionCompiler compiler = new StdActionCompiler();
 		Widget prevHasKeyboardFocus = null;
 		deriveStandardActions(actions, compiler);
-		for (Widget w : topWidgets) {
-			// skip irrelevant widgets
-			// NOTE: not all APIs accurately report the isKeyboardFocusable property,
-			// so don't use it when filtering out irrelevant widgets.
-			if (!AccessibilityUtil.isRelevant(w))
-				continue;
+		for (Widget w : widgets) {
 			AccessibilityUtil.printWidgetDebugInfo(w);	
 			deriveActionsAll(actions, compiler, w);
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {

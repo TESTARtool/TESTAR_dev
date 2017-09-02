@@ -35,6 +35,9 @@ import org.fruit.alayer.Widget;
  */
 public abstract class AbstractGuideline extends ItemBase {
 	
+	/**
+	 * The list of all the success criteria in this guideline
+	 */
 	protected final List<SuccessCriterion> criteria = new ArrayList<>();
 	
 	/**
@@ -58,10 +61,10 @@ public abstract class AbstractGuideline extends ItemBase {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will typically include one or more evaluation results for each success criterion in this guideline.
-	 * @param topWidgets The set of topmost widgets.
+	 * @param widgets The set of widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	protected EvaluationResults evaluate(Set<Widget> topWidgets) {
+	protected EvaluationResults evaluate(Set<Widget> widgets) {
 		return new EvaluationResults();
 	}
 	
@@ -69,10 +72,10 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * Derives the follow-up actions from the given state
 	 * This will typically include actions from all success criteria in this guideline.
 	 * The actions are specific to accessibility.
-	 * @param topWidgets The set of topmost widgets.
+	 * @param widgets The set of widgets to consider.
 	 * @return The set of actions.
 	 */
-	protected Set<Action> deriveActions(Set<Widget> topWidgets) {
+	protected Set<Action> deriveActions(Set<Widget> widgets) {
 		return new HashSet<>();
 	}
 	

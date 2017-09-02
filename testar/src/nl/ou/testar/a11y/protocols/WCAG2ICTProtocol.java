@@ -17,11 +17,13 @@
 
 package nl.ou.testar.a11y.protocols;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -29,6 +31,7 @@ import org.fruit.monkey.DefaultProtocol;
 
 import nl.ou.testar.a11y.wcag2.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.WCAG2ICT;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
  * Test protocol for WCAG2ICT
@@ -37,13 +40,16 @@ import nl.ou.testar.a11y.wcag2.WCAG2ICT;
  */
 public class WCAG2ICTProtocol extends DefaultProtocol {
 	
-	private final WCAG2ICT wcag;
+	/**
+	 * The WCAG2ICT guidelines
+	 */
+	protected final WCAG2ICT wcag;
 	
 	/**
-	 * The set of topmost widgets
+	 * The set of relevant widgets
 	 * This needs to be updated after every state change.
 	 */
-	protected Set<Widget> topWidgets;
+	protected Set<Widget> relevantWidgets;
 
 	/**
 	 * Constructs a new WCAG2ICT test protocol
@@ -60,9 +66,9 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 			// something went wrong upstream
 			return verdict;
 		}
-		// safe the topmost widgets to use when deriving actions
-		topWidgets = getTopWidgets(state);
-		EvaluationResults results = wcag.evaluate(topWidgets);
+		// safe only the relevant widgets to use when computing a verdict and deriving actions
+		relevantWidgets = getRelevantWidgets(state);
+		EvaluationResults results = wcag.evaluate(relevantWidgets);
 		return results.getOverallVerdict();
 	}
 
@@ -71,9 +77,18 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
-			actions = wcag.deriveActions(topWidgets);
+			actions = wcag.deriveActions(relevantWidgets);
 		}
 		return actions;
+	}
+	
+	private Set<Widget> getRelevantWidgets(State state) {
+		Set<Widget> widgets = new HashSet<>();
+		double maxZIndex = state.get(Tags.MaxZIndex);
+		for (Widget w : state)
+			if (w.get(Tags.ZIndex) == maxZIndex && AccessibilityUtil.isRelevant(w))
+				widgets.add(w);
+		return widgets;
 	}
 
 }
