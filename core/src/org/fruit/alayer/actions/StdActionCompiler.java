@@ -261,17 +261,19 @@ public class StdActionCompiler {
 		return ret;
 	}
 	
-	public Action hitKey(KBKeys key){
+	public Action hitKey(KBKeys key) {
 		return new CompoundAction.Builder().add(new KeyDown(key), .0)
 				.add(new KeyUp(key), 1.0).add(NOP, 1.0).build();
 	}
 	
-	public Action hitShortcutKey(List<KBKeys> keys){
+	public Action hitShortcutKey(List<KBKeys> keys) {
+		if (keys.size() == 1) // single key
+			return hitKey(keys.get(0));
 		CompoundAction.Builder builder = new CompoundAction.Builder();
 		for (int i = 0; i < keys.size(); i++)
-			builder.add(new KeyDown(keys.get(i)), i == 0 ? .0 : 1.0);
+			builder.add(new KeyDown(keys.get(i)), i == 0 ? .0 : .1);
 		for (int i = keys.size() - 1; i >= 0; i--)
-			builder.add(new KeyUp(keys.get(i)), 1.0);
+			builder.add(new KeyUp(keys.get(i)), i == keys.size() - 1 ? 1.0 : .0);
 		builder.add(NOP, 1.0);
 		return builder.build();
 	}

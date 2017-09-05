@@ -40,7 +40,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
  * @author Davy Kager
  *
  */
-public class AccessibilityUtil {
+public final class AccessibilityUtil {
 	
 	private static final String KEY_SEP_REGEX = "[+]{1}";
 	private static final String VIRTUAL_KEY_PREFIX = "VK_";
@@ -149,26 +149,6 @@ public class AccessibilityUtil {
 		return actions;
 	}
 	
-	public static boolean canUseUpDown(Widget w) {
-		return Role.isOneOf(getRole(w), new Role[] {UIAComboBox, UIADocument, UIAEdit, UIAListItem, UIAMenu, UIAMenuItem, UIARadioButton, UIASlider, UIASpinner, UIATreeItem});
-	}
-	
-	public static boolean canUseLeftRight(Widget w) {
-		return Role.isOneOf(getRole(w), new Role[] {UIADocument, UIAEdit, UIAMenuItem, UIARadioButton, UIASlider, UIATabItem, UIATreeItem});
-	}
-	
-	public static boolean canUseEditCommands(Widget w) {
-		// this is like NativeLinker.getNativeTypeable()
-		// put here for consistency and to avoid coupling
-		Role r = getRole(w);
-		// TODO: also check if the widget is read-only
-		return Role.isOneOf(r, new Role[] {UIADocument, UIAEdit})
-				// static text is not editable according to UIA documentation,
-				// but sometimes it is, e.g. Windows Calculator
-				// static text can only be edited when it can have keyboard focus
-				|| (r.isA(UIAText) && isKeyboardFocusable(w));
-	}
-	
 	public static boolean hasKeyboardFocus(Widget w) {
 		return w.get(UIATags.UIAHasKeyboardFocus, false);
 	}
@@ -220,7 +200,7 @@ public class AccessibilityUtil {
 	 * @param w The widget.
 	 */
 	public static void printWidgetDebugInfo(Widget w) {
-		logA11y("Widget" + (w.get(UIATags.UIAHasKeyboardFocus, false) ? "[focus]" : "")  
+		logA11y("Widget" + (w.get(UIATags.UIAHasKeyboardFocus, false) ? " [focus]" : "")  
 				+ ": <" + w.get(Tags.Title, "unknown widget")
 				+ ">@" + w.get(Tags.ZIndex) + "/" + w.root().get(Tags.MaxZIndex)
 				+ " (" + w.get(Tags.Role, Roles.Invalid) + ")"

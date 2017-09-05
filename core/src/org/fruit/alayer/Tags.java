@@ -25,12 +25,11 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -44,10 +43,9 @@ import org.fruit.alayer.devices.ProcessHandle;
 
 import es.upv.staq.testar.CodingManager;
 
-public final class Tags {
-	private static final Set<Tag<?>> tagSet = new HashSet<Tag<?>>();
-
-	private Tags(){}
+public final class Tags extends TagsBase {
+	
+	private Tags() {}
 
 	//public static final Tag<Boolean> Checked = from("Checked", Boolean.class);
 	//public static final Tag<String> RoleDesc = from("RoleDesc", String.class);
@@ -213,13 +211,5 @@ public final class Tags {
 	 * the SystemActivator makes sure that the SUT gets focused again. */
 	@SuppressWarnings("unchecked")
 	public static final Tag<Proc> SystemActivator = from("SystemActivator", (Class<Proc>)(Class<?>)Proc.class);
-
-
-	private static <T> Tag<T> from(String name, Class<T> valueType){
-		Tag<T> ret = Tag.from(name, valueType);
-		tagSet.add(ret);
-		return ret;
-	}
-		
-	public static Set<Tag<?>> tagSet(){ return Collections.unmodifiableSet(tagSet); }
+	
 }

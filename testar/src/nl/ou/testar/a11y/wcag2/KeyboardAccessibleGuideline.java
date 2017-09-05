@@ -20,6 +20,7 @@ package nl.ou.testar.a11y.wcag2;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.fruit.Assert;
@@ -37,24 +38,51 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
+	private static final int
+			C_KEYBOARD = 0,
+			C_NO_KEYBOARD_TRAP = 1;
+	
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
+	private static final int MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP = 7;
 	
 	private final Deque<Action> shortcutKeysCache = new LinkedList<>();
+	private String lastConcreteID = "";
+	private int sameWidgetCount = 0;
 	
 	KeyboardAccessibleGuideline(AbstractPrinciple parent) {
 		super(1, "Keyboard Accessible", parent);
-		criteria.add(new SuccessCriterion(1, "Keyboard", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "No Keyboard Trap", this, Level.A));
+		criteria.add(new SuccessCriterion(C_KEYBOARD + 1,
+				"Keyboard", this, Level.A));
+		criteria.add(new SuccessCriterion(C_NO_KEYBOARD_TRAP + 1,
+				"No Keyboard Trap", this, Level.A));
 	}
 	
 	@Override
-	public EvaluationResults evaluate(Set<Widget> widgets) {
-		// todo
-		return null;
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			if (AccessibilityUtil.hasKeyboardFocus(w)) {
+				w.set(WCAG2Tags.KeyboardVisited, true);
+				
+				String concreteID = w.get(Tags.ConcreteID, "");
+				if (lastConcreteID.equals(concreteID)) {
+					sameWidgetCount++;
+					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
+						results.add(new EvaluationResult(
+								criteria.get(C_NO_KEYBOARD_TRAP),
+								EvaluationResult.Type.WARNING));
+				}
+				else {
+					sameWidgetCount = 0;
+				}
+				lastConcreteID = concreteID;
+			} // hasKeyboardFocus(w)
+		}
+		return results;
 	}
 	
 	@Override
-	public Set<Action> deriveActions(Set<Widget> widgets) {
+	public Set<Action> deriveActions(List<Widget> widgets) {
 		Set<Action> actions = new HashSet<>();
 		StdActionCompiler compiler = new StdActionCompiler();
 		Widget prevHasKeyboardFocus = null;

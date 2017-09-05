@@ -17,7 +17,8 @@
 
 package nl.ou.testar.a11y.protocols;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -46,10 +47,10 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 	protected final WCAG2ICT wcag;
 	
 	/**
-	 * The set of relevant widgets
+	 * The relevant widgets
 	 * This needs to be updated after every state change.
 	 */
-	protected Set<Widget> relevantWidgets;
+	protected List<Widget> relevantWidgets;
 
 	/**
 	 * Constructs a new WCAG2ICT test protocol
@@ -82,8 +83,8 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		return actions;
 	}
 	
-	private Set<Widget> getRelevantWidgets(State state) {
-		Set<Widget> widgets = new HashSet<>();
+	private List<Widget> getRelevantWidgets(State state) {
+		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state)
 			if (w.get(Tags.ZIndex) == maxZIndex && AccessibilityUtil.isRelevant(w))

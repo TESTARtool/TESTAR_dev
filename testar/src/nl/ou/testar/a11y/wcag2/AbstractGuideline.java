@@ -61,10 +61,10 @@ public abstract class AbstractGuideline extends ItemBase {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will typically include one or more evaluation results for each success criterion in this guideline.
-	 * @param widgets The set of widgets to consider.
+	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	protected EvaluationResults evaluate(Set<Widget> widgets) {
+	protected EvaluationResults evaluate(List<Widget> widgets) {
 		return new EvaluationResults();
 	}
 	
@@ -72,10 +72,10 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * Derives the follow-up actions from the given state
 	 * This will typically include actions from all success criteria in this guideline.
 	 * The actions are specific to accessibility.
-	 * @param widgets The set of widgets to consider.
+	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
-	protected Set<Action> deriveActions(Set<Widget> widgets) {
+	protected Set<Action> deriveActions(List<Widget> widgets) {
 		return new HashSet<>();
 	}
 	
