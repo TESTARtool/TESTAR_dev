@@ -184,6 +184,10 @@ public final class AccessibilityUtil {
 				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
 	}
 	
+	public static boolean isImage(Widget w) {
+		return getRole(w).isA(UIAImage);
+	}
+	
 	public static boolean isTabItem(Widget w) {
 		return getRole(w).isA(UIATabItem);
 	}
