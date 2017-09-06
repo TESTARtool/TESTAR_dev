@@ -32,6 +32,7 @@ import org.fruit.monkey.DefaultProtocol;
 
 import nl.ou.testar.a11y.wcag2.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.WCAG2ICT;
+import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
@@ -70,6 +71,7 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
 		EvaluationResults results = wcag.evaluate(relevantWidgets);
+		state.set(WCAG2Tags.EvaluationResults, results);
 		return results.getOverallVerdict();
 	}
 
