@@ -70,7 +70,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
 						results.add(new EvaluationResult(
 								criteria.get(C_NO_KEYBOARD_TRAP),
-								EvaluationResult.Type.WARNING));
+								EvaluationResult.Type.WARNING, w));
 				}
 				else {
 					sameWidgetCount = 0;

@@ -1,5 +1,7 @@
 package nl.ou.testar.a11y.wcag2;
 
+import org.fruit.alayer.Widget;
+
 /**
  * The result of evaluating a success criterion
  * @author Davy Kager
@@ -35,15 +37,27 @@ public class EvaluationResult {
 	
 	private final SuccessCriterion criterion;
 	private final Type type;
-
+	private final Widget widget;
+	
 	/**
-	 * Constructs a new evaluation result
-	 * @param criterion The associated success criterion.
+	 * Constructs a new evaluation result that does not apply to a single widget
+	 * @param criterion The success criterion.
 	 * @param type The problem type.
 	 */
 	EvaluationResult(SuccessCriterion criterion, Type type) {
+		this(criterion, type, null);
+	}
+
+	/**
+	 * Constructs a new evaluation result that applies to a single widget
+	 * @param criterion The success criterion.
+	 * @param type The problem type.
+	 * @param widget The widget that the success criterion applies to.
+	 */
+	EvaluationResult(SuccessCriterion criterion, Type type, Widget widget) {
 		this.criterion = criterion;
 		this.type = type;
+		this.widget = widget;
 	}
 	
 	/**
@@ -60,6 +74,14 @@ public class EvaluationResult {
 	 */
 	public Type getType() {
 		return type;
+	}
+	
+	/**
+	 * Gets the widget that the success criterion associated with this evaluation result applies to
+	 * @return The widget.
+	 */
+	public Widget getWidget() {
+		return widget;
 	}
 
 }

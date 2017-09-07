@@ -46,7 +46,7 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
 				results.add(new EvaluationResult(
 						criteria.get(C_NON_TEXT_CONTENT),
-						EvaluationResult.Type.ERROR));
+						EvaluationResult.Type.ERROR, w));
 		}
 		return results;
 	}
