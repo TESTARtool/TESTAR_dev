@@ -17,7 +17,13 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
+
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
  * A WCAG 2.0 guideline
@@ -30,6 +36,19 @@ public final class CompatibleGuideline extends AbstractGuideline {
 		super(1, "Compatible", parent);
 		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
+	}
+	
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			// exclude images, they are handled by guideline "Text Alternatives"
+			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Name, Role, Value"),
+						EvaluationResult.Type.ERROR, w));
+		}
+		return results;
 	}
 
 }
