@@ -32,11 +32,9 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class TextAlternativesGuideline extends AbstractGuideline {
 	
-	private static final int C_NON_TEXT_CONTENT = 0;
-	
 	TextAlternativesGuideline(AbstractPrinciple parent) {
 		super(1, "Text Alternatives", parent);
-		criteria.add(new SuccessCriterion(C_NON_TEXT_CONTENT + 1, "Non-text Content", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
 	}
 	
 	@Override
@@ -45,7 +43,7 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
 				results.add(new EvaluationResult(
-						criteria.get(C_NON_TEXT_CONTENT),
+						getSuccessCriterionByName("Non-text Content"),
 						EvaluationResult.Type.ERROR, w));
 		}
 		return results;

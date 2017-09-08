@@ -38,10 +38,6 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
-	private static final int
-			C_KEYBOARD = 0,
-			C_NO_KEYBOARD_TRAP = 1;
-	
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
 	private static final int MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP = 7;
 	
@@ -51,10 +47,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	KeyboardAccessibleGuideline(AbstractPrinciple parent) {
 		super(1, "Keyboard Accessible", parent);
-		criteria.add(new SuccessCriterion(C_KEYBOARD + 1,
-				"Keyboard", this, Level.A));
-		criteria.add(new SuccessCriterion(C_NO_KEYBOARD_TRAP + 1,
-				"No Keyboard Trap", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Keyboard", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "No Keyboard Trap", this, Level.A));
 	}
 	
 	@Override
@@ -69,7 +63,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					sameWidgetCount++;
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
 						results.add(new EvaluationResult(
-								criteria.get(C_NO_KEYBOARD_TRAP),
+								getSuccessCriterionByName("No Keyboard Trap"),
 								EvaluationResult.Type.WARNING, w));
 				}
 				else {

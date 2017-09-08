@@ -59,6 +59,19 @@ public abstract class AbstractGuideline extends ItemBase {
 	}
 	
 	/**
+	 * Gets a success criterion by its name (case-insensitive)
+	 * @param name The name.
+	 * @return The success criterion, or null if not found.
+	 */
+	protected SuccessCriterion getSuccessCriterionByName(String name) {
+		Assert.notNull(name);
+		for (SuccessCriterion criterion : criteria)
+			if (criterion.getName().equalsIgnoreCase(name))
+				return criterion;
+		return null;
+	}
+	
+	/**
 	 * Evaluates the accessibility of the given state
 	 * This will typically include one or more evaluation results for each success criterion in this guideline.
 	 * @param widgets The widgets to consider.
