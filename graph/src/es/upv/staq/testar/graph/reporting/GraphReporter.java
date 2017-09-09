@@ -27,14 +27,15 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.actions.BriefActionRolesMap;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.graph.GraphEdge;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphAction;
@@ -55,21 +56,27 @@ public class GraphReporter {
 	private static String testSequenceFolder = null;
 	
 	private static final String OUT_DIR = "output/graphs/";
-			
+	
+	final static String THICK_PROPERTY = ", penwidth=3",
+						CLUSTER_THICK_PROPERTY = ", penwidth=5";
+	
+	final static String WARNING_COLOR = "#FF7F00";
+	
+	private static String STYLE_NORMAL = ", style=solid",
+						  STYLE_KNOWN = ", style=dotted",
+						  STYLE_VERTEX_REVISIT = ", style=diagonals",
+						  STYLE_EDGE_REVISIT = ", style=tapered, penwidth=3, arrowtail=none";
+
+	private static HashMap<String,String> mapToAbstractStateIDs = new HashMap<String,String>(); // concrete -> abstract_R
+
 	public static void useGraphData(long graphTime, String testSequencePath){		
 		GraphReporter.testSequenceFolder = testSequencePath.replaceAll(".*(sequence[0-9]*)", "$1");		
 		usingGraphTime = graphTime;
 		(new File(OUT_DIR + testSequenceFolder)).mkdirs();
 	}
-	
-	private static HashMap<String,String> mapToAbstractStateIDs = new HashMap<String,String>();
-	
-	private static String dashedS = ", style=dashed",
-						  dottedS = ", style=dotted";
-	
+		
 	// [0] screenshots, [1] tiny, [2] minimal [3] abstract screenshoted, [4] abstract tiny, [5] abstract minimal
 	private static String[] buildVertexGraph(IEnvironment env, TESTARGraph g){
-		//mapToAbstractStateIDs.clear();
 		int unx = 1;
 		String label;
 		StringBuffer sb0 = new StringBuffer(), // screenshots
@@ -84,8 +91,7 @@ public class GraphReporter {
 		Verdict verdict;
 		int unxC;
 		
-		final String THICK_PROPERTY = ", penwidth=3";
-		List<IGraphState> longestPath = g.getLongestPathArray();
+		List<String> longestPath = g.getLongestPathArray();
 		String thickS;
 		
 		HashMap<String,Set<String>> stateClusters = env.getGraphStateClusters();
@@ -94,6 +100,7 @@ public class GraphReporter {
 		HashMap<String,String> statesScreenshots = new HashMap<String,String>(g.vertexSet().size());
 		
 		boolean k, r;
+		String color;
 		
 		for(IGraphState vertex : g.vertexStates()){
 			if (vertex.toString().equals(Grapher.GRAPH_NODE_PASS) || vertex.toString().equals(Grapher.GRAPH_NODE_FAIL))
@@ -114,27 +121,29 @@ public class GraphReporter {
 				else
 					label = "\"" + nodeLabel + "\"";				
 				
-				if (longestPath.contains(vertex))
+				if (longestPath.contains(vertex.getConcreteID()))
 					thickS = THICK_PROPERTY;
 				else
 					thickS = "";
 				
 				k = vertex.knowledge(); r = vertex.revisited();
 				
-				sb0.append(vertex.toString() + " [label=" + label + thickS + "];\n");
-				sb1.append(vertex.toString() + " [label=\"" + nodeLabel + "\"" + thickS + "];\n");
-				sb2.append(vertex.toString() + " [label=\"" + vertex.getCount() + "\", height=0.3" + thickS + (k ? (r ? dottedS : dashedS) : "" ) + "];\n");
+				color = getLineColor(vertex.getCount());
+				
+				sb0.append(vertex.toString() + " [label=" + label + thickS + (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color + "];\n");
+				sb1.append(vertex.toString() + " [label=\"" + nodeLabel + "\"" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color +  "];\n");
+				sb2.append(vertex.toString() + " [label=\"" + vertex.getCount() + "\", height=0.3" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color +  "];\n");
 
 				verdict = vertex.getVerdict();
 				if (verdict != null){
-					String t1 = "verdict_" + vertex.toString() + " [color=\"#ffff00\", style=solid];\n",
-						   t2 = vertex.toString() + " -> verdict_" + vertex.toString() + " [label=\"" + verdict.info() + "\", color=\"#ffff00\"];\n"; 
+					String t1 = "verdict_" + vertex.toString() + " [color=\"" + WARNING_COLOR + "\", style=solid];\n",
+						   t2 = vertex.toString() + " -> verdict_" + vertex.toString() + " [label=\"" + verdict.info() + "\", color=\"" + WARNING_COLOR + "\"];\n"; 
 					sb0.append(t1);
 					sb1.append(t1);
-					sb2.append("verdict_" + vertex.toString() + " [color=\"#ffff00\", shape=point, height=0.3, style=solid, label=\"\"];\n");
+					sb2.append("verdict_" + vertex.toString() + " [color=\"" + WARNING_COLOR + "\", shape=point, height=0.3, style=solid, label=\"\"];\n");
 					sb0.append(t2);
 					sb1.append(t2);
-					sb2.append(vertex.toString() + " -> verdict_" + vertex.toString() + " [label=\"\", color=\"#ffff00\"];\n");
+					sb2.append(vertex.toString() + " -> verdict_" + vertex.toString() + " [label=\"\", color=\"" + WARNING_COLOR + "\"];\n");
 				}
 				
 				unxC = vertex.getUnexploredActionsSize();
@@ -150,23 +159,30 @@ public class GraphReporter {
 		HashMap<String,Integer> unexploredClusterCount = new HashMap<String,Integer>(stateClusters.size());
 		int clusterCount, unexploredCount;
 		String scrshot;
-		for (String cluster : stateClusters.keySet()){
+		for (String cluster : stateClusters.keySet()){ // abstract_R
 			clusterCount = 0;
 			unexploredCount = 0;
 			scrshot = null;
-			for (String cs : stateClusters.get(cluster)){
+			k = false; r = false;
+			for (String cs : stateClusters.get(cluster)){ // concrete
 				mapToAbstractStateIDs.put(cs, cluster);
 				clusterCount += statesCount.get(cs).intValue();
 				unexploredCount += statesUnexploredCount.get(cs).intValue(); 
 				if (statesScreenshots.get(cs) != null)
 					scrshot = statesScreenshots.get(cs);
 				statesScreenshots.remove(cs); // clean-up
+				if (env.getState(cs).knowledge()) k = true; if (env.getState(cs).revisited()) r = true;
 			}
+
+			color = getLineColor(clusterCount);
+			
 			unexploredClusterCount.put(cluster,unexploredCount);
 			if (clusterCount != 0){
-				String toAppend = cluster + " [label=\"" + cluster + " (" + clusterCount + ")\"" + "];\n";
+				String toAppend = cluster + " [label=\"" + cluster + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n";
 				sb4.append(toAppend);
-				sb5.append(cluster + " [label=\"" + clusterCount + "\"" + ", height=0.3];\n");
+				sb5.append(cluster + " [label=\"" + clusterCount + "\"" + ", height=0.3" +
+						(k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
 				if (scrshot == null)
 					sb3.append(toAppend); // unable to retrieve any screenshot for the cluster
 				else{
@@ -175,7 +191,7 @@ public class GraphReporter {
 							scrshot.replace("output","../..") +
 							"\"/></TD></TR><TR><TD>" + cluster + " (" + clusterCount + ")" +
 							"</TD></TR></TABLE>>";
-					sb3.append(cluster + " [label=" + scrShotedLabel + "];\n");
+					sb3.append(cluster + " [label=" + scrShotedLabel + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
 				}
 			}
 		}
@@ -260,9 +276,8 @@ public class GraphReporter {
 				
 		HashMap<String,IGraphAction> actions = new HashMap<String,IGraphAction>(g.edgeSet().size());
 		HashMap<String,Set<String>> actionClusters = env.getGraphActionClusters();
-		HashMap<IGraphAction,Integer> actionsCount = new HashMap<IGraphAction,Integer>();
-		HashMap<IGraphAction,String> actionsOrder = new HashMap<IGraphAction,String>(); 
-		HashMap<String,String> actionsScreenshots = new HashMap<String,String>(g.edgeSet().size());
+
+		boolean isStartAction, isStopAction;
 		IGraphAction startAction = null, stopAction = null;
 		
 		boolean k, r;
@@ -271,152 +286,179 @@ public class GraphReporter {
 		String edgeClusterOrder;
 		boolean skipGraphDisplay;
 		Set<String> itEdges = new HashSet<String>();
-		
-		for(IGraphAction edge : g.edgeActions()){
 
-			if (edge.toString().equals(Grapher.GRAPH_ACTION_START))
-				startAction = edge;
-			else if (edge.toString().equals(Grapher.GRAPH_ACTION_STOP))
-				stopAction = edge;
+		Map<String,Set<IGraphAction>> actionsBySourceState = new HashMap<String,Set<IGraphAction>>(); // abstract source state ID x graph actions
+		Map<String,Set<IGraphAction>> actionsByTargetState = new HashMap<String,Set<IGraphAction>>(); // abstract target state ID x graph actions
+		String abstractSourceStateID, abstractTargetStateID;
+		Set<IGraphAction> actionsSet, actionsSet2;
 
-			skipGraphDisplay = itEdges.contains(edge.getAbstractID());
-			if (!skipGraphDisplay)
-				itEdges.add(edge.getAbstractID());
+		for(IGraphAction graphAction : g.edgeActions()){
+		/*IGraphAction graphAction;
+		for (GraphEdge edge : g.edgeSet()){
+			graphAction = env.getAction(edge.getActionID());*/
+
+			if (graphAction.toString().equals(Grapher.GRAPH_ACTION_START)){
+				startAction = graphAction;
+				isStartAction = true;
+				isStopAction = false;
+			} else if (graphAction.toString().equals(Grapher.GRAPH_ACTION_STOP)){
+				stopAction = graphAction;
+				isStartAction = false;
+				isStopAction = true;
+			} else{
+				isStartAction = false;
+				isStopAction = false;
+			}
 			
-			actions.put(edge.getConcreteID(), edge);
-			actionsCount.put(edge, edge.getCount());
-			actionsOrder.put(edge, edge.getOrder());
-			actionsScreenshots.put(edge.toString(), edge.getStateshot());
+			skipGraphDisplay = itEdges.contains(graphAction.getAbstractID());
+			if (!skipGraphDisplay)
+				itEdges.add(graphAction.getAbstractID());
+			
+			actions.put(graphAction.getConcreteID(), graphAction);
 			
 			if (skipGraphDisplay)
 				continue;
 			
-			sb0.append(g.getState(g.getEdgeSource(edge.getConcreteID())) + " -> " + g.getState(g.getEdgeTarget(edge.getConcreteID())));
-			sb1.append(g.getState(g.getEdgeSource(edge.getConcreteID())) + " -> " + g.getState(g.getEdgeTarget(edge.getConcreteID())));
-			sb2.append(g.getState(g.getEdgeSource(edge.getConcreteID())) + " -> " + g.getState(g.getEdgeTarget(edge.getConcreteID())));
-			//detailedS = ai.getDetailedName() == null ? "" : "\n{" + ai.getDetailedName() + "}";
-			detailedS = "";
-			edgeClusterCount = 0;
-			edgeClusterOrder = "";
-			if (actionClusters.containsKey(edge.getAbstractID())){
-				for (String aid : actionClusters.get(edge.getAbstractID())){
-					edgeClusterCount += g.getAction(aid).getCount();
-					edgeClusterOrder += g.getAction(aid).getOrder();
+			Set<String> targetStates = graphAction.getTargetStateIDs();
+			for (String targetStateID : targetStates){
+				
+				String multiTargetVisuals = targetStates.size() == 1 ? "" : THICK_PROPERTY;
+				
+				String fromToS = g.getState(graphAction.getSourceStateID()) + " -> " + targetStateID;
+				sb0.append(fromToS);
+				sb1.append(fromToS);
+				sb2.append(fromToS);
+				//detailedS = ai.getDetailedName() == null ? "" : "\n{" + ai.getDetailedName() + "}";
+				detailedS = "";
+				edgeClusterCount = 0;
+				edgeClusterOrder = "";
+				if (actionClusters.containsKey(graphAction.getAbstractID())){
+					for (String aid : actionClusters.get(graphAction.getAbstractID())){
+						edgeClusterCount += g.getAction(aid).getCount();
+						edgeClusterOrder += g.getAction(aid).getOrder(targetStateID);
+					}
+				}
+				if (edgeClusterCount > 1){
+					color = getLineColor(edgeClusterCount);
+					linkLabel = "G_" + graphAction.getAbstractID() + breakInLines(edgeClusterOrder) + " (" + edgeClusterCount + ")";
+				} else {
+					color = getLineColor(graphAction.getCount());
+					linkLabel = graphAction.getConcreteID() + " " + breakInLines(graphAction.getOrder(targetStateID)) + " (" + graphAction.getCount() + ")";
+				}
+				linkLabel += " " + detailedS;
+				if (graphAction.getStateshot() != null)
+					label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							graphAction.getStateshot().replace("output","../..") +
+						"\"/></TD></TR><TR><TD>" +
+						linkLabel.replaceAll("\n","<br/>") +
+						"</TD></TR></TABLE>>";
+				else
+					label = "\"" + linkLabel + "\"";						
+	
+				k = graphAction.knowledge(); r = graphAction.revisited();
+				
+				sb0.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=" + label + "];\n");
+				//label = label.replaceAll("(.*->.*)((?:\\n|<br/>)\\{(?s)[^\\}]*(?-s)\\})?(.*;)","$1$2"); // no detailed edges/actions
+				sb1.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" + linkLabel + "\"];\n");
+				sb2.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" +
+						   (edgeClusterCount == 0 ? graphAction.getConcreteID() : edgeClusterCount) + "\"" + "];\n");
+				
+			}
+
+			if (!isStartAction && !isStopAction){
+				// actions clustering by abstract target state
+				abstractSourceStateID = env.getState(graphAction.getSourceStateID()).getAbstract_R_ID();
+				actionsSet = actionsBySourceState.get(abstractSourceStateID);
+				if (actionsSet == null){
+					actionsSet = new HashSet<IGraphAction>();
+					actionsBySourceState.put(abstractSourceStateID, actionsSet);
+				}
+				actionsSet.add(graphAction);
+				// actions clustering by abstract source state
+				for (String tid : graphAction.getTargetStateIDs()){
+					abstractTargetStateID = mapToAbstractStateIDs.get(tid);
+					actionsSet = actionsByTargetState.get(abstractTargetStateID);
+					if (actionsSet == null){
+						actionsSet = new HashSet<IGraphAction>();
+						actionsByTargetState.put(abstractTargetStateID, actionsSet);
+					}
+					actionsSet.add(graphAction);
 				}
 			}
-			if (edgeClusterCount > 1){
-				color = getLineColor(edgeClusterCount);
-				linkLabel = "G_" + edge.getAbstractID() + breakInLines(edgeClusterOrder) + " (" + edgeClusterCount + ")";
-			} else {
-				color = getLineColor(edge.getCount());
-				linkLabel = edge.getConcreteID() + " " + breakInLines(edge.getOrder()) + " (" + edge.getCount() + ")";
-			}
-			linkLabel += " " + detailedS;
-			if (edge.getStateshot() != null)
-				label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
-						edge.getStateshot().replace("output","../..") +
-					"\"/></TD></TR><TR><TD>" +
-					linkLabel.replaceAll("\n","<br/>") +
-					"</TD></TR></TABLE>>";
-			else
-				label = "\"" + linkLabel + "\"";						
-			sb0.append(" [color=" + color + ", label=" + label + ", style=solid];\n");
-
-			k = edge.knowledge(); r = edge.revisited();
 			
-			//label = label.replaceAll("(.*->.*)((?:\\n|<br/>)\\{(?s)[^\\}]*(?-s)\\})?(.*;)","$1$2"); // no detailed edges/actions
-			sb1.append(" [color=" + color + ", label=\"" + linkLabel + "\", style=solid];\n");
-			sb2.append(" [color=" + color + ", label=\"" +
-					   (edgeClusterCount == 0 ? edge.getConcreteID() : edgeClusterCount) +
-					   "\", style=solid" + (k ? (r ? dottedS : dashedS) : "") + "];\n");
-
 		}
 				
 		int clusterCount;
-		String clusterOrder, targetStateID;
+		String clusterOrder;
 		IGraphAction ga;
-		Set<IGraphAction> actionsBT;
-		HashMap<String,Set<IGraphAction>> actionsByTarget = new HashMap<String,Set<IGraphAction>>();
-		String scrshot;
-		for (String cluster : actionClusters.keySet()){ // pending optimization: high population of cyclic actions in a cluster
-			actionsByTarget.clear();
-			scrshot = null;
-			for (String ca : actionClusters.get(cluster)){
-				ga = actions.get(ca);
-				targetStateID = mapToAbstractStateIDs.get(g.getState(g.getEdgeTarget(ga.getConcreteID())).toString());
-				actionsBT = actionsByTarget.get(targetStateID);
-				if (actionsBT == null){
-					actionsBT = new HashSet<IGraphAction>();
-					actionsByTarget.put(targetStateID, actionsBT);
+		Set<IGraphAction> actionsIntersect;
+		// optimized: high population of cyclic actions in a cluster
+		for (String abstractTID : actionsByTargetState.keySet()){
+			actionsSet = actionsByTargetState.get(abstractTID);
+			for (String abstractSID : actionsBySourceState.keySet()){
+				actionsSet2 = actionsBySourceState.get(abstractSID);
+				actionsIntersect = new HashSet<IGraphAction>(actionsSet);
+				actionsIntersect.retainAll(actionsSet2); // source n target
+				if (actionsIntersect.isEmpty()) continue;
+				clusterCount = 0; clusterOrder = ""; k = false; r = false;
+				for (IGraphAction gaBT : actionsIntersect){
+					clusterCount += gaBT.getCount();
+					clusterOrder += gaBT.getOrder(env.getGraphStateClusters().get(abstractTID));
+					if (gaBT.knowledge()) k = true; if (gaBT.revisited()) r = true;
 				}
-				actionsBT.add(ga);				
-				if (actionsScreenshots.get(ca.toString()) != null)
-					scrshot = actionsScreenshots.get(ca.toString());
-				actionsScreenshots.remove(ca.toString()); // clean-up
-			}
-			for (String gsID : actionsByTarget.keySet()){
-				clusterCount = 0;
-				clusterOrder = "";
-				actionsBT = actionsByTarget.get(gsID);
-				for (IGraphAction graphAction : actionsBT){
-					clusterCount += actionsCount.get(graphAction).intValue();
-					clusterOrder += actionsOrder.get(graphAction);
-				}
-				clusterOrder = breakInLines(clusterOrder);
-				ga = actionsBT.iterator().next(); // any action from the set
 				color = getLineColor(clusterCount);
+				clusterOrder = breakInLines(clusterOrder);
 				String toAppend = 
-						g.getState(g.getEdgeSource(ga.getConcreteID())).getAbstract_R_ID() + // source state
+						abstractSID + // source state
 						" -> " +
-						g.getState(g.getEdgeTarget(ga.getConcreteID())).getAbstract_R_ID() + // target state
-						" [color=" + color + ", label=" + "\"" + cluster + " " + clusterOrder + " (" + clusterCount + ")\", style=solid];\n";
-				sb4.append(toAppend);
-				sb5.append(g.getState(g.getEdgeSource(ga.getConcreteID())).getAbstract_R_ID() + // source state
-						   " -> " +
-						   g.getState(g.getEdgeTarget(ga.getConcreteID())).getAbstract_R_ID() + // target state
-						   " [color=" + color + ", label=" + "\"" + clusterCount + "\", style=solid];\n");
-				if (scrshot == null)
-					sb3.append(toAppend); // unable to retrieve any screenshot from cluster actions
-				else {
-					String scrshotLabel =
-								"<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
-								scrshot.replace("output","../..") +
-								"\"/></TD></TR><TR><TD>" +
-								cluster + " " + clusterOrder.replaceAll("\n","<br/>") + " (" + clusterCount + ")" +
-								"</TD></TR></TABLE>>";
-							
-					sb3.append(
-							g.getState(g.getEdgeSource(ga.getConcreteID())).getAbstract_R_ID() + // source state
-							" -> " +
-							g.getState(g.getEdgeTarget(ga.getConcreteID())).getAbstract_R_ID() + // target state
-							" [color=" + color + ", label=" + scrshotLabel + ", style=solid];\n"
-					);
-				}
+						abstractTID; // target state
+				sb4.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				sb5.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				sb3.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				  // which screenshot for a cluster of actions?
+				/*String scrshotLabel =
+							"<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							scrshot.replace("output","../..") +
+							"\"/></TD></TR><TR><TD>" +
+							clusterCount + " " + clusterOrder.replaceAll("\n","<br/>") + " (" + clusterCount + ")" +
+							"</TD></TR></TABLE>>";								
+				sb3.append(toAppend + " [color=" + color + ", label=" + scrshotLabel + ", style=solid];\n");*/
 			}
 		}
-		mapToAbstractStateIDs.clear(); // clean-up
+		// clean up
+		mapToAbstractStateIDs.clear();
+		actionsBySourceState.clear();
+		actionsByTargetState.clear();
+		
 		String toAppend;
 		// START action
 		if (startAction != null){
-			toAppend = 
-					g.getState(g.getEdgeSource(startAction.getConcreteID())).getAbstract_R_ID() + // source state
-					" -> " +
-					g.getState(g.getEdgeTarget(startAction.getConcreteID())).getAbstract_R_ID() + // target state							
-					" [color=black, label=\"" + startAction.toString() + "\", style=solid];\n";
-			sb3.append(toAppend);
-			sb4.append(toAppend);
-			sb5.append(toAppend);
+			for (String tid : startAction.getTargetStateIDs()){
+				toAppend = 
+						g.getState(startAction.getSourceStateID()).getAbstract_R_ID() + // source state
+						" -> " +
+						g.getState(tid).getAbstract_R_ID() + // target state							
+						" [color=black, label=\"" + startAction.toString() + "\", style=solid];\n";
+				sb3.append(toAppend);
+				sb4.append(toAppend);
+				sb5.append(toAppend);
+			}
 		}
 		// STOP action
 		if (stopAction != null){
-			toAppend = 
-					g.getState(g.getEdgeSource(stopAction.getConcreteID())).getAbstract_R_ID() + // source state
-					" -> " +
-					g.getState(g.getEdgeTarget(stopAction.getConcreteID())).getAbstract_R_ID() + // target state							
-					" [color=black, label=\"" + stopAction.toString() + "\", style=solid];\n";
-			sb3.append(toAppend);
-			sb4.append(toAppend);
-			sb5.append(toAppend);
+			for (String tid : stopAction.getTargetStateIDs()){
+				toAppend = 
+						g.getState(stopAction.getSourceStateID()).getAbstract_R_ID() + // source state
+						" -> " +
+						g.getState(tid).getAbstract_R_ID() + // target state							
+						" [color=black, label=\"" + stopAction.toString() + "\", style=solid];\n";
+				sb3.append(toAppend);
+				sb4.append(toAppend);
+				sb5.append(toAppend);
+			}
 		}
 		
 		return new String[]{sb0.toString(),sb1.toString(),sb2.toString(),sb3.toString(),sb4.toString(),sb5.toString()};
@@ -541,9 +583,9 @@ public class GraphReporter {
 	}*/
 			
 	// TODO: RAM optimization for big graphs
-	public static void saveGraph(IEnvironment env, TESTARGraph g){	
+	public static void saveGraph(IEnvironment env, TESTARGraph g){
 		//System.out.print("\tExporting graph to xml ...");
-		g.saveToXML(OUT_DIR + testSequenceFolder + "/" + "graph_" + usingGraphTime + ".xml");
+		g.saveToXML(env, OUT_DIR + testSequenceFolder + "/" + "graph_" + usingGraphTime + ".xml");
 		//System.out.println("\t... xml graph export finished!");
 		
 		//System.out.print("\tPopulating .dot contents ...");
@@ -598,322 +640,41 @@ public class GraphReporter {
 		t.start();
 	}
 	
-	private static String reportGraphStats(IEnvironment env, TESTARGraph tGraph){
-		StringBuffer report = new StringBuffer();
+	 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+	private static String[] reportGraphStats(IEnvironment env, TESTARGraph tGraph, int firstSequenceActionNumber){
+		String[] report = new String[4];
 		
-		report.append("\n-- TESTAR graph report ... --\n");
+		report[0] = ReportPages.getClustersPageReport(env);
 
-		report.append(reportClusters(env));
-
-		IGraphAction[] orderedActions = env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
+		GraphEdge[] orderedActions = env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
 		int SEQUENCE_LENGTH = (int)Math.log10((double)orderedActions.length) + 1;
 		if (SEQUENCE_LENGTH < 4)
 			SEQUENCE_LENGTH = 4; // minimum column width
-		reportDetailed(report,env,tGraph,orderedActions,SEQUENCE_LENGTH);
-		reportSummary(report,env,tGraph,orderedActions,SEQUENCE_LENGTH);
-
-		report.append("\n\n-- ... report end --");		
 		
-		return report.toString();
+		report[1] = ReportPages.getTestTablePageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH,firstSequenceActionNumber);
+		report[2] = ReportPages.getExplorationCurvePageReport(env,tGraph,SEQUENCE_LENGTH,firstSequenceActionNumber);
+		report[3] = ReportPages.getStatsPageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH);
+		
+		return report;
 	}
 	
-	private static String reportClusters(IEnvironment env){
-		StringBuffer report = new StringBuffer();
-
-		final int CLUSTER_MEMBERS_PERLINE = 8;
-		
-		report.append("\n-- States clustering (abstract -> concrete) --\n");
-		HashMap<String,Set<String>> absStateGroups = env.getGraphStateClusters();
-		int gi = 1, i, nlc;
-		for (String g : absStateGroups.keySet()){
-			report.append("  Cluster (" + gi++ + ") " + g + " contains:\n\t");
-			i = 1; nlc = 0;
-			for (String s : absStateGroups.get(g)){
-				nlc++;
-				report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t" : " "));
-			}
-			report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n" : "");
-		}
-
-		report.append("\n-- Actions clustering (abstract -> concrete) --\n");
-		absStateGroups = env.getGraphActionClusters();
-		gi = 1;
-		for (String g : absStateGroups.keySet()){
-			report.append("  Cluster (" + gi++ + ") " + g + " contains:\n\t");
-			i = 1; nlc = 0;
-			for (String s : absStateGroups.get(g)){
-				nlc++;
-				report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t" : " "));
-			}
-			report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n" : "");
-		}
-		
-		return report.toString();
-	}
-	
-	private static void reportDetailed(StringBuffer report, IEnvironment env, TESTARGraph tGraph,
-									   IGraphAction[] orderedActions, int SEQUENCE_LENGTH){
-		report.append("\n=== Ordered test sequence actions list ===\n");
-		report.append("\n\tACTION_TYPES:\n");
-		for (String actionRole : BriefActionRolesMap.map.keySet())
-			report.append("\t\t" + BriefActionRolesMap.map.get(actionRole) + " = " + actionRole + "\n");
-		int ID_LENGTH = CodingManager.ID_LENTGH;
-		String tableHead = String.format("%1$" + SEQUENCE_LENGTH + 
-										 "s %2$7" + // RAM //"s %2$" + SEQUENCE_LENGTH +
-										 "s %3$11" + // CPU (user)
-										 "s %4$11" + // CPU (system)
-										 "s %5$6" + // CPU %
-										 "s %6$" + ID_LENGTH +
-										 "s %7$" + SEQUENCE_LENGTH +
-										 "s %8$" + ID_LENGTH +
-										 "s %9$" + SEQUENCE_LENGTH +
-										 "s %10$" + ID_LENGTH +
-										 "s %11$" + SEQUENCE_LENGTH +
-										 "s %12$s",
-				"#",
-				"RAM(KB)", //"Sync",
-				"CPUser(ms)",
-				"CPUsys(ms)",
-				"CPU(%)",
-				"FROM",
-				"x",
-				"TO",
-				"x",
-				"C_ACTION",
-				"x",
-				"ACTION_TYPE ( (WIDGET,ROLE,TITLE)[parameter*] )+ ");
-		for (int i=0; i<tableHead.length(); i++)
-			report.append("-");
-		report.append("\n" + tableHead + "\n");
-		for (int i=0; i<tableHead.length(); i++)
-			report.append("-");
-		report.append("\n");
-		
-		int i=1;
-		long[] cpu;
-		IGraphState from, to;
-		List<Integer> movesSync = Grapher.getMovementsSync();
-		for (IGraphAction edge : orderedActions){
-			if (edge.knowledge()) continue;
-			cpu = edge.getCPUsage();
-			from = env.getSourceState(edge);
-			to =  env.getTargetState(edge);
-			String actionList = String.format("%1$" + SEQUENCE_LENGTH +
-											  "d %2$7" + //"d %2$" + SEQUENCE_LENGTH +
-											  "d %3$11" + // CPU (user)
-											  "d %4$11" + // CPU (system)
-											  "d %5$6" + // CPU %
-											  "s %6$" + ID_LENGTH +
-											  "s %7$" + SEQUENCE_LENGTH +
-											  "d %8$" + ID_LENGTH +
-											  "s %9$" + SEQUENCE_LENGTH +
-											  "s %10$" + ID_LENGTH +
-											  "s %11$" + SEQUENCE_LENGTH +
-											  "d %12$s",
-					i,
-					edge.getMemUsage(), //movesSync.get(i-1),
-					cpu[0], // user
-					cpu[1], // system
-					String.format("%.2f", (cpu[0] + cpu[1]) / (double)cpu[2] * 100), // cpu %
-					from.getConcreteID(),
-					from.getCount(),
-					to.getConcreteID(),
-					to.getCount(),
-					edge.getConcreteID(),
-					edge.getCount(),
-					edge.getDetailedName());
-			report.append(actionList + "\n");
-			i++;
-		}
-	}
-	
-	private static void reportSummary(StringBuffer report, IEnvironment env, TESTARGraph tGraph,
-									  IGraphAction[] orderedActions, int SEQUENCE_LENGTH){
-		int unxStates = 0, unxActions = 0,
-			totalStates = -1; // discard start node
-		String verdict = null;
-		for (IGraphState vertex : tGraph.vertexStates()){
-			if (vertex.getUnexploredActionsSize() > 0)
-				unxStates++;
-			unxActions += vertex.getUnexploredActionsSize();
-			if (vertex.toString().equals(Grapher.GRAPH_NODE_FAIL))
-				verdict = Grapher.GRAPH_NODE_FAIL;
-			else if (vertex.toString().equals(Grapher.GRAPH_NODE_PASS))
-				verdict = Grapher.GRAPH_NODE_PASS;
-			else
-				totalStates += vertex.getCount();
-		}
-		
-		report.append("\n=== Exploration curve ===\n");
-		String headerS = String.format("%1$22s %2$16s %3$16s",
-			"________________UNIQUE",
-			"________ABSTRACT",
-			"___________TOTAL");
-		report.append(headerS + "\n");
-		String explorationCurveS = String.format("%1$" + SEQUENCE_LENGTH + "s, %2$6s, %3$7s, %4$6s, %5$7s, %6$6s, %7$8s %8$18s %9$11s %10$6s %11$6s",
-			"#",
-			"states",
-			"actions",
-			"states",
-			"actions",
-			"unique",
-			"abstract",
-			"unexplored actions",
-			"longestPath",
-			"minCvg",
-			"maxCvg");
-		report.append(explorationCurveS + "\n");
-		int idx = 1;
-		String sampleS;
-		List<int[]> explorationCurve = env.getExplorationCurve();
-		for (int[] sample : explorationCurve){
-			sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, %2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$11d %10$6s %11$6s",
-				idx++, sample[0], sample[1], sample[2], sample[3],
-				sample[0] + sample[1], sample[2] + sample[3], sample[4], sample[5], sample[6]+"%", sample[7]+"%");
-			report.append(sampleS + "\n");
-			if (idx % 10 == 0)
-				report.append("---------------------------------------------------------------------------\n");
-		}
-		
-		report.append("\n=== SUT UI space explored ===\n");
-		String statsMetahead = String.format("%1$27s %2$27s %3$17s",
-				"______________________________STATES",
-				"_____________________________ACTIONS",
-				"____________TOTAL");
-		report.append(statsMetahead + "\n");
-		//String statsHead = String.format("%1$5s, %2$6s, %3$8s, %4$10s, %5$5s, %6$6s, %7$8s, %8$10s, %9$6s, %10$8s, ... %11$7s",
-		String statsHead = String.format("%1$5s, %2$6s, %3$8s, %4$10s, %5$5s, %6$6s, %7$8s, %8$10s, %9$6s, %10$8s, %11$11s, %12$6s, %13$6s ... %14$7s", // by fraalpe2				
-				
-				"total",
-				"unique",
-				"abstract",
-				"unexplored",
-				"total",
-				"unique",
-				"abstract",
-				"unexplored",
-				"unique",
-				"abstract",
-				// begin by fraalpe2
-				"longestPath",
-				"minCvg",
-				"maxCvg",	
-				// end by fraalpe2
-				"VERDICT");		
-		report.append(statsHead + "\n");
-		int uniqueStates = tGraph.vertexSet().size() - 2,
-			uniqueActions = tGraph.edgeSet().size() - 2,
-			abstractStates = env.getGraphStateClusters().size(),
-			longestPath = env.getLongestPathLength(),
-			abstractActions = env.getGraphActionClusters().size();
-		
-		if (Grapher.testGenerator.equals(Grapher.EVOLUTIONARY_GENERATOR) &&
-			verdict.equals(Grapher.GRAPH_NODE_PASS)){ // temporal fitness.txt patch for evolutionary algorithm
-			try{
-				java.io.Writer fitnessWriter = new java.io.FileWriter("output/fitness.txt");
-				//fitnessWriter.write(new Double(abstractStates == 0 ? 2.0 : 1.0/(double)abstractStates).toString()); // fitness = 0.0 .. 1.0 (0 is best)
-				fitnessWriter.write(new Double(abstractStates == 0 ? 0.0 : (double)abstractStates).toString()); // fitness = numero estados abstractos (higher is better)
-				fitnessWriter.close();
-			} catch(Exception e){}
-		}
-		
-		double[] cvgMetrics = env.getCoverageMetrics(); // min x max coverage
-		String minCvg = String.format("%.2f", cvgMetrics[0]), // min coverage
-			   maxCvg = String.format("%.2f", cvgMetrics[1]); // max coverage
-		//String stats = String.format("%1$5s, %2$6s, %3$8s, %4$10s, %5$5s, %6$6s, %7$8s, %8$10s, %9$6s, %10$8s, ... %11$7s",	
-		String stats = String.format("%1$5s, %2$6s, %3$8s, %4$10s, %5$5s, %6$6s, %7$8s, %8$10s, %9$6s, %10$8s, %11$11s, %12$6s, %13$6s ... %14$7s", // by fraalpe2				
-				totalStates,
-				uniqueStates, // without start/end states
-				abstractStates, // clusters
-				unxStates, // states with unexplored actions (unexplored actions may not discover new states)
-				orderedActions.length,
-				uniqueActions, // without start/end edges
-				abstractActions, // clusters
-				unxActions,
-				uniqueStates + uniqueActions,
-				abstractStates + abstractActions,
-				// begin by fraalpe2
-				longestPath,
-				minCvg + "%", // min coverage
-				maxCvg + "%", // max coverage
-				// end by fraalpe2
-				verdict == null ? "????" : verdict);
-		report.append(stats + " -STATS\n");		
-		
-		int[] grm = env.getGraphResumingMetrics();
-		report.append("\n=== Graph resuming data ===\n");
-		report.append("Known states: " + grm[0] + "\n");
-		report.append("Revisited states: " + grm[1] + "\n");
-		report.append("New states: " + grm[2] + "\n");
-		
-		report.append("\n=== Test generator ===\n");
-		report.append("Name: " + Grapher.testGenerator + "\n");
-		if (Grapher.testGenerator.equals(Grapher.QLEARNING_GENERATOR)){
-			report.append("DISCOUNT: " + Grapher.QLEARNING_DISCOUNT_PARAM + "\n");
-			report.append("MAXREWARD: " + Grapher.QLEARNING_MAXREWARD_PARAM + "\n");
-			String calibS = String.format("%1$8.2f , %2$10.2f , %3$10d , %4$10d , %5$11d , %6$11d , %7$11d , %8$20d , %9$20d , %10$11s , %11$6s , %12$6s",
-					Grapher.QLEARNING_DISCOUNT_PARAM * 100,
-					Grapher.QLEARNING_MAXREWARD_PARAM,
-					uniqueStates,
-					abstractStates,
-					uniqueActions,
-					abstractActions,
-					orderedActions.length,
-					uniqueStates + uniqueActions,
-					abstractStates + abstractActions,
-					// begin by fraalpe2
-					longestPath,
-					minCvg + "%", // min coverage
-					maxCvg + "%"); // max coverage
-					// end by fraalpe2
-			report.append("CALIB. : " + calibS + "\n");
-			report.append("format : discount x max_reward x unq_states x abs_states x unq_actions x abs_actions x exc_actions = unq_states_n_actions x abs_states_n_actions x longestPath x minCvg x maxCvg");
-		}
-		
-		
-		/*report.append("\n=== Stats report ===\n");
-
-		double sequenceLength = orderedActions.length;
-		int count;
-		double frac, idealFrac = 1.0 / tGraph.edgeSet().size();
-		double dist = 0;
-		for (IGraphAction ga : tGraph.edgeSet()){
-			count = ga.getCount();;
-			frac = count / sequenceLength;
-			if (frac < idealFrac)
-				dist += (count > 0 ? idealFrac / frac : 100 * (idealFrac / (1.0 / sequenceLength))) - 1.0; 
-		}
-		//dist = Math.sqrt(dist);
-		
-		double E = sequenceLength / tGraph.edgeSet().size();				
-		report.append("Mean: " + E + "\n");
-		report.append("Distance: " + dist +"\n");*/		
-	}	
-	
-	public static String PrintResults(TESTAREnvironment env, TESTARGraph g){
+	 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+	public static String[] getReport(TESTAREnvironment env, TESTARGraph g, int firstSequenceActionNumber){
 		if (g.vertexSet().isEmpty() || g.edgeSet().isEmpty())
-			return "EMPTY GRAPH";
+			return null; // empty graph
+		else if (!mapToAbstractStateIDs.isEmpty()){
+			System.out.println("WARNING - Last report not finished? Doing cleanup");
+			mapToAbstractStateIDs.clear();
+		}
 
 		//System.out.println("\tWill save graphs ...");
 		saveGraph(env,g);
 		//System.out.println("\t... graphs saved!");
 		
 		//System.out.print("\tWill generate graph report ...");
-		String report = reportGraphStats(env,g);
+		return reportGraphStats(env,g, firstSequenceActionNumber);
 		//System.out.println("\t... graph report generated!");
-
-		/*String reportPath = OUT_DIR + testSequenceFolder + "/" + 
-				 			"graph_" + usingGraphTime + "_report.txt";
-		try {
-			PrintWriter writer = new PrintWriter(reportPath, "UTF-8");
-			writer.println(report);
-			writer.close();
-			System.out.println("Graph report saved to: " + reportPath);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}*/
 					
-		return report;
 	}
 	
 }

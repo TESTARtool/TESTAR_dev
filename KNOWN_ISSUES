@@ -8,8 +8,6 @@
 			-> No widgets detected? Check (*) below
 		=> Mozilla Firefox: scrollbars not being detected (not compliant with Accessiblity API)
 		=> Google Chrome: web application widgets not being detected
-	-> Unsopported technologies (fix pending)
-		=> Java Swing: yet, Java AWT/SWT is supported
 		
 - Protocol
 	-> Editing
@@ -22,13 +20,7 @@
 - Console error messages
 	-> "System is offline! I assume it crashed"
 		=> Check whether the SUT is already running. In such a case, first close any SUT process beforehand.
-			-> TESTAR will automatically try to detect and kill any SUT running processes
-
-- Abstract graphs
-	-> sometimes the abstracted graphs are broken in several partitions
-		=> it happens whenever there are actions that from the same state S0, ends in different states S1, S2
-		=> such actions are represented as MUTATED in non-abstracted graphs
-		=> during abstraction, MUTATED actions are lost because of the clusterization (i.e. cluster S0->S1, but not S0->S2)
+			-> TESTAR will automatically try to detect and kill any SUT running processes			
 		
 --
 

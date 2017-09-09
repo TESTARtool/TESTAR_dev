@@ -37,8 +37,9 @@ public class TestSerialiser extends Thread {
 	private static int fragmentTimes;
 	private static final int FLUSH_INTERVAL = 16;
 	private static LinkedList<Taggable> testSavingQueue =  new LinkedList<Taggable>();
+	private static final int QUEUE_LIMIT = 16;
 	private static TestSerialiser singletonTestSerialiser;
-	private static boolean alive;
+	private static boolean alive, queueBoost;
 
 	private TestSerialiser(){}
 	
@@ -47,7 +48,7 @@ public class TestSerialiser extends Thread {
 		Assert.isTrue(testSavingQueue.isEmpty());
 		TestSerialiser.test = test;
 		fragmentTimes = 0;
-		alive = true;
+		alive = true; queueBoost = false;
 		//ExecutorService exeSrv = Executors.newFixedThreadPool(1);
 		//exeSrv.execute(singletonTestSerialisationManager);
 		singletonTestSerialiser = new TestSerialiser();
@@ -68,6 +69,13 @@ public class TestSerialiser extends Thread {
 				} catch (InterruptedException e1) {}
 			}
 			if (!testSavingQueue.isEmpty()){
+				if (!queueBoost && testSavingQueue.size() > QUEUE_LIMIT){
+					this.setPriority(NORM_PRIORITY);
+					queueBoost = true;
+				} else if (queueBoost && testSavingQueue.size() < QUEUE_LIMIT/2){
+					this.setPriority(MIN_PRIORITY);
+					queueBoost = false;
+				}				
 				Taggable fragment;
 				synchronized(testSavingQueue){
 					fragment = testSavingQueue.removeFirst();
@@ -123,6 +131,7 @@ public class TestSerialiser extends Thread {
 
 	public static void exit(){
 		if (singletonTestSerialiser != null){
+			TestSerialiser.finish();
 			try {
 				synchronized(test){
 					while (singletonTestSerialiser != null){

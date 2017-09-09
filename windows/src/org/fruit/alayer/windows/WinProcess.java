@@ -34,6 +34,7 @@ import java.util.Set;
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Util;
+import org.fruit.alayer.AutomationCache;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.SUTBase;
 import org.fruit.alayer.Tag;
@@ -236,6 +237,7 @@ public final class WinProcess extends SUTBase {
 			pid = wp.pid();
 		} catch(IllegalStateException e){
 			System.out.println("SUT is not running - cannot retrieve RAM usage");
+			return -1;
 		}
 		return Windows.GetProcessMemoryInfo(pid);
 	}
@@ -249,6 +251,7 @@ public final class WinProcess extends SUTBase {
 			pid = wp.pid();
 		} catch(IllegalStateException e){
 			System.out.println("SUT is not running - cannot retrieve CPU usage");
+			return new long[]{-1,-1};
 		}
 		return Windows.GetProcessTimes(pid);
 	}
@@ -281,6 +284,10 @@ public final class WinProcess extends SUTBase {
 			Windows.CoUninitialize();
 			pApplicationActivationManager = 0;
 		}
+		// begin by urueda
+		if (this.getNativeAutomationCache() != null)
+			this.getNativeAutomationCache().releaseCachedAutomationElements();
+		// end by urueda
 	}
 
 
@@ -347,5 +354,28 @@ public final class WinProcess extends SUTBase {
 	public String getStatus(){
 		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] ... " + this.get(Tags.Desc,"");
 	}
-	
+
+	@Override
+	public void setNativeAutomationCache() {
+		this.nativeAutomationCache = new AutomationCache(){
+			@Override
+			public void nativeReleaseAutomationElement(long elementPtr){
+				/*long refCount =*/ Windows.IUnknown_Release(elementPtr);
+				//System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
+			}
+			@Override
+			public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr){
+				return Windows.IUIAutomation_ElementFromHandle(automationPtr, hwndPtr);
+			}
+			@Override
+			public long[] nativeGetAutomationElementBoundingRectangl(long cachedAutomationElementPtr, boolean fromCache){
+				return  Windows.IUIAutomationElement_get_BoundingRectangle(cachedAutomationElementPtr, fromCache);
+			}
+			@Override
+			public long nativeGetAutomationElementFromHandleBuildCache(long automationPtr, long hwndPtr, long cacheRequestPtr){
+				return Windows.IUIAutomation_ElementFromHandleBuildCache(automationPtr, hwndPtr, cacheRequestPtr);
+			}
+		};
+	}
+
 }

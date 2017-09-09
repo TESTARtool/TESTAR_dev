@@ -27,9 +27,16 @@
  */
 package org.fruit.monkey;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +48,6 @@ import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.exceptions.NoSuchTagException;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -110,6 +116,13 @@ public class Settings extends TaggableBase implements Serializable {
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
+		// begin by urueda
+		}else if(tag.type().equals(Float.class)){
+			try{
+				return (T)(Float)Float.parseFloat(stringValue);
+			}catch(NumberFormatException nfe){
+				throw new ConfigParseException("Unable to parse value for tag " + tag);
+			} // end by urueda
 		}else if(tag.type().equals(Boolean.class)){
 			try{
 				return (T)(Boolean)Boolean.parseBoolean(stringValue);
@@ -144,7 +157,15 @@ public class Settings extends TaggableBase implements Serializable {
 	public static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException{
 		Assert.notNull(path);
 		Properties props = new Properties();
-		FileInputStream fis = new FileInputStream(path); props.load(fis); fis.close(); // by urueda
+		// begin by urueda
+		FileInputStream fis = new FileInputStream(path);
+		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
+		Reader in = new BufferedReader(isw);
+		props.load(in);
+		in.close();			
+		if (isw != null) isw.close();
+		if (fis != null) fis.close();
+		// end by urueda
 		return new Settings(defaults, new Properties(props));
 	}
 
@@ -167,7 +188,7 @@ public class Settings extends TaggableBase implements Serializable {
 
 		for(String key : props.stringPropertyNames()){
 			String value = props.getProperty(key);
-
+			
 			Tag<?> defTag = null;
 			
 			for(Pair<?, ?> p : defaults){

@@ -23,10 +23,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
 import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphAction;
 import es.upv.staq.testar.graph.IGraphState;
 import es.upv.staq.testar.graph.WalkStopper;
-import es.upv.staq.testar.graph.reporting.WalkReport;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
@@ -49,6 +47,16 @@ public interface IWalker {
 	public double getBaseReward();	
 	
 	/**
+	 * Enables and disables walking a previous test.
+	 * How-to:
+	 *   1) enablePreviousWalk()
+	 *   2) populate previous graph contents
+	 *   3) disablePreviousWalk()
+	 */
+	public void enablePreviousWalk();
+	public void disablePreviousWalk();
+
+	/**
 	 * Walking algorithm.
 	 * @param env Graph environment.
 	 * @param walkStopper A walk stopping criteria.
@@ -57,28 +65,20 @@ public interface IWalker {
 	
 	/**
 	 * Selects an action to be executed from a set of available actions for a SUT state.
+	 * @param env Graph environment.
 	 * @param state SUT state.
 	 * @param actions Available actions for SUT state.
 	 * @return The selected algorithm action.
 	 */
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper);	
-	
+
 	/**
-	 * Calculates a rewarding score (0.0 .. 1.0; or MAX_REWARD), which determines how interesting is the state' action.
+	 * Gets a reward for a state taking into account its derived UI actions and the target states for each action.
 	 * @param env Graph environment.
-	 * @param action A graph action..
-	 * @return A rewarding score between 0.0 (no interest at all) and 1.0 (maximum interest); or MAX_REWARD.
-	 */
-	public double getActionReward(IEnvironment env, IGraphAction action);
-	
-	/**
-	 * Calculates a rewarding score (0.0 .. 1.0; or MAX_REWARD), which determines how interesting is the state. 
-	 * @param env Graph environment.
-	 * @param state A graph state.
-	 * @return A rewarding score between 0.0 (no interest at all) and 1.0 (maximum interest);  or MAX_REWARD.
+	 * @param state Graph state.
+	 * @return A rewarding score for the state between 0.0 (worst) and >0.0 (best).
 	 */
 	public double getStateReward(IEnvironment env, IGraphState state);
-	
 	/**
 	 * Proportional action selection.
 	 * @param env Graph environment.
@@ -87,7 +87,5 @@ public interface IWalker {
 	 * @return A proportional selected action.
 	 */
 	public Action selectProportional(IEnvironment env, State state, Set<Action> actions);
-	
-	public WalkReport getReport();
-	
+
 }

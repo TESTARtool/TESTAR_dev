@@ -19,6 +19,8 @@ Enhancements:
 			--> -DSequenceLength=X or -DSL=X (X = number of actions for each test sequence)
 			--> -DGrahResuming=true/false or -DGRA=true/false
 			--> -DForceToSequenceLength=true/false or -DF2SL=true/false (continues testing in presence of FAIL)
+			--> -DTypingTextsForExecutedAction=1.. or -DTT=1.. (number of typing actions with different texts for executed action)
+			--> -DStateScreenshotSimilarityThreshold=0.0..1.0 or -DSST=0.0..1.0 (widget-tree build cache by screenshots similarity) -> use with caution: it is unstable; symptom: unable to access the SUT UI at future SUT runs
 	- Prolog:
 		-> Facts are automatically calculated based on execution information (states, actions, graphs)
 		-> actions rules to build feasible UI actions
@@ -69,7 +71,7 @@ Enhancements:
 			--> getRandomText(widget): calculates a random text from feasible input values (input_values.xml specification):
 				1) specific data type (e.g. numbers): random selection from that specific data type (e.g. a random number)
 				2) unrestricted data type: random selection from all the available input data types (e.g. texts, numbers, dates, emails, weburls, etc)
-			--> getTopWidgets(state): retrieves the widgets on top of others (highest Z-INDEX propoerty)
+			--> getTopWidgets(state): retrieves the widgets on top of others (highest Z-INDEX property)
 				---> Where to use? for example, in deriveActions method
 				---> Resolves:
 					a) hidden screen widgets at UI background might acquire test focus
@@ -100,9 +102,13 @@ Enhancements:
 		-> Previous test sequence graph can be automatically resumed
 		-> Resumed graphs are marked with
 			----- dashed style for known states/actions
-			..... dot style for known and revisited states/actions
+			\---/ diagonals style for (known)revisited states
+			..... dot style for (known)revisited actions
+		-> Directed pseudographs (loops and multiple edges between vertexes)
+		-> Edges can now lead to different vertexes (no more "MUTATED" edges)
 	- Metrics: metrics/*.csv files for each test sequence
 		-> graph resuming metrics (known states, revisited states, new states)
+		-> test duration in seconds/minutes/hours
 	- Feedback dialogs
 		-> Displayed (short-time) when TESTAR changes working mode: Spy, Generate, Oracle specification, etc.
 		
@@ -123,24 +129,34 @@ Improvements:
 		-> Forms-filling algorithm:
 			--> activation now at test.settings (AlgorithmFormsFilling = true/false)
 			--> refactored from AbstractProtocol to "graph" project
+		-> TypingTextsForExecutedAction (number of typing actions with different texts for executed action)
 		-> GraphResuming property (true/false)
 		-> OfflineGraphConversion property (true/false)
 		-> NonReactingUIThreshold property (int)
 			--> Threshold on the number of executed actions that did not achieve a UI reaction
 			--> Default = 100 executed actions
 			--> Once threshold is reached, an ESC action is forced
+		-> SUTProcesses property (regex)
+			-> spawn tests to several windows, which conform to SUT processes
+			-> Shift+0 shortcut to debug process names at STDOUT
 	- CodingManager:
 		-> all widgets/states and actions IDs calculated once from widget-tree information:
 			--> ConcreteID <- ROLE, TITLE, SHAPE, ENABLED properties
 			--> Abs(R)ID <- ROLE property
 			--> Abs(R,T)ID <- ROLE, TITLE properties
 			--> Abs(R,T,P)ID <- ROLE; TITLE, PATH properties
-	- Test information serialisation through threads to avoid test efficiency penalty:
-		-> Logs:
-			--> Widgets information reporting has been extended with additional fields
-			--> A log file for each test sequence
-		-> Screenshots: png files for UI states and actions
-		-> Tests sequences: compressed, at test sequence end (RAM optimisation), to reduce disk size
+	- Test efficiency
+		- Test information serialisation through threads to avoid test efficiency penalty:
+			-> Logs:
+				--> Widgets information reporting has been extended with additional fields
+				--> A log file for each test sequence
+			-> Screenshots: png files for UI states and actions
+			-> Tests sequences: compressed, at test sequence end (RAM optimisation), to reduce disk size
+		- Widget-tree building cache throughout test:
+			-> factors for cache hit:
+				--> equal UI window handle
+				--> equal UI window size
+				--> similar (e.g. >95%) UI window screenshot
 	- TESTAR UI:
 		-> Changed Generate-button to Test-button
 		-> Changed Selection tab to UI-Walker tab
@@ -177,6 +193,7 @@ Reporting:
 		-> PASS: OK, WARNING, SUSPICIOUSTITLE
 		-> FAIL: UNRESPONSIVE, UNEXPECTEDCLOSE, FAIL
 		-> OTHER: can be PASS or FAIL depending on the verdict severity used
+	- test reports as individual *_report_*.log files
 	- Longest path in the UI exploration (how far a test did go into the UI?)
 		-> marked at graphs (CONCRETE/non-ABSTRACT versions) with thick nodes outlines
 	- Minimum and maximum (<1.0 as UI actions space is unknown) coverage for all explored states
@@ -207,6 +224,12 @@ Fixes:
 	- Memory leaks resolved (screenshots serialisation and test fragments serialisation)
 	- KNOWN_ISSUES
 		-> "System is offline! I assume it crashed": automatic detection/kill of running SUT processes
+		-> Swing for Java (light-weight widgets) is now supported
+			--> How to:
+				- add the line "AccessBridgeEnabled = true" to test.settings
+				- Activate native Java Access Bridge (e.g. Windows: Control panel -> Accessibility -> Accessibility center -> Help to use the machine -> Activate Java Access Bridge at page bottom)
+			
+	- General stability fixes
 			
 #TESTAR v1.2 (2016-02-04)
 -------------------------

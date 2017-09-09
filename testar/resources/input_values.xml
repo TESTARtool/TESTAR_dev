@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<TESTAR_inputvalues version="1.0.20160412">
+<TESTAR_inputvalues version="1.0.20170322">
 	<data_types> <!-- note: negative data types are reserved -->
 		<!-- <data type="1" desc="data_type_description" example="example_value"/> -->
 	</data_types>

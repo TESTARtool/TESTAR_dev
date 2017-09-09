@@ -35,15 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+import jsyntaxpane.DefaultSyntaxKit;
 
 import org.fruit.Util;
-
-import jsyntaxpane.DefaultSyntaxKit;
 
 public class ProtocolEditor extends javax.swing.JDialog {
     private static final long serialVersionUID = 5922037291232012481L;

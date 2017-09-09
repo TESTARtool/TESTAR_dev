@@ -52,15 +52,20 @@ EVO_TESTAR_ACTIONS = 0
 MAX_PASS_EVAL_ATTEMPTS = 3
 
 # begin set up
-POPULATION_SIZE = 50
+POPULATION_SIZE = 100
 MAX_DEPTH = 6 # IF/THEN rules number + 1
-MAX_CONDITION_DEPTH = 3 # AND/OR depth
+MAX_CONDITION_DEPTH = 2 # 3 # AND/OR depth
 GENERATIONS = 50
 TOURNAMENT_SIZE = 5
 CROSSOVER_PROBABILITY = 1.0 # steady state => always
 MUTATION_PROBABILITY = 0.05
 INDIVIDUAL_EVAL_ACTIONS = 100
-BEST_INDIVIDUAL_EVAL_ACTIONS = 1000
+# set to 1 (true) to simulate the evaluation of individuals without running TESTAR; 0 (false) otherwise
+SIMULATE_TESTAR = 0
+# set to 1 (true) to remove testar data, 0 (false) otherwise
+REMOVE_TESTAR_DATA = 1
+# set low values for next parameters to "discard" statistical analysis of the best individual
+BEST_INDIVIDUAL_EVAL_ACTIONS = 10000 # 1000
 BEST_INDIVIDUAL_EVAL_RUNS = 30
 # end set up
 
@@ -457,6 +462,10 @@ def evaluate_individual(individual, symbols=None):
     :param symbols: Symbols used in evaluation
     :type symbols: dict
     """
+
+    if SIMULATE_TESTAR:
+        individual["fitness"] = random.randint(1,POPULATION_SIZE * GENERATIONS)
+        return
 	
     # begin by urueda
     global INDIVIDUAL_IDX, EVO_TESTAR_ACTIONS
@@ -480,7 +489,7 @@ def evaluate_individual(individual, symbols=None):
             print("Evaluation attempt " + str(eval_try))
             time.sleep(1)	
             # begin by urueda
-            p = Popen("run.bat -Dheadless=true -DTG=evolutionary -DSequenceLength=" + str(EVO_TESTAR_ACTIONS) + " -DF2SL=true -DGRA=false")
+            p = Popen("run.bat -Dheadless=true -DTG=evolutionary -DSequenceLength=" + str(EVO_TESTAR_ACTIONS) + " -DF2SL=true -DGRA=false -DTT=1 -DUT=true")
             stdout, stderr = p.communicate()
 		    # end by urueda
 		
@@ -512,6 +521,8 @@ def evaluate_individual(individual, symbols=None):
             evalfile.write(str(eval_try))
             evalfile.close()
             # shutil.move("../" + tmpd, prefix + "testar") #could raise error due pending processes writing files (e.g. dot.exe)
+            if REMOVE_TESTAR_DATA:
+                shutil.rmtree("../" + tmpd, ignore_errors=True); # clean up to save disk space
 		    # end by urueda
 		
 		    # Get the mean fitness and assign it to the individual
@@ -754,28 +765,32 @@ def mutation(individuo, param):
     if random.random() >= param["mutation_probability"]:
         return individuo
 
-    print("mutating: " + genome_to_str(individuo) + "\n")
-    mutpoint = random.randint(0, len(individuo["genome"]) - 1)
+    mutated = copy.deepcopy(individuo)
+    mutated["fitness"] = DEFAULT_FITNESS
+	
+    print("mutating: " + genome_to_str(mutated) + "\n")
+    mutpoint = random.randint(0, len(mutated["genome"]) - 1)
     dice = random.randint(1,2) # 1 = IF, 2 = THEN
     if dice == 1:
         print("\trule to mutate: " + str(mutpoint) + " -> if")
-        tomutate = individuo["genome"][mutpoint]["if"]
-        individuo["genome"][mutpoint]["if"] = mutate_rule(tomutate,param)
+        tomutate = mutated["genome"][mutpoint]["if"]
+        mutated["genome"][mutpoint]["if"] = mutate_rule(tomutate,param)
     else:
         print("\trule to mutate: " + str(mutpoint) + " -> then")
-        tomutate = individuo["genome"][mutpoint]["then"]
-        individuo["genome"][mutpoint]["then"] = mutate_rule(tomutate,param)
+        tomutate = mutated["genome"][mutpoint]["then"]
+        mutated["genome"][mutpoint]["then"] = mutate_rule(tomutate,param)
 	
-    print("mutated: " + genome_to_str(individuo) + "\n")
-    return individuo
+    print("mutated: " + genome_to_str(mutated) + "\n")
+    return mutated
 
 # by urueda
 def mutate_rule(tomutate, param):
     a = " "
     b = " "
+    attempt = 0
     acount = 0
-    while a == b or acount == 0:
-        n = random.randint(1,5)
+    while attempt < 100 and (a == b or acount == 0):
+        n = random.randint(1,6)
         if (n == 1):
             a = random.choice(param["symbols"]["terminalsNum"])
             b = random.choice(param["symbols"]["terminalsNum"])
@@ -791,9 +806,17 @@ def mutate_rule(tomutate, param):
         elif (n == 5):
             a = random.choice(param["symbols"]["functions1"])
             b = random.choice(param["symbols"]["functions1"])
+        elif (n == 6):
+            a = random.choice(param["symbols"]["functions2"])
+            b = random.choice(param["symbols"]["functions2"])			
         acount = docount(tomutate, a)
+        print("\t<" + a + "> -> <" + b + ">?")
+        attempt += 1
 
-    if acount == 1:
+    if acount == 0:
+        print("\tno mutation performed!\n")
+        return tomutate
+    elif acount == 1:
         rplpoint = 0
     else:
         rplpoint = random.randint(0, acount - 1)
@@ -849,9 +872,9 @@ def search_loop(population, param):
     """
 
 	# begin by urueda
-    global ITERATION_IDX, INDIVIDUAL_IDX, EVO_TESTAR_ACTIONS
+    global ITERATION_IDX, INDIVIDUAL_IDX, EVO_TESTAR_ACTIONS, REMOVE_TESTAR_DATA
     EVO_TESTAR_ACTIONS = INDIVIDUAL_EVAL_ACTIONS
-    #evotestarDebug = open(OUTPUT_DIR + "/_evotestar-debug.txt", 'w') may cause concurrency lock?
+    evotestarDebug = open(OUTPUT_DIR + "/_evotestar-debug.txt", 'w')
 	# end by urueda
 
     # Evaluate fitness
@@ -868,14 +891,13 @@ def search_loop(population, param):
     iteration = 1
 	
     while iteration <= param["population_size"] * param["generations"]: #and population[0]["fitness"] < 85.0: # by urueda; 85.0 depends on INDIVIDUAL_EVAL_ACTIONS
-        print("Best fitness at iteration <" + iteration + "> = " + str(population[0]["fitness"]) + "\n") # by urueda
-        # Selection
-        parents = tournament_selection(population, param) # by urueda
-        #TODO: create a selection tournament
-        #father = population[0]
-        #father2 = population[1]
-        parent1 = parents[0] # by urueda
-        parent2 = parents[1] # by urueda
+        print("Best fitness at iteration <" + str(iteration) + "> = " + str(population[0]["fitness"]) + "\n") # by urueda
+        # Selection - by tournament
+        #parents = tournament_selection(population, param) # by urueda
+        #parent1 = parents[0] # by urueda
+        #parent2 = parents[1] # by urueda
+        parent1 = tournament_selection(population, param)[0] # by urueda
+        parent2 = tournament_selection(population, param)[0] # by urueda
 
         # Crossover
         #newIndividuo = exchange(father, father2)
@@ -886,7 +908,7 @@ def search_loop(population, param):
 
 		# Mutation
         #newindividuo = subtree_mutation(newindividuo, param)
-        #newIndividuo = mutation(newIndividuo, param) # seems to cycle forever at some point
+        newIndividuo = mutation(newIndividuo, param)
 		#end by urueda
 		
         ITERATION_IDX = iteration # by urueda
@@ -895,10 +917,10 @@ def search_loop(population, param):
         evaluate_individual(newIndividuo, param["symbols"])
 
 		# begin by urueda
-        #evotestarDebug.write("ITERATION: " + str(ITERATION_IDX) + "\n")
-        #evotestarDebug.write(genome_to_str(newIndividuo) + "\n")
-        #evotestarDebug.write("\tFITNESS = " + str(newIndividuo["fitness"]) + "\n")
-        #evotestarDebug.write("------------------------------------------------\n")
+        evotestarDebug.write("ITERATION: " + str(ITERATION_IDX) + "\n")
+        evotestarDebug.write(genome_to_str(newIndividuo) + "\n")
+        evotestarDebug.write("\tFITNESS = " + str(newIndividuo["fitness"]) + "\n")
+        evotestarDebug.write("------------------------------------------------\n")
 		# end by urueda
 		
         # Replace population
@@ -920,8 +942,8 @@ def search_loop(population, param):
     
 	# begin by urueda
 
-    #evotestarDebug.close()		
-    
+    evotestarDebug.close()		
+
 	# Set best solution
     population = sort_population(population)
     best_ever = population[0]
@@ -939,6 +961,7 @@ def search_loop(population, param):
     target.write(str(worst_ever["fitness"]))
     target.close()
 
+    REMOVE_TESTAR_DATA = 0
     EVO_TESTAR_ACTIONS = BEST_INDIVIDUAL_EVAL_ACTIONS
     ITERATION_IDX = 0
     for run in range(1,BEST_INDIVIDUAL_EVAL_RUNS + 1):

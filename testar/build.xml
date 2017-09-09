@@ -1,16 +1,17 @@
 <project name="testar" default="jar">
 
 	<!-- properties -->
-    <property name="src" 		   location="src/"/>
-    <property name="lib" 		   location="lib/"/>
-    <property name="doc" 		   location="doc/"/>
-    <property name="bin" 		   location="bin/"/>
-	<property name="target" 	   location="target/"/>
-	<property name="resources" 	   location="resources/"/>
-	<property name="coreJarFile"   location="../core/target/core.jar"/>
-	<property name="nativeJarFile" location="../native/target/native.jar"/> <!-- by urueda -->
-	<property name="graphJarFile"  location="../graph/target/graph.jar"/>
-    <property name="jarfile" 	   value="testar.jar"/>
+    <property name="src" 		   		location="src/"/>
+    <property name="lib" 		   		location="lib/"/>
+    <property name="doc" 		   		location="doc/"/>
+    <property name="bin" 		   		location="bin/"/>
+	<property name="target" 	   		location="target/"/>
+	<property name="resources" 	   		location="resources/"/>
+	<property name="coreJarFile"   		location="../core/target/core.jar"/>
+	<property name="nativeJarFile" 		location="../native/target/native.jar"/> <!-- by urueda -->
+	<property name="graphJarFile"  		location="../graph/target/graph.jar"/>
+	<property name="jnativehookJarFile" location="${lib}/JNativeHook.jar"/>
+    <property name="jarfile" 	   		value="testar.jar"/>
 
 	<!-- begin by wcoux -->
 	<condition property="is_windows">
@@ -35,7 +36,7 @@
     	<ant antfile="build.xml" dir="../graph" target="jar" inheritAll="false"/>
         <ant antfile="build.xml" dir="../suts/swtcalc" target="jar" inheritAll="false"/>
         <mkdir dir="${bin}"/>
-        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};${prologJarFile};${nativeJarFile};${graphJarFile};${lib}/JNativeHook.jar" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};${prologJarFile};${nativeJarFile};${graphJarFile};${jnativehookJarFile}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
     	<mkdir dir="${bin}/resources/icons"/>
 		<copy todir="${bin}/icons" >
 	   		<fileset dir="resources/icons/"/>
@@ -48,7 +49,7 @@
 
 	<!-- copy_Windows_files (by wcoux) -->
 	<target name="copy_windows_files" if="is_windows">
-		<copy file="../windows/target/resources/main/windows.dll" todir="${target}" />
+		<copy file="../windows/target/resources/main/windows.dll" todir="${target}/lib" />
 		<copy file="../windows/target/resources/main/windows.dll" todir="../native/target/" />
 	</target>
 
@@ -73,10 +74,10 @@
     	    <zipfileset src="${nativeJarFile}"/>
     		<zipfileset src="${graphJarFile}"/>
     		<zipfileset src="../graph/lib/com.alexmerz.graphviz.jar"/>
-    		<zipfileset src="../graph/lib/jgrapht-jdk1.6.jar"/>
+    		<zipfileset src="../graph/lib/jgrapht-ext-1.0.1-uber.jar"/>
     		<zipfileset src="../graph/lib/jiprolog-4.1.3.1.jar"/>
     		<zipfileset src="../graph/lib/json-simple-1.1.1.jar"/>
-    		<zipfileset src = "${lib}/JNativeHook.jar"/>
+    		<zipfileset src = "${jnativehookJarFile}"/>
     		<zipfileset src = "${lib}/jsyntaxpane-0.9.5-b29.jar"/>
     	    <zipfileset src="${target}/intermediate.jar"/>
 		</zip>
@@ -91,11 +92,11 @@
 		<copy file="resources/scripts/lux_run.sh" todir="${target}"/>
     	
     	<!-- start by urueda -->
-    	<copy file="resources/windows/x86_64/JNativeHook.dll" todir="${target}"/>
-    	<copy todir="${target}">
+    	<!--<copy file="resources/windows/x86_64/JNativeHook.dll" todir="${target}"/>-->
+    	<copy todir="${target}/lib">
     		<fileset dir="../native/target/resources/" />
     	</copy>
-    	<copy todir="${target}/settings">
+    	<copy todir="${target}/settings" encoding="UTF-8">
 	    	<fileset dir="resources/settings/"/>
         </copy>
     	<copy file="../LICENSE" todir="${target}"/>
@@ -123,50 +124,50 @@
     	<copy file="resources/SUT/web_genetest.settingsings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/web_generic/WebProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- Odoo (web) -->
 		<!--
     	<copy file="resources/SUT/odoo/test.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/odoo/WebProtocol.java" todir="${target}"/>
-    	-->	
-    	
+    	-->
+
     	<!-- Microsoft Powerpoint -->
     	<!--
     	<copy file="resources/SUT/MicrosoftOffice/powerpoint/powerpoint.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/MicrosoftOffice/powerpoint/PowerPointProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- Microsoft Excel -->
     	<!--
     	<copy file="resources/SUT/MicrosoftOffice/excel/excel.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/MicrosoftOffice/excel/ExcelProtocol.java" todir="${target}"/>
     	<copy file="resources/SUT/MicrosoftOffice/excel/ProtocolFilter.idx" todir="${target}"/>
 		-->
-    	
+
     	<!-- Microsoft Word -->
     	<!--
     	<copy file="resources/SUT/MicrosoftOffice/word/word.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/MicrosoftOffice/word/WordProtocol.java" todir="${target}"/>
     	<copy file="resources/SUT/MicrosoftOffice/word/ProtocolFilter.idx" todir="${target}"/>
 		-->
-    	
+
        	<!-- bitrix24 -->
     	<!--
     	<copy file="resources/SUT/Bitrix24//bitrix24.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/Bitrix24/Bitrix24Protocol.java" todir="${target}"/>
-    	<copy file="resources/SUT/Bitrix24/protocol_filter.xml" todir="${target}"/>		
+    	<copy file="resources/SUT/Bitrix24/protocol_filter.xml" todir="${target}"/>
 		-->
 
 		<!-- UPV suts .......................................................................... -->
-    	
+
     	<!-- Agencia Fotografica (ACG 2016) -->
 		<!--
     	<copy file="resources/SUT/acg2016/test.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/acg2016/WebProtocol.java" todir="${target}"/>
-    	<copy file="resources/SUT/acg2016/protocol_filter.xml" todir="${target}"/>		
-    	<copy file="resources/SUT/acg2016/input_values.xml" todir="${target}"/>		
+    	<copy file="resources/SUT/acg2016/protocol_filter.xml" todir="${target}"/>
+    	<copy file="resources/SUT/acg2016/input_values.xml" todir="${target}"/>
     	-->
-    	
+
     	<!-- EVERIS -->
 		<!--
     	<copy file="resources/SUT/everis/test.settings" todir="${target}"/>
@@ -174,14 +175,14 @@
     	-->
 
     	<!-- TESTAR PdC 2015 ................................................................... -->
-    	
+
     	<!-- clavei -->
     	<!--
     	<copy file="resources/SUT/pdc2015/clavei/clavei.settings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/pdc2015/clavei/ClaveiProtocol.java" todir="${target}"/>
     	<copy file="resources/SUT/pdc2015/clavei/ProtocolFilter.idx" todir="${target}"/>
 		-->
-    	
+
     	<!-- ADDinformatica -->
     	<!--
     	<copy file="resources/SUT/pdc2015/addinformatica/addinformatica.settings" tofile="${target}/test.settings"/>
@@ -191,44 +192,44 @@
     	<!-- indenova -->
     	<!--
     	<copy file="resources/SUT/pdc2015/indenova/indenova.settings" tofile="${target}/test.settings"/>
-    	<copy file="resources/SUT/pdc2015/indenova/IndenovaProtocol.java" todir="${target}"/>    	
+    	<copy file="resources/SUT/pdc2015/indenova/IndenovaProtocol.java" todir="${target}"/>
     	-->
-    	
-		<!-- ............................................................ TESTAR PdC 2015 -->    	
-    	
-    	
-    	<!-- Hacklab 2015 (@Zaragoza) ................................................................ --> 
-    	
+
+		<!-- ............................................................ TESTAR PdC 2015 -->
+
+
+    	<!-- Hacklab 2015 (@Zaragoza) ................................................................ -->
+
     	<!-- alcura (health) -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/alcura/alcura_heatest.settingsings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/hacklab2015_freeze/alcura/alcura_health/WebProtocol.java" todir="${target}"/>
-    	-->	
-    	
+    	-->
+
     	<!-- alcura (alphega_pharmacie) -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/alcura/alphega_pharmatest.settingsings" tofile="${target}/test.settings"/>
     	<copy file="resources/SUT/hacklab2015_freeze/alcura/alphega_pharmacie/WebProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- keensoft - Ayuntamiento Zaragoza -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/keensoft/ayuntamiento_zaragoza/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/hacklab2015_freeze/keensoft/ayuntamiento_zaragoza/WebProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- keensoft - DARA -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/keensoft/dara/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/hacklab2015_freeze/keensoft/dara/WebProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- clearone - spontania (moderador) -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_moderador/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_moderador/WebProtocol.java" todir="${target}"/>
 		-->
-    	
+
     	<!-- clearone - spontania (participante) -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/clearone/spontania_participante/test.settings" todir="${target}"/>
@@ -240,22 +241,22 @@
     	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_web/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_web/WebProtocol.java" todir="${target}"/>
     	-->
-    	
+
     	<!-- endalia - testea (desktop) -->
 		<!--
     	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/CustomProtocol.java" todir="${target}"/>
 		<copy todir="${target}" >
 			<fileset dir="resources/SUT/hacklab2015_freeze/endalia/testea_desktop/app/EndaliaORH_TESTEA/"/>
-		</copy>    	
+		</copy>
     	-->
 
-    	<!-- ................................................... Hacklab 2015 (@Zaragoza) --> 
-    	    	
-    	<!-- end by urueda -->    	
-		
+    	<!-- ................................................... Hacklab 2015 (@Zaragoza) -->
+
+    	<!-- end by urueda -->
+
     	<!-- TFM (@fraalpe2) ................................................................ -->
-    	
+
     	<!-- PowerPoint -->
     	<!--
     	<copy file="resources/SUT/TFM-Paco/power point/test.settings" todir="${target}"/>
@@ -268,23 +269,23 @@
     	<copy file="resources/SUT/TFM-Paco/testona/TestonaProtocol.java" todir="${target}"/>
     	<copy file="resources/SUT/TFM-Paco/testona/protocol_filter.xml" todir="${target}"/>
     	-->
-    	
+
     	<!-- Odoo -->
     	<!--
     	<copy file="resources/SUT/TFM-Paco/odoo/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/TFM-Paco/odoo/OdooProtocol.java" todir="${target}"/>
-    	<copy file="resources/SUT/TFM-Paco/odoo/protocol_filter.xml" todir="${target}"/> 
+    	<copy file="resources/SUT/TFM-Paco/odoo/protocol_filter.xml" todir="${target}"/>
     	-->
-    	
+
     	<!-- Clikeen -->
     	<!--
     	<copy file="resources/SUT/TFM-Paco/clikeen/test.settings" todir="${target}"/>
     	<copy file="resources/SUT/TFM-Paco/clikeen/ClikeenProtocol.java" todir="${target}"/>
     	<copy file="resources/SUT/TFM-Paco/clikeen/protocol_filter.xml" todir="${target}"/>
     	-->
-    	
-    	<!-- ................................................... TFM (@fraalpe2) --> 		
-    	
+
+    	<!-- ................................................... TFM (@fraalpe2) -->
+
        <javac classpath="${target}/${jarfile}" sourcepath="${target}/*.java" srcdir="${target}" destdir="${target}" failonerror="true" verbose="no" listfiles="no"
         	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
 
@@ -301,6 +302,7 @@
     	    	
         <mkdir dir="${target}/suts"/>
     	<copy file="../suts/swtcalc/target/calc.jar" todir="${target}/suts"/>
+    	<copy file="../suts/SwingSet2.jar" todir="${target}/suts"/> <!-- by urueda -->
 
     </target>
 
