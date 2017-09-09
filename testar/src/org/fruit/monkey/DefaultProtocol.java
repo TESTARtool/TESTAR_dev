@@ -32,6 +32,7 @@ import static org.fruit.alayer.Tags.Title;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -406,8 +407,8 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	protected Set<Widget> getTopWidgets(State state){
-		Set<Widget> topWidgets = new HashSet<>();
+	protected List<Widget> getTopWidgets(State state){
+		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state)
 			if (w.get(Tags.ZIndex) == maxZIndex)
