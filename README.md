@@ -3,6 +3,16 @@
 This is the github development root folder for TESTAR development. 
 The software can be build with both ant and gradle.
 
+### Required tools to build the software
+
+In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
+These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
+
+After installation of these tools  the file compile_w10.bat and clean_w10.bat need to be adapted.
+CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
+
+Path needs to be set to the folder where the tools are installed.
+
 ### Gradle build
 
 To build the Gradle project and run it execute the following procedure;
@@ -10,6 +20,17 @@ To build the Gradle project and run it execute the following procedure;
 1. Run `gradlew installDist` in the root of the project
 2. Change directory to testar/target/install/bin
 3. Run testar.bat
+
+It is also possible to generate a zip file containing TESTAR. This zip can be extracted on any other machine
+that has a 64-bit Windows operating system and Visual Studio redistributable installed. A proper way of using
+TESTAR is to run the tool in a virtual-machine.
+To build the zip execute the following command.
+
+1. Run `gradlew distZip` in the root of the project. 
+2. Extract the zip on the machine where TESTAR is used.
+
+NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
+ [link](https://go.microsoft.com/fwlink/?LinkId=746572) .Also a JAVA 1.8 JDK is required.
 
 #### Running Gradle in Eclipse
 To use Gradle within Eclipse the

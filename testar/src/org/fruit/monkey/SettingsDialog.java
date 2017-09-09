@@ -417,9 +417,8 @@ public class SettingsDialog extends javax.swing.JFrame {
 		jLabel26.setIcon(new ImageIcon(loadIcon("/icons/logos/testar_logo.png")));
 		jLabel27.setIcon(new ImageIcon(loadIcon("/icons/logos/pros.png"))); //("/icons/fp7_logo.png")));
 
-		jLabel28.setFont(new java.awt.Font("Arial", Font.BOLD, 14)); // NOI18N
-		jLabel28.setText("TESTAR " + TESTAR_VERSION);
-
+		jLabel28.setIcon(new ImageIcon(loadIcon("/icons/logos/ou.jpg")));
+		
 		JLabel lblUPVLogo = new JLabel();
 		lblUPVLogo.setIcon(new ImageIcon(loadIcon("/icons/logos/upv.png"))); //("/icons/fp7_logo.png")));
 
@@ -450,7 +449,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 						.addGroup(aboutPanelLayout.createParallelGroup(Alignment.TRAILING)
 								.addComponent(lblUPVLogo, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 								.addComponent(jLabel27, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-								.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
 				);
 		aboutPanel.setLayout(aboutPanelLayout);
 
@@ -1134,7 +1133,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 								.addComponent(btnReplay, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addContainerGap())
 				);
 
