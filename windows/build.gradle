@@ -36,8 +36,8 @@ task cleanWindows(type:Exec) {
     }
 }
 
-buildWindows.dependsOn processResources
+buildWindows.dependsOn classes
 
-build.dependsOn buildWindows
+jar.dependsOn buildWindows
 clean.dependsOn cleanWindows
 
