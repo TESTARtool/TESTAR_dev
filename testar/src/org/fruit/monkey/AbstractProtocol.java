@@ -1103,7 +1103,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		graphDB.addState(newState);
 
 		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
-			System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, lastExecutedAction.toShortString()));
+			//TODO this does not work in all cases check (the last executed action tag does not always have a description
+			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc));
 			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));

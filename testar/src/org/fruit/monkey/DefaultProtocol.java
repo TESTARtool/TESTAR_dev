@@ -157,8 +157,8 @@ public class DefaultProtocol extends AbstractProtocol{
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
-			sut.setNativeAutomationCache();
-			//Util.pause(settings().get(ConfigTags.StartupTime));
+			//sut.setNativeAutomationCache();
+			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
 					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 			State state;

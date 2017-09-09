@@ -32,6 +32,7 @@ dependencies {
     runtime files('../graph/lib/json-simple-1.1.1.jar')
     //runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
+evaluationDependsOn(':windows')
 
 task prepareSettings(type: Copy) {
     from 'resources/settings'
@@ -59,7 +60,8 @@ task prepareNativeDLL(type: Copy) {
     into 'target/scripts'
 }
 
-prepareOracles.dependsOn oracleClasses
+prepareOracles.dependsOn(oracleClasses)
+
 
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
