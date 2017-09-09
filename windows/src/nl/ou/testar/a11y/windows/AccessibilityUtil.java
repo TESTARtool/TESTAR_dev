@@ -19,7 +19,10 @@ package nl.ou.testar.a11y.windows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
@@ -75,6 +78,10 @@ public final class AccessibilityUtil {
 			UIADocument, UIAEdit, UIAText
 	};
 	
+	/**
+	 * Standard navigational actions
+	 * These will work in most areas of a GUI.
+	 */
 	public static final Action
 		AC_ACTIVATE_WIDGET = parseShortcutKey("Enter"),
 		AC_CANCEL = parseShortcutKey("Escape"),
@@ -86,6 +93,9 @@ public final class AccessibilityUtil {
 		AC_NAVIGATE_NEXT_TAB = parseShortcutKey("Ctrl+Tab"),
 		AC_NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab");
 	
+	/**
+	 * The prefix for log messages related to accessibility
+	 */
 	public static final String LOG_PREFIX = "[a11y]";
 	
 	private AccessibilityUtil() {}
@@ -123,10 +133,19 @@ public final class AccessibilityUtil {
 		return compiler.hitShortcutKey(keys);
 	}
 	
+	// ####################
+	// UIA querying methods
+	// ####################
+	
 	// The methods below can be moved to Tags on the Widget and/or to NativeLinker.
 	// This has not yet been done because it requires finding appropriate equivalents
-	// for the UIA properties in the other accessibility APIs.
+	// for the UIA properties in other accessibility APIs.
 	
+	/**
+	 * Checks whether the given widget is relevant to accessibility evaluation
+	 * @param w The widget.
+	 * @return True if the widget is relevant, else false.
+	 */
 	public static boolean isRelevant(Widget w) {
 		// NOTE: UIA doesn't accurately report the isKeyboardFocusable property,
 		// so don't use it when filtering out irrelevant widgets.
@@ -135,9 +154,14 @@ public final class AccessibilityUtil {
 				&& w.get(UIATags.UIAIsEnabled, true);
 	}
 	
-	public static List<Action> getApplicableActions(Widget w) {
+	/**
+	 * Gets all non-standard actions that can be performed on the given widget
+	 * @param w The widget.
+	 * @return The set of actions.
+	 */
+	public static Set<Action> getApplicableActions(Widget w) {
 		Role r = getRole(w);
-		List<Action> actions = new ArrayList<>();
+		Set<Action> actions = new HashSet<>();
 		if (Role.isOneOf(r, R_LEFT_RIGHT))
 			actions.addAll(AC_LEFT_RIGHT);
 		if (Role.isOneOf(r, R_UP_DOWN))
@@ -149,18 +173,38 @@ public final class AccessibilityUtil {
 		return actions;
 	}
 	
+	/**
+	 * Checks whether the given widget has keyboard focus
+	 * @param w The widget.
+	 * @return True if the widget has keyboard focus, else false.
+	 */
 	public static boolean hasKeyboardFocus(Widget w) {
 		return w.get(UIATags.UIAHasKeyboardFocus, false);
 	}
 	
+	/**
+	 * Checks whether the given widget can receive keyboard focus
+	 * @param w The widget.
+	 * @return True if the widget can receive keyboard focus, else false.
+	 */
 	public static boolean isKeyboardFocusable(Widget w) {
 		return w.get(UIATags.UIAIsKeyboardFocusable, false);
 	}
 	
+	/**
+	 * Gets the access key for the given widget
+	 * @param w The widget.
+	 * @return The access key, as unprocessed string.
+	 */
 	public static String getAccessKey(Widget w) {
 		return w.get(UIATags.UIAAccessKey, "");
 	}
 	
+	/**
+	 * Gets the shortcut key for the given widget
+	 * @param w The widget.
+	 * @return The shortcut key, as unprocessed string.
+	 */
 	public static String getShortcutKey(Widget w) {
 		String key = w.get(UIATags.UIAAcceleratorKey, "");
 		if (key != null && !key.isEmpty())
@@ -179,25 +223,48 @@ public final class AccessibilityUtil {
 		return "";
 	}
 	
-	public static boolean canUseShortcutKeys(Widget w) {
-		return !w.root().get(UIATags.UIAIsWindowModal, false)
-				&& !Role.isOneOf(getRole(w), new Role[] {UIAMenu, UIAMenuItem});
+	/**
+	 * Checks whether shortcut keys can be used provided that the given widget has keyboard focus
+	 * @param focusW The widget with keyboard focus.
+	 * @return True if shortcut keys can be used, else false.
+	 */
+	public static boolean canUseShortcutKeys(Widget focusW) {
+		Assert.isTrue(hasKeyboardFocus(focusW),
+				"Only applies to the widget with keyboard focus");
+		return !focusW.root().get(UIATags.UIAIsWindowModal, false)
+				&& !Role.isOneOf(getRole(focusW), new Role[] {UIAMenu, UIAMenuItem});
 	}
 	
+	/**
+	 * Checks whether the given widget is an image
+	 * @param w The widget.
+	 * @return True if the widget is an image, else false.
+	 */
 	public static boolean isImage(Widget w) {
 		return getRole(w).isA(UIAImage);
 	}
 	
+	/**
+	 * Checks whether the given widget is a tab item
+	 * @param w The widget.
+	 * @return True if the widget is a tab item, else false.
+	 */
 	public static boolean isTabItem(Widget w) {
 		return getRole(w).isA(UIATabItem);
 	}
+	
+	// #########W####
+	// helper methods
+	// #########W####
 	
 	private static Role getRole(Widget w) {
 		Assert.notNull(w);
 		return w.get(Tags.Role, UIAWidget);
 	}
 	
+	// #########
 	// debugging
+	// #########
 	
 	/**
 	 * Prints debug info about a widget that is useful for evaluating accessibility

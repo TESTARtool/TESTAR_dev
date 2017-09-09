@@ -27,7 +27,10 @@ import java.util.Map;
  */
 public final class AlternativeKeyNames {
 	
-	// based on en-US (International) keyboard, all uppercase
+	/**
+	 * The map from alternative key names to standard key names
+	 * Based on the en-US (International) keyboard layout, all uppercase.
+	 */
 	public static final Map<String,String> map = new HashMap<String,String>() {
 		private static final long serialVersionUID = 4670847371224012836L;
 
