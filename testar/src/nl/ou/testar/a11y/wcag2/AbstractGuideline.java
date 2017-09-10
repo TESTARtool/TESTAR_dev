@@ -27,13 +27,15 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.protocols.Evaluator;
+
 /**
  * An abstract WCAG guideline
  * Subclasses implement specific guideline behavior.
  * @author Davy Kager
  *
  */
-public abstract class AbstractGuideline extends ItemBase {
+public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	
 	/**
 	 * The list of all the success criteria in this guideline
@@ -77,7 +79,8 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	protected EvaluationResults evaluate(List<Widget> widgets) {
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
 		return new EvaluationResults();
 	}
 	
@@ -88,7 +91,8 @@ public abstract class AbstractGuideline extends ItemBase {
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
-	protected Set<Action> deriveActions(List<Widget> widgets) {
+	@Override
+	public Set<Action> deriveActions(List<Widget> widgets) {
 		return new HashSet<>();
 	}
 	

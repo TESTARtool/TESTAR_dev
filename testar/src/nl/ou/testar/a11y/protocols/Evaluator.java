@@ -15,76 +15,37 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag2;
+package nl.ou.testar.a11y.protocols;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.a11y.protocols.Evaluator;
+import nl.ou.testar.a11y.wcag2.EvaluationResults;
 
 /**
- * A WCAG principle
+ * Specifies the requirements for an object to be plugged into an AbstractProtocol to evaluate accessibility
+ * Such objects need to be able to evaluate a given state and derive actions to move to a new state.
  * @author Davy Kager
  *
  */
-public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
-	
-	/**
-	 * The list of all the guidelines in this principle
-	 */
-	protected final List<AbstractGuideline> guidelines = new ArrayList<>();
-
-	/**
-	 * Constructs a new principle
-	 * @param nr The number of the principle.
-	 * @param name The name of the principle.
-	 */
-	protected AbstractPrinciple(int nr, String name) {
-		super(nr, name);
-	}
-
-	/**
-	 * Gets all guidelines in this principle
-	 * @return The list of guidelines.
-	 */
-	public List<AbstractGuideline> getGuidelines() {
-		return Collections.unmodifiableList(guidelines);
-	}
+public interface Evaluator {
 	
 	/**
 	 * Evaluates the accessibility of the given state
-	 * This will collect evaluation results from all guidelines in this principle.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		for (AbstractGuideline g : guidelines)
-			for (EvaluationResult result : g.evaluate(widgets).getResults())
-				results.add(result);
-		return results;
-	}
+	public EvaluationResults evaluate(List<Widget> widgets);
 	
 	/**
 	 * Derives the follow-up actions from the given state
-	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
-	@Override
-	public Set<Action> deriveActions(List<Widget> widgets) {
-		Set<Action> actions = new HashSet<>();
-		for (AbstractGuideline g : guidelines)
-			actions.addAll(g.deriveActions(widgets));
-		return actions;
-	}
-		
+	public Set<Action> deriveActions(List<Widget> widgets);
+
 }
