@@ -25,13 +25,13 @@ import java.util.Map;
  * @author Davy Kager
  *
  */
-public final class AlternativeKeyNames {
+final class AlternativeKeyNames {
 	
 	/**
 	 * The map from alternative key names to standard key names
 	 * Based on the en-US (International) keyboard layout, all uppercase.
 	 */
-	public static final Map<String,String> map = new HashMap<String,String>() {
+	static final Map<String,String> map = new HashMap<String,String>() {
 		private static final long serialVersionUID = 4670847371224012836L;
 
 		{
