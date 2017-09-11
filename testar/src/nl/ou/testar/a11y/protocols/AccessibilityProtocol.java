@@ -35,11 +35,11 @@ import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * Base class for accessibility evaluation protocols
+ * Accessibility evaluation protocol
  * @author Davy Kager
  *
  */
-public abstract class AbstractAccessibilityProtocol extends DefaultProtocol {
+public class AccessibilityProtocol extends DefaultProtocol {
 	
 	/**
 	 * The accessibility evaluator
@@ -55,7 +55,7 @@ public abstract class AbstractAccessibilityProtocol extends DefaultProtocol {
 	/**
 	 * Constructs a new WCAG2ICT test protocol
 	 */
-	public AbstractAccessibilityProtocol(Evaluator evaluator) {
+	public AccessibilityProtocol(Evaluator evaluator) {
 		super();
 		this.evaluator = evaluator;
 	}
