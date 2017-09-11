@@ -14,12 +14,20 @@
  *                                                                                            *
  **********************************************************************************************/
 
-import nl.ou.testar.a11y.protocols.WCAG2ICTProtocol;
+import nl.ou.testar.a11y.protocols.AbstractAccessibilityProtocol;
+import nl.ou.testar.a11y.wcag2.WCAG2ICT;
 
 /**
- * A generic accessibility protocol based on WCAG2ICT
+ * An accessibility evaluation protocol based on WCAG2ICT
  * @author Davy Kager
  */
-public class Protocol_accessibility_generic extends WCAG2ICTProtocol {
+public class Protocol_accessibility_wcag2ict extends AbstractAccessibilityProtocol {
+
+	/**
+	 * Constructs a new protocol
+	 */
+	public Protocol_accessibility_wcag2ict() {
+		super(new WCAG2ICT());
+	}
 
 }

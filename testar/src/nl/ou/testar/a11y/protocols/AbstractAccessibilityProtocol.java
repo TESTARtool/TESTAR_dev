@@ -31,21 +31,20 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.DefaultProtocol;
 
 import nl.ou.testar.a11y.wcag2.EvaluationResults;
-import nl.ou.testar.a11y.wcag2.WCAG2ICT;
 import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * Test protocol for WCAG2ICT
+ * Base class for accessibility evaluation protocols
  * @author Davy Kager
  *
  */
-public class WCAG2ICTProtocol extends DefaultProtocol {
+public abstract class AbstractAccessibilityProtocol extends DefaultProtocol {
 	
 	/**
-	 * The WCAG2ICT guidelines
+	 * The accessibility evaluator
 	 */
-	protected final WCAG2ICT wcag;
+	protected final Evaluator evaluator;
 	
 	/**
 	 * The relevant widgets
@@ -56,11 +55,16 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 	/**
 	 * Constructs a new WCAG2ICT test protocol
 	 */
-	public WCAG2ICTProtocol() {
+	public AbstractAccessibilityProtocol(Evaluator evaluator) {
 		super();
-		wcag = new WCAG2ICT();
+		this.evaluator = evaluator;
 	}
 
+	/**
+	 * Protocol method: evaluates the given state
+	 * @param state The state.
+	 * @return The verdict.
+	 */
 	@Override
 	protected Verdict getVerdict(State state) {
 		Verdict verdict = super.getVerdict(state);
@@ -70,17 +74,22 @@ public class WCAG2ICTProtocol extends DefaultProtocol {
 		}
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
-		EvaluationResults results = wcag.evaluate(relevantWidgets);
+		EvaluationResults results = evaluator.evaluate(relevantWidgets);
 		state.set(WCAG2Tags.EvaluationResults, results);
 		return results.getOverallVerdict();
 	}
 
+	/**
+	 * Protocol method: derives the follow-up actions from the given state
+	 * @param state The state.
+	 * @return The set of actions.
+	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
-			actions = wcag.deriveActions(relevantWidgets);
+			actions = evaluator.deriveActions(relevantWidgets);
 		}
 		return actions;
 	}
