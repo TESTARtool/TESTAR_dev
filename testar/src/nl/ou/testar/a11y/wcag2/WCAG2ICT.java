@@ -26,12 +26,14 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.protocols.Evaluator;
+
 /**
  * Specification of WCAG 2.0 according to WCAG2ICT
  * @author Davy Kager
  *
  */
-public final class WCAG2ICT {
+public final class WCAG2ICT implements Evaluator {
 	
 	private final List<AbstractPrinciple> principles = new ArrayList<>();
 	
@@ -59,6 +61,7 @@ public final class WCAG2ICT {
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
+	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractPrinciple p : principles)
@@ -74,6 +77,7 @@ public final class WCAG2ICT {
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
+	@Override
 	public Set<Action> deriveActions(List<Widget> widgets) {
 		Set<Action> actions = new HashSet<>();
 		for (AbstractPrinciple p : principles)
