@@ -98,7 +98,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state)
-			if (w.get(Tags.ZIndex) == maxZIndex && AccessibilityUtil.isRelevant(w))
+			if (isUnfiltered(w)
+					&& w.get(Tags.ZIndex) == maxZIndex
+					&& AccessibilityUtil.isRelevant(w))
 				widgets.add(w);
 		return widgets;
 	}
