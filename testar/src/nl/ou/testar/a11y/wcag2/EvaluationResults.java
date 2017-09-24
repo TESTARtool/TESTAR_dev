@@ -59,7 +59,7 @@ public class EvaluationResults {
 		double severity = Verdict.OK.severity();
 		for (EvaluationResult result : results) {
 			switch (result.getType()) {
-			case GENERAL:
+			case GENERIC:
 				severity = Math.max(severity, SEVERITY_GENERAL);
 				continue;
 			case WARNING:

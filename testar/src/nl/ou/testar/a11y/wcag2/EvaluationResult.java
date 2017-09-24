@@ -28,11 +28,11 @@ public class EvaluationResult {
 		WARNING,
 		
 		/**
-		 * A general problem
+		 * A generic problem
 		 * This is a potential problem that is not specific to one piece of code
 		 * and that needs expert evaluation.
 		 */
-		GENERAL;
+		GENERIC;
 	}
 	
 	private final SuccessCriterion criterion;

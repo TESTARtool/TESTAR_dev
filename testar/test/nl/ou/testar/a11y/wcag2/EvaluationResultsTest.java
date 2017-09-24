@@ -20,7 +20,7 @@ public class EvaluationResultsTest {
 				s2 = new SuccessCriterion(2, "Bar", g, Level.AA),
 				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA);
 		EvaluationResult r1 = new EvaluationResult(s1, Type.OK),
-				r2 = new EvaluationResult(s2, Type.GENERAL),
+				r2 = new EvaluationResult(s2, Type.GENERIC),
 				r3 = new EvaluationResult(s2, Type.WARNING),
 				r4 = new EvaluationResult(s1, Type.WARNING),
 				r5 = new EvaluationResult(s3, Type.ERROR),
