@@ -15,15 +15,37 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.protocols;
+
+import java.util.List;
+import java.util.Set;
+
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.EvaluationResults;
 
 /**
- * WCAG success criterion conformance levels
+ * Specifies the requirements for an object to be plugged into an AbstractProtocol to evaluate accessibility
+ * Such objects need to be able to evaluate a given state and derive actions to move to a new state.
  * @author Davy Kager
  *
  */
-public enum Level {
-	A,
-	AA,
-	AAA;
+public interface Evaluator {
+	
+	/**
+	 * Evaluates the accessibility of the given state
+	 * @param widgets The widgets to consider.
+	 * @return The results of the evaluation.
+	 */
+	public EvaluationResults evaluate(List<Widget> widgets);
+	
+	/**
+	 * Derives the follow-up actions from the given state
+	 * The actions are specific to accessibility.
+	 * @param widgets The widgets to consider.
+	 * @return The set of actions.
+	 */
+	public Set<Action> deriveActions(List<Widget> widgets);
+
 }

@@ -15,39 +15,40 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * An abstract WCAG guideline
- * Subclasses implement specific guideline behavior.
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public abstract class AbstractGuideline extends ItemBase {
-	
-	protected final Principle parent;
+public final class CompatibleGuideline extends AbstractGuideline {
 
-	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name);
-		this.parent = parent;
+	CompatibleGuideline(AbstractPrinciple parent) {
+		super(1, "Compatible", parent);
+		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
 	}
 	
 	@Override
-	public String getNr() {
-		return parent.getNr() + "." + nr;
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			// exclude images, they are handled by guideline "Text Alternatives"
+			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Name, Role, Value"),
+						EvaluationResult.Type.ERROR, w));
+		}
+		return results;
 	}
-	
-	protected abstract Verdict getVerdict(State state);
-	protected abstract Set<Action> deriveActions(State state);
-	
+
 }

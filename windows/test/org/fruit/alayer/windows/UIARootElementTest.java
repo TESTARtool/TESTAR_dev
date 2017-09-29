@@ -18,7 +18,7 @@ public class UIARootElementTest {
 
       try {
          UIAElement element = sut.at(0.0, 0.0);
-         fail("Execpected an exception");
+         fail("Expected an exception, got " + element);
       } catch (UnsupportedOperationException uoe) {
          assertNotNull("A exception is expected",uoe);
       }

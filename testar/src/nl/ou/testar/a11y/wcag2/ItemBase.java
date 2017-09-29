@@ -15,45 +15,71 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import org.fruit.alayer.Verdict;
+import org.fruit.Assert;
 
 /**
- * A WCAG success criterion
+ * Base class for a WCAG item (principle, guideline, success criterion)
  * @author Davy Kager
  *
  */
-public class SuccessCriterion extends ItemBase {
+abstract class ItemBase {
 	
-	protected final AbstractGuideline parent;
-	protected final Level level;
+	/**
+	 * This item's numbe
+	 */
+	protected final int nr;
 	
-	private static final int NLEVELS = Level.values().length;
+	/**
+	 * This item's name.
+	 */
+	protected final String name;
 	
-	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
-		super(nr, name);
-		this.parent = parent;
-		this.level = level;
+	/**
+	 * This item's parent
+	 * This can be null if the item has no parent.
+	 */
+	protected final ItemBase parent;
+	
+	/**
+	 * Constructs a new item
+	 * @param nr Item number
+	 * @param name Item name
+	 */
+	protected ItemBase(int nr, String name) {
+		this(nr, name, null);
 	}
 	
-	@Override
-	public String getNr() {
-		return parent.getNr() + "." + nr;
+	/**
+	 * Constructs a new item
+	 * @param nr Item number
+	 * @param name Item name
+	 * @param parent The parent, may be null
+	 */
+	protected ItemBase(int nr, String name, ItemBase parent) {
+		Assert.hasText(name);
+		this.nr = nr;
+		this.name = name;
+		this.parent = parent;
 	}
 
-	public Level getLevel() {
-		return level;
+	/**
+	 * Gets the number
+	 * If the item is not at the top of the hierarchy, this will also include the parent's number.
+	 * For example: 1.2.3
+	 * @return This item's number as a String
+	 */
+	public String getNr() {
+		return parent == null ? Integer.toString(nr) : parent.getNr() + "." + nr;
 	}
-	
-	public double getVerdictPriority() {
-		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
-		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
-	}
-	
-	@Override
-	public String toString() {
-		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
+
+	/**
+	 * Gets the name
+	 * @return The name
+	 */
+	public String getName() {
+		return name;
 	}
 	
 }

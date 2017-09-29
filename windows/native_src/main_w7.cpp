@@ -1592,6 +1592,17 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1NativeWindowHandle)) (JNIEnv
 }
 
 
+/* IUIAutomationElement_get_IsContentElement */
+JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsContentElement)) (JNIEnv * env, jclass, 
+		jlong pIUIAutomationElement, jboolean fromCache){
+	BOOL value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedIsContentElement(&value) : el->get_CurrentIsContentElement(&value);
+	if (FAILED(hr))
+		return 0;
+	return (jboolean) value;
+}
+
 /* IUIAutomationElement_get_IsControlElement */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsControlElement)) (JNIEnv * env, jclass, 
 		jlong pIUIAutomationElement, jboolean fromCache){
@@ -2484,7 +2495,7 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
   * by urueda */			   
 char* wchart2String(JNIEnv * env, wchar_t *value){
 
-	char bf[sizeof(value)/sizeof(wchar_t)];
+	static char bf[sizeof(value)/sizeof(wchar_t)];
 		
 	sprintf(bf, "%ws", value);
 	
@@ -2496,7 +2507,7 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
   * by urueda */			   
 char* jint2String(JNIEnv * env, jint value){
 
-	char bf[64];
+	static char bf[64];
 	
 	sprintf(bf, "%d", value);
 	

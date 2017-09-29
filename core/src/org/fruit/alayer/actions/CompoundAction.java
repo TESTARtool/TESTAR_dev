@@ -28,6 +28,7 @@
 package org.fruit.alayer.actions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -78,15 +79,17 @@ public final class CompoundAction extends TaggableBase implements Action {
 		this.relativeDurations = b.relativeDurations;
 	}
 	
-	public CompoundAction(Action...actions){
+	public CompoundAction(Action... actions){
 		Assert.notNull((Object)actions);
 		this.actions = Arrays.asList(actions);
 		this.relativeDurations = Util.newArrayList();
 		
-		if(actions.length > 0){
-			for(int i = 0; i < actions.length; i++)
-				relativeDurations.add(1.0 / actions.length);
-		}
+		for(int i = 0; i < actions.length; i++)
+			relativeDurations.add(1.0 / actions.length);
+	}
+	
+	public List<Action> getActions() {
+		return Collections.unmodifiableList(actions);
 	}
 			
 	public void run(SUT system, State state, double duration) {		
@@ -97,7 +100,7 @@ public final class CompoundAction extends TaggableBase implements Action {
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("Compound Action =");
-		for(Action a : actions)
+		for (Action a : actions)
 			sb.append(Util.lineSep()).append(a.toString());
 		return sb.toString();
 	}
@@ -107,7 +110,7 @@ public final class CompoundAction extends TaggableBase implements Action {
 	public String toString(Role... discardParameters) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Compound Action =");
-		for(Action a : actions)
+		for (Action a : actions)
 			sb.append(Util.lineSep()).append(a.toString(discardParameters));
 		return sb.toString();
 	}	

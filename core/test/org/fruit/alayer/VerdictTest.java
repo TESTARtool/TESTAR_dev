@@ -42,5 +42,22 @@ public class VerdictTest {
 		assertTrue("Joining two Verdicts shall reset the Visualizer to the NullVisualizer",
 				v3.join(v1).visualizer() == Util.NullVisualizer);
 	}
+	
+	@Test
+	public void testEquals() {
+		Verdict v1 = Verdict.OK,
+				v2 = Verdict.FAIL,
+				v3 = new Verdict(Verdict.SEVERITY_FAIL, "Failure"),
+				v4 = new Verdict(Verdict.SEVERITY_FAIL, "Different failure");
+		assertTrue(Verdict.OK.equals(Verdict.OK));
+		assertTrue(v1.equals(Verdict.OK));
+		assertTrue(Verdict.OK.equals(v1));
+		assertTrue(v2.equals(Verdict.FAIL));
+		assertTrue(Verdict.FAIL.equals(v2));
+		assertFalse(v1.equals(Verdict.FAIL));
+		assertFalse(v3.equals(Verdict.FAIL));
+		assertFalse(v3.equals(v4));
+		assertFalse(v4.equals(v3));
+	}
 
 }

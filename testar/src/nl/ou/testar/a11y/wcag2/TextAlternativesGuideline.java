@@ -15,32 +15,38 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import org.fruit.Assert;
+import java.util.List;
+
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * Base class for a WCAG item (principle, guideline, success criterion)
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-abstract class ItemBase {
+public final class TextAlternativesGuideline extends AbstractGuideline {
 	
-	protected final int nr;
-	protected final String name;
+	TextAlternativesGuideline(AbstractPrinciple parent) {
+		super(1, "Text Alternatives", parent);
+		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
+	}
 	
-	protected ItemBase(int nr, String name) {
-		Assert.hasText(name);
-		this.nr = nr;
-		this.name = name;
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Non-text Content"),
+						EvaluationResult.Type.ERROR, w));
+		}
+		return results;
 	}
 
-	public String getNr() {
-		return Integer.toString(nr);
-	}
-
-	public String getName() {
-		return name;
-	}
-	
 }

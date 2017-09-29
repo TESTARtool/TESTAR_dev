@@ -15,34 +15,23 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package org.fruit.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
- * A WCAG guideline
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public class KeyboardAccessibleGuideline extends AbstractGuideline {
-	
-	private final SuccessCriterion scKeyboard;
-	
-	KeyboardAccessibleGuideline(int nr, Principle parent) {
-		super(nr, "Keyboard Accessible", parent);
-		scKeyboard = new SuccessCriterion(1, "Keyboard", this, Level.A);
+public final class PredictableGuideline extends AbstractGuideline {
+
+	PredictableGuideline(AbstractPrinciple parent) {
+		super(2, "Predictable", parent);
+		criteria.add(new SuccessCriterion(1, "On Focus", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "On Input", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Consistent Navigation", this, Level.AA));
+		criteria.add(new SuccessCriterion(4, "Consistent Identification", this, Level.AA));
 	}
-	
-	protected Verdict getVerdict(State state) { return null; }
-	
-	protected Set<Action> deriveActions(State state) { return null; }
-	
+
 }

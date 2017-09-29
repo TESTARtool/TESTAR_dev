@@ -268,7 +268,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @return A String representation of the AtSpiWidget.
      */
     @Override
-    public String toString(Tag<?>[] tags) {
+    public String toString(Tag<?>... tags) {
         return Util.treeDesc(this, 2, tags);
     }
 

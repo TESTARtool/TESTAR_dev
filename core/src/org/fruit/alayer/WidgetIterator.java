@@ -27,17 +27,18 @@
  */
 package org.fruit.alayer;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.fruit.Assert;
 
-public final class WidgetIterator implements java.util.Iterator<Widget> {
+public final class WidgetIterator implements Iterator<Widget> {
 
 	private final LinkedList<Widget> buffer;
 	private final Navigator navi;
 	
 	public WidgetIterator(Widget start){
-        this(start, new BFNavigator());
+		this(start, new BFNavigator());
 	}
 
 	public WidgetIterator(Widget start, Navigator navi){
