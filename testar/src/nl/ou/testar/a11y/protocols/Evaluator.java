@@ -15,41 +15,37 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.protocols;
 
-import org.fruit.alayer.Verdict;
+import java.util.List;
+import java.util.Set;
+
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.EvaluationResults;
 
 /**
- * A WCAG success criterion
+ * Specifies the requirements for an object to be plugged into an AbstractProtocol to evaluate accessibility
+ * Such objects need to be able to evaluate a given state and derive actions to move to a new state.
  * @author Davy Kager
  *
  */
-public class SuccessCriterion extends ItemBase {
+public interface Evaluator {
 	
 	/**
-	 * The conformance level of this success criterion
+	 * Evaluates the accessibility of the given state
+	 * @param widgets The widgets to consider.
+	 * @return The results of the evaluation.
 	 */
-	protected final Level level;
+	public EvaluationResults evaluate(List<Widget> widgets);
 	
-	private static final int NLEVELS = Level.values().length;
-	
-	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
-		super(nr, name, parent);
-		this.level = level;
-	}
-	
-	public Level getLevel() {
-		return level;
-	}
-	
-	public double getVerdictPriority() {
-		final double STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
-		return Verdict.SEVERITY_MAX - (level.ordinal() * STEP);
-	}
-	
-	@Override
-	public String toString() {
-		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
-	}
-	
+	/**
+	 * Derives the follow-up actions from the given state
+	 * The actions are specific to accessibility.
+	 * @param widgets The widgets to consider.
+	 * @return The set of actions.
+	 */
+	public Set<Action> deriveActions(List<Widget> widgets);
+
 }

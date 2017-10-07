@@ -32,6 +32,7 @@ import static org.fruit.alayer.Tags.Title;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -266,6 +267,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 		
 		// begin by urueda
+		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
@@ -277,19 +279,6 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 
 		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
-
-		double minZIndex = Double.MAX_VALUE,
-			   maxZIndex = Double.MIN_VALUE,
-			   zindex;
-		for (Widget w : state){
-			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
-				minZIndex = zindex;
-			if (zindex > maxZIndex)
-				maxZIndex = zindex;
-		}
-		state.set(Tags.MinZIndex, minZIndex);
-		state.set(Tags.MaxZIndex, maxZIndex);
 		// end by urueda
 
 		return state;
@@ -374,7 +363,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		// if the system is in the background force it into the foreground!
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			//actions.add(ac.activateSystem());
-			this.forceToForeground = true; // bu urueda
+			this.forceToForeground = true; // by urueda
 			return actions;
 		}
 		
@@ -396,34 +385,49 @@ public class DefaultProtocol extends AbstractProtocol{
 		return actions;
 	}
 	
-    // by urueda (random inputs)	
-    protected String getRandomText(Widget w){
-    	return DataManager.getRandomData();
-    }
+	// by urueda (random inputs)	
+	protected String getRandomText(Widget w){
+		return DataManager.getRandomData();
+	}
+	
+	// by urueda (refactored)
+	protected void calculateZIndices(State state) {
+		double minZIndex = Double.MAX_VALUE,
+				maxZIndex = Double.MIN_VALUE,
+				zindex;
+		for (Widget w : state){
+			zindex = w.get(Tags.ZIndex).doubleValue();
+			if (zindex < minZIndex)
+				minZIndex = zindex;
+			if (zindex > maxZIndex)
+				maxZIndex = zindex;
+		}
+		state.set(Tags.MinZIndex, minZIndex);
+		state.set(Tags.MaxZIndex, maxZIndex);
+	}
 	
 	// by urueda
-	protected Set<Widget> getTopWidgets(State state){
-		Set<Widget> topWidgets = new HashSet<Widget>();
+	protected List<Widget> getTopWidgets(State state){
+		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state){
+		for (Widget w : state)
 			if (w.get(Tags.ZIndex) == maxZIndex)
 				topWidgets.add(w);
-		}
 		return topWidgets;
 	}
 	
 	// by urueda
 	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
 		Drag[] drags = null;
-	    if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
 			for (Drag drag : drags){
 				actions.add(ac.slideFromTo(
-					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+					));
 				storeWidget(state.get(Tags.ConcreteID), w);
 			}
-	    }
+		}
 	}
 	
 	// by urueda
@@ -447,17 +451,14 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickable()))
+		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
 			return isUnfiltered(w);
 		return false;
 	}
 	
-	//by urueda
+	// by urueda
 	protected boolean isTypeable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeTypeable()) && NativeLinker.isNativeTypeable(w))
-			return isUnfiltered(w);
-		return false;
+		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
 
 	protected boolean moreActions(State state) {
@@ -480,7 +481,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
 		else if (this.lastState != null && state != null &&
-				 this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
+				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
 			this.nonReactingActionNumber++;			
 		this.lastState = state;
 		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){

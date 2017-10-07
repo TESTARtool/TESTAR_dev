@@ -39,9 +39,6 @@ import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CodingErrorAction;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -86,7 +83,6 @@ import org.fruit.alayer.WidgetIterator;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
-
 
 /**
  * Utility methods.
@@ -863,6 +859,7 @@ public final class Util {
 		}
 	}
 
+	@SafeVarargs
 	public static <T> ArrayList<T> newArrayList(T...elements){
 		Assert.notNull(elements);
 		ArrayList<T> ret = new ArrayList<>();

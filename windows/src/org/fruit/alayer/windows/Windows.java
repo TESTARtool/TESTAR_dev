@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.accessibility.AccessibleContext;
-
 
 /**
  * Provides access to the classic native WinApi Functions.
@@ -300,6 +298,7 @@ public final class Windows{
 	public static final long UIA_WindowPatternId =	10009;
 
 	/* UIA control type ids */
+	public static final long UIA_AppBarControlTypeId =	50040; // since Windows 8.1
 	public static final long UIA_ButtonControlTypeId =	50000;
 	public static final long UIA_CalendarControlTypeId =	50001;
 	public static final long UIA_CheckBoxControlTypeId =	50002;
@@ -821,6 +820,7 @@ public final class Windows{
 	public static native long IUIAutomationElement_get_Orientation(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_ProcessId(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_NativeWindowHandle(long pElement, boolean fromCache);
+	public static native boolean IUIAutomationElement_get_IsContentElement(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_IsControlElement(long pElement, boolean fromCache);	
 	public static native boolean IUIAutomationElement_get_IsEnabled(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationElement_get_HasKeyboardFocus(long pElement, boolean fromCache);

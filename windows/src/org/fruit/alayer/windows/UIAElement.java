@@ -42,17 +42,17 @@ class UIAElement implements Serializable {
 	UIAElement parent;
 	UIARootElement root;
 	UIAWidget backRef;
-	boolean blocked, enabled, ignore, isTopmostWnd, 
-		isModal, hasKeyboardFocus, isKeyboardFocusable,
-		isWndTopMost, isTopLevelContainer,
+	boolean blocked, enabled, ignore, isModal,
+		isContentElement, isControlElement,
+		hasKeyboardFocus, isKeyboardFocusable,
+		isTopmostWnd, isTopLevelContainer,
 		scrollPattern, hScroll, vScroll; // by urueda
 	long ctrlId, orientation, hwnd, wndInteractionState, wndVisualState;
 	Rect rect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
 		acceleratorKey, accessKey;
 	double zindex,
-		   hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
-	//int[] scrollbarInfo, scrollbarInfoH, scrollbarInfoV; // by urueda
+		hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
 
 	public UIAElement(){ this(null); }
 

@@ -27,8 +27,7 @@
  */
 package org.fruit.alayer.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
+import java.util.List;
 
 import org.fruit.Assert;
 import org.fruit.Util;
@@ -262,10 +261,21 @@ public class StdActionCompiler {
 		return ret;
 	}
 	
-	public Action hitKey(KBKeys key){
+	public Action hitKey(KBKeys key) {
 		return new CompoundAction.Builder().add(new KeyDown(key), .0)
-				//.add(new KeyUp(KBKeys.VK_ESCAPE), 1).add(NOP, 1.0).build();
-				.add(new KeyUp(key), 1).add(NOP, 1.0).build(); // by urueda (typo fix?)
+				.add(new KeyUp(key), 1.0).add(NOP, 1.0).build();
+	}
+	
+	public Action hitShortcutKey(List<KBKeys> keys) {
+		if (keys.size() == 1) // single key
+			return hitKey(keys.get(0));
+		CompoundAction.Builder builder = new CompoundAction.Builder();
+		for (int i = 0; i < keys.size(); i++)
+			builder.add(new KeyDown(keys.get(i)), i == 0 ? .0 : .1);
+		for (int i = keys.size() - 1; i >= 0; i--)
+			builder.add(new KeyUp(keys.get(i)), i == keys.size() - 1 ? 1.0 : .0);
+		builder.add(NOP, 1.0);
+		return builder.build();
 	}
 	
 	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }

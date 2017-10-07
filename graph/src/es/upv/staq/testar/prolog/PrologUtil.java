@@ -40,6 +40,7 @@ public class PrologUtil {
 		else return atom;
 	}*/
 	
+	@SafeVarargs
 	public static String setToString(Set<String>... sets){
 		StringBuilder sb = new StringBuilder();
 		for (Set<String> set : sets){

@@ -42,6 +42,7 @@ public final class UIARoles {
 	public static final Role
 	
 	UIAWidget = from(-1, "UIAWidget", Roles.Widget),
+	UIAAppBar = from(Windows.UIA_AppBarControlTypeId, "UIAAppBar", UIAWidget, Roles.Control),
 	UIAButton = from(Windows.UIA_ButtonControlTypeId, "UIAButton", UIAWidget, Roles.Button), 
 	UIACalendar = from(Windows.UIA_CalendarControlTypeId, "UIACalendar", UIAWidget, Roles.Control), 
 	UIACheckBox = from(Windows.UIA_CheckBoxControlTypeId, "UIACheckBox", UIAWidget, Roles.Control), 
@@ -65,7 +66,7 @@ public final class UIARoles {
 	UIAProgressBar = from(Windows.UIA_ProgressBarControlTypeId, "UIAProgressBar", UIAWidget, Roles.Control),
 	UIARadioButton = from(Windows.UIA_RadioButtonControlTypeId, "UIARadioButton", UIAWidget, Roles.Control),
 	UIAScrollBar = from(Windows.UIA_ScrollBarControlTypeId, "UIAScrollBar", UIAWidget, Roles.Control),
-	UIASeanticZoom = from(Windows.UIA_SemanticZoomControlTypeId, "UIASeanticZoom", UIAWidget, Roles.Control),
+	UIASemanticZoom = from(Windows.UIA_SemanticZoomControlTypeId, "UIASemanticZoom", UIAWidget, Roles.Control),
 	UIASeparator = from(Windows.UIA_SeparatorControlTypeId, "UIASeparator", UIAWidget, Roles.Control),
 	UIASlider = from(Windows.UIA_SliderControlTypeId, "UIASlider", UIAWidget, Roles.Control),
 	UIASpinner = from(Windows.UIA_SpinnerControlTypeId, "UIASpinner", UIAWidget, Roles.Control),
