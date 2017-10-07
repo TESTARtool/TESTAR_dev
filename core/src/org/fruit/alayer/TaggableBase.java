@@ -85,7 +85,5 @@ public class TaggableBase implements Taggable, Serializable {
 		tagValues.put(tag, value);
 	}
 
-
-
 	public void remove(Tag<?> tag) { tagValues.put(Assert.notNull(tag), null); }
 }

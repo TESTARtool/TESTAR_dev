@@ -43,6 +43,7 @@ public final class ActionRoles {
 	MouseUp = Role.from("MouseUp", MouseAction),
 	KeyUp = Role.from("KeyUp", KeyboardAction),
 	HitKey = Role.from("HitKey", KeyDown, KeyUp),
+	HitShortcutKey = Role.from("HitShortcutKey", KeyDown, KeyUp),
 	Click = Role.from("Click", MouseDown, MouseUp),
 	LeftClick = Role.from("LeftClick", Click),
 	RightClick = Role.from("RightClick", Click),

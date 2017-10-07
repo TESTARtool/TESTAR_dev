@@ -25,17 +25,16 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.windows;
 
-import java.util.Collections;
-import java.util.Set;
-
-import org.fruit.Util;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.TagsBase;
 
-public final class UIATags{
-	private static final Set<Tag<?>> tagSet = Util.newHashSet();
+public final class UIATags extends TagsBase {
+	
+	private UIATags() {}
 	
 	/**
 	 * Type of a widget in localized form (language)
@@ -100,6 +99,16 @@ public final class UIATags{
 	public static final Tag<long[]> UIARuntimeId = from("UIARuntimeId", long[].class);
 	
 	/**
+	 * Whether a widget is a content element.
+	 */
+	public static final Tag<Boolean> UIAIsContentElement = from("UIAIsContentElement", Boolean.class);
+	
+	/**
+	 * Whether a widget is a control element.
+	 */
+	public static final Tag<Boolean> UIAIsControlElement = from("UIAIsControlElement", Boolean.class);
+	
+	/**
 	 * If the widget is a window, this tells whether it is the top-most window
 	 */
 	public static final Tag<Boolean> UIAIsTopmostWindow = from("UIAIsTopmostWindow", Boolean.class);
@@ -145,12 +154,5 @@ public final class UIATags{
 	 * Access key of a widget.
 	 */
 	public static final Tag<String> UIAAccessKey = from("UIAAccessKey", String.class);
-
-	private static <T> Tag<T> from(String name, Class<T> valueType){
-		Tag<T> ret = Tag.from(name, valueType);
-		tagSet.add(ret);
-		return ret;
-	}
 	
-	public static Set<Tag<?>> tagSet(){ return Collections.unmodifiableSet(tagSet); }
 }

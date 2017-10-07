@@ -69,21 +69,21 @@ public final class Role implements Serializable{
 	}
 	
 	public static boolean isAnyOneOf(List<Widget> widgets, Role... oneOf) {
-        Role r;
+		Role r;
 		for(Widget w : widgets) {
-            r = w.get(Tags.Role, null);
-            if (r != null) {
-                for (Role o : oneOf) {
-    			    if (r.isA(o)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+			r = w.get(Tags.Role, null);
+			if (r != null) {
+				for (Role o : oneOf) {
+					if (r.isA(o)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 	
-    // end by urueda@STaQ	
+	// end by urueda@STaQ	
 		
 	public static Role from(String name, Role... inheritFrom){
 		Assert.notNull(name, inheritFrom);
