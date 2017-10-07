@@ -26,8 +26,14 @@ class OrientDBRepository implements GraphDBRepository {
 
 
     OrientDBRepository(final String url, final String userName, final String password) {
-        graphFactory = new OrientGraphFactory(url, userName, password);
 
+        graphFactory = new OrientGraphFactory(url, userName, password);
+        //graphFactory.getDatabase().create();
+
+    }
+
+    public void dropDatabase(){
+        graphFactory.drop();
     }
 
 
@@ -60,7 +66,7 @@ class OrientDBRepository implements GraphDBRepository {
         try {
             Vertex vertexFrom = getWidgetVertex(action.get(Tags.TargetID), graph);
             if (vertexFrom == null) {
-                throw new GraphDBException("Wiget not found " + action.get(Tags.TargetID));
+                throw new GraphDBException("Widget not found " + action.get(Tags.TargetID));
             }
             Vertex vertexTo = getStateVertex(toStateID, graph);
             if (vertexTo == null) {
@@ -149,18 +155,18 @@ class OrientDBRepository implements GraphDBRepository {
     /**
      * Lookup state vertex in the database
      *
-     * @param concrteID unique identification of the state
+     * @param concreteID unique identification of the state
      * @param graph     handle to the graph database
      * @return the vertex of for the State object or null if the state is not found.
      */
-    private Vertex getStateVertex(String concrteID, OrientGraph graph) {
+    private Vertex getStateVertex(String concreteID, OrientGraph graph) {
         try {
-            Iterable<Vertex> vertices = graph.getVertices("State." + Tags.ConcreteID, concrteID);
+            Iterable<Vertex> vertices = graph.getVertices("State." + Tags.ConcreteID, concreteID);
             Vertex vertex = vertices.iterator().next();
             LOGGER.debug("Vertex {} found", vertex.getId());
             return vertex;
         } catch (IllegalArgumentException | NoSuchElementException ex) {
-            LOGGER.debug("There is no vertex inserted yet for the given State ConcreteID {}", concrteID);
+            LOGGER.debug("There is no vertex inserted yet for the given State ConcreteID {}", concreteID);
             return null;
         }
     }
@@ -197,6 +203,7 @@ class OrientDBRepository implements GraphDBRepository {
         action.tags().forEach(t -> edge.setProperty(
                 t.name().replace(',', '_'),
                 action.get(t).toString()));
+
     }
 
 }

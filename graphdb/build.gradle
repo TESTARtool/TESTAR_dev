@@ -31,12 +31,19 @@ task jmh(type: JavaExec, description: 'Executing JMH benchmarks') {
     classpath = sourceSets.jmh.runtimeClasspath
     main = 'org.openjdk.jmh.Main'
 
-    def include = project.properties.get('include','');
-    def format = project.properties.get('format','json');
+    def include = project.properties.get('include','')
+    def format = project.properties.get('format','latex')
     def resultFile = file("target/reports/jmh/result.${format}")
     resultFile.parentFile.mkdirs()
 
     args include
     args '-rf', format
     args '-rff', resultFile
+}
+
+task jmhFormats(type: JavaExec, description: 'Executing JMH benchmarks') {
+    classpath = sourceSets.jmh.runtimeClasspath
+    main = 'org.openjdk.jmh.Main'
+
+    args '-lrf'
 }
