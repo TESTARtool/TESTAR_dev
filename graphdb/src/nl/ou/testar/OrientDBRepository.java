@@ -124,7 +124,7 @@ class OrientDBRepository implements GraphDBRepository {
         } finally {
             graph.shutdown();
         }
-        LOGGER.error("Widget {} stored ", w.get(Tags.ConcreteID));
+        LOGGER.info("Widget {} stored ", w.get(Tags.ConcreteID));
 
     }
 
