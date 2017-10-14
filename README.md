@@ -51,9 +51,17 @@ The procedure presented in this chapter requires the installation of the [builds
 
 ## GraphDb support
 This version of Testar supports the output of data to an http://orientdb.com database.
-Currently only the state in each step is exported. 
+Currently Widget's, Actions, States and there relation are recorded to the graph database. 
 
-### Configuring graphdb
+### using graphdb on the local filesystem
+The easiest way to use the graph database support is to write the database to the local file system
+After starting Testar, it's required to configure the database settings in the tab "GraphDB".
+- url : plocal:&lt;path&gt; (for instance plocal:output/testdb) 
+- user: admin
+- password: admin
+- Check the checkbox.
+
+### using graphdb with orientdb server
 In order to use the graphdb feature it's advised to install a graph database on your machine  The current implementation 
 of Testar has a backend for Orientdb. You can download the
 community edition from [orientdb](orientdb.com). Follow the installation instructions to install
@@ -83,6 +91,7 @@ graph.
 to query a graph database. OrientDB supports Gremlin and provides an implementation of the traversal engine in it's 
 community release.
 
-To start Gremlin run the following command.
+To start Gremlin run the following command; orientdb-gremlin. This command is delivered with the community 
+edition of Orientdb.
 
 See the manuals of orientdb to learn about the possibilities to query the model.
