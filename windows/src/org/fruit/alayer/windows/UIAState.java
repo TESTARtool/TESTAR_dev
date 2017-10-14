@@ -147,6 +147,12 @@ final class UIAState extends UIAWidget implements State {
 			ret = w.element.zindex;
 		}else if(t.equals(UIATags.UIAIsWindowModal)){
 			ret = w.element.isModal;
+		}else if(t.equals(UIATags.UIAIsTopmostWindow)){
+			ret = w.element.isTopmostWnd;
+		}else if(t.equals(UIATags.UIAIsContentElement)){
+			ret = w.element.isContentElement;
+		}else if(t.equals(UIATags.UIAIsControlElement)){
+			ret = w.element.isControlElement;
 		}else if(t.equals(UIATags.UIAScrollPattern)){
 			ret = w.element.scrollPattern;
 		//}else if(t.equals(UIATags.UIAScrollbarInfo)){

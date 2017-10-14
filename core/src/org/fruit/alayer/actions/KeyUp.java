@@ -58,12 +58,17 @@ public final class KeyUp extends //TaggableBase
 	
 	// by urueda
 	@Override
-	protected void keyAction(SUT system, KBKeys key) {
+	protected void performKeyAction(SUT system, KBKeys key) {
 		system.get(Tags.StandardKeyboard).release(key);		
 	}
 
 	// by urueda
 	@Override
 	protected void altNumpad(SUT system, String numpadCodes){}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o == this || (o instanceof KeyUp && this.key.equals(((KeyUp)o).key));
+	}
 
 }

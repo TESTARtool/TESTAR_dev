@@ -27,6 +27,8 @@
  */
 package org.fruit.alayer.actions;
 
+import java.util.List;
+
 import org.fruit.Util;
 import org.fruit.alayer.Abstractor;
 import org.fruit.alayer.Action;
@@ -201,6 +203,17 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.hitKey(key);
 		ret.set(Tags.Desc, "Hit Key " + key);
 		ret.set(Tags.Role, ActionRoles.HitKey);		
+		return ret;
+	}
+	
+	@Override // by urueda
+	public Action hitShortcutKey(List<KBKeys> keys){
+		Action ret = super.hitShortcutKey(keys);
+		String keysString = "";
+		for (int i = 0; i < keys.size(); i++)
+			keysString += i != 0 ? "+" : "" + keys.get(i);
+		ret.set(Tags.Desc, "Hit Shortcut Key " + keysString);
+		ret.set(Tags.Role, ActionRoles.HitShortcutKey);		
 		return ret;
 	}	
 	

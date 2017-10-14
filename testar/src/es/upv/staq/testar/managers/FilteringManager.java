@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Set;
 
 import javax.swing.JFrame;

@@ -40,6 +40,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.fruit.Drag;
@@ -55,7 +56,7 @@ class UIAWidget implements Widget, Serializable {
 	UIAState root;
 	UIAWidget parent;
 	Map<Tag<?>, Object> tags = Util.newHashMap();
-	ArrayList<UIAWidget> children = new ArrayList<UIAWidget>();
+	List<UIAWidget> children = new ArrayList<UIAWidget>();
 	UIAElement element;
 		
 	protected UIAWidget(UIAState root, UIAWidget parent, UIAElement element){
@@ -87,7 +88,7 @@ class UIAWidget implements Widget, Serializable {
 	public final void remove() { /*check();*/ root.remove(this); }
 	public final int childCount() { /*check();*/ return root.childCount(this); }
 
-	public final <T> T get(Tag<T> t) { /*check;*/ return root.get(this, t); }
+	public final <T> T get(Tag<T> tag) { /*check;*/ return root.get(this, tag); }
 	public final <T> void set(Tag<T> tag, T value) { /*check;*/ root.setTag(this, tag, value); }
 	public final <T> T get(Tag<T> tag, T defaultValue) { /*check;*/ return root.get(this, tag, defaultValue); }
 	public final Iterable<Tag<?>> tags() { /*check;*/ return root.tags(this); }
@@ -109,28 +110,28 @@ class UIAWidget implements Widget, Serializable {
 	
 	// by urueda (scrolls helper)
 	private Drag[] getDrags(Shape shape,
-							boolean scrollOrientation, // true = horizontal, false = vertical
-							double viewSize, double scrollPercent,
-							double scrollArrowSize, double scrollThick){ // system dependent
+			boolean scrollOrientation, // true = horizontal, false = vertical
+			double viewSize, double scrollPercent,
+			double scrollArrowSize, double scrollThick){ // system dependent
 		double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - scrollArrowSize*2;
 		double fixedH = 0.0, fixedV = 0.0;
 		if (scrollOrientation){ // horizontal
 			fixedH = shape.x() + scrollArrowSize +
-					 scrollableSize*scrollPercent/100.0 +
-					 (scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
+					scrollableSize*scrollPercent/100.0 +
+					(scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
 			fixedV = shape.y() + shape.height() - scrollThick/2;
 		} else{ // vertical
 			fixedH = shape.x() + shape.width() - scrollThick/2;
 			fixedV = shape.y() + scrollArrowSize +
-					 scrollableSize*scrollPercent/100.0 +
-					 (scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
+					scrollableSize*scrollPercent/100.0 +
+					(scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
 		}
 		int dragC = (int)Math.ceil(100.0 / viewSize) - 1;
 		if (dragC < 1)
 			return null;
 		double[] emptyDragPoints = calculateScrollDragPoints(dragC,
-															 scrollOrientation ? fixedH-shape.x() : fixedV-shape.y(), 
-															 scrollableSize/(double)dragC);
+				scrollOrientation ? fixedH-shape.x() : fixedV-shape.y(), 
+						scrollableSize/(double)dragC);
 		Drag[] drags = new Drag[dragC];
 		for (int i=0; i<dragC; i++){
 			drags[i] = new Drag(
@@ -209,9 +210,9 @@ class UIAWidget implements Widget, Serializable {
 	public String getRepresentation(String tab){
 		StringBuffer repr = new StringBuffer();
 		repr.append(tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
-								  		this.get(Tags.Abstract_R_ID) + ", " +
-								  		this.get(Tags.Abstract_R_T_ID) + ", " +
-								  		this.get(Tags.Abstract_R_T_P_ID) + "\n");
+				this.get(Tags.Abstract_R_ID) + ", " +
+				this.get(Tags.Abstract_R_T_ID) + ", " +
+				this.get(Tags.Abstract_R_T_P_ID) + "\n");
 		repr.append(getPropertiesRepresentation(tab));
 		return repr.toString();
 	}

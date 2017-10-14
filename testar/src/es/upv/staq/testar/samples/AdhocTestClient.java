@@ -20,7 +20,6 @@ package es.upv.staq.testar.samples;
 import java.io.*;
 import java.net.*;
 
-import org.fruit.alayer.actions.BriefActionRolesMap;
 import org.fruit.alayer.devices.KBKeys;
 
 /**

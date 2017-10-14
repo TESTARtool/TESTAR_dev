@@ -28,7 +28,6 @@
 package org.fruit.alayer.windows;
 
 import org.fruit.alayer.HitTester;
-import org.fruit.alayer.Rect;
 
 public final class UIAHitTester implements HitTester {
 	private static final long serialVersionUID = 1134479951851719957L;

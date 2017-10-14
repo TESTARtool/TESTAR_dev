@@ -15,71 +15,23 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import org.fruit.Assert;
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
- * Base class for a WCAG item (principle, guideline, success criterion)
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-abstract class ItemBase {
-	
-	/**
-	 * This item's numbe
-	 */
-	protected final int nr;
-	
-	/**
-	 * This item's name.
-	 */
-	protected final String name;
-	
-	/**
-	 * This item's parent
-	 * This can be null if the item has no parent.
-	 */
-	protected final ItemBase parent;
-	
-	/**
-	 * Constructs a new item
-	 * @param nr Item number
-	 * @param name Item name
-	 */
-	protected ItemBase(int nr, String name) {
-		this(nr, name, null);
-	}
-	
-	/**
-	 * Constructs a new item
-	 * @param nr Item number
-	 * @param name Item name
-	 * @param parent The parent, may be null
-	 */
-	protected ItemBase(int nr, String name, ItemBase parent) {
-		Assert.hasText(name);
-		this.nr = nr;
-		this.name = name;
-		this.parent = parent;
+public final class PredictableGuideline extends AbstractGuideline {
+
+	PredictableGuideline(AbstractPrinciple parent) {
+		super(2, "Predictable", parent);
+		criteria.add(new SuccessCriterion(1, "On Focus", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "On Input", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Consistent Navigation", this, Level.AA));
+		criteria.add(new SuccessCriterion(4, "Consistent Identification", this, Level.AA));
 	}
 
-	/**
-	 * Gets the number
-	 * If the item is not at the top of the hierarchy, this will also include the parent's number.
-	 * For example: 1.2.3
-	 * @return This item's number as a String
-	 */
-	public String getNr() {
-		return parent == null ? Integer.toString(nr) : parent.getNr() + "." + nr;
-	}
-
-	/**
-	 * Gets the name
-	 * @return The name
-	 */
-	public String getName() {
-		return name;
-	}
-	
 }

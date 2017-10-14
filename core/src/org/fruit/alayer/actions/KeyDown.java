@@ -58,8 +58,13 @@ public final class KeyDown extends //TaggableBase
 	
 	// by urueda
 	@Override
-	protected void keyAction(SUT system, KBKeys key) {		
+	protected void performKeyAction(SUT system, KBKeys key) {		
 		system.get(Tags.StandardKeyboard).press(key);		
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		return o == this || (o instanceof KeyDown && this.key.equals(((KeyDown)o).key));
 	}
 	
 }

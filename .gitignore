@@ -4,7 +4,10 @@ bin/
 target/
 *.obj
 /windows/native_src/windows.h
+compile_w10.bat
+clean_w10.bat
 *.iml
+doc/
 .project
 */.classpath
 .settings

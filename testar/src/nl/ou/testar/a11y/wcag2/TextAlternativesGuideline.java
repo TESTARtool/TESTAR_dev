@@ -15,24 +15,38 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
+
+import java.util.List;
+
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * WCAG success criterion conformance levels
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public enum Level {
-	/**
-	 * Level A: minimum conformance / highest priority guidelines.
-	 */
-	A,
-	/**
-	 * Level AA: medium priority guidelines.
-	 */
-	AA,
-	/**
-	 * Level AAA: maximum conformance / lowest priority guidelines.
-	 */
-	AAA;
+public final class TextAlternativesGuideline extends AbstractGuideline {
+	
+	TextAlternativesGuideline(AbstractPrinciple parent) {
+		super(1, "Text Alternatives", parent);
+		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
+	}
+	
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Non-text Content"),
+						EvaluationResult.Type.ERROR, w));
+		}
+		return results;
+	}
+
 }

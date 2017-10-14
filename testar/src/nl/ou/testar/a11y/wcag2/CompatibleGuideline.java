@@ -15,74 +15,40 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * Specification of WCAG 2.0 according to WCAG2ICT
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public final class WCAG2ICT {
-	
-	private final List<Principle> principles = new ArrayList<Principle>();
-	
-	/**
-	 * Constructs the WCAG 2.0 specification
-	 */
-	public WCAG2ICT() {
-		init();
+public final class CompatibleGuideline extends AbstractGuideline {
+
+	CompatibleGuideline(AbstractPrinciple parent) {
+		super(1, "Compatible", parent);
+		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
 	}
 	
-	private void init() {
-		Principle p; AbstractGuideline g;
-		
-		// Principle 1: Perceivable
-		p = new Principle(1, "Perceivable");
-		principles.add(p);
-		
-		// Principle 2: Operable
-		p = new Principle(2, "Operable");
-		g = new KeyboardAccessibleGuideline(1, p);
-		p.addGuideline(g);
-		principles.add(p);
-		
-		// Principle 3: Understandable
-		p = new Principle(3, "Understandable");
-		principles.add(p);
-		
-		// Principle 4: Robust
-		p = new Principle(4, "Robust");
-		principles.add(p);
-	}
-	
-	List<Principle> getPrinciples() {
-		return principles;
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets) {
+			// exclude images, they are handled by guideline "Text Alternatives"
+			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Name, Role, Value"),
+						EvaluationResult.Type.ERROR, w));
+		}
+		return results;
 	}
 
-	public List<Verdict> getVerdicts(State state) {
-		List<Verdict> verdicts = new ArrayList<Verdict>();
-		for (Principle p : getPrinciples())
-			for (AbstractGuideline g : p.getGuidelines())
-				verdicts.add(g.getVerdict(state));
-		return verdicts;
-	}
-	
-	public Set<Action> deriveActions(State state) {
-		Set<Action> actions = Collections.emptySet();
-		for (Principle p : getPrinciples())
-			for (AbstractGuideline g : p.getGuidelines())
-				actions.addAll(g.deriveActions(state));
-		return actions;
-	}
-	
 }

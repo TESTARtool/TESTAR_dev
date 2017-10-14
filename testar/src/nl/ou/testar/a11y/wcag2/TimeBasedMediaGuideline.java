@@ -15,31 +15,24 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag;
+package nl.ou.testar.a11y.wcag2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
- * An abstract WCAG guideline
- * Subclasses implement specific guideline behavior.
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
-public abstract class AbstractGuideline extends ItemBase {
+public final class TimeBasedMediaGuideline extends AbstractGuideline {
 	
-	protected AbstractGuideline(int nr, String name, Principle parent) {
-		super(nr, name, parent);
+	TimeBasedMediaGuideline(AbstractPrinciple parent) {
+		super(2, "Time-based Media", parent);
+		criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(2, "Captions (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(3, "Audio Description or Media Alternative (Prerecorded)", this, Level.A));
+		criteria.add(new SuccessCriterion(4, "Captions (Live)", this, Level.AA));
+		criteria.add(new SuccessCriterion(5, "Audio Description (Prerecorded)", this, Level.AA));
 	}
-	
-	protected abstract Verdict getVerdict(State state);
-	protected abstract Set<Action> deriveActions(State state);
-	
+
 }
