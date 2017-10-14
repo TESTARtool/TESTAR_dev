@@ -71,10 +71,10 @@ ProtocolClass = accessibility_wcag2ict/Protocol_accessibility_wcag2ict
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBEnabled = true
+GraphDBUrl = plocal:./output/logs/db
+GraphDBUser = admin
+GraphDBPassword = admin
 
 #################################################################
 # Other more advanced settings
