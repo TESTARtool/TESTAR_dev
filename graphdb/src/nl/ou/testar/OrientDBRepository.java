@@ -118,7 +118,8 @@ class OrientDBRepository implements GraphDBRepository {
             if (widget == null) {
                 createWidgetVertex(stateID, w, graph);
             } else {
-                //nothing for now
+                int i = widget.getProperty("visited");
+                widget.setProperty("visited", i + 1);
             }
             graph.commit();
         } finally {
