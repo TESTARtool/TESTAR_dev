@@ -54,7 +54,7 @@ class OrientDBRepository implements GraphDBRepository {
     public void addAction(final Action action, final String toStateID) {
 
         LOGGER.info("Store Action {} ({}) from {} to {}",
-                action.get(Tags.ConcreteID), action.get(Tags.Desc), action.get(Tags.TargetID), toStateID);
+                action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
@@ -78,7 +78,7 @@ class OrientDBRepository implements GraphDBRepository {
     @Override
     public void addActionOnState(String stateId, Action action, String toStateID) {
         LOGGER.info("Store Action {} ({}) from {} to {}",
-                action.get(Tags.ConcreteID), action.get(Tags.Desc), stateId, toStateID);
+                action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
@@ -101,7 +101,7 @@ class OrientDBRepository implements GraphDBRepository {
 
     @Override
     public void addWidget(String stateID, Widget w) {
-        LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc), w.get(Tags.ConcreteID), stateID);
+        LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
         OrientGraph graph = graphFactory.getTx();
         try {
             Vertex state = getStateVertex(stateID, graph);
