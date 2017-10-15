@@ -8,7 +8,7 @@
     <file>debug.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <Pattern>
-        %d{yyyy-MM-dd HH:mm:sss} %-5level [%c]- %msg%n
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n
       </Pattern>
     </encoder>
 
@@ -23,6 +23,10 @@
     </rollingPolicy>
 
   </appender>
+
+  <logger name="org.fruit.monkey.AbstractProtocol" level="info" additivity="false">
+    <appender-ref ref="FILE-AUDIT" />
+  </logger>
 
   <logger name="nl.ou.testar" level="info"
           additivity="false">

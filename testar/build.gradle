@@ -40,7 +40,7 @@ task prepareSettings(type: Copy) {
 }
 
 task prepareOracles(type: Copy) {
-    from 'target/classes/oracle'
+    from 'target/classes/java/oracle'
     into 'target/scripts/settings'
 }
 
@@ -61,6 +61,8 @@ task prepareNativeDLL(type: Copy) {
 }
 
 prepareOracles.dependsOn(oracleClasses)
+
+applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
 
 
 startScripts.dependsOn {
