@@ -84,7 +84,7 @@ class OrientDBRepository implements GraphDBRepository {
     @Override
     public void addActionOnState(String stateId, Action action, String toStateID) {
         LOGGER.info("Store Action {} ({}) from {} to {}",
-                action.get(Tags.ConcreteID), action.get(Tags.Desc), stateId, toStateID);
+                action.get(Tags.ConcreteID), action.get(Tags.Desc,""), stateId, toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
@@ -118,8 +118,7 @@ class OrientDBRepository implements GraphDBRepository {
             if (widget == null) {
                 createWidgetVertex(stateID, w, graph);
             } else {
-                int i = widget.getProperty("visited");
-                widget.setProperty("visited", i + 1);
+               //nothing
             }
             graph.commit();
         } finally {
@@ -204,6 +203,7 @@ class OrientDBRepository implements GraphDBRepository {
         action.tags().forEach(t -> edge.setProperty(
                 t.name().replace(',', '_'),
                 action.get(t).toString()));
+        Action.
 
     }
 
