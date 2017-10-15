@@ -203,7 +203,6 @@ class OrientDBRepository implements GraphDBRepository {
         action.tags().forEach(t -> edge.setProperty(
                 t.name().replace(',', '_'),
                 action.get(t).toString()));
-        Action.
 
     }
 
