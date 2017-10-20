@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @State(Scope.Benchmark)
-public class AddWidgetBenchmark1 {
+public class AddWidgetBenchmark {
 
     OrientDBRepository graphFactory;
 
