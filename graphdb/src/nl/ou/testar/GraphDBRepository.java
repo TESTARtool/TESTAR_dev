@@ -36,7 +36,7 @@ public interface GraphDBRepository {
 
 
     /**
-     * Add a widget to the datamodel.
+     * Add a widget to the the graph database as Wiget.
      * @param stateID State to which the widget belongs
      * @param w The widget object
      */

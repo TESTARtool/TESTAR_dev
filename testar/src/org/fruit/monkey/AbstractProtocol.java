@@ -123,6 +123,7 @@ import es.upv.staq.testar.protocols.ProtocolUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
 												  IEventListener { // by urueda
@@ -156,6 +157,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// FAIL
 	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
+
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
 
 	protected double passSeverity = Verdict.SEVERITY_OK;
 	private int generatedSequenceNumber = -1;
@@ -949,6 +952,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda (refactor run() method)
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
+		long tStart = System.currentTimeMillis();
+		LOGGER.info("[RA} start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -1109,7 +1114,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-
+        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1142,6 +1147,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// end by urueda		
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
+			long tStart = System.currentTimeMillis();
+			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
 			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
@@ -1396,6 +1403,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
+			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
 				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){

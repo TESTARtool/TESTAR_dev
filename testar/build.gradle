@@ -62,6 +62,8 @@ task prepareNativeDLL(type: Copy) {
 
 prepareOracles.dependsOn(oracleClasses)
 
+applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+
 
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
