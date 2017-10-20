@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
  * benchmark will also change linear.
  */
 @State(Scope.Benchmark)
-public class GraphDBLiniaritybenchmark {
+public class Linearitybenchmark {
 
     OrientDBRepository graphFactory;
 
     @Setup
     public void setupDatabase() {
-        graphFactory = new OrientDBRepository("plocal:/temp/benchmark" +
+        graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
     }
 
@@ -29,11 +29,11 @@ public class GraphDBLiniaritybenchmark {
     @Param({"1","2","4","8","16","32","64","128","256","512","1024"})
     private int interations;
 
-    //@Benchmark()
-    @Warmup(iterations = 10)
+    @Benchmark()
+    @Warmup(iterations = 30)
     @Fork(5)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.SingleShotTime})
+    @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateLiniairity() {
         for(int i = 1; i<interations; i++)

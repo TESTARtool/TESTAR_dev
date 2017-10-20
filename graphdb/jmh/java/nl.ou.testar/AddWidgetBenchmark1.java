@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @State(Scope.Benchmark)
-public class GraphDBAddWidgetBenchmark1 {
+public class AddWidgetBenchmark1 {
 
     OrientDBRepository graphFactory;
 
@@ -21,7 +21,7 @@ public class GraphDBAddWidgetBenchmark1 {
 
     @Setup
     public void setupDatabase() {
-        graphFactory = new OrientDBRepository("plocal:/temp/benchmark" +
+        graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
 
         graphFactory.addState(Util.createState("widget"+1));
@@ -35,10 +35,10 @@ public class GraphDBAddWidgetBenchmark1 {
 
 
     @Benchmark
-    @Warmup(iterations = 10)
+    @Warmup(iterations = 30)
     @Fork(5)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.SingleShotTime})
+    @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void addSingleWidgetToState() {
 

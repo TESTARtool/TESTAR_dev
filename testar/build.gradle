@@ -40,7 +40,7 @@ task prepareSettings(type: Copy) {
 }
 
 task prepareOracles(type: Copy) {
-    from 'target/classes/oracle'
+    from 'target/classes/java/oracle'
     into 'target/scripts/settings'
 }
 
