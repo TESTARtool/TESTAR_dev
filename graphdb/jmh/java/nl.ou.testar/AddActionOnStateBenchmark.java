@@ -14,7 +14,7 @@ public class AddActionOnStateBenchmark {
 
     OrientDBRepository graphFactory;
 
-    @Setup
+    @Setup(Level.Invocation)
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
@@ -25,7 +25,7 @@ public class AddActionOnStateBenchmark {
 
     }
 
-    @TearDown
+    @TearDown(Level.Invocation)
     public void dropDatabase() {
         graphFactory.dropDatabase();
     }

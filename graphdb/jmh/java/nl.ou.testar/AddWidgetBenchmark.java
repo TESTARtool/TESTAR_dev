@@ -17,18 +17,20 @@ public class AddWidgetBenchmark {
 
     OrientDBRepository graphFactory;
 
-    Widget widget = createWidget();
+    Widget widget = createWidget("0xDADA");
+    Widget dummy  = createWidget("0xADAD");
 
-    @Setup
+    @Setup(Level.Invocation)
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
-                "benchmark","admin","admin");
+                "/benchmark","admin","admin");
 
         graphFactory.addState(Util.createState("widget"+1));
+        graphFactory.addWidget("widget1",dummy);
 
     }
 
-    @TearDown
+    @TearDown(Level.Invocation)
     public void dropDatabase() {
         graphFactory.dropDatabase();
     }
@@ -41,14 +43,13 @@ public class AddWidgetBenchmark {
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void addSingleWidgetToState() {
-
         graphFactory.addWidget("widget1",widget);
     }
 
 
-    private Widget createWidget() {
+    private Widget createWidget(String id) {
         Widget widget = new StdWidget();
-        widget.set(Tags.ConcreteID,"0xDADA");
+        widget.set(Tags.ConcreteID,id);
         widget.set(Tags.Desc,"Demo");
         return widget;
     }

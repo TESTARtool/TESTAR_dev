@@ -15,13 +15,14 @@ public class Linearitybenchmark {
 
     OrientDBRepository graphFactory;
 
-    @Setup
+    @Setup(Level.Invocation)
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
+       graphFactory.addState(Util.createState("tagI"+0));
     }
 
-    @TearDown
+    @TearDown(Level.Invocation)
     public void dropDatabase() {
         graphFactory.dropDatabase();
     }

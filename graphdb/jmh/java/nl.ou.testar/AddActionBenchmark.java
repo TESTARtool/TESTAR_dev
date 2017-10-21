@@ -16,7 +16,7 @@ public class AddActionBenchmark {
 
     OrientDBRepository graphFactory;
 
-    @Setup
+    @Setup(Level.Invocation)
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
@@ -26,12 +26,12 @@ public class AddActionBenchmark {
 
     }
 
-    @TearDown
+    @TearDown(Level.Invocation)
     public void dropDatabase() {
         graphFactory.dropDatabase();
     }
 
-    //@Benchmark
+    @Benchmark
     @Warmup(iterations = 30)
     @Fork(5)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
