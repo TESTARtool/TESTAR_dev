@@ -23,6 +23,7 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.wcag2.EvaluationResults;
 
 /**
@@ -35,17 +36,27 @@ public interface Evaluator {
 	
 	/**
 	 * Evaluates the accessibility of the given state
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
 	public EvaluationResults evaluate(List<Widget> widgets);
 	
 	/**
-	 * Derives the follow-up actions from the given state
+	 * Derives the possible actions from the given state
 	 * The actions are specific to accessibility.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
 	public Set<Action> deriveActions(List<Widget> widgets);
+	
+	/**
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
+	 * This method executes oracles in offline analysis.
+	 * @param graphdb The graph database to use.
+	 * @return The results of the evaluation.
+	 */
+	public EvaluationResults query(GraphDB graphdb);
 
 }

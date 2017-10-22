@@ -26,6 +26,7 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 
 /**
@@ -58,6 +59,7 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all principles in WCAG2ICT.
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -71,9 +73,10 @@ public final class WCAG2ICT implements Evaluator {
 	}
 	
 	/**
-	 * Derives the follow-up actions from the given state
+	 * Derives the possible actions from the given state
 	 * This will collect actions from all principles in WCAG2ICT.
 	 * The actions are specific to accessibility.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -83,6 +86,22 @@ public final class WCAG2ICT implements Evaluator {
 		for (AbstractPrinciple p : principles)
 			actions.addAll(p.deriveActions(widgets));
 		return actions;
+	}
+	
+	/**
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
+	 * This will collect evaluation results from all principles in WCAG2ICT.
+	 * This method executes oracles in offline analysis.
+	 * @param graphdb The graph database to use.
+	 * @return The results of the evaluation.
+	 */
+	@Override
+	public EvaluationResults query(GraphDB graphdb) {
+		EvaluationResults results = new EvaluationResults();
+		for (AbstractPrinciple p : principles)
+			for (EvaluationResult result : p.query(graphdb).getResults())
+				results.add(result);
+		return results;
 	}
 	
 }
