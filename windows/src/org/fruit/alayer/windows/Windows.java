@@ -817,6 +817,7 @@ public final class Windows{
 	public static native String IUIAutomationElement_get_ProviderDescription(long pElement, boolean fromCache);
 	public static native String IUIAutomationElement_get_FrameworkId(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_ControlType(long pElement, boolean fromCache);
+	public static native long IUIAutomationElement_get_Culture(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_Orientation(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_ProcessId(long pElement, boolean fromCache);
 	public static native long IUIAutomationElement_get_NativeWindowHandle(long pElement, boolean fromCache);

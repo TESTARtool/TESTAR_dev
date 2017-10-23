@@ -180,6 +180,8 @@ final class UIAState extends UIAWidget implements State {
 			ret = w.element.className;
 		}else if(t.equals(UIATags.UIAControlType)){
 			ret = w.element.ctrlId;
+		}else if(t.equals(UIATags.UIACulture)){
+			ret = w.element.culture;
 		}else if(t.equals(UIATags.UIAFrameworkId)){
 			ret = w.element.frameworkId;
 		}else if(t.equals(UIATags.UIAHasKeyboardFocus)){
