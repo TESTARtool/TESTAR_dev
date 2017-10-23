@@ -42,9 +42,14 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 		EvaluationResults results = new EvaluationResults();
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				results.add(new EvaluationResult(
-						getSuccessCriterionByName("Non-text Content"),
-						EvaluationResult.Type.ERROR, w));
+				if (AccessibilityUtil.isKeyboardFocusable(w)) // focusable images must have a text alternative
+					results.add(new EvaluationResult(
+							getSuccessCriterionByName("Non-text Content"),
+							EvaluationResult.Type.ERROR, w));
+				else
+					results.add(new EvaluationResult(
+							getSuccessCriterionByName("Non-text Content"),
+							EvaluationResult.Type.WARNING, w));
 		}
 		return results;
 	}
