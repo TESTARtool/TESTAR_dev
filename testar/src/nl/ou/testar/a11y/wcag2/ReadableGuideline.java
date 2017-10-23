@@ -17,7 +17,12 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
+
+import org.fruit.alayer.Widget;
+
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
  * A WCAG 2.0 guideline
@@ -30,6 +35,17 @@ public final class ReadableGuideline extends AbstractGuideline {
 		super(1, "Readable", parent);
 		criteria.add(new SuccessCriterion(1, "Language of Page", this, Level.A));
 		criteria.add(new SuccessCriterion(2, "Language of Parts", this, Level.AA));
+	}
+	
+	@Override
+	public EvaluationResults evaluate(List<Widget> widgets) {
+		EvaluationResults results = new EvaluationResults();
+		for (Widget w : widgets)
+			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0)
+				results.add(new EvaluationResult(
+						getSuccessCriterionByName("Language of Page"),
+						EvaluationResult.Type.ERROR, w));
+		return results;
 	}
 
 }

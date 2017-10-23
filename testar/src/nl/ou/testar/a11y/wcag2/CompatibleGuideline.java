@@ -41,13 +41,12 @@ public final class CompatibleGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
-		for (Widget w : widgets) {
+		for (Widget w : widgets)
 			// exclude images, they are handled by guideline "Text Alternatives"
 			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
 				results.add(new EvaluationResult(
 						getSuccessCriterionByName("Name, Role, Value"),
 						EvaluationResult.Type.ERROR, w));
-		}
 		return results;
 	}
 
