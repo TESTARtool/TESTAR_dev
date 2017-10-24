@@ -27,7 +27,8 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.GraphDB;
+import com.tinkerpop.blueprints.Graph;
+
 import nl.ou.testar.a11y.protocols.Evaluator;
 
 /**
@@ -100,14 +101,14 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database
+	 * Evaluates the overall accessibility of the SUT by querying the given graph
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
 	 * This method executes oracles in offline analysis.
-	 * @param graphdb The graph database to use.
+	 * @param graph The graph to use.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(GraphDB graphdb) {
+	public EvaluationResults query(Graph graph) {
 		return new EvaluationResults();
 	}
 	
