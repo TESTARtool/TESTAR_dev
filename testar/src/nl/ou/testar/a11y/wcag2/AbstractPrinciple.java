@@ -26,6 +26,8 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import com.tinkerpop.blueprints.Graph;
+
 import nl.ou.testar.a11y.protocols.Evaluator;
 
 /**
@@ -60,6 +62,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all guidelines in this principle.
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -73,9 +76,10 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Derives the follow-up actions from the given state
+	 * Derives the possible actions from the given state
 	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -85,6 +89,22 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 		for (AbstractGuideline g : guidelines)
 			actions.addAll(g.deriveActions(widgets));
 		return actions;
+	}
+	
+	/**
+	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * This will collect evaluation results from all guidelines in this principle.
+	 * This method executes oracles in offline analysis.
+	 * @param graphdb The graph to use.
+	 * @return The results of the evaluation.
+	 */
+	@Override
+	public EvaluationResults query(Graph graph) {
+		EvaluationResults results = new EvaluationResults();
+		for (AbstractGuideline g : guidelines)
+			for (EvaluationResult result : g.query(graph).getResults())
+				results.add(result);
+		return results;
 	}
 		
 }

@@ -23,16 +23,9 @@ public class EvaluationResult {
 		
 		/**
 		 * A warning
-		 * This is a potential problem that needs expert evaluation.
+		 * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
 		 */
-		WARNING,
-		
-		/**
-		 * A generic problem
-		 * This is a potential problem that is not specific to one piece of code
-		 * and that needs expert evaluation.
-		 */
-		GENERIC;
+		WARNING;
 	}
 	
 	private final SuccessCriterion criterion;

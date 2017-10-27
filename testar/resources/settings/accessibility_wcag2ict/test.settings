@@ -71,10 +71,10 @@ ProtocolClass = accessibility_wcag2ict/Protocol_accessibility_wcag2ict
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBEnabled = true
+GraphDBUrl = plocal:./output/logs/db
+GraphDBUser = admin
+GraphDBPassword = admin
 
 #################################################################
 # Other more advanced settings
@@ -99,7 +99,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 5.0
+StartupTime = 3.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = false

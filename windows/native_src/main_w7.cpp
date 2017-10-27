@@ -1555,6 +1555,16 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ControlType)) (JNIEnv * env,
 	return (jlong) value;
 }
 
+/* IUIAutomationElement_get_Culture */
+JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Culture)) (JNIEnv * env, jclass, 
+		jlong pIUIAutomationElement, jboolean fromCache){
+	int value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedCulture(&value) : el->get_CurrentCulture(&value);
+	if (FAILED(hr))
+		return 0;
+	return (jlong) value;
+}
 
 /* IUIAutomationElement_get_Orientation */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Orientation)) (JNIEnv * env, jclass, 

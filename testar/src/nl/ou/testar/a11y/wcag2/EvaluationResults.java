@@ -14,12 +14,6 @@ import org.fruit.alayer.Verdict;
 public class EvaluationResults {
 	
 	/**
-	 * The severity of a general problem
-	 */
-	public static final double SEVERITY_GENERAL =
-			Verdict.SEVERITY_MIN + ((Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / 20.0);
-	
-	/**
 	 * The severity of a warning
 	 */
 	public static final double SEVERITY_WARNING =
@@ -59,9 +53,6 @@ public class EvaluationResults {
 		double severity = Verdict.OK.severity();
 		for (EvaluationResult result : results) {
 			switch (result.getType()) {
-			case GENERIC:
-				severity = Math.max(severity, SEVERITY_GENERAL);
-				continue;
 			case WARNING:
 				severity = Math.max(severity, SEVERITY_WARNING);
 				continue;
