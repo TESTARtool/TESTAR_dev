@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Generate
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
