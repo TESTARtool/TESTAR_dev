@@ -37,6 +37,7 @@ import nl.ou.testar.a11y.protocols.Evaluator;
  */
 public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	
+	private static final long serialVersionUID = 7735450322487421780L;
 	/**
 	 * The list of all the guidelines in this principle
 	 */

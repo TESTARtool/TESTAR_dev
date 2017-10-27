@@ -32,6 +32,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class CompatibleGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = -8328191457523354317L;
+
 	CompatibleGuideline(AbstractPrinciple parent) {
 		super(1, "Compatible", parent);
 		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));

@@ -1,5 +1,7 @@
 package nl.ou.testar.a11y.wcag2;
 
+import java.io.Serializable;
+
 import org.fruit.alayer.Widget;
 
 /**
@@ -7,8 +9,10 @@ import org.fruit.alayer.Widget;
  * @author Davy Kager
  *
  */
-public class EvaluationResult {
+public class EvaluationResult implements Serializable {
 	
+	private static final long serialVersionUID = 7113907300577990875L;
+
 	public enum Type {
 		/**
 		 * No problem found

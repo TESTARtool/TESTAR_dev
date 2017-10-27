@@ -24,6 +24,8 @@ package nl.ou.testar.a11y.wcag2;
  */
 public final class OperablePrinciple extends AbstractPrinciple {
 
+	private static final long serialVersionUID = -4007975209530478661L;
+
 	OperablePrinciple() {
 		super(2, "Operable");
 		guidelines.add(new KeyboardAccessibleGuideline(this));

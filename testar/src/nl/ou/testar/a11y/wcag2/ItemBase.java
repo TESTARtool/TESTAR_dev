@@ -17,6 +17,8 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import java.io.Serializable;
+
 import org.fruit.Assert;
 
 /**
@@ -24,8 +26,10 @@ import org.fruit.Assert;
  * @author Davy Kager
  *
  */
-abstract class ItemBase {
+abstract class ItemBase implements Serializable {
 	
+	private static final long serialVersionUID = 3593969061710272565L;
+
 	/**
 	 * This item's numbe
 	 */

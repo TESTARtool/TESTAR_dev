@@ -27,6 +27,8 @@ import org.fruit.alayer.Verdict;
  */
 public final class SuccessCriterion extends ItemBase {
 	
+	private static final long serialVersionUID = 2042413918878837966L;
+
 	/**
 	 * WCAG success criterion conformance levels
 	 */

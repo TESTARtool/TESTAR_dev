@@ -39,6 +39,7 @@ import nl.ou.testar.a11y.protocols.Evaluator;
  */
 public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	
+	private static final long serialVersionUID = -2941524827644792263L;
 	/**
 	 * The list of all the success criteria in this guideline
 	 */

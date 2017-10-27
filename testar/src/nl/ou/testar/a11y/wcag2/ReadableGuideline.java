@@ -31,6 +31,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class ReadableGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = -7061749135757191395L;
+
 	ReadableGuideline(AbstractPrinciple parent) {
 		super(1, "Readable", parent);
 		criteria.add(new SuccessCriterion(1, "Language of Page", this, Level.A));

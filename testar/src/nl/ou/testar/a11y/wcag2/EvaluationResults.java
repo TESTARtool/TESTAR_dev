@@ -1,5 +1,6 @@
 package nl.ou.testar.a11y.wcag2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,10 @@ import org.fruit.alayer.Verdict;
  * @author Davy Kager
  *
  */
-public class EvaluationResults {
+public class EvaluationResults implements Serializable {
 	
+	private static final long serialVersionUID = 4338993838674375390L;
+
 	/**
 	 * The severity of a warning
 	 */

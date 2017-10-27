@@ -26,6 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class AdaptableGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = 3699259852412561121L;
+
 	AdaptableGuideline(AbstractPrinciple parent) {
 		super(3, "Adaptable", parent);
 		criteria.add(new SuccessCriterion(1, "Info and Relationships", this, Level.A));

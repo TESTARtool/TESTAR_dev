@@ -38,6 +38,7 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
+	private static final long serialVersionUID = 4099763917658781054L;
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
 	private static final int MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP = 7;
 	

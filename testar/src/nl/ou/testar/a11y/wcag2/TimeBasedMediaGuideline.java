@@ -26,6 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class TimeBasedMediaGuideline extends AbstractGuideline {
 	
+	private static final long serialVersionUID = 277505674566380437L;
+
 	TimeBasedMediaGuideline(AbstractPrinciple parent) {
 		super(2, "Time-based Media", parent);
 		criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)", this, Level.A));
