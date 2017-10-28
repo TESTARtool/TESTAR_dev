@@ -32,9 +32,9 @@ public class Linearitybenchmark {
 
     //@Benchmark()
     @Warmup(iterations = 30)
-    @Fork(5)
+    @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateLiniairity() {
         for(int i = 1; i<interations; i++)
