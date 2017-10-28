@@ -41,8 +41,8 @@ public final class SuccessCriterion extends ItemBase {
 		/**
 		 * Level AA: medium priority guidelines.
 		 */
-		
 		AA,
+		
 		/**
 		 * Level AAA: maximum conformance / lowest priority guidelines.
 		 */
