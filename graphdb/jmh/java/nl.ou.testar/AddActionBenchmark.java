@@ -37,8 +37,8 @@ public class AddActionBenchmark {
     }
 
     @Benchmark
-    @Warmup(iterations = 30)
-    @Fork(5)
+    @Warmup(iterations = 50)
+    @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
     @BenchmarkMode({Mode.AverageTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)

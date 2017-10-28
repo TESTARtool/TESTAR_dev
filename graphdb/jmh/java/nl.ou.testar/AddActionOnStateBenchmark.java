@@ -34,7 +34,7 @@ public class AddActionOnStateBenchmark {
         graphFactory.dropDatabase();
     }
 
-    @Benchmark
+    //@Benchmark
     @Warmup(iterations = 30)
     @Fork(5)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)

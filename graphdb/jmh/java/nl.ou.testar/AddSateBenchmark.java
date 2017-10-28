@@ -41,7 +41,7 @@ public class AddSateBenchmark {
     }
 
 
-    @Benchmark()
+    //@Benchmark()
     @Warmup(iterations = 10)
     @Fork(5)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
