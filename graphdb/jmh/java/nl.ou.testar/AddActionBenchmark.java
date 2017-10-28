@@ -24,6 +24,11 @@ public class AddActionBenchmark {
         graphFactory.addState(Util.createState("widget"+1));
         graphFactory.addWidget("widget1", Util.createWidget("w1"));
 
+        Action action = new NOP();
+        action.set(Tags.ConcreteID,"dummy");
+        action.set(Tags.TargetID,"w1");
+        graphFactory.addAction(action,"widget1");
+
     }
 
     @TearDown(Level.Invocation)

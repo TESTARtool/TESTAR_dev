@@ -32,7 +32,7 @@ task jmh(type: JavaExec, description: 'Executing JMH benchmarks') {
     main = 'org.openjdk.jmh.Main'
 
     def include = project.properties.get('include','')
-    def format = project.properties.get('format','latex')
+    def format = project.properties.get('format','text')
     def resultFile = file("target/reports/jmh/result.${format}")
     resultFile.parentFile.mkdirs()
 
