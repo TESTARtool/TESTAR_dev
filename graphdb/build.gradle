@@ -2,7 +2,6 @@
 dependencies {
     compile project(':core')
     compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '2.2.15'
-    compile group: 'com.tinkerpop.gremlin', name: 'gremlin-java', version: '2.6.0'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
     runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
