@@ -32,9 +32,9 @@ public class AddSateBenchmark {
 
     @Benchmark()
     @Warmup(iterations = 30)
-    @Fork(5)
+    @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddState() {
         graphFactory.addState(Util.createState("0xCAFE"));
@@ -43,9 +43,9 @@ public class AddSateBenchmark {
 
     @Benchmark()
     @Warmup(iterations = 10)
-    @Fork(5)
+    @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateTwice() {
         graphFactory.addState(Util.createState("0xCAFE"));

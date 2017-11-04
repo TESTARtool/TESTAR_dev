@@ -36,9 +36,9 @@ public class AddActionOnStateBenchmark {
 
     @Benchmark
     @Warmup(iterations = 30)
-    @Fork(5)
+    @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void addSingleAction() {
 
