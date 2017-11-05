@@ -68,14 +68,17 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	@Override
 	protected Verdict getVerdict(State state) {
 		Verdict verdict = super.getVerdict(state);
-		if (!verdict.equals(Verdict.OK)) {
+		if (!verdict.equals(Verdict.OK))
 			// something went wrong upstream
 			return verdict;
-		}
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
 		EvaluationResults results = evaluator.evaluate(relevantWidgets);
-		state.set(WCAG2Tags.EvaluationResults, results);
+		state.set(WCAG2Tags.WCAG2EvaluationResults, results);
+		state.set(WCAG2Tags.WCAG2ResultCount, results.getResultCount());
+		state.set(WCAG2Tags.WCAG2PassCount, results.getPassCount());
+		state.set(WCAG2Tags.WCAG2WarningCount, results.getWarningCount());
+		state.set(WCAG2Tags.WCAG2ErrorCount, results.getErrorCount());
 		return results.getOverallVerdict();
 	}
 

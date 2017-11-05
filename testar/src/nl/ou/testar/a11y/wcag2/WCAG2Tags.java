@@ -35,8 +35,12 @@ public final class WCAG2Tags extends TagsBase {
 	
 	private WCAG2Tags() {}
 	
-	public static final Tag<Object> EvaluationResults = from("EvaluationResults", Object.class);
+	public static final Tag<EvaluationResults> WCAG2EvaluationResults = from("WCAG2EvaluationResults", EvaluationResults.class);
+	public static final Tag<Integer> WCAG2ResultCount = from("WCAG2ResultCount", Integer.class);
+	public static final Tag<Integer> WCAG2PassCount = from("WCAG2PassCount", Integer.class);
+	public static final Tag<Integer> WCAG2WarningCount = from("WCAG2WarningCount", Integer.class);
+	public static final Tag<Integer> WCAG2ErrorCount = from("WCAG2ErrorCount", Integer.class);
 	
-	public static final Tag<Boolean> KeyboardVisited = from("KeyboardVisited", Boolean.class);
+	public static final Tag<Boolean> WCAG2KeyboardVisited = from("WCAG2KeyboardVisited", Boolean.class);
 
 }

@@ -47,6 +47,38 @@ public class EvaluationResults implements Serializable {
 	}
 	
 	/**
+	 * Get the total number of evaluation results
+	 * @return The result count.
+	 */
+	public int getResultCount() {
+		return results.size();
+	}
+	
+	/**
+	 * Get the total number of evaluation results that are passes
+	 * @return The pass count.
+	 */
+	public int getPassCount() {
+		return getCount(EvaluationResult.Type.OK);
+	}
+	
+	/**
+	 * Get the total number of evaluation results that are warnings
+	 * @return The warning count.
+	 */
+	public int getWarningCount() {
+		return getCount(EvaluationResult.Type.WARNING);
+	}
+	
+	/**
+	 * Get the total number of evaluation results that are errors
+	 * @return The error count.
+	 */
+	public int getErrorCount() {
+		return getCount(EvaluationResult.Type.ERROR);
+	}
+	
+	/**
 	 * Computes an overall Verdict from all evaluation results
 	 * The severity will match that of the highest-level problem that was found.
 	 * It will be the minimum severity if no problems were found.
@@ -68,6 +100,14 @@ public class EvaluationResults implements Serializable {
 			}
 		}
 		return new Verdict(severity, "Accessibility evaluation");
+	}
+	
+	private int getCount(EvaluationResult.Type type) {
+		int count = 0;
+		for (EvaluationResult result : results)
+			if (result.getType() == type)
+				count++;
+		return count;
 	}
 
 }

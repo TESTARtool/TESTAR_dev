@@ -57,7 +57,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		EvaluationResults results = new EvaluationResults();
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
-				w.set(WCAG2Tags.KeyboardVisited, true);
+				w.set(WCAG2Tags.WCAG2KeyboardVisited, true);
 				
 				String concreteID = w.get(Tags.ConcreteID, "");
 				if (lastConcreteID.equals(concreteID)) {
