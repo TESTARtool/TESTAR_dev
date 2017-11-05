@@ -17,6 +17,7 @@
 
 package nl.ou.testar.a11y.protocols;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,8 +29,13 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
+import org.fruit.monkey.Settings;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.a11y.reporting.HTMLReporter;
 import nl.ou.testar.a11y.wcag2.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
@@ -42,6 +48,11 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
 public class AccessibilityProtocol extends DefaultProtocol {
 	
 	/**
+	 * The name of the HTML report containing the evaluation results
+	 */
+	public static final String HTML_FILENAME = "report.html";
+	
+	/**
 	 * The accessibility evaluator
 	 */
 	protected final Evaluator evaluator;
@@ -51,6 +62,11 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 * This needs to be updated after every state change.
 	 */
 	protected List<Widget> relevantWidgets;
+	
+	/**
+	 * The HTML reporter to store the evaluation results
+	 */
+	protected HTMLReporter html = null;
 
 	/**
 	 * Constructs a new WCAG2ICT test protocol
@@ -58,6 +74,25 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	public AccessibilityProtocol(Evaluator evaluator) {
 		super();
 		this.evaluator = evaluator;
+	}
+	
+	@Override
+	protected void initialize(Settings settings) {
+		super.initialize(settings);
+		try {
+			html = new HTMLReporter(settings.get(ConfigTags.OutputDir) + File.separator + HTML_FILENAME);
+		}
+		catch (Exception e) {
+			LogSerialiser.log("Failed to open the HTML report: " + e.getMessage(),
+					LogSerialiser.LogLevel.Critical);
+		}
+	}
+	
+	@Override
+	protected SUT startSystem() throws SystemStartException {
+		SUT system = super.startSystem();
+		html.writeHeader();
+		return system;
 	}
 
 	/**
@@ -95,6 +130,12 @@ public class AccessibilityProtocol extends DefaultProtocol {
 			actions = evaluator.deriveActions(relevantWidgets);
 		}
 		return actions;
+	}
+	
+	@Override
+	protected void stopSystem(SUT system) {
+		super.stopSystem(system);
+		html.writeFooter().close();
 	}
 	
 	private List<Widget> getRelevantWidgets(State state) {
