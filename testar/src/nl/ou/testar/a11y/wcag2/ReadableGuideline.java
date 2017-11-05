@@ -42,11 +42,12 @@ public final class ReadableGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
 		for (Widget w : widgets)
 			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0)
-				results.add(new EvaluationResult(
-						getSuccessCriterionByName("Language of Page"),
-						EvaluationResult.Type.ERROR, w));
+				results.add(new EvaluationResult(sc, EvaluationResult.Type.ERROR, w));
+			else
+				results.add(evaluationPassed(sc));
 		return results;
 	}
 

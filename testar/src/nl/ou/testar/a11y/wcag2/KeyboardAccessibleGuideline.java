@@ -55,6 +55,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("No Keyboard Trap");
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
 				w.set(WCAG2Tags.WCAG2KeyboardVisited, true);
@@ -63,9 +64,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				if (lastConcreteID.equals(concreteID)) {
 					sameWidgetCount++;
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
-						results.add(new EvaluationResult(
-								getSuccessCriterionByName("No Keyboard Trap"),
-								EvaluationResult.Type.WARNING, w));
+						results.add(new EvaluationResult(sc, EvaluationResult.Type.WARNING, w));
+					else
+						results.add(evaluationPassed(sc));
 				}
 				else {
 					sameWidgetCount = 0;

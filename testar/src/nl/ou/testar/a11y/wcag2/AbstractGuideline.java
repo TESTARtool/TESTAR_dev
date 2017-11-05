@@ -113,4 +113,13 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 		return new EvaluationResults();
 	}
 	
+	/**
+	 * Constructs a new EvaluationResult indicating that the given success criterion was passed
+	 * @param criterion The success criterion.
+	 * @return A new EvaluationResult.
+	 */
+	protected EvaluationResult evaluationPassed(SuccessCriterion criterion) {
+		return new EvaluationResult(criterion, EvaluationResult.Type.OK);
+	}
+	
 }
