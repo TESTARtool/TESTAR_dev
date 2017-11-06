@@ -102,6 +102,14 @@ public class EvaluationResults implements Serializable {
 		return new Verdict(severity, "Accessibility evaluation");
 	}
 	
+	@Override
+	public String toString() {
+		return "EvaluationResults: {" +
+				getWarningCount() + " warnings, " +
+				getErrorCount() + " errors, " +
+				getResultCount() + " total}";
+	}
+	
 	private int getCount(EvaluationResult.Type type) {
 		int count = 0;
 		for (EvaluationResult result : results)
