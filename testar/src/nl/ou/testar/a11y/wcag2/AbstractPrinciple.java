@@ -107,5 +107,9 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 				results.add(result);
 		return results;
 	}
+	
+	public String getImplementationVersion() {
+		return "WCAG2ICT-principle-" + WCAG2ICT.VERSION;
+	}
 		
 }

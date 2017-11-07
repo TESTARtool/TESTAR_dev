@@ -91,7 +91,11 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	@Override
 	protected SUT startSystem() throws SystemStartException {
 		SUT system = super.startSystem();
-		html.writeHeader();
+		html.writeHeader()
+		.writeSectionStart()
+		.writeHeading(1, "General Information")
+		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
+		.writeSectionEnd();
 		return system;
 	}
 

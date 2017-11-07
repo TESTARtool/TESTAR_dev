@@ -37,6 +37,11 @@ import nl.ou.testar.a11y.protocols.Evaluator;
  */
 public final class WCAG2ICT implements Evaluator {
 	
+	/**
+	 * The implementation version
+	 */
+	static final String VERSION = "20171107";
+	
 	private final List<AbstractPrinciple> principles = new ArrayList<>();
 	
 	/**
@@ -103,6 +108,10 @@ public final class WCAG2ICT implements Evaluator {
 			for (EvaluationResult result : p.query(graph).getResults())
 				results.add(result);
 		return results;
+	}
+	
+	public String getImplementationVersion() {
+		return "WCAG2ICT-" + VERSION;
 	}
 	
 }

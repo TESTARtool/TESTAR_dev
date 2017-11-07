@@ -122,4 +122,8 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 		return new EvaluationResult(criterion, EvaluationResult.Type.OK);
 	}
 	
+	public String getImplementationVersion() {
+		return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
+	}
+	
 }

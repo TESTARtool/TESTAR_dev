@@ -59,5 +59,11 @@ public interface Evaluator {
 	 * @return The results of the evaluation.
 	 */
 	public EvaluationResults query(Graph graph);
+	
+	/**
+	 * Gets the unique version of the implementation for the guidelines being used
+	 * @return The version as a String.
+	 */
+	public String getImplementationVersion();
 
 }
