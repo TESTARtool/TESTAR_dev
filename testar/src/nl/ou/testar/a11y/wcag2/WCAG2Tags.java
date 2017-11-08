@@ -31,6 +31,8 @@ package nl.ou.testar.a11y.wcag2;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
+import nl.ou.testar.a11y.reporting.EvaluationResults;
+
 public final class WCAG2Tags extends TagsBase {
 	
 	private WCAG2Tags() {}

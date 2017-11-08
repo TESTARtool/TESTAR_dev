@@ -29,6 +29,8 @@ import org.fruit.alayer.Widget;
 import com.tinkerpop.blueprints.Graph;
 
 import nl.ou.testar.a11y.protocols.Evaluator;
+import nl.ou.testar.a11y.reporting.EvaluationResult;
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 
 /**
  * A WCAG principle

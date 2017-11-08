@@ -22,6 +22,7 @@ import java.util.List;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -46,9 +47,9 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 		for (Widget w : widgets)
 			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
 				if (AccessibilityUtil.isKeyboardFocusable(w)) // focusable images must have a text alternative
-					results.add(new EvaluationResult(sc, EvaluationResult.Type.ERROR, w));
+					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR, w));
 				else
-					results.add(new EvaluationResult(sc, EvaluationResult.Type.WARNING, w));
+					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING, w));
 			else
 				results.add(evaluationPassed(sc));
 		return results;

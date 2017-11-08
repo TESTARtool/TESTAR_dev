@@ -17,41 +17,40 @@
 
 package nl.ou.testar.a11y.wcag2;
 
-import java.util.List;
-
-import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.a11y.reporting.EvaluationResults;
-import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
-import nl.ou.testar.a11y.windows.AccessibilityUtil;
+import nl.ou.testar.a11y.reporting.EvaluationResult;
 
 /**
- * A WCAG 2.0 guideline
+ * The result of evaluating a WCAG2ICT success criterion
  * @author Davy Kager
  *
  */
-public final class CompatibleGuideline extends AbstractGuideline {
+public final class WCAG2EvaluationResult extends EvaluationResult {
+	
+	private static final long serialVersionUID = -3449985990033944575L;
+	private final SuccessCriterion criterion;
+	
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type) {
+		this(criterion, type, null);
+	}
 
-	private static final long serialVersionUID = -8328191457523354317L;
-
-	CompatibleGuideline(AbstractPrinciple parent) {
-		super(1, "Compatible", parent);
-		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, Widget widget) {
+		super(type, widget);
+		this.criterion = criterion;
+	}
+	
+	/**
+	 * Gets the success criterion associated with this evaluation result
+	 * @return The success criterion.
+	 */
+	public SuccessCriterion getSuccessCriterion() {
+		return criterion;
 	}
 	
 	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		SuccessCriterion sc = getSuccessCriterionByName("Name, Role, Value");
-		for (Widget w : widgets)
-			// exclude images, they are handled by guideline "Text Alternatives"
-			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR, w));
-			else
-				results.add(evaluationPassed(sc));
-		return results;
+	public double getVerdictSeverity() {
+		return criterion.getVerdictSeverity();
 	}
-
+	
 }

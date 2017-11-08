@@ -1,4 +1,21 @@
-package nl.ou.testar.a11y.wcag2;
+/*****************************************************************************************
+ *                                                                                       *
+ * COPYRIGHT (2017):                                                                     *
+ * Universitat Politecnica de Valencia                                                   *
+ * Camino de Vera, s/n                                                                   *
+ * 46022 Valencia, Spain                                                                 *
+ * www.upv.es                                                                            *
+ *                                                                                       * 
+ * D I S C L A I M E R:                                                                  *
+ * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
+ * in the context of the TESTAR Proof of Concept project:                                *
+ *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
+ * This sample is distributed FREE of charge under the TESTAR license, as an open        *
+ * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
+ *                                                                                       *
+ *****************************************************************************************/
+
+package nl.ou.testar.a11y.reporting;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +29,7 @@ import org.fruit.alayer.Verdict;
  * @author Davy Kager
  *
  */
-public class EvaluationResults implements Serializable {
+public final class EvaluationResults implements Serializable {
 	
 	private static final long serialVersionUID = 4338993838674375390L;
 
@@ -28,13 +45,13 @@ public class EvaluationResults implements Serializable {
 	/**
 	 * Constructs a new container for evaluation results
 	 */
-	EvaluationResults() {}
+	public EvaluationResults() {}
 
 	/**
 	 * Add an evaluation result to the list of results
 	 * @param result The result.
 	 */
-	void add(EvaluationResult result) {
+	public void add(EvaluationResult result) {
 		results.add(Assert.notNull(result));
 	}
 	
@@ -92,8 +109,7 @@ public class EvaluationResults implements Serializable {
 				severity = Math.max(severity, SEVERITY_WARNING);
 				continue;
 			case ERROR:
-				severity = Math.max(severity,
-						result.getSuccessCriterion().getVerdictSeverity());
+				severity = Math.max(severity, result.getVerdictSeverity());
 				continue;
 			default:
 				continue;

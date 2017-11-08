@@ -28,6 +28,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
+
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -64,7 +66,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				if (lastConcreteID.equals(concreteID)) {
 					sameWidgetCount++;
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
-						results.add(new EvaluationResult(sc, EvaluationResult.Type.WARNING, w));
+						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING, w));
 					else
 						results.add(evaluationPassed(sc));
 				}

@@ -15,55 +15,85 @@
  *                                                                                       *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.protocols;
+package nl.ou.testar.a11y.reporting;
 
-import java.util.List;
-import java.util.Set;
+import java.io.Serializable;
 
-import org.fruit.alayer.Action;
+import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Graph;
-
-import nl.ou.testar.a11y.reporting.EvaluationResults;
-
 /**
- * Specifies the requirements for an object to be plugged into an AbstractProtocol to evaluate accessibility
- * Such objects need to be able to evaluate a given state and derive actions to move to a new state.
+ * The result of evaluating an accessibility rule
  * @author Davy Kager
  *
  */
-public interface Evaluator {
+public class EvaluationResult implements Serializable {
+	
+	private static final long serialVersionUID = -51527046346987231L;
+
+	public enum Type {
+		/**
+		 * No problem found
+		 */
+		OK,
+		
+		/**
+		 * An error
+		 * This is a definite problem that can be detected automatically.
+		 */
+		ERROR,
+		
+		/**
+		 * A warning
+		 * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
+		 */
+		WARNING;
+	}
+	
+	private final Type type;
+	private final Widget widget;
 	
 	/**
-	 * Evaluates the accessibility of the given state
-	 * This method executes oracles in state analysis.
-	 * @param widgets The widgets to consider.
-	 * @return The results of the evaluation.
+	 * Constructs a new evaluation result that does not apply to a single widget
+	 * @param criterion The success criterion.
+	 * @param type The problem type.
 	 */
-	public EvaluationResults evaluate(List<Widget> widgets);
+	public EvaluationResult(Type type) {
+		this(type, null);
+	}
 	
 	/**
-	 * Derives the possible actions from the given state
-	 * The actions are specific to accessibility.
-	 * This method derives actions in state analysis.
-	 * @param widgets The widgets to consider.
-	 * @return The set of actions.
+	 * Constructs a new evaluation result that applies to a single widget
+	 * @param criterion The success criterion.
+	 * @param type The problem type.
 	 */
-	public Set<Action> deriveActions(List<Widget> widgets);
+	public EvaluationResult(Type type, Widget widget) {
+		this.type = type;
+		this.widget = widget;
+	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph
-	 * This method executes oracles in offline analysis.
-	 * @param graphdb The graph to use.
-	 * @return The results of the evaluation.
+	 * Gets the problem type of this evaluation result
+	 * @return The problem type.
 	 */
-	public EvaluationResults query(Graph graph);
+	public Type getType() {
+		return type;
+	}
 	
 	/**
-	 * Gets the unique version of the implementation for the guidelines being used
-	 * @return The version as a String.
+	 * Gets the widget that the success criterion associated with this evaluation result applies to
+	 * @return The widget.
 	 */
-	public String getImplementationVersion();
+	public Widget getWidget() {
+		return widget;
+	}
+	
+	/**
+	 * Computes the Verdict severity for the result
+	 * @return The severity.
+	 */
+	public double getVerdictSeverity() {
+		return type.equals(Type.OK) ? Verdict.SEVERITY_OK : Verdict.SEVERITY_FAIL;
+	}
 
 }

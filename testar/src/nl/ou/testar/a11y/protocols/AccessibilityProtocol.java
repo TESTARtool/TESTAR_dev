@@ -35,8 +35,8 @@ import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
-import nl.ou.testar.a11y.wcag2.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 

@@ -30,6 +30,7 @@ import org.fruit.alayer.Widget;
 import com.tinkerpop.blueprints.Graph;
 
 import nl.ou.testar.a11y.protocols.Evaluator;
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 
 /**
  * An abstract WCAG guideline
@@ -118,8 +119,8 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	 * @param criterion The success criterion.
 	 * @return A new EvaluationResult.
 	 */
-	protected EvaluationResult evaluationPassed(SuccessCriterion criterion) {
-		return new EvaluationResult(criterion, EvaluationResult.Type.OK);
+	protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
+		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK);
 	}
 	
 	public String getImplementationVersion() {

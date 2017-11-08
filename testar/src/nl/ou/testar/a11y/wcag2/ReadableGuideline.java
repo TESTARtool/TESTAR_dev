@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -45,7 +46,7 @@ public final class ReadableGuideline extends AbstractGuideline {
 		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
 		for (Widget w : widgets)
 			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0)
-				results.add(new EvaluationResult(sc, EvaluationResult.Type.ERROR, w));
+				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR, w));
 			else
 				results.add(evaluationPassed(sc));
 		return results;
