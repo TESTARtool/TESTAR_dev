@@ -129,7 +129,7 @@ public final class EvaluationResults implements Serializable {
 	private int getCount(EvaluationResult.Type type) {
 		int count = 0;
 		for (EvaluationResult result : results)
-			if (result.getType() == type)
+			if (result.getType().equals(type))
 				count++;
 		return count;
 	}

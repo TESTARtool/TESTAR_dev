@@ -22,20 +22,24 @@
  * UPV's intention to make this work accessible, free of any charge.                      *
  *****************************************************************************************/
 
-package nl.ou.testar.a11y.wcag2;
+package nl.ou.testar.a11y.reporting;
 
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
 /**
- * WCAG2ICT tags
+ * Accessibility tags
  * @author Davy Kager
  *
  */
-public final class WCAG2Tags extends TagsBase {
+public final class A11yTags extends TagsBase {
+
+	private A11yTags() {}
 	
-	private WCAG2Tags() {}
-	
-	public static final Tag<Boolean> WCAG2KeyboardVisited = from("WCAG2KeyboardVisited", Boolean.class);
+	public static final Tag<EvaluationResults> A11yEvaluationResults = from("WCAG2EvaluationResults", EvaluationResults.class);
+	public static final Tag<Integer> A11yResultCount = from("WCAG2ResultCount", Integer.class);
+	public static final Tag<Integer> A11yPassCount = from("WCAG2PassCount", Integer.class);
+	public static final Tag<Integer> A11yWarningCount = from("WCAG2WarningCount", Integer.class);
+	public static final Tag<Integer> A11yErrorCount = from("WCAG2ErrorCount", Integer.class);
 
 }

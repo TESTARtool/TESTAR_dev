@@ -40,8 +40,7 @@ public final class HTMLReporter {
 		"<head>",
 		"<title>Accessibility Evaluation Report</title>", 
 		"</head>",
-		"<body>",
-		"<h1>Accessibility Evaluation Report</h1>"
+		"<body>"
 	};
 	
 	private static final String[] FOOTER = new String[] {
@@ -49,15 +48,21 @@ public final class HTMLReporter {
 		"</html>"
 	};
 	
-	private static final String SECTION_START = "<div>",
-			SECTION_END = "</div>";
-	
 	private static final String[]
 			HEADING_START = new String[] { "<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>" },
 			HEADING_END = new String[] { "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>" };
 	
 	private static final String PARAGRAPH_START = "<p>",
 			PARAGRAPH_END = "</p>";
+	
+	private static final String ULIST_START = "<ul>",
+			ULIST_END = "</ul>";
+	
+	private static final String OLIST_START = "<ol>",
+			OLIST_END = "</ol>";
+	
+	private static final String LIST_ITEM_START = "<li>",
+			LIST_ITEM_END = "</li>";
 	
 	private static final String TABLE_START = "<table>",
 			TABLE_END = "</table>";
@@ -97,6 +102,7 @@ public final class HTMLReporter {
 	public HTMLReporter writeHeader() {
 		for (String el : HEADER)
 			write(el);
+		writeHeading(1, "Accessibility Evaluation Report");
 		return this;
 	}
 	
@@ -107,24 +113,6 @@ public final class HTMLReporter {
 	public HTMLReporter writeFooter() {
 		for (String el : FOOTER)
 			write(el);
-		return this;
-	}
-	
-	/**
-	 * Writes the start of a section to the HTML report
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeSectionStart() {
-		write(SECTION_START);
-		return this;
-	}
-	
-	/**
-	 * Writes the end of a section to the HTML report
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeSectionEnd() {
-		write(SECTION_END);
 		return this;
 	}
 	
@@ -147,6 +135,52 @@ public final class HTMLReporter {
 	 */
 	public HTMLReporter writeParagraph(String text) {
 		write(PARAGRAPH_START + text + PARAGRAPH_END);
+		return this;
+	}
+	
+	/**
+	 * Writes the start of an unordered list to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeUListStart() {
+		write(ULIST_START);
+		return this;
+	}
+	
+	/**
+	 * Writes the end of an unordered list to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeUListEnd() {
+		write(ULIST_END);
+		return this;
+	}
+	
+	/**
+	 * Writes the start of an ordered list to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeOListStart() {
+		write(OLIST_START);
+		return this;
+	}
+	
+	/**
+	 * Writes the end of an ordered list to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeOListEnd() {
+		write(OLIST_END);
+		return this;
+	}
+	
+	/**
+	 * Writes a list item to the HTML report
+	 * @param text The item text.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeListItem(String text) {
+		write(LIST_ITEM_START + text + LIST_ITEM_END);
 		return this;
 	}
 	

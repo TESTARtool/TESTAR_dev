@@ -19,6 +19,7 @@ package nl.ou.testar.a11y.reporting;
 
 import java.io.Serializable;
 
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 
@@ -94,6 +95,16 @@ public class EvaluationResult implements Serializable {
 	 */
 	public double getVerdictSeverity() {
 		return type.equals(Type.OK) ? Verdict.SEVERITY_OK : Verdict.SEVERITY_FAIL;
+	}
+	
+	@Override
+	public String toString() {
+		String widgetInfo = "Not set";
+		if (widget != null)
+			widgetInfo = widget.get(Tags.Title, "") + " (" + widget.get(Tags.Role) + ")";
+		return "EvaluationResult: {" +
+				"Type: " + type.toString() + ", " +
+				"Widget: " + widgetInfo + "}";
 	}
 
 }

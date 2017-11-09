@@ -29,15 +29,15 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.a11y.reporting.A11yTags;
+import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.reporting.HTMLReporter;
-import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
@@ -47,10 +47,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public class AccessibilityProtocol extends DefaultProtocol {
 	
-	/**
-	 * The name of the HTML report containing the evaluation results
-	 */
-	public static final String HTML_FILENAME = "report.html";
+	public static final String HTML_FILENAME_PREFIX = "report_",
+			HTML_EXTENSION = ".html";
 	
 	/**
 	 * The accessibility evaluator
@@ -79,24 +77,24 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
+	}
+	
+	@Override
+	protected void beginSequence() {
+		super.beginSequence();
 		try {
-			html = new HTMLReporter(settings.get(ConfigTags.OutputDir) + File.separator + HTML_FILENAME);
+			html = new HTMLReporter(
+					settings().get(ConfigTags.OutputDir) + File.separator +
+					HTML_FILENAME_PREFIX + sequenceCount() + HTML_EXTENSION);
 		}
 		catch (Exception e) {
 			LogSerialiser.log("Failed to open the HTML report: " + e.getMessage(),
 					LogSerialiser.LogLevel.Critical);
 		}
-	}
-	
-	@Override
-	protected SUT startSystem() throws SystemStartException {
-		SUT system = super.startSystem();
 		html.writeHeader()
-		.writeSectionStart()
-		.writeHeading(1, "General Information")
+		.writeHeading(2, "General Information")
 		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
-		.writeSectionEnd();
-		return system;
+		.writeParagraph("Sequence: " + sequenceCount());
 	}
 
 	/**
@@ -113,11 +111,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
 		EvaluationResults results = evaluator.evaluate(relevantWidgets);
-		state.set(WCAG2Tags.WCAG2EvaluationResults, results);
-		state.set(WCAG2Tags.WCAG2ResultCount, results.getResultCount());
-		state.set(WCAG2Tags.WCAG2PassCount, results.getPassCount());
-		state.set(WCAG2Tags.WCAG2WarningCount, results.getWarningCount());
-		state.set(WCAG2Tags.WCAG2ErrorCount, results.getErrorCount());
+		state.set(A11yTags.A11yEvaluationResults, results);
+		state.set(A11yTags.A11yResultCount, results.getResultCount());
+		state.set(A11yTags.A11yPassCount, results.getPassCount());
+		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
+		state.set(A11yTags.A11yErrorCount, results.getErrorCount());
+		if (!settings().get(ConfigTags.GraphDBEnabled))
+			// report every state
+			writeAdHocStateResults(results);
 		return results.getOverallVerdict();
 	}
 
@@ -137,9 +138,29 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	@Override
-	protected void stopSystem(SUT system) {
-		super.stopSystem(system);
+	protected void finishSequence(File recordedSequence) {
+		super.finishSequence(recordedSequence);
 		html.writeFooter().close();
+	}
+	
+	/**
+	 * Write implementation-specific evaluation result details to the HTML report
+	 * Subclasses can override this to retrieve information from a subclass of EvaluationResult.
+	 * @param results The evaluation results.
+	 */
+	protected void writeAdHocStateResultsDetails(EvaluationResults results) {
+		boolean hadViolations = false;
+		html.writeHeading(4, "Violations")
+		.writeUListStart();
+		for (EvaluationResult result : results.getResults()) {
+			if (!result.getType().equals(EvaluationResult.Type.OK)) {
+				html.writeListItem(result.toString());
+				hadViolations = true;
+			}
+		}
+		if (!hadViolations)
+			html.writeListItem("None");
+		html.writeUListEnd();
 	}
 	
 	private List<Widget> getRelevantWidgets(State state) {
@@ -151,6 +172,18 @@ public class AccessibilityProtocol extends DefaultProtocol {
 					&& AccessibilityUtil.isRelevant(w))
 				widgets.add(w);
 		return widgets;
+	}
+	
+	private void writeAdHocStateResults(EvaluationResults results) {
+		html.writeHeading(3, "State: " + state.get(Tags.ConcreteID))
+		.writeTableStart()
+		.writeTableHeadings("Type", "Count")
+		.writeTableRow("Error", Integer.toString(results.getErrorCount()))
+		.writeTableRow("Warning", Integer.toString(results.getWarningCount()))
+		.writeTableRow("Pass", Integer.toString(results.getPassCount()))
+		.writeTableRow("Total", Integer.toString(results.getResultCount()))
+		.writeTableEnd();
+		writeAdHocStateResultsDetails(results);
 	}
 
 }
