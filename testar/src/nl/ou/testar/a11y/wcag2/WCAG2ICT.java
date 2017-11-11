@@ -26,7 +26,7 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
@@ -100,18 +100,19 @@ public final class WCAG2ICT implements Evaluator {
 	 * Evaluates the overall accessibility of the SUT by querying the given graph
 	 * This will collect evaluation results from all principles in WCAG2ICT.
 	 * This method executes oracles in offline analysis.
-	 * @param graphdb The graph to use.
+	 * @param vertices All state vertices.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(Graph graph) {
+	public EvaluationResults query(Iterable<Vertex> vertices) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.query(graph).getResults())
+			for (EvaluationResult result : p.query(vertices).getResults())
 				results.add(result);
 		return results;
 	}
 	
+	@Override
 	public String getImplementationVersion() {
 		return "WCAG2ICT-" + VERSION;
 	}

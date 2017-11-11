@@ -23,7 +23,7 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 
@@ -55,10 +55,10 @@ public interface Evaluator {
 	/**
 	 * Evaluates the overall accessibility of the SUT by querying the given graph
 	 * This method executes oracles in offline analysis.
-	 * @param graphdb The graph to use.
+	 * @param vertices All state vertices.
 	 * @return The results of the evaluation.
 	 */
-	public EvaluationResults query(Graph graph);
+	public EvaluationResults query(Iterable<Vertex> vertices);
 	
 	/**
 	 * Gets the unique version of the implementation for the guidelines being used

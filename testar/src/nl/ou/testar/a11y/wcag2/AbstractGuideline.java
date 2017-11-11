@@ -27,7 +27,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
@@ -106,12 +106,17 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	 * Evaluates the overall accessibility of the SUT by querying the given graph
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
 	 * This method executes oracles in offline analysis.
-	 * @param graph The graph to use.
+	 * @param vertices All state vertices.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(Graph graph) {
+	public EvaluationResults query(Iterable<Vertex> vertices) {
 		return new EvaluationResults();
+	}
+	
+	@Override
+	public String getImplementationVersion() {
+		return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
 	}
 	
 	/**
@@ -121,10 +126,6 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	 */
 	protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
 		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK);
-	}
-	
-	public String getImplementationVersion() {
-		return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
 	}
 	
 }
