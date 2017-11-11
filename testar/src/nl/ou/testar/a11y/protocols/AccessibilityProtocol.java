@@ -20,6 +20,7 @@ package nl.ou.testar.a11y.protocols;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -33,6 +34,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
+import com.tinkerpop.gremlin.java.GremlinPipeline;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
@@ -93,8 +95,10 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		html.writeHeader()
 		.writeHeading(2, "General Information")
+		.writeParagraph("Report type: " +
+				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "Ad-hoc"))
 		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
-		.writeParagraph("Sequence: " + sequenceCount());
+		.writeParagraph("Sequence number: " + sequenceCount());
 	}
 
 	/**
@@ -116,9 +120,10 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		state.set(A11yTags.A11yPassCount, results.getPassCount());
 		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
 		state.set(A11yTags.A11yErrorCount, results.getErrorCount());
+		state.set(A11yTags.A11yHasViolations, results.hasViolations());
 		if (!settings().get(ConfigTags.GraphDBEnabled))
-			// report every state
-			writeAdHocStateResults(results);
+			// ad-hoc analysis (spammy)
+			writeAdHocResults(results);
 		return results.getOverallVerdict();
 	}
 
@@ -140,15 +145,18 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	@Override
 	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
+		if (settings().get(ConfigTags.GraphDBEnabled))
+			// proper offline analysis
+			writeGraphDBResults();
 		html.writeFooter().close();
 	}
 	
 	/**
-	 * Write implementation-specific evaluation result details to the HTML report
+	 * Write implementation-specific ad-hoc evaluation result details to the HTML report
 	 * Subclasses can override this to retrieve information from a subclass of EvaluationResult.
 	 * @param results The evaluation results.
 	 */
-	protected void writeAdHocStateResultsDetails(EvaluationResults results) {
+	protected void writeAdHocResultsDetails(EvaluationResults results) {
 		boolean hadViolations = false;
 		html.writeHeading(4, "Violations")
 		.writeUListStart();
@@ -163,6 +171,12 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		html.writeUListEnd();
 	}
 	
+	/**
+	 * Write implementation-specific offline evaluation result details to the HTML report
+	 * Subclasses can override this to retrieve information from a graph database.
+	 */
+	protected void writeGraphDBResultsDetails() {}
+	
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
@@ -174,7 +188,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		return widgets;
 	}
 	
-	private void writeAdHocStateResults(EvaluationResults results) {
+	private void writeAdHocResults(EvaluationResults results) {
 		html.writeHeading(3, "State: " + state.get(Tags.ConcreteID))
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
@@ -183,7 +197,41 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeTableRow("Pass", Integer.toString(results.getPassCount()))
 		.writeTableRow("Total", Integer.toString(results.getResultCount()))
 		.writeTableEnd();
-		writeAdHocStateResultsDetails(results);
+		writeAdHocResultsDetails(results);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void writeGraphDBResults() {
+		GremlinPipeline pipe = new GremlinPipeline(graphDB().getStateVertices());
+		html.writeParagraph("Unique states: " + pipe.count());
+		
+		pipe = new GremlinPipeline(graphDB().getStateVertices());
+		pipe.has(A11yTags.A11yHasViolations.name(), "true")
+		.map(Tags.ConcreteID.name(),
+				A11yTags.A11yErrorCount.name(),
+				A11yTags.A11yWarningCount.name(),
+				A11yTags.A11yPassCount.name(),
+				A11yTags.A11yResultCount.name(),
+				A11yTags.A11yEvaluationResults.name());
+		for (Object state : pipe) {
+			Map<String, Object> props = (Map<String, Object>)state;
+			html.writeHeading(3,
+					"State: " + (String)props.get(Tags.ConcreteID.name()))
+			.writeTableStart()
+			.writeTableHeadings("Type", "Count")
+			.writeTableRow("Error",
+					(String)props.get(A11yTags.A11yErrorCount.name()))
+			.writeTableRow("Warning",
+					(String)props.get(A11yTags.A11yWarningCount.name()))
+			.writeTableRow("Pass",
+					(String)props.get(A11yTags.A11yPassCount.name()))
+			.writeTableRow("Total",
+					(String)props.get(A11yTags.A11yResultCount.name()))
+			.writeTableEnd()
+			.writeParagraph((String)props.get(A11yTags.A11yEvaluationResults.name()));
+		}
+		
+		writeGraphDBResultsDetails();
 	}
 
 }

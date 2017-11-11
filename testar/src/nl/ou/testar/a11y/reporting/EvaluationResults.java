@@ -19,6 +19,7 @@ package nl.ou.testar.a11y.reporting;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.fruit.Assert;
@@ -42,6 +43,8 @@ public final class EvaluationResults implements Serializable {
 	
 	private final List<EvaluationResult> results = new ArrayList<>();
 	
+	private int passCount = 0, warningCount = 0, errorCount = 0;
+	
 	/**
 	 * Constructs a new container for evaluation results
 	 */
@@ -53,6 +56,19 @@ public final class EvaluationResults implements Serializable {
 	 */
 	public void add(EvaluationResult result) {
 		results.add(Assert.notNull(result));
+		switch (result.getType()) {
+			case WARNING:
+				warningCount++;
+				return;
+			case ERROR:
+				errorCount++;
+				return;
+			case OK:
+				passCount++;
+				return;
+			default:
+				return;
+		}
 	}
 	
 	/**
@@ -60,7 +76,7 @@ public final class EvaluationResults implements Serializable {
 	 * @return The list of results.
 	 */
 	public List<EvaluationResult> getResults() {
-		return results;
+		return Collections.unmodifiableList(results);
 	}
 	
 	/**
@@ -76,7 +92,7 @@ public final class EvaluationResults implements Serializable {
 	 * @return The pass count.
 	 */
 	public int getPassCount() {
-		return getCount(EvaluationResult.Type.OK);
+		return passCount;
 	}
 	
 	/**
@@ -84,7 +100,7 @@ public final class EvaluationResults implements Serializable {
 	 * @return The warning count.
 	 */
 	public int getWarningCount() {
-		return getCount(EvaluationResult.Type.WARNING);
+		return warningCount;
 	}
 	
 	/**
@@ -92,7 +108,15 @@ public final class EvaluationResults implements Serializable {
 	 * @return The error count.
 	 */
 	public int getErrorCount() {
-		return getCount(EvaluationResult.Type.ERROR);
+		return errorCount;
+	}
+	
+	/**
+	 * Returns if at least one evaluation result is a violation (warning or error)
+	 * @return Whether or not the results contain any violations.
+	 */
+	public boolean hasViolations() {
+		return getResultCount() - passCount > 0;
 	}
 	
 	/**
@@ -126,12 +150,4 @@ public final class EvaluationResults implements Serializable {
 				getResultCount() + " total}";
 	}
 	
-	private int getCount(EvaluationResult.Type type) {
-		int count = 0;
-		for (EvaluationResult result : results)
-			if (result.getType().equals(type))
-				count++;
-		return count;
-	}
-
 }
