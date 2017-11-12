@@ -20,7 +20,9 @@ package nl.ou.testar.a11y.reporting;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.fruit.Assert;
 
 /**
@@ -48,30 +50,15 @@ public final class HTMLReporter {
 		"</html>"
 	};
 	
-	private static final String[]
-			HEADING_START = new String[] { "<h1>", "<h2>", "<h3>", "<h4>", "<h5>", "<h6>" },
-			HEADING_END = new String[] { "</h1>", "</h2>", "</h3>", "</h4>", "</h5>", "</h6>" };
+	private static final String[] HEADING = new String[] {
+			"h1", "h2", "h3", "h4", "h5", "h6"
+	};
 	
-	private static final String PARAGRAPH_START = "<p>",
-			PARAGRAPH_END = "</p>";
-	
-	private static final String ULIST_START = "<ul>",
-			ULIST_END = "</ul>";
-	
-	private static final String OLIST_START = "<ol>",
-			OLIST_END = "</ol>";
-	
-	private static final String LIST_ITEM_START = "<li>",
-			LIST_ITEM_END = "</li>";
-	
-	private static final String TABLE_START = "<table>",
-			TABLE_END = "</table>";
-	private static final String TABLE_ROW_START = "<tr>",
-			TABLE_ROW_END = "</tr>";
-	private static final String TABLE_HEADING_START = "<th>",
-			TABLE_HEADING_END = "</th>";
-	private static final String TABLE_CELL_START = "<td>",
-			TABLE_CELL_END = "</td>";
+	private static final String PARAGRAPH = "p",
+			ULIST = "ul", OLIST = "ol", LIST_ITEM = "li",
+			TABLE = "table", TABLE_ROW = "tr", TABLE_HEADING = "th", TABLE_CELL = "td",
+			IMAGE = "img", IMAGE_SRC = "src", IMAGE_ALT = "alt",
+			LINK = "a", LINK_DEST = "href", LINK_TARGET = "target", LINK_TARGET_NEW = "_blank";
 	
 	// ---------
 	// Constants
@@ -123,8 +110,9 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeHeading(int level, String text) {
+		Assert.notNull(text);
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(HEADING_START[level-1] + text + HEADING_END[level-1]);
+		write(start(HEADING[level-1]) + text + end(HEADING[level-1]));
 		return this;
 	}
 	
@@ -134,7 +122,8 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeParagraph(String text) {
-		write(PARAGRAPH_START + text + PARAGRAPH_END);
+		Assert.notNull(text);
+		write(start(PARAGRAPH) + text + end(PARAGRAPH));
 		return this;
 	}
 	
@@ -143,7 +132,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeUListStart() {
-		write(ULIST_START);
+		write(start(ULIST));
 		return this;
 	}
 	
@@ -152,7 +141,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeUListEnd() {
-		write(ULIST_END);
+		write(end(ULIST));
 		return this;
 	}
 	
@@ -161,7 +150,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeOListStart() {
-		write(OLIST_START);
+		write(start(OLIST));
 		return this;
 	}
 	
@@ -170,7 +159,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeOListEnd() {
-		write(OLIST_END);
+		write(end(OLIST));
 		return this;
 	}
 	
@@ -180,7 +169,8 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeListItem(String text) {
-		write(LIST_ITEM_START + text + LIST_ITEM_END);
+		Assert.notNull(text);
+		write(start(LIST_ITEM) + text + end(LIST_ITEM));
 		return this;
 	}
 	
@@ -189,7 +179,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableStart() {
-		write(TABLE_START);
+		write(start(TABLE));
 		return this;
 	}
 	
@@ -198,7 +188,7 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableEnd() {
-		write(TABLE_END);
+		write(end(TABLE));
 		return this;
 	}
 	
@@ -208,10 +198,10 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableHeadings(String... headings) {
-		write(TABLE_ROW_START);
+		write(start(TABLE_ROW));
 		for (String heading : headings)
-			write(TABLE_HEADING_START + heading + TABLE_HEADING_END);
-		write(TABLE_ROW_END);
+			write(start(TABLE_HEADING) + heading + end(TABLE_HEADING));
+		write(end(TABLE_ROW));
 		return this;
 	}
 	
@@ -221,12 +211,44 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRow(String... cells) {
-		write(TABLE_ROW_START);
+		write(start(TABLE_ROW));
 		for (String cell : cells)
-			write(TABLE_CELL_START + cell + TABLE_CELL_END);
-		write(TABLE_ROW_END);
+			write(start(TABLE_CELL) + cell + end(TABLE_CELL));
+		write(end(TABLE_ROW));
 		return this;
-	}	
+	}
+	
+	/**
+	 * Writes a reference to an image to the HTML report
+	 * @param src The image URL.
+	 * @param alt The alternative text for the image.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeImage(String src, String alt) {
+		Assert.notNull(src, alt);
+		Map<String, String> attrs = new HashMap<>();
+		attrs.put(IMAGE_SRC, src);
+		attrs.put(IMAGE_ALT, alt);
+		write(start(IMAGE, attrs)); // image tag is not closed
+		return this;
+	}
+	
+	/**
+	 * Writes a reference to an image to the HTML report
+	 * @param text The link text.
+	 * @param dest The destination URL.
+	 * @param newWindow If the link should open in a new window or tab.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeLink(String text, String dest, boolean newWindow) {
+		Assert.notNull(text, dest);
+		Map<String, String> attrs = new HashMap<>();
+		attrs.put(LINK_DEST, dest);
+		if (newWindow)
+			attrs.put(LINK_TARGET, LINK_TARGET_NEW);
+		write(start(LINK, attrs) + text + end(LINK));
+		return this;
+	}
 	
 	/**
 	 * Closes the HTML report
@@ -237,6 +259,22 @@ public final class HTMLReporter {
 	
 	private void write(String s) {
 		out.println(s);
+	}
+	
+	private String start(String el) {
+		return "<" + el + ">";
+	}
+	
+	private String start(String el, Map<String, String> attrs) {
+		String ret = "<" + el;
+		for (Entry<String, String> attr : attrs.entrySet())
+			ret += " " + attr.getKey() + "=\"" + attr.getValue() + "\"";
+		ret += ">";
+		return ret;
+	}
+	
+	private String end(String el) {
+		return "</" + el + ">";
 	}
 
 }

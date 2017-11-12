@@ -66,7 +66,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				if (lastConcreteID.equals(concreteID)) {
 					sameWidgetCount++;
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
-						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING, w));
+						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+								"Possible keyboard trap", w));
 					else
 						results.add(evaluationPassed(sc));
 				}

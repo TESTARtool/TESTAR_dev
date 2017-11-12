@@ -31,12 +31,25 @@ public final class WCAG2EvaluationResult extends EvaluationResult {
 	private static final long serialVersionUID = -3449985990033944575L;
 	private final SuccessCriterion criterion;
 	
-	WCAG2EvaluationResult(SuccessCriterion criterion, Type type) {
-		this(criterion, type, null);
+	/**
+	 * Constructs a new evaluation result that does not apply to a single widget
+	 * @param criterion The success criterion associated with this evaluation result.
+	 * @param type The problem type.
+	 * @param message The problem description.
+	 */
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message) {
+		this(criterion, type, message, null);
 	}
 
-	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, Widget widget) {
-		super(type, widget);
+	/**
+	 * Constructs a new evaluation result that applies to a single widget
+	 * @param criterion The success criterion associated with this evaluation result.
+	 * @param type The problem type.
+	 * @param message The problem description.
+	 * @param widget The widget this evaluation result applies to.
+	 */
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message, Widget widget) {
+		super(type, message, widget);
 		this.criterion = criterion;
 	}
 	

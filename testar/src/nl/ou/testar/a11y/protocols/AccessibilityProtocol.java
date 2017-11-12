@@ -49,8 +49,10 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public class AccessibilityProtocol extends DefaultProtocol {
 	
-	public static final String HTML_FILENAME_PREFIX = "report_",
+	public static final String HTML_FILENAME_PREFIX = "accessibility_report_",
 			HTML_EXTENSION = ".html";
+	
+	private final static String SCREENSHOT_PATH_PREFIX = "../";
 	
 	/**
 	 * The accessibility evaluator
@@ -180,11 +182,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
+		for (Widget w : state) {
 			if (isUnfiltered(w)
 					&& w.get(Tags.ZIndex) == maxZIndex
-					&& AccessibilityUtil.isRelevant(w))
+					&& AccessibilityUtil.isRelevant(w)) {
 				widgets.add(w);
+				storeWidget(state.get(Tags.ConcreteID), w);
+			}
+		}
 		return widgets;
 	}
 	
@@ -206,29 +211,27 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		html.writeParagraph("Unique states: " + pipe.count());
 		
 		pipe = new GremlinPipeline(graphDB().getStateVertices());
-		pipe.has(A11yTags.A11yHasViolations.name(), "true")
-		.map(Tags.ConcreteID.name(),
-				A11yTags.A11yErrorCount.name(),
-				A11yTags.A11yWarningCount.name(),
-				A11yTags.A11yPassCount.name(),
-				A11yTags.A11yResultCount.name(),
-				A11yTags.A11yEvaluationResults.name());
-		for (Object state : pipe) {
-			Map<String, Object> props = (Map<String, Object>)state;
+		// This will retrieve all properties,
+		// which may be inefficient when storing many properties to the GraphDB.
+		pipe.has(A11yTags.A11yHasViolations.name(), "true").map();
+		for (Object props : pipe) {
+			Map<String, Object> state = (Map<String, Object>)props;
 			html.writeHeading(3,
-					"State: " + (String)props.get(Tags.ConcreteID.name()))
+					"State: " + (String)state.get(Tags.ConcreteID.name()))
 			.writeTableStart()
 			.writeTableHeadings("Type", "Count")
 			.writeTableRow("Error",
-					(String)props.get(A11yTags.A11yErrorCount.name()))
+					(String)state.get(A11yTags.A11yErrorCount.name()))
 			.writeTableRow("Warning",
-					(String)props.get(A11yTags.A11yWarningCount.name()))
+					(String)state.get(A11yTags.A11yWarningCount.name()))
 			.writeTableRow("Pass",
-					(String)props.get(A11yTags.A11yPassCount.name()))
+					(String)state.get(A11yTags.A11yPassCount.name()))
 			.writeTableRow("Total",
-					(String)props.get(A11yTags.A11yResultCount.name()))
+					(String)state.get(A11yTags.A11yResultCount.name()))
 			.writeTableEnd()
-			.writeParagraph((String)props.get(A11yTags.A11yEvaluationResults.name()));
+			.writeHeading(4, "Screenshot")
+			.writeImage(SCREENSHOT_PATH_PREFIX + (String)state.get(Tags.ScreenshotPath.name()),
+					"State screenshot");
 		}
 		
 		writeGraphDBResultsDetails();

@@ -52,29 +52,32 @@ public class EvaluationResult implements Serializable {
 	}
 	
 	private final Type type;
+	private final String message;
 	private final Widget widget;
 	
 	/**
 	 * Constructs a new evaluation result that does not apply to a single widget
-	 * @param criterion The success criterion.
 	 * @param type The problem type.
+	 * @param message The problem description.
 	 */
-	public EvaluationResult(Type type) {
-		this(type, null);
+	public EvaluationResult(Type type, String message) {
+		this(type, message, null);
 	}
 	
 	/**
 	 * Constructs a new evaluation result that applies to a single widget
-	 * @param criterion The success criterion.
 	 * @param type The problem type.
+	 * @param message The problem description.
+	 * @param widget The widget this evaluation result applies to.
 	 */
-	public EvaluationResult(Type type, Widget widget) {
+	public EvaluationResult(Type type, String message, Widget widget) {
 		this.type = type;
+		this.message = message;
 		this.widget = widget;
 	}
 	
 	/**
-	 * Gets the problem type of this evaluation result
+	 * Gets the problem type
 	 * @return The problem type.
 	 */
 	public Type getType() {
@@ -82,7 +85,15 @@ public class EvaluationResult implements Serializable {
 	}
 	
 	/**
-	 * Gets the widget that the success criterion associated with this evaluation result applies to
+	 * Gets the problem message
+	 * @return The problem message.
+	 */
+	public String getMessage() {
+		return message;
+	}
+	
+	/**
+	 * Gets the widget that this evaluation result applies to
 	 * @return The widget.
 	 */
 	public Widget getWidget() {
@@ -99,12 +110,10 @@ public class EvaluationResult implements Serializable {
 	
 	@Override
 	public String toString() {
-		String widgetInfo = "Not set";
+		String ret = type.name() + ": " + message;
 		if (widget != null)
-			widgetInfo = widget.get(Tags.Title, "") + " (" + widget.get(Tags.Role) + ")";
-		return "EvaluationResult: {" +
-				"Type: " + type.toString() + ", " +
-				"Widget: " + widgetInfo + "}";
+			ret += " [Widget: \"" + widget.get(Tags.Title, "") + "\" (" + widget.get(Tags.Role) + ")]";
+		return ret;
 	}
 
 }

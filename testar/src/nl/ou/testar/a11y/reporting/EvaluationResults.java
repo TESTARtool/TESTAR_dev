@@ -144,10 +144,9 @@ public final class EvaluationResults implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "EvaluationResults: {" +
-				getWarningCount() + " warnings, " +
-				getErrorCount() + " errors, " +
-				getResultCount() + " total}";
+		return "Warnings: " + getWarningCount() +
+				", Errors: " + getErrorCount() +
+				", Total: " + getResultCount();
 	}
 	
 }

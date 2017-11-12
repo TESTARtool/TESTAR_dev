@@ -47,9 +47,11 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 		for (Widget w : widgets)
 			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
 				if (AccessibilityUtil.isKeyboardFocusable(w)) // focusable images must have a text alternative
-					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR, w));
+					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+							"Missing text alternative", w));
 				else
-					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING, w));
+					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+							"Possible missing text alternative", w));
 			else
 				results.add(evaluationPassed(sc));
 		return results;

@@ -125,7 +125,8 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	 * @return A new EvaluationResult.
 	 */
 	protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
-		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK);
+		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK,
+				"Evaluation passed");
 	}
 	
 }

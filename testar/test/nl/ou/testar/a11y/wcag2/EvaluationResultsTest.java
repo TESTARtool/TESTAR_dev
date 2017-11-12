@@ -20,12 +20,12 @@ public class EvaluationResultsTest {
 		SuccessCriterion s1 = new SuccessCriterion(1, "Foo", g, Level.A),
 				s2 = new SuccessCriterion(2, "Bar", g, Level.AA),
 				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA);
-		WCAG2EvaluationResult r1 = new WCAG2EvaluationResult(s1, Type.OK),
-				r2 = new WCAG2EvaluationResult(s2, Type.WARNING),
-				r3 = new WCAG2EvaluationResult(s1, Type.WARNING),
-				r4 = new WCAG2EvaluationResult(s3, Type.ERROR),
-				r5 = new WCAG2EvaluationResult(s2, Type.ERROR),
-				r6 = new WCAG2EvaluationResult(s1, Type.ERROR);
+		WCAG2EvaluationResult r1 = new WCAG2EvaluationResult(s1, Type.OK, "Pass"),
+				r2 = new WCAG2EvaluationResult(s2, Type.WARNING, "Warning"),
+				r3 = new WCAG2EvaluationResult(s1, Type.WARNING, "Warning"),
+				r4 = new WCAG2EvaluationResult(s3, Type.ERROR, "Error"),
+				r5 = new WCAG2EvaluationResult(s2, Type.ERROR, "Error"),
+				r6 = new WCAG2EvaluationResult(s1, Type.ERROR, "Error");
 		double os1, os2, os3;
 		EvaluationResults results = new EvaluationResults();
 		

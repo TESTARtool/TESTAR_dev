@@ -48,7 +48,8 @@ public final class CompatibleGuideline extends AbstractGuideline {
 		for (Widget w : widgets)
 			// exclude images, they are handled by guideline "Text Alternatives"
 			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR, w));
+				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+						"Missing name", w));
 			else
 				results.add(evaluationPassed(sc));
 		return results;
