@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
@@ -42,7 +43,11 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * The implementation version
 	 */
-	static final String VERSION = "20171107";
+	static final String VERSION = "20171112";
+	
+	/**
+	 * The base part for anchor links, e.g. to success criteria
+	 */
 	
 	private final List<AbstractPrinciple> principles = new ArrayList<>();
 	
@@ -110,6 +115,26 @@ public final class WCAG2ICT implements Evaluator {
 			for (EvaluationResult result : p.query(vertices).getResults())
 				results.add(result);
 		return results;
+	}
+	
+	/**
+	 * Gets a success criterion by its qualified number, e.g. "1.1.1"
+	 * @param number The qualified number.
+	 * @return The success criterion,
+	 */
+	public SuccessCriterion getSuccessCriterionByNumber(String number) {
+		Assert.isTrue(number.length() == 5);
+		String[] parts = number.split(".");
+		Assert.isTrue(parts.length == 3);
+		int p = Integer.parseInt(parts[0]),
+				g = Integer.parseInt(parts[1]),
+				s = Integer.parseInt(parts[2]);
+		Assert.isTrue(p > 0 && p <= principles.size());
+		AbstractPrinciple principle = principles.get(p-1);
+		Assert.isTrue(g > 0 && g <= principle.getGuidelines().size());
+		AbstractGuideline guideline = principle.getGuidelines().get(g-1);
+		Assert.isTrue(s > 0 && s <= guideline.getSuccessCriteria().size());
+		return guideline.getSuccessCriteria().get(s);
 	}
 	
 	@Override

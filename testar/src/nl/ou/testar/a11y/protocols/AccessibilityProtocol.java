@@ -117,7 +117,6 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
 		EvaluationResults results = evaluator.evaluate(relevantWidgets);
-		state.set(A11yTags.A11yEvaluationResults, results);
 		state.set(A11yTags.A11yResultCount, results.getResultCount());
 		state.set(A11yTags.A11yPassCount, results.getPassCount());
 		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
@@ -136,6 +135,11 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+		// first store all relevant widgets to the graph database
+		String concreteID = state.get(Tags.ConcreteID);
+		for (Widget w : relevantWidgets)
+			storeWidget(concreteID, w);
+		
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
@@ -182,14 +186,11 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state) {
+		for (Widget w : state)
 			if (isUnfiltered(w)
 					&& w.get(Tags.ZIndex) == maxZIndex
-					&& AccessibilityUtil.isRelevant(w)) {
+					&& AccessibilityUtil.isRelevant(w))
 				widgets.add(w);
-				storeWidget(state.get(Tags.ConcreteID), w);
-			}
-		}
 		return widgets;
 	}
 	
