@@ -1,4 +1,3 @@
-apply plugin: 'eclipse'
 subprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
