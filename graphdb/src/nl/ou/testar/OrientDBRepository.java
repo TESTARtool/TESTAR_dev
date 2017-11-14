@@ -121,6 +121,13 @@ class OrientDBRepository implements GraphDBRepository {
         LOGGER.error("Widget {} stored ", w.get(Tags.ConcreteID));
 
     }
+    
+    @Override
+    public Iterable<Vertex> getStateVertices() {
+    	OrientGraph graph = graphFactory.getTx();
+    	return graph.getVerticesOfClass("State");
+    	// TODO: when/where to shutdown graph?
+    }
 
     /**
      * Create new State Vertex
@@ -198,5 +205,5 @@ class OrientDBRepository implements GraphDBRepository {
                 t.name().replace(',', '_'),
                 action.get(t).toString()));
     }
-
+    
 }

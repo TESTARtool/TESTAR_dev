@@ -421,6 +421,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
+	protected final GraphDB graphDB(){ return graphDB; }
 	protected void beginSequence() {}
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;

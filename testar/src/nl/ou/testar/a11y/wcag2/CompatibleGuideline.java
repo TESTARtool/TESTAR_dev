@@ -22,6 +22,7 @@ import java.util.List;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -32,6 +33,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class CompatibleGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = -8328191457523354317L;
+
 	CompatibleGuideline(AbstractPrinciple parent) {
 		super(1, "Compatible", parent);
 		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
@@ -41,12 +44,14 @@ public final class CompatibleGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("Name, Role, Value");
 		for (Widget w : widgets)
 			// exclude images, they are handled by guideline "Text Alternatives"
 			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				results.add(new EvaluationResult(
-						getSuccessCriterionByName("Name, Role, Value"),
-						EvaluationResult.Type.ERROR, w));
+				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+						"Missing name", w));
+			else
+				results.add(evaluationPassed(sc));
 		return results;
 	}
 

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -31,6 +32,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class ReadableGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = -7061749135757191395L;
+
 	ReadableGuideline(AbstractPrinciple parent) {
 		super(1, "Readable", parent);
 		criteria.add(new SuccessCriterion(1, "Language of Page", this, Level.A));
@@ -40,11 +43,13 @@ public final class ReadableGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
 		for (Widget w : widgets)
 			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0)
-				results.add(new EvaluationResult(
-						getSuccessCriterionByName("Language of Page"),
-						EvaluationResult.Type.ERROR, w));
+				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+						"Missing top-level language identifier", w));
+			else
+				results.add(evaluationPassed(sc));
 		return results;
 	}
 

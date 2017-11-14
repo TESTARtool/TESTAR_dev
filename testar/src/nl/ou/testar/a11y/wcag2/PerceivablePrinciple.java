@@ -24,6 +24,8 @@ package nl.ou.testar.a11y.wcag2;
  */
 public final class PerceivablePrinciple extends AbstractPrinciple {
 
+	private static final long serialVersionUID = -7997953003623261769L;
+
 	PerceivablePrinciple() {
 		super(1, "Perceivable");
 		guidelines.add(new TextAlternativesGuideline(this));
