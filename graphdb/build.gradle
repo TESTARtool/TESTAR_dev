@@ -18,7 +18,7 @@ jmhReport {
 
 dependencies {
     compile project(':core')
-    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.0m2'
+    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '2.2.21'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '2.0.0-beta'
 
