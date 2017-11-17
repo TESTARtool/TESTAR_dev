@@ -56,7 +56,9 @@ class OrientDBRepository implements GraphDBRepository {
 
     @Override
     public void addAction(final Action action, final String toStateID) {
-        long tStart = System.currentTimeMillis();
+
+        LOGGER.info("Store Action {} ({}) from {} to {}",
+                action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
@@ -79,7 +81,8 @@ class OrientDBRepository implements GraphDBRepository {
 
     @Override
     public void addActionOnState(String stateId, Action action, String toStateID) {
-        long tStart = System.currentTimeMillis();
+        LOGGER.info("Store Action {} ({}) from {} to {}",
+                action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
 
         OrientGraph graph = graphFactory.getTx();
         try {
@@ -102,8 +105,7 @@ class OrientDBRepository implements GraphDBRepository {
 
     @Override
     public void addWidget(String stateID, Widget w) {
-        long tStart = System.currentTimeMillis();
-
+        LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
         OrientGraph graph = graphFactory.getTx();
         try {
             Vertex state = getStateVertex(stateID, graph);
@@ -123,6 +125,13 @@ class OrientDBRepository implements GraphDBRepository {
         long tEnd = System.currentTimeMillis();
         LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID),tEnd-tStart);
 
+    }
+
+    @Override
+    public Iterable<Vertex> getStateVertices() {
+    	OrientGraph graph = graphFactory.getTx();
+    	return graph.getVerticesOfClass("State");
+    	// TODO: when/where to shutdown graph?
     }
 
     /**

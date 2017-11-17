@@ -26,6 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class InputAssistanceGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = -3766907198803540591L;
+
 	InputAssistanceGuideline(AbstractPrinciple parent) {
 		super(3, "Input Assistance", parent);
 		criteria.add(new SuccessCriterion(1, "Error Identification", this, Level.A));

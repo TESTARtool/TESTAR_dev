@@ -103,7 +103,7 @@ public final class UIAStateBuilder implements StateBuilder {
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClickablePointPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControllerForPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControlTypePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_CulturePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_CulturePropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_DescribedByPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FlowsToPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FrameworkIdPropertyId);

@@ -26,6 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class NavigableGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = 7746462844461205071L;
+
 	NavigableGuideline(AbstractPrinciple parent) {
 		super(4, "Navigable", parent);
 		criteria.add(new SuccessCriterion(1, "Bypass Blocks", this, Level.A));

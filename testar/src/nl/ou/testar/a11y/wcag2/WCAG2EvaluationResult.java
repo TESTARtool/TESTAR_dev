@@ -17,22 +17,53 @@
 
 package nl.ou.testar.a11y.wcag2;
 
-import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
+import org.fruit.alayer.Widget;
+
+import nl.ou.testar.a11y.reporting.EvaluationResult;
 
 /**
- * A WCAG 2.0 guideline
+ * The result of evaluating a WCAG2ICT success criterion
  * @author Davy Kager
  *
  */
-public final class AdaptableGuideline extends AbstractGuideline {
-
-	private static final long serialVersionUID = 3699259852412561121L;
-
-	AdaptableGuideline(AbstractPrinciple parent) {
-		super(3, "Adaptable", parent);
-		criteria.add(new SuccessCriterion(1, "Info and Relationships", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Meaningful Sequence", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Sensory Characteristics", this, Level.A));
+public final class WCAG2EvaluationResult extends EvaluationResult {
+	
+	private static final long serialVersionUID = -3449985990033944575L;
+	private final SuccessCriterion criterion;
+	
+	/**
+	 * Constructs a new evaluation result that does not apply to a single widget
+	 * @param criterion The success criterion associated with this evaluation result.
+	 * @param type The problem type.
+	 * @param message The problem description.
+	 */
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message) {
+		this(criterion, type, message, null);
 	}
 
+	/**
+	 * Constructs a new evaluation result that applies to a single widget
+	 * @param criterion The success criterion associated with this evaluation result.
+	 * @param type The problem type.
+	 * @param message The problem description.
+	 * @param widget The widget this evaluation result applies to.
+	 */
+	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message, Widget widget) {
+		super(type, message, widget);
+		this.criterion = criterion;
+	}
+	
+	/**
+	 * Gets the success criterion associated with this evaluation result
+	 * @return The success criterion.
+	 */
+	public SuccessCriterion getSuccessCriterion() {
+		return criterion;
+	}
+	
+	@Override
+	public double getVerdictSeverity() {
+		return criterion.getVerdictSeverity();
+	}
+	
 }

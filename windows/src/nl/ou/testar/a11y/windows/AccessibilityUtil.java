@@ -174,6 +174,15 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
+	 * Gets the language for the given widget
+	 * @param w The widget.
+	 * @return The language, as unprocessed language code.
+	 */
+	public static long getLanguage(Widget w) {
+		return w.get(UIATags.UIACulture, 0L);
+	}
+	
+	/**
 	 * Checks whether the given widget has keyboard focus
 	 * @param w The widget.
 	 * @return True if the widget has keyboard focus, else false.
@@ -251,6 +260,15 @@ public final class AccessibilityUtil {
 	 */
 	public static boolean isTabItem(Widget w) {
 		return getRole(w).isA(UIATabItem);
+	}
+	
+	/**
+	 * Checks whether the given widget is a window
+	 * @param w The widget.
+	 * @return True if the widget is a window, else false.
+	 */
+	public static boolean isWindow(Widget w) {
+		return getRole(w).isA(UIAWindow);
 	}
 	
 	// #########W####

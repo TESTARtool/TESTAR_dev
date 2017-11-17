@@ -27,7 +27,10 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
+import com.tinkerpop.blueprints.Vertex;
+
 import nl.ou.testar.a11y.protocols.Evaluator;
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 
 /**
  * An abstract WCAG guideline
@@ -37,6 +40,7 @@ import nl.ou.testar.a11y.protocols.Evaluator;
  */
 public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	
+	private static final long serialVersionUID = -2941524827644792263L;
 	/**
 	 * The list of all the success criteria in this guideline
 	 */
@@ -75,7 +79,8 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	
 	/**
 	 * Evaluates the accessibility of the given state
-	 * This will typically include one or more evaluation results for each success criterion in this guideline.
+	 * This will include zero or more evaluation results for each success criterion in this guideline.
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -85,15 +90,43 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Derives the follow-up actions from the given state
-	 * This will typically include actions from all success criteria in this guideline.
+	 * Derives the possible actions from the given state
+	 * This will include zero or more actions for each success criterion in this guideline.
 	 * The actions are specific to accessibility.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
 	@Override
 	public Set<Action> deriveActions(List<Widget> widgets) {
 		return new HashSet<>();
+	}
+	
+	/**
+	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * This will include zero or more evaluation results for each success criterion in this guideline.
+	 * This method executes oracles in offline analysis.
+	 * @param vertices All state vertices.
+	 * @return The results of the evaluation.
+	 */
+	@Override
+	public EvaluationResults query(Iterable<Vertex> vertices) {
+		return new EvaluationResults();
+	}
+	
+	@Override
+	public String getImplementationVersion() {
+		return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
+	}
+	
+	/**
+	 * Constructs a new EvaluationResult indicating that the given success criterion was passed
+	 * @param criterion The success criterion.
+	 * @return A new EvaluationResult.
+	 */
+	protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
+		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK,
+				"Evaluation passed");
 	}
 	
 }

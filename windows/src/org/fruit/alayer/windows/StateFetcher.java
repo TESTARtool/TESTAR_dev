@@ -323,6 +323,7 @@ public class StateFetcher implements Callable<UIAState>{
 				el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWndPtr, true);
 				Windows.IUnknown_Release(uiaWndPtr);
 			}
+			el.culture = Windows.IUIAutomationElement_get_Culture(uiaPtr, true);
 		}
 
 		// begin by urueda

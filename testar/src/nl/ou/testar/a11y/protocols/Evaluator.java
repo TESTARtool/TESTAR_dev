@@ -23,7 +23,9 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.a11y.wcag2.EvaluationResults;
+import com.tinkerpop.blueprints.Vertex;
+
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 
 /**
  * Specifies the requirements for an object to be plugged into an AbstractProtocol to evaluate accessibility
@@ -35,17 +37,33 @@ public interface Evaluator {
 	
 	/**
 	 * Evaluates the accessibility of the given state
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
 	public EvaluationResults evaluate(List<Widget> widgets);
 	
 	/**
-	 * Derives the follow-up actions from the given state
+	 * Derives the possible actions from the given state
 	 * The actions are specific to accessibility.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
 	public Set<Action> deriveActions(List<Widget> widgets);
+	
+	/**
+	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * This method executes oracles in offline analysis.
+	 * @param vertices All state vertices.
+	 * @return The results of the evaluation.
+	 */
+	public EvaluationResults query(Iterable<Vertex> vertices);
+	
+	/**
+	 * Gets the unique version of the implementation for the guidelines being used
+	 * @return The version as a String.
+	 */
+	public String getImplementationVersion();
 
 }

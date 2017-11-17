@@ -28,6 +28,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
+
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
@@ -38,6 +40,7 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
+	private static final long serialVersionUID = 4099763917658781054L;
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
 	private static final int MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP = 7;
 	
@@ -54,17 +57,19 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("No Keyboard Trap");
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
-				w.set(WCAG2Tags.KeyboardVisited, true);
+				w.set(WCAG2Tags.WCAG2KeyboardVisited, true);
 				
 				String concreteID = w.get(Tags.ConcreteID, "");
 				if (lastConcreteID.equals(concreteID)) {
 					sameWidgetCount++;
 					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
-						results.add(new EvaluationResult(
-								getSuccessCriterionByName("No Keyboard Trap"),
-								EvaluationResult.Type.WARNING, w));
+						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+								"Possible keyboard trap", w));
+					else
+						results.add(evaluationPassed(sc));
 				}
 				else {
 					sameWidgetCount = 0;

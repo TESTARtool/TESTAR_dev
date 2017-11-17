@@ -26,6 +26,8 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class PredictableGuideline extends AbstractGuideline {
 
+	private static final long serialVersionUID = 7865244281809536826L;
+
 	PredictableGuideline(AbstractPrinciple parent) {
 		super(2, "Predictable", parent);
 		criteria.add(new SuccessCriterion(1, "On Focus", this, Level.A));

@@ -5,6 +5,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 
+import com.tinkerpop.blueprints.Vertex;
+
 /**
  * Wrapper for interaction with the Graph Database
  * Created by floren on 5-6-2017.
@@ -70,6 +72,13 @@ public class GraphDB implements GraphDBRepository {
         if(enabled) {
             repository.addActionOnState(fromSateID, action, toStateID);
         }
+    }
+    
+    public Iterable<Vertex> getStateVertices() {
+        if(enabled) {
+            return repository.getStateVertices();
+        }
+        return null;
     }
 
     /**

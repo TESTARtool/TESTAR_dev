@@ -4,6 +4,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 
+import com.tinkerpop.blueprints.Vertex;
+
 /**
  * Repository API
  * Created by floren on 9-6-2017.
@@ -41,4 +43,6 @@ public interface GraphDBRepository {
      * @param w The widget object
      */
     void addWidget(final String stateID, Widget w);
+    
+    Iterable<Vertex> getStateVertices();
 }

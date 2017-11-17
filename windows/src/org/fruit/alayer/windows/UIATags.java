@@ -69,6 +69,11 @@ public final class UIATags extends TagsBase {
 	public static final Tag<Long> UIAControlType = from("UIAControlType", Long.class);
 	
 	/**
+	 * UIA Culture Identifier of a widget
+	 */
+	public static final Tag<Long> UIACulture = from("UIACulture", Long.class);
+	
+	/**
 	 * If the widget is a Win32 widget, this will be its native handle
 	 */
 	public static final Tag<Long> UIANativeWindowHandle = from("UIANativeWindowHandle", Long.class);
