@@ -50,8 +50,10 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	KeyboardAccessibleGuideline(AbstractPrinciple parent) {
 		super(1, "Keyboard Accessible", parent);
-		criteria.add(new SuccessCriterion(1, "Keyboard", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "No Keyboard Trap", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Keyboard",
+				this, Level.A, "keyboard-operation-keyboard-operable"));
+		criteria.add(new SuccessCriterion(2, "No Keyboard Trap",
+				this, Level.A, "keyboard-operation-trapping"));
 	}
 	
 	@Override

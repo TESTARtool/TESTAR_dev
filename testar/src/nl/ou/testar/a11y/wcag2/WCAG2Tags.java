@@ -37,5 +37,6 @@ public final class WCAG2Tags extends TagsBase {
 	private WCAG2Tags() {}
 	
 	public static final Tag<Boolean> WCAG2KeyboardVisited = from("WCAG2KeyboardVisited", Boolean.class);
+	public static final Tag<String> WCAG2Violations = from("WCAG2Violations", String.class);
 
 }

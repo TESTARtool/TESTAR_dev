@@ -30,7 +30,8 @@ public final class SeizuresGuideline extends AbstractGuideline {
 
 	SeizuresGuideline(AbstractPrinciple parent) {
 		super(3, "Seizures", parent);
-		criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold",
+				this, Level.A, "seizure-does-not-violate"));
 	}
 
 }

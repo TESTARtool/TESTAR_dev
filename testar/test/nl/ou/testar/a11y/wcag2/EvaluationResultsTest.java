@@ -17,9 +17,9 @@ public class EvaluationResultsTest {
 	public void testGetOverallVerdict() {
 		AbstractPrinciple p = new PerceivablePrinciple();
 		AbstractGuideline g = new TextAlternativesGuideline(p);
-		SuccessCriterion s1 = new SuccessCriterion(1, "Foo", g, Level.A),
-				s2 = new SuccessCriterion(2, "Bar", g, Level.AA),
-				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA);
+		SuccessCriterion s1 = new SuccessCriterion(1, "Foo", g, Level.A, "foo"),
+				s2 = new SuccessCriterion(2, "Bar", g, Level.AA, "bar"),
+				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA, "baz");
 		WCAG2EvaluationResult r1 = new WCAG2EvaluationResult(s1, Type.OK, "Pass"),
 				r2 = new WCAG2EvaluationResult(s2, Type.WARNING, "Warning"),
 				r3 = new WCAG2EvaluationResult(s1, Type.WARNING, "Warning"),

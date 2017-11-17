@@ -34,7 +34,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
-import com.tinkerpop.gremlin.java.GremlinPipeline;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
@@ -52,7 +51,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	public static final String HTML_FILENAME_PREFIX = "accessibility_report_",
 			HTML_EXTENSION = ".html";
 	
-	private final static String SCREENSHOT_PATH_PREFIX = "../";
+	private static final String SCREENSHOT_PATH_PREFIX = "../";
 	
 	/**
 	 * The accessibility evaluator
@@ -114,9 +113,11 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		if (!verdict.equals(Verdict.OK))
 			// something went wrong upstream
 			return verdict;
+		
 		// safe only the relevant widgets to use when computing a verdict and deriving actions
 		relevantWidgets = getRelevantWidgets(state);
 		EvaluationResults results = evaluator.evaluate(relevantWidgets);
+		state.set(A11yTags.A11yEvaluationResults, results);
 		state.set(A11yTags.A11yResultCount, results.getResultCount());
 		state.set(A11yTags.A11yPassCount, results.getPassCount());
 		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
@@ -180,8 +181,23 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	/**
 	 * Write implementation-specific offline evaluation result details to the HTML report
 	 * Subclasses can override this to retrieve information from a graph database.
+	 * @param stateProps The map of state properties, indexed by tag name.
 	 */
-	protected void writeGraphDBResultsDetails() {}
+	protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {}
+	
+	/**
+	 * Gets the title of the widget with the given concrete ID from a graph database
+	 * @param concreteID The concrete ID of the widget.
+	 * @return The widget title, or null if the widget is not in the graph database.
+	 */
+	protected String getWidgetTitleFromGraphDB(String concreteID) {
+		String gremlinWidget = "_().has('@class','Widget').has('" +
+				Tags.ConcreteID.name() + "','" + concreteID +"').Title";
+		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget);
+		if (widgets.size() != 1) // too many or too few widgets
+			return null;
+		return (String)widgets.get(0);
+	}
 	
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
@@ -206,36 +222,38 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		writeAdHocResultsDetails(results);
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void writeGraphDBResults() {
-		GremlinPipeline pipe = new GremlinPipeline(graphDB().getStateVertices());
-		html.writeParagraph("Unique states: " + pipe.count());
-		
-		pipe = new GremlinPipeline(graphDB().getStateVertices());
 		// This will retrieve all properties,
 		// which may be inefficient when storing many properties to the GraphDB.
-		pipe.has(A11yTags.A11yHasViolations.name(), "true").map();
-		for (Object props : pipe) {
-			Map<String, Object> state = (Map<String, Object>)props;
-			html.writeHeading(3,
-					"State: " + (String)state.get(Tags.ConcreteID.name()))
-			.writeTableStart()
-			.writeTableHeadings("Type", "Count")
-			.writeTableRow("Error",
-					(String)state.get(A11yTags.A11yErrorCount.name()))
-			.writeTableRow("Warning",
-					(String)state.get(A11yTags.A11yWarningCount.name()))
-			.writeTableRow("Pass",
-					(String)state.get(A11yTags.A11yPassCount.name()))
-			.writeTableRow("Total",
-					(String)state.get(A11yTags.A11yResultCount.name()))
-			.writeTableEnd()
-			.writeHeading(4, "Screenshot")
-			.writeImage(SCREENSHOT_PATH_PREFIX + (String)state.get(Tags.ScreenshotPath.name()),
-					"State screenshot");
+		String gremlinStateProperties = "_().has('@class','State').has('" +
+				A11yTags.A11yHasViolations.name() + "','true').map";
+		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties);
+		html.writeParagraph("Unique states: " + stateMaps.size());
+		for (Object stateMap : stateMaps) {
+			Map<String, Object> stateProps = (Map<String, Object>)stateMap;
+			writeGeneralGraphDBResults(stateProps);
+			writeGraphDBResultsDetails(stateProps);
 		}
-		
-		writeGraphDBResultsDetails();
 	}
-
+	
+	private void writeGeneralGraphDBResults(Map<String, Object> stateProps) {
+		html.writeHeading(3,
+				"State: " + (String)stateProps.get(Tags.ConcreteID.name()))
+		.writeTableStart()
+		.writeTableHeadings("Type", "Count")
+		.writeTableRow("Error",
+				(String)stateProps.get(A11yTags.A11yErrorCount.name()))
+		.writeTableRow("Warning",
+				(String)stateProps.get(A11yTags.A11yWarningCount.name()))
+		.writeTableRow("Pass",
+				(String)stateProps.get(A11yTags.A11yPassCount.name()))
+		.writeTableRow("Total",
+				(String)stateProps.get(A11yTags.A11yResultCount.name()))
+		.writeTableEnd()
+		.writeHeading(4, "Screenshot")
+		.writeLink("Click to open screenshot in a new window",
+				SCREENSHOT_PATH_PREFIX + (String)stateProps.get(Tags.ScreenshotPath.name()), true);
+	}
+	
 }

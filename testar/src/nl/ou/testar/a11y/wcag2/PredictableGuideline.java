@@ -30,10 +30,14 @@ public final class PredictableGuideline extends AbstractGuideline {
 
 	PredictableGuideline(AbstractPrinciple parent) {
 		super(2, "Predictable", parent);
-		criteria.add(new SuccessCriterion(1, "On Focus", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "On Input", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Consistent Navigation", this, Level.AA));
-		criteria.add(new SuccessCriterion(4, "Consistent Identification", this, Level.AA));
+		criteria.add(new SuccessCriterion(1, "On Focus",
+				this, Level.A, "consistent-behavior-receive-focus"));
+		criteria.add(new SuccessCriterion(2, "On Input",
+				this, Level.A, "consistent-behavior-unpredictable-change"));
+		criteria.add(new SuccessCriterion(3, "Consistent Navigation",
+				this, Level.AA, "consistent-behavior-consistent-locations"));
+		criteria.add(new SuccessCriterion(4, "Consistent Identification",
+				this, Level.AA, "consistent-behavior-consistent-functionality"));
 	}
 
 }

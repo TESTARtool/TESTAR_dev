@@ -1,10 +1,10 @@
 package nl.ou.testar;
 
+import java.util.List;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-
-import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Repository API
@@ -44,5 +44,10 @@ public interface GraphDBRepository {
      */
     void addWidget(final String stateID, Widget w);
     
-    Iterable<Vertex> getStateVertices();
+    /**
+     * Get all objects from a pipe specified by a Gremlin-Groovy expression
+     * @param gremlin The Gremlin-Groovy expression.
+     * @return A list of all objects in the pipe.
+     */
+    List<Object> getObjectsFromGremlinPipe(String gremlin);
 }

@@ -37,8 +37,10 @@ public final class CompatibleGuideline extends AbstractGuideline {
 
 	CompatibleGuideline(AbstractPrinciple parent) {
 		super(1, "Compatible", parent);
-		criteria.add(new SuccessCriterion(1, "Parsing", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Name, Role, Value", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Parsing",
+				this, Level.A, "ensure-compat-parses"));
+		criteria.add(new SuccessCriterion(2, "Name, Role, Value",
+				this, Level.A, "ensure-compat-rsv"));
 	}
 	
 	@Override

@@ -23,12 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Vertex;
-
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
@@ -43,7 +41,7 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * The implementation version
 	 */
-	static final String VERSION = "20171112";
+	static final String VERSION = "20171113";
 	
 	/**
 	 * The base part for anchor links, e.g. to success criteria
@@ -102,39 +100,19 @@ public final class WCAG2ICT implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will collect evaluation results from all principles in WCAG2ICT.
 	 * This method executes oracles in offline analysis.
-	 * @param vertices All state vertices.
+	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(Iterable<Vertex> vertices) {
+	public EvaluationResults query(GraphDB graphDB) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.query(vertices).getResults())
+			for (EvaluationResult result : p.query(graphDB).getResults())
 				results.add(result);
 		return results;
-	}
-	
-	/**
-	 * Gets a success criterion by its qualified number, e.g. "1.1.1"
-	 * @param number The qualified number.
-	 * @return The success criterion,
-	 */
-	public SuccessCriterion getSuccessCriterionByNumber(String number) {
-		Assert.isTrue(number.length() == 5);
-		String[] parts = number.split(".");
-		Assert.isTrue(parts.length == 3);
-		int p = Integer.parseInt(parts[0]),
-				g = Integer.parseInt(parts[1]),
-				s = Integer.parseInt(parts[2]);
-		Assert.isTrue(p > 0 && p <= principles.size());
-		AbstractPrinciple principle = principles.get(p-1);
-		Assert.isTrue(g > 0 && g <= principle.getGuidelines().size());
-		AbstractGuideline guideline = principle.getGuidelines().get(g-1);
-		Assert.isTrue(s > 0 && s <= guideline.getSuccessCriteria().size());
-		return guideline.getSuccessCriteria().get(s);
 	}
 	
 	@Override

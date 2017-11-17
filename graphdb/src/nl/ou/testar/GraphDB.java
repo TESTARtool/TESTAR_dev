@@ -1,11 +1,12 @@
 package nl.ou.testar;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-
-import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Wrapper for interaction with the Graph Database
@@ -70,11 +71,16 @@ public class GraphDB {
         }
     }
     
-    public Iterable<Vertex> getStateVertices() {
+    /**
+     * Get all objects from a pipe specified by a Gremlin-Groovy expression
+     * @param gremlin The Gremlin-Groovy expression.
+     * @return A list of all objects in the pipe.
+     */
+    public List<Object> getObjectsFromGremlinPipe(String gremlin) {
         if(enabled) {
-            return repository.getStateVertices();
+            return repository.getObjectsFromGremlinPipe(gremlin);
         }
-        return null;
+        return new ArrayList<Object>();
     }
 
     /**

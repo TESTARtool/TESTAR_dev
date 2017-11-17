@@ -36,8 +36,10 @@ public final class ReadableGuideline extends AbstractGuideline {
 
 	ReadableGuideline(AbstractPrinciple parent) {
 		super(1, "Readable", parent);
-		criteria.add(new SuccessCriterion(1, "Language of Page", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Language of Parts", this, Level.AA));
+		criteria.add(new SuccessCriterion(1, "Language of Page",
+				this, Level.A, "meaning-doc-lang-id"));
+		criteria.add(new SuccessCriterion(2, "Language of Parts",
+				this, Level.AA, "meaning-other-lang-id"));
 	}
 	
 	@Override

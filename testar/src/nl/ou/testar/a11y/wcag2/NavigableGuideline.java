@@ -30,13 +30,20 @@ public final class NavigableGuideline extends AbstractGuideline {
 
 	NavigableGuideline(AbstractPrinciple parent) {
 		super(4, "Navigable", parent);
-		criteria.add(new SuccessCriterion(1, "Bypass Blocks", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Page Titled", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Focus Order", this, Level.A));
-		criteria.add(new SuccessCriterion(4, "Link Purpose (In Context)", this, Level.A));
-		criteria.add(new SuccessCriterion(5, "Multiple Ways", this, Level.AA));
-		criteria.add(new SuccessCriterion(6, "Headings and Labels", this, Level.AA));
-		criteria.add(new SuccessCriterion(7, "Focus Visible", this, Level.AA));
+		criteria.add(new SuccessCriterion(1, "Bypass Blocks",
+				this, Level.A, "navigation-mechanisms-skip"));
+		criteria.add(new SuccessCriterion(2, "Page Titled",
+				this, Level.A, "navigation-mechanisms-title"));
+		criteria.add(new SuccessCriterion(3, "Focus Order",
+				this, Level.A, "navigation-mechanisms-focus-order"));
+		criteria.add(new SuccessCriterion(4, "Link Purpose (In Context)",
+				this, Level.A, "navigation-mechanisms-refs"));
+		criteria.add(new SuccessCriterion(5, "Multiple Ways",
+				this, Level.AA, "navigation-mechanisms-mult-loc"));
+		criteria.add(new SuccessCriterion(6, "Headings and Labels",
+				this, Level.AA, "navigation-mechanisms-descriptive"));
+		criteria.add(new SuccessCriterion(7, "Focus Visible",
+				this, Level.AA, "navigation-mechanisms-focus-visible"));
 	}
 
 }

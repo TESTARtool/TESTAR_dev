@@ -5,6 +5,10 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
+import com.tinkerpop.gremlin.groovy.Gremlin;
+import com.tinkerpop.pipes.Pipe;
+
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -12,6 +16,8 @@ import org.fruit.alayer.Widget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -122,11 +128,23 @@ class OrientDBRepository implements GraphDBRepository {
 
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public Iterable<Vertex> getStateVertices() {
-    	OrientGraph graph = graphFactory.getTx();
-    	return graph.getVerticesOfClass("State");
-    	// TODO: when/where to shutdown graph?
+    public List<Object> getObjectsFromGremlinPipe(String gremlin) {
+       	try {
+       	    Pipe pipe = Gremlin.compile(gremlin);
+       	    OrientGraph graph = graphFactory.getTx();
+       	    pipe.setStarts(graph.getVertices());
+       	    List<Object> ret = new ArrayList<>();
+       	    for (Object o : pipe)
+                ret.add(o);
+            graph.shutdown();
+       	    return ret;
+        }
+       	catch (Exception e) {
+            LOGGER.error("Gremlin exception: {}", e.getMessage());
+            return new ArrayList<Object>();
+       	}
     }
 
     /**
