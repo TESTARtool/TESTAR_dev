@@ -330,13 +330,15 @@ public class Grapher implements Runnable {
 	 * @return
 	 */
 	public static Action selectAction(State state, Set<Action> actions){
-		if (PROLOG_ACTIVATED)
-			jipWrapper.setFacts(state,actions);			
+		if (PROLOG_ACTIVATED) {
+			jipWrapper.setFacts(state, actions);
+		}
 		Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT ?
 			FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
 			: actions;
-		if (Grapher.GRAPHS_ACTIVATED)
+		if (Grapher.GRAPHS_ACTIVATED) {
 			env.notifyEnvironment(state, filteredActions);
+		}
 		Action selectedAction = walker.selectAction(env, state, filteredActions, jipWrapper);
 		if (FORMS_TYPING_ENHANCEMENT)
 			FormsFilling.updateFormActions(state,selectedAction); // update typing actions management

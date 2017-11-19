@@ -69,26 +69,7 @@ import nl.ou.testar.GraphDB;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.ActivateSystem;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -136,19 +117,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	protected boolean faultySequence; // by urueda (refactored from DefaultProtocol)
 
-	Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);	
+	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 	private Settings settings;
 	private Modes mode;
 	protected Mouse mouse = AWTMouse.build();
 	private boolean saveStateSnapshot = false,
 					markParentWidget = false; // by urueda
-	int actionCount, sequenceCount,
-		firstSequenceActionNumber, lastSequenceActionNumber; // by urueda
+	private int actionCount, sequenceCount,
+		firstSequenceActionNumber;
+	protected int lastSequenceActionNumber; // by urueda
 	double startTime;
 	
 	// begin by urueda
 	
-	public static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
 
 	// Verdict severities
 	// PASS
@@ -205,7 +187,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 	protected List<ProcessInfo> contextRunningProcesses = null;
-	
+
+	/**
+	 * Retrieve a list of Running processes
+	 * @param debugTag Tag used in debug output
+	 * @return a list of running processes
+	 */
 	protected List<ProcessInfo> getRunningProcesses(String debugTag){
 		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
 		long pid, handle; String desc;
@@ -213,7 +200,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			System.out.println("\t[" + (i++) +  "] " + /*sut.toString() + "\t - " +*/ sut.getStatus());			
+			System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -403,7 +390,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			default: break;
 			}		
 		}
-		//logln("'" + mode + "' mode active.", LogLevel.Info);
+
 		// begin by urueda
 		String modeParamS = "";
 		if (mode == Modes.GenerateManual)
@@ -1030,7 +1017,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){ // by urueda					
 				//logln(String.format("Executed (%d): %s...", actionCount, action.get(Desc, action.toString())), LogLevel.Info);
 				// begin by urueda
-				cv.begin(); Util.clear(cv); cv.end(); // by urueda (overlay is invalid until new state/actions scan)
+				cv.begin();
+				Util.clear(cv);
+				cv.end(); // by urueda (overlay is invalid until new state/actions scan)
 				stampLastExecutedAction = System.currentTimeMillis();
 				actionExecuted(system,state,actionStatus.getAction()); // notification
 				if (actionStatus.isUserEventAction())
@@ -1047,6 +1036,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
 						actionRepresentation[0]) + "\n",
 						LogSerialiser.LogLevel.Info);
+
 				System.out.print(String.format(
 						"S[%1$" + (1 + (int)Math.log10((double)settings.get(ConfigTags.Sequences))) + "d=%2$" + (1 + (int)Math.log10((double)generatedSequenceNumber)) + "d]-" + // S = test Sequence
 						"A[%3$" + (1 + (int)Math.log10((double)settings().get(ConfigTags.SequenceLength))) + // A = Action
@@ -1104,7 +1094,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 		
 		lastExecutedAction = actionStatus.getAction(); // by urueda
-
+		lastExecutedAction.set(Tags.UsedResources, new UsedResources(lastCPU[0],lastCPU[1],sutRAMbase,sutRAMpeak).toString());
+		lastExecutedAction.set(Tags.Representation, Action.getActionRepresentation(state,lastExecutedAction,"\t")[1]);
 		State newState = getState(system);
 		graphDB.addState(newState);
 

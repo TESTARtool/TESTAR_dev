@@ -198,6 +198,8 @@ public final class Tags extends TagsBase {
 	public static final Tag<Action> ExecutedAction = from("ExecutedAction", Action.class);
 	public static final Tag<Double> ActionDuration = from("ActionDuration", Double.class);
 	public static final Tag<Double> ActionDelay = from("ActionDelay", Double.class);
+	public static final Tag<String> UsedResources = from("Resources", String.class);
+	public static final Tag<String> Representation = from("Representation",String.class);
 
 	/** A list of process handles. Usually attached to a system. Process handles allow to  obtain information about and stop the processes that they refer to. */ 
 	@SuppressWarnings("unchecked")

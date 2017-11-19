@@ -203,7 +203,7 @@ class UIAWidget implements Widget, Serializable {
 	}
 	
 	/**
-	 * @param A tabulator for indentation.
+	 * @param tab tabulator for indentation.
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */

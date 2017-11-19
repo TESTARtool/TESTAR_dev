@@ -7,7 +7,6 @@ sourceSets {
         }
     }
 
-   /* TODO Remove comment after import into Eclipse
    oracle {
 
        java {
@@ -16,7 +15,7 @@ sourceSets {
 
        compileClasspath += main.output
        compileClasspath += main.compileClasspath
-   } TODO Remove comment after import into Eclipse */
+   }
 }
 
 dependencies {
@@ -65,9 +64,8 @@ task prepareNativeDLL(type: Copy) {
     into 'target/scripts'
 }
 
-/*TODO Remove comment after import into Eclipse
 prepareOracles.dependsOn(oracleClasses)
-*/
+
 
 applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
 
