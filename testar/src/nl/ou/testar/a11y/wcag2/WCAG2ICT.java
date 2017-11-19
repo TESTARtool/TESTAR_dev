@@ -41,7 +41,7 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * The implementation version
 	 */
-	static final String VERSION = "20171113";
+	static final String VERSION = "20171118";
 	
 	/**
 	 * The base part for anchor links, e.g. to success criteria

@@ -308,6 +308,19 @@ public final class HTMLReporter {
 	}
 	
 	/**
+	 * Writes a regular table row to the HTML report
+	 * @param cells The cells.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableRow(Object... cells) {
+		writeTableRowStart();
+		for (Object cell : cells)
+			writeTableCell(cell.toString());
+		writeTableRowEnd();
+		return this;
+	}
+	
+	/**
 	 * Writes a reference to an image to the HTML report
 	 * @param src The image URL.
 	 * @param alt The alternative text for the image.

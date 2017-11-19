@@ -53,7 +53,7 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 			if (!result.getType().equals(EvaluationResult.Type.OK)) {
 				SuccessCriterion sc = result.getSuccessCriterion();
 				Widget w = result.getWidget();
-				s += (s.isEmpty() ? ";" : "") + result.getType().name() +
+				s += (!s.isEmpty() ? ";" : "") + result.getType().name() +
 						":" + sc.toString() +
 						":" + sc.getLevel().name() +
 						":" + sc.getURLSuffix() +
@@ -86,6 +86,25 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 			.writeTableCell(level)
 			.writeTableCell(widgetTitle)
 			.writeTableCell(message)
+			.writeTableRowEnd();
+		}
+		html.writeTableEnd();
+	}
+	
+	@Override
+	protected void writeOfflineAnalysisResultsDetails(EvaluationResults results) {
+		html.writeHeading(3, "Violations")
+		.writeTableStart()
+		.writeTableHeadings("Type", "Criterion", "Level", "Message");
+		for (EvaluationResult r : results.getResults()) {
+			WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
+			SuccessCriterion sc = result.getSuccessCriterion();
+			String url = SuccessCriterion.URL_BASE + sc.getURLSuffix();
+			html.writeTableRowStart()
+			.writeTableCell(result.getType().name())
+			.writeTableCellStart().writeLink(sc.toString(), url, true).writeTableCellEnd()
+			.writeTableCell(sc.getLevel().name())
+			.writeTableCell(result.getMessage())
 			.writeTableRowEnd();
 		}
 		html.writeTableEnd();
