@@ -13,7 +13,11 @@ import org.fruit.alayer.Widget;
  * Created by floren on 5-6-2017.
  */
 public class GraphDB implements GraphDBRepository {
-
+	
+    public enum GremlinStart {
+        VERTICES,
+        EDGES;
+    }
 
     private final boolean enabled;
     private GraphDBRepository repository;
@@ -75,14 +79,10 @@ public class GraphDB implements GraphDBRepository {
         }
     }
     
-    /**
-     * Get all objects from a pipe specified by a Gremlin-Groovy expression
-     * @param gremlin The Gremlin-Groovy expression.
-     * @return A list of all objects in the pipe.
-     */
-    public List<Object> getObjectsFromGremlinPipe(String gremlin) {
+    @Override
+    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
         if(enabled) {
-            return repository.getObjectsFromGremlinPipe(gremlin);
+            return repository.getObjectsFromGremlinPipe(gremlin, start);
         }
         return new ArrayList<Object>();
     }

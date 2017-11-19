@@ -30,6 +30,7 @@ import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
+import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
  * Specification of WCAG 2.0 according to WCAG2ICT
@@ -57,6 +58,7 @@ public final class WCAG2ICT implements Evaluator {
 		principles.add(new OperablePrinciple());
 		principles.add(new UnderstandablePrinciple());
 		principles.add(new RobustPrinciple());
+		setActionTags();
 	}
 	
 	/**
@@ -118,6 +120,11 @@ public final class WCAG2ICT implements Evaluator {
 	@Override
 	public String getImplementationVersion() {
 		return "WCAG2ICT-" + VERSION;
+	}
+	
+	private void setActionTags() {
+		AccessibilityUtil.AC_NAVIGATE_PREVIOUS_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
+		AccessibilityUtil.AC_NAVIGATE_NEXT_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
 	}
 	
 }

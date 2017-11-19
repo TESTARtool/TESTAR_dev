@@ -17,6 +17,10 @@
 
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
+import nl.ou.testar.GraphDB;
+import nl.ou.testar.GraphDB.GremlinStart;
+import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -38,6 +42,22 @@ public final class PredictableGuideline extends AbstractGuideline {
 				this, Level.AA, "consistent-behavior-consistent-locations"));
 		criteria.add(new SuccessCriterion(4, "Consistent Identification",
 				this, Level.AA, "consistent-behavior-consistent-functionality"));
+	}
+	
+	@Override
+	public EvaluationResults query(GraphDB graphDB) {
+		EvaluationResults results = new EvaluationResults();
+		SuccessCriterion sc = getSuccessCriterionByName("On Focus");
+		String gremlinStateChange = "todo";
+		List<Object> stateChanges = graphDB.getObjectsFromGremlinPipe(gremlinStateChange,
+				GremlinStart.EDGES);
+		// the list contains the titles of the new states
+		for (Object title : stateChanges)
+			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+					"Possible unexpected state changes to \"" + title + "\""));
+		if (stateChanges.isEmpty())
+			results.add(evaluationPassed(sc));
+		return results;
 	}
 
 }

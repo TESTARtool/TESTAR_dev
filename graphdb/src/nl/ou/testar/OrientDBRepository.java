@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
 import com.tinkerpop.gremlin.groovy.Gremlin;
 import com.tinkerpop.pipes.Pipe;
 
+import nl.ou.testar.GraphDB.GremlinStart;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -141,11 +142,14 @@ class OrientDBRepository implements GraphDBRepository {
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public List<Object> getObjectsFromGremlinPipe(String gremlin) {
+    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
        	try {
        	    Pipe pipe = Gremlin.compile(gremlin);
        	    OrientGraph graph = graphFactory.getTx();
-       	    pipe.setStarts(graph.getVertices());
+       	    if (start.equals(GremlinStart.VERTICES))
+       	        pipe.setStarts(graph.getVertices());
+       	    else
+       	        pipe.setStarts(graph.getEdges());
        	    List<Object> ret = new ArrayList<>();
        	    for (Object o : pipe)
                 ret.add(o);

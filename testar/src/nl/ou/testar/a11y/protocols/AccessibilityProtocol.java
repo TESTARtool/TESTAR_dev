@@ -35,6 +35,7 @@ import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.GraphDB.GremlinStart;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
@@ -209,7 +210,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected String getWidgetTitleFromGraphDB(String concreteID) {
 		String gremlinWidget = "_().has('@class','Widget').has('" +
 				Tags.ConcreteID.name() + "','" + concreteID +"').Title";
-		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget);
+		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget,
+				GremlinStart.VERTICES);
 		if (widgets.size() != 1) // too many or too few widgets
 			return null;
 		return (String)widgets.get(0);
@@ -247,7 +249,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		// which may be inefficient when storing many properties to the GraphDB.
 		String gremlinStateProperties = "_().has('@class','State').has('" +
 				A11yTags.A11yHasViolations.name() + "',true).map";
-		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties);
+		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties,
+				GremlinStart.VERTICES);
 		html.writeParagraph("Unique states: " + stateMaps.size())
 		.writeHeading(2, "States with violations");
 		for (Object stateMap : stateMaps) {

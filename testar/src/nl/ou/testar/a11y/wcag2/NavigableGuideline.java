@@ -25,6 +25,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
 import nl.ou.testar.GraphDB;
+import nl.ou.testar.GraphDB.GremlinStart;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
@@ -75,7 +76,8 @@ public final class NavigableGuideline extends AbstractGuideline {
 		String gremlinTitleCount = "_().has('@class','Widget')" +
 				".has('" + WCAG2Tags.WCAG2IsWindow.name() +"',true)" +
 				".groupCount{it." + Tags.Title.name() + "}.cap";
-		List<Object> titleCounts = graphDB.getObjectsFromGremlinPipe(gremlinTitleCount);
+		List<Object> titleCounts = graphDB.getObjectsFromGremlinPipe(gremlinTitleCount,
+				GremlinStart.VERTICES);
 		// the list contains one map with title counts
 		Map<String, Long> titleCount = (Map<String, Long>)titleCounts.get(0);
 		boolean hasViolations = false;

@@ -6,6 +6,8 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.GraphDB.GremlinStart;
+
 /**
  * Repository API
  * Created by floren on 9-6-2017.
@@ -47,7 +49,8 @@ public interface GraphDBRepository {
     /**
      * Get all objects from a pipe specified by a Gremlin-Groovy expression
      * @param gremlin The Gremlin-Groovy expression.
+     * @param start The starting point for the expression.
      * @return A list of all objects in the pipe.
      */
-    List<Object> getObjectsFromGremlinPipe(String gremlin);
+    List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start);
 }
