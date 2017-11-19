@@ -50,6 +50,10 @@ task prepareOutputFolder(type: Copy) {
     into 'target/scripts/output'
 }
 
+/**
+ * Copy windows.dll from the subproject windows into target scripts
+ * so it can be used with the creation of the distribution.
+ */
 task prepareWindowsDLL(type: Copy) {
     from '../windows/target/resources/main'
     into 'target/scripts'
