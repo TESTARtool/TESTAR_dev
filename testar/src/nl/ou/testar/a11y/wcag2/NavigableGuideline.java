@@ -38,7 +38,7 @@ public final class NavigableGuideline extends AbstractGuideline {
 
 	private static final long serialVersionUID = 7746462844461205071L;
 	
-	private static final int SAME_TITLE_THRESHOLD = 0;
+	private static final int SAME_TITLE_THRESHOLD = 3;
 
 	NavigableGuideline(AbstractPrinciple parent) {
 		super(4, "Navigable", parent);
