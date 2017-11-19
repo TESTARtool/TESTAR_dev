@@ -218,11 +218,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
+		for (Widget w : state) {
 			if (isUnfiltered(w)
 					&& w.get(Tags.ZIndex) == maxZIndex
-					&& AccessibilityUtil.isRelevant(w))
+					&& AccessibilityUtil.isRelevant(w)) {
+				//AccessibilityUtil.printWidgetDebugInfo(w);
 				widgets.add(w);
+			}
+		}
 		return widgets;
 	}
 	

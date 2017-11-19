@@ -41,8 +41,10 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
 public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	private static final long serialVersionUID = 4099763917658781054L;
+	
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
-	private static final int MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP = 7;
+	private static final int KEYBOARD_TRAP_THRESHOLD = 7;
+	private static final int SHORTCUT_KEYS_TO_WIDGETS_RATIO = 2;
 	
 	private final Deque<Action> shortcutKeysCache = new LinkedList<>();
 	private String lastConcreteID = "";
@@ -60,6 +62,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("No Keyboard Trap");
+		int shortcutKeyCount = 0;
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
 				w.set(WCAG2Tags.WCAG2KeyboardVisited, true);
@@ -67,7 +70,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				String concreteID = w.get(Tags.ConcreteID, "");
 				if (lastConcreteID.equals(concreteID)) {
 					sameWidgetCount++;
-					if (sameWidgetCount == MIN_SAME_WIDGET_COUNT_BEFORE_KEYBOARD_TRAP)
+					if (sameWidgetCount == KEYBOARD_TRAP_THRESHOLD)
 						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 								"Possible keyboard trap", w));
 					else
@@ -78,7 +81,16 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				}
 				lastConcreteID = concreteID;
 			} // hasKeyboardFocus(w)
+			
+			String key1 = AccessibilityUtil.getAccessKey(w),
+					key2 = AccessibilityUtil.getShortcutKey(w);
+			if ((key1 != null && !key1.isEmpty())
+					|| (key2 != null && !key2.isEmpty()))
+				shortcutKeyCount++;
 		}
+		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size())
+			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+					"Possible widgets missing shortcut keys"));
 		return results;
 	}
 	
@@ -89,7 +101,6 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		Widget prevHasKeyboardFocus = null;
 		deriveStandardActions(actions, compiler);
 		for (Widget w : widgets) {
-			AccessibilityUtil.printWidgetDebugInfo(w);	
 			deriveActionsAll(actions, compiler, w);
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
 				// catch inconsistent keyboard focus reporting
