@@ -11,7 +11,7 @@ import com.tinkerpop.blueprints.Vertex;
  * Wrapper for interaction with the Graph Database
  * Created by floren on 5-6-2017.
  */
-public class GraphDB {
+public class GraphDB implements GraphDBRepository {
 
 
     private final boolean enabled;
@@ -28,6 +28,7 @@ public class GraphDB {
      * Store the State in the graph database.
      * @param state state to store.
      */
+    @Override
     public void addState(final State state) {
         if(enabled) {
             repository.addState(state);
@@ -40,6 +41,7 @@ public class GraphDB {
      * @param statedID State to which the widget belongs
      * @param widget The widget to add
      */
+    @Override
     public void addWidget(final String statedID, final Widget widget) {
         if(enabled) {
             repository.addWidget(statedID,widget);
@@ -51,6 +53,7 @@ public class GraphDB {
      * @param action the action performed
      * @param toStateId the new state.
      */
+    @Override
     public void addAction(final Action action, final String toStateId) {
         if(enabled) {
             repository.addAction(action, toStateId);
@@ -64,6 +67,7 @@ public class GraphDB {
      * @param action The action performed
      * @param toStateID the resulting stateId
      */
+    @Override
     public void addActionOnState(final String fromSateID, final Action action, final String toStateID) {
         if(enabled) {
             repository.addActionOnState(fromSateID, action, toStateID);

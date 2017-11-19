@@ -33,29 +33,39 @@ NOTE: TESTAR requires Visual Redistributable which can be downloaded from the fo
  [link](https://go.microsoft.com/fwlink/?LinkId=746572) .Also a JAVA 1.8 JDK is required.
 
 #### Running Gradle in Eclipse
-To use Gradle within Eclipse the
-[eclipse plugin](https://docs.gradle.org/3.3/userguide/eclipse_plugin.html) is added to the root project. The following
-steps need to be performed to start development in Eclipse;
-1. Open a command prompt in the root of the project
-2. Execute `gradlew eclipse` (this will generate the required Eclipse information)
-3. Open Eclipse (make sure the workspace folder is outside the project folder) and choose File -&gt; Import existing project into workspace
-4. Browse to the directory where the Testar souces are located and import the project
-5. Right-Click on the project -&gt; Select Configure -&gt; Add gradle nature.
+The following procedure has been performed
 
-After these steps it is possible to execute gradle tasks. A separate view for Gradle is available.
+1. Create a new empty workspace for Eclipse in a folder which is not the folder that contains the source
+code.
+2. Select File -> Import to open the import dialog
+3. Select Gradle -> Existing Gradle project to open te import dialog 
+4. Select the folder that contains the root of the source code and start the import
+
+**Important**
+In order to allow Eclipse to import the project a build.gradle in the folder testar has to be modified
+Put the following sections in comments (see TODO's in [build.gradle in the folder testar](./testar/build.gradle));
+After the project is import the comments can be removed. It is now possible to build TESTAR
 
 The procedure presented in this chapter requires the installation of the [buildship](https://projects.eclipse.org/projects/tools.buildship) plugin. This plugin comes pre-installed with Eclipse Neon.
 
 ## Known issue
-- Testar hangs at the end of the execution.
+- TESTAR can not be excuted using the gradle task ./gradlew run. 
 
 ## GraphDb support
-This version of Testar supports the output of data to an http://orientdb.com database.
-Currently only the state in each step is exported. 
+This version of TESTAR supports the output of data to an http://orientdb.com database.
+Currently Widget's, Actions, States and there relation are recorded to the graph database. 
 
-### Configuring graphdb
+### using graphdb on the local filesystem
+The easiest way to use the graph database support is to write the database to the local file system
+After starting TESTAR, it's required to configure the database settings in the tab "GraphDB".
+- url : plocal:&lt;path&gt; (for instance plocal:output/testdb) 
+- user: admin
+- password: admin
+- Check the checkbox.
+
+### using graphdb with orientdb server
 In order to use the graphdb feature it's advised to install a graph database on your machine  The current implementation 
-of Testar has a backend for Orientdb. You can download the
+of TESTAR has a backend for Orientdb. You can download the
 community edition from [orientdb](orientdb.com). Follow the installation instructions to install
 the database on your machine. 
 
@@ -67,14 +77,23 @@ In order to use the graphdb feature. A database must be created in Orientdb. To 
 - Choose "New DB" and provide the name, root user and password. (The database will also get a default admin/adimin 
 user/password).
 
-After starting Testar, it's required to configure the database settings in the tab "GraphDB".
+After starting TESTAR, it's required to configure the database settings in the tab "GraphDB".
 - url : remote:<hostname>/&lt;database name> (for instance remote:/localhost/demo)
 - user: admin
 - password: admin
 - Check the checkbox.
 
-When Testar finishes, the data be inspected in the database. The easiest way to see the complete
+When TESTAR finishes, the data be inspected in the database. The easiest way to see the complete
 graph is to type the following query in the graph tab "Select * From E". This will display the complete
 graph.
+
+### Exploring the graph database with Gremlin.
+
+[Gremlin](http://tinkerpop.apache.org/docs/current/reference/#_tinkerpop3) is a graph traversel engine which can be used 
+to query a graph database. OrientDB supports Gremlin and provides an implementation of the traversal engine in it's 
+community release.
+
+To start Gremlin run the following command; orientdb-gremlin. This command is delivered with the community 
+edition of Orientdb.
 
 See the manuals of orientdb to learn about the possibilities to query the model.
