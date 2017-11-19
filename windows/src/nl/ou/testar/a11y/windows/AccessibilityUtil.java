@@ -245,6 +245,16 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
+	 * Checks whether the role of the given widget is unknown
+	 * @param w The widget.
+	 * @return True if the widget role is unknown, else false.
+	 */
+	public static boolean isRoleUnknown(Widget w) {
+		return Role.isOneOf(getRole(w),
+				UIAUnknown, UIAWidget, Roles.Invalid, Roles.Widget);
+	}
+	
+	/**
 	 * Checks whether the given widget is an image
 	 * @param w The widget.
 	 * @return True if the widget is an image, else false.
