@@ -44,7 +44,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
 	private static final int KEYBOARD_TRAP_THRESHOLD = 7;
-	private static final int SHORTCUT_KEYS_TO_WIDGETS_RATIO = 2;
+	private static final int SHORTCUT_KEYS_TO_WIDGETS_RATIO = 3;
 	
 	private final Deque<Action> shortcutKeysCache = new LinkedList<>();
 	private String lastConcreteID = "";

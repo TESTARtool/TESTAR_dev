@@ -56,7 +56,8 @@ public final class CompatibleGuideline extends AbstractGuideline {
 				results.add(evaluationPassed(sc));
 			if (AccessibilityUtil.isRoleUnknown(w))
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-						"Missing role", w));
+						"Unknown widget role \"" + w.get(Tags.Role).name() +
+						"\" for \"" + w.get(Tags.Title) + "\"", w));
 		}
 		return results;
 	}

@@ -78,7 +78,8 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 					criterion = violationInfo[1],
 					level = violationInfo[2],
 					url = SuccessCriterion.URL_BASE + violationInfo[3],
-					widgetTitle = this.getWidgetTitleFromGraphDB(violationInfo[4]),
+					widgetTitle = !violationInfo[4].equals("N/A") ?
+							getWidgetTitleFromGraphDB(violationInfo[4]) : violationInfo[4],
 					message = violationInfo[5];
 			html.writeTableRowStart()
 			.writeTableCell(violationType)
@@ -93,10 +94,16 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 	
 	@Override
 	protected void writeOfflineAnalysisResultsDetails(EvaluationResults results) {
-		html.writeHeading(3, "Violations")
-		.writeTableStart()
+		html.writeHeading(3, "Violations");
+		if (!results.hasViolations()) {
+			html.writeParagraph("None");
+			return;
+		}
+		html.writeTableStart()
 		.writeTableHeadings("Type", "Criterion", "Level", "Message");
 		for (EvaluationResult r : results.getResults()) {
+			if (r.getType().equals(EvaluationResult.Type.OK))
+				continue;
 			WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
 			SuccessCriterion sc = result.getSuccessCriterion();
 			String url = SuccessCriterion.URL_BASE + sc.getURLSuffix();

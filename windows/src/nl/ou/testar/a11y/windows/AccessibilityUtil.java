@@ -251,7 +251,7 @@ public final class AccessibilityUtil {
 	 */
 	public static boolean isRoleUnknown(Widget w) {
 		return Role.isOneOf(getRole(w),
-				UIAUnknown, UIAWidget, Roles.Invalid, Roles.Widget);
+				UIAUnknown, Roles.Invalid);
 	}
 	
 	/**
