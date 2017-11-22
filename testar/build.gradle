@@ -8,15 +8,14 @@ sourceSets {
         }
     }
 
-   oracle {
+    oracle {
+        java {
+            srcDirs =['resources/settings']
+        }
 
-       java {
-           srcDirs =['resources/settings']
-       }
-
-       compileClasspath += main.output
-       compileClasspath += main.compileClasspath
-   }
+        compileClasspath += main.output
+        compileClasspath += main.compileClasspath
+    }
 }
 
 dependencies {
@@ -69,10 +68,8 @@ prepareOracles.dependsOn(oracleClasses)
 
 applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
 
-
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
 }
 
 mainClassName='org.fruit.monkey.Main'
-
