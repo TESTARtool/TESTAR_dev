@@ -37,10 +37,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +147,8 @@ class OrientDBRepository implements GraphDBRepository {
             }
             Vertex widget = getWidgetVertex(w.get(Tags.ConcreteID), graph);
             if (widget == null) {
-                createWidgetVertex(stateID, w, graph);
+                Vertex wv = createWidgetVertex(stateID, w, graph);
+                bindToAbstractRole(wv,w,graph);
             } else {
                //nothing
             }
@@ -184,7 +182,7 @@ class OrientDBRepository implements GraphDBRepository {
         vertex.setProperty("visited", 1);
     }
 
-    private void createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
+    private Vertex createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
         Vertex vertex = graph.addVertex("class:Widget");
         w.tags().forEach(t -> vertex.setProperty(
                 t.name().replace(',', '_'),
@@ -192,6 +190,7 @@ class OrientDBRepository implements GraphDBRepository {
         Vertex state = getStateVertex(widgetId, graph);
         Edge edge = graph.addEdge(null, state, vertex, "has");
         LOGGER.debug("Widget {} Vertex created and connected to state via Edge {} ", vertex.getId(), edge.getId());
+        return vertex;
     }
 
     /**
@@ -246,6 +245,27 @@ class OrientDBRepository implements GraphDBRepository {
                 t.name().replace(',', '_'),
                 action.get(t).toString()));
 
+    }
+
+    private void bindToAbstractRole(Vertex wv, Widget w, Graph graph) {
+        Vertex abs = getAbstractRoleWidget(graph,w,wv);
+        Edge role = graph.addEdge(null,wv,abs,"role");
+    }
+
+
+    private Vertex getAbstractRoleWidget(Graph g,Widget widget, Vertex wv) {
+        String absID = widget.get(Tags.Abstract_R_ID,"");
+        try {
+            Iterable<Vertex> vertices = g.getVertices("AbsRole.absid", absID);
+            return vertices.iterator().next();
+        } catch (NoSuchElementException nse) {
+            Vertex abstractRole = g.addVertex("class:AbsRole");
+            abstractRole.setProperty("Role",widget.get(Tags.Role, Role.from("UNKNONW")));
+            return abstractRole;
+        } catch (IllegalArgumentException ia) {
+            LOGGER.debug("Failed to get vertex for Abstract Role");
+            return null;
+        }
     }
 
 }
