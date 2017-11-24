@@ -189,6 +189,7 @@ class OrientDBRepository implements GraphDBRepository {
                 w.get(t).toString()));
         Vertex state = getStateVertex(widgetId, graph);
         Edge edge = graph.addEdge(null, state, vertex, "has");
+        graph.commit();
         LOGGER.debug("Widget {} Vertex created and connected to state via Edge {} ", vertex.getId(), edge.getId());
         return vertex;
     }
@@ -258,13 +259,10 @@ class OrientDBRepository implements GraphDBRepository {
         try {
             Iterable<Vertex> vertices = g.getVertices("AbsRole.absid", absID);
             return vertices.iterator().next();
-        } catch (NoSuchElementException nse) {
+        } catch (NoSuchElementException | IllegalArgumentException nse) {
             Vertex abstractRole = g.addVertex("class:AbsRole");
-            abstractRole.setProperty("Role",widget.get(Tags.Role, Role.from("UNKNONW")));
+            abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")));
             return abstractRole;
-        } catch (IllegalArgumentException ia) {
-            LOGGER.debug("Failed to get vertex for Abstract Role");
-            return null;
         }
     }
 
