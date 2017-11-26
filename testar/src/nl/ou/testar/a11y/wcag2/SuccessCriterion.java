@@ -49,10 +49,17 @@ public final class SuccessCriterion extends ItemBase {
 		AAA;
 	}
 	
-	private final Level level;
+	/**
+	 * The base for building anchor URLs of success criteria
+	 */
+	public static final String URL_BASE =
+			"https://www.w3.org/WAI/GL/2013/WD-wcag2ict-20130905/accordion#";
 	
 	private static final int NLEVELS = 3;
 	private static final double SEVERITY_STEP = (Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / NLEVELS;
+	
+	private final Level level;
+	private final String urlSuffix;
 	
 	/**
 	 * Constructs a new success criterion
@@ -60,10 +67,14 @@ public final class SuccessCriterion extends ItemBase {
 	 * @param name The name (short description) of the success criterion.
 	 * @param parent The guideline (parent) this success criterion belongs to.
 	 * @param level The level of the success criterion.
+	 * @param urlSuffix The anchor URL suffix on the W3C website.
 	 */
-	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level) {
+	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level, String urlSuffix) {
 		super(nr, name, Assert.notNull(parent));
+		Assert.notNull(level);
+		Assert.hasText(urlSuffix);
 		this.level = level;
+		this.urlSuffix = urlSuffix;
 	}
 	
 	/**
@@ -75,6 +86,14 @@ public final class SuccessCriterion extends ItemBase {
 	}
 	
 	/**
+	 * Gets the anchor URL suffix of this success criterion
+	 * @return The URL suffix.
+	 */
+	public String getURLSuffix() {
+		return urlSuffix;
+	}
+	
+	/**
 	 * Gets the severity of violating this success criterion as used in verdicts
 	 * The severity depends on the conformance level of the success criterion.
 	 * A low level (A) corresponds to a high severity
@@ -83,11 +102,6 @@ public final class SuccessCriterion extends ItemBase {
 	 */
 	public double getVerdictSeverity() {
 		return Verdict.SEVERITY_MAX - (level.ordinal() * SEVERITY_STEP);
-	}
-	
-	@Override
-	public String toString() {
-		return getNr() + " " + getName() + " (Level " + getLevel() + ")";
 	}
 	
 }

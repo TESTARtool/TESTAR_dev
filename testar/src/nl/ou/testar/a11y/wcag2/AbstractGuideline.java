@@ -27,8 +27,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Vertex;
-
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 
@@ -103,14 +102,14 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
 	 * This method executes oracles in offline analysis.
-	 * @param vertices All state vertices.
+	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(Iterable<Vertex> vertices) {
+	public EvaluationResults query(GraphDB graphDB) {
 		return new EvaluationResults();
 	}
 	

@@ -117,13 +117,33 @@ public final class HTMLReporter {
 	}
 	
 	/**
+	 * Writes the start of a paragraph to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeParagraphStart() {
+		write(start(PARAGRAPH));
+		return this;
+	}
+	
+	/**
+	 * Writes the end of a paragraph to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeParagraphEnd() {
+		write(end(PARAGRAPH));
+		return this;
+	}
+	
+	/**
 	 * Writes a paragraph to the HTML report
 	 * @param text The paragraph text.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeParagraph(String text) {
 		Assert.notNull(text);
-		write(start(PARAGRAPH) + text + end(PARAGRAPH));
+		writeParagraphStart();
+		write(text);
+		writeParagraphEnd();
 		return this;
 	}
 	
@@ -164,13 +184,33 @@ public final class HTMLReporter {
 	}
 	
 	/**
+	 * Writes the start of a list item to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeListItemStart() {
+		write(start(LIST_ITEM));
+		return this;
+	}
+	
+	/**
+	 * Writes the end of a list item to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeListItemEnd() {
+		write(end(LIST_ITEM));
+		return this;
+	}
+	
+	/**
 	 * Writes a list item to the HTML report
 	 * @param text The item text.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeListItem(String text) {
 		Assert.notNull(text);
-		write(start(LIST_ITEM) + text + end(LIST_ITEM));
+		writeListItemStart();
+		write(text);
+		writeListItemEnd();
 		return this;
 	}
 	
@@ -193,6 +233,55 @@ public final class HTMLReporter {
 	}
 	
 	/**
+	 * Writes the start of a table row to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableRowStart() {
+		write(start(TABLE_ROW));
+		return this;
+	}
+	
+	/**
+	 * Writes the end of a table row to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableRowEnd() {
+		write(end(TABLE_ROW));
+		return this;
+	}
+	
+	/**
+	 * Writes the start of a table cell to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableCellStart() {
+		write(start(TABLE_CELL));
+		return this;
+	}
+	
+	/**
+	 * Writes the end of a table cell to the HTML report
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableCellEnd() {
+		write(end(TABLE_CELL));
+		return this;
+	}
+	
+	/**
+	 * Writes a table cell to the HTML report
+	 * @param text The cell text.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableCell(String text) {
+		Assert.notNull(text);
+		writeTableCellStart();
+		write(text);
+		writeTableCellEnd();
+		return this;
+	}
+	
+	/**
 	 * Writes a table headings row to the HTML report
 	 * @param headings The headings.
 	 * @return This HTML reporter.
@@ -211,10 +300,23 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRow(String... cells) {
-		write(start(TABLE_ROW));
+		writeTableRowStart();
 		for (String cell : cells)
-			write(start(TABLE_CELL) + cell + end(TABLE_CELL));
-		write(end(TABLE_ROW));
+			writeTableCell(cell);
+		writeTableRowEnd();
+		return this;
+	}
+	
+	/**
+	 * Writes a regular table row to the HTML report
+	 * @param cells The cells.
+	 * @return This HTML reporter.
+	 */
+	public HTMLReporter writeTableRow(Object... cells) {
+		writeTableRowStart();
+		for (Object cell : cells)
+			writeTableCell(cell.toString());
+		writeTableRowEnd();
 		return this;
 	}
 	

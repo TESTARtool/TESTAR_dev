@@ -86,4 +86,9 @@ abstract class ItemBase implements Serializable {
 		return name;
 	}
 	
+	@Override
+	public String toString() {
+		return getNr() + " " + getName();
+	}
+	
 }

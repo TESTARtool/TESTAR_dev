@@ -26,8 +26,7 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-import com.tinkerpop.blueprints.Vertex;
-
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
@@ -95,17 +94,17 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will collect evaluation results from all guidelines in this principle.
 	 * This method executes oracles in offline analysis.
-	 * @param vertices All state vertices.
+	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */
 	@Override
-	public EvaluationResults query(Iterable<Vertex> vertices) {
+	public EvaluationResults query(GraphDB graphDB) {
 		EvaluationResults results = new EvaluationResults();
 		for (AbstractGuideline g : guidelines)
-			for (EvaluationResult result : g.query(vertices).getResults())
+			for (EvaluationResult result : g.query(graphDB).getResults())
 				results.add(result);
 		return results;
 	}

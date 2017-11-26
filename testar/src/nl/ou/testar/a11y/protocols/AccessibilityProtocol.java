@@ -34,8 +34,8 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
-import com.tinkerpop.gremlin.java.GremlinPipeline;
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.GraphDB.GremlinStart;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
@@ -52,7 +52,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	public static final String HTML_FILENAME_PREFIX = "accessibility_report_",
 			HTML_EXTENSION = ".html";
 	
-	private final static String SCREENSHOT_PATH_PREFIX = "../";
+	private static final String SCREENSHOT_PATH_PREFIX = "../";
 	
 	/**
 	 * The accessibility evaluator
@@ -96,7 +96,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 					LogSerialiser.LogLevel.Critical);
 		}
 		html.writeHeader()
-		.writeHeading(2, "General Information")
+		.writeHeading(2, "General information")
 		.writeParagraph("Report type: " +
 				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "Ad-hoc"))
 		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
@@ -110,13 +110,18 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state) {
+		EvaluationResults results;
 		Verdict verdict = super.getVerdict(state);
-		if (!verdict.equals(Verdict.OK))
-			// something went wrong upstream
-			return verdict;
-		// safe only the relevant widgets to use when computing a verdict and deriving actions
-		relevantWidgets = getRelevantWidgets(state);
-		EvaluationResults results = evaluator.evaluate(relevantWidgets);
+		boolean upstreamProblem = !verdict.equals(Verdict.OK);
+		if (upstreamProblem) {
+			results = new EvaluationResults();
+		}
+		else {
+			// safe only the relevant widgets to use when computing a verdict and deriving actions
+			relevantWidgets = getRelevantWidgets(state);
+			results = evaluator.evaluate(relevantWidgets);
+		}
+		state.set(A11yTags.A11yEvaluationResults, results);
 		state.set(A11yTags.A11yResultCount, results.getResultCount());
 		state.set(A11yTags.A11yPassCount, results.getPassCount());
 		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
@@ -125,7 +130,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		if (!settings().get(ConfigTags.GraphDBEnabled))
 			// ad-hoc analysis (spammy)
 			writeAdHocResults(results);
-		return results.getOverallVerdict();
+		return upstreamProblem ? verdict : results.getOverallVerdict();
 	}
 
 	/**
@@ -151,20 +156,29 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	@Override
 	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
-		if (settings().get(ConfigTags.GraphDBEnabled))
+		if (settings().get(ConfigTags.GraphDBEnabled)) {
 			// proper offline analysis
 			writeGraphDBResults();
+			offlineAnalysis();
+		}
 		html.writeFooter().close();
 	}
 	
 	/**
+	 * Perform offline analysis, e.g. with a graph database
+	 */
+	protected void offlineAnalysis() {
+		EvaluationResults results = evaluator.query(graphDB());
+		writeOfflineAnalysisResults(results);
+	}
+	
+	/**
 	 * Write implementation-specific ad-hoc evaluation result details to the HTML report
-	 * Subclasses can override this to retrieve information from a subclass of EvaluationResult.
 	 * @param results The evaluation results.
 	 */
 	protected void writeAdHocResultsDetails(EvaluationResults results) {
 		boolean hadViolations = false;
-		html.writeHeading(4, "Violations")
+		html.writeHeading(3, "Violations")
 		.writeUListStart();
 		for (EvaluationResult result : results.getResults()) {
 			if (!result.getType().equals(EvaluationResult.Type.OK)) {
@@ -178,24 +192,49 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	/**
-	 * Write implementation-specific offline evaluation result details to the HTML report
-	 * Subclasses can override this to retrieve information from a graph database.
+	 * Write implementation-specific evaluation result details from a graph database to the HTML report
+	 * @param stateProps The map of state properties, indexed by tag name.
 	 */
-	protected void writeGraphDBResultsDetails() {}
+	protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {}
+	
+	/**
+	 * Write implementation-specific offline analysis result details to the HTML report
+	 */
+	protected void writeOfflineAnalysisResultsDetails(EvaluationResults results) {}
+	
+	/**
+	 * Gets the title of the widget with the given concrete ID from a graph database
+	 * @param concreteID The concrete ID of the widget.
+	 * @return The widget title, or null if the widget is not in the graph database.
+	 */
+	protected String getWidgetTitleFromGraphDB(String concreteID) {
+		String gremlinWidget = "_().has('@class','Widget').has('" +
+				Tags.ConcreteID.name() + "','" + concreteID +"').Title";
+		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget,
+				GremlinStart.VERTICES);
+		if (widgets.size() != 1) { // no matches or too many matches
+			System.out.println("<---> Failed " + concreteID + " found " + widgets.size());
+			return "N/A";
+		}
+		return (String)widgets.get(0);
+	}
 	
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
+		for (Widget w : state) {
 			if (isUnfiltered(w)
 					&& w.get(Tags.ZIndex) == maxZIndex
-					&& AccessibilityUtil.isRelevant(w))
+					&& AccessibilityUtil.isRelevant(w)) {
+				//AccessibilityUtil.printWidgetDebugInfo(w);
 				widgets.add(w);
+			}
+		}
 		return widgets;
 	}
 	
 	private void writeAdHocResults(EvaluationResults results) {
-		html.writeHeading(3, "State: " + state.get(Tags.ConcreteID))
+		html.writeHeading(2, "State: " + state.get(Tags.ConcreteID))
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
 		.writeTableRow("Error", Integer.toString(results.getErrorCount()))
@@ -206,36 +245,57 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		writeAdHocResultsDetails(results);
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void writeGraphDBResults() {
-		GremlinPipeline pipe = new GremlinPipeline(graphDB().getStateVertices());
-		html.writeParagraph("Unique states: " + pipe.count());
-		
-		pipe = new GremlinPipeline(graphDB().getStateVertices());
 		// This will retrieve all properties,
 		// which may be inefficient when storing many properties to the GraphDB.
-		pipe.has(A11yTags.A11yHasViolations.name(), "true").map();
-		for (Object props : pipe) {
-			Map<String, Object> state = (Map<String, Object>)props;
-			html.writeHeading(3,
-					"State: " + (String)state.get(Tags.ConcreteID.name()))
-			.writeTableStart()
-			.writeTableHeadings("Type", "Count")
-			.writeTableRow("Error",
-					(String)state.get(A11yTags.A11yErrorCount.name()))
-			.writeTableRow("Warning",
-					(String)state.get(A11yTags.A11yWarningCount.name()))
-			.writeTableRow("Pass",
-					(String)state.get(A11yTags.A11yPassCount.name()))
-			.writeTableRow("Total",
-					(String)state.get(A11yTags.A11yResultCount.name()))
-			.writeTableEnd()
-			.writeHeading(4, "Screenshot")
-			.writeImage(SCREENSHOT_PATH_PREFIX + (String)state.get(Tags.ScreenshotPath.name()),
-					"State screenshot");
+		String gremlinStateProperties = "_().has('@class','State').has('" +
+				A11yTags.A11yHasViolations.name() + "',true).map";
+		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties,
+				GremlinStart.VERTICES);
+		html.writeParagraph("Unique states: " + stateMaps.size())
+		.writeHeading(2, "States with violations");
+		for (Object stateMap : stateMaps) {
+			Map<String, Object> stateProps = (Map<String, Object>)stateMap;
+			writeGeneralGraphDBResults(stateProps);
+			writeGraphDBResultsDetails(stateProps);
 		}
-		
-		writeGraphDBResultsDetails();
 	}
-
+	
+	private void writeGeneralGraphDBResults(Map<String, Object> stateProps) {
+		html.writeHeading(3,
+				"State: " + stateProps.get(Tags.ConcreteID.name()))
+		.writeTableStart()
+		.writeTableHeadings("Type", "Count")
+		.writeTableRow("Error",
+				stateProps.get(A11yTags.A11yErrorCount.name()))
+		.writeTableRow("Warning",
+				stateProps.get(A11yTags.A11yWarningCount.name()))
+		.writeTableRow("Pass",
+				stateProps.get(A11yTags.A11yPassCount.name()))
+		.writeTableRow("Total",
+				stateProps.get(A11yTags.A11yResultCount.name()))
+		.writeTableEnd()
+		.writeHeading(4, "Screenshot")
+		.writeLink("Open screenshot in a new window",
+				SCREENSHOT_PATH_PREFIX + stateProps.get(Tags.ScreenshotPath.name()), true);
+	}
+	
+	private void writeOfflineAnalysisResults(EvaluationResults results) {
+		html.writeHeading(2, "Offline analysis");
+		writeGeneralOfflineAnalysisResults(results);
+		writeOfflineAnalysisResultsDetails(results);
+	}
+	
+	private void writeGeneralOfflineAnalysisResults(EvaluationResults results) {
+		html.writeHeading(3, "General information")
+		.writeTableStart()
+		.writeTableHeadings("Type", "Count")
+		.writeTableRow("Error", results.getErrorCount())
+		.writeTableRow("Warning", results.getWarningCount())
+		.writeTableRow("Pass", results.getPassCount())
+		.writeTableRow("Total", results.getResultCount())
+		.writeTableEnd();
+	}
+	
 }

@@ -30,10 +30,14 @@ public final class InputAssistanceGuideline extends AbstractGuideline {
 
 	InputAssistanceGuideline(AbstractPrinciple parent) {
 		super(3, "Input Assistance", parent);
-		criteria.add(new SuccessCriterion(1, "Error Identification", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Labels or Instructions", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Error Suggestion", this, Level.AA));
-		criteria.add(new SuccessCriterion(4, "Error Prevention (Legal, Financial, Data)", this, Level.AA));
+		criteria.add(new SuccessCriterion(1, "Error Identification",
+				this, Level.A, "minimize-error-identified"));
+		criteria.add(new SuccessCriterion(2, "Labels or Instructions",
+				this, Level.A, "minimize-error-cues"));
+		criteria.add(new SuccessCriterion(3, "Error Suggestion",
+				this, Level.AA, "minimize-error-suggestions"));
+		criteria.add(new SuccessCriterion(4, "Error Prevention (Legal, Financial, Data)",
+				this, Level.AA, "minimize-error-reversible"));
 	}
 
 }
