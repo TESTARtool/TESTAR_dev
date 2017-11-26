@@ -35,7 +35,7 @@ import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDB.GremlinStart;
+import nl.ou.testar.GremlinStart;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;

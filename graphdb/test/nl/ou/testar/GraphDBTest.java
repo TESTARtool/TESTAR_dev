@@ -24,7 +24,9 @@ public class GraphDBTest {
         GraphDB sut =create(true);
         State state = new StdState();
         sut.addState(state);
-        Mockito.verify(repository,Mockito.times(1)).addState(state);
+        sut.addState(state,true);
+        Mockito.verify(repository,Mockito.times(1)).addState(state,false);
+       Mockito.verify(repository,Mockito.times(1)).addState(state,true);
     }
 
     @Test
@@ -32,7 +34,7 @@ public class GraphDBTest {
         GraphDB sut =create(false);
         State state = new StdState();
         sut.addState(state);
-        Mockito.verify(repository,Mockito.times(0)).addState(state);
+        Mockito.verify(repository,Mockito.times(0)).addState(state,false);
     }
 
     @Test

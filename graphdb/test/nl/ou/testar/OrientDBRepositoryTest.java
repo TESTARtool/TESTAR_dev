@@ -47,14 +47,14 @@ public class OrientDBRepositoryTest {
       state.set(Tags.ConcreteID, "0xCAFE");
       state.set(Tags.Abstract_R_ID,"demo");
 
-      sut.addState(state);
+      sut.addState(state,false);
 
       OrientGraph graph = factory.getTx();
       long data = graph.getRawGraph().countClass("State");
       assertEquals("The database shall contain one element", 1, data);
       graph.shutdown();
 
-      sut.addState(state);
+      sut.addState(state,false);
 
       graph = factory.getTx();
       data = graph.getRawGraph().countClass("State");
@@ -62,7 +62,7 @@ public class OrientDBRepositoryTest {
 
       state.set(Tags.ConcreteID, "0xDEAD");
 
-      sut.addState(state);
+      sut.addState(state,false);
 
       graph = factory.getTx();
       data = graph.getRawGraph().countClass("State");
@@ -87,7 +87,7 @@ public class OrientDBRepositoryTest {
       from.set(Tags.ConcreteID, "0xDEAD");
       from.set(Tags.Abstract_R_ID,"demo");
 
-      sut.addState(from);
+      sut.addState(from,false);
       sut.addWidget("0xDEAD", widget);
       sut.addWidget("0xDEAD", widget);
 
@@ -123,9 +123,9 @@ public class OrientDBRepositoryTest {
       widget.set(Tags.Title, "dummy");
       widget.set(Tags.Desc, "Demo");
 
-      sut.addState(from);
+      sut.addState(from,false);
       sut.addWidget("0xDEAD", widget);
-      sut.addState(to);
+      sut.addState(to,false);
 
       sut.addAction(action, "0xCAFE");
 
@@ -145,8 +145,8 @@ public class OrientDBRepositoryTest {
       to.set(Tags.ConcreteID, "0xCAFE");
       to.set(Tags.Abstract_R_ID,"demo");
 
-      sut.addState(from);
-      sut.addState(to);
+      sut.addState(from,false);
+      sut.addState(to,false);
       try {
          sut.addAction(action, "0xCAFE");
          fail("addAction should throw an exception");
@@ -173,7 +173,7 @@ public class OrientDBRepositoryTest {
       widget.set(Tags.Abstract_R_T_P_ID,"RoleTitleAndPath");
       widget.set(Tags.Desc, "Demo");
 
-      sut.addState(from);
+      sut.addState(from,false);
       sut.addWidget("0xDEAD", widget);
 
       try {
@@ -201,8 +201,8 @@ public class OrientDBRepositoryTest {
       to.set(Tags.ConcreteID, "0xCAFE");
       to.set(Tags.Abstract_R_ID,"demo");
 
-      sut.addState(from);
-      sut.addState(to);
+      sut.addState(from,false);
+      sut.addState(to,false);
 
       sut.addActionOnState("0xDEAD", action, "0xCAFE");
 
@@ -220,7 +220,7 @@ public class OrientDBRepositoryTest {
          to.set(Tags.ConcreteID, "0xCAFE");
          to.set(Tags.Abstract_R_ID,"demo");
 
-         sut.addState(to);
+         sut.addState(to,false);
 
          sut.addActionOnState("0xDEAD", action, "0xCAFE");
          fail("addAction should throw an exception");
@@ -257,7 +257,7 @@ public class OrientDBRepositoryTest {
          from.set(Tags.ConcreteID, "0xCAFE");
          from.set(Tags.Abstract_R_ID,"demo");
 
-         sut.addState(from);
+         sut.addState(from,false);
 
          sut.addActionOnState("0xCAFE", action, "0xDEAD");
          fail("addAction should throw an exception");

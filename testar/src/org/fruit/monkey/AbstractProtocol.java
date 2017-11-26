@@ -711,7 +711,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// note /by urueda): could be more interesting as XML (instead of Java Serialisation)
-	private void saveStateSnapshot(State state){
+	private void saveStateSnapshot(final State state){
 		try{
 			if(saveStateSnapshot){
 				//System.out.println(Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
@@ -1251,7 +1251,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
 				//Store ( initial )state
-				graphDB.addState(state);
+				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 	

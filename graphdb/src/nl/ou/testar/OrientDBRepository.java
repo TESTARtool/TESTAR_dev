@@ -40,7 +40,6 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
 import com.tinkerpop.gremlin.groovy.Gremlin;
 import com.tinkerpop.pipes.Pipe;
-import nl.ou.testar.GraphDB.GremlinStart;
 import org.fruit.alayer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,24 +69,21 @@ class OrientDBRepository implements GraphDBRepository {
 
 
    @Override
-   public void addState(final State state) {
+   public void addState(final State state, final boolean isInitial) {
       long tStart = System.currentTimeMillis();
       OrientGraph graph = graphFactory.getTx();
 
       Vertex v = getStateVertex(state.get(Tags.ConcreteID), graph);
       if (v == null) {
-         createStateVertex(state, graph);
-      } else {
-         int i = v.getProperty("visited");
-         v.setProperty("visited", i + 1);
+         createStateVertex(state, graph, isInitial);
       }
-
       graph.commit();
 
       graph.shutdown();
       long tEnd = System.currentTimeMillis();
       LOGGER.info("[S<] # {} # stored in #{} # ms", state.get(Tags.ConcreteID), tEnd - tStart);
    }
+
 
    @Override
    public void addAction(final Action action, final String toStateID) {
@@ -154,6 +150,7 @@ class OrientDBRepository implements GraphDBRepository {
          Vertex widget = getWidgetVertex(w.get(Tags.ConcreteID), graph);
          if (widget == null) {
             Vertex wv = createWidgetVertex(stateID, w, graph);
+
             bindToAbstractRole(wv, w, graph);
          }
          graph.commit();
@@ -192,11 +189,15 @@ class OrientDBRepository implements GraphDBRepository {
     * @param state State which needs to be stored as a vertex
     * @param graph Handle to the graph database.
     */
-   private void createStateVertex(final State state, final OrientGraph graph) {
+   private void createStateVertex(final State state, final OrientGraph graph,final boolean isInitial) {
       Vertex vertex = graph.addVertex("class:State");
       for (Tag<?> t : state.tags())
          setProperty(t, state.get(t), vertex);
-      vertex.setProperty("visited", 1);
+      if(isInitial) {
+         vertex.setProperty("IsInitial", true);
+      } else {
+         vertex.setProperty("IsInitial",false);
+      }
 
       Vertex abstractState = createVertex("AbsState","AbsRoleID",state.get(Tags.Abstract_R_ID),graph);
 
@@ -344,10 +345,10 @@ class OrientDBRepository implements GraphDBRepository {
       Edge role = graph.addEdge(null, wv, abs, "role");
 
       abs = getAbstractRoleTitleWidget(graph, w);
-      role = graph.addEdge(null, wv, abs, "role_title");
+      role = graph.addEdge(null, wv, abs, "roleTitle");
 
       abs = getAbstractRoleTitlePathWidget(graph, w);
-      role = graph.addEdge(null, wv, abs, "role_title_path");
+      role = graph.addEdge(null, wv, abs, "roleTitlePath");
    }
 
 

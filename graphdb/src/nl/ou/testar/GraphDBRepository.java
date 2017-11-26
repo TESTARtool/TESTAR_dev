@@ -37,7 +37,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.GraphDB.GremlinStart;
 
 /**
  * Repository API
@@ -49,8 +48,9 @@ public interface GraphDBRepository {
      * Store State in Graph database.
      *
      * @param state State of the SUT for this step.
+     * @param isInitial indicate if the state is initial.
      */
-    void addState(final State state);
+    void addState(final State state, final boolean isInitial);
 
     /**
      * Add Action on a widget to the graph database as Edge

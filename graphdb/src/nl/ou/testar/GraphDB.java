@@ -44,11 +44,6 @@ import org.fruit.alayer.Widget;
  * Created by floren on 5-6-2017.
  */
 public class GraphDB implements GraphDBRepository {
-	
-    public enum GremlinStart {
-        VERTICES,
-        EDGES;
-    }
 
     private final boolean enabled;
     private GraphDBRepository repository;
@@ -60,14 +55,21 @@ public class GraphDB implements GraphDBRepository {
         }
     }
 
+    public void addState(final State state) {
+       if(enabled) {
+          repository.addState(state,false);
+       }
+    }
+
     /**
      * Store the State in the graph database.
      * @param state state to store.
+     * @param isInitial indicate if this is the initial state.
      */
     @Override
-    public void addState(final State state) {
+    public void addState(final State state, final boolean isInitial) {
         if(enabled) {
-            repository.addState(state);
+            repository.addState(state,isInitial);
         }
     }
 
