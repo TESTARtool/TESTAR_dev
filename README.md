@@ -41,13 +41,6 @@ code.
 3. Select Gradle -> Existing Gradle project to open te import dialog 
 4. Select the folder that contains the root of the source code and start the import
 
-**Important**
-In order to allow Eclipse to import the project a build.gradle in the folder testar has to be modified
-Put the following sections in comments (see TODO's in [build.gradle in the folder testar](./testar/build.gradle));
-After the project is import the comments can be removed. It is now possible to build TESTAR
-
-The procedure presented in this chapter requires the installation of the [buildship](https://projects.eclipse.org/projects/tools.buildship) plugin. This plugin comes pre-installed with Eclipse Neon.
-
 ## Known issue
 - TESTAR can not be excuted using the gradle task ./gradlew run. 
 
