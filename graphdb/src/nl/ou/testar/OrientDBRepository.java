@@ -248,22 +248,88 @@ class OrientDBRepository implements GraphDBRepository {
 
     }
 
+    /**
+     * Bind the Widget to it's abstract counter parts
+     * @param wv the vertex of the widget to bind.
+     * @param w the widget to bind.
+     * @param graph reference to the graph database.
+     */
     private void bindToAbstractRole(Vertex wv, Widget w, Graph graph) {
-        Vertex abs = getAbstractRoleWidget(graph,w,wv);
+        Vertex abs = getAbstractRoleWidget(graph,w);
         Edge role = graph.addEdge(null,wv,abs,"role");
+
+        abs = getAbstractRoleTitleWidget(graph,w);
+        role = graph.addEdge(null, wv, abs, "role_title");
+
+        abs = getAbstractRoleTitlePathWidget(graph,w);
+        role = graph.addEdge(null, wv, abs, "role_title_path");
     }
 
 
-    private Vertex getAbstractRoleWidget(Graph g,Widget widget, Vertex wv) {
+    /**
+     *
+     * @param g
+     * @param widget
+     * @return
+     */
+    private Vertex getAbstractRoleWidget(Graph g,Widget widget) {
         String absID = widget.get(Tags.Abstract_R_ID,"");
+        Vertex abstractRole;
         try {
             Iterable<Vertex> vertices = g.getVertices("AbsRole.absid", absID);
-            return vertices.iterator().next();
+            abstractRole = vertices.iterator().next();
         } catch (NoSuchElementException | IllegalArgumentException nse) {
-            Vertex abstractRole = g.addVertex("class:AbsRole");
-            abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")));
-            return abstractRole;
+            abstractRole = g.addVertex("class:AbsRole");
         }
+        abstractRole.setProperty("absid",absID);
+        abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+        return abstractRole;
     }
+
+    /**
+     * Get or create an abstract widget based on the role, title and path.
+     * @param g The graph the should contain the vertex
+     * @param widget the widget which will be bind to the abstract widget.
+     * @return Vertext for the abstract Role/Title/Path combination.
+     */
+    private Vertex getAbstractRoleTitleWidget(Graph g,Widget widget) {
+        String absID = widget.get(Tags.Abstract_R_T_ID,"");
+        Vertex abstractRole;
+        try {
+            Iterable<Vertex> vertices = g.getVertices("AbsRoleTitle.absid", absID);
+            abstractRole = vertices.iterator().next();
+        } catch (NoSuchElementException | IllegalArgumentException nse) {
+            abstractRole = g.addVertex("class:AbsRoleTitle");
+
+        }
+        abstractRole.setProperty("absid",absID);
+        abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+        abstractRole.setProperty("Title",widget.get(Tags.Title,"UNKNOWN"));
+        return abstractRole;
+    }
+
+    /**
+     * Get or create an abstract widget based on the role, title and path.
+     * @param g The graph the should contain the vertex
+     * @param widget the widget which will be bind to the abstract widget.
+     * @return Vertext for the abstract Role/Title/Path combination.
+     */
+    private Vertex getAbstractRoleTitlePathWidget(Graph g,Widget widget) {
+        String absID = widget.get(Tags.Abstract_R_T_P_ID,"");
+        Vertex abstractRole;
+        try {
+            Iterable<Vertex> vertices = g.getVertices("AbsRoleTitlePath.absid", absID);
+            abstractRole =  vertices.iterator().next();
+        } catch (NoSuchElementException | IllegalArgumentException nse) {
+            abstractRole = g.addVertex("class:AbsRoleTitlePath");
+        }
+        abstractRole.setProperty("absid",absID);
+        abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+        abstractRole.setProperty("Title",widget.get(Tags.Title,"UNKNOWN"));
+        abstractRole.setProperty("Path",widget.get(Tags.Path,"[]"));
+        return abstractRole;
+    }
+
+
 
 }
