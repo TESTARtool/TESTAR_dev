@@ -37,7 +37,8 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 
 	TextAlternativesGuideline(AbstractPrinciple parent) {
 		super(1, "Text Alternatives", parent);
-		criteria.add(new SuccessCriterion(1, "Non-text Content", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Non-text Content",
+				this, Level.A, "text-equiv-all"));
 	}
 	
 	@Override

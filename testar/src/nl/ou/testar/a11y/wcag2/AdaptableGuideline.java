@@ -30,9 +30,12 @@ public final class AdaptableGuideline extends AbstractGuideline {
 
 	AdaptableGuideline(AbstractPrinciple parent) {
 		super(3, "Adaptable", parent);
-		criteria.add(new SuccessCriterion(1, "Info and Relationships", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Meaningful Sequence", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Sensory Characteristics", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Info and Relationships",
+				this, Level.A, "content-structure-separation-programmatic"));
+		criteria.add(new SuccessCriterion(2, "Meaningful Sequence",
+				this, Level.A, "content-structure-separation-sequence"));
+		criteria.add(new SuccessCriterion(3, "Sensory Characteristics",
+				this, Level.A, "content-structure-separation-understanding"));
 	}
 
 }

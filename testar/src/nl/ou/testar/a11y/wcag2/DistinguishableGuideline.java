@@ -30,11 +30,16 @@ public final class DistinguishableGuideline extends AbstractGuideline {
 
 	DistinguishableGuideline(AbstractPrinciple parent) {
 		super(4, "Distinguishable", parent);
-		criteria.add(new SuccessCriterion(1, "Use of Color", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Audio Control", this, Level.A));
-		criteria.add(new SuccessCriterion(3, "Contrast (Minimum)", this, Level.AA));
-		criteria.add(new SuccessCriterion(4, "Resize Text", this, Level.AA));
-		criteria.add(new SuccessCriterion(5, "Images of Text", this, Level.AA));
+		criteria.add(new SuccessCriterion(1, "Use of Color",
+				this, Level.A, "visual-audio-contrast-without-color"));
+		criteria.add(new SuccessCriterion(2, "Audio Control",
+				this, Level.A, "visual-audio-contrast-dis-audio"));
+		criteria.add(new SuccessCriterion(3, "Contrast (Minimum)",
+				this, Level.AA, "visual-audio-contrast-contrast"));
+		criteria.add(new SuccessCriterion(4, "Resize Text",
+				this, Level.AA, "visual-audio-contrast-scale"));
+		criteria.add(new SuccessCriterion(5, "Images of Text",
+				this, Level.AA, "visual-audio-contrast-text-presentation"));
 	}
 
 }

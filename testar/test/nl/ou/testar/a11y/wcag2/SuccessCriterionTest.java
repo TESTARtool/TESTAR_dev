@@ -21,7 +21,7 @@ public class SuccessCriterionTest {
 	public void testGetNr() {
 		AbstractPrinciple p = new PerceivablePrinciple();
 		AbstractGuideline g = new TimeBasedMediaGuideline(p);
-		SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A);
+		SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A, "foo");
 		assertEquals("1.2.3", s.getNr());
 	}
 	
@@ -29,8 +29,8 @@ public class SuccessCriterionTest {
 	public void testToString() {
 		AbstractPrinciple p = new PerceivablePrinciple();
 		AbstractGuideline g = new TimeBasedMediaGuideline(p);
-		SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A);
-		assertEquals("1.2.3 Foo (Level A)", s.toString());
+		SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A, "foo");
+		assertEquals("1.2.3 Foo", s.toString());
 	}
 	
 	@SuppressWarnings("unused")
@@ -41,9 +41,9 @@ public class SuccessCriterionTest {
 		}
 		AbstractPrinciple p = new PerceivablePrinciple();
 		AbstractGuideline g = new TimeBasedMediaGuideline(p);
-		SuccessCriterion s1 = new SuccessCriterion(3, "Foo", g, Level.A),
-				s2 = new SuccessCriterion(3, "Bar", g, Level.AA),
-				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA);
+		SuccessCriterion s1 = new SuccessCriterion(3, "Foo", g, Level.A, "foo"),
+				s2 = new SuccessCriterion(3, "Bar", g, Level.AA, "bar"),
+				s3 = new SuccessCriterion(3, "Baz", g, Level.AAA, "baz");
 		assertEquals("Level A shall have a high priority",
 				PRIO_A, s1.getVerdictSeverity(), DELTA);
 		assertEquals("Level AA shall have a medium priority",

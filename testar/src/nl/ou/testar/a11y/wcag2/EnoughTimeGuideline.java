@@ -30,8 +30,10 @@ public final class EnoughTimeGuideline extends AbstractGuideline {
 
 	EnoughTimeGuideline(AbstractPrinciple parent) {
 		super(2, "Enough Time", parent);
-		criteria.add(new SuccessCriterion(1, "Timing Adjustable", this, Level.A));
-		criteria.add(new SuccessCriterion(2, "Pause, Stop, Hide", this, Level.A));
+		criteria.add(new SuccessCriterion(1, "Timing Adjustable",
+				this, Level.A, "time-limits-required-behaviors"));
+		criteria.add(new SuccessCriterion(2, "Pause, Stop, Hide",
+				this, Level.A, "time-limits-pause"));
 	}
 
 }

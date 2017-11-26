@@ -4,19 +4,18 @@ sourceSets {
     main {
         resources {
             srcDirs = ['resources']
+            excludes = ['settings/']
         }
     }
 
-   /* TODO Remove comment after import into Eclipse
-   oracle {
+    oracle {
+        java {
+            srcDirs =['resources/settings']
+        }
 
-       java {
-           srcDirs =['resources/settings']
-       }
-
-       compileClasspath += main.output
-       compileClasspath += main.compileClasspath
-   } TODO Remove comment after import into Eclipse */
+        compileClasspath += main.output
+        compileClasspath += main.compileClasspath
+    }
 }
 
 dependencies {
@@ -65,16 +64,12 @@ task prepareNativeDLL(type: Copy) {
     into 'target/scripts'
 }
 
-/*TODO Remove comment after import into Eclipse
 prepareOracles.dependsOn(oracleClasses)
-*/
 
 applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
-
 
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
 }
 
 mainClassName='org.fruit.monkey.Main'
-

@@ -1,18 +1,23 @@
 package nl.ou.testar;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-
-import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Wrapper for interaction with the Graph Database
  * Created by floren on 5-6-2017.
  */
 public class GraphDB implements GraphDBRepository {
-
+	
+    public enum GremlinStart {
+        VERTICES,
+        EDGES;
+    }
 
     private final boolean enabled;
     private GraphDBRepository repository;
@@ -74,11 +79,12 @@ public class GraphDB implements GraphDBRepository {
         }
     }
     
-    public Iterable<Vertex> getStateVertices() {
+    @Override
+    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
         if(enabled) {
-            return repository.getStateVertices();
+            return repository.getObjectsFromGremlinPipe(gremlin, start);
         }
-        return null;
+        return new ArrayList<Object>();
     }
 
     /**

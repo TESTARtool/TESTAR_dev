@@ -1,17 +1,26 @@
 package nl.ou.testar;
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
+import com.tinkerpop.gremlin.groovy.Gremlin;
+import com.tinkerpop.pipes.Pipe;
+
+import nl.ou.testar.GraphDB.GremlinStart;
+
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -130,12 +139,27 @@ class OrientDBRepository implements GraphDBRepository {
         LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID),tEnd-tStart);
 
     }
-
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public Iterable<Vertex> getStateVertices() {
-    	OrientGraph graph = graphFactory.getTx();
-    	return graph.getVerticesOfClass("State");
-    	// TODO: when/where to shutdown graph?
+    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
+       	try {
+       	    Pipe pipe = Gremlin.compile(gremlin);
+       	    OrientGraph graph = graphFactory.getTx();
+       	    if (start.equals(GremlinStart.VERTICES))
+       	        pipe.setStarts(graph.getVertices());
+       	    else
+       	        pipe.setStarts(graph.getEdges());
+       	    List<Object> ret = new ArrayList<>();
+       	    for (Object o : pipe)
+                ret.add(o);
+            graph.shutdown();
+       	    return ret;
+        }
+       	catch (Exception e) {
+            LOGGER.error("Gremlin exception: {}", e.getMessage());
+            return new ArrayList<Object>();
+       	}
     }
 
     /**
@@ -146,17 +170,15 @@ class OrientDBRepository implements GraphDBRepository {
      */
     private void createStateVertex(final State state, final OrientGraph graph) {
         Vertex vertex = graph.addVertex("class:State");
-        state.tags().forEach(t -> vertex.setProperty(
-                t.name().replace(',', '_'),
-                state.get(t).toString()));
+        for (Tag<?> t : state.tags())
+            setProperty(t, state.get(t), vertex);
         vertex.setProperty("visited", 1);
     }
 
     private void createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
         Vertex vertex = graph.addVertex("class:Widget");
-        w.tags().forEach(t -> vertex.setProperty(
-                t.name().replace(',', '_'),
-                w.get(t).toString()));
+        for (Tag<?> t : w.tags())
+            setProperty(t, w.get(t), vertex);
         Vertex state = getStateVertex(widgetId, graph);
         Edge edge = graph.addEdge(null, state, vertex, "has");
         LOGGER.debug("Widget {} Vertex created and connected to state via Edge {} ", vertex.getId(), edge.getId());
@@ -210,10 +232,31 @@ class OrientDBRepository implements GraphDBRepository {
      */
     private void createActionEdge(final Vertex vFrom, final Action action, final Vertex vTo, final Graph graph) {
         Edge edge = graph.addEdge(null, vFrom, vTo, "execute");
-        action.tags().forEach(t -> edge.setProperty(
-                t.name().replace(',', '_'),
-                action.get(t).toString()));
-
+        for (Tag<?> t : action.tags())
+            setProperty(t, action.get(t), edge);
+    }
+    
+    private void setProperty(Tag<?> t, Object o, Element el) {
+    	String name = t.name().replace(',', '_');
+    	// TODO: is there a more sophisticated way to do this?
+    	if (o instanceof Boolean)
+    		el.setProperty(name, ((Boolean)o).booleanValue());
+    	else if (o instanceof Byte)
+    		el.setProperty(name, ((Byte)o).byteValue());
+    	else if (o instanceof Character)
+    		el.setProperty(name, ((Character)o).charValue());
+    	else if (o instanceof Double)
+    		el.setProperty(name, ((Double)o).doubleValue());
+    	else if (o instanceof Float)
+    		el.setProperty(name, ((Float)o).floatValue());
+    	else if (o instanceof Integer)
+    		el.setProperty(name, ((Integer)o).intValue());
+    	else if (o instanceof Long)
+    		el.setProperty(name, ((Long)o).longValue());
+    	else if (o instanceof Short)
+    		el.setProperty(name, ((Short)o).shortValue());
+    	else
+    		el.setProperty(name, o.toString());
     }
 
 }
