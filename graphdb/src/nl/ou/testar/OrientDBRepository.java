@@ -311,7 +311,7 @@ class OrientDBRepository implements GraphDBRepository {
       name = name.replace(')','_');
       // TODO: is there a more sophisticated way to do this?
       if (o instanceof Boolean)
-         el.setProperty(name, ((Boolean) o));
+         el.setProperty(name, ((Boolean) o).booleanValue());
       else if (o instanceof Byte)
          el.setProperty(name, ((Byte) o).byteValue());
       else if (o instanceof Character)
