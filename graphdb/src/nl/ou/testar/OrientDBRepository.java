@@ -366,7 +366,7 @@ class OrientDBRepository implements GraphDBRepository {
          widget.get(Tags.Abstract_R_ID),g);
 
       abstractRole.setProperty("absid", absID);
-      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNOWN")).toString());
       return abstractRole;
    }
 
@@ -388,7 +388,7 @@ class OrientDBRepository implements GraphDBRepository {
 
       }
       abstractRole.setProperty("absid", absID);
-      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNOWN")).toString());
       abstractRole.setProperty("Title", widget.get(Tags.Title, "UNKNOWN"));
       return abstractRole;
    }
@@ -410,7 +410,7 @@ class OrientDBRepository implements GraphDBRepository {
          abstractRole = g.addVertex("class:AbsRoleTitlePath");
       }
       abstractRole.setProperty("absid", absID);
-      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNONW")).toString());
+      abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNOWN")).toString());
       abstractRole.setProperty("Title", widget.get(Tags.Title, "UNKNOWN"));
       abstractRole.setProperty("Path", widget.get(Tags.Path, "[]"));
       return abstractRole;
