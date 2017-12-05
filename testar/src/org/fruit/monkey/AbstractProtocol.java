@@ -27,17 +27,65 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.Role;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Visualizer;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.EventHandler;
+import es.upv.staq.testar.FlashFeedback;
+import es.upv.staq.testar.IEventListener;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.graph.IEnvironment;
+import es.upv.staq.testar.graph.IGraphState;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.GraphDB;
+import org.fruit.Assert;
+import org.fruit.UnProc;
+import org.fruit.Util;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Canvas;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Finder;
+import org.fruit.alayer.Pen;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Rect;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Taggable;
+import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.UsedResources;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Visualizer;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.actions.ActivateSystem;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.KillProcess;
+import org.fruit.alayer.actions.NOP;
+import org.fruit.alayer.devices.AWTMouse;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Mouse;
+import org.fruit.alayer.devices.MouseButtons;
+import org.fruit.alayer.devices.ProcessHandle;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.ActionFailedException;
+import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.exceptions.WidgetNotFoundException;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -65,46 +113,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import nl.ou.testar.GraphDB;
-import org.fruit.Assert;
-import org.fruit.UnProc;
-import org.fruit.Util;
-import org.fruit.alayer.*;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.actions.ActivateSystem;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.KillProcess;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.devices.AWTMouse;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.devices.MouseButtons;
-import org.fruit.alayer.devices.ProcessHandle;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.EventHandler;
-import es.upv.staq.testar.FlashFeedback;
-import es.upv.staq.testar.IEventListener;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphState;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.protocols.ProtocolUtil;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
-import org.slf4j.LoggerFactory;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.Role;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Visualizer;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
 												  IEventListener { // by urueda
@@ -1486,7 +1505,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					);
 				ps.println(heading);
 				IEnvironment env = Grapher.getEnvironment();
-				double[] cvgMetrics = env.getCoverageMetrics();
+				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
 				final int VERDICT_WEIGHT = 	1000,
 						  CVG_WEIGHT = 		  10,
 						  PATH_WEIGHT = 	 100,
@@ -1496,7 +1515,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						  TEST_WEIGHT = 	1000;
 				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
 					((problems ? 1 : 0) * VERDICT_WEIGHT +
-					 cvgMetrics[0] + cvgMetrics[1] * CVG_WEIGHT +
+					 cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
 					 env.getLongestPathLength() * PATH_WEIGHT +
 					 (env.getGraphStates().size() - 2) * STATES_WEIGHT +
 					 (1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
@@ -1506,8 +1525,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
 					(problems ? "FAIL" : "PASS"),		  // verdict
 					this.testFailTimes,					  // test FAIL count
-					String.format("%.2f", cvgMetrics[0]), // min coverage);
-					String.format("%.2f", cvgMetrics[1]), // max coverage
+					String.format("%.2f", cvgMetrics.getMinCoverage()),
+					String.format("%.2f", cvgMetrics.getMaxCoverage()),
 					env.getLongestPathLength(), 			  // longest path
 					env.getGraphStates().size() - 2,	  // graph states
 					env.getGraphStateClusters().size(),	  // abstract states
