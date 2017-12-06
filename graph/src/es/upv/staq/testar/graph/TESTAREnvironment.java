@@ -46,25 +46,14 @@ public class TESTAREnvironment implements IEnvironment {
 
   private Map<String, IGraphState> cachedGetStates = null;
   private Map<String, IGraphAction> cachedGetActions = null;
-
-  // [0] states number
-  // [1] actions number
-  // [2] abstract states number
-  // [3] abstract actions number
-  // [4] unexplored (known) actions number
-  // [5] longestPath
-  // [6] minCvg
-  // [7] maxCvg
-  // [8] KCVG - CVG value (coverage of known UI space)
-  // [9] KCVG - K value (known UI space scale)
-  private List<int[]> explorationCurve;
+  private List<ResumingMetrics> explorationCurve;
 
   public TESTAREnvironment (String testSequencePath) {
     this(TESTARGraph.buildEmptyGraph());
-    this.discoveredStateActions = new HashMap<String, Set<Action>>();
-    this.cachedGetStates = new WeakHashMap<String, IGraphState>();
-    this.cachedGetActions = new WeakHashMap<String, IGraphAction>();
-    this.explorationCurve = new ArrayList<int[]>();
+    this.discoveredStateActions = new HashMap<>();
+    this.cachedGetStates = new WeakHashMap<>();
+    this.cachedGetActions = new WeakHashMap<>();
+    this.explorationCurve = new ArrayList<>();
   }
 
   private TESTAREnvironment (TESTARGraph g) {
@@ -329,7 +318,7 @@ public class TESTAREnvironment implements IEnvironment {
   }
 
 	/*private boolean stateAtGraph(String concreteID){
-		for (IGraphState gs : g.vertexSet()){
+    for (IGraphState gs : g.vertexSet()){
 			if (gs.getConcreteID().equals(concreteID))
 				return true;
 		}
@@ -448,8 +437,7 @@ public class TESTAREnvironment implements IEnvironment {
         }
       }
     }
-    return new int[]{knownStates,
-        revisitedStates,
+    return new int[]{knownStates, revisitedStates,
         g.vertexSet().size() - 2 - knownStates};
   }
 
@@ -459,33 +447,31 @@ public class TESTAREnvironment implements IEnvironment {
     sampleExplorationCount++;
     if (sampleExplorationCount % Grapher.EXPLORATION_SAMPLE_INTERVAL == 0) {
       CoverageMetrics cvgMetrics = getCoverageMetrics();
-      int[] sample = new int[]{
-          g.vertexStates().size() - 1, // states number (without start state)
-          g.edgeSet().size() - 1, // actions number (without start edges)
-          getGraphStateClusters().size(), // abstract states number
-          getGraphActionClusters().size(), // abstract actions number
+      ResumingMetrics sample = new ResumingMetrics(
+          g.vertexStates().size() - 1,
+          g.edgeSet().size() - 1,
+          getGraphStateClusters().size(),
+          getGraphActionClusters().size(),
           (int) cvgMetrics.getTotalKnownUnexploredActions(),
-          getLongestPathLength(), // longest path
+          getLongestPathLength(),
           (int) cvgMetrics.getMinCoverage(),
           (int) cvgMetrics.getMaxCoverage(),
           (int) cvgMetrics.getKnownSpaceCvgs(),
-          (int) cvgMetrics.getKnownSpaceScale()
-      };
+          (int) cvgMetrics.getKnownSpaceScale());
       explorationCurve.add(sample);
     }
   }
 
   @Override
-  public List<int[]> getExplorationCurve () {
+  public List<ResumingMetrics> getExplorationCurve () {
     return explorationCurve;
   }
 
   @Override
   public String getExplorationCurveSample () {
     if (explorationCurve != null && !explorationCurve.isEmpty()) {
-      int[] sample = explorationCurve.get(explorationCurve.size() - 1);
-      return "ExplorationCurve (unique states/actions, abstract states/actions, unexplored_count): " +
-          sample[0] + ", " + sample[1] + ", " + sample[2] + ", " + sample[3] + "; " + sample[4] + ", " + sample[5] + ", " + sample[6] + ", " + sample[7];
+      ResumingMetrics lastSample = explorationCurve.get(explorationCurve.size() - 1);
+      return lastSample.getExplorationCurveString();
     }
     else {
       return "Cannot get exploration curve sample - initialisation missing";
@@ -495,7 +481,8 @@ public class TESTAREnvironment implements IEnvironment {
   @Override
   public int getExplorationCurveSampleCvg () {
     if (explorationCurve != null && !explorationCurve.isEmpty()) {
-      return explorationCurve.get(explorationCurve.size() - 1)[8];
+      ResumingMetrics lastSample = explorationCurve.get(explorationCurve.size() - 1);
+      return lastSample.getCoverageUIspace();
     }
     else {
       return 0;
@@ -505,7 +492,8 @@ public class TESTAREnvironment implements IEnvironment {
   @Override
   public int getExplorationCurveSampleScale () {
     if (explorationCurve != null && !explorationCurve.isEmpty()) {
-      return explorationCurve.get(explorationCurve.size() - 1)[9];
+      ResumingMetrics lastSample = explorationCurve.get(explorationCurve.size() - 1);
+      return lastSample.getSpaceScale();
     }
     else {
       return 0;

@@ -228,23 +228,22 @@ public class ReportPages {
 
     int idx = firstSequenceActionNumber - 1; //int idx = 1;
     String sampleS;
-    List<int[]> explorationCurve = env.getExplorationCurve();
-    // [0] states number
-    // [1] actions number
-    // [2] abstract states number
-    // [3] abstract actions number
-    // [4] unexplored (known) actions number
-    // [5] longestPath
-    // [6] minCvg
-    // [7] maxCvg
-    // [8] KCVG - CVG value (coverage of known UI space)
-    // [9] KCVG - K value (known UI space scale)
-    for (int[] sample : explorationCurve) {
-      sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, %2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$7d %10$6s %11$6s %12$7s",
-          idx++, sample[0], sample[1], sample[2], sample[3],
-          sample[0] + sample[1], sample[2] + sample[3],
-          sample[4], sample[5], sample[6] + "%", sample[7] + "%",
-          sample[8] + "@" + env.convertKCVG(sample[9]));
+    List<IEnvironment.ResumingMetrics> explorationCurve = env.getExplorationCurve();
+    for (IEnvironment.ResumingMetrics sample : explorationCurve) {
+      sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, " +
+              "%2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$7d %10$6s %11$6s %12$7s",
+          idx++,
+          sample.getStateNumber(),
+          sample.getActionNumber(),
+          sample.getAbstractStateNumber(),
+          sample.getAbstractActionNumber(),
+          sample.getStateNumber() + sample.getActionNumber(),
+          sample.getAbstractStateNumber() + sample.getAbstractActionNumber(),
+          sample.getUnexploredActionNumber(),
+          sample.getLongesthPath(),
+          sample.getMinCvg() + "%",
+          sample.getMaxCvg() + "%",
+          sample.getCoverageUIspace() + "@" + env.convertKCVG(sample.getSpaceScale()));
       report.append(sampleS + "\n");
       if (idx % 50 == 0) {
         report.append(TABLE_HEADING); // repeat heading

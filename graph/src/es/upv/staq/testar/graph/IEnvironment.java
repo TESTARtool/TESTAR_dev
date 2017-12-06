@@ -265,19 +265,10 @@ public interface IEnvironment {
 
   /**
    * Retrieves data for the exploration curve.
-   * return Metrics:
-   * [0] states number
-   * [1] actions number
-   * [2] abstract states number
-   * [3] abstract actions number
-   * [4] unexplored (known) actions number
-   * [5] longestPath
-   * [6] minCvg
-   * [7] maxCvg
-   * [8] KCVG - CVG value (coverage of known UI space)
-   * [9] KCVG - K value (known UI space scale)
+   *
+   * @return list of ResumingMetrics
    */
-  public List<int[]> getExplorationCurve ();
+  public List<ResumingMetrics> getExplorationCurve ();
 
   /**
    * Gets the last sample from the GUI exploration curve.
@@ -387,6 +378,96 @@ public interface IEnvironment {
    * @return null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
    */
   public String[] getReport (int firstSequenceActionNumber);
+
+  class ResumingMetrics {
+    // states number
+    private int stateNumber;
+    // actions number
+    private int actionNumber;
+    // abstract states number
+    private int abstractStateNumber;
+    // abstract actions number
+    private int abstractActionNumber;
+    // unexplored (known) actions number
+    private int unexploredActionNumber;
+    private int longesthPath;
+    private int minCvg;
+    private int maxCvg;
+    // KCVG - CVG value (coverage of known UI space)
+    private int coverageUIspace;
+    // KCVG - K value (known UI space scale)
+    private int spaceScale;
+
+    public ResumingMetrics (int stateNumber,
+                            int actionNumber,
+                            int abstractStateNumber,
+                            int abstractActionNumber,
+                            int unexploredActionNumber,
+                            int longesthPath,
+                            int minCvg,
+                            int maxCvg,
+                            int coverageUIspace,
+                            int spaceScale) {
+      this.stateNumber = stateNumber;
+      this.actionNumber = actionNumber;
+      this.abstractStateNumber = abstractStateNumber;
+      this.abstractActionNumber = abstractActionNumber;
+      this.unexploredActionNumber = unexploredActionNumber;
+      this.longesthPath = longesthPath;
+      this.minCvg = minCvg;
+      this.maxCvg = maxCvg;
+      this.coverageUIspace = coverageUIspace;
+      this.spaceScale = spaceScale;
+    }
+
+    public int getStateNumber () {
+      return stateNumber;
+    }
+
+    public int getActionNumber () {
+      return actionNumber;
+    }
+
+    public int getAbstractStateNumber () {
+      return abstractStateNumber;
+    }
+
+    public int getAbstractActionNumber () {
+      return abstractActionNumber;
+    }
+
+    public int getUnexploredActionNumber () {
+      return unexploredActionNumber;
+    }
+
+    public int getLongesthPath () {
+      return longesthPath;
+    }
+
+    public int getMinCvg () {
+      return minCvg;
+    }
+
+    public int getMaxCvg () {
+      return maxCvg;
+    }
+
+    public int getCoverageUIspace () {
+      return coverageUIspace;
+    }
+
+    public int getSpaceScale () {
+      return spaceScale;
+    }
+
+    public String getExplorationCurveString () {
+      return String.format("ExplorationCurve (unique states/actions, " +
+              "abstract states/actions, unexplored_count): " +
+              "%d, %d, %d, %d; %d, %d, %d, %d",
+          stateNumber, actionNumber, abstractStateNumber, abstractActionNumber,
+          unexploredActionNumber, longesthPath, minCvg, maxCvg);
+    }
+  }
 
   class CoverageMetrics {
     private double minCoverage;
