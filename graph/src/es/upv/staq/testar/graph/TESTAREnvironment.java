@@ -39,13 +39,12 @@ import java.util.WeakHashMap;
  * @author Urko Rueda Molina (urueda)
  */
 public class TESTAREnvironment implements IEnvironment {
-
   private TESTARGraph g;
 
-  private HashMap<String, Set<Action>> discoveredStateActions; // Concrete state ID -> actions
-
-  private Map<String, IGraphState> cachedGetStates = null;
-  private Map<String, IGraphAction> cachedGetActions = null;
+  // Concrete state ID -> actions
+  private HashMap<String, Set<Action>> discoveredStateActions;
+  private Map<String, IGraphState> cachedGetStates;
+  private Map<String, IGraphAction> cachedGetActions;
   private List<ResumingMetrics> explorationCurve;
 
   public TESTAREnvironment (String testSequencePath) {
@@ -286,22 +285,6 @@ public class TESTAREnvironment implements IEnvironment {
     return getActionsNumber(set, state);
   }
 
-	/*@Override
-  public IGraphAction[] getSortedStateActionsByDecReward(IGraphState state) {
-		Set<IGraphAction> actions = g.outgoingEdgesOf(state);
-		IGraphAction[] sortedActions = actions.toArray(new IGraphAction[actions.size()]);
-		Arrays.sort(sortedActions, new Comparator<Object>() {
-			@Override
-			public int compare(Object graphAction1, Object graphAction2) {
-				return (new Double(((IGraphAction)graphAction2).getActionReward())).compareTo(
-					    new Double(((IGraphAction)graphAction1).getActionReward())); // descending order
-				//return (new Double(((IGraphAction)graphAction1).getActionReward())).compareTo(
-				//	    new Double(((IGraphAction)graphAction2).getActionReward())); // ascending order
-			}
-		});
-		return sortedActions;
-	}*/
-
   @Override
   public GraphEdge[] getSortedActionsByOrder (int fromOrder, int toOrder) {
     return g.getSortedActionsByOrder(fromOrder, toOrder);
@@ -316,22 +299,6 @@ public class TESTAREnvironment implements IEnvironment {
   public ListIterator<GraphEdge> getBackwardActions () {
     return g.getBackwardActions();
   }
-
-	/*private boolean stateAtGraph(String concreteID){
-    for (IGraphState gs : g.vertexSet()){
-			if (gs.getConcreteID().equals(concreteID))
-				return true;
-		}
-		return false;
-	}	
-	
-	private boolean actionAtGraph(String concreteID){
-		for (IGraphAction ga : g.edgeSet()){
-			if (ga.getConcreteID().equals(concreteID))
-				return true;
-		}
-		return false;
-	}*/
 
   @Override
   public boolean stateAtGraph (IGraphState gs) {
@@ -373,8 +340,6 @@ public class TESTAREnvironment implements IEnvironment {
     g.addVertex(this, v);
     g.addEdge(this, weState, v, new GraphAction(Grapher.GRAPH_ACTION_STOP));
   }
-
-  private static final double LOG10_2 = Math.log10(2.);
 
   /**
    * &lt;[0],[1]&gt; = &lt;min%,max%&gt; coverage (for all states)

@@ -375,7 +375,8 @@ public interface IEnvironment {
   /**
    * Get the test report.
    *
-   * @return null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
+   * @return null or: [0] = clusters, [1] = test table,
+   *                  [2] = exploration curve, [3] = UI exploration data
    */
   public String[] getReport (int firstSequenceActionNumber);
 
