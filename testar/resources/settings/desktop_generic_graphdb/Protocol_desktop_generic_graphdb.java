@@ -22,6 +22,7 @@
 import java.io.File;
 import java.util.Set;
 
+import nl.ou.testar.CustomType;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
@@ -209,8 +210,11 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		action.set(CustomTags.ACTION_SEQUENCE,sequence++);
+
+
+
 		return super.executeAction(system, state, action);
-		
+
 	}
 
 	/**
@@ -247,8 +251,25 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		return super.moreSequences();
 
 	}
+
+	private class ButtonColor extends CustomType {
+
+		private static final String TYPE = "ButtonColor";
+
+		public ButtonColor(final String rgb) {
+			super(TYPE,rgb);
+		}
+
+	}
 	
 }
+
+
+ class ButtonColorTags extends TagsBase {
+	 public static Tag<Integer> RED_VALUE = from("red", Integer.class);
+	 public static Tag<Integer> GREEN_VALUE = from("green", Integer.class);
+	 public static Tag<Integer> BLUE_VALUE = from("blue", Integer.class);
+ }
 
 class CustomTags extends TagsBase {
 	public static Tag<Long> ACTION_SEQUENCE = from("sequenceNumber",Long.class);
