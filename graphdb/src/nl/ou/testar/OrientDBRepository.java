@@ -162,6 +162,11 @@ class OrientDBRepository implements GraphDBRepository {
 
    }
 
+   @Override
+   public void addCustomType(String sourceID, String relation, CustomType instance) {
+      throw new UnsupportedOperationException("Not implemented yet");
+   }
+
    @SuppressWarnings({"rawtypes", "unchecked"})
    @Override
    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {

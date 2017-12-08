@@ -128,4 +128,8 @@ public class GraphDB implements GraphDBRepository {
         repository = repo;
     }
 
+    @Override
+    public void addCustomType(String sourceID, String relation, CustomType instance) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

@@ -19,7 +19,7 @@ public class Linearitybenchmark {
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
-       graphFactory.addState(Util.createState("tagI"+0));
+       graphFactory.addState(Util.createState("tagI"+0),true);
     }
 
     @TearDown(Level.Invocation)
@@ -38,6 +38,6 @@ public class Linearitybenchmark {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateLiniairity() {
         for(int i = 1; i<interations; i++)
-        graphFactory.addState(Util.createState("tagI"+i));
+        graphFactory.addState(Util.createState("tagI"+i),false);
     }
 }

@@ -20,7 +20,7 @@ public class AddSateBenchmark {
     public void setupDatabase() {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
-       graphFactory.addState(Util.createState("0xDEAD"));
+       graphFactory.addState(Util.createState("0xDEAD"),true);
     }
 
     @TearDown(Level.Invocation)
@@ -37,7 +37,7 @@ public class AddSateBenchmark {
     @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddState() {
-        graphFactory.addState(Util.createState("0xCAFE"));
+        graphFactory.addState(Util.createState("0xCAFE"),true);
     }
 
 
@@ -48,8 +48,8 @@ public class AddSateBenchmark {
     @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateTwice() {
-        graphFactory.addState(Util.createState("0xCAFE"));
-        graphFactory.addState(Util.createState("0xCAFE"));
+        graphFactory.addState(Util.createState("0xCAFE"),false);
+        graphFactory.addState(Util.createState("0xCAFE"),false);
     }
 
 

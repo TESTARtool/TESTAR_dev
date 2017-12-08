@@ -251,5 +251,5 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 }
 
 class CustomTags extends TagsBase {
-	public static Tag<Long> ACTION_SEQUENCE = from("SEQUENCE_NUMBER",Long.class);
+	public static Tag<Long> ACTION_SEQUENCE = from("sequenceNumber",Long.class);
 }
