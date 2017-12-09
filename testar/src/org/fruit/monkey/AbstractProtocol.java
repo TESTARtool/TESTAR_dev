@@ -167,7 +167,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private boolean forceToSequenceLengthAfterFail = false;
 	private int testFailTimes = 0;
     private final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
-	private GraphDB graphDB;
+	protected GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
     

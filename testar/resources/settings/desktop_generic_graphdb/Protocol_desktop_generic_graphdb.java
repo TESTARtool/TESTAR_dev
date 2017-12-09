@@ -39,7 +39,6 @@ import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 
 import static org.fruit.alayer.Tags.Blocked;
-
 import static org.fruit.alayer.Tags.Enabled;
 
 
@@ -194,8 +193,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
-
+	protected Action selectAction(State state, Set<Action> actions){
 		return super.selectAction(state, actions);
 
 	}
@@ -209,9 +207,15 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+
+		ButtonColor buttonColor = new ButtonColor("ffffff");
+		buttonColor.set(ButtonColorTags.BLUE_VALUE,0xFF);
+		buttonColor.set(ButtonColorTags.RED_VALUE,0xFF);
+		buttonColor.set(ButtonColorTags.GREEN_VALUE,0xFF);
+
+		graphDB.addCustomType(state,"coloured", buttonColor);
+
 		action.set(CustomTags.ACTION_SEQUENCE,sequence++);
-
-
 
 		return super.executeAction(system, state, action);
 

@@ -1,4 +1,5 @@
 package nl.ou.testar;
+
 /*************************************************************************************
  *
  * COPYRIGHT (2017):
@@ -117,7 +118,28 @@ public class GraphDB implements GraphDBRepository {
         if(enabled) {
             return repository.getObjectsFromGremlinPipe(gremlin, start);
         }
-        return new ArrayList<Object>();
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void addCustomType(Action action, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(action,relation,instance);
+        }
+    }
+
+    @Override
+    public void addCustomType(State state, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(state,relation,instance);
+        }
+    }
+
+    @Override
+    public void addCustomType(Widget widget, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(widget,relation,instance);
+        }
     }
 
     /**
@@ -128,8 +150,4 @@ public class GraphDB implements GraphDBRepository {
         repository = repo;
     }
 
-    @Override
-    public void addCustomType(String sourceID, String relation, CustomType instance) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
 }

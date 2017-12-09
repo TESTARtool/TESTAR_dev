@@ -32,10 +32,7 @@ package nl.ou.testar;
  * POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************************/
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
 import com.tinkerpop.gremlin.groovy.Gremlin;
@@ -163,9 +160,50 @@ class OrientDBRepository implements GraphDBRepository {
    }
 
    @Override
-   public void addCustomType(String sourceID, String relation, CustomType instance) {
-      throw new UnsupportedOperationException("Not implemented yet");
+   public void addCustomType(Action action, String relation, CustomType instance) {
+      addCustomType("Action",action.get(Tags.ConcreteID),relation,instance);
    }
+
+   @Override
+   public void addCustomType(State state, String relation, CustomType instance) {
+      addCustomType("State",state.get(Tags.ConcreteID),relation,instance);
+   }
+
+   @Override
+   public void addCustomType(Widget widget, String relation, CustomType instance) {
+      addCustomType("Widget",widget.get(Tags.ConcreteID),relation,instance);
+   }
+
+
+   /**
+    * Create the relation between an action, state or widget and the customType.
+    * @param sourceType type of the source. This must be an Action, State or Widget.
+    * @param sourceId id of the source.
+    * @param relation relation between the source and the customType.
+    * @param instance the instance of the customType.
+    */
+   private void addCustomType(String sourceType, String sourceId, String relation, CustomType instance) {
+      OrientGraph graph = graphFactory.getTx();
+      try {
+         Vertex source = getVertexByTypeAndId(sourceType, Tags.ConcreteID.toString(), sourceId, graph);
+         if(source == null) {
+            throw new IllegalArgumentException("Source action not found in database");
+         }
+         Vertex target = createVertex(instance.getType(),Tags.ConcreteID.toString(),instance.getId(),graph);
+         instance.tags().forEach(tag -> setProperty(tag, instance.get(tag), target));
+
+         if( !source.getEdges(Direction.OUT,relation).iterator().hasNext() ) {
+            Edge edge = graph.addEdge(null, source, target, relation);
+         }
+
+         graph.commit();
+
+      } finally {
+         graph.shutdown();
+      }
+   }
+
+
 
    @SuppressWarnings({"rawtypes", "unchecked"})
    @Override
@@ -228,32 +266,36 @@ class OrientDBRepository implements GraphDBRepository {
     * @return the vertex of for the State object or null if the state is not found.
     */
    private Vertex getStateVertex(String concreteID, OrientGraph graph) {
-      try {
-         Iterable<Vertex> vertices = graph.getVertices("State." + Tags.ConcreteID, concreteID);
-         Vertex vertex = vertices.iterator().next();
-         LOGGER.debug("Vertex {} found", vertex.getId());
-         return vertex;
-      } catch (IllegalArgumentException | NoSuchElementException ex) {
-         LOGGER.debug("There is no vertex inserted yet for the given State ConcreteID {}", concreteID);
-         return null;
-      }
+     return getVertexByTypeAndId("State", Tags.ConcreteID.toString(), concreteID,graph);
    }
 
    /**
     * Lookup widget vertex in the database
     *
-    * @param concrteID unique identification of the state
+    * @param concreteID unique identification of the state
     * @param graph     handle to the graph database
     * @return the vertex of for the Widget object or null if the state is not found.
     */
-   private Vertex getWidgetVertex(String concrteID, OrientGraph graph) {
+   private Vertex getWidgetVertex(String concreteID, OrientGraph graph) {
+      return getVertexByTypeAndId("Widget",Tags.ConcreteID.toString(),concreteID,graph);
+   }
+
+   /**
+    * Lookup state vertex in the database.
+    * @param type       type of the Vertex
+    * @param idField    field used for identification.    
+    * @param concreteID unique identification of the state
+    * @param graph      handle to the graph database
+    * @return the vertex of for the State object or null if the state is not found.
+    */
+   private Vertex getVertexByTypeAndId(String type, String idField, String concreteID, OrientGraph graph) {
       try {
-         Iterable<Vertex> vertices = graph.getVertices("Widget." + Tags.ConcreteID, concrteID);
+         Iterable<Vertex> vertices = graph.getVertices(type+"." + idField, concreteID);
          Vertex vertex = vertices.iterator().next();
          LOGGER.debug("Vertex {} found", vertex.getId());
          return vertex;
       } catch (IllegalArgumentException | NoSuchElementException ex) {
-         LOGGER.debug("There is no vertex inserted yet for the given Widget ConcreteID {}", concrteID);
+         LOGGER.debug("There is no vertex inserted yet for the given {} ConcreteID {}",type, concreteID);
          return null;
       }
    }
@@ -277,8 +319,9 @@ class OrientDBRepository implements GraphDBRepository {
 
       Edge isA = graph.addEdge(null, a, abstractAction,"isA");
 
-      for (Tag<?> t : action.tags())
+      for (Tag<?> t : action.tags()) {
          setProperty(t, action.get(t), a);
+      }
    }
 
    /**
