@@ -25,7 +25,7 @@ public class AddWidgetBenchmark {
         graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "/benchmark","admin","admin");
 
-        graphFactory.addState(Util.createState("widget"+1));
+        graphFactory.addState(Util.createState("widget"+1),true);
         graphFactory.addWidget("widget1",dummy);
 
     }

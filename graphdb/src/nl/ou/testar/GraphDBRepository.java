@@ -76,6 +76,30 @@ public interface GraphDBRepository {
      * @param w The widget object
      */
     void addWidget(final String stateID, Widget w);
+
+    /**
+     * Store a custom type in the graph database.
+     * @param action the actionto which the custom type relates.
+     * @param relation The name of the relation
+     * @param instance the custom object.
+     */
+    void addCustomType(final Action action, final String relation, final CustomType instance);
+
+    /**
+     * Store a custom type in the graph database.
+     * @param state the ID of the artifact to which the custom type relates.
+     * @param relation The name of the relation
+     * @param instance the custom object.
+     */
+    void addCustomType(final State state, final String relation, final CustomType instance);
+
+    /**
+     * Store a custom type in the graph database.
+     * @param widget the ID of the artifact to which the custom type relates.
+     * @param relation The name of the relation
+     * @param instance the custom object.
+     */
+    void addCustomType(final Widget widget, final String relation, final CustomType instance);
     
     /**
      * Get all objects from a pipe specified by a Gremlin-Groovy expression

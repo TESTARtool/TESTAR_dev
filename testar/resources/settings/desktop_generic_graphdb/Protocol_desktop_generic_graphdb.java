@@ -22,6 +22,7 @@
 import java.io.File;
 import java.util.Set;
 
+import nl.ou.testar.CustomType;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
@@ -38,7 +39,6 @@ import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 
 import static org.fruit.alayer.Tags.Blocked;
-
 import static org.fruit.alayer.Tags.Enabled;
 
 
@@ -193,8 +193,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
-
+	protected Action selectAction(State state, Set<Action> actions){
 		return super.selectAction(state, actions);
 
 	}
@@ -208,9 +207,18 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+
+		ButtonColor buttonColor = new ButtonColor("ffffff");
+		buttonColor.set(ButtonColorTags.BLUE_VALUE,0xFF);
+		buttonColor.set(ButtonColorTags.RED_VALUE,0xFF);
+		buttonColor.set(ButtonColorTags.GREEN_VALUE,0xFF);
+
+		graphDB.addCustomType(state,"coloured", buttonColor);
+
 		action.set(CustomTags.ACTION_SEQUENCE,sequence++);
+
 		return super.executeAction(system, state, action);
-		
+
 	}
 
 	/**
@@ -247,9 +255,26 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		return super.moreSequences();
 
 	}
+
+	private class ButtonColor extends CustomType {
+
+		private static final String TYPE = "ButtonColor";
+
+		public ButtonColor(final String rgb) {
+			super(TYPE,rgb);
+		}
+
+	}
 	
 }
 
+
+ class ButtonColorTags extends TagsBase {
+	 public static Tag<Integer> RED_VALUE = from("red", Integer.class);
+	 public static Tag<Integer> GREEN_VALUE = from("green", Integer.class);
+	 public static Tag<Integer> BLUE_VALUE = from("blue", Integer.class);
+ }
+
 class CustomTags extends TagsBase {
-	public static Tag<Long> ACTION_SEQUENCE = from("SEQUENCE_NUMBER",Long.class);
+	public static Tag<Long> ACTION_SEQUENCE = from("sequenceNumber",Long.class);
 }
