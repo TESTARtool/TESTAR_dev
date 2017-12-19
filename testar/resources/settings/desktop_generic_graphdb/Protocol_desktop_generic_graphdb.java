@@ -258,6 +258,8 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 
 	private class ButtonColor extends CustomType {
 
+		private static final long serialVersionUID = -7965579837062997054L;
+		
 		private static final String TYPE = "ButtonColor";
 
 		public ButtonColor(final String rgb) {

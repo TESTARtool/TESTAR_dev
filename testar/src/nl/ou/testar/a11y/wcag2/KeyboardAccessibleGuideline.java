@@ -43,11 +43,11 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	private static final long serialVersionUID = 4099763917658781054L;
 	
 	private static final int MAX_CACHED_SHORTCUT_KEYS = 50;
-	private static final int KEYBOARD_TRAP_THRESHOLD = 7;
+	private static final int KEYBOARD_TRAP_WIDGET_THRESHOLD = 5;
 	private static final int SHORTCUT_KEYS_TO_WIDGETS_RATIO = 3;
 	
 	private final Deque<Action> shortcutKeysCache = new LinkedList<>();
-	private String lastConcreteID = "";
+	private String lastConcreteWidgetID = "";
 	private int sameWidgetCount = 0;
 	
 	KeyboardAccessibleGuideline(AbstractPrinciple parent) {
@@ -68,9 +68,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				w.set(WCAG2Tags.WCAG2KeyboardVisited, true);
 				
 				String concreteID = w.get(Tags.ConcreteID, "");
-				if (lastConcreteID.equals(concreteID)) {
+				if (lastConcreteWidgetID.equals(concreteID)) {
 					sameWidgetCount++;
-					if (sameWidgetCount == KEYBOARD_TRAP_THRESHOLD)
+					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD)
 						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 								"Possible keyboard trap", w));
 					else
@@ -79,7 +79,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				else {
 					sameWidgetCount = 0;
 				}
-				lastConcreteID = concreteID;
+				lastConcreteWidgetID = concreteID;
 			} // hasKeyboardFocus(w)
 			
 			String key1 = AccessibilityUtil.getAccessKey(w),

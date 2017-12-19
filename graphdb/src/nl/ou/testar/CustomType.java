@@ -43,6 +43,8 @@ import org.fruit.alayer.TaggableBase;
  */
 public class CustomType extends TaggableBase {
 
+    private static final long serialVersionUID = 1429882004050950922L;
+
     private final String type;
     private final String id;
 
