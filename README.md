@@ -5,19 +5,24 @@ The software can be build with both ant and gradle.
 
 ### Required tools to build the software
 
-In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
-These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
+In order to build the native code, a view manual steps need to be executed;
 
-After installation of these tools  the file compile_w10.bat and clean_w10.bat need to be adapted.
+1. In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
+These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
+2. Install the Visual Studio tools on your machine (remember the path where the tools are installed)
+3. Download [compile_w10.bat](https://github.com/florendg/testar_floren/releases/download/PERFORMANCE/compile_w10.bat) 
+and [clean_w10.bat](https://github.com/florendg/testar_floren/releases/download/PERFORMANCE/clean_w10.bat)
+4. Copy clean.bat and compile.bat to the folder windows/native_src within the TESTAR project
+5. Adapt compile.bat and clean.bat. Set *PATH* to the installation folder used in step 2.
 CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
 
-Path needs to be set to the folder where the tools are installed.
+It should be possible to build the project using the instructions provided in the next section
 
 ### Gradle build
 
 To build the Gradle project and run it execute the following procedure;
 
-1. Run `gradlew installDist` in the root of the project
+1. Run `.\gradlew installDist` in the root of the project
 2. Change directory to testar/target/install/bin
 3. Run testar.bat
 
@@ -26,7 +31,7 @@ that has a 64-bit Windows operating system and Visual Studio redistributable ins
 TESTAR is to run the tool in a virtual-machine.
 To build the zip execute the following command.
 
-1. Run `gradlew distZip` in the root of the project. 
+1. Run `.\gradlew distZip` in the root of the project. 
 2. Extract the zip on the machine where TESTAR is used.
 
 NOTE: TESTAR requires Visual Redistributable which can be downloaded from the following
@@ -42,7 +47,7 @@ code.
 4. Select the folder that contains the root of the source code and start the import
 
 ## Known issue
-- TESTAR can not be excuted using the gradle task ./gradlew run. 
+- TESTAR can not be excuted using the gradle task .\gradlew run. 
 
 ## GraphDb support
 This version of TESTAR supports the output of data to an http://orientdb.com database.
