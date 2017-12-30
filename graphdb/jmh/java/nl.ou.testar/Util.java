@@ -18,7 +18,7 @@ public class Util {
        widget.set(Tags.ConcreteID,tag);
        widget.set(Tags.Abstract_R_ID,"role");
        widget.set(Tags.Abstract_R_T_ID,"role_type");
-       widget.set(Tags.Abstract_R_T_P_ID,"r_t_p");
+       widget.set(Tags.Abstract_R_T_P_ID,"role_type_path");
        return widget;
     }
 }
