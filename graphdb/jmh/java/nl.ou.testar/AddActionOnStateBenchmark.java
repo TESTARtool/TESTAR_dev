@@ -23,6 +23,7 @@ public class AddActionOnStateBenchmark {
         graphFactory.addState(Util.createState("widget"+2),true);
         graphFactory.addWidget("widget1", Util.createWidget("w1"));
         Action action = new NOP();
+        action.set(Tags.AbstractID,"abstract");
         action.set(Tags.ConcreteID,"dummy");
 
         graphFactory.addActionOnState("widget2",action,"widget1");
@@ -44,7 +45,7 @@ public class AddActionOnStateBenchmark {
 
         Action action = new NOP();
         action.set(Tags.ConcreteID,"arghh");
-
+        action.set(Tags.AbstractID,"abstract");
         graphFactory.addActionOnState("widget2",action,"widget1");
     }
 
