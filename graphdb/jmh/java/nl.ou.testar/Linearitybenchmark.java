@@ -30,7 +30,7 @@ public class Linearitybenchmark {
     @Param({"1","2","4","8","16","32","64","128","256","512","1024"})
     private int interations;
 
-    //@Benchmark()
+    @Benchmark()
     @Warmup(iterations = 30)
     @Fork(10)
     @Measurement(iterations = 10, time=1, timeUnit = TimeUnit.MILLISECONDS)
