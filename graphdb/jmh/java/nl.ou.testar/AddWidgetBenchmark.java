@@ -50,6 +50,9 @@ public class AddWidgetBenchmark {
     private Widget createWidget(String id) {
         Widget widget = new StdWidget();
         widget.set(Tags.ConcreteID,id);
+        widget.set(Tags.Abstract_R_ID,"role");
+        widget.set(Tags.Abstract_R_T_ID,"role_type");
+        widget.set(Tags.Abstract_R_T_P_ID,"role_type_path");
         widget.set(Tags.Desc,"Demo");
         return widget;
     }
