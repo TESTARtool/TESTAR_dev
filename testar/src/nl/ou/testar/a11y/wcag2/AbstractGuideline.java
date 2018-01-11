@@ -95,7 +95,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
-	 * This method executes oracles in state analysis.
+	 * This method executes oracles in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -108,7 +108,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	 * Derives the possible actions from the given state
 	 * This will include zero or more actions for each success criterion in this guideline.
 	 * The actions are specific to accessibility.
-	 * This method derives actions in state analysis.
+	 * This method derives actions in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -120,7 +120,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	/**
 	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
-	 * This method executes oracles in offline analysis.
+	 * This method executes oracles in offline evaluation.
 	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */
