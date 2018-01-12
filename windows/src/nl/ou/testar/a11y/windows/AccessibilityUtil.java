@@ -225,16 +225,16 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Gets the shortcut key for the given widget
+	 * Gets the accelerator key for the given widget
 	 * @param w The widget.
 	 * @return The shortcut key, as unprocessed string.
 	 */
-	public static String getShortcutKey(Widget w) {
+	public static String getAcceleratorKey(Widget w) {
 		String key = w.get(UIATags.UIAAcceleratorKey, "");
 		if (key != null && !key.isEmpty())
 			return key;
 		if (getRole(w).isA(UIAMenuItem)) {
-			// many menu items contain a shortcut key even if the accelerator key is not set
+			// many menu items contain an accelerator key even if the accelerator key property is not set
 			// find these by pattern matching (may return the wrong thing, but better than nothing)
 			String name = w.get(UIATags.UIAName, "");
 			int index = name.lastIndexOf("\t");
