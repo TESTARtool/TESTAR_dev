@@ -296,9 +296,9 @@ public final class AccessibilityUtil {
 		return getRole(w).isA(UIAWindow);
 	}
 	
-	// #########W####
+	// ##############
 	// helper methods
-	// #########W####
+	// ##############
 	
 	private static Role getRole(Widget w) {
 		Assert.notNull(w);
