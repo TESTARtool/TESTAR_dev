@@ -33,6 +33,7 @@ package org.fruit.monkey;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -49,11 +50,24 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.ToolTipManager;
 
-import nl.ou.testar.GraphDBPanel;
 import org.fruit.Pair;
 import org.fruit.Util;
 
@@ -64,29 +78,32 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 	private static final long serialVersionUID = 5156320008281200950L;
 
-	static final String TESTAR_VERSION = "v1.3";
+	public static final String TESTAR_VERSION = "v1.3";
 
-	private String settingsFile;
-	private Settings settings, ret;
+	String settingsFile;
+	Settings settings, ret;
 
-	/**
-	 * Starts the settings Dialog.
-	 * @throws IOException when Icons cannot be found.
-	 */
-	SettingsDialog() throws IOException {
+	public SettingsDialog() throws IOException {
 		getContentPane().setBackground(Color.WHITE);
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
 					break;
 				}
 			}
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+		} catch (ClassNotFoundException ex) {
+			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (InstantiationException ex) {
+			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (IllegalAccessException ex) {
+			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
 			java.util.logging.Logger.getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
+
 		//By: mimarmu1
-		this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
+		this.setIconImage(loadIcon("/resources/icons/logos/TESTAR.jpg"));
 
 		ToolTipManager.sharedInstance().setDismissDelay(25000);
 		ToolTipManager.sharedInstance().setInitialDelay(100);
@@ -115,7 +132,6 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		return ret;
 	}
-
 
 	private Image loadIcon(String path) throws IOException{
 		return ImageIO.read(this.getClass().getResourceAsStream(path));
@@ -233,6 +249,8 @@ public class SettingsDialog extends javax.swing.JFrame {
 		txtOutputDir.setText(settings.get(ConfigTags.OutputDir));
 		txtTempDir.setText(settings.get(ConfigTags.TempDir));
 		spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
+		txtStrategy.setText(settings.get(ConfigTags.Strategy));
+
 
 		for(int i = 0; i < tblCopyFromTo.getRowCount(); i++){
 			tblCopyFromTo.setValueAt(null, i, 0);
@@ -254,7 +272,6 @@ public class SettingsDialog extends javax.swing.JFrame {
 			tblDelete.setValueAt(f, i, 0);
 			i++;
 		}
-		graphDBPanel.populateFrom(settings);
 	}
 
 	public void extractInformation(Settings settings){
@@ -284,6 +301,8 @@ public class SettingsDialog extends javax.swing.JFrame {
 		settings.set(ConfigTags.OutputDir, txtOutputDir.getText()); 
 		settings.set(ConfigTags.TempDir, txtTempDir.getText()); 
 		settings.set(ConfigTags.TimeToFreeze, (Double)spnFreezeTime.getValue());
+		settings.set(ConfigTags.Strategy, txtStrategy.getText());
+
 
 		List<Pair<String, String>> copyFromTo = Util.newArrayList();
 		for(int i = 0; i < tblCopyFromTo.getRowCount(); i++){
@@ -302,7 +321,6 @@ public class SettingsDialog extends javax.swing.JFrame {
 				delete.add(value); 
 		}
 		settings.set(ConfigTags.Delete, delete);
-		graphDBPanel.extractInformation(settings);
 	}
 
 
@@ -368,7 +386,9 @@ public class SettingsDialog extends javax.swing.JFrame {
 		tblDelete = new javax.swing.JTable();
 		btnReplay = new javax.swing.JButton();
 		btnView = new javax.swing.JButton();
-
+		jLabelm01 = new javax.swing.JLabel();
+		jLabelm01.setBounds(10, 177, 255, 14);
+		
 
 		jButton1.setText("jButton1");
 		jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -384,7 +404,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		setResizable(false);
 
 		btnGenerate.setBackground(new java.awt.Color(255, 255, 255));
-		btnGenerate.setIcon(new ImageIcon(loadIcon("/icons/engine.jpg")));
+		btnGenerate.setIcon(new ImageIcon(loadIcon("/resources/icons/engine.jpg")));
 		btnGenerate.setToolTipText("<html>\nStart in Generation-Mode:<br>\nThis mode will start the SUT and execute a full test.\n</html>");
 		btnGenerate.setFocusPainted(false);
 		btnGenerate.addActionListener(new java.awt.event.ActionListener() {
@@ -394,7 +414,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		});
 
 		btnSpy.setBackground(new java.awt.Color(255, 255, 255));
-		btnSpy.setIcon(new ImageIcon(loadIcon("/icons/magnifier.png")));
+		btnSpy.setIcon(new ImageIcon(loadIcon("/resources/icons/magnifier.png")));
 		btnSpy.setToolTipText("<html>\nStart in Spy-Mode: <br>\nThis mode does allows you to inspect the GUI of the System under Test. <br>\nSimply use the mouse cursor to point on a widget and TESTAR<br>\nwill display everything it knows about it. The Spy-Mode will also visualize<br>\nthe set of actions that TESTAR recognizes, so that you can see<br>\nwhich ones will be executed during a test.\n</html>");
 		btnSpy.setFocusPainted(false);
 		btnSpy.addActionListener(new java.awt.event.ActionListener() {
@@ -412,14 +432,15 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 
 
-		// jLabel26.setIcon(new ImageIcon(loadIcon("/icons/logos/TESTAR.jpg")));  //("/icons/fittest_logo.png")));
-		jLabel26.setIcon(new ImageIcon(loadIcon("/icons/logos/testar_logo.png")));
-		jLabel27.setIcon(new ImageIcon(loadIcon("/icons/logos/pros.png"))); //("/icons/fp7_logo.png")));
+		// jLabel26.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/TESTAR.jpg")));  //("/resources/icons/fittest_logo.png")));
+		jLabel26.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/testar_logo.png")));
+		jLabel27.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/pros.png"))); //("/resources/icons/fp7_logo.png")));
 
-		jLabel28.setIcon(new ImageIcon(loadIcon("/icons/logos/ou.jpg")));
-		
+		jLabel28.setFont(new java.awt.Font("Arial", Font.BOLD, 14)); // NOI18N
+		jLabel28.setText("TESTAR " + TESTAR_VERSION);
+
 		JLabel lblUPVLogo = new JLabel();
-		lblUPVLogo.setIcon(new ImageIcon(loadIcon("/icons/logos/upv.png"))); //("/icons/fp7_logo.png")));
+		lblUPVLogo.setIcon(new ImageIcon(loadIcon("/resources/icons/logos/upv.png"))); //("/resources/icons/fp7_logo.png")));
 
 
 		javax.swing.GroupLayout aboutPanelLayout = new javax.swing.GroupLayout(aboutPanel);
@@ -448,7 +469,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 						.addGroup(aboutPanelLayout.createParallelGroup(Alignment.TRAILING)
 								.addComponent(lblUPVLogo, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 								.addComponent(jLabel27, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-								.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(jLabel28, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)))
 				);
 		aboutPanel.setLayout(aboutPanelLayout);
 
@@ -467,7 +488,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		spnSequenceLength.setBounds(160, 199, 81, 31);
 		checkForceForeground = new javax.swing.JCheckBox();
 		checkForceForeground.setText("Force SUT to Foreground");
-		checkForceForeground.setBounds(10, 77, 171, 21);
+		checkForceForeground.setBounds(10, 177, 171, 21);
 		//btnLoadSettings = new javax.swing.JButton();
 		//btnLoadSettings.setBounds(400, 292, 35, 35);
 		//btnSaveSettingsAs = new javax.swing.JButton();
@@ -623,11 +644,11 @@ public class SettingsDialog extends javax.swing.JFrame {
 				garesumeCheckBox.setEnabled(gaCheckbox.isSelected());
 			}
 		});
-		gaCheckbox.setBounds(10, 127, 171, 21);
+		gaCheckbox.setBounds(10, 227, 171, 21);
 		jPanelWalker.add(gaCheckbox);		
 		
 		garesumeCheckBox = new JCheckBox("Graphs resuming");
-		garesumeCheckBox.setBounds(10, 151, 171, 23);
+		garesumeCheckBox.setBounds(10, 251, 171, 23);
 		jPanelWalker.add(garesumeCheckBox);
 		
 		jPanelWalker.add(checkForceForeground);
@@ -637,12 +658,22 @@ public class SettingsDialog extends javax.swing.JFrame {
 		comboBoxTestGenerator.setModel(new DefaultComboBoxModel<String>(algorithms));
 		comboBoxTestGenerator.setSelectedIndex(0);
 		comboBoxTestGenerator.setBounds(145, 23, 173, 23);
-		comboBoxTestGenerator.setToolTipText("Determines how the IU actions are selected during tests");
+		comboBoxTestGenerator.setToolTipText("Determines how the UI actions are selected during tests");
 		comboBoxTestGenerator.setMaximumRowCount(algorithms.length);
 		jPanelWalker.add(comboBoxTestGenerator);
+		
+		jLabelm01.setText("In case of tree-based strategy, enter the action selection strategy below:");
+		jLabelm01.setToolTipText("<html>\nPlease use colons to separate commands.\n</html>");
+		jLabelm01.setBounds(10, 50, 450, 23);
+		jPanelWalker.add(jLabelm01);
 
+		txtStrategy = new JTextArea();
+		txtStrategy.setLineWrap(true);
+		txtStrategy.setBounds(10, 70, 480, 100);
+		jPanelWalker.add(txtStrategy);
+		
 		checkFormsFilling = new JCheckBox("Forms filling");
-		checkFormsFilling.setBounds(10, 101, 171, 23);
+		checkFormsFilling.setBounds(10, 201, 171, 23);
 		jPanelWalker.add(checkFormsFilling);
 		jPanelFilters = new javax.swing.JPanel();
 		//jPanel5.setBackground(Color.WHITE);
@@ -660,7 +691,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		scrollPane_2 = new JScrollPane();
 
 		scrollPane_3 = new JScrollPane();
-
+		
 		javax.swing.GroupLayout gl_jPanelFilters = new javax.swing.GroupLayout(jPanelFilters);
 		gl_jPanelFilters.setHorizontalGroup(
 				gl_jPanelFilters.createParallelGroup(Alignment.LEADING)
@@ -825,6 +856,47 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		jLabel8.setText("Output Directory:");
 
+		/*jLabelm01.setText("Use the below action selection strategy:");
+		jLabelm01.setToolTipText("<html>\nPlease use colons to separate commands.\n</html>");
+
+		jPanelSelector.setLayout(null);
+		jPanelSelector.add(jLabelm01);
+		txtStrategy = new JTextArea();
+		txtStrategy.setLineWrap(true);
+		jPanelSelector.add(txtStrategy);
+		/////
+		scrollPane_m1 = new JScrollPane();
+
+		javax.swing.GroupLayout gl_jPanelSelector = new javax.swing.GroupLayout(jPanelSelector);
+		gl_jPanelSelector.setHorizontalGroup(
+				gl_jPanelSelector.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_jPanelSelector.createSequentialGroup()
+						.addGroup(gl_jPanelSelector.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_jPanelSelector.createSequentialGroup()
+										.addContainerGap()
+												.addComponent(scrollPane_m1, GroupLayout.PREFERRED_SIZE, 447, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_jPanelSelector.createSequentialGroup()
+														.addContainerGap()
+														.addGroup(gl_jPanelSelector.createParallelGroup(Alignment.LEADING)
+																.addComponent(jLabelm01, GroupLayout.PREFERRED_SIZE, 357, GroupLayout.PREFERRED_SIZE))))
+																.addContainerGap(29, Short.MAX_VALUE))
+				);
+		gl_jPanelSelector.setVerticalGroup(
+				gl_jPanelSelector.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_jPanelSelector.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(jLabelm01)
+						.addGap(18)
+						.addComponent(scrollPane_m1, GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+						.addGap(22))
+				);
+
+		scrollPane_m1.setViewportView(txtStrategy);
+
+		jPanelSelector.setLayout(gl_jPanelSelector);
+
+		jTabbedPane1.addTab("Selector", jPanelSelector);
+		///////*/
 		btnSetOutputDir.setText("...");
 		btnSetOutputDir.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1051,11 +1123,6 @@ public class SettingsDialog extends javax.swing.JFrame {
 
 		jTabbedPane1.addTab("Misc", jPanelMisc);
 
-		graphDBPanel = GraphDBPanel.createGraphDBPanel();
-		jTabbedPane1.addTab("GraphDB",graphDBPanel);
-
-		//graphDBPanel.updateUI();
-
 		jTabbedPane1.setSelectedComponent(jPanelGeneral); // by urueda
 		
 		comboBoxProtocol = new JComboBox<String>();
@@ -1085,7 +1152,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		jPanelGeneral.add(lblProtocol);
 		
 		btnReplay.setBackground(new java.awt.Color(255, 255, 255));
-		btnReplay.setIcon(new ImageIcon(loadIcon("/icons/rewind.jpg")));
+		btnReplay.setIcon(new ImageIcon(loadIcon("/resources/icons/rewind.jpg")));
 		btnReplay.setToolTipText("<html>\nStart in Replay-Mode: This mode replays a previously recorded sequence.<br>\nTESTAR will ask you for the sequence to replay.\n</html>");
 		btnReplay.setFocusPainted(false);
 		btnReplay.addActionListener(new java.awt.event.ActionListener() {
@@ -1095,7 +1162,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 		});
 
 		btnView.setBackground(new java.awt.Color(255, 255, 255));
-		btnView.setIcon(new ImageIcon(loadIcon("/icons/view.jpg")));
+		btnView.setIcon(new ImageIcon(loadIcon("/resources/icons/view.jpg")));
 		btnView.setToolTipText("<html>\nStart in View-Mode:<br>\nThe View-Mode allows you to inspect all steps of a previously recorded<br>\nsequence. Contrary to the Replay-Mode, it will not execute any actions,<br>\nbut only show you the screenshots that were recorded during sequence<br>\ngeneration. This is ideal if a sequence turns out not to be reproducible.\n</html>");
 		btnView.setFocusPainted(false);
 		btnView.addActionListener(new java.awt.event.ActionListener() {
@@ -1132,7 +1199,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 								.addComponent(btnReplay, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnView, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
 								.addContainerGap())
 				);
 
@@ -1384,5 +1451,7 @@ public class SettingsDialog extends javax.swing.JFrame {
 	private JCheckBox offlineGraphConversionCheckBox;
 	private JComboBox<String> cboxSUTconnector;
 	private JComboBox<String> comboBoxProtocol;
-	private GraphDBPanel graphDBPanel;
+	private javax.swing.JLabel jLabelm01;
+	private JTextArea txtStrategy;
+	
 }

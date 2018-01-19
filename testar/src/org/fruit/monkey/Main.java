@@ -27,7 +27,6 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.monkey.ConfigTags.AccessBridgeEnabled;
 import static org.fruit.monkey.ConfigTags.ActionDuration;
 import static org.fruit.monkey.ConfigTags.AlgorithmFormsFilling;
 import static org.fruit.monkey.ConfigTags.ClickFilter;
@@ -66,22 +65,19 @@ import static org.fruit.monkey.ConfigTags.ShowSettingsAfterTest;
 import static org.fruit.monkey.ConfigTags.ShowVisualSettingsDialogOnStartup;
 import static org.fruit.monkey.ConfigTags.StartupTime;
 import static org.fruit.monkey.ConfigTags.StateScreenshotSimilarityThreshold;
+import static org.fruit.monkey.ConfigTags.UnattendedTests;
 import static org.fruit.monkey.ConfigTags.StopGenerationOnFault;
 import static org.fruit.monkey.ConfigTags.SuspiciousTitles;
-import static org.fruit.monkey.ConfigTags.SUTProcesses;
 import static org.fruit.monkey.ConfigTags.TempDir;
 import static org.fruit.monkey.ConfigTags.TestGenerator;
 import static org.fruit.monkey.ConfigTags.TimeToFreeze;
 import static org.fruit.monkey.ConfigTags.TimeToWaitAfterAction;
 import static org.fruit.monkey.ConfigTags.TypingTextsForExecutedAction;
-import static org.fruit.monkey.ConfigTags.UnattendedTests;
 import static org.fruit.monkey.ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay;
 import static org.fruit.monkey.ConfigTags.VisualizeActions;
 import static org.fruit.monkey.ConfigTags.VisualizeSelectedAction;
-import static org.fruit.monkey.ConfigTags.GraphDBEnabled;
-import static org.fruit.monkey.ConfigTags.GraphDBPassword;
-import static org.fruit.monkey.ConfigTags.GraphDBUrl;
-import static org.fruit.monkey.ConfigTags.GraphDBUser;
+import static org.fruit.monkey.ConfigTags.Strategy;
+
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -175,7 +171,7 @@ public class Main {
 			try{
 				Integer tt = new Integer(p);
 				settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">",LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">",LogSerialiser.LogLevel.Critical);				
 			} catch (NumberFormatException e) {
 				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",LogSerialiser.LogLevel.Critical);
 			}
@@ -189,11 +185,11 @@ public class Main {
 			try{
 				Float sst = new Float(p);
 				settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
-				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">",LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">",LogSerialiser.LogLevel.Critical);				
 			} catch (NumberFormatException e) {
 				LogSerialiser.log("Property <" + pS + "> could not be set! (using default)",LogSerialiser.LogLevel.Critical);
 			}
-		}
+		}		
 		// UnattendedTests
 		pS = ConfigTags.UnattendedTests.name();
 		p = System.getProperty(pS,null);
@@ -201,8 +197,17 @@ public class Main {
 			p= System.getProperty("UT",null); // mnemonic
 		if (p != null){
 			settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
-			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">",LogSerialiser.LogLevel.Critical);
-		}
+			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">",LogSerialiser.LogLevel.Critical);				
+		}	
+		// Strategy
+		pS = ConfigTags.Strategy.name();
+		p = System.getProperty(pS,null);
+		if (p == null)
+			p= System.getProperty("Strategy",null); // mnemonic
+		if (p != null){
+			settings.set(ConfigTags.Strategy, p);
+			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">",LogSerialiser.LogLevel.Critical);				
+		}	
 	}
 	
 	// begin by urueda
@@ -351,7 +356,7 @@ public class Main {
 			LogSerialiser.exit();
 			Grapher.exit();
 			if (loader != null)
-				try { loader.close(); } catch (IOException e) { e.printStackTrace(); }
+				try { loader.close(); } catch (IOException e) { e.printStackTrace(); } 
 			// end by urueda
 			System.exit(0);
 		}
@@ -412,14 +417,10 @@ public class Main {
 			defaults.add(Pair.from(OfflineGraphConversion, true));
 			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
-			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
-			defaults.add(Pair.from(SUTProcesses, ""));
+			defaults.add(Pair.from(Strategy, "strategy.txt")); 
+			
 			// end by urueda
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
-
+			
 			return Settings.fromFile(defaults, file);
 		}catch(IOException ioe){
 			throw new ConfigException("Unable to load configuration file!", ioe);

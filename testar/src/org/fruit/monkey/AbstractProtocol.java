@@ -27,21 +27,45 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.EventHandler;
-import es.upv.staq.testar.FlashFeedback;
-import es.upv.staq.testar.IEventListener;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphState;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.protocols.ProtocolUtil;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
-import nl.ou.testar.GraphDB;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.Role;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Visualizer;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -62,7 +86,6 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.UsedResources;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
@@ -85,45 +108,21 @@ import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
-import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.Role;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Visualizer;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.EventHandler;
+import es.upv.staq.testar.FlashFeedback;
+import es.upv.staq.testar.IEventListener;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.graph.IEnvironment;
+import es.upv.staq.testar.graph.IGraphState;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
 												  IEventListener { // by urueda
@@ -136,31 +135,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	protected boolean faultySequence; // by urueda (refactored from DefaultProtocol)
 
-	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+	Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);	
 	private Settings settings;
 	private Modes mode;
 	protected Mouse mouse = AWTMouse.build();
 	private boolean saveStateSnapshot = false,
 					markParentWidget = false; // by urueda
-	private int actionCount, sequenceCount,
-		firstSequenceActionNumber;
-	protected int lastSequenceActionNumber; // by urueda
+	int actionCount, sequenceCount;
 	double startTime;
 	
 	// begin by urueda
 	
-	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
-
-	// Verdict severities
-	// PASS
-	protected static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	protected static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
-	// FAIL
-	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
-
-	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
-
+	public static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	
 	protected double passSeverity = Verdict.SEVERITY_OK;
 	private int generatedSequenceNumber = -1;
 	private Object[] userEvent = null;
@@ -169,26 +156,24 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected ProtocolUtil protocolUtil = new ProtocolUtil();
 	protected EventHandler eventHandler;
 	protected Canvas cv;
-
+	
     protected Pattern clickFilterPattern = null;
     protected Map<String,Matcher> clickFilterMatchers = new WeakHashMap<String,Matcher>();
     protected Pattern suspiciousTitlesPattern = null;
     protected Map<String,Matcher> suspiciousTitlesMatchers = new WeakHashMap<String,Matcher>();
-
+	
 	protected JIPrologWrapper jipWrapper;
-	private double delay = Double.MIN_VALUE;
-	private final static double SLOW_MOTION = 2.0;
+    private double delay = Double.MIN_VALUE;
+    private final static double SLOW_MOTION = 2.0;
     
-	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false,
-			forceNextActionESC = false;
+    protected String forceKillProcess = null;
+    protected boolean forceToForeground = false,
+    				  forceNextActionESC = false;
     
-	private boolean forceToSequenceLengthAfterFail = false;
-	private int testFailTimes = 0;
-    private final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
-	protected GraphDB graphDB;
+    private boolean forceToSequenceLengthAfterFail = false;
+    private int testFailTimes = 0;
     
-	protected boolean nonSuitableAction = false;
+    protected boolean nonSuitableAction = false;
     
 	protected class ProcessInfo{
 		public SUT sut;
@@ -206,12 +191,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 	protected List<ProcessInfo> contextRunningProcesses = null;
-
-	/**
-	 * Retrieve a list of Running processes
-	 * @param debugTag Tag used in debug output
-	 * @return a list of running processes
-	 */
+	
 	protected List<ProcessInfo> getRunningProcesses(String debugTag){
 		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
 		long pid, handle; String desc;
@@ -219,7 +199,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
+			System.out.println("\t[" + (i++) +  "] " + /*sut.toString() + "\t - " +*/ sut.getStatus());			
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -338,10 +318,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		
 		else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
 			settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
-
-		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
-			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
-
+			
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
 			protocolUtil.startAdhocServer();
 			mode = Modes.AdhocTest;
@@ -358,7 +335,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			markParentWidget = !markParentWidget;
 		// end by urueda
 	}
-
+	
 	@Override
 	public void keyUp(KBKeys key){
 		pressed.remove(key);
@@ -409,7 +386,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			default: break;
 			}		
 		}
-
+		//logln("'" + mode + "' mode active.", LogLevel.Info);
 		// begin by urueda
 		String modeParamS = "";
 		if (mode == Modes.GenerateManual)
@@ -430,7 +407,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
-	protected final GraphDB graphDB(){ return graphDB; }
 	protected void beginSequence() {}
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;
@@ -460,7 +436,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				while (rootW.parent() != null && rootW.parent() != rootW)
 					rootW = rootW.parent();
 				Shape cwShape = cursorWidget.get(Tags.Shape, null);
-
 				if(cwShape != null){
 					cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
 					// begin by urueda
@@ -470,7 +445,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							   widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
 							   roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
 							   idxText = "Path: " + cursorWidget.get(Tags.Path);
-
 						double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
 						double miniwidgetInfoH = 80; // 20 * 4
 						Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
@@ -703,7 +677,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // by urueda (seconds)
-
+	
 	protected boolean executeAction(SUT system, State state, Action action){
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		 try{
@@ -730,7 +704,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// note /by urueda): could be more interesting as XML (instead of Java Serialisation)
-	private void saveStateSnapshot(final State state){
+	private void saveStateSnapshot(State state){
 		try{
 			if(saveStateSnapshot){
 				//System.out.println(Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
@@ -959,8 +933,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda (refactor run() method)
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
-		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA} start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -988,11 +960,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 		// begin by urueda
 		cv.end();
-
+		
 		if (actionStatus.getAction() == null)
 			return true; // problems
-
-		if (actionCount == firstSequenceActionNumber && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
+		// end by urueda
+		
+		if (actionCount == 1 && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
 			System.out.println("First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
 			Util.pauseMs(NOP_WAIT_WINDOW); // hold-on for UI to react (e.g. scenario: SUT loading ... logo)
 			actionStatus.setAction(new NOP());
@@ -1004,9 +977,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// end by urueda
 		
 		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
-
+				
 		visualizeSelectedAction(cv, state, actionStatus.getAction());
-
+		
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		
 		boolean isTestAction = nopAttempts >= MAX_NOP_ATTEMPTS || !isNOP(actionStatus.getAction()); // by urueda
@@ -1036,10 +1009,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){ // by urueda					
 				//logln(String.format("Executed (%d): %s...", actionCount, action.get(Desc, action.toString())), LogLevel.Info);
 				// begin by urueda
-				cv.begin();
-				Util.clear(cv);
-				cv.end(); // by urueda (overlay is invalid until new state/actions scan)
-				stampLastExecutedAction = System.currentTimeMillis();
+				cv.begin(); Util.clear(cv); cv.end(); // by urueda (overlay is invalid until new state/actions scan)
+				stampLastExecutedAction = System.currentTimeMillis();					
 				actionExecuted(system,state,actionStatus.getAction()); // notification
 				if (actionStatus.isUserEventAction())
 					Util.pause(settings.get(ConfigTags.TimeToWaitAfterAction)); // wait between actions
@@ -1055,7 +1026,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
 						actionRepresentation[0]) + "\n",
 						LogSerialiser.LogLevel.Info);
-
 				System.out.print(String.format(
 						"S[%1$" + (1 + (int)Math.log10((double)settings.get(ConfigTags.Sequences))) + "d=%2$" + (1 + (int)Math.log10((double)generatedSequenceNumber)) + "d]-" + // S = test Sequence
 						"A[%3$" + (1 + (int)Math.log10((double)settings().get(ConfigTags.SequenceLength))) + // A = Action
@@ -1106,26 +1076,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				try {
 					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
 					protocolUtil.adhocTestServerWriter.flush();
-				} catch (Exception e) {
-					LogSerialiser.log("protocolUtil Failed!\n");
-				} // AdhocTest client disconnected?
+				} catch (Exception e) {} // AdhocTest client disconnected?
 			}				
 		}
 		
 		lastExecutedAction = actionStatus.getAction(); // by urueda
-		lastExecutedAction.set(Tags.UsedResources, new UsedResources(lastCPU[0],lastCPU[1],sutRAMbase,sutRAMpeak).toString());
-		lastExecutedAction.set(Tags.Representation, Action.getActionRepresentation(state,lastExecutedAction,"\t")[1]);
-		State newState = getState(system);
-		graphDB.addState(newState);
-
-		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
-			//TODO this does not work in all cases check (the last executed action tag does not always have a description
-			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
-			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
-		} else {
-			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
-		}
-        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
+		
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1141,7 +1097,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		if (testRAM > testRAMpeak)
 			testRAMpeak = testRAM;
 		double testCPU = (nowStamp - lastStamp)/1000.0;
-		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
+		if (testCPU > testCPUpeak)
 			testCPUpeak = testCPU;
 		System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
 						 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
@@ -1149,7 +1105,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// by urueda (refactor run() method)
-	private void runTest(){
+	private void runTest(){		
 		// begin by urueda
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
@@ -1158,12 +1114,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// end by urueda		
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
-			long tStart = System.currentTimeMillis();
-			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
-			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
-			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", "")).intValue();
 			// begin by urueda
 
 			sutRAMbase = Double.MAX_VALUE; sutRAMpeak = 0.0; sutCPUpeak = 0.0; testRAMpeak = 0.0; testCPUpeak = 0.0;
@@ -1183,9 +1136,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			if (mode() == Modes.GenerateManual)
 				setMode(Modes.Spy);
 			jipWrapper = new JIPrologWrapper();
+			
 			Grapher.grapher(generatedSequence,
-							settings.get(ConfigTags.SequenceLength),
-							settings.get(ConfigTags.AlgorithmFormsFilling),
+							settings.get(ConfigTags.SequenceLength).intValue(),
+							settings.get(ConfigTags.AlgorithmFormsFilling).booleanValue(),
 							settings.get(ConfigTags.TypingTextsForExecutedAction).intValue(),
 							settings.get(ConfigTags.TestGenerator),
 							settings.get(ConfigTags.MaxReward),
@@ -1197,6 +1151,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 									true :
 									settings.get(ConfigTags.GraphResuming),
 							settings.get(ConfigTags.OfflineGraphConversion),
+							settings.get(ConfigTags.Strategy),							
 							jipWrapper);
 			Grapher.waitEnvironment();
 			ScreenshotSerialiser.start(generatedSequence);
@@ -1209,16 +1164,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			if (this.forceToSequenceLengthAfterFail){
 				this.forceToSequenceLengthAfterFail = false;
 				this.testFailTimes++;
-				this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
 			} else{
-				if (settings.get(ConfigTags.GraphsActivated) && settings.get(ConfigTags.GraphResuming))
-					actionCount = Grapher.getEnvironment().getGraphActions().size() + 1;
-				else
-					actionCount = 1;
+				actionCount = 1;
 				this.testFailTimes = 0;
-				lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 			}
-			firstSequenceActionNumber = actionCount;
 			// end by urueda
 
 			LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
@@ -1269,8 +1218,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				beginSequence();
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
-				//Store ( initial )state
-				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 	
@@ -1308,7 +1255,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						// end by urueda
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 						state = getState(system);
-						graphDB.addState(state);
 						if (faultySequence) problems = true; // by urueda
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){ // by urueda
@@ -1322,12 +1268,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				}
 	
 				//logln("Shutting down system...", LogLevel.Info);
-				// begin by urueda
-				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
-				stopSystem(system);
-				if (system != null && system.isRunning())
+				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info); // by urueda
+				stopSystem(system); // by urueda
+				if (system != null && system.isRunning()) // by urueda
 					system.stop();
 				//logln("System has been shut down!", LogLevel.Debug);
+				// begin by urueda
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);								
 				
 				ScreenshotSerialiser.finish();
@@ -1376,9 +1322,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				
 				saveSequenceMetrics(generatedSequence,problems);
 				
-				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
-				if (reportPages == null)
-					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
+				if (ConfigTags.Strategy != null && !ConfigTags.Strategy.equals("")){
+					System.out.println("It's a strategy test generator");
+					saveStrategyMetrics(generatedSequence,problems);
+				}
+				
+				ScreenshotSerialiser.exit(); final String[] report = Grapher.getReport(); // screenshots must be serialised
 				TestSerialiser.exit();
 				String stopDateString =  Util.dateString(DATE_FORMAT),
 					   durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
@@ -1386,8 +1335,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
-
+				// save report
+				this.saveReportPage(generatedSequence, "clusters", report[0]);
+				this.saveReportPage(generatedSequence, "testable", report[1]);
+				this.saveReportPage(generatedSequence, "curve", report[2]);
+				this.saveReportPage(generatedSequence, "stats", report[3]);
 				// end by urueda
 				
 				sequenceCount++;
@@ -1398,26 +1350,21 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				ScreenshotSerialiser.finish();
 				TestSerialiser.finish();				
 				Grapher.walkFinished(false, null, null);
-				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber);  // screenshots must be serialised
-				if (reportPages == null)
-					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
+				ScreenshotSerialiser.exit(); LogSerialiser.log(Grapher.getReport() + "\n", LogSerialiser.LogLevel.Info); // screenshots must be serialised
 				LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
 				int i=1; StringBuffer trace = new StringBuffer();
 				for(StackTraceElement t : e.getStackTrace())
 				   trace.append("\n\t[" + i++ + "] " + t.toString());
 				System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
-				stopSystem(system);
-				if (system != null && system.isRunning())
+				if (system != null)
 					system.stop();
 				TestSerialiser.exit();
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
-			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
-				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
+				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit){
 			this.forceToSequenceLengthAfterFail = true;
 			System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
  			runTest(); // continue testing
@@ -1440,28 +1387,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		LogSerialiser.log(page, LogSerialiser.LogLevel.Critical);
 		LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 	}
-
-	// by urueda
-	private void saveReport(String[] reportPages, String generatedSequence){
-		this.saveReportPage(generatedSequence, "clusters", reportPages[0]);
-		this.saveReportPage(generatedSequence, "testable", reportPages[1]);
-		this.saveReportPage(generatedSequence, "curve", reportPages[2]);
-		this.saveReportPage(generatedSequence, "stats", reportPages[3]);
-	}
-
+	
 	// by urueda
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
-		final double sev = verdict.severity();
+		double sev = verdict.severity();
 		if (sev == Verdict.SEVERITY_OK)
 			targetFolder = "sequences_ok";
-		else if (sev == SEVERITY_WARNING)
+		else if (sev ==  Verdict.SEVERITY_WARNING)
 			targetFolder = "sequences_warning";
-		else if (sev == SEVERITY_SUSPICIOUS_TITLE)
+		else if (sev == Verdict.SEVERITY_SUSPICIOUS_TITLE)
 			targetFolder = "sequences_suspicioustitle";
-		else if (sev == SEVERITY_NOT_RESPONDING)
+		else if (sev == Verdict.SEVERITY_NOT_RESPONDING)
 			targetFolder = "sequences_unresponsive";
-		else if (sev == SEVERITY_NOT_RUNNING)
+		else if (sev == Verdict.SEVERITY_NOT_RUNNING)
 			targetFolder = "sequences_unexpectedclose";
 		else if (sev == Verdict.SEVERITY_FAIL)
 			targetFolder = "sequencces_fail";
@@ -1505,7 +1444,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					);
 				ps.println(heading);
 				IEnvironment env = Grapher.getEnvironment();
-				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
+				double[] cvgMetrics = env.getCoverageMetrics();
 				final int VERDICT_WEIGHT = 	1000,
 						  CVG_WEIGHT = 		  10,
 						  PATH_WEIGHT = 	 100,
@@ -1515,7 +1454,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						  TEST_WEIGHT = 	1000;
 				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
 					((problems ? 1 : 0) * VERDICT_WEIGHT +
-					 cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
+					 cvgMetrics[0] + cvgMetrics[1] * CVG_WEIGHT +
 					 env.getLongestPathLength() * PATH_WEIGHT +
 					 (env.getGraphStates().size() - 2) * STATES_WEIGHT +
 					 (1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
@@ -1525,8 +1464,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
 					(problems ? "FAIL" : "PASS"),		  // verdict
 					this.testFailTimes,					  // test FAIL count
-					String.format("%.2f", cvgMetrics.getMinCoverage()),
-					String.format("%.2f", cvgMetrics.getMaxCoverage()),
+					String.format("%.2f", cvgMetrics[0]), // min coverage);
+					String.format("%.2f", cvgMetrics[1]), // max coverage
 					env.getLongestPathLength(), 			  // longest path
 					env.getGraphStates().size() - 2,	  // graph states
 					env.getGraphStateClusters().size(),	  // abstract states
@@ -1541,10 +1480,69 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				ps.print(metrics);
 				ps.close();
 				System.out.println(heading + "\n" + metrics);
-			} catch (NoSuchTagException | FileNotFoundException e) {
+			} catch (NoSuchTagException e) {
 				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-			//} catch (FileNotFoundException e) {
-			//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			} catch (FileNotFoundException e) {
+				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			}
+		}
+	}
+	
+	private void saveStrategyMetrics(String testSequenceName, boolean problems){
+		if (Grapher.GRAPHS_ACTIVATED){
+			try {
+				String filename;
+				if (System.getProperty("Dcounter") == null){
+					filename = "ecj_"+testSequenceName;
+				} else {
+					filename = "ecj_sequence"+System.getProperty("Dcounter");
+				}
+				
+				PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+					settings.get(OutputDir) + File.separator + "metrics" + File.separator + filename + ".csv"))));
+				String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$14s",
+					"verdict",	 // test verdict
+					"FAILS",	 // test FAIL count
+					"minCvg(%)", // min coverage
+					"maxCvg(%)", // max coverage
+					"maxpath",	 // longest path
+					"graph-states",	 // graph states
+					"abstract-states", // abstract states
+					"graph-actions", // graph actions
+					"test-actions", // test actions
+					"SUTRAM(KB)",	 // SUT RAM peak 
+					"SUTCPU(%)",	 // SUT CPU peak
+					"TestRAM(MB)",	 // TESTAR RAM peak
+					"TestCPU(s)",	 // TESTAR CPU peak
+					"random-actions"	//Number of random actions instead of selected by strategy 
+					);
+				ps.println(heading);
+				IEnvironment env = Grapher.getEnvironment();
+				double[] cvgMetrics = env.getCoverageMetrics();
+				TreeMap<String, Double> strategyMetrics = env.getStrategyMetrics();
+				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
+					(problems ? "FAIL" : "PASS"),		  // verdict
+					this.testFailTimes,					  // test FAIL count
+					String.format("%.2f", cvgMetrics[0]), // min coverage);
+					String.format("%.2f", cvgMetrics[1]), // max coverage
+					env.getLongestPathLength(), 			  // longest path
+					env.getGraphStates().size() - 2,	  // graph states
+					env.getGraphStateClusters().size(),	  // abstract states
+					env.getGraphActions().size() - 2,	  // graph actions
+					this.actionCount - 1,                 // test actions
+					sutRAMpeak,						  	  // SUT RAM peak
+					String.format("%.2f",sutCPUpeak),	  // SUT CPU peak
+					testRAMpeak,						  // TESTAR RAM peak
+					String.format("%.3f",testCPUpeak), 	  // TESTAR CPU peak
+					strategyMetrics.get("randomactions")  // Random actions
+					);
+				ps.print(metrics);
+				ps.close();
+				System.out.println(heading + "\n" + metrics);
+			} catch (NoSuchTagException e) {
+				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			} catch (FileNotFoundException e) {
+				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
 			}
 		}
 	}
@@ -1555,12 +1553,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		mode = settings.get(ConfigTags.Mode);
 		initialize(settings);
 		eventHandler = new EventHandler(this); // by urueda
-
-		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
-				settings.get(ConfigTags.GraphDBUrl),
-				settings.get(ConfigTags.GraphDBUser),
-				settings.get(ConfigTags.GraphDBPassword));
-
+		
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
@@ -1740,11 +1733,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		Grapher.PROLOG_ACTIVATED = prologActivated;
 		// end by urueda		
 	}
-
-	protected void storeWidget(String stateID, Widget widget) {
-		graphDB.addWidget(stateID, widget);
-	}
-
+	
 	// by urueda
 	protected Widget getWidget(State state, String concreteID){
 		for (Widget w : state){

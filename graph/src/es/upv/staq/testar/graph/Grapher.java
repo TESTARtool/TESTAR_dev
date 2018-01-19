@@ -44,6 +44,7 @@ import es.upv.staq.testar.graph.reporting.GraphReporter;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
+import es.upv.staq.testar.strategyparser.StrategyFactory;
 
 /**
  * Graphing utility for TESTAR' tests.
@@ -59,6 +60,8 @@ public class Grapher implements Runnable {
 	public static final String MAXCOVERAGE_GENERATOR 		= "maxcoverage";
 	public static final String PROLOG_GENERATOR 			= "prolog";
 	public static final String EVOLUTIONARY_GENERATOR 		= "evolutionary"; //by fraalpe2
+	public static final String STRATEGY_GENERATOR 			= "tree-based_strategy"; //by mgroot
+	
 		
 	// QLEARNING parameters needs calibration
 	// -> SUT UI space exploration capability (note: being worse at exploration might be good at concrete UI parts as these parts are more exercised): 
@@ -69,6 +72,8 @@ public class Grapher implements Runnable {
 	private static double MAX_MAXREWARD = 9999999.0;
 	
 	public static String testGenerator = RANDOM_GENERATOR;
+	
+	public static String STRATEGY = "RandomAction:";
 
 	public static int EXPLORATION_SAMPLE_INTERVAL = 10;
 	public static boolean GRAPHS_ACTIVATED = true;
@@ -119,7 +124,8 @@ public class Grapher implements Runnable {
 			QLEARNING_RESTARTS_GENERATOR,
 			MAXCOVERAGE_GENERATOR,
 			PROLOG_GENERATOR,
-			EVOLUTIONARY_GENERATOR
+			EVOLUTIONARY_GENERATOR, 
+			STRATEGY_GENERATOR
 		};
 	}
 	
@@ -130,7 +136,7 @@ public class Grapher implements Runnable {
 	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling, int typingTexts,
 							   String testGenerator, Double maxReward, Double discount,
 							   Integer explorationSampleInterval, boolean graphsActivated, boolean prologActivated,
-							   boolean graphResumingActivated, boolean offlineGraphConversion,
+							   boolean graphResumingActivated, boolean offlineGraphConversion, String strategy,
 							   JIPrologWrapper jipWrapper) {
 		try {
 			synchronized(env){
@@ -147,6 +153,8 @@ public class Grapher implements Runnable {
 		Grapher.testSequenceLength = sequenceLength;
 		Grapher.FORMS_TYPING_ENHANCEMENT = formsFilling;
 		Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION = typingTexts;
+		Grapher.STRATEGY = strategy;
+		
 		if (!graphsActivated && !testGenerator.equals(Grapher.RANDOM_GENERATOR)){
 			System.out.println("Cannot use <" + testGenerator + "> test generator as GRAPHS are not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
 			Grapher.testGenerator = Grapher.RANDOM_GENERATOR;			
@@ -273,7 +281,7 @@ public class Grapher implements Runnable {
 	}
 	
 	/**
-	 * Consumes a pair of &lt;State,Action&gt; from a FIFO queue, synchronously.
+	 * Consumes a pair of <State,Action> from a FIFO queue, synchronously.
 	 * @return Next non consumed movement.
 	 */
 	public static Movement getMovement(){
@@ -330,15 +338,15 @@ public class Grapher implements Runnable {
 	 * @return
 	 */
 	public static Action selectAction(State state, Set<Action> actions){
-		if (PROLOG_ACTIVATED) {
-			jipWrapper.setFacts(state, actions);
-		}
+		if (PROLOG_ACTIVATED)
+			jipWrapper.setFacts(state,actions);			
 		Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT ?
 			FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
 			: actions;
-		if (Grapher.GRAPHS_ACTIVATED) {
+		if (Grapher.GRAPHS_ACTIVATED)
 			env.notifyEnvironment(state, filteredActions);
-		}
+		if (env == null)
+			System.out.println("Environment is null");
 		Action selectedAction = walker.selectAction(env, state, filteredActions, jipWrapper);
 		if (FORMS_TYPING_ENHANCEMENT)
 			FormsFilling.updateFormActions(state,selectedAction); // update typing actions management
@@ -383,7 +391,15 @@ public class Grapher implements Runnable {
 		GraphReporter.useGraphData(graphTime,testSequencePath);
 		//WalkReport wr = new WalkReport("Q-Learning", 0, 0, 0, 0, 0, 0);
 		//System.out.println(wr);
-		
+		if (Grapher.GRAPHS_ACTIVATED){
+			Grapher.GRAPH_LOADING_TASK = Grapher.GRAPH_RESUMING_ACTIVATED;
+			if (Grapher.GRAPH_RESUMING_ACTIVATED){
+				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
+				Grapher.graphLoadingMovement = 0;
+			}
+			env = new TESTAREnvironment(testSequencePath);
+			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
+		}
 		if (testGenerator.equals(QLEARNING_GENERATOR)){
 			if (QLEARNING_CALIBRATION){
 				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
@@ -406,22 +422,15 @@ public class Grapher implements Runnable {
 			System.out.println("<Evolutionary> test generator enabled"); // by urueda
 		} else if (testGenerator.equals(RANDOM_RESTARTS_GENERATOR)){
 			walker = new RandomRestartsWalker(new Random (graphTime), Grapher.testSequenceLength);
-			System.out.println("<Random +> test generator enabled");			
+			System.out.println("<Random +> test generator enabled");
+		} else if (testGenerator.equals(STRATEGY_GENERATOR)){
+			StrategyFactory sf = new StrategyFactory(STRATEGY);
+			walker = sf.getStrategyWalker();
+			System.out.println("<Tree based strategy> test generator enabled");			
 		} else{ // default: RANDOM_GENERATOR
 			walker = new RandomWalker(new Random(graphTime));
 			System.out.println("<Random> test generator enabled");			
 		}
-
-		if (Grapher.GRAPHS_ACTIVATED){
-			Grapher.GRAPH_LOADING_TASK = Grapher.GRAPH_RESUMING_ACTIVATED;
-			if (Grapher.GRAPH_RESUMING_ACTIVATED){
-				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
-				Grapher.graphLoadingMovement = 0;
-			}
-			env = new TESTAREnvironment(testSequencePath);
-			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
-		}
-		
 		if (PROLOG_ACTIVATED)
 			walker.setProlog(jipWrapper);
 		if (Grapher.GRAPHS_ACTIVATED){
@@ -430,16 +439,8 @@ public class Grapher implements Runnable {
 		}
 	}
 	
-	/**
-	 * Retrieves the active walker.
-	 * @return The walker.
-	 */
-	public static IWalker getWalker(){
-		return Grapher.walker;		
-	}
-	
 	// null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
-	public static String[] getReport(int firstSequenceActionNumber){
+	public static String[] getReport(){
 		if (!Grapher.GRAPHS_ACTIVATED)
 			return null;
 		System.out.println("TESTAR sequence graph dump on way ...");
@@ -451,7 +452,7 @@ public class Grapher implements Runnable {
 					} catch (InterruptedException e) {}
 				}
 			}
-			String[] report = env.getReport(firstSequenceActionNumber);
+			String[] report = env.getReport();
 			System.out.println("... finished TESTAR sequence graph dump");			
 			return report;
 		} catch(java.lang.NullPointerException npe){ // premature test end <- env == null
