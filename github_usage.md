@@ -1,19 +1,19 @@
-#Github usage
+# Github usage
 The code of TESTAR is stored in [github](https://github.com). This document provides information about the way of working
 within the TESTAR development project. For detailed information about Git and Github, please read the documentation at the
 websites of the project.
 
-##TESTAR
+## TESTAR
 
 TESTAR is a tool for automated testing of the desktop. More
 information can be found at [testar.org](https://testar.org/about/).
 
-##Git
+## Git
 
 The source code is maintained in a repository at Github. In order to work with this repository, GIT needs to 
 be installed on the development machine. Git can be installed from [https://git-scm.com/downloads](https://git-scm.com/downloads).
 
-##Cloning the repository
+## Cloning the repository
 
 The software of TESTAR is maintained in a source code repository at Github. The repository
 can be found at [https://github.com/florendg/TESTAR_dev](https://github.com/florendg/TESTAR_dev).

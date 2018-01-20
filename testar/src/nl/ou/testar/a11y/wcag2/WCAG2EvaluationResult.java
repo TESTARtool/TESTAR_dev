@@ -44,6 +44,7 @@ import nl.ou.testar.a11y.reporting.EvaluationResult;
 public final class WCAG2EvaluationResult extends EvaluationResult {
 	
 	private static final long serialVersionUID = -3449985990033944575L;
+	
 	private final SuccessCriterion criterion;
 	
 	/**
