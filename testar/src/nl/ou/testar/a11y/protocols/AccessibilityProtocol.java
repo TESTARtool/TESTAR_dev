@@ -222,11 +222,10 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 */
 	protected String getWidgetTitleFromGraphDB(String concreteID) {
 		String gremlinWidget = "_().has('@class','Widget').has('" +
-				Tags.ConcreteID.name() + "','" + concreteID +"').Title";
+				Tags.ConcreteID.name() + "','" + concreteID + "').Title";
 		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget,
 				GremlinStart.VERTICES);
 		if (widgets.size() != 1) { // no matches or too many matches
-			System.out.println("<---> Failed " + concreteID + " found " + widgets.size());
 			return "N/A";
 		}
 		return (String)widgets.get(0);
