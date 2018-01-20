@@ -27,6 +27,7 @@ public class GeneralPanel extends JPanel {
   private JCheckBox paCheckbox;
   private JCheckBox offlineGraphConversionCheckBox;
   private JComboBox<String> comboBoxProtocol;
+  private JCheckBox compileCheckBox;
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -77,9 +78,10 @@ public class GeneralPanel extends JPanel {
     comboboxVerbosity.setBounds(373, 222, 107, 20);
     comboboxVerbosity.setMaximumRowCount(3);
     comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
+    add(comboboxVerbosity);
 
     comboBoxProtocol = new JComboBox<>();
-    comboBoxProtocol.setBounds(286, 258, 194, 20);
+    comboBoxProtocol.setBounds(286, 248, 194, 20);
     String[] sutSettings = new File("./settings/")
         .list((current, name) -> new File(current, name).isDirectory());
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
@@ -89,6 +91,11 @@ public class GeneralPanel extends JPanel {
     myItemListener.addObserver(settingsDialog);
     comboBoxProtocol.addItemListener(myItemListener);
     add(comboBoxProtocol);
+
+    compileCheckBox = new JCheckBox("Always compile protocol");
+    compileCheckBox.setBounds(286, 272, 192, 21);
+    compileCheckBox.setToolTipText(lblCompileTTT);
+    add(compileCheckBox);
 
     f2slCheckBox = new JCheckBox("Force to sequence length");
     f2slCheckBox.setBounds(10, 235, 192, 20);
@@ -156,7 +163,7 @@ public class GeneralPanel extends JPanel {
     add(lblSequenceActions);
 
     JLabel lblProtocol = new JLabel("Protocol:");
-    lblProtocol.setBounds(229, 258, 64, 20);
+    lblProtocol.setBounds(229, 248, 64, 20);
     // TODO Create TTT
     add(lblProtocol);
   }
@@ -197,6 +204,7 @@ public class GeneralPanel extends JPanel {
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
     comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
+    compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
   }
 
   /**
@@ -216,6 +224,7 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
+    settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

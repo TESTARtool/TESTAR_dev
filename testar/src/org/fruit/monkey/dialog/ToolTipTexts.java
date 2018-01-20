@@ -24,7 +24,6 @@ public class ToolTipTexts {
   public static String sutConnectorTTT = "How does TESTAR engage with the SUT";
   public static String suthPathTTT = "<html> Path to the SUT: " +
       "Pick the executable of the SUT or insert a custom command line. </html>";
-
   public static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
   public static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
       "After having executed the given amount of<br>\n" +
@@ -37,6 +36,7 @@ public class ToolTipTexts {
       "Sets how much information will be written to TESTAR's log-file. </html>";
   public static String checkStopOnFaultTTT = "<html> Stop sequence generation on fault: " +
       "If TESTAR detects and error, it will immediately stop sequence generation. </html>";
+  public static String lblCompileTTT = "Always compile protocol on action start";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
