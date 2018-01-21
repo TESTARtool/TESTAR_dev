@@ -1,6 +1,9 @@
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.*;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.ProtocolEditor;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,11 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Observable;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
-import static org.fruit.monkey.dialog.ToolTipTexts.lblLoggingVerbosityTTT;
-import static org.fruit.monkey.dialog.ToolTipTexts.sequencesActionsTTT;
 
 public class GeneralPanel extends JPanel {
   private Settings settings;
@@ -84,6 +86,7 @@ public class GeneralPanel extends JPanel {
     comboBoxProtocol.setBounds(286, 248, 194, 20);
     String[] sutSettings = new File("./settings/")
         .list((current, name) -> new File(current, name).isDirectory());
+    Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
     // Pass button click to settings dialog
