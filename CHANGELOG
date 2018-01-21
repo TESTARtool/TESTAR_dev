@@ -25,7 +25,7 @@ Enhancements:
 		-> Facts are automatically calculated based on execution information (states, actions, graphs)
 		-> actions rules to build feasible UI actions
 		-> queries can be performed (e.g. UI actions filtering and selection, oracles definition)
-	- Testing protocol
+	- Testing protocol 
 		-> protocol can now be selected from a default set
 		-> SUT monitoring:
 			--> When?: for SUTs that are started through other applications (i.e. jnlp for Java applications)
