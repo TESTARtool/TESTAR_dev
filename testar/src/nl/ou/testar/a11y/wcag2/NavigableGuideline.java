@@ -78,7 +78,7 @@ public final class NavigableGuideline extends AbstractGuideline {
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		for (Widget w : widgets)
-			// used during offline analysis
+			// used during offline evaluation
 			w.set(WCAG2Tags.WCAG2IsWindow, AccessibilityUtil.isWindow(w));
 		return results;
 	}
