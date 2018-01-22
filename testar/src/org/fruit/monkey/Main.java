@@ -20,9 +20,7 @@
  * before the end of the project. Beware of any restrictions regarding the use of this    *
  * work that might arise from the open source license it might fall under! It is the      *
  * UPV's intention to make this work accessible, free of any charge.                      *
- *
- * @author Sebastian Bauersfeld
- */
+ *****************************************************************************************/
 
 /**
  *  @author Sebastian Bauersfeld

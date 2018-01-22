@@ -27,14 +27,14 @@
  */
 package org.fruit.alayer.windows;
 
+import org.fruit.alayer.Rect;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
-import org.fruit.alayer.Rect;
 
 class UIAElement implements Serializable {
 	private static final long serialVersionUID = -2561441199642411403L;
@@ -51,6 +51,8 @@ class UIAElement implements Serializable {
 	Rect rect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
 		acceleratorKey, accessKey;
+	String valuePattern;
+
 	double zindex,
 		hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
 

@@ -124,6 +124,8 @@ final class UIAState extends UIAWidget implements State {
 			ret = w.element.enabled;
 		}else if(t.equals(Tags.Title)){
 			ret = w.element.name;
+		}else if (t.equals(Tags.ValuePattern)) {
+			ret = w.element.valuePattern;
 		}else if(t.equals(Tags.ToolTipText)){
 			ret = w.element.helpText;
 		}else if(t.equals(Tags.PID)){
