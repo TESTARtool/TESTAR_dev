@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = C:\\Windows\\System32\\notepad.exe
+SUTConnectorValue = C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe
 
 #################################################################
 # Sequences
@@ -49,7 +49,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xception.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ystem.*|.*[cC]lose.*|.*[eE]xit.*|.*[mM]inimi[zs]e.*|.*[oO]pen.*|.*[sS]ave.*|.*[pP]rint.*
+ClickFilter = .*[sS]ystem.*|.*[cC]lose.*|.*[eE]xit.*|.*[mM]inimi[zs]e.*|.*[sS]ave.*|.*[pP]rint.*|.*[fF]ile.*|.*[dD]elete.*
 
 #################################################################
 # Processfilter
@@ -88,7 +88,10 @@ UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 2
 ExecuteActions = true
+
+# Don't abort on faults
 FaultThreshold = 1.01
+
 DrawWidgetUnderCursor = false
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
@@ -99,7 +102,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 2.5
+StartupTime = 5.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
