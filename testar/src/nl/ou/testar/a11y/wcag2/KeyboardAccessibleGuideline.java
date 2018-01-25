@@ -98,7 +98,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 			} // hasKeyboardFocus(w)
 			
 			String key1 = AccessibilityUtil.getAccessKey(w),
-					key2 = AccessibilityUtil.getShortcutKey(w);
+					key2 = AccessibilityUtil.getAcceleratorKey(w);
 			if ((key1 != null && !key1.isEmpty())
 					|| (key2 != null && !key2.isEmpty()))
 				shortcutKeyCount++;
@@ -156,7 +156,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		}
 		
 		// find shortcut keys
-		String shortcutKey = AccessibilityUtil.getShortcutKey(w);
+		String shortcutKey = AccessibilityUtil.getAcceleratorKey(w);
 		if (shortcutKey != null && !shortcutKey.isEmpty()) {
 			Action a = AccessibilityUtil.parseShortcutKey(shortcutKey);
 			if (a != null)

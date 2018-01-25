@@ -27,89 +27,22 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.monkey.ConfigTags.AccessBridgeEnabled;
-import static org.fruit.monkey.ConfigTags.ActionDuration;
-import static org.fruit.monkey.ConfigTags.AlgorithmFormsFilling;
-import static org.fruit.monkey.ConfigTags.ClickFilter;
-import static org.fruit.monkey.ConfigTags.CopyFromTo;
-import static org.fruit.monkey.ConfigTags.Delete;
-import static org.fruit.monkey.ConfigTags.Discount;
-import static org.fruit.monkey.ConfigTags.DrawWidgetInfo;
-import static org.fruit.monkey.ConfigTags.DrawWidgetTree;
-import static org.fruit.monkey.ConfigTags.DrawWidgetUnderCursor;
-import static org.fruit.monkey.ConfigTags.ExecuteActions;
-import static org.fruit.monkey.ConfigTags.ExplorationSampleInterval;
-import static org.fruit.monkey.ConfigTags.FaultThreshold;
-import static org.fruit.monkey.ConfigTags.ForceForeground;
-import static org.fruit.monkey.ConfigTags.ForceToSequenceLength;
-import static org.fruit.monkey.ConfigTags.GraphResuming;
-import static org.fruit.monkey.ConfigTags.GraphsActivated;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.MaxReward;
-import static org.fruit.monkey.ConfigTags.MaxTime;
-import static org.fruit.monkey.ConfigTags.Mode;
-import static org.fruit.monkey.ConfigTags.MyClassPath;
-import static org.fruit.monkey.ConfigTags.NonReactingUIThreshold;
-import static org.fruit.monkey.ConfigTags.OfflineGraphConversion;
-import static org.fruit.monkey.ConfigTags.OnlySaveFaultySequences;
-import static org.fruit.monkey.ConfigTags.OutputDir;
-import static org.fruit.monkey.ConfigTags.PathToReplaySequence;
-import static org.fruit.monkey.ConfigTags.ProcessesToKillDuringTest;
-import static org.fruit.monkey.ConfigTags.PrologActivated;
-import static org.fruit.monkey.ConfigTags.ProtocolClass;
-import static org.fruit.monkey.ConfigTags.ReplayRetryTime;
-import static org.fruit.monkey.ConfigTags.SUTConnector;
-import static org.fruit.monkey.ConfigTags.SUTConnectorValue;
-import static org.fruit.monkey.ConfigTags.SequenceLength;
-import static org.fruit.monkey.ConfigTags.Sequences;
-import static org.fruit.monkey.ConfigTags.ShowSettingsAfterTest;
-import static org.fruit.monkey.ConfigTags.ShowVisualSettingsDialogOnStartup;
-import static org.fruit.monkey.ConfigTags.StartupTime;
-import static org.fruit.monkey.ConfigTags.StateScreenshotSimilarityThreshold;
-import static org.fruit.monkey.ConfigTags.StopGenerationOnFault;
-import static org.fruit.monkey.ConfigTags.SuspiciousTitles;
-import static org.fruit.monkey.ConfigTags.SUTProcesses;
-import static org.fruit.monkey.ConfigTags.TempDir;
-import static org.fruit.monkey.ConfigTags.TestGenerator;
-import static org.fruit.monkey.ConfigTags.TimeToFreeze;
-import static org.fruit.monkey.ConfigTags.TimeToWaitAfterAction;
-import static org.fruit.monkey.ConfigTags.TypingTextsForExecutedAction;
-import static org.fruit.monkey.ConfigTags.UnattendedTests;
-import static org.fruit.monkey.ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay;
-import static org.fruit.monkey.ConfigTags.VisualizeActions;
-import static org.fruit.monkey.ConfigTags.VisualizeSelectedAction;
-import static org.fruit.monkey.ConfigTags.GraphDBEnabled;
-import static org.fruit.monkey.ConfigTags.GraphDBPassword;
-import static org.fruit.monkey.ConfigTags.GraphDBUrl;
-import static org.fruit.monkey.ConfigTags.GraphDBUser;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
 
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+import javax.swing.*;
+import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+
+import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
@@ -419,6 +352,8 @@ public class Main {
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
+
+			defaults.add(Pair.from(AlwaysCompile, true));
 
 			return Settings.fromFile(defaults, file);
 		}catch(IOException ioe){
