@@ -28,12 +28,7 @@
 
 package org.fruit.alayer;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import es.upv.staq.testar.CodingManager;
 import org.fruit.Pair;
 import org.fruit.Proc;
 import org.fruit.UnFunc;
@@ -41,7 +36,11 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.ProcessHandle;
 
-import es.upv.staq.testar.CodingManager;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public final class Tags extends TagsBase {
 	
@@ -126,6 +125,9 @@ public final class Tags extends TagsBase {
 	
 	/** The text of a widget (e.g. the text within a text box) */
 	public static final Tag<String> Text = from("Text", String.class);
+
+	/** The pattern value of a web-widget : hyperlink or text in input field */
+	public static final Tag<String> ValuePattern = from("ValuePattern", String.class);
 
 	public static final Tag<WidgetMap> WidgetMap = from("WidgetMap", WidgetMap.class);
 

@@ -1,4 +1,4 @@
-/**
+/*
  * COPYRIGHT:                                                                             *
  * Universitat Politecnica de Valencia 2013                                               *
  * Camino de Vera, s/n                                                                    *
@@ -21,17 +21,10 @@
  * work that might arise from the open source license it might fall under! It is the      *
  * UPV's intention to make this work accessible, free of any charge.                      *
  *
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
- * @author Sebastian Bauersfeld
  */
 
 /**
- *  @author Sebastian Bauersfeld
+ * @author Sebastian Bauersfeld
  */
 package org.fruit;
 

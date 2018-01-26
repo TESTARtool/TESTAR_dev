@@ -78,8 +78,6 @@ public class SettingsDialog extends JFrame implements Observer {
   private MiscPanel miscPanel;
   private GraphDBPanel graphDBPanel;
 
-  private GeneralPanel.MyItemListener myItemListener = null;
-
   /**
    * Starts the settings Dialog.
    *
