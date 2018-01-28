@@ -1,5 +1,3 @@
-package accessibility_wcag2ict;
-
 /*************************************************************************************
  *
  * COPYRIGHT (2017):
@@ -111,7 +109,7 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 	}
 	
 	@Override
-	protected void writeOfflineAnalysisResultsDetails(EvaluationResults results) {
+	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {
 		html.writeHeading(3, "Violations");
 		if (!results.hasViolations()) {
 			html.writeParagraph("None");

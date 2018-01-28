@@ -54,6 +54,7 @@ import nl.ou.testar.a11y.reporting.EvaluationResults;
 public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	
 	private static final long serialVersionUID = 7735450322487421780L;
+	
 	/**
 	 * The list of all the guidelines in this principle
 	 */
@@ -79,7 +80,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all guidelines in this principle.
-	 * This method executes oracles in state analysis.
+	 * This method executes oracles in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -96,7 +97,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	 * Derives the possible actions from the given state
 	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
-	 * This method derives actions in state analysis.
+	 * This method derives actions in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -111,7 +112,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	/**
 	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will collect evaluation results from all guidelines in this principle.
-	 * This method executes oracles in offline analysis.
+	 * This method executes oracles in offline evaluation.
 	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */

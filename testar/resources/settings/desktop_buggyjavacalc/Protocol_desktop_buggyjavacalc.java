@@ -1,5 +1,3 @@
-package desktop_buggyjavacalc;
-
 /******************************************************************************************
  * COPYRIGHT:                                                                             *
  * Universitat Politecnica de Valencia 2013                                               *
