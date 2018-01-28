@@ -849,7 +849,6 @@ public final class Windows{
 	public static native void SafeArrayDestroy(long pArray) throws WinApiException;
 	public static native long SafeArrayGetIntElement(long pArray, long idx) throws WinApiException;				// This is only for 1-dimensional arrays yet! (UIA only uses 1-dimensional ones!)
 	public static native long SafeArrayGetUBound(long pArray, long dim) throws WinApiException;
-	public static native String IUIAutomationElement_get_ValuePattern(long pElement, long patternId);
 
 	public static boolean hitTest(long pAutomation, long pExpected, long x, long y){
 		long pUnderCursor = 0;

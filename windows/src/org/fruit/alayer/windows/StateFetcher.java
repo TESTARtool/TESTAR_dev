@@ -28,15 +28,19 @@
  */
 package org.fruit.alayer.windows;
 
-import org.fruit.Util;
-import org.fruit.alayer.*;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+
+import org.fruit.Util;
+import org.fruit.alayer.Rect;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 
 public class StateFetcher implements Callable<UIAState>{
 	
@@ -305,7 +309,6 @@ public class StateFetcher implements Callable<UIAState>{
 		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
 		el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
 		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
-		el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaPtr, Windows.UIA_ValuePatternId);
 
 		parent.root.hwndMap.put(el.hwnd, el);
 

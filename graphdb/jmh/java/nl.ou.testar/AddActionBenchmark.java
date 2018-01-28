@@ -1,10 +1,9 @@
-package nl.ou.testar;
+
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.actions.NOP;
 import org.openjdk.jmh.annotations.*;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,7 +17,7 @@ public class AddActionBenchmark {
 
     @Setup(Level.Invocation)
     public void setupDatabase() {
-        graphFactory = new OrientDBRepository("plocal:benchmark" +
+        graphFactory = new OrientDBRepository("plocal:/tmp/benchmark" +
                 "benchmark","admin","admin");
 
         graphFactory.addState(Util.createState("widget"+1),true);
@@ -27,7 +26,6 @@ public class AddActionBenchmark {
         Action action = new NOP();
         action.set(Tags.ConcreteID,"dummy");
         action.set(Tags.TargetID,"w1");
-        action.set(Tags.AbstractID,"abstract");
         graphFactory.addAction(action,"widget1");
 
     }
@@ -48,7 +46,6 @@ public class AddActionBenchmark {
         Action action = new NOP();
         action.set(Tags.ConcreteID,"arghh");
         action.set(Tags.TargetID,"w1");
-        action.set(Tags.AbstractID,"appie");
         graphFactory.addAction(action,"widget1");
     }
 

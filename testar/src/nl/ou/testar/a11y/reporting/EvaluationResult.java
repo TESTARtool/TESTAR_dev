@@ -54,16 +54,16 @@ public class EvaluationResult implements Serializable {
 		OK,
 		
 		/**
-		 * A warning
-		 * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
-		 */
-		WARNING,
-		
-		/**
 		 * An error
 		 * This is a definite problem that can be detected automatically.
 		 */
-		ERROR;
+		ERROR,
+		
+		/**
+		 * A warning
+		 * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
+		 */
+		WARNING;
 	}
 	
 	private final Type type;

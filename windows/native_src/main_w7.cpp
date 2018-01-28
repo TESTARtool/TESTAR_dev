@@ -1516,40 +1516,6 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1Name)) (JNIEnv * env, jcla
 	return ret;
 }
 
-HRESULT GetValuePatternFromElement(IUIAutomationElement *pElement, PATTERNID patternId, BSTR *pValuePattern) {
-    *pValuePattern = NULL;
-
-    BSTR bstr;
-    IUIAutomationValuePattern *pUIAValuePattern;
-    HRESULT hr = pElement->GetCurrentPatternAs(patternId, IID_PPV_ARGS(&pUIAValuePattern));
-    if (SUCCEEDED(hr) && (pUIAValuePattern != NULL)) {
-        // Cached version doesn't seem to work ?
-        hr = pUIAValuePattern->get_CurrentValue(&bstr);
-        if (SUCCEEDED(hr) && bstr != NULL) {
-            *pValuePattern = bstr;
-            SysFreeString(bstr);
-        }
-        pUIAValuePattern->Release();
-        pUIAValuePattern = NULL;
-    }
-
-    return hr;
-}
-
-/* IUIAutomationElement_get_ValuePattern */
-JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ValuePattern)) (JNIEnv * env, jclass,
-		jlong pIUIAutomationElement, jlong patternId) {
-	BSTR value;
-    IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
-    HRESULT hr = GetValuePatternFromElement(el, patternId, &value);
-    if (FAILED(hr))
-        return 0;
-
-    jstring ret = env->NewStringUTF(_com_util::ConvertBSTRToString(value));
-    SysFreeString(value);
-    return ret;
-}
-
 /* IUIAutomationElement_get_ProviderDescription */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ProviderDescription)) (JNIEnv * env, 
 		jclass, jlong pIUIAutomationElement, jboolean fromCache){

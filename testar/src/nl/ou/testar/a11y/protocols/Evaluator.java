@@ -51,7 +51,7 @@ public interface Evaluator {
 	
 	/**
 	 * Evaluates the accessibility of the given state
-	 * This method executes oracles in on-the-fly evaluation.
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -60,7 +60,7 @@ public interface Evaluator {
 	/**
 	 * Derives the possible actions from the given state
 	 * The actions are specific to accessibility.
-	 * This method derives actions in on-the-fly evaluation.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -68,7 +68,7 @@ public interface Evaluator {
 	
 	/**
 	 * Evaluates the overall accessibility of the SUT by querying the given graph database
-	 * This method executes oracles in offline evaluation.
+	 * This method executes oracles in offline analysis.
 	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */

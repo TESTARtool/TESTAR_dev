@@ -4,7 +4,7 @@ sourceSets {
     main {
         resources {
             srcDirs = ['resources']
-            excludes = ['settings/']
+         //   excludes = ['settings/']
         }
     }
 
@@ -23,7 +23,7 @@ dependencies {
     compile project(':native')
     compile project(':graph')
     compile project(':graphdb')
-    compile files('./lib/jsyntaxpane-1.1.5.jar')
+    compile files('./lib/jsyntaxpane-0.9.5-b29.jar')
     compile files('./lib/JNativeHook.jar')
     runtime project(':windows')
     runtime files('../graph/lib/jiprolog-4.1.3.1.jar')

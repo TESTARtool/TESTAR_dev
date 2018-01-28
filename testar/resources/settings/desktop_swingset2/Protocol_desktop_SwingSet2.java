@@ -1,3 +1,6 @@
+package desktop_swingset2;
+
+
 /******************************************************************************************
  * COPYRIGHT:                                                                             *
  * Universitat Politecnica de Valencia 2013                                               *

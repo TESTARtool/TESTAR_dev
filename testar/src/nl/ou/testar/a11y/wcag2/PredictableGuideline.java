@@ -86,8 +86,8 @@ public final class PredictableGuideline extends AbstractGuideline {
 				GremlinStart.VERTICES);
 		// the list contains the titles of the new states
 		for (Object title : stateChanges)
-			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-					"Unexpected state change to \"" + title + "\""));
+			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+					"Possible unexpected state change to \"" + title + "\""));
 		if (stateChanges.isEmpty())
 			results.add(evaluationPassed(sc));
 		return results;

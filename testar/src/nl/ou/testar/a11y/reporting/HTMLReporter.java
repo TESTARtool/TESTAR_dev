@@ -98,7 +98,7 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the header to the HTML report
+	 * Writes the footer to the HTML report
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeHeader() {
@@ -119,28 +119,6 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the start of a heading
-	 * @param level The heading level, 1 (highest) .. 6 (lowest).
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeHeadingStart(int level) {
-		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(start(HEADING[level-1]));
-		return this;
-	}
-	
-	/**
-	 * Writes the end of a heading
-	 * @param level The heading level, 1 (highest) .. 6 (lowest).
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeHeadingEnd(int level) {
-		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(end(HEADING[level-1]));
-		return this;
-	}
-	
-	/**
 	 * Writes a heading
 	 * @param level The heading level, 1 (highest) .. 6 (lowest).
 	 * @param text The heading text.
@@ -149,9 +127,7 @@ public final class HTMLReporter {
 	public HTMLReporter writeHeading(int level, String text) {
 		Assert.notNull(text);
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		writeHeadingStart(level);
-		write(text);
-		writeHeadingEnd(level);
+		write(start(HEADING[level-1]) + text + end(HEADING[level-1]));
 		return this;
 	}
 	
@@ -290,37 +266,6 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the start of a table heading to the HTML report
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeTableHeadingStart() {
-		write(start(TABLE_HEADING));
-		return this;
-	}
-	
-	/**
-	 * Writes the end of a table heading to the HTML report
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeTableHeadingEnd() {
-		write(end(TABLE_HEADING));
-		return this;
-	}
-	
-	/**
-	 * Writes a table heading to the HTML report
-	 * @param text The heading text.
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeTableHeading(String text) {
-		Assert.notNull(text);
-		writeTableHeadingStart();
-		write(text);
-		writeTableHeadingEnd();
-		return this;
-	}
-	
-	/**
 	 * Writes the start of a table cell to the HTML report
 	 * @return This HTML reporter.
 	 */
@@ -357,10 +302,10 @@ public final class HTMLReporter {
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableHeadings(String... headings) {
-		writeTableRowStart();
+		write(start(TABLE_ROW));
 		for (String heading : headings)
-			writeTableHeading(heading);
-		writeTableRowEnd();
+			write(start(TABLE_HEADING) + heading + end(TABLE_HEADING));
+		write(end(TABLE_ROW));
 		return this;
 	}
 	
@@ -406,42 +351,19 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the start of a link to the HTML report
-	 * @param dest The destination URL.
-	 * @param newWindow If the link should open in a new window or tab.
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeLinkStart(String dest, boolean newWindow) {
-		Assert.notNull(dest);
-		Map<String, String> attrs = new HashMap<>();
-		attrs.put(LINK_DEST, dest);
-		if (newWindow)
-			attrs.put(LINK_TARGET, LINK_TARGET_NEW);
-		write(start(LINK, attrs));
-		return this;
-	}
-	
-	/**
-	 * Writes the end of a link to the HTML report
-	 * @return This HTML reporter.
-	 */
-	public HTMLReporter writeLinkEnd() {
-		write(end(LINK));
-		return this;
-	}
-	
-	/**
-	 * Writes a link to the HTML report
+	 * Writes a reference to an image to the HTML report
 	 * @param text The link text.
 	 * @param dest The destination URL.
 	 * @param newWindow If the link should open in a new window or tab.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeLink(String text, String dest, boolean newWindow) {
-		Assert.notNull(text);
-		writeLinkStart(dest, newWindow);
-		write(text);
-		writeLinkEnd();
+		Assert.notNull(text, dest);
+		Map<String, String> attrs = new HashMap<>();
+		attrs.put(LINK_DEST, dest);
+		if (newWindow)
+			attrs.put(LINK_TARGET, LINK_TARGET_NEW);
+		write(start(LINK, attrs) + text + end(LINK));
 		return this;
 	}
 	

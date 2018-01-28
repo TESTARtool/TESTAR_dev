@@ -87,7 +87,7 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * This method executes oracles in on-the-fly evaluation.
+	 * This method executes oracles in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
@@ -104,7 +104,7 @@ public final class WCAG2ICT implements Evaluator {
 	 * Derives the possible actions from the given state
 	 * This will collect actions from all principles in WCAG2ICT.
 	 * The actions are specific to accessibility.
-	 * This method derives actions in on-the-fly evaluation.
+	 * This method derives actions in state analysis.
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
@@ -119,7 +119,7 @@ public final class WCAG2ICT implements Evaluator {
 	/**
 	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * This method executes oracles in offline evaluation.
+	 * This method executes oracles in offline analysis.
 	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */

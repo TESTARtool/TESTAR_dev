@@ -49,7 +49,7 @@ SuspiciousTitles = THIS_WONT_BE_DISPLAYED
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[mM]inimizar.*|.*[mM]inimize.*|.*[cC]errar.*|.*[cC]lose.*|.*[rR]estaurar.*|.*[rR]estore.*|.*[aA]rchivo.*|.*[aA]brir.*|.*[oO]pen.*|.*[gG]uardar.*|.*[sS]ave.*|.*[sS]alir.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[cC]ompartir.*|.*[sS]hare.*|.*[eE]xport.*|.*[oO]ption.*|.*[oO]pci.*|.*[cC]uenta.*|.*[aA]ccount.*|.*[sS]oporte.*|.*[sS]upport.*|.*[mM]ail.*|.*[cC]orreo.*|.*[dD]esconectar.*|.*[sS]istema.*|.*[sS]ystem.*|.*[oO]ffice.*|.*[oO]ne[dD]rive.*|.*[dD]elete.*|.*[bB]orrar.*|.*[bB]rowse.*|.*SVN.*|.*[eE]nviar.*|.*[sS]lide.*|.*[sS]creenshot.*|.*[rR]ecording.*|.*[rR]eading.*|.*[mM]anage.*|.*[fF]ile.*|.*[nN]ew.*|.*[sS][iIíÍ].*
+ClickFilter = .*[mM]inimizar.*|.*[mM]inimize.*|.*[cC]errar.*|.*[cC]lose.*|.*[rR]estaurar.*|.*[rR]estore.*|.*[aA]rchivo.*|.*[aA]brir.*|.*[oO]pen.*|.*[gG]uardar.*|.*[sS]ave.*|.*[sS]alir.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[cC]ompartir.*|.*[sS]hare.*|.*[eE]xport.*|.*[oO]ption.*|.*[oO]pci.*|.*[cC]uenta.*|.*[aA]ccount.*|.*[sS]oporte.*|.*[sS]upport.*|.*[mM]ail.*|.*[cC]orreo.*|.*[dD]esconectar.*|.*[sS]istema.*|.*[sS]ystem.*|.*[oO]ffice.*|.*[oO]ne[dD]rive.*|.*[dD]elete.*|.*[bB]orrar.*|.*[bB]rowse.*|.*SVN.*|.*[eE]nviar.*|.*[sS]lide.*|.*[sS]creenshot.*|.*[rR]ecording.*|.*[rR]eading.*|.*[mM]anage.*|.*[fF]ile.*|.*[nN]ew.*|.*[sS][iIÃ­Ã�].*
 
 #################################################################
 # Processfilter
@@ -90,7 +90,7 @@ LogLevel = 1
 ExecuteActions = true
 FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
-MyClassPath = ./settings
+MyClassPath = ./resources/settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true
