@@ -4,7 +4,6 @@ sourceSets {
     main {
         resources {
             srcDirs = ['resources']
-            excludes = ['settings/']
         }
     }
 
