@@ -103,11 +103,12 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					|| (key2 != null && !key2.isEmpty()))
 				shortcutKeyCount++;
 		}
-		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size()) {
-			sc = getSuccessCriterionByName("Keyboard");
+		sc = getSuccessCriterionByName("Keyboard");
+		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size())
 			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 					"Possible widgets missing shortcut keys"));
-		}
+		else
+			results.add(evaluationPassed(sc));
 		return results;
 	}
 	
