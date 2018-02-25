@@ -29,7 +29,6 @@
 
 
 package nl.ou.testar;
- ************************************************************************************/
 
 /**
  * Exception class for GraphDB interaction
