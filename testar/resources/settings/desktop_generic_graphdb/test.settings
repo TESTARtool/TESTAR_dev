@@ -81,16 +81,16 @@ GraphDBPassword = admin
 #################################################################
 
 ProcessesToKillDuringTest =
-OutputDir = ./output
-PathToReplaySequence = ./output/temp
-TempDir = ./output/temp
+OutputDir = ./resources/output
+PathToReplaySequence = ./resources/output/temp
+TempDir = ./resources/output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 ExecuteActions = true
 FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
-MyClassPath = ./settings
+MyClassPath = ./resources/settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true

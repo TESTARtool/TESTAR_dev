@@ -72,7 +72,7 @@ ProtocolClass = accessibility_wcag2ict/Protocol_accessibility_wcag2ict
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = true
-GraphDBUrl = plocal:./output/logs/db
+GraphDBUrl = plocal:./resources/output/logs/db
 GraphDBUser = admin
 GraphDBPassword = admin
 
@@ -81,9 +81,9 @@ GraphDBPassword = admin
 #################################################################
 
 ProcessesToKillDuringTest =
-OutputDir = ./output
-PathToReplaySequence = ./output/temp
-TempDir = ./output/temp
+OutputDir = ./resources/output
+PathToReplaySequence = ./resources/output/temp
+TempDir = ./resources/output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 2
@@ -93,7 +93,7 @@ ExecuteActions = true
 FaultThreshold = 1.01
 
 DrawWidgetUnderCursor = false
-MyClassPath = ./settings
+MyClassPath = ./resources/settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.1
 ShowVisualSettingsDialogOnStartup = true
