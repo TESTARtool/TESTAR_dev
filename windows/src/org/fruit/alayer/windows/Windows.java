@@ -875,7 +875,7 @@ public final class Windows{
 
 	static{
 		try{
-			loadExternalLib("windows.dll");
+			loadExternalLib("target/scripts/windows.dll");
 			// end by urueda
 		}catch(IOException ioe){
 			throw new RuntimeException(ioe);

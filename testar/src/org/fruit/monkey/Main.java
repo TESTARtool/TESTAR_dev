@@ -155,7 +155,7 @@ public class Main {
   // by urueda
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./settings").listFiles()) {
+    for (File f : new File("./resources/settings").listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -177,7 +177,7 @@ public class Main {
       }
       final String sse = s + SUT_SETTINGS_EXT;
       try {
-        File f = new File("./settings/" + sse);
+        File f = new File("./resources/settings/" + sse);
         if (f.createNewFile()) {
           //System.out.println("Using <" + s + "> test settings");
           SSE_ACTIVATED = s;
@@ -192,7 +192,7 @@ public class Main {
 
   // by urueda
   public static String[] getSSE() {
-    return new File("./settings/").list(new FilenameFilter() {
+    return new File("./resources/settings/").list(new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
         return name.endsWith(SUT_SETTINGS_EXT);
@@ -223,7 +223,7 @@ public class Main {
     else {
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
-    String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
+    String testSettings = "./resources/settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // end by urueda
@@ -326,7 +326,7 @@ public class Main {
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
-      defaults.add(Pair.from(PathToReplaySequence, "./output/temp")); // by urueda
+      defaults.add(Pair.from(PathToReplaySequence, "./resources/output/temp")); // by urueda
       defaults.add(Pair.from(ActionDuration, 0.1));
       defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
       defaults.add(Pair.from(ExecuteActions, true));
