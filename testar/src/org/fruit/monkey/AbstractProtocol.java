@@ -1173,6 +1173,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							settings.get(ConfigTags.TestGenerator),
 							settings.get(ConfigTags.MaxReward),
 							settings.get(ConfigTags.Discount),
+							settings.get(ConfigTags.LearningRead), //QLearning Refactor Salmi & ferpasri
+							settings.get(ConfigTags.Egreedy), //QLearning Refactor Salmi & ferpasri
 							settings.get(ConfigTags.ExplorationSampleInterval),
 							settings.get(ConfigTags.GraphsActivated),
 							settings.get(ConfigTags.PrologActivated),

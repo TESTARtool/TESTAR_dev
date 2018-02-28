@@ -82,6 +82,9 @@ import static org.fruit.monkey.ConfigTags.GraphDBEnabled;
 import static org.fruit.monkey.ConfigTags.GraphDBPassword;
 import static org.fruit.monkey.ConfigTags.GraphDBUrl;
 import static org.fruit.monkey.ConfigTags.GraphDBUser;
+import static org.fruit.monkey.ConfigTags.LearningRead; //QLearning Refactor Salmi & ferpasri
+import static org.fruit.monkey.ConfigTags.Egreedy; //QLearning Refactor Salmi & ferpasri
+
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -400,6 +403,8 @@ public class Main {
 			defaults.add(Pair.from(TestGenerator, "random"));
 			defaults.add(Pair.from(MaxReward, 9999999.0));
 			defaults.add(Pair.from(Discount, .95));
+			defaults.add(Pair.from(LearningRead, 1.0)); //QLearning Refactor Salmi & ferpasri
+			defaults.add(Pair.from(Egreedy, false)); //QLearning Refactor Salmi & ferpasri
 			defaults.add(Pair.from(AlgorithmFormsFilling, false));
 			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
 			defaults.add(Pair.from(DrawWidgetTree,false));

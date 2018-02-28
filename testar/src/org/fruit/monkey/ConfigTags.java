@@ -84,6 +84,8 @@ public final class ConfigTags {
 	public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
 	public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);
 	public static final Tag<Double> Discount = Tag.from("Discount", Double.class);
+	public static final Tag<Double> LearningRead = Tag.from("LearningRead", Double.class); // QLearning Refactor Salmi & ferpasri
+	public static final Tag<Boolean> Egreedy = Tag.from("Egreedy", Boolean.class); //QLearning Refactor Salmi & ferpasri
 	public static final Tag<Boolean> AlgorithmFormsFilling = Tag.from("AlgorithmFormsFilling", Boolean.class);
 	public static final Tag<Integer> TypingTextsForExecutedAction = Tag.from("TypingTextsForExecutedAction", Integer.class);
 	public static final Tag<Boolean> DrawWidgetTree = Tag.from("DrawWidgetTree", Boolean.class);
