@@ -19,6 +19,8 @@ package es.upv.staq.testar.graph;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
@@ -39,6 +42,7 @@ import es.upv.staq.testar.algorithms.QLearningRestartsWalker;
 import es.upv.staq.testar.algorithms.QLearningWalker;
 import es.upv.staq.testar.algorithms.RandomRestartsWalker;
 import es.upv.staq.testar.algorithms.RandomWalker;
+import es.upv.staq.testar.algorithms.RefactorQLearningWalker;
 import es.upv.staq.testar.algorithms.forms.FormsFilling;
 import es.upv.staq.testar.graph.reporting.GraphReporter;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
@@ -64,6 +68,8 @@ public class Grapher implements Runnable {
 	// -> SUT UI space exploration capability (note: being worse at exploration might be good at concrete UI parts as these parts are more exercised): 
 	public static double QLEARNING_DISCOUNT_PARAM = .95; // non fnal to allow calibration (.95 Sebastian base)
 	public static double QLEARNING_MAXREWARD_PARAM =  9999999.0; // non final to allow calibration (9999999.0 Sebastian base)
+	public static double QLEARNING_LEARNING_READ = 1.0d; // 1 by default, (Salmi & ferpasri)
+	public static boolean QLEARNING_EGREEDY = false; // greedy by default, (Salmi & ferpasri)
 	
 	public static final boolean QLEARNING_CALIBRATION = false; // how-to retrieve from logs: findstr "CALIBRATION" log_file_name.log
 	private static double MAX_MAXREWARD = 9999999.0;
@@ -128,7 +134,7 @@ public class Grapher implements Runnable {
 	 * @param testGenerator A valid generator is expected.
 	 */
 	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling, int typingTexts,
-							   String testGenerator, Double maxReward, Double discount,
+							   String testGenerator, Double maxReward, Double discount, Double learningRead, boolean egreedy,
 							   Integer explorationSampleInterval, boolean graphsActivated, boolean prologActivated,
 							   boolean graphResumingActivated, boolean offlineGraphConversion,
 							   JIPrologWrapper jipWrapper) {
@@ -157,6 +163,8 @@ public class Grapher implements Runnable {
 			Grapher.testGenerator = testGenerator;
 		Grapher.QLEARNING_MAXREWARD_PARAM = maxReward.doubleValue();
 		Grapher.QLEARNING_DISCOUNT_PARAM = discount.doubleValue();
+		Grapher.QLEARNING_LEARNING_READ =  learningRead.doubleValue();
+		Grapher.QLEARNING_EGREEDY = egreedy;
 		Grapher.EXPLORATION_SAMPLE_INTERVAL = explorationSampleInterval.intValue();
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
 		Grapher.PROLOG_ACTIVATED = prologActivated;
@@ -387,9 +395,12 @@ public class Grapher implements Runnable {
 				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
 				QLEARNING_MAXREWARD_PARAM = Math.random() * MAX_MAXREWARD; // 0.0 .. MAX_MAXREWARD
 			}
-			walker = new QLearningWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM);
+			// New QLearning algorithm, in development and testing, by Salmi & ferpasri
+			walker = new RefactorQLearningWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM, QLEARNING_LEARNING_READ, QLEARNING_EGREEDY);
 			System.out.println("<Q-Learning> test generator enabled (" +
-							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM + ")");
+							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM +
+							   "learningRead = " + QLEARNING_LEARNING_READ + ", egreedy = " + QLEARNING_EGREEDY + ")");
+		
 		} else if (testGenerator.equals(QLEARNING_RESTARTS_GENERATOR)){
 			walker = new QLearningRestartsWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM, Grapher.testSequenceLength);
 			System.out.println("<Q-Learning +> test generator enabled");			
