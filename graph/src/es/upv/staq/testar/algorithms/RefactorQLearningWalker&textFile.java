@@ -25,7 +25,6 @@ import es.upv.staq.testar.graph.Movement;
 import es.upv.staq.testar.graph.WalkStopper;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
 
-// New QLearning class based on AbstractWalker & QLearningWalker, in development and testing by Salmi & ferpasri
 public class RefactorQLearningWalker implements IWalker{
 
 	protected double maxReward;
@@ -34,8 +33,6 @@ public class RefactorQLearningWalker implements IWalker{
 	protected boolean egreedy;
 
 	public double BASE_REWARD = 1.0d;
-	
-	protected int numberAction = 0;
 
 	private JIPrologWrapper jipWrapper = null;
 	private boolean walkingMemento = false;
@@ -44,7 +41,7 @@ public class RefactorQLearningWalker implements IWalker{
 	private Map<String,Double> qValues = new HashMap<String,Double>();
 	
 	public void putQvalue(Action a, Double d) {
-		String id = a.get(Tags.AbstractID);
+		String id = a.get(Tags.ConcreteID);
 		
 		qValues.put(id, d);	
 	}
@@ -144,27 +141,7 @@ public class RefactorQLearningWalker implements IWalker{
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
 		Grapher.syncMovements(); // synchronize graph movements consumption for up to date rewards and states/actions exploration
 		Action aprueba = selectProportional(env, state, actions);
-		//prueba ferpasri
-		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-			pw.println();
-			for(Map.Entry entry: qValues.entrySet()) {
-				pw.print("Action: "+entry.getKey());
-				pw.println(" -> QValue: "+ entry.getValue());
-			}
-			pw.println("***********SELECT ACTION ********");
-			pw.println(aprueba.get(Tags.AbstractID));
-			pw.println("LearningRead = " + getLearningRead());
-			pw.println("Egreedy = " + getEgreedy());
-			addNumberAction();
-			pw.println();
-			pw.println();
-			pw.println();
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}// fin prueba ferpasri
+		
 		return aprueba;// selectProportional(env, state, actions);
 	}
 
@@ -172,18 +149,6 @@ public class RefactorQLearningWalker implements IWalker{
 	// NOT used ?¿
 	@Override
 	public double getStateReward(IEnvironment env, IGraphState state) {
-		//prueba ferpasri
-		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-			pw.println("------------------------------------------------------------------------------------------------------------------------");
-			pw.println("get State Reward se no se usa??");
-			pw.println();
-			pw.println();
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}// fin prueba ferpasri
 		return 0.0;
 	}
 	/**
@@ -194,15 +159,6 @@ public class RefactorQLearningWalker implements IWalker{
 	 */
 	protected double calculateRewardForAction(IEnvironment env, IGraphAction action){
 		if (action == null || !env.actionAtGraph(action)) {
-			//prueba ferpasri
-			try {
-				PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-				pw.println("Reward For Action: null or not at graph, base reward "+ getMaxReward()); //Base vs Max / Reward
-				pw.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}// fin prueba ferpasri
 			return getMaxReward();} // MaxReward if we never executed this action
 
 		double actionReward = 0.0d;
@@ -212,30 +168,6 @@ public class RefactorQLearningWalker implements IWalker{
 			actionReward = getMaxReward(); // ¿same as not executed? ¿1.0 or max Reward?
 		else
 			actionReward = 1.0d / (actionWCount[0] + 1); // 1.0 / nº of times we have  executed this action
-		/*actionReward = 1.0d / ( actionWCount[0] * // action count (concrete)
-									Math.log(actionWCount[1] + Math.E - 1)); // action type count (abstract)*/
-
-		/*IGraphState gs = env.getSourceState(action);
-		if (gs != null){
-			Integer tc = gs.getStateWidgetsExecCount().get(action.getTargetWidgetID());
-			if (tc != null)
-				actionReward /= Math.pow(2, tc.intValue());  // prevent too much repeated execution of the same action (e.g. typing with different texts)		
-		}*/
-		//prueba ferpasri
-		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-			pw.println();
-			pw.print("Reward For Action: "+action.toString());
-			if(actionWCount[0] == 0) pw.println(" with actionCount[0]==0");
-			else { pw.println(" with actionCount[0]:"+ actionWCount[0]);
-			}
-			pw.println("ActionReward: "+actionReward);
-			pw.println();
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}// fin prueba ferpasri
 
 		return actionReward;
 	}
@@ -248,24 +180,19 @@ public class RefactorQLearningWalker implements IWalker{
 	 */
 	protected double calculateRewardForState(IEnvironment env, IGraphState state, Set<Action> availableActions){
 		if (state == null || !env.stateAtGraph(state)) {
-			//prueba ferpasri
-			try {
-				PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-				pw.println("------------------------------------------------------------------------------------------------------------------------");
-				pw.println("Refactor QLearning ---> Calculate Reward For State");
-				pw.println("state == null ");
-				pw.println();
-				pw.println();
-				pw.println();
-				pw.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}// fin prueba ferpasri
 			return getMaxReward();}   //We never walk to state'
-	
+
+		IGraphAction ga;
+		IGraphAction maxRewardAction;
+		double actionQ = 0.0;
+		double q = 0.0;
+		
 		//Unexplored size actions' from state'
 		int unx = state.getUnexploredActionsSize();
+		
+		//If exist minimum one action at state' not executed, q value it's minimum maxReward. 
+		if(unx>0) q = maxReward;
+		
 		//String with all unexplored AbstractID actions' from state'
 		String unxActions = state.getUnexploredActionsString();
 		
@@ -273,77 +200,21 @@ public class RefactorQLearningWalker implements IWalker{
 		
 		//We check the available Actions of graph enviroment of state'
 		for(Action a: availableActions) {
-			String id = a.get(Tags.AbstractID);
-			if (unxActions.contains(id)) { //if one of this available Actions its an unexplored action' from state'
-				stateActions.add(a);		//save this action'
-				unxActions = unxActions.replaceAll(a.get(Tags.AbstractID), "");//remove AbstractID because exists at graph enviroment
-				}
-			else { //check if its an explored action' of state'
-				Set<String> idstates = env.get(a).getTargetStateIDs();
-				if(idstates.contains(state.getConcreteID())) {
-					stateActions.add(a);
-				}				
-			}
+			String id = a.get(Tags.ConcreteID);
+			//check if its an explored action' of state'
+			Set<String> idstates = env.get(a).getTargetStateIDs();
+			if(idstates.contains(state.getConcreteID())) {
+				stateActions.add(a);
+			}				
 		}
 		
-		IGraphAction ga;
-		IGraphAction maxRewardAction;
-		double actionQ = 0.0;
-		double q = 0.0;
-		
-		//if exists one or more actions' at state' not executed at graph enviroment
-		if (unxActions.contains("AA")) {
-			if(unxActions.contains(",")) {
-				int startindex = unxActions.indexOf("AA");
-				int endindex = unxActions.indexOf(",");
-				String idAction = unxActions.substring(startindex, endindex);
-				qValues.put(idAction, maxReward);
-				unxActions = unxActions.replaceAll(idAction, "");
-			}
-			else {
-				int startindex = unxActions.indexOf("AA");
-				String idAction = unxActions.substring(startindex);
-				qValues.put(idAction, maxReward);
-			}
-			
-		//	MaxRew = getMaxReward();	//this move its a max reward action'
-			q = maxReward;
-		}
-		
-		//prueba ferpasri
-		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-			pw.println("Reward For State with "+unx+ " Unexplored actions size");
-			pw.println("Actions unexplored id: " +state.getUnexploredActionsString() );
-			/*if(stateActions != null) { 
-				for (Action a : stateActions)pw.println("Actions futura " + a.get(Tags.AbstractID)+" "+a.get(Tags.ConcreteID));}*/
-			if (unxActions.contains("AA")) pw.println("One of this actions of state' is not executed at graph"); //pw.println("Existe action AA en state' no ejecutada en graph");
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}// fin prueba ferpasri
-		
-		
-		
-		/*if(stateActions != null && !unxActions.contains("AA")) { 
-			for (Action a : stateActions) {
-				ga = env.get(a);
-				q = calculateRewardForAction(env, ga);
-				if(q > MaxRew) {
-					MaxRew = q;
-					maxRewardAction = ga;
-					}
-			}
-		}*/
-		
-		//Now we check the maxReward Action of state'
+		//Now we check the Actions q-values of state'
 		Map <String, Double> qVrew = getQvalues();
 		
 		if(stateActions != null) {
 			for (Action a : stateActions) {
-				if(qVrew.containsKey(a.get(Tags.AbstractID))){
-					actionQ = qVrew.get(a.get(Tags.AbstractID));
+				if(qVrew.containsKey(a.get(Tags.ConcreteID))){
+					actionQ = qVrew.get(a.get(Tags.ConcreteID));
 				}
 				if(actionQ > q)
 					q = actionQ;
@@ -356,62 +227,20 @@ public class RefactorQLearningWalker implements IWalker{
 
 	@Override
 	public Action selectProportional(IEnvironment env, State state, Set<Action> actions) {
-		//Create a map to asociate action with values for one iteration
-		//Map<Action,Double> rewards = new HashMap<Action,Double>();
-
-		//prueba ferpasri
-		try {
-			PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-			pw.println("Number of actions performed: "+getNumberAction());
-			pw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}// fin prueba ferpasri
 
 		IGraphAction ga;
 		IGraphState[] targetStates;
 		double sum = .0, rew, trew;
 		for (Action a : actions){
 			ga = env.get(a);
-			//prueba ferpasri
-			try {
-				PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-				pw.println();
-				pw.println("******Possible Action: "+a.get(Tags.ConcreteID)+" "+a.get(Tags.AbstractID));
-				pw.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}// fin prueba ferpasri
 			trew = .0;
 			targetStates = env.getTargetStates(ga);
 			if (targetStates != null){
 				for (IGraphState gs : targetStates) { // ¿Can we have more than 1 target state from 1 action?
-					//prueba ferpasri
-					try {
-						PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-						pw.println("---------TargetState: "+ gs.getConcreteID());
-						pw.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}// fin prueba ferpasri
 					trew += this.calculateRewardForState(env, gs, actions);};
 					trew = trew * discount; // gamma * max a V(s',a)
 			}
 			rew = getLearningRead()*(this.calculateRewardForAction(env, ga) + trew);
-
-			//prueba ferpasri
-			try {
-				PrintWriter pw = new PrintWriter(new FileWriter("C:/Users/testar/Desktop/TrazaAlgoritmos.txt",true));
-				pw.println("Select Proportional: Reward "+rew + "    Action: "+ga.getDetailedName()+ " "+ga.toString());
-				pw.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}// fin prueba ferpasri
-
 
 			putQvalue(a, rew); // We add or update qValue for action
 			
@@ -422,17 +251,14 @@ public class RefactorQLearningWalker implements IWalker{
 		Map <Action, Double> rewards = new HashMap<Action,Double>();
 		Map <String, Double> qVrew = getQvalues();
 		
-		//for (Map.Entry <Action,Double> entry: rewards.entrySet()){
 		for(Action a : actions) {
-			if(qVrew.containsKey(a.get(Tags.AbstractID))){
-				rewards.put(a, qVrew.get(a.get(Tags.AbstractID)));
+			if(qVrew.containsKey(a.get(Tags.ConcreteID))){
+				rewards.put(a, qVrew.get(a.get(Tags.ConcreteID)));
 			}
 			else {
 				rewards.put(a, maxReward);
-				//putQvalue(a, maxReward);
 			}
 		}
-		//return selectMax(rewards);
 		
 		// select proportional
 		// e-greedy
@@ -458,7 +284,7 @@ public class RefactorQLearningWalker implements IWalker{
 		}
 
 	}
-
+	//greedy
 	private Action selectMax(Map<Action,Double> rewards){
 		double maxDesirability = 0.0;
 		double q;

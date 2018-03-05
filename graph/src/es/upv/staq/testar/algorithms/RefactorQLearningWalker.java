@@ -25,8 +25,6 @@ import es.upv.staq.testar.graph.Movement;
 import es.upv.staq.testar.graph.WalkStopper;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
 
-
-// New QLearning class based on AbstractWalker & QLearningWalker, in development and testing by Salmi & ferpasri
 public class RefactorQLearningWalker implements IWalker{
 
 	protected double maxReward;
@@ -43,7 +41,7 @@ public class RefactorQLearningWalker implements IWalker{
 	private Map<String,Double> qValues = new HashMap<String,Double>();
 	
 	public void putQvalue(Action a, Double d) {
-		String id = a.get(Tags.AbstractID);
+		String id = a.get(Tags.ConcreteID);
 		
 		qValues.put(id, d);	
 	}
@@ -72,6 +70,13 @@ public class RefactorQLearningWalker implements IWalker{
 	
 	public boolean getEgreedy() {
 		return this.egreedy;
+	}
+	public int getNumberAction(){
+		return this.numberAction;
+	}
+	
+	public void addNumberAction(){
+		this.numberAction++;
 	}
 
 	@Override
@@ -136,7 +141,7 @@ public class RefactorQLearningWalker implements IWalker{
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
 		Grapher.syncMovements(); // synchronize graph movements consumption for up to date rewards and states/actions exploration
 		Action aprueba = selectProportional(env, state, actions);
-
+		
 		return aprueba;// selectProportional(env, state, actions);
 	}
 
@@ -163,15 +168,6 @@ public class RefactorQLearningWalker implements IWalker{
 			actionReward = getMaxReward(); // ¿same as not executed? ¿1.0 or max Reward?
 		else
 			actionReward = 1.0d / (actionWCount[0] + 1); // 1.0 / nº of times we have  executed this action
-		/*actionReward = 1.0d / ( actionWCount[0] * // action count (concrete)
-									Math.log(actionWCount[1] + Math.E - 1)); // action type count (abstract)*/
-
-		/*IGraphState gs = env.getSourceState(action);
-		if (gs != null){
-			Integer tc = gs.getStateWidgetsExecCount().get(action.getTargetWidgetID());
-			if (tc != null)
-				actionReward /= Math.pow(2, tc.intValue());  // prevent too much repeated execution of the same action (e.g. typing with different texts)		
-		}*/
 
 		return actionReward;
 	}
@@ -185,9 +181,17 @@ public class RefactorQLearningWalker implements IWalker{
 	protected double calculateRewardForState(IEnvironment env, IGraphState state, Set<Action> availableActions){
 		if (state == null || !env.stateAtGraph(state)) {
 			return getMaxReward();}   //We never walk to state'
-	
+
+		IGraphAction ga;
+		IGraphAction maxRewardAction;
+		double actionQ = 0.0;
+		double q = 0.0;
+		
 		//Unexplored size actions' from state'
 		int unx = state.getUnexploredActionsSize();
+		
+		//If exist minimum one action at state' not executed, q value it's minimum maxReward. 
+		if(unx>0) q = maxReward;
 		
 		//String with all unexplored AbstractID actions' from state'
 		String unxActions = state.getUnexploredActionsString();
@@ -196,50 +200,21 @@ public class RefactorQLearningWalker implements IWalker{
 		
 		//We check the available Actions of graph enviroment of state'
 		for(Action a: availableActions) {
-			String id = a.get(Tags.AbstractID);
-			if (unxActions.contains(id)) { //if one of this available Actions its an unexplored action' from state'
-				stateActions.add(a);		//save this action'
-				unxActions = unxActions.replaceAll(a.get(Tags.AbstractID), "");//remove AbstractID because exists at graph enviroment
-				}
-			else { //check if its an explored action' of state'
-				Set<String> idstates = env.get(a).getTargetStateIDs();
-				if(idstates.contains(state.getConcreteID())) {
-					stateActions.add(a);
-				}				
-			}
+			String id = a.get(Tags.ConcreteID);
+			//check if its an explored action' of state'
+			Set<String> idstates = env.get(a).getTargetStateIDs();
+			if(idstates.contains(state.getConcreteID())) {
+				stateActions.add(a);
+			}				
 		}
 		
-		IGraphAction ga;
-		IGraphAction maxRewardAction;
-		double actionQ = 0.0;
-		double q = 0.0;
-		
-		//if exists one or more actions' at state' not executed at graph enviroment
-		if (unxActions.contains("AA")) {
-			if(unxActions.contains(",")) {
-				int startindex = unxActions.indexOf("AA");
-				int endindex = unxActions.indexOf(",");
-				String idAction = unxActions.substring(startindex, endindex);
-				qValues.put(idAction, maxReward);
-				unxActions = unxActions.replaceAll(idAction, "");
-			}
-			else {
-				int startindex = unxActions.indexOf("AA");
-				String idAction = unxActions.substring(startindex);
-				qValues.put(idAction, maxReward);
-			}
-			
-			q = maxReward;
-		}
-		
-		
-		//Now we check the maxReward Action of state'
+		//Now we check the Actions q-values of state'
 		Map <String, Double> qVrew = getQvalues();
 		
 		if(stateActions != null) {
 			for (Action a : stateActions) {
-				if(qVrew.containsKey(a.get(Tags.AbstractID))){
-					actionQ = qVrew.get(a.get(Tags.AbstractID));
+				if(qVrew.containsKey(a.get(Tags.ConcreteID))){
+					actionQ = qVrew.get(a.get(Tags.ConcreteID));
 				}
 				if(actionQ > q)
 					q = actionQ;
@@ -263,10 +238,9 @@ public class RefactorQLearningWalker implements IWalker{
 			if (targetStates != null){
 				for (IGraphState gs : targetStates) { // ¿Can we have more than 1 target state from 1 action?
 					trew += this.calculateRewardForState(env, gs, actions);};
-					trew = trew * discount;
+					trew = trew * discount; // gamma * max a V(s',a)
 			}
 			rew = getLearningRead()*(this.calculateRewardForAction(env, ga) + trew);
-
 
 			putQvalue(a, rew); // We add or update qValue for action
 			
@@ -277,10 +251,9 @@ public class RefactorQLearningWalker implements IWalker{
 		Map <Action, Double> rewards = new HashMap<Action,Double>();
 		Map <String, Double> qVrew = getQvalues();
 		
-		//for (Map.Entry <Action,Double> entry: rewards.entrySet()){
 		for(Action a : actions) {
-			if(qVrew.containsKey(a.get(Tags.AbstractID))){
-				rewards.put(a, qVrew.get(a.get(Tags.AbstractID)));
+			if(qVrew.containsKey(a.get(Tags.ConcreteID))){
+				rewards.put(a, qVrew.get(a.get(Tags.ConcreteID)));
 			}
 			else {
 				rewards.put(a, maxReward);
@@ -288,7 +261,7 @@ public class RefactorQLearningWalker implements IWalker{
 		}
 		
 		// select proportional
-		// e-greedy??
+		// e-greedy
 		if(getEgreedy()) {
 			double r = sum * (new Random(System.currentTimeMillis()).nextDouble());
 			double frac = 0.0, q;
@@ -311,7 +284,7 @@ public class RefactorQLearningWalker implements IWalker{
 		}
 
 	}
-
+	//greedy
 	private Action selectMax(Map<Action,Double> rewards){
 		double maxDesirability = 0.0;
 		double q;
