@@ -242,6 +242,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# starts the SUT.\n"
 					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
 					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
+					+"# Chrome: web_browser_path --force-renderer-accessibility SUT_URL.\n"
 					+"#\n"
 					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
 					+"# in the SUT main window. The SUT must be manually started and closed.\n"
