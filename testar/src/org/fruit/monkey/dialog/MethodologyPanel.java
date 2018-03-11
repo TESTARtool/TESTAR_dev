@@ -10,18 +10,20 @@ import java.io.IOException;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 
 public class MethodologyPanel extends JPanel {
-  private JLabel testarLogo = getLogo("/icons/info/methodology.jpg");
+  private JLabel methodologyLogo = getLogo("/icons/info/methodology.jpg");
 
   public MethodologyPanel () throws IOException {
     setBackground(Color.WHITE);
-
+    
+    add(methodologyLogo);
+    /*
     GroupLayout aboutPanelLayout = new GroupLayout(this);
     setLayout(aboutPanelLayout);
     aboutPanelLayout.setHorizontalGroup(
         aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(aboutPanelLayout.createSequentialGroup()
                  .addContainerGap()
-            	 .addComponent(testarLogo, PREFERRED_SIZE, 500, PREFERRED_SIZE)
+            	 .addComponent(methodologyLogo, PREFERRED_SIZE, 500, PREFERRED_SIZE)
                  .addContainerGap()
             )
     );
@@ -29,10 +31,11 @@ public class MethodologyPanel extends JPanel {
         aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
             .addGroup(aboutPanelLayout.createSequentialGroup()
             	.addContainerGap()	
-                .addComponent(testarLogo, PREFERRED_SIZE,500, PREFERRED_SIZE)
+                .addComponent(methodologyLogo, PREFERRED_SIZE,500, PREFERRED_SIZE)
                 .addContainerGap()               
                 )
     );
+    */
   }
 
   private JLabel getLogo (String iconPath) throws IOException{

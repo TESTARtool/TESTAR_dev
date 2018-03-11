@@ -96,8 +96,9 @@ public class SettingsDialog extends JFrame implements Observer {
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+   
     this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
-
+    
     ToolTipManager.sharedInstance().setDismissDelay(25000);
     ToolTipManager.sharedInstance().setInitialDelay(100);
     initComponents();
@@ -125,9 +126,8 @@ public class SettingsDialog extends JFrame implements Observer {
 
   public static Image loadIcon(String path) throws IOException {
 	  System.out.println("SettingsDialog: path = "+path);
-	  File file = new File(path);
-	  
-	  System.exit(0);
+	  Image img = ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
+	  System.out.println("Settingsdialog "+ img);
     return ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
   }
 
@@ -235,7 +235,7 @@ public class SettingsDialog extends JFrame implements Observer {
     btnView = getBtnView();
 
     JTabbedPane jTabsPane = new JTabbedPane();
-    jTabsPane.addTab("About", new AboutPanel());
+ //   jTabsPane.addTab("About", new AboutPanel());
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
     walkerPanel = new WalkerPanel();
