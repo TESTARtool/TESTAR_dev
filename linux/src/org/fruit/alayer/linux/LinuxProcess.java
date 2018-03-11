@@ -812,7 +812,6 @@ public class LinuxProcess extends SUTBase {
      * Most likely adds new tags to instances of this class.
      * @return A new set of tags to be added to instances of this class.
      */
-    @SuppressWarnings("Duplicates")
     protected Set<Tag<?>> tagDomain(){
         Set<Tag<?>> ret = Util.newHashSet();
         ret.add(Tags.StandardKeyboard);

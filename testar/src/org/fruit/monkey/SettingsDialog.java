@@ -77,6 +77,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private GraphDBPanel graphDBPanel;
+  private MethodologyPanel methodologyPanel;
 
   /**
    * Starts the settings Dialog.
@@ -123,6 +124,10 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   public static Image loadIcon(String path) throws IOException {
+	  System.out.println("SettingsDialog: path = "+path);
+	  File file = new File(path);
+	  
+	  System.exit(0);
     return ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
   }
 
@@ -245,7 +250,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
-
+    methodologyPanel = new MethodologyPanel();
+    jTabsPane.addTab("Methodology", methodologyPanel);
     setLayout(jTabsPane);
     pack();
     setCentreScreen();

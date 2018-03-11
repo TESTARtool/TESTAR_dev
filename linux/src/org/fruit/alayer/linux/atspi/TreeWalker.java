@@ -1,7 +1,6 @@
 package org.fruit.alayer.linux.atspi;
 
 
-import org.fruit.alayer.linux.AtSpiState;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.atspi.enums.AtSpiStateTypes;
 import org.fruit.alayer.linux.util.xdotools;

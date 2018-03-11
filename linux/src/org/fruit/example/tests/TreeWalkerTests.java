@@ -3,7 +3,6 @@ package org.fruit.example.tests;
 
 import org.fruit.alayer.linux.LinuxProcess;
 import org.fruit.alayer.linux.atspi.AtSpiAccessible;
-import org.fruit.alayer.linux.atspi.AtSpiRelation;
 import org.fruit.alayer.linux.atspi.TreeWalker;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.util.xdotools;

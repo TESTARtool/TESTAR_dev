@@ -190,7 +190,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick The scroller thickness.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
+    
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
 
@@ -304,7 +304,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param tab The TAB string to use - to be able to define different spacings most likely.
      * @return Returns a string representation for the widget.
      */
-    @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
     private String getPropertiesRepresentation(String tab){
 
 
@@ -352,7 +351,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick Size of the scroll thumb.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
+    
     private Drag[] getDrags(Shape shape, boolean scrollOrientation, double viewSize, double scrollPercent,
                             double scrollArrowSize, double scrollThick) {
 
@@ -411,7 +410,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param fragment The length two drag points will be apart.
      * @return Returns relative points.
      */
-    @SuppressWarnings("Duplicates")
+   
     private double[] calculateScrollDragPoints(int dragC, double fixedPoint, double fragment) {
 
 
@@ -593,8 +592,6 @@ public class AtSpiWidget implements Widget, Serializable {
             AtSpiWidget target = self;
             Tag<?> next;
 
-
-            @SuppressWarnings("Duplicates")
             private Tag<?> fetchNext(){
                 if(next == null){
                     while(i.hasNext()){

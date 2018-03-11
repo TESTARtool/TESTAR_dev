@@ -67,7 +67,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
   // If we encounter a login URL, determine the 'login button'and force click
   private static String loginTitle = "inloggen"; // lower case
-  private static String loginUrl = "https://login.awo.ou.nl/sso/login";
+  private static String loginUrl = "https://mijn.awo.ou.nl";
   // Go back once we encounter certain files
   private static String[] deniedExtensions = new String[]{"pdf"};
   // If set to NULL, only the sut connector domain will be used

@@ -227,18 +227,21 @@ public class Main {
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // end by urueda
-
+   
     try {
       settings = loadSettings(args, testSettings);
       overrideWithUserProperties(settings); // by urueda
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+     
       if (SST != null) {
         System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
       }
-
+      
+      // This will start up the Testar Screen
       if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
         if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
           return;
+        
         }
       }
 
@@ -264,6 +267,7 @@ public class Main {
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
       List<String> cp = settings.get(MyClassPath);
+     
       URL[] classPath = new URL[cp.size()];
       for (int i = 0; i < cp.size(); i++) {
         classPath[i] = new File(cp.get(i)).toURI().toURL();
@@ -271,6 +275,8 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
+      System.out.println("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'");
+      
       String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
@@ -278,6 +284,7 @@ public class Main {
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
       //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
+      System.out.println("Monkey protocol loaded!");
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
 
       //logln("Starting monkey protocol ...", Main.LogLevel.Debug);

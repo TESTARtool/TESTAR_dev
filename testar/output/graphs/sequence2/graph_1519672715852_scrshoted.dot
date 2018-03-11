@@ -1,0 +1,204 @@
+digraph TESTAR {
+rankdir=LR;
+ENTRY [shape=point, height=0.3, style=solid, color=black];
+node [fixedsize=false, shape=rect, style=solid, color=black, fontcolor=black, height=0.8];
+SC16a06486532979378113 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16a06486532979378113.png"/></TD></TR><TR><TD>SC16a06486532979378113 (3)</TD></TR></TABLE>>, penwidth=3, style=solid, color=black];
+SC1ax8r5f1941954200481 [label="SC1ax8r5f1941954200481 (6)", style=dotted, color=blue];
+SC1376p7i29c1036021252 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1376p7i29c1036021252.png"/></TD></TR><TR><TD>SC1376p7i29c1036021252 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SCxk8s322c43160729738 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCxk8s322c43160729738.png"/></TD></TR><TR><TD>SCxk8s322c43160729738 (6)</TD></TR></TABLE>>, style=solid, color=blue];
+SCo5unjo2d53497587727 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCo5unjo2d53497587727.png"/></TD></TR><TR><TD>SCo5unjo2d53497587727 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC1oj9p2r25b1352208433 [label="SC1oj9p2r25b1352208433 (1)", style=dotted, color=grey];
+SC1jx3f9b1a53745924133 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1jx3f9b1a53745924133.png"/></TD></TR><TR><TD>SC1jx3f9b1a53745924133 (2)</TD></TR></TABLE>>, penwidth=3, style=solid, color=black];
+SCa3vb1a17e2205435146 [label="SCa3vb1a17e2205435146 (26)", style=dotted, color=yellow];
+SC000 [label="SC000 (1)", style=dotted, color=grey];
+SC15wc6q463c1197581658 [label="SC15wc6q463c1197581658 (1)", style=dotted, color=grey];
+SCim79is2984273594855 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCim79is2984273594855.png"/></TD></TR><TR><TD>SCim79is2984273594855 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC1mpc1em1e72726401042 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1mpc1em1e72726401042.png"/></TD></TR><TR><TD>SC1mpc1em1e72726401042 (2)</TD></TR></TABLE>>, penwidth=3, style=solid, color=black];
+SCzqkd2u1e83083150591 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCzqkd2u1e83083150591.png"/></TD></TR><TR><TD>SCzqkd2u1e83083150591 (5)</TD></TR></TABLE>>, penwidth=3, style=solid, color=blue];
+SC1ua31da1952110342658 [label="SC1ua31da1952110342658 (3)", style=dotted, color=black];
+SC1xwgshe2481821025580 [label="SC1xwgshe2481821025580 (1)", style=dotted, color=grey];
+SC1bs1tmj1e54257258352 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1bs1tmj1e54257258352.png"/></TD></TR><TR><TD>SC1bs1tmj1e54257258352 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC1wu54st2223690325725 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1wu54st2223690325725.png"/></TD></TR><TR><TD>SC1wu54st2223690325725 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC1yrudbh493697925435 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435.png"/></TD></TR><TR><TD>SC1yrudbh493697925435 (15)</TD></TR></TABLE>>, penwidth=3, style=solid, color=green];
+SC11h08fh4562958079469 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC11h08fh4562958079469.png"/></TD></TR><TR><TD>SC11h08fh4562958079469 (5)</TD></TR></TABLE>>, style=solid, color=blue];
+SCmg2kbe2753484254519 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCmg2kbe2753484254519.png"/></TD></TR><TR><TD>SCmg2kbe2753484254519 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC16wpr4324e3492576819 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16wpr4324e3492576819.png"/></TD></TR><TR><TD>SC16wpr4324e3492576819 (2)</TD></TR></TABLE>>, style=solid, color=black];
+SC1aq74i61a6129464804 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804.png"/></TD></TR><TR><TD>SC1aq74i61a6129464804 (9)</TD></TR></TABLE>>, penwidth=3, style=solid, color=blue];
+SC1jwvpfa287295060561 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1jwvpfa287295060561.png"/></TD></TR><TR><TD>SC1jwvpfa287295060561 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SCkrcn1w1d02920948761 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCkrcn1w1d02920948761.png"/></TD></TR><TR><TD>SCkrcn1w1d02920948761 (1)</TD></TR></TABLE>>, penwidth=3, style=solid, color=grey];
+SCravzl6223937935317 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCravzl6223937935317.png"/></TD></TR><TR><TD>SCravzl6223937935317 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SCkkd9365be959800205 [label="SCkkd9365be959800205 (5)", style=dotted, color=blue];
+SCsm0x4u194564459447 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCsm0x4u194564459447.png"/></TD></TR><TR><TD>SCsm0x4u194564459447 (1)</TD></TR></TABLE>>, penwidth=3, style=solid, color=grey];
+SCoidwrr28b380874364 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCoidwrr28b380874364.png"/></TD></TR><TR><TD>SCoidwrr28b380874364 (1)</TD></TR></TABLE>>, penwidth=3, style=solid, color=grey];
+SCh65xcm5c01124955154 [label="SCh65xcm5c01124955154 (18)", style=dotted, color=green];
+SCgzc7da156971168975 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCgzc7da156971168975.png"/></TD></TR><TR><TD>SCgzc7da156971168975 (14)</TD></TR></TABLE>>, penwidth=3, style=diagonals, color=green];
+SC13ijc901573865638090 [label="SC13ijc901573865638090 (21)", style=dotted, color=green];
+SC1erd1q2288548619718 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1erd1q2288548619718.png"/></TD></TR><TR><TD>SC1erd1q2288548619718 (4)</TD></TR></TABLE>>, style=solid, color=black];
+SC6rnatm2381950555453 [label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC6rnatm2381950555453.png"/></TD></TR><TR><TD>SC6rnatm2381950555453 (1)</TD></TR></TABLE>>, style=solid, color=grey];
+SC1h6wqjd193605388731 [label="SC1h6wqjd193605388731 (1)", style=dotted, color=grey];
+PASS [fixedsize=false, shape=doublecircle, style=filled, color=green, fontcolor=black, height=0.8];
+node [fixedsize=false, shape=ellipse, style=dashed, color=pink, fontcolor=pink, height=0.8];
+SC16a06486532979378113 -> u1 [color=pink, fontcolor=red, label="unexplored(8)", style=dashed];
+SC1ax8r5f1941954200481 -> u2 [color=pink, fontcolor=red, label="unexplored(1)", style=dashed];
+SC1376p7i29c1036021252 -> u3 [color=pink, fontcolor=red, label="unexplored(9)", style=dashed];
+SCxk8s322c43160729738 -> u4 [color=pink, fontcolor=red, label="unexplored(3)", style=dashed];
+SCo5unjo2d53497587727 -> u5 [color=pink, fontcolor=red, label="unexplored(7)", style=dashed];
+SC1oj9p2r25b1352208433 -> u6 [color=pink, fontcolor=red, label="unexplored(1)", style=dashed];
+SC1jx3f9b1a53745924133 -> u7 [color=pink, fontcolor=red, label="unexplored(6)", style=dashed];
+SCim79is2984273594855 -> u11 [color=pink, fontcolor=red, label="unexplored(7)", style=dashed];
+SCzqkd2u1e83083150591 -> u13 [color=pink, fontcolor=red, label="unexplored(3)", style=dashed];
+SC1ua31da1952110342658 -> u14 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SC1xwgshe2481821025580 -> u15 [color=pink, fontcolor=red, label="unexplored(6)", style=dashed];
+SC1bs1tmj1e54257258352 -> u16 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SC1wu54st2223690325725 -> u17 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SC1yrudbh493697925435 -> u18 [color=pink, fontcolor=red, label="unexplored(8)", style=dashed];
+SC11h08fh4562958079469 -> u19 [color=pink, fontcolor=red, label="unexplored(12)", style=dashed];
+SC16wpr4324e3492576819 -> u21 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SC1aq74i61a6129464804 -> u22 [color=pink, fontcolor=red, label="unexplored(3)", style=dashed];
+SC1jwvpfa287295060561 -> u23 [color=pink, fontcolor=red, label="unexplored(5)", style=dashed];
+SCravzl6223937935317 -> u25 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SCkkd9365be959800205 -> u26 [color=pink, fontcolor=red, label="unexplored(47)", style=dashed];
+SCsm0x4u194564459447 -> u27 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SCoidwrr28b380874364 -> u28 [color=pink, fontcolor=red, label="unexplored(3)", style=dashed];
+SCh65xcm5c01124955154 -> u30 [color=pink, fontcolor=red, label="unexplored(41)", style=dashed];
+SCgzc7da156971168975 -> u31 [color=pink, fontcolor=red, label="unexplored(8)", style=dashed];
+SC13ijc901573865638090 -> u32 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+SC1erd1q2288548619718 -> u33 [color=pink, fontcolor=red, label="unexplored(3)", style=dashed];
+SC1h6wqjd193605388731 -> u35 [color=pink, fontcolor=red, label="unexplored(2)", style=dashed];
+node [fixedsize=false, shape=rect, style=solid, color=black, fontcolor=black, height=0.8];
+SCxk8s322c43160729738 -> SCxk8s322c43160729738 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCxk8s322c43160729738_AC15iwwhl7f1059491531.png"/></TD></TR><TR><TD>G_AA15iwwhl7f1059491531[97]<br/>[98][99] (3) </TD></TR></TABLE>>];
+SC16a06486532979378113 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16a06486532979378113_AC1g3cthm803409901425.png"/></TD></TR><TR><TD>AC1g3cthm803409901425 [117]<br/> (1) </TD></TR></TABLE>>];
+SC1376p7i29c1036021252 -> SC1jwvpfa287295060561 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1376p7i29c1036021252_ACaqi8r480744808974.png"/></TD></TR><TR><TD>ACaqi8r480744808974 [77]<br/> (1) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_ACkkli7d7f169807940.png"/></TD></TR><TR><TD>G_AAkkli7d7f169807940[109]<br/>[112] (2) </TD></TR></TABLE>>];
+SCa3vb1a17e2205435146 -> SCa3vb1a17e2205435146 [color=green, style=dotted, label="G_AA1guexrh7e2336649823[27]
+ (13) "];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC1uzsnaw3932712996645 [20]
+ (1) "];
+SC1aq74i61a6129464804 -> SC1376p7i29c1036021252 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_AC1j6bsnh7d1945437015.png"/></TD></TR><TR><TD>G_AA1j6bsnh7d1945437015[76]<br/> (2) </TD></TR></TABLE>>];
+SC1aq74i61a6129464804 -> SCim79is2984273594855 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_AC1j6bsnh7d1945437015.png"/></TD></TR><TR><TD>G_AA1j6bsnh7d1945437015[67]<br/> (2) </TD></TR></TABLE>>];
+SC1jx3f9b1a53745924133 -> SC1jx3f9b1a53745924133 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1jx3f9b1a53745924133_ACz7gqfy3971093193023.png"/></TD></TR><TR><TD>ACz7gqfy3971093193023 [57]<br/> (1) </TD></TR></TABLE>>];
+SCh65xcm5c01124955154 -> SCkkd9365be959800205 [color=grey, style=dotted, label="ACfahylgb74040439566 [21]
+ (1) "];
+SCzqkd2u1e83083150591 -> SCzqkd2u1e83083150591 [color=grey, style=solid, label="AC1nx571t381105239083 [87]
+ (1) "];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=black, style=dotted, label="G_AAfzw9yr7f1346691407[13]
+ (2) "];
+SCsm0x4u194564459447 -> SC1jx3f9b1a53745924133 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCsm0x4u194564459447_ACykawdu7e3128883466.png"/></TD></TR><TR><TD>ACykawdu7e3128883466 [56]<br/> (1) </TD></TR></TABLE>>];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC1fpnwxl7f965689073 [18]
+ (1) "];
+SC1jx3f9b1a53745924133 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1jx3f9b1a53745924133_ACm19qub801858983134.png"/></TD></TR><TR><TD>ACm19qub801858983134 [58]<br/> (1) </TD></TR></TABLE>>];
+SCzqkd2u1e83083150591 -> SC1wu54st2223690325725 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCzqkd2u1e83083150591_AC6xgzto7e3342525217.png"/></TD></TR><TR><TD>AC6xgzto7e3342525217 [88]<br/> (1) </TD></TR></TABLE>>];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC1rxcs9b7f1987987221 [14]
+ (1) "];
+SCoidwrr28b380874364 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCoidwrr28b380874364_AC1y8m02g7d2922007441.png"/></TD></TR><TR><TD>AC1y8m02g7d2922007441 [102]<br/> (1) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_AC1kt9hna7e3280274653.png"/></TD></TR><TR><TD>AC1kt9hna7e3280274653 [113]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SCa3vb1a17e2205435146 [color=black, style=dotted, label="G_AAfjibwf7f3627200122[26]
+ (2) "];
+SC11h08fh4562958079469 -> SC11h08fh4562958079469 [color=grey, style=solid, label="AC1dp8mrt393429450072 [73]
+ (1) "];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_AC1ws1umk38d2146001003.png"/></TD></TR><TR><TD>G_AA1m2xfaa2694250618636[103]<br/>[104] (2) </TD></TR></TABLE>>];
+SC1aq74i61a6129464804 -> SC1bs1tmj1e54257258352 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_AC1ly4pj37e1432144692.png"/></TD></TR><TR><TD>AC1ly4pj37e1432144692 [59]<br/> (1) </TD></TR></TABLE>>];
+SCmg2kbe2753484254519 -> SCzqkd2u1e83083150591 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCmg2kbe2753484254519_ACfrx0u3801992411816.png"/></TD></TR><TR><TD>ACfrx0u3801992411816 [92]<br/> (1) </TD></TR></TABLE>>];
+SC1aq74i61a6129464804 -> SC16wpr4324e3492576819 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_ACk1winh7d3429720003.png"/></TD></TR><TR><TD>G_AAk1winh7d3429720003[64]<br/>[69] (2) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_ACoaqzn7391742701953.png"/></TD></TR><TR><TD>G_AAk8p2jt269631807884[105]<br/>[106] (2) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC11015yt611391369530 [48]
+ (1) "];
+SC1erd1q2288548619718 -> SC1erd1q2288548619718 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1erd1q2288548619718_AC1cu56007f2779349028.png"/></TD></TR><TR><TD>G_AA1cu56007f2779349028[79]<br/>[81] (2) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> PASS [color=grey, style=solid, label="STOP  (1) "];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="ACzv1j047e2164872059 [4]
+ (1) "];
+SCo5unjo2d53497587727 -> SCxk8s322c43160729738 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCo5unjo2d53497587727_ACpidysa7f3765132523.png"/></TD></TR><TR><TD>ACpidysa7f3765132523 [94]<br/> (1) </TD></TR></TABLE>>];
+SC1aq74i61a6129464804 -> SC1aq74i61a6129464804 [color=grey, style=solid, label="AC1wq8ys4383353297081 [61]
+ (1) "];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="AC1pavsq47d150250383 [6]
+ (1) "];
+SC1aq74i61a6129464804 -> SCkrcn1w1d02920948761 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_AC1ps3o787e1051742373.png"/></TD></TR><TR><TD>AC1ps3o787e1051742373 [83]<br/> (1) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_AC1sjl9847f2863761044.png"/></TD></TR><TR><TD>AC1sjl9847f2863761044 [108]<br/> (1) </TD></TR></TABLE>>];
+SCkkd9365be959800205 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC1i792z67e1510459334 [25]
+ (1) "];
+SCxk8s322c43160729738 -> SCxk8s322c43160729738 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCxk8s322c43160729738_ACzlc2ik7f2918230455.png"/></TD></TR><TR><TD>G_AAzlc2ik7f2918230455[95]<br/> (2) </TD></TR></TABLE>>];
+SCxk8s322c43160729738 -> SCzqkd2u1e83083150591 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCxk8s322c43160729738_ACzlc2ik7f2918230455.png"/></TD></TR><TR><TD>G_AAzlc2ik7f2918230455[100]<br/> (2) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_AC11widgg7e2853748931.png"/></TD></TR><TR><TD>G_AA11widgg7e2853748931[114]<br/>[115] (2) </TD></TR></TABLE>>];
+SCgzc7da156971168975 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC1nzdap7e1587384551 [8]
+ (1) "];
+SCzqkd2u1e83083150591 -> SCoidwrr28b380874364 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCzqkd2u1e83083150591_AC19wi84w7d2026623247.png"/></TD></TR><TR><TD>AC19wi84w7d2026623247 [101]<br/> (1) </TD></TR></TABLE>>];
+SC1jwvpfa287295060561 -> SC1erd1q2288548619718 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1jwvpfa287295060561_AC1jjo52j3933189588361.png"/></TD></TR><TR><TD>AC1jjo52j3933189588361 [78]<br/> (1) </TD></TR></TABLE>>];
+SC11h08fh4562958079469 -> SC11h08fh4562958079469 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC11h08fh4562958079469_AC5710qr7f210167935.png"/></TD></TR><TR><TD>AC5710qr7f210167935 [74]<br/> (1) </TD></TR></TABLE>>];
+SC1erd1q2288548619718 -> SC1erd1q2288548619718 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1erd1q2288548619718_AC1udi5p47f2397822200.png"/></TD></TR><TR><TD>AC1udi5p47f2397822200 [80]<br/> (1) </TD></TR></TABLE>>];
+SC15wc6q463c1197581658 -> SCkkd9365be959800205 [color=grey, style=dotted, label="AC678kol813385283000 [23]
+ (1) "];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="ACf651i67e450104390 [3]
+ (1) "];
+SC1yrudbh493697925435 -> SC16a06486532979378113 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_ACd1229d7f3880593589.png"/></TD></TR><TR><TD>G_AAd1229d7f3880593589[110]<br/> (2) </TD></TR></TABLE>>];
+SC1yrudbh493697925435 -> SC1yrudbh493697925435 [color=black, penwidth=3, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_ACd1229d7f3880593589.png"/></TD></TR><TR><TD>G_AAd1229d7f3880593589[107]<br/> (2) </TD></TR></TABLE>>];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AChiksd8b74272093217 [12]
+ (1) "];
+SCkkd9365be959800205 -> SC15wc6q463c1197581658 [color=grey, style=dotted, label="AC1llqf3o7e1336917696 [22]
+ (1) "];
+SC16wpr4324e3492576819 -> SC6rnatm2381950555453 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16wpr4324e3492576819_ACym9d8y7e1070426743.png"/></TD></TR><TR><TD>ACym9d8y7e1070426743 [65]<br/> (1) </TD></TR></TABLE>>];
+SCkrcn1w1d02920948761 -> SC1mpc1em1e72726401042 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCkrcn1w1d02920948761_AC1lc1og17e3008790986.png"/></TD></TR><TR><TD>AC1lc1og17e3008790986 [84]<br/> (1) </TD></TR></TABLE>>];
+SC6rnatm2381950555453 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC6rnatm2381950555453_AC1v9scvj801668585026.png"/></TD></TR><TR><TD>AC1v9scvj801668585026 [66]<br/> (1) </TD></TR></TABLE>>];
+SC1aq74i61a6129464804 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1aq74i61a6129464804_ACx1by4938f3046221830.png"/></TD></TR><TR><TD>ACx1by4938f3046221830 [62]<br/> (1) </TD></TR></TABLE>>];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="ACs8p7pu371335427685 [7]
+ (1) "];
+SC16wpr4324e3492576819 -> SC11h08fh4562958079469 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16wpr4324e3492576819_AC1kpv1q27f1995901276.png"/></TD></TR><TR><TD>AC1kpv1q27f1995901276 [70]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC1ax8r5f1941954200481 [color=black, style=dotted, label="G_AAbpjd8a7f3017684459[43]
+ (2) "];
+SC1oj9p2r25b1352208433 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC1et0ybp801147201089 [45]
+ (1) "];
+SCim79is2984273594855 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCim79is2984273594855_AC1e7qmxe7f425048058.png"/></TD></TR><TR><TD>AC1e7qmxe7f425048058 [68]<br/> (1) </TD></TR></TABLE>>];
+SC1ua31da1952110342658 -> SCh65xcm5c01124955154 [color=black, style=dotted, label="G_AA1gtb2e97f3007383780[11]
+ (2) "];
+SCzqkd2u1e83083150591 -> SCo5unjo2d53497587727 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCzqkd2u1e83083150591_AC9ztg5s7d3344141723.png"/></TD></TR><TR><TD>AC9ztg5s7d3344141723 [93]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC1xwgshe2481821025580 [color=black, style=dotted, label="G_AA5ke60i7e2455231768[46]
+ (2) "];
+SC1wu54st2223690325725 -> SCzqkd2u1e83083150591 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1wu54st2223690325725_ACxqq4vy7f2874639270.png"/></TD></TR><TR><TD>ACxqq4vy7f2874639270 [89]<br/> (1) </TD></TR></TABLE>>];
+SCravzl6223937935317 -> SCmg2kbe2753484254519 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCravzl6223937935317_AC86n3iv7d3283025643.png"/></TD></TR><TR><TD>AC86n3iv7d3283025643 [91]<br/> (1) </TD></TR></TABLE>>];
+SC16a06486532979378113 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16a06486532979378113_AC5lumwz802892238881.png"/></TD></TR><TR><TD>AC5lumwz802892238881 [119]<br/> (1) </TD></TR></TABLE>>];
+SC1ax8r5f1941954200481 -> SC1ax8r5f1941954200481 [color=black, style=dotted, label="G_AAg8pl357f2734204624[52]
+ (2) "];
+SCxk8s322c43160729738 -> SCxk8s322c43160729738 [color=grey, style=solid, label="AC5plx1160677404863 [96]
+ (1) "];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="AC13kif92392409482447 [2]
+ (1) "];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC6ytdpy7f3067810723 [16]
+ (1) "];
+SC1erd1q2288548619718 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1erd1q2288548619718_AC16wkc0z7f931112792.png"/></TD></TR><TR><TD>AC16wkc0z7f931112792 [82]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC13ijc901573865638090 [color=grey, style=dotted, label="ACjw415b39699314496 [9]
+ (1) "];
+SCzqkd2u1e83083150591 -> SCzqkd2u1e83083150591 [color=grey, style=solid, label="ACmv9gnr601480448511 [86]
+ (1) "];
+SCkkd9365be959800205 -> SCkkd9365be959800205 [color=grey, style=dotted, label="ACqfgzov7e4202682466 [24]
+ (1) "];
+SCgzc7da156971168975 -> SCgzc7da156971168975 [color=grey, style=dotted, label="AC15svhfc5f4006904826 [5]
+ (1) "];
+SC11h08fh4562958079469 -> SC11h08fh4562958079469 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC11h08fh4562958079469_AC660jeg3921074316558.png"/></TD></TR><TR><TD>AC660jeg3921074316558 [71]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC1ua31da1952110342658 [color=black, style=dotted, label="G_AA15yfpfq7e1771746661[10]
+ (3) "];
+SC11h08fh4562958079469 -> SC11h08fh4562958079469 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC11h08fh4562958079469_ACr2rwo7802460370876.png"/></TD></TR><TR><TD>ACr2rwo7802460370876 [72]<br/> (1) </TD></TR></TABLE>>];
+SCzqkd2u1e83083150591 -> SCravzl6223937935317 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCzqkd2u1e83083150591_AC1aduzl07d1017046502.png"/></TD></TR><TR><TD>AC1aduzl07d1017046502 [90]<br/> (1) </TD></TR></TABLE>>];
+SC13ijc901573865638090 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC15h2xzm7e768573836 [50]
+ (1) "];
+SC11h08fh4562958079469 -> SC1aq74i61a6129464804 [color=grey, style=solid, label="AC1ygy0a7613726965593 [75]
+ (1) "];
+SC1yrudbh493697925435 -> SC16a06486532979378113 [color=black, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1yrudbh493697925435_AC1ovzekr7f3768804169.png"/></TD></TR><TR><TD>G_AA1ovzekr7f3768804169[116]<br/>[118] (2) </TD></TR></TABLE>>];
+SCgzc7da156971168975 -> SCsm0x4u194564459447 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SCgzc7da156971168975_ACndo08q7e2725803346.png"/></TD></TR><TR><TD>ACndo08q7e2725803346 [55]<br/> (1) </TD></TR></TABLE>>];
+SC1mpc1em1e72726401042 -> SC1mpc1em1e72726401042 [color=grey, style=solid, label="AC14gzkp2613654416740 [85]
+ (1) "];
+SC1ax8r5f1941954200481 -> SC1oj9p2r25b1352208433 [color=grey, style=dotted, label="AC1nhsr6o7f2207820792 [44]
+ (1) "];
+ENTRY -> SCgzc7da156971168975 [color=grey, style=solid, label="START  (1) "];
+SC1aq74i61a6129464804 -> SC1aq74i61a6129464804 [color=grey, style=solid, label="ACim18sa60396717837 [63]
+ (1) "];
+SC1xwgshe2481821025580 -> SC13ijc901573865638090 [color=grey, style=dotted, label="AC1bjt8777f314910298 [47]
+ (1) "];
+SC1bs1tmj1e54257258352 -> SC1aq74i61a6129464804 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC1bs1tmj1e54257258352_AC11cn6dh7f4171131836.png"/></TD></TR><TR><TD>AC11cn6dh7f4171131836 [60]<br/> (1) </TD></TR></TABLE>>];
+SC1h6wqjd193605388731 -> SCgzc7da156971168975 [color=grey, style=dotted, label="AC14gimu37f1041278554 [1]
+ (1) "];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC2ll3us7f3160815857 [15]
+ (1) "];
+SCh65xcm5c01124955154 -> SCh65xcm5c01124955154 [color=grey, style=dotted, label="AC89xyyf7f1306079432 [17]
+ (1) "];
+SC16a06486532979378113 -> SC1yrudbh493697925435 [color=grey, style=solid, label=<<TABLE border="0" cellborder="1" color='#cccccc'><TR><TD><IMG SRC="../../scrshots/sequence2/SC16a06486532979378113_AC8s92a8802236393872.png"/></TD></TR><TR><TD>AC8s92a8802236393872 [111]<br/> (1) </TD></TR></TABLE>>];
+}
+
