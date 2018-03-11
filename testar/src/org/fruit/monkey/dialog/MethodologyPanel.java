@@ -10,7 +10,7 @@ import java.io.IOException;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 
 public class MethodologyPanel extends JPanel {
-  private JLabel methodologyLogo = getLogo("/icons/info/methodology.jpg");
+  private JLabel methodologyLogo = getLogo("/icons/info/Methodology.jpg");
 
   public MethodologyPanel () throws IOException {
     setBackground(Color.WHITE);
