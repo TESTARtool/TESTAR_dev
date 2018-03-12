@@ -71,13 +71,6 @@ public class RefactorQLearningWalker implements IWalker{
 	public boolean getEgreedy() {
 		return this.egreedy;
 	}
-	public int getNumberAction(){
-		return this.numberAction;
-	}
-	
-	public void addNumberAction(){
-		this.numberAction++;
-	}
 
 	@Override
 	final public void setProlog(JIPrologWrapper jipWrapper) {
@@ -146,7 +139,7 @@ public class RefactorQLearningWalker implements IWalker{
 	}
 
 
-	// NOT used ?¿
+	// NOT used ?Â¿
 	@Override
 	public double getStateReward(IEnvironment env, IGraphState state) {
 		return 0.0;
@@ -164,10 +157,10 @@ public class RefactorQLearningWalker implements IWalker{
 		double actionReward = 0.0d;
 		int[] actionWCount = env.getWalkedCount(action);
 
-		if (actionWCount[0] == 0) // action count (concrete), nº times we walk to state' with this action
-			actionReward = getMaxReward(); // ¿same as not executed? ¿1.0 or max Reward?
+		if (actionWCount[0] == 0) // action count (concrete), nÂº times we walk to state' with this action
+			actionReward = getMaxReward(); // Â¿same as not executed? Â¿1.0 or max Reward?
 		else
-			actionReward = 1.0d / (actionWCount[0] + 1); // 1.0 / nº of times we have  executed this action
+			actionReward = 1.0d / (actionWCount[0] + 1); // 1.0 / nÂº of times we have  executed this action
 
 		return actionReward;
 	}
@@ -236,7 +229,7 @@ public class RefactorQLearningWalker implements IWalker{
 			trew = .0;
 			targetStates = env.getTargetStates(ga);
 			if (targetStates != null){
-				for (IGraphState gs : targetStates) { // ¿Can we have more than 1 target state from 1 action?
+				for (IGraphState gs : targetStates) { // Â¿Can we have more than 1 target state from 1 action?
 					trew += this.calculateRewardForState(env, gs, actions);};
 					trew = trew * discount; // gamma * max a V(s',a)
 			}
