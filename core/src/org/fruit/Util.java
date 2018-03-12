@@ -739,7 +739,7 @@ public final class Util {
         options.add("-classpath");
         options.add(classPath);
         options.add("-d");
-        options.add("./settings/");
+        options.add("./resources/settings/");
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,
@@ -760,7 +760,7 @@ public final class Util {
   }
 
   public static void compileProtocol(String protocolClass) {
-    File compileDir = new File("./settings/" +
+    File compileDir = new File("./resources/settings/" +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
 
@@ -780,7 +780,7 @@ public final class Util {
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
-        options.add("./settings/");
+        options.add("./resources/settings/");
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,
