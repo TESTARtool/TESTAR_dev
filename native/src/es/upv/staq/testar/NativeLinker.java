@@ -1,19 +1,32 @@
-/*****************************************************************************************
- *                                                                                       *
- * COPYRIGHT (2015):                                                                     *
- * Universitat Politecnica de Valencia                                                   *
- * Camino de Vera, s/n                                                                   *
- * 46022 Valencia, Spain                                                                 *
- * www.upv.es                                                                            *
- *                                                                                       * 
- * D I S C L A I M E R:                                                                  *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
- * in the context of the TESTAR Proof of Concept project:                                *
- *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
- * This software is distributed FREE of charge under the TESTAR license, as an open        *
- * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
- *                                                                                       *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
 
 package es.upv.staq.testar;
 
@@ -22,6 +35,7 @@ import static org.fruit.alayer.windows.UIARoles.UIACheckBox;
 import static org.fruit.alayer.windows.UIARoles.UIAComboBox;
 import static org.fruit.alayer.windows.UIARoles.UIACustomControl;
 import static org.fruit.alayer.windows.UIARoles.UIADataItem;
+import static org.fruit.alayer.windows.UIARoles.UIADocument;
 import static org.fruit.alayer.windows.UIARoles.UIAEdit;
 import static org.fruit.alayer.windows.UIARoles.UIAHyperlink;
 import static org.fruit.alayer.windows.UIARoles.UIAList;
@@ -48,9 +62,11 @@ import java.util.Set;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Pen;
 import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.StateBuilder;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.NoSuchTagException;
@@ -66,8 +82,6 @@ import org.fruit.alayer.windows.UIAStateBuilder;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcHandle;
 import org.fruit.alayer.windows.WinProcess;
-import org.fruit.alayer.windows.Windows;
-
 import static org.fruit.alayer.linux.AtSpiRolesWrapper.*; // by wcoux
 
 /**
@@ -323,6 +337,7 @@ public class NativeLinker {
 	 * @return true/false value for the widget native boolean property.
 	 * @throws NoSuchTagException If the property is not available for the widget.
 	 */
+	@SuppressWarnings("unchecked")
 	public static boolean getNativeBooleanProperty(Widget widget, String booleanPropertyName) throws NoSuchTagException {
 		Tag<Boolean> tag = null;
 		try {
@@ -337,13 +352,13 @@ public class NativeLinker {
 	 * Gets all roles that correspond to elements that can be clicked.
 	 * @return All roles that correspond to elements that can be clicked.
 	 */
-	public static Role[] getNativeClickable(){
+	public static Role[] getNativeClickableRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return new Role[]{UIAMenu, UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
-							  UIAComboBox, UIAList, UIAListItem,
-							  UIATabItem, UIAHyperlink, UIADataItem, UIATree, UIATreeItem,
-							  UIASlider, UIASpinner, UIAScrollBar, UIASplitButton,
-							  UIACustomControl}; // be careful on custom control (we do not know what they are)
+					UIAComboBox, UIAList, UIAListItem,
+					UIATabItem, UIAHyperlink, UIADataItem, UIATree, UIATreeItem,
+					UIASlider, UIASpinner, UIAScrollBar, UIASplitButton,
+					UIACustomControl}; // be careful on custom control (we do not know what they are)
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return new Role[]{AtSpiCheckBox, AtSpiCheckMenuItem, AtSpiComboBox, AtSpiMenuItem,
 			AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
@@ -352,20 +367,18 @@ public class NativeLinker {
 		throw new UnsupportedPlatformException();
 	}
 
-
 	/**
 	 * Gets all roles that correspond to elements that can be edited.
 	 * @return All roles that correspond to elements that can be edited.
 	 */
-	public static Role[] getNativeTypeable(){
+	public static Role[] getNativeTypeableRoles(){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
-			return new Role[]{UIAEdit, UIAText};
+			return new Role[]{UIADocument, UIAEdit, UIAText};
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new Role[]{AtSpiPasswordText, AtSpiText, AtSpiDocumentText, AtSpiDocumentWeb,
-							  AtSpiDocumentEmail};
+					AtSpiDocumentEmail};
 		throw new UnsupportedPlatformException();
 	}
-
 
 	/**
 	 * Determines whether a widget supports typing.
@@ -373,6 +386,8 @@ public class NativeLinker {
 	 * @return True if the widget supports typing; False otherwise.
 	 */
 	public static boolean isNativeTypeable(Widget w){
+		if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles()))
+			return false;
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return w.get(UIATags.UIAIsKeyboardFocusable);
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))

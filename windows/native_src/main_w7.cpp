@@ -1516,6 +1516,40 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1Name)) (JNIEnv * env, jcla
 	return ret;
 }
 
+HRESULT GetValuePatternFromElement(IUIAutomationElement *pElement, PATTERNID patternId, BSTR *pValuePattern) {
+    *pValuePattern = NULL;
+
+    BSTR bstr;
+    IUIAutomationValuePattern *pUIAValuePattern;
+    HRESULT hr = pElement->GetCurrentPatternAs(patternId, IID_PPV_ARGS(&pUIAValuePattern));
+    if (SUCCEEDED(hr) && (pUIAValuePattern != NULL)) {
+        // Cached version doesn't seem to work ?
+        hr = pUIAValuePattern->get_CurrentValue(&bstr);
+        if (SUCCEEDED(hr) && bstr != NULL) {
+            *pValuePattern = bstr;
+            SysFreeString(bstr);
+        }
+        pUIAValuePattern->Release();
+        pUIAValuePattern = NULL;
+    }
+
+    return hr;
+}
+
+/* IUIAutomationElement_get_ValuePattern */
+JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ValuePattern)) (JNIEnv * env, jclass,
+		jlong pIUIAutomationElement, jlong patternId) {
+	BSTR value;
+    IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+    HRESULT hr = GetValuePatternFromElement(el, patternId, &value);
+    if (FAILED(hr))
+        return 0;
+
+    jstring ret = env->NewStringUTF(_com_util::ConvertBSTRToString(value));
+    SysFreeString(value);
+    return ret;
+}
+
 /* IUIAutomationElement_get_ProviderDescription */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ProviderDescription)) (JNIEnv * env, 
 		jclass, jlong pIUIAutomationElement, jboolean fromCache){
@@ -1555,6 +1589,16 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ControlType)) (JNIEnv * env,
 	return (jlong) value;
 }
 
+/* IUIAutomationElement_get_Culture */
+JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Culture)) (JNIEnv * env, jclass, 
+		jlong pIUIAutomationElement, jboolean fromCache){
+	int value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedCulture(&value) : el->get_CurrentCulture(&value);
+	if (FAILED(hr))
+		return 0;
+	return (jlong) value;
+}
 
 /* IUIAutomationElement_get_Orientation */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Orientation)) (JNIEnv * env, jclass, 
@@ -1591,6 +1635,17 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1NativeWindowHandle)) (JNIEnv
 	return (jlong) value;
 }
 
+
+/* IUIAutomationElement_get_IsContentElement */
+JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsContentElement)) (JNIEnv * env, jclass, 
+		jlong pIUIAutomationElement, jboolean fromCache){
+	BOOL value;
+	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
+	HRESULT hr = fromCache ? el->get_CachedIsContentElement(&value) : el->get_CurrentIsContentElement(&value);
+	if (FAILED(hr))
+		return 0;
+	return (jboolean) value;
+}
 
 /* IUIAutomationElement_get_IsControlElement */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsControlElement)) (JNIEnv * env, jclass, 
@@ -2484,7 +2539,7 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
   * by urueda */			   
 char* wchart2String(JNIEnv * env, wchar_t *value){
 
-	char bf[sizeof(value)/sizeof(wchar_t)];
+	static char bf[sizeof(value)/sizeof(wchar_t)];
 		
 	sprintf(bf, "%ws", value);
 	
@@ -2496,7 +2551,7 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
   * by urueda */			   
 char* jint2String(JNIEnv * env, jint value){
 
-	char bf[64];
+	static char bf[64];
 	
 	sprintf(bf, "%d", value);
 	

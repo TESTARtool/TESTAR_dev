@@ -1,5 +1,38 @@
+/***************************************************************************************************
+*
+* Copyright (c) 2017 Open Universiteit - www.ou.nl
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
+
 package nl.ou.testar;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -9,8 +42,7 @@ import org.fruit.alayer.Widget;
  * Wrapper for interaction with the Graph Database
  * Created by floren on 5-6-2017.
  */
-public class GraphDB {
-
+public class GraphDB implements GraphDBRepository {
 
     private final boolean enabled;
     private GraphDBRepository repository;
@@ -22,13 +54,21 @@ public class GraphDB {
         }
     }
 
+    public void addState(final State state) {
+       if(enabled) {
+          repository.addState(state,false);
+       }
+    }
+
     /**
      * Store the State in the graph database.
      * @param state state to store.
+     * @param isInitial indicate if this is the initial state.
      */
-    public void addState(final State state) {
+    @Override
+    public void addState(final State state, final boolean isInitial) {
         if(enabled) {
-            repository.addState(state);
+            repository.addState(state,isInitial);
         }
     }
 
@@ -38,6 +78,7 @@ public class GraphDB {
      * @param statedID State to which the widget belongs
      * @param widget The widget to add
      */
+    @Override
     public void addWidget(final String statedID, final Widget widget) {
         if(enabled) {
             repository.addWidget(statedID,widget);
@@ -49,6 +90,7 @@ public class GraphDB {
      * @param action the action performed
      * @param toStateId the new state.
      */
+    @Override
     public void addAction(final Action action, final String toStateId) {
         if(enabled) {
             repository.addAction(action, toStateId);
@@ -62,9 +104,39 @@ public class GraphDB {
      * @param action The action performed
      * @param toStateID the resulting stateId
      */
+    @Override
     public void addActionOnState(final String fromSateID, final Action action, final String toStateID) {
         if(enabled) {
             repository.addActionOnState(fromSateID, action, toStateID);
+        }
+    }
+    
+    @Override
+    public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
+        if(enabled) {
+            return repository.getObjectsFromGremlinPipe(gremlin, start);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void addCustomType(Action action, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(action,relation,instance);
+        }
+    }
+
+    @Override
+    public void addCustomType(State state, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(state,relation,instance);
+        }
+    }
+
+    @Override
+    public void addCustomType(Widget widget, String relation, CustomType instance) {
+        if(enabled) {
+            repository.addCustomType(widget,relation,instance);
         }
     }
 

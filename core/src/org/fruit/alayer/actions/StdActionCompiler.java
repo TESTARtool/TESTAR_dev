@@ -1,34 +1,39 @@
-/******************************************************************************************
- * COPYRIGHT:                                                                             *
- * Universitat Politecnica de Valencia 2013                                               *
- * Camino de Vera, s/n                                                                    *
- * 46022 Valencia, Spain                                                                  *
- * www.upv.es                                                                             *
- *                                                                                        * 
- * D I S C L A I M E R:                                                                   *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)      *
- * in the context of the european funded FITTEST project (contract number ICT257574)      *
- * of which the UPV is the coordinator. As the sole developer of this source code,        *
- * following the signed FITTEST Consortium Agreement, the UPV should decide upon an       *
- * appropriate license under which the source code will be distributed after termination  *
- * of the project. Until this time, this code can be used by the partners of the          *
- * FITTEST project for executing the tasks that are outlined in the Description of Work   *
- * (DoW) that is annexed to the contract with the EU.                                     *
- *                                                                                        * 
- * Although it has already been decided that this code will be distributed under an open  *
- * source license, the exact license has not been decided upon and will be announced      *
- * before the end of the project. Beware of any restrictions regarding the use of this    *
- * work that might arise from the open source license it might fall under! It is the      *
- * UPV's intention to make this work accessible, free of any charge.                      *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
 
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit.alayer.actions;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
+import java.util.List;
 
 import org.fruit.Assert;
 import org.fruit.Util;
@@ -262,10 +267,21 @@ public class StdActionCompiler {
 		return ret;
 	}
 	
-	public Action hitKey(KBKeys key){
+	public Action hitKey(KBKeys key) {
 		return new CompoundAction.Builder().add(new KeyDown(key), .0)
-				//.add(new KeyUp(KBKeys.VK_ESCAPE), 1).add(NOP, 1.0).build();
-				.add(new KeyUp(key), 1).add(NOP, 1.0).build(); // by urueda (typo fix?)
+				.add(new KeyUp(key), 1.0).add(NOP, 1.0).build();
+	}
+	
+	public Action hitShortcutKey(List<KBKeys> keys) {
+		if (keys.size() == 1) // single key
+			return hitKey(keys.get(0));
+		CompoundAction.Builder builder = new CompoundAction.Builder();
+		for (int i = 0; i < keys.size(); i++)
+			builder.add(new KeyDown(keys.get(i)), i == 0 ? .0 : .1);
+		for (int i = keys.size() - 1; i >= 0; i--)
+			builder.add(new KeyUp(keys.get(i)), i == keys.size() - 1 ? 1.0 : .0);
+		builder.add(NOP, 1.0);
+		return builder.build();
 	}
 	
 	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }

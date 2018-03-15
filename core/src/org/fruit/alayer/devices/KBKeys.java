@@ -1,26 +1,32 @@
-/******************************************************************************************
- * COPYRIGHT:                                                                             *
- * Universitat Politecnica de Valencia 2013                                               *
- * Camino de Vera, s/n                                                                    *
- * 46022 Valencia, Spain                                                                  *
- * www.upv.es                                                                             *
- *                                                                                        * 
- * D I S C L A I M E R:                                                                   *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)      *
- * in the context of the european funded FITTEST project (contract number ICT257574)      *
- * of which the UPV is the coordinator. As the sole developer of this source code,        *
- * following the signed FITTEST Consortium Agreement, the UPV should decide upon an       *
- * appropriate license under which the source code will be distributed after termination  *
- * of the project. Until this time, this code can be used by the partners of the          *
- * FITTEST project for executing the tasks that are outlined in the Description of Work   *
- * (DoW) that is annexed to the contract with the EU.                                     *
- *                                                                                        * 
- * Although it has already been decided that this code will be distributed under an open  *
- * source license, the exact license has not been decided upon and will be announced      *
- * before the end of the project. Beware of any restrictions regarding the use of this    *
- * work that might arise from the open source license it might fall under! It is the      *
- * UPV's intention to make this work accessible, free of any charge.                      *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
 
 /**
  *  @author Sebastian Bauersfeld
@@ -54,7 +60,8 @@ public enum KBKeys {
 	VK_RIGHT(39), VK_RIGHT_PARENTHESIS(522), VK_ROMAN_CHARACTERS(245), VK_S(83), VK_SCROLL_LOCK(145), VK_SEMICOLON(59), VK_SEPARATER(108),
 	VK_SEPARATOR(108), VK_SHIFT(16), VK_SLASH(47), VK_SPACE(32), VK_STOP(65480), VK_SUBTRACT(109), VK_T(84), VK_TAB(9), VK_U(85), VK_UNDEFINED(0),
 	VK_UNDO(65483), VK_UP(38), VK_V(86), VK_W(87), VK_X(88), VK_Y(89), VK_Z(90),
-	/*VK_UNDERSCORE(523)*/VK_UNDERSCORE(95), VK_ASTERISK(42), VK_ARROBA(64), VK_EXCLAMATION_MARK(33), VK_BEGIN(KeyEvent.VK_BEGIN); // by urueda
+	/*VK_UNDERSCORE(523)*/VK_UNDERSCORE(95), VK_ASTERISK(42), VK_ARROBA(64), VK_EXCLAMATION_MARK(33), VK_BEGIN(KeyEvent.VK_BEGIN), // by urueda
+	VK_WINDOWS(KeyEvent.VK_WINDOWS), VK_CONTEXT_MENU(KeyEvent.VK_CONTEXT_MENU);
 
 	private final int code;
 	private KBKeys(int code){ this.code = code; }

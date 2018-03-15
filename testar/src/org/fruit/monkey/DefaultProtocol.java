@@ -1,26 +1,33 @@
-/******************************************************************************************
- * COPYRIGHT:                                                                             *
- * Universitat Politecnica de Valencia 2013                                               *
- * Camino de Vera, s/n                                                                    *
- * 46022 Valencia, Spain                                                                  *
- * www.upv.es                                                                             *
- *                                                                                        * 
- * D I S C L A I M E R:                                                                   *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)      *
- * in the context of the european funded FITTEST project (contract number ICT257574)      *
- * of which the UPV is the coordinator. As the sole developer of this source code,        *
- * following the signed FITTEST Consortium Agreement, the UPV should decide upon an       *
- * appropriate license under which the source code will be distributed after termination  *
- * of the project. Until this time, this code can be used by the partners of the          *
- * FITTEST project for executing the tasks that are outlined in the Description of Work   *
- * (DoW) that is annexed to the contract with the EU.                                     *
- *                                                                                        * 
- * Although it has already been decided that this code will be distributed under an open  *
- * source license, the exact license has not been decided upon and will be announced      *
- * before the end of the project. Beware of any restrictions regarding the use of this    *
- * work that might arise from the open source license it might fall under! It is the      *
- * UPV's intention to make this work accessible, free of any charge.                      *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
+
 
 /**
  *  @author Sebastian Bauersfeld
@@ -32,6 +39,7 @@ import static org.fruit.alayer.Tags.Title;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -266,6 +274,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 		
 		// begin by urueda
+		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
@@ -277,19 +286,6 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 
 		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
-
-		double minZIndex = Double.MAX_VALUE,
-			   maxZIndex = Double.MIN_VALUE,
-			   zindex;
-		for (Widget w : state){
-			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
-				minZIndex = zindex;
-			if (zindex > maxZIndex)
-				maxZIndex = zindex;
-		}
-		state.set(Tags.MinZIndex, minZIndex);
-		state.set(Tags.MaxZIndex, maxZIndex);
 		// end by urueda
 
 		return state;
@@ -374,7 +370,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		// if the system is in the background force it into the foreground!
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			//actions.add(ac.activateSystem());
-			this.forceToForeground = true; // bu urueda
+			this.forceToForeground = true; // by urueda
 			return actions;
 		}
 		
@@ -396,34 +392,49 @@ public class DefaultProtocol extends AbstractProtocol{
 		return actions;
 	}
 	
-    // by urueda (random inputs)	
-    protected String getRandomText(Widget w){
-    	return DataManager.getRandomData();
-    }
+	// by urueda (random inputs)	
+	protected String getRandomText(Widget w){
+		return DataManager.getRandomData();
+	}
+	
+	// by urueda (refactored)
+	protected void calculateZIndices(State state) {
+		double minZIndex = Double.MAX_VALUE,
+				maxZIndex = Double.MIN_VALUE,
+				zindex;
+		for (Widget w : state){
+			zindex = w.get(Tags.ZIndex).doubleValue();
+			if (zindex < minZIndex)
+				minZIndex = zindex;
+			if (zindex > maxZIndex)
+				maxZIndex = zindex;
+		}
+		state.set(Tags.MinZIndex, minZIndex);
+		state.set(Tags.MaxZIndex, maxZIndex);
+	}
 	
 	// by urueda
-	protected Set<Widget> getTopWidgets(State state){
-		Set<Widget> topWidgets = new HashSet<Widget>();
+	protected List<Widget> getTopWidgets(State state){
+		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state){
+		for (Widget w : state)
 			if (w.get(Tags.ZIndex) == maxZIndex)
 				topWidgets.add(w);
-		}
 		return topWidgets;
 	}
 	
 	// by urueda
 	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
 		Drag[] drags = null;
-	    if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
 			for (Drag drag : drags){
 				actions.add(ac.slideFromTo(
-					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+					));
 				storeWidget(state.get(Tags.ConcreteID), w);
 			}
-	    }
+		}
 	}
 	
 	// by urueda
@@ -447,17 +458,14 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickable()))
+		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
 			return isUnfiltered(w);
 		return false;
 	}
 	
-	//by urueda
+	// by urueda
 	protected boolean isTypeable(Widget w){
-		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeTypeable()) && NativeLinker.isNativeTypeable(w))
-			return isUnfiltered(w);
-		return false;
+		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
 
 	protected boolean moreActions(State state) {
@@ -480,7 +488,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
 		else if (this.lastState != null && state != null &&
-				 this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
+				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
 			this.nonReactingActionNumber++;			
 		this.lastState = state;
 		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
