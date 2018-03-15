@@ -1,8 +1,5 @@
 package es.upv.staq.testar.algorithms;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +12,6 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
 import es.upv.staq.testar.graph.GraphAction;
-import es.upv.staq.testar.graph.GraphEdge;
 import es.upv.staq.testar.graph.GraphState;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
@@ -175,8 +171,6 @@ public class RefactorQLearningWalker implements IWalker{
 		if (state == null || !env.stateAtGraph(state)) {
 			return getMaxReward();}   //We never walk to state'
 
-		IGraphAction ga;
-		IGraphAction maxRewardAction;
 		double actionQ = 0.0;
 		double q = 0.0;
 		
@@ -187,13 +181,13 @@ public class RefactorQLearningWalker implements IWalker{
 		if(unx>0) q = maxReward;
 		
 		//String with all unexplored AbstractID actions' from state'
-		String unxActions = state.getUnexploredActionsString();
+		//String unxActions = state.getUnexploredActionsString();
 		
 		Set<Action> stateActions = new HashSet<Action>();
 		
 		//We check the available Actions of graph enviroment of state'
 		for(Action a: availableActions) {
-			String id = a.get(Tags.ConcreteID);
+			//String id = a.get(Tags.ConcreteID);
 			//check if its an explored action' of state'
 			Set<String> idstates = env.get(a).getTargetStateIDs();
 			if(idstates.contains(state.getConcreteID())) {
