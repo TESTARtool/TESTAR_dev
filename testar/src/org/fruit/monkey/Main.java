@@ -385,6 +385,12 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
+      defaults.add(Pair.from(TgherkinDocument, ""));
+      defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
+      defaults.add(Pair.from(ContinueToApplyDefault, true));
+      defaults.add(Pair.from(RepeatTgherkinScenarios, true));
+      defaults.add(Pair.from(GenerateTgherkinReport, true));		
+
       return Settings.fromFile(defaults, file);
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);

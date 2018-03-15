@@ -23,6 +23,7 @@ dependencies {
     compile project(':native')
     compile project(':graph')
     compile project(':graphdb')
+    compile project(':tgherkin')    
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/JNativeHook.jar')
     runtime project(':windows')

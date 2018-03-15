@@ -103,4 +103,10 @@ public final class ConfigTags {
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
+
+  public static final Tag<String> TgherkinDocument = Tag.from("TgherkinDocument", String.class);
+  public static final Tag<Boolean> ApplyDefaultOnMismatch = Tag.from("ApplyDefaultOnMismatch", Boolean.class);
+  public static final Tag<Boolean> ContinueToApplyDefault = Tag.from("ContinueToApplyDefault", Boolean.class);
+  public static final Tag<Boolean> RepeatTgherkinScenarios = Tag.from("RepeatTgherkinScenarios", Boolean.class);
+  public static final Tag<Boolean> GenerateTgherkinReport = Tag.from("GenerateTgherkinReport", Boolean.class);
 }

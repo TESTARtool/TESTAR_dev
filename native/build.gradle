@@ -5,3 +5,9 @@ dependencies {
     compile files('../linux/lib/libatspi.jar')
 }
 
+task generateVariables(type:JavaExec) {
+   main = 'nl.ou.testar.tgherkin.variables.GenerateVariables'
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+compileJava.finalizedBy(generateVariables)

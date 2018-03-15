@@ -1,0 +1,50 @@
+Feature: Perform calculations with windows calculator 
+
+  Background: Clear.
+    Step: Select Clear
+		When  $Title="Wissen" click()
+		
+  Scenario: Add two numbers
+    Step: Select 2
+		When  $Title="Twee" click()
+		Then  $Title="Weergave is 2"
+    Step: Select +
+		When  $Title="Plus" click()
+		Then  $Title="Expressie is 2 + "
+    Step: Select 3
+		When  $Title="Drie" click()
+		Then  $Title="Weergave is 3"
+    Step: Select = 
+		When  $Title="Is gelijk aan" click()
+		Then  $Title="Weergave is 5"
+
+  Scenario Outline: Add two numbers
+    Step: Select number 1
+		When  $Title=<number1> click()
+    Step: Select +
+		When  $Title="Plus" click()
+    Step: Select number 2
+		When  $Title=<number2> click()
+    Step: Select = 
+		When  $Title="Is gelijk aan" click()
+  Examples: To be added numbers
+    | number1 | number2 |
+    |  Negen  |  Vier |
+    |  Zeven  |  Zes  |  
+	
+  Scenario: Add two numbers
+    Step: Select 8
+		When  $Title="Acht" click()
+		Then  $Title="Weergave is 8"
+    Step: Select +
+		When  $Title="Plus" click()
+		Then  $Title="Expressie is 8 + "
+    Step: Select 1
+		When  $Title="Een" click()
+		Then  $Title="Weergave is 1"
+    Step: Select = 
+		When  $Title="Is gelijk aan" click()
+		Then  $Title="Weergave is 9"
+
+
+		
