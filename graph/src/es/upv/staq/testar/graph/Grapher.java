@@ -1,32 +1,19 @@
-/***************************************************************************************************
-*
-* Copyright (c) 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-
+/*****************************************************************************************
+ *                                                                                       *
+ * COPYRIGHT (2015):                                                                     *
+ * Universitat Politecnica de Valencia                                                   *
+ * Camino de Vera, s/n                                                                   *
+ * 46022 Valencia, Spain                                                                 *
+ * www.upv.es                                                                            *
+ *                                                                                       * 
+ * D I S C L A I M E R:                                                                  *
+ * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
+ * in the context of the TESTAR Proof of Concept project:                                *
+ *               "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
+ * This graph project is distributed FREE of charge under the TESTAR license, as an open *
+ * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        * 
+ *                                                                                       *
+ *****************************************************************************************/
 
 package es.upv.staq.testar.graph;
 
@@ -52,7 +39,6 @@ import es.upv.staq.testar.algorithms.QLearningRestartsWalker;
 import es.upv.staq.testar.algorithms.QLearningWalker;
 import es.upv.staq.testar.algorithms.RandomRestartsWalker;
 import es.upv.staq.testar.algorithms.RandomWalker;
-import es.upv.staq.testar.algorithms.RefactorQLearningWalker;
 import es.upv.staq.testar.algorithms.forms.FormsFilling;
 import es.upv.staq.testar.graph.reporting.GraphReporter;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
@@ -78,8 +64,6 @@ public class Grapher implements Runnable {
 	// -> SUT UI space exploration capability (note: being worse at exploration might be good at concrete UI parts as these parts are more exercised): 
 	public static double QLEARNING_DISCOUNT_PARAM = .95; // non fnal to allow calibration (.95 Sebastian base)
 	public static double QLEARNING_MAXREWARD_PARAM =  9999999.0; // non final to allow calibration (9999999.0 Sebastian base)
-	public static double QLEARNING_LEARNING_READ = 1.0d; // 1 by default, (Salmi & ferpasri)
-	public static boolean QLEARNING_EGREEDY = false; // greedy by default, (Salmi & ferpasri)
 	
 	public static final boolean QLEARNING_CALIBRATION = false; // how-to retrieve from logs: findstr "CALIBRATION" log_file_name.log
 	private static double MAX_MAXREWARD = 9999999.0;
@@ -144,7 +128,7 @@ public class Grapher implements Runnable {
 	 * @param testGenerator A valid generator is expected.
 	 */
 	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling, int typingTexts,
-							   String testGenerator, Double maxReward, Double discount, Double learningRead, boolean egreedy,
+							   String testGenerator, Double maxReward, Double discount,
 							   Integer explorationSampleInterval, boolean graphsActivated, boolean prologActivated,
 							   boolean graphResumingActivated, boolean offlineGraphConversion,
 							   JIPrologWrapper jipWrapper) {
@@ -173,8 +157,6 @@ public class Grapher implements Runnable {
 			Grapher.testGenerator = testGenerator;
 		Grapher.QLEARNING_MAXREWARD_PARAM = maxReward.doubleValue();
 		Grapher.QLEARNING_DISCOUNT_PARAM = discount.doubleValue();
-		Grapher.QLEARNING_LEARNING_READ =  learningRead.doubleValue();
-		Grapher.QLEARNING_EGREEDY = egreedy;
 		Grapher.EXPLORATION_SAMPLE_INTERVAL = explorationSampleInterval.intValue();
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
 		Grapher.PROLOG_ACTIVATED = prologActivated;
@@ -407,12 +389,9 @@ public class Grapher implements Runnable {
 				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
 				QLEARNING_MAXREWARD_PARAM = Math.random() * MAX_MAXREWARD; // 0.0 .. MAX_MAXREWARD
 			}
-			// New QLearning algorithm, in development and testing, by Salmi & ferpasri
-			walker = new RefactorQLearningWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM, QLEARNING_LEARNING_READ, QLEARNING_EGREEDY);
+			walker = new QLearningWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM);
 			System.out.println("<Q-Learning> test generator enabled (" +
-							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM +
-							   "learningRead = " + QLEARNING_LEARNING_READ + ", egreedy = " + QLEARNING_EGREEDY + ")");
-		
+							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM + ")");
 		} else if (testGenerator.equals(QLEARNING_RESTARTS_GENERATOR)){
 			walker = new QLearningRestartsWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM, Grapher.testSequenceLength);
 			System.out.println("<Q-Learning +> test generator enabled");			

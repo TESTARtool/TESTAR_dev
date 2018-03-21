@@ -1,33 +1,3 @@
-/***************************************************************************************************
-*
-* Copyright (c) 2017 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-
-
 package org.fruit.alayer.linux;
 
 
@@ -220,7 +190,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick The scroller thickness.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
+    
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
 
@@ -334,7 +304,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param tab The TAB string to use - to be able to define different spacings most likely.
      * @return Returns a string representation for the widget.
      */
-    @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
     private String getPropertiesRepresentation(String tab){
 
 
@@ -382,7 +351,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick Size of the scroll thumb.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
+    
     private Drag[] getDrags(Shape shape, boolean scrollOrientation, double viewSize, double scrollPercent,
                             double scrollArrowSize, double scrollThick) {
 
@@ -441,7 +410,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param fragment The length two drag points will be apart.
      * @return Returns relative points.
      */
-    @SuppressWarnings("Duplicates")
+   
     private double[] calculateScrollDragPoints(int dragC, double fixedPoint, double fragment) {
 
 
@@ -623,8 +592,6 @@ public class AtSpiWidget implements Widget, Serializable {
             AtSpiWidget target = self;
             Tag<?> next;
 
-
-            @SuppressWarnings("Duplicates")
             private Tag<?> fetchNext(){
                 if(next == null){
                     while(i.hasNext()){
