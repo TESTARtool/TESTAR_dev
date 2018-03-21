@@ -4,13 +4,12 @@ sourceSets {
     main {
         resources {
             srcDirs = ['resources']
-            excludes = ['settings/']
         }
     }
 
     oracle {
         java {
-            srcDirs =['resources/settings']
+            srcDirs =['settings']
         }
 
         compileClasspath += main.output
@@ -35,7 +34,7 @@ dependencies {
 evaluationDependsOn(':windows')
 
 task prepareSettings(type: Copy) {
-    from 'resources/settings'
+    from 'settings'
     into 'target/scripts/settings'
 }
 

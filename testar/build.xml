@@ -97,7 +97,7 @@
     		<fileset dir="../native/target/resources/" />
     	</copy>
     	<copy todir="${target}/settings" encoding="UTF-8">
-	    	<fileset dir="resources/settings/"/>
+	    	<fileset dir="settings/"/>
         </copy>
     	<copy file="../LICENSE" todir="${target}"/>
     	<copy file="../VERSION" todir="${target}"/>
