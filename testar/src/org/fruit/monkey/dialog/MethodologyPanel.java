@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
-import static javax.swing.GroupLayout.PREFERRED_SIZE;
-
 public class MethodologyPanel extends JPanel {
   private JLabel methodologyLogo = getLogo("/icons/info/Methodology.jpg");
 

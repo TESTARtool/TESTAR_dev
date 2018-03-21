@@ -194,9 +194,9 @@ public class SettingsDialog extends JFrame implements Observer {
       return;
     }
     saveCurrentSettings();
-    new File("./resources/settings/" + previousSSE).renameTo(new File("./resources/settings/" + sse));
+    new File("./settings/" + previousSSE).renameTo(new File("./settings/" + sse));
     try {
-      settingsFile = "./resources/settings/" + sutSettings + "/" + Main.SETTINGS_FILE;
+      settingsFile = "./settings/" + sutSettings + "/" + Main.SETTINGS_FILE;
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");

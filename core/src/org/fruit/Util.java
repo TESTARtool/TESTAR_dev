@@ -438,6 +438,10 @@ public final class Util {
     List<Widget> candidates = new ArrayList<Widget>(widgetsFromPoint(state, x, y));
     if (candidates.isEmpty()) {
       return defaultValue;
+    } else {
+    	for (Widget c: candidates) {
+    	//	System.out.println("oooooooooUTIL => "+c.getRepresentation("\t"));
+    	}
     }
 
     Comparator<Widget> comp = new Comparator<Widget>() {
@@ -739,7 +743,7 @@ public final class Util {
         options.add("-classpath");
         options.add(classPath);
         options.add("-d");
-        options.add("./resources/settings/");
+        options.add("./settings/");
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,
@@ -760,7 +764,7 @@ public final class Util {
   }
 
   public static void compileProtocol(String protocolClass) {
-    File compileDir = new File("./resources/settings/" +
+    File compileDir = new File("./settings/" +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
 
@@ -780,7 +784,7 @@ public final class Util {
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
-        options.add("./resources/settings/");
+        options.add("./settings/");
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,

@@ -84,7 +84,7 @@ public class GeneralPanel extends JPanel {
 
     comboBoxProtocol = new JComboBox<>();
     comboBoxProtocol.setBounds(286, 248, 194, 20);
-    String[] sutSettings = new File("./resources/settings/")
+    String[] sutSettings = new File("./settings/")
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));

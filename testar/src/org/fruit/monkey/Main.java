@@ -155,7 +155,7 @@ public class Main {
   // by urueda
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./resources/settings").listFiles()) {
+    for (File f : new File("./settings").listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -177,7 +177,7 @@ public class Main {
       }
       final String sse = s + SUT_SETTINGS_EXT;
       try {
-        File f = new File("./resources/settings/" + sse);
+        File f = new File("./settings/" + sse);
         if (f.createNewFile()) {
           //System.out.println("Using <" + s + "> test settings");
           SSE_ACTIVATED = s;
@@ -192,7 +192,7 @@ public class Main {
 
   // by urueda
   public static String[] getSSE() {
-    return new File("./resources/settings/").list(new FilenameFilter() {
+    return new File("./settings/").list(new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
         return name.endsWith(SUT_SETTINGS_EXT);
@@ -223,7 +223,7 @@ public class Main {
     else {
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
-    String testSettings = "./resources/settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
+    String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // end by urueda
@@ -241,17 +241,17 @@ public class Main {
       if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
         if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
           return;
-        
         }
       }
-
+       
       try {
         String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
         File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
         if (logFile.exists()) {
           logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
         }
-        LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
+        LogSerialiser.start(new PrintStream(new BufferedOutputStream(
+        	new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
       } catch (Throwable t) {
         System.out.println("Cannot initialize log file!");
         t.printStackTrace(System.out);
@@ -267,7 +267,7 @@ public class Main {
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
       List<String> cp = settings.get(MyClassPath);
-     
+      System.out.println(new Main().getClass().getSimpleName() + " => " + cp);
       URL[] classPath = new URL[cp.size()];
       for (int i = 0; i < cp.size(); i++) {
         classPath[i] = new File(cp.get(i)).toURI().toURL();
@@ -278,6 +278,7 @@ public class Main {
       System.out.println("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'");
       
       String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
+      
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
@@ -286,7 +287,6 @@ public class Main {
       //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
       System.out.println("Monkey protocol loaded!");
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
-
       //logln("Starting monkey protocol ...", Main.LogLevel.Debug);
       LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
       protocol.run(settings);
@@ -328,7 +328,7 @@ public class Main {
       defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
       defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
       defaults.add(Pair.from(FaultThreshold, 0.1));
-      defaults.add(Pair.from(LogLevel, 1));
+      defaults.add(Pair.from(LogLevel, 2));
       defaults.add(Pair.from(Mode, AbstractProtocol.Modes.Spy));
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));

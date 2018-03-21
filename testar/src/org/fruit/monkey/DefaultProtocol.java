@@ -167,6 +167,7 @@ public class DefaultProtocol extends AbstractProtocol{
 				if (sut.isRunning()){
 					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 					state = builder.apply(sut);
+					System.out.println(getClass().getSimpleName() + " => " + state.toString());
 					if (state != null && state.childCount() > 0){
 						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 						System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
