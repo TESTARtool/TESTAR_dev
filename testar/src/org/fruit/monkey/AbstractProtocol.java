@@ -27,7 +27,7 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.Action1Status;
+import es.upv.staq.testar.ActionStatus;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.EventHandler;
 import es.upv.staq.testar.FlashFeedback;
@@ -834,7 +834,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * Requirement: Mode must be GenerateManual.
 	 * @author urueda
 	 */
-	private void waitUserActionLoop(Canvas cv, SUT system, State state, Action1Status actionStatus){
+	private void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
         int teller=0;
 		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
@@ -865,7 +865,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * @return 'true' if problems were found.
 	 * @author urueda
 	 */
-	private boolean waitAdhocTestEventLoop(State state, Action1Status actionStatus){
+	private boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
 		while(protocolUtil.adhocTestServerReader == null || protocolUtil.adhocTestServerWriter == null){
 			synchronized(this){
 				try {
@@ -922,7 +922,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * @return
 	 * @author urueda
 	 */
-	private boolean waitAutomaticAction(SUT system, State state, Taggable fragment, Action1Status actionStatus){
+	private boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus){
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state,actions);
 		
@@ -967,7 +967,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
 	    // LOGGER.info("[RA] start runAction");
-		Action1Status actionStatus = new Action1Status();
+		ActionStatus actionStatus = new ActionStatus();
 		// System.out.println("------ABSTRACTPROTOCOL => "+state.toString());
 		waitUserActionLoop(cv,system,state,actionStatus);
        
