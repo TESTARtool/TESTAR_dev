@@ -82,6 +82,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private GraphDBPanel graphDBPanel;
+  private MethodologyPanel methodologyPanel;
 
   /**
    * Starts the settings Dialog.
@@ -100,8 +101,9 @@ public class SettingsDialog extends JFrame implements Observer {
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+ //   System.exit(0);
     this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
-
+    
     ToolTipManager.sharedInstance().setDismissDelay(25000);
     ToolTipManager.sharedInstance().setInitialDelay(100);
     initComponents();
@@ -132,6 +134,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void start(AbstractProtocol.Modes mode) {
+       System.out.println("SettingsDialog: "+settings.get(ConfigTags.ProtocolClass));
     try {
       extractInformation(settings);
       checkSettings(settings);
@@ -250,7 +253,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
-
+    methodologyPanel = new MethodologyPanel();
+    jTabsPane.addTab("Methodology", methodologyPanel);
     setLayout(jTabsPane);
     pack();
     setCentreScreen();

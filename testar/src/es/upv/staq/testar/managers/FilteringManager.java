@@ -77,7 +77,7 @@ import es.upv.staq.testar.protocols.ProtocolUtil;
  */
 public class FilteringManager {
 
-	public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
+	public static final String XML_UI_FILTER_VERSION = "1.0.20180314";
     public static final String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
 
 	private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",

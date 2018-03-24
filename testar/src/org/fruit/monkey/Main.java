@@ -234,28 +234,31 @@ public class Main {
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // end by urueda
-
+   
     try {
       settings = loadSettings(args, testSettings);
       overrideWithUserProperties(settings); // by urueda
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+     
       if (SST != null) {
         System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
       }
-
+      
+      // This will start up the Testar Screen
       if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
         if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
           return;
         }
       }
-
+       
       try {
         String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
         File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
         if (logFile.exists()) {
           logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
         }
-        LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
+        LogSerialiser.start(new PrintStream(new BufferedOutputStream(
+        	new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
       } catch (Throwable t) {
         System.out.println("Cannot initialize log file!");
         t.printStackTrace(System.out);
@@ -271,6 +274,7 @@ public class Main {
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
       List<String> cp = settings.get(MyClassPath);
+      System.out.println(new Main().getClass().getSimpleName() + " => " + cp);
       URL[] classPath = new URL[cp.size()];
       for (int i = 0; i < cp.size(); i++) {
         classPath[i] = new File(cp.get(i)).toURI().toURL();
@@ -278,15 +282,18 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
+      System.out.println("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'");
+      
       String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
+      
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
       //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
+      System.out.println("Monkey protocol loaded!");
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
-
       //logln("Starting monkey protocol ...", Main.LogLevel.Debug);
       LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
       protocol.run(settings);
@@ -328,12 +335,12 @@ public class Main {
       defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
       defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
       defaults.add(Pair.from(FaultThreshold, 0.1));
-      defaults.add(Pair.from(LogLevel, 1));
+      defaults.add(Pair.from(LogLevel, 2));
       defaults.add(Pair.from(Mode, AbstractProtocol.Modes.Spy));
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
-      defaults.add(Pair.from(PathToReplaySequence, "./output/temp")); // by urueda
+      defaults.add(Pair.from(PathToReplaySequence, "./resources/output/temp")); // by urueda
       defaults.add(Pair.from(ActionDuration, 0.1));
       defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
       defaults.add(Pair.from(ExecuteActions, true));

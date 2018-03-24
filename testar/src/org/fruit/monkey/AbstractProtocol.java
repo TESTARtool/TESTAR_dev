@@ -165,8 +165,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
 
-	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
-
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(org.fruit.monkey.AbstractProtocol.class);
+   
 	protected double passSeverity = Verdict.SEVERITY_OK;
 	private int generatedSequenceNumber = -1;
 	private Object[] userEvent = null;
@@ -757,10 +757,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	// by urueda
 	private Action mapUserEvent(State state){
-		Assert.notNull(userEvent);		
+		Assert.notNull(userEvent);	
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
 			double x = ((Double)userEvent[1]).doubleValue();
 			double y = ((Double)userEvent[2]).doubleValue();	
+		//	System.out.println("+++++++ABSTRACTPROTOCOL => "+userEvent[0]);
+		//	System.out.println("+++++++ABSTRACTPROTOCOL => "+userEvent[1]);
+		//	System.out.println("+++++++ABSTRACTPROTOCOL => "+userEvent[2]);
+			
 			Widget w = null;
 			try {
 				w = Util.widgetFromPoint(state, x, y);
@@ -837,6 +841,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * @author urueda
 	 */
 	private void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
+        int teller=0;
 		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
 				actionStatus.setAction(mapUserEvent(state));
@@ -846,6 +851,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			synchronized(this){
 				try {
 					this.wait(10);
+					// System.out.println("-----------ABSTRACTPROTOCOL => "+ teller++);
 				} catch (InterruptedException e) {}
 			}
 			//cv.begin();
@@ -966,10 +972,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA} start runAction");
+	    // LOGGER.info("[RA] start runAction");
 		ActionStatus actionStatus = new ActionStatus();
+		// System.out.println("------ABSTRACTPROTOCOL => "+state.toString());
 		waitUserActionLoop(cv,system,state,actionStatus);
-
+       
+		// System.out.println("ABSTRACTPROTOCOL => "+state.toString());
 		cv.begin(); Util.clear(cv);
 		//visualizeState(cv, state);
 		visualizeState(cv, state,system); // by urueda 
@@ -1131,7 +1139,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
+        // LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1165,10 +1173,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
 			long tStart = System.currentTimeMillis();
-			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
-
-			//
+			// LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
+            
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
+			System.out.println(getClass().getSimpleName() + " => generatedSequence: " + generatedSequence);
 			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
 			// begin by urueda
 
@@ -1420,7 +1428,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
-			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
+			// LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
 				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
@@ -1573,7 +1581,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				// begin by urueda
 				if (GlobalScreen.isNativeHookRegistered())
 					GlobalScreen.unregisterNativeHook();
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
+				// Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
 				// end by urueda
 				GlobalScreen.registerNativeHook();
 				//GlobalScreen.getInstance().addNativeKeyListener(this);

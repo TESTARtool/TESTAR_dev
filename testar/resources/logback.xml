@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <property name="DEV_HOME" value="c:/logs" />
+  <property name="DEV_HOME" value="C:\logs" />
 
   <appender name="FILE-AUDIT"
             class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>debug.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <Pattern>
-        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n
+         %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n
       </Pattern>
     </encoder>
 
@@ -28,8 +28,7 @@
     <appender-ref ref="FILE-AUDIT" />
   </logger>
 
-  <logger name="nl.ou.testar" level="info"
-          additivity="false">
+  <logger name="nl.ou.testar" level="info" additivity="false">
     <appender-ref ref="FILE-AUDIT" />
   </logger>
 
