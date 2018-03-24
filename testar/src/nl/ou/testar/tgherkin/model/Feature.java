@@ -15,6 +15,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
@@ -163,20 +164,23 @@ public class Feature {
 	 * @return true if condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(State state, Settings settings) {
-		// Feature title
-		Report.appendReportDetail(Report.Column.FEATURE,getTitle());
-		// Scenario definition title
-		Report.appendReportDetail(Report.Column.SCENARIO,currentScenarioDefinition().getTitle());
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.FEATURE,getTitle());
+			Report.appendReportDetail(Report.Column.SCENARIO,currentScenarioDefinition().getTitle());
+		}
+	
 		if (backgroundRun ) {
 			if (background.moreActions()){
-				// scenario type
-				Report.appendReportDetail(Report.Column.TYPE,background.getClass().getSimpleName());
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.TYPE,background.getClass().getSimpleName());
+				}
 				return background.evaluateGivenCondition(state, settings);
 			}	
 			backgroundRun = false;
 		}
-		// scenario type
-		Report.appendReportDetail(Report.Column.TYPE,currentScenarioDefinition().getClass().getSimpleName());
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.TYPE,currentScenarioDefinition().getClass().getSimpleName());
+		}
 		return currentScenarioDefinition().evaluateGivenCondition(state, settings);
 	}
 	
@@ -236,7 +240,9 @@ public class Feature {
 				}else {
 					currentScenarioDefinition().setFailed();
 				}
-				Report.appendReportDetail(Report.Column.THEN,"false");
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.THEN,"false");
+				}
 				return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin feature oracle failure!");
 		}
 		// scenario level

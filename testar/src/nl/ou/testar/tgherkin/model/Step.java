@@ -18,6 +18,7 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
+import nl.ou.testar.tgherkin.protocol.ReportUtils;
 
 
 /**
@@ -160,16 +161,22 @@ public class Step {
 	 */
 	public boolean evaluateGivenCondition(State state, Settings settings, DataTable dataTable, boolean mismatchOccurred) {
 		// Step
-		Report.appendReportDetail(Report.Column.STEP,getTitle());
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.STEP,getTitle());
+		}
 		boolean result = true;
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			if (givenCondition != null) {
 				result = givenCondition.evaluate(state, dataTable);
 				if (result) {
-					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"false");
+					if (settings.get(ConfigTags.GenerateTgherkinReport)){
+						Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"false");
+					}
 				}else {
 					setMismatch(true);
-					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"true");
+					if (settings.get(ConfigTags.GenerateTgherkinReport)){
+						Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"true");
+					}
 					if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 						setStatus(Status.FAILED);
 					}else {
@@ -178,7 +185,9 @@ public class Step {
 				}
 			}
 		}
-		Report.appendReportDetail(Report.Column.GIVEN,"" + result);
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.GIVEN,"" + result);
+		}
 		return result;
 	}
     
@@ -199,7 +208,9 @@ public class Step {
 			if (map.size() == 0) {
 				// current step level execution resulted in mismatch
 				setMismatch(true);
-				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + true);
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + true);
+				}
 				if (settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					// restore map if default should be applied 
 					map = oldMap;
@@ -207,9 +218,12 @@ public class Step {
 					setStatus(Status.FAILED);
 				}
 			}else {
-				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + false);
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + false);
+				}
 			}
 		}
+		ReportUtils.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
 		// generate actions
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 		while (iterator.hasNext()) {
@@ -220,7 +234,9 @@ public class Step {
 				actions.addAll(gesture.getActions(widget, proxy, table));
 			}
 		}
-		Report.appendReportDetail(Report.Column.WHEN_DERIVED_ACTIONS,"" + actions.size());
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.WHEN_DERIVED_ACTIONS,"" + actions.size());
+		}
 		return actions;
 	}
 	
@@ -294,17 +310,25 @@ public class Step {
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			if (thenCondition != null && !thenCondition.evaluate(state, dataTable)) { 
 				setMismatch(true);
-				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"true");
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.THEN_MISMATCH,"true");
+				}
 				if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					setStatus(Status.FAILED);
-					Report.appendReportDetail(Report.Column.THEN,"false");					
+					if (settings.get(ConfigTags.GenerateTgherkinReport)){
+						Report.appendReportDetail(Report.Column.THEN,"false");					
+					}
 					return new Verdict(TGHERKIN_FAILURE, "Tgherkin step oracle failure!");
 				}
 			}else {
-				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"false");
+				if (settings.get(ConfigTags.GenerateTgherkinReport)){
+					Report.appendReportDetail(Report.Column.THEN_MISMATCH,"false");
+				}
 			}
 		}
-		Report.appendReportDetail(Report.Column.THEN,"true");
+		if (settings.get(ConfigTags.GenerateTgherkinReport)){
+			Report.appendReportDetail(Report.Column.THEN,"true");
+		}
 		if (getStatus() == Status.FAILED) {
 			return new Verdict(TGHERKIN_FAILURE, "Tgherkin step failure!");
 		}else {

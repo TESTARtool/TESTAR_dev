@@ -25,6 +25,8 @@ BOOLEAN_VARIABLE_NAME :
 NUMBER_VARIABLE_NAME :
    'ActionDelay'
  | 'UIAControlType'
+ | 'Shape.height'
+ | 'Shape.width'
  | 'ActionDuration'
  | 'TimeStamp'
  | 'UIAProcessId'
@@ -39,6 +41,8 @@ NUMBER_VARIABLE_NAME :
  | 'UIAOrientation'
  | 'MinZIndex'
  | 'UIACulture'
+ | 'Shape.x'
+ | 'Shape.y'
  | 'PID'
  | 'Angle'
  | 'UIANativeWindowHandle'

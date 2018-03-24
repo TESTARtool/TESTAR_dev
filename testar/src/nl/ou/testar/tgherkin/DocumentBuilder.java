@@ -14,6 +14,7 @@ import nl.ou.testar.tgherkin.model.MouseMoveGesture;
 import nl.ou.testar.tgherkin.model.AnyGesture;
 import nl.ou.testar.tgherkin.model.Argument;
 import nl.ou.testar.tgherkin.model.Background;
+import nl.ou.testar.tgherkin.model.BooleanArgument;
 import nl.ou.testar.tgherkin.model.ClickGesture;
 import nl.ou.testar.tgherkin.model.ConditionalGesture;
 import nl.ou.testar.tgherkin.model.DataTable;
@@ -353,6 +354,61 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		return new TypeGesture(arguments);
 	}
 	
+	@Override
+	public ClickGesture visitClickGesture(TgherkinParser.ClickGestureContext ctx) {
+		List<Argument> arguments = new ArrayList<Argument>();
+		if (ctx.PLACEHOLDER() != null) {
+			// use placeholder name without enclosing angular brackets
+			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+		}else {
+			if (ctx.TRUE() != null) {
+				arguments.add(new BooleanArgument(true)); 
+			}else {
+				if (ctx.FALSE() != null) {
+					arguments.add(new BooleanArgument(false)); 
+				}				
+			}
+		}
+		return new ClickGesture(arguments);		
+	}
+	
+	@Override
+	public DoubleClickGesture visitDoubleClickGesture(TgherkinParser.DoubleClickGestureContext ctx) {
+		List<Argument> arguments = new ArrayList<Argument>();
+		if (ctx.PLACEHOLDER() != null) {
+			// use placeholder name without enclosing angular brackets
+			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+		}else {
+			if (ctx.TRUE() != null) {
+				arguments.add(new BooleanArgument(true)); 
+			}else {
+				if (ctx.FALSE() != null) {
+					arguments.add(new BooleanArgument(false)); 
+				}				
+			}
+		}
+		return new DoubleClickGesture(arguments);		
+	}
+	
+	@Override
+	public TripleClickGesture visitTripleClickGesture(TgherkinParser.TripleClickGestureContext ctx) {
+		List<Argument> arguments = new ArrayList<Argument>();
+		if (ctx.PLACEHOLDER() != null) {
+			// use placeholder name without enclosing angular brackets
+			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+		}else {
+			if (ctx.TRUE() != null) {
+				arguments.add(new BooleanArgument(true)); 
+			}else {
+				if (ctx.FALSE() != null) {
+					arguments.add(new BooleanArgument(false)); 
+				}				
+			}
+		}
+		return new TripleClickGesture(arguments);		
+	}
+	
+	
 	@Override 
 	public Gesture visitParameterlessGesture(TgherkinParser.ParameterlessGestureContext ctx) { 
 		if (ctx.gestureName() == null) {
@@ -362,17 +418,8 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		if (ctx.gestureName().ANY_NAME() != null) {
 			return new AnyGesture(arguments);
 		}
-		if (ctx.gestureName().CLICK_NAME() != null) {
-			return new ClickGesture(arguments);
-		}
 		if (ctx.gestureName().DRAG_NAME() != null) {
 			return new DragGesture(arguments);
-		}
-		if (ctx.gestureName().DOUBLE_CLICK_NAME() != null) {
-			return new DoubleClickGesture(arguments);	
-		}
-		if (ctx.gestureName().TRIPLE_CLICK_NAME() != null) {
-			return new TripleClickGesture(arguments);
 		}
 		if (ctx.gestureName().RIGHT_CLICK_NAME() != null) {
 			return new RightClickGesture(arguments);

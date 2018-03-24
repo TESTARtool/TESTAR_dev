@@ -35,6 +35,8 @@ public class TgherkinPanel extends JPanel {
 	private JCheckBox tgContinueToApplyDefaultCheckBox;
 	private JCheckBox tgRepeatTgherkinScenariosCheckBox;
 	private JCheckBox tgGenerateTgherkinReportCheckBox;
+	private JCheckBox tgReportDerivedGesturesCheckBox;
+	private JCheckBox tgReportStateCheckBox;
 	private JButton btnEditTgherkinDocument;
 	private String tgherkinDocument;
 	private String protocolClass;
@@ -44,7 +46,7 @@ public class TgherkinPanel extends JPanel {
 	
 	/**
 	 * Retrieve document protocol indicator.
-	 * @return document protocol
+	 * @return document protocol indicator
 	 */
 	public boolean isDocumentProtocol() {
 		return documentProtocol;
@@ -52,15 +54,15 @@ public class TgherkinPanel extends JPanel {
 
 	/**
 	 * Retrieve active indicator.
-	 * @return active
+	 * @return active indicator
 	 */
 	public boolean isActive() {
 		return active;
 	}
 
 	/**
-	 * Set active.
-	 * @param active	  
+	 * Set active indicator.
+	 * @param active the active indicator	  
 	 */
 	public void setActive(boolean active) {
 		this.active = active;
@@ -119,6 +121,16 @@ public class TgherkinPanel extends JPanel {
 		tgGenerateTgherkinReportCheckBox.setBounds(10, 197, 300, 23);
 		tgGenerateTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be generated.\n</html>");
 		add(tgGenerateTgherkinReportCheckBox);
+
+		tgReportDerivedGesturesCheckBox = new JCheckBox("Report Tgherkin derived gestures");
+		tgReportDerivedGesturesCheckBox.setBounds(10, 221, 300, 23);
+		tgReportDerivedGesturesCheckBox.setToolTipText("<html>\nIndicates whether Tgherkin derived gestures should be reported.\n</html>");
+		add(tgReportDerivedGesturesCheckBox);
+
+		tgReportStateCheckBox = new JCheckBox("Report state");
+		tgReportStateCheckBox.setBounds(10, 245, 300, 23);
+		tgReportStateCheckBox.setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
+		add(tgReportStateCheckBox);
 	}
 
 	private void addTgherkinLabels() {
@@ -138,6 +150,8 @@ public class TgherkinPanel extends JPanel {
 		tgContinueToApplyDefaultCheckBox.setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
 		tgRepeatTgherkinScenariosCheckBox.setSelected(settings.get(ConfigTags.RepeatTgherkinScenarios));
 		tgGenerateTgherkinReportCheckBox.setSelected(settings.get(ConfigTags.GenerateTgherkinReport));
+		tgReportDerivedGesturesCheckBox.setSelected(settings.get(ConfigTags.ReportDerivedGestures));
+		tgReportStateCheckBox.setSelected(settings.get(ConfigTags.ReportState));
 		tgherkinDocument = settings.get(ConfigTags.TgherkinDocument);
 		protocolClass = settings.get(ConfigTags.ProtocolClass); 
 		myClassPath = settings.get(MyClassPath);
@@ -161,6 +175,8 @@ public class TgherkinPanel extends JPanel {
 		settings.set(ConfigTags.ContinueToApplyDefault, tgContinueToApplyDefaultCheckBox.isSelected());
 		settings.set(ConfigTags.RepeatTgherkinScenarios, tgRepeatTgherkinScenariosCheckBox.isSelected());
 		settings.set(ConfigTags.GenerateTgherkinReport, tgGenerateTgherkinReportCheckBox.isSelected());	
+		settings.set(ConfigTags.ReportDerivedGestures, tgReportDerivedGesturesCheckBox.isSelected());
+		settings.set(ConfigTags.ReportState, tgReportStateCheckBox.isSelected());
 	}
 
 	private void btnEditTgherkinDocumentActionPerformed(java.awt.event.ActionEvent evt) {

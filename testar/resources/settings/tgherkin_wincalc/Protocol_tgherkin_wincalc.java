@@ -1,23 +1,6 @@
-/**********************************************************************************************
- *                                                                                            *
- * COPYRIGHT (2017):                                                                          *
- * Universitat Politecnica de Valencia                                                        *
- * Camino de Vera, s/n                                                                        *
- * 46022 Valencia, Spain                                                                      *
- * www.upv.es                                                                                 *
- *                                                                                            * 
- * D I S C L A I M E R:                                                                       *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)          *
- * in the context of the STaQ (Software Testing and Quality) research group: staq.dsic.upv.es *
- * This software is distributed FREE of charge under the TESTAR license, as an open           *
- * source project under the BSD3 license (http://opensource.org/licenses/BSD-3-Clause)        *                                                                                        * 
- *                                                                                            *
- **********************************************************************************************/
-
 /**
- * Windows calculator desktop protocol
- * @author Urko Rueda Molina
- */
+* Tgherkin document protocol for Windows calculator
+*/
 
 import java.io.File;
 import java.util.Collections;
@@ -78,7 +61,7 @@ import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 import java.io.PrintStream;
 
-public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProtocol {
+public class Protocol_tgherkin_wincalc extends DocumentProtocol { 
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -87,13 +70,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected void initialize(Settings settings){
-        try{
-            PrintStream o = new PrintStream(new File("A.txt"));
-            System.setOut(o);    
-        }catch(Exception e){}
-        System.out.println("***initialize: " + sequenceCount() + "-" + actionCount());
 		super.initialize(settings);
-
 	}
 	
 
@@ -102,7 +79,6 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	 @Override
 	protected void beginSequence(){
-        System.out.println("***beginSequence: " + sequenceCount() + "-" + actionCount());
 		super.beginSequence();
 
 	}
@@ -121,9 +97,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-		System.out.println("***startSystem: " + sequenceCount() + "-" + actionCount());
         return super.startSystem();
-
 	}
 
 
@@ -138,9 +112,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-        System.out.println("***getState: " + sequenceCount() + "-" + actionCount());
 		return super.getState(system);
-
 	}
 
 
@@ -152,9 +124,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected Verdict getVerdict(State state){
-		System.out.println("***getVerdict: " + sequenceCount() + "-" + actionCount());
 		return super.getVerdict(state);
-		
 	}
 	
 	/**
@@ -169,13 +139,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		System.out.println("***deriveActions: " + sequenceCount() + "-" + actionCount());
-        Set<Action> actions = super.deriveActions(system,state);
-        System.out.println("***deriveActions aantal: " + actions.size());
-        return actions;
-		//return super.deriveActions(system,state);
-
-
+		return super.deriveActions(system,state);
 	}
 
 	/**
@@ -186,9 +150,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){ 
-        System.out.println("***selectAction: " + sequenceCount() + "-" + actionCount());
 		return super.selectAction(state, actions);
-
 	}
 
 
@@ -201,9 +163,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		System.out.println("***executeAction: " + sequenceCount() + "-" + actionCount());
 		return super.executeAction(system, state, action);
-		
 	}
 	
 
@@ -215,10 +175,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-        boolean result = super.moreActions(state);
-        System.out.println("***moreActions: " + sequenceCount() + "-" + actionCount() + " result: " + result);
-		return result;
-
+		return super.moreActions(state);
 	}
 
 
@@ -227,9 +184,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 */
 	@Override
 	protected void finishSequence(File recordedSequence){
-		System.out.println("***finishSequence: " + sequenceCount() + "-" + actionCount());
 		super.finishSequence(recordedSequence);
-		
 	}
 
 
@@ -240,10 +195,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol { // DefaultProt
 	 * @return  if <code>true</code> continue test, else stop	 */
 	@Override
 	protected boolean moreSequences() {
-        boolean result = super.moreSequences();
-        System.out.println("***moreSequences: " + sequenceCount() + "-" + actionCount() + " result: " + result);
-		return result;
-
+		return super.moreSequences();
 	}
 	
 }

@@ -3,6 +3,7 @@ package nl.ou.testar.tgherkin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
@@ -168,7 +169,7 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Boolean visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx) { 
 		// retrieve value widget variable
-		String str = (String)widget.get(tagMap.get(ctx.STRING_VARIABLE().getText().substring(1)), null);
+		String str = getTagValue(widget, ctx.STRING_VARIABLE().getText().substring(1)).toString();
 		String regex = ctx.STRING().getText();
 		// unquote regex
 		regex = regex.substring(1, regex.length()-1);		
@@ -183,7 +184,7 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Boolean visitLogicalVariable(WidgetConditionParser.LogicalVariableContext ctx) { 
 		// retrieve value widget variable
-		Boolean result = (Boolean) widget.get(tagMap.get(ctx.BOOLEAN_VARIABLE().getText().substring(1)), null);
+		Boolean result = (Boolean)getTagValue(widget, ctx.BOOLEAN_VARIABLE().getText().substring(1));
 		if (result == null) {
 			throw new TgherkinException("Invalid logical variable");
 		}
@@ -209,7 +210,7 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Double visitNumericVariable(WidgetConditionParser.NumericVariableContext ctx) { 
 		// retrieve value widget variable		
-		Double result = (Double) widget.get(tagMap.get(ctx.NUMBER_VARIABLE().getText().substring(1)), null);
+		Double result = (Double)getTagValue(widget, ctx.NUMBER_VARIABLE().getText().substring(1));
 		if (result == null) {
 			throw new TgherkinException("Invalid numeric variable");
 		}
@@ -232,7 +233,7 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public String visitStringVariable(WidgetConditionParser.StringVariableContext ctx) { 
 		//retrieve value widget variable
-		String result = widget.get(tagMap.get(ctx.STRING_VARIABLE().getText().substring(1)), null).toString();
+		String result = getTagValue(widget, ctx.STRING_VARIABLE().getText().substring(1)).toString();
 		if (result == null) {
 			throw new TgherkinException("Invalid string variable");
 		}
@@ -264,5 +265,26 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	private static boolean approxEqual(final double d1, final double d2) {
 	    return Math.abs(d1 - d2) < TOLERANCE;
 	}	
+	
+	private Object getTagValue(Widget widget, String tagName) {
+		if (tagName.equals("Shape.x")){
+			Shape shape = widget.get(Tags.Shape, null);
+			return shape.x();
+		}
+		if (tagName.equals("Shape.y")){
+			Shape shape = widget.get(Tags.Shape, null);
+			return shape.y();
+		}
+		if (tagName.equals("Shape.width")){
+			Shape shape = widget.get(Tags.Shape, null);
+			return shape.width();
+		}
+		if (tagName.equals("Shape.height")){
+			Shape shape = widget.get(Tags.Shape, null);
+			return shape.height();
+		}
+		return widget.get(tagMap.get(tagName), null);		
+	}
+	
 	
 }

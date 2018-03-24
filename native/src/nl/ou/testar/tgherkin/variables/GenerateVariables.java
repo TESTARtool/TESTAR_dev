@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.linux.AtSpiTags;
@@ -63,6 +64,13 @@ public class GenerateVariables {
 			}
 		}
 		tagMap.put(tag.name(), variableType);
+		// add special cases
+		if (tag.type() == Shape.class) {
+			tagMap.put("Shape.x", Double.class);
+			tagMap.put("Shape.y", Double.class);
+			tagMap.put("Shape.width", Double.class);
+			tagMap.put("Shape.height", Double.class);
+		}
 	}
 
 	private static void generateGrammar(String fileName) {

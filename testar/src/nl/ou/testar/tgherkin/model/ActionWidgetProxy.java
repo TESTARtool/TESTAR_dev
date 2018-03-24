@@ -45,5 +45,17 @@ public interface ActionWidgetProxy {
 	 * @return list of top widgets
 	 */
 	List<Widget> getTopWidgets(State state);
+
+	/**
+	 * Retrieve sequence count.
+	 * @return sequence count
+	 */
+    int getSequenceCount();
+
+	/**
+	 * Retrieve action count.
+	 * @return action count
+	 */
+    int getActionCount();
 	
 }

@@ -26,8 +26,12 @@ public class DoubleClickGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
-   		return proxy.isClickable(widget);
+    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    	if (getArguments().size() > 0 && getBooleanArgument(0, dataTable)) {    		 
+    		// unchecked argument contains value true
+    		return super.gesturePossible(widget, proxy, dataTable);
+    	}    	
+    	return proxy.isClickable(widget);
     }
     
     @Override

@@ -161,6 +161,24 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypeGesture(TgherkinParser.TypeGestureContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#clickGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClickGesture(TgherkinParser.ClickGestureContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#doubleClickGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoubleClickGesture(TgherkinParser.DoubleClickGestureContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#tripleClickGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTripleClickGesture(TgherkinParser.TripleClickGestureContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#gestureName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -49,9 +49,10 @@ public abstract class Gesture {
 	 * Retrieve whether gesture is possible on a given widget.
 	 * @param widget given widget
 	 * @param proxy given action widget proxy
+	 * @param dataTable given data table
 	 * @return true if gesture is possible on widget, otherwise false
 	 */
-	public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
+	public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
 		return proxy.isUnfiltered(widget);
 	}
     
@@ -72,6 +73,19 @@ public abstract class Gesture {
     	}else {
     		if (argument instanceof StringArgument) {
    				return ((StringArgument)argument).getValue();
+        	}    		
+    	}
+    	return null;
+    }
+    
+    protected Boolean getBooleanArgument(int index, DataTable dataTable) {
+    	Argument argument = getArguments().get(index);
+    	if (argument instanceof PlaceholderArgument) {
+    		String columnName = ((PlaceholderArgument)argument).getName();
+    		return Boolean.valueOf(dataTable.getPlaceholderValue(columnName));
+    	}else {
+    		if (argument instanceof BooleanArgument) {
+   				return ((BooleanArgument)argument).getValue();
         	}    		
     	}
     	return null;

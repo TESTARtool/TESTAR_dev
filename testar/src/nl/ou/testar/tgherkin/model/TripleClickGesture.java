@@ -26,7 +26,11 @@ public class TripleClickGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
+    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    	if (getArguments().size() > 0 && getBooleanArgument(0, dataTable)) {    		 
+    		// unchecked argument contains value true
+    		return super.gesturePossible(widget, proxy, dataTable);
+    	}    	
    		return proxy.isClickable(widget);
     }
     

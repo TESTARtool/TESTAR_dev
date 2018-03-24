@@ -24,15 +24,6 @@ public class RightClickGesture extends Gesture {
     	super(arguments);
     }
 	
-    
-    @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
-    	if (super.gesturePossible(widget, proxy)) {
-    		return true;
-    	}
-    	return false;
-    }
-    
     @Override
     public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	

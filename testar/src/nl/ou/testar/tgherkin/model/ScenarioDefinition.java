@@ -11,6 +11,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
@@ -178,7 +179,9 @@ public abstract class ScenarioDefinition {
 		// scenario level
 		if (oracle != null && !oracle.evaluate(state, null)){
 			setFailed();
-			Report.appendReportDetail(Report.Column.THEN,"false");
+			if (settings.get(ConfigTags.GenerateTgherkinReport)){
+				Report.appendReportDetail(Report.Column.THEN,"false");
+			}
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!");
 		}
 		// step level

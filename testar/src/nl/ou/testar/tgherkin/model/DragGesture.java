@@ -29,11 +29,8 @@ public class DragGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
-    	if (super.gesturePossible(widget, proxy)) {
-    		return widget.scrollDrags(Gesture.SCROLL_ARROW_SIZE, Gesture.SCROLL_THICKNESS) != null;
-    	}
-    	return false;
+    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    	return super.gesturePossible(widget, proxy, dataTable) && widget.scrollDrags(Gesture.SCROLL_ARROW_SIZE, Gesture.SCROLL_THICKNESS) != null;
     }
     
     @Override

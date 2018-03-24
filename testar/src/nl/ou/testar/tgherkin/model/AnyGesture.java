@@ -43,9 +43,10 @@ public class AnyGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
-       	for (Gesture gesture: gestures) {
-       		if (gesture.gesturePossible(widget, proxy)) {
+    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+       	// at least one gesture has to be possible
+    	for (Gesture gesture: gestures) {
+       		if (gesture.gesturePossible(widget, proxy, dataTable)) {
            		return true;
        		}
        	}
@@ -57,7 +58,7 @@ public class AnyGesture extends Gesture {
     public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
     	for (Gesture gesture: gestures) {
-    		if (gesture.gesturePossible(widget, proxy)) {
+    		if (gesture.gesturePossible(widget, proxy, dataTable)) {
         		actions.addAll(gesture.getActions(widget, proxy, dataTable));
     		}
     	}

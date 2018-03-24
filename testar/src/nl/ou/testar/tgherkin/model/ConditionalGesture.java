@@ -55,7 +55,7 @@ public class ConditionalGesture {
 	 * @return true if widget is a candidate, otherwise false
 	 */
 	public boolean isCandidate(ActionWidgetProxy proxy, Widget widget, DataTable dataTable) {
-		return getGesture().gesturePossible(widget, proxy) && (getWidgetCondition() == null || getWidgetCondition().evaluate(widget, dataTable));
+		return getGesture().gesturePossible(widget, proxy, dataTable) && (getWidgetCondition() == null || getWidgetCondition().evaluate(widget, dataTable));
 	}
 
 	/**	  

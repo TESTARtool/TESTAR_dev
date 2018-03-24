@@ -26,7 +26,7 @@ public class TypeGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy) {
+    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
    		return proxy.isTypeable(widget);
     }
     

@@ -120,11 +120,19 @@ conditional_gesture:
  
 gesture:
    parameterlessGesture
- | typeGesture;
+ | typeGesture
+ | clickGesture
+ | doubleClickGesture
+ | tripleClickGesture;
  
 typeGesture: TYPE_NAME LPAREN (STRING | PLACEHOLDER)? RPAREN; 
 
-gestureName:  CLICK_NAME | DRAG_NAME | ANY_NAME | DOUBLE_CLICK_NAME | TRIPLE_CLICK_NAME | 
-	RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
+clickGesture: CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
+
+doubleClickGesture: DOUBLE_CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
+
+tripleClickGesture: TRIPLE_CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
+
+gestureName:  DRAG_NAME | ANY_NAME | RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
 
 parameterlessGesture: gestureName LPAREN RPAREN; 
