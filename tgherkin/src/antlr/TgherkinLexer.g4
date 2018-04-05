@@ -7,6 +7,9 @@ boolean ignoreEOL=false;
 boolean ignoreWS=true;
 }
 
+OPTION_KEYWORD_INCLUDE: 'include:';
+OPTION_KEYWORD_EXCLUDE: 'exclude:';
+
 TAGNAME: '@' ~(' ' | '\t' | '\n' | '\r')+ {ignoreWS=true;};
 
 FEATURE_KEYWORD : 'Feature:' {ignoreEOL=false;ignoreWS=false;};
@@ -45,8 +48,7 @@ INTEGER_NUMBER: [0-9]+;
 
 PLACEHOLDER: '<' ~('>' | ' ' | '\t' | '\n' | '\r')+ '>';
 
-STRING:
-	'"' ('\\' ('b' | 't' | 'n' | 'f' | 'r' | 'u' | DQUOTE | QUOTE | '\\') | ~('\\' | '"' | '\r' | '\n'))* '"';
+STRING: '"' (ESC|.)*? '"';
  
 COMMENT: '#' ~('\n' | '\r')* EOL {skip();};	
 
@@ -108,6 +110,4 @@ WS: (' ' | '\t')+ { if(ignoreWS) skip();};
 // Any other characters
 OTHER: .+?;
 
-fragment DQUOTE : '"';
-
-fragment QUOTE : '\'';
+fragment ESC : '\\"' | '\\\\' ;

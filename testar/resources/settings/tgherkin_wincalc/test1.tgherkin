@@ -1,50 +1,54 @@
+@Add 
 Feature: Perform calculations with windows calculator 
 
   Background: Clear.
     Step: Select Clear
-		When  $Title="Wissen" click()
+		When  $UIAAutomationId="clearButton" click()
 		
+  @Sc1 @Prod
   Scenario: Add two numbers
     Step: Select 2
-		When  $Title="Twee" click()
-		Then  $Title="Weergave is 2"
+		When  $UIAAutomationId="num2Button" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*2$")
     Step: Select +
-		When  $Title="Plus" click()
-		Then  $Title="Expressie is 2 + "
+		When  $UIAAutomationId="plusButton" click()
+		Then  $UIAAutomationId="CalculatorExpression" and matches($Title,"^.*2\s\+\s$")
     Step: Select 3
-		When  $Title="Drie" click()
-		Then  $Title="Weergave is 3"
+		When  $UIAAutomationId="num3Button" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*3$")
     Step: Select = 
-		When  $Title="Is gelijk aan" click()
-		Then  $Title="Weergave is 5"
+		When  $UIAAutomationId="equalButton" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*5$")
 
+  @Sc2 @Dev
   Scenario Outline: Add two numbers
     Step: Select number 1
-		When  $Title=<number1> click()
+		When  $UIAAutomationId=<number1> click()
     Step: Select +
-		When  $Title="Plus" click()
+		When  $UIAAutomationId="plusButton" click()
     Step: Select number 2
-		When  $Title=<number2> click()
+		When  $UIAAutomationId=<number2> click()
     Step: Select = 
-		When  $Title="Is gelijk aan" click()
+		When  $UIAAutomationId="equalButton" click()
   Examples: To be added numbers
     | number1 | number2 |
-    |  Negen  |  Vier |
-    |  Zeven  |  Zes  |  
+    |  num9Button  |  num4Button |
+    |  num7Button  |  num6Button  |  
 	
+  @Sc3 @Prod
   Scenario: Add two numbers
     Step: Select 8
-		When  $Title="Acht" click()
-		Then  $Title="Weergave is 8"
+		When  $UIAAutomationId="num8Button" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*8$")
     Step: Select +
-		When  $Title="Plus" click()
-		Then  $Title="Expressie is 8 + "
+		When  $UIAAutomationId="plusButton" click()
+		Then  $UIAAutomationId="CalculatorExpression" and matches($Title,"^.*8\s\+\s$")
     Step: Select 1
-		When  $Title="Een" click()
-		Then  $Title="Weergave is 1"
+		When  $UIAAutomationId="num1Button" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*1$")
     Step: Select = 
-		When  $Title="Is gelijk aan" click()
-		Then  $Title="Weergave is 9"
+		When  $UIAAutomationId="equalButton" click()
+		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*9$")
 
 
 		

@@ -16,22 +16,7 @@ import org.fruit.alayer.Widget;
 public class AnyGesture extends Gesture {
 
 	
-	private static List<Gesture> gestures = new ArrayList<Gesture>(){
-		/**
-		 * Serial version UID
-		 */
-		private static final long serialVersionUID = -4478767799881634291L;
-	{
-		add(new ClickGesture(new ArrayList<Argument>()));
-		add(new DoubleClickGesture(new ArrayList<Argument>()));
-		add(new DragGesture(new ArrayList<Argument>()));
-		add(new DropDownAtGesture(new ArrayList<Argument>()));
-		add(new MouseMoveGesture(new ArrayList<Argument>()));
-		add(new RightClickGesture(new ArrayList<Argument>()));
-		add(new TripleClickGesture(new ArrayList<Argument>()));
-		add(new TypeGesture(new ArrayList<Argument>()));
-		
-	}};
+	private List<Gesture> gestures = new ArrayList<Gesture>();
 	
     /**
      * AnyGesture constructor.
@@ -39,6 +24,15 @@ public class AnyGesture extends Gesture {
      */
     public AnyGesture(List<Argument> arguments) {
     	super(arguments);
+    	// pass boolean argument unchecked to the click gestures 
+		gestures.add(new ClickGesture(arguments));
+		gestures.add(new DoubleClickGesture(arguments));
+		gestures.add(new DragGesture(new ArrayList<Argument>()));
+		gestures.add(new DropDownAtGesture(new ArrayList<Argument>()));
+		gestures.add(new MouseMoveGesture(new ArrayList<Argument>()));
+		gestures.add(new RightClickGesture(new ArrayList<Argument>()));
+		gestures.add(new TripleClickGesture(arguments));
+		gestures.add(new TypeGesture(new ArrayList<Argument>()));
     }
 	
     

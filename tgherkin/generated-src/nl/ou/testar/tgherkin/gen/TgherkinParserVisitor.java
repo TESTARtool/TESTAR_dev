@@ -20,6 +20,24 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDocument(TgherkinParser.DocumentContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#execOptions}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExecOptions(TgherkinParser.ExecOptionsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#execOptionExclude}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExecOptionExclude(TgherkinParser.ExecOptionExcludeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#execOptionInclude}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExecOptionInclude(TgherkinParser.ExecOptionIncludeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#feature}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -178,6 +196,12 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTripleClickGesture(TgherkinParser.TripleClickGestureContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#anyGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAnyGesture(TgherkinParser.AnyGestureContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#gestureName}.
 	 * @param ctx the parse tree

@@ -223,7 +223,9 @@ public class Step {
 				}
 			}
 		}
-		ReportUtils.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
+		if (settings.get(ConfigTags.ReportDerivedGestures)){
+			ReportUtils.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
+		}
 		// generate actions
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 		while (iterator.hasNext()) {

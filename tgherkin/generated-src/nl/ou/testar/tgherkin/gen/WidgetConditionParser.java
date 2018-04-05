@@ -19,18 +19,19 @@ public class WidgetConditionParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		TAGNAME=1, FEATURE_KEYWORD=2, BACKGROUND_KEYWORD=3, SCENARIO_KEYWORD=4, 
-		SCENARIO_OUTLINE_KEYWORD=5, EXAMPLES_KEYWORD=6, SELECTION_KEYWORD=7, ORACLE_KEYWORD=8, 
-		STEP_KEYWORD=9, STEP_RANGE_KEYWORD=10, STEP_GIVEN_KEYWORD=11, STEP_WHEN_KEYWORD=12, 
-		STEP_THEN_KEYWORD=13, STEP_ALSO_KEYWORD=14, STEP_EITHER_KEYWORD=15, TABLE_ROW=16, 
-		DECIMAL_NUMBER=17, INTEGER_NUMBER=18, PLACEHOLDER=19, STRING=20, COMMENT=21, 
-		AND=22, OR=23, NOT=24, TRUE=25, FALSE=26, POW=27, MULT=28, DIV=29, MOD=30, 
-		PLUS=31, MINUS=32, GT=33, GE=34, LT=35, LE=36, EQ=37, NE=38, LPAREN=39, 
-		RPAREN=40, COMMA=41, MATCHES_NAME=42, CLICK_NAME=43, TYPE_NAME=44, DRAG_NAME=45, 
-		ANY_NAME=46, DOUBLE_CLICK_NAME=47, TRIPLE_CLICK_NAME=48, RIGHT_CLICK_NAME=49, 
-		MOUSE_MOVE_NAME=50, DROP_DOWN_AT_NAME=51, BOOLEAN_VARIABLE=52, NUMBER_VARIABLE=53, 
-		STRING_VARIABLE=54, EOL=55, WS=56, OTHER=57, BOOLEAN_VARIABLE_NAME=58, 
-		NUMBER_VARIABLE_NAME=59, STRING_VARIABLE_NAME=60;
+		OPTION_KEYWORD_INCLUDE=1, OPTION_KEYWORD_EXCLUDE=2, TAGNAME=3, FEATURE_KEYWORD=4, 
+		BACKGROUND_KEYWORD=5, SCENARIO_KEYWORD=6, SCENARIO_OUTLINE_KEYWORD=7, 
+		EXAMPLES_KEYWORD=8, SELECTION_KEYWORD=9, ORACLE_KEYWORD=10, STEP_KEYWORD=11, 
+		STEP_RANGE_KEYWORD=12, STEP_GIVEN_KEYWORD=13, STEP_WHEN_KEYWORD=14, STEP_THEN_KEYWORD=15, 
+		STEP_ALSO_KEYWORD=16, STEP_EITHER_KEYWORD=17, TABLE_ROW=18, DECIMAL_NUMBER=19, 
+		INTEGER_NUMBER=20, PLACEHOLDER=21, STRING=22, COMMENT=23, AND=24, OR=25, 
+		NOT=26, TRUE=27, FALSE=28, POW=29, MULT=30, DIV=31, MOD=32, PLUS=33, MINUS=34, 
+		GT=35, GE=36, LT=37, LE=38, EQ=39, NE=40, LPAREN=41, RPAREN=42, COMMA=43, 
+		MATCHES_NAME=44, CLICK_NAME=45, TYPE_NAME=46, DRAG_NAME=47, ANY_NAME=48, 
+		DOUBLE_CLICK_NAME=49, TRIPLE_CLICK_NAME=50, RIGHT_CLICK_NAME=51, MOUSE_MOVE_NAME=52, 
+		DROP_DOWN_AT_NAME=53, BOOLEAN_VARIABLE=54, NUMBER_VARIABLE=55, STRING_VARIABLE=56, 
+		EOL=57, WS=58, OTHER=59, BOOLEAN_VARIABLE_NAME=60, NUMBER_VARIABLE_NAME=61, 
+		STRING_VARIABLE_NAME=62;
 	public static final int
 		RULE_widget_condition = 0, RULE_relational_expr = 1, RULE_relational_operator = 2, 
 		RULE_arithmetic_expr = 3, RULE_string_expr = 4, RULE_booleanFunction = 5, 
@@ -43,26 +44,28 @@ public class WidgetConditionParser extends Parser {
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, null, "'Feature:'", "'Background:'", "'Scenario:'", "'Scenario Outline:'", 
-		"'Examples:'", "'Selection:'", "'Oracle:'", "'Step:'", "'Range'", "'Given'", 
-		"'When'", "'Then'", "'Also'", "'Either'", null, null, null, null, null, 
-		null, "'and'", "'or'", null, "'true'", "'false'", "'^'", "'*'", "'/'", 
-		"'%'", "'+'", "'-'", "'>'", "'>='", "'<'", "'<='", "'='", null, "'('", 
-		"')'", "','", "'matches'", "'click'", "'type'", "'drag'", "'anyGesture'", 
-		"'doubleClick'", "'tripleClick'", "'rightClick'", "'mouseMove'", "'dropDownAt'"
+		null, "'include:'", "'exclude:'", null, "'Feature:'", "'Background:'", 
+		"'Scenario:'", "'Scenario Outline:'", "'Examples:'", "'Selection:'", "'Oracle:'", 
+		"'Step:'", "'Range'", "'Given'", "'When'", "'Then'", "'Also'", "'Either'", 
+		null, null, null, null, null, null, "'and'", "'or'", null, "'true'", "'false'", 
+		"'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", "'>='", "'<'", "'<='", 
+		"'='", null, "'('", "')'", "','", "'matches'", "'click'", "'type'", "'drag'", 
+		"'anyGesture'", "'doubleClick'", "'tripleClick'", "'rightClick'", "'mouseMove'", 
+		"'dropDownAt'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
-		null, "TAGNAME", "FEATURE_KEYWORD", "BACKGROUND_KEYWORD", "SCENARIO_KEYWORD", 
-		"SCENARIO_OUTLINE_KEYWORD", "EXAMPLES_KEYWORD", "SELECTION_KEYWORD", "ORACLE_KEYWORD", 
-		"STEP_KEYWORD", "STEP_RANGE_KEYWORD", "STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", 
-		"STEP_THEN_KEYWORD", "STEP_ALSO_KEYWORD", "STEP_EITHER_KEYWORD", "TABLE_ROW", 
-		"DECIMAL_NUMBER", "INTEGER_NUMBER", "PLACEHOLDER", "STRING", "COMMENT", 
-		"AND", "OR", "NOT", "TRUE", "FALSE", "POW", "MULT", "DIV", "MOD", "PLUS", 
-		"MINUS", "GT", "GE", "LT", "LE", "EQ", "NE", "LPAREN", "RPAREN", "COMMA", 
-		"MATCHES_NAME", "CLICK_NAME", "TYPE_NAME", "DRAG_NAME", "ANY_NAME", "DOUBLE_CLICK_NAME", 
-		"TRIPLE_CLICK_NAME", "RIGHT_CLICK_NAME", "MOUSE_MOVE_NAME", "DROP_DOWN_AT_NAME", 
-		"BOOLEAN_VARIABLE", "NUMBER_VARIABLE", "STRING_VARIABLE", "EOL", "WS", 
-		"OTHER", "BOOLEAN_VARIABLE_NAME", "NUMBER_VARIABLE_NAME", "STRING_VARIABLE_NAME"
+		null, "OPTION_KEYWORD_INCLUDE", "OPTION_KEYWORD_EXCLUDE", "TAGNAME", "FEATURE_KEYWORD", 
+		"BACKGROUND_KEYWORD", "SCENARIO_KEYWORD", "SCENARIO_OUTLINE_KEYWORD", 
+		"EXAMPLES_KEYWORD", "SELECTION_KEYWORD", "ORACLE_KEYWORD", "STEP_KEYWORD", 
+		"STEP_RANGE_KEYWORD", "STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", "STEP_THEN_KEYWORD", 
+		"STEP_ALSO_KEYWORD", "STEP_EITHER_KEYWORD", "TABLE_ROW", "DECIMAL_NUMBER", 
+		"INTEGER_NUMBER", "PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", 
+		"TRUE", "FALSE", "POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", 
+		"LT", "LE", "EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "CLICK_NAME", 
+		"TYPE_NAME", "DRAG_NAME", "ANY_NAME", "DOUBLE_CLICK_NAME", "TRIPLE_CLICK_NAME", 
+		"RIGHT_CLICK_NAME", "MOUSE_MOVE_NAME", "DROP_DOWN_AT_NAME", "BOOLEAN_VARIABLE", 
+		"NUMBER_VARIABLE", "STRING_VARIABLE", "EOL", "WS", "OTHER", "BOOLEAN_VARIABLE_NAME", 
+		"NUMBER_VARIABLE_NAME", "STRING_VARIABLE_NAME"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -1211,7 +1214,7 @@ public class WidgetConditionParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3>u\4\2\t\2\4\3\t\3"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3@u\4\2\t\2\4\3\t\3"+
 		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\4\f"+
 		"\t\f\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2\"\n\2\3\2\3\2\3\2\3\2\3\2"+
 		"\3\2\7\2*\n\2\f\2\16\2-\13\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3"+
@@ -1219,27 +1222,27 @@ public class WidgetConditionParser extends Parser {
 		"\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5R\n\5\f\5\16\5U\13\5\3\6\3\6\3\7\3\7"+
 		"\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\t\3\t\3\n\3\n\3\n\3\n\5\nh\n\n\3\13\3\13"+
 		"\3\13\3\13\5\13n\n\13\3\f\3\f\3\f\5\fs\n\f\3\f\2\4\2\b\r\2\4\6\b\n\f\16"+
-		"\20\22\24\26\2\6\3\2#(\3\2\36 \3\2!\"\3\2\33\34}\2!\3\2\2\2\4:\3\2\2\2"+
-		"\6<\3\2\2\2\bF\3\2\2\2\nV\3\2\2\2\fX\3\2\2\2\16Z\3\2\2\2\20a\3\2\2\2\22"+
-		"g\3\2\2\2\24m\3\2\2\2\26r\3\2\2\2\30\31\b\2\1\2\31\32\7\32\2\2\32\"\5"+
-		"\2\2\6\33\"\5\22\n\2\34\35\7)\2\2\35\36\5\2\2\2\36\37\7*\2\2\37\"\3\2"+
+		"\20\22\24\26\2\6\3\2%*\3\2 \"\3\2#$\3\2\35\36}\2!\3\2\2\2\4:\3\2\2\2\6"+
+		"<\3\2\2\2\bF\3\2\2\2\nV\3\2\2\2\fX\3\2\2\2\16Z\3\2\2\2\20a\3\2\2\2\22"+
+		"g\3\2\2\2\24m\3\2\2\2\26r\3\2\2\2\30\31\b\2\1\2\31\32\7\34\2\2\32\"\5"+
+		"\2\2\6\33\"\5\22\n\2\34\35\7+\2\2\35\36\5\2\2\2\36\37\7,\2\2\37\"\3\2"+
 		"\2\2 \"\5\4\3\2!\30\3\2\2\2!\33\3\2\2\2!\34\3\2\2\2! \3\2\2\2\"+\3\2\2"+
-		"\2#$\f\4\2\2$%\7\30\2\2%*\5\2\2\5&\'\f\3\2\2\'(\7\31\2\2(*\5\2\2\4)#\3"+
+		"\2#$\f\4\2\2$%\7\32\2\2%*\5\2\2\5&\'\f\3\2\2\'(\7\33\2\2(*\5\2\2\4)#\3"+
 		"\2\2\2)&\3\2\2\2*-\3\2\2\2+)\3\2\2\2+,\3\2\2\2,\3\3\2\2\2-+\3\2\2\2./"+
 		"\5\b\5\2/\60\5\6\4\2\60\61\5\b\5\2\61;\3\2\2\2\62\63\5\n\6\2\63\64\5\6"+
-		"\4\2\64\65\5\n\6\2\65;\3\2\2\2\66\67\7)\2\2\678\5\4\3\289\7*\2\29;\3\2"+
+		"\4\2\64\65\5\n\6\2\65;\3\2\2\2\66\67\7+\2\2\678\5\4\3\289\7,\2\29;\3\2"+
 		"\2\2:.\3\2\2\2:\62\3\2\2\2:\66\3\2\2\2;\5\3\2\2\2<=\t\2\2\2=\7\3\2\2\2"+
-		">?\b\5\1\2?@\7\"\2\2@G\5\b\5\6AG\5\24\13\2BC\7)\2\2CD\5\b\5\2DE\7*\2\2"+
-		"EG\3\2\2\2F>\3\2\2\2FA\3\2\2\2FB\3\2\2\2GS\3\2\2\2HI\f\5\2\2IJ\7\35\2"+
+		">?\b\5\1\2?@\7$\2\2@G\5\b\5\6AG\5\24\13\2BC\7+\2\2CD\5\b\5\2DE\7,\2\2"+
+		"EG\3\2\2\2F>\3\2\2\2FA\3\2\2\2FB\3\2\2\2GS\3\2\2\2HI\f\5\2\2IJ\7\37\2"+
 		"\2JR\5\b\5\6KL\f\4\2\2LM\t\3\2\2MR\5\b\5\5NO\f\3\2\2OP\t\4\2\2PR\5\b\5"+
 		"\4QH\3\2\2\2QK\3\2\2\2QN\3\2\2\2RU\3\2\2\2SQ\3\2\2\2ST\3\2\2\2T\t\3\2"+
-		"\2\2US\3\2\2\2VW\5\26\f\2W\13\3\2\2\2XY\5\16\b\2Y\r\3\2\2\2Z[\7,\2\2["+
-		"\\\7)\2\2\\]\78\2\2]^\7+\2\2^_\7\26\2\2_`\7*\2\2`\17\3\2\2\2ab\t\5\2\2"+
-		"b\21\3\2\2\2ch\5\20\t\2dh\7\66\2\2eh\7\25\2\2fh\5\f\7\2gc\3\2\2\2gd\3"+
-		"\2\2\2ge\3\2\2\2gf\3\2\2\2h\23\3\2\2\2in\7\24\2\2jn\7\23\2\2kn\7\67\2"+
-		"\2ln\7\25\2\2mi\3\2\2\2mj\3\2\2\2mk\3\2\2\2ml\3\2\2\2n\25\3\2\2\2os\7"+
-		"\26\2\2ps\78\2\2qs\7\25\2\2ro\3\2\2\2rp\3\2\2\2rq\3\2\2\2s\27\3\2\2\2"+
-		"\f!)+:FQSgmr";
+		"\2\2US\3\2\2\2VW\5\26\f\2W\13\3\2\2\2XY\5\16\b\2Y\r\3\2\2\2Z[\7.\2\2["+
+		"\\\7+\2\2\\]\7:\2\2]^\7-\2\2^_\7\30\2\2_`\7,\2\2`\17\3\2\2\2ab\t\5\2\2"+
+		"b\21\3\2\2\2ch\5\20\t\2dh\78\2\2eh\7\27\2\2fh\5\f\7\2gc\3\2\2\2gd\3\2"+
+		"\2\2ge\3\2\2\2gf\3\2\2\2h\23\3\2\2\2in\7\26\2\2jn\7\25\2\2kn\79\2\2ln"+
+		"\7\27\2\2mi\3\2\2\2mj\3\2\2\2mk\3\2\2\2ml\3\2\2\2n\25\3\2\2\2os\7\30\2"+
+		"\2ps\7:\2\2qs\7\27\2\2ro\3\2\2\2rp\3\2\2\2rq\3\2\2\2s\27\3\2\2\2\f!)+"+
+		":FQSgmr";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

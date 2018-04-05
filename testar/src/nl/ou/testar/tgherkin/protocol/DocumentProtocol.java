@@ -133,7 +133,9 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	 * @throws ActionBuildException 
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		ReportUtils.reportState(state, getSequenceCount(), getActionCount());
+		if (settings().get(ConfigTags.ReportState)){
+			ReportUtils.reportState(state, getSequenceCount(), getActionCount());	
+		}
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 		Set<Action> actions = super.deriveActions(system,state);
 		if (documentExecutionMode()) {		

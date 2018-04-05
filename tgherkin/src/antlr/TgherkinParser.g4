@@ -4,7 +4,11 @@ options { tokenVocab=TgherkinLexer; }
 
 import WidgetConditionParser;
 
-document : feature+ EOF;
+document : execOptions? feature+ EOF;
+
+execOptions : execOptionExclude execOptionInclude? | execOptionInclude execOptionExclude?;
+execOptionExclude : OPTION_KEYWORD_EXCLUDE tags+=TAGNAME+ EOL*;
+execOptionInclude : OPTION_KEYWORD_INCLUDE tags+=TAGNAME+ EOL*;
 
 feature:
 	tags+=tagname* 
@@ -123,7 +127,8 @@ gesture:
  | typeGesture
  | clickGesture
  | doubleClickGesture
- | tripleClickGesture;
+ | tripleClickGesture
+ | anyGesture;
  
 typeGesture: TYPE_NAME LPAREN (STRING | PLACEHOLDER)? RPAREN; 
 
@@ -133,6 +138,8 @@ doubleClickGesture: DOUBLE_CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPARE
 
 tripleClickGesture: TRIPLE_CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
 
-gestureName:  DRAG_NAME | ANY_NAME | RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
+anyGesture: ANY_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
+
+gestureName:  DRAG_NAME | RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
 
 parameterlessGesture: gestureName LPAREN RPAREN; 

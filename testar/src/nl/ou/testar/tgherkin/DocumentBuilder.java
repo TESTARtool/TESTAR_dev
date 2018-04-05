@@ -47,24 +47,72 @@ import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
  *
  */
 public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
-
+	private class ExecOptions{		
+		List<Tag> excludeTags;
+		List<Tag> includeTags;
+		private ExecOptions(List<Tag> excludeTags, List<Tag> includeTags) {
+			super();
+			this.excludeTags = excludeTags;
+			this.includeTags = includeTags;
+		}
+	}
 	/**
 	 * Data separator meta.
 	 */
 	public static final String DATA_SEPARTATOR_META = "\\|";
+	private ExecOptions execOptions;
 	private List<WidgetCondition> widgetConditions;
 	private Queue<WidgetCondition.Type> operatorQueue = new LinkedList<WidgetCondition.Type>();
 
 	@Override 
 	public Document visitDocument(TgherkinParser.DocumentContext ctx) { 
+		if (ctx.execOptions() != null) {
+			execOptions = visitExecOptions(ctx.execOptions());	
+		}
 		List<Feature> features = new ArrayList<Feature>();
 		for (TgherkinParser.FeatureContext featureContext : ctx.feature()){
-			features.add(visitFeature(featureContext));
+			Feature feature = visitFeature(featureContext);
+			if (feature != null) {
+				features.add(visitFeature(featureContext));
+			}
 		}
 		Document document = new Document(features);
 		return document;
 	}
+	
+	@Override
+	public ExecOptions visitExecOptions(TgherkinParser.ExecOptionsContext ctx) {
+		List<Tag> excludeTags;
+		List<Tag> includeTags;
+		if (ctx.execOptionExclude() != null){
+			excludeTags = visitExecOptionExclude(ctx.execOptionExclude()); 
+		}else {
+			excludeTags = new ArrayList<Tag>();
+		}
+		if (ctx.execOptionInclude() != null){
+			includeTags = visitExecOptionInclude(ctx.execOptionInclude());
+		}else {
+			includeTags = new ArrayList<Tag>();
+		}
+		return new ExecOptions(excludeTags, includeTags);
+	}
 
+	public List<Tag> visitExecOptionExclude(TgherkinParser.ExecOptionExcludeContext ctx) {
+		List<Tag> tags = new ArrayList<Tag>();		
+		for (TerminalNode terminalNode : ctx.TAGNAME()) {
+			tags.add(new Tag(terminalNode.getText()));
+		}		
+		return tags;
+	}
+
+	public List<Tag> visitExecOptionInclude(TgherkinParser.ExecOptionIncludeContext ctx) {
+		List<Tag> tags = new ArrayList<Tag>();		
+		for (TerminalNode terminalNode : ctx.TAGNAME()) {
+			tags.add(new Tag(terminalNode.getText()));
+		}		
+		return tags;		
+	}
+	
 	@Override 
 	public Feature visitFeature(TgherkinParser.FeatureContext ctx) {
 		List<Tag> tags = new ArrayList<Tag>();
@@ -92,8 +140,23 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		}
 		List<ScenarioDefinition> scenarioDefinitions = new ArrayList<ScenarioDefinition>();
 		for (TgherkinParser.ScenarioDefinitonContext scenarioDefinitionContext : ctx.scenarioDefiniton()) {
-			scenarioDefinitions.add(visitScenarioDefiniton(scenarioDefinitionContext));
+			ScenarioDefinition scenarioDefinition = visitScenarioDefiniton(scenarioDefinitionContext);
+			boolean select = true;
+			if (scenarioDefinition instanceof Scenario) {
+				select = select(execOptions, tags, ((Scenario)scenarioDefinition).getTags());
+			}
+			if (scenarioDefinition instanceof ScenarioOutline) {
+				select = select(execOptions, tags, ((ScenarioOutline)scenarioDefinition).getTags());
+			}
+			if (select) {
+				// only add scenario definitions defined by execution option to model
+				scenarioDefinitions.add(scenarioDefinition);
+			}
 		}		
+		if (scenarioDefinitions.size() == 0 ) {
+			// no scenarios selected for the execution option settings.
+			return null;
+		}
 		return new Feature(tags, title, narrative, selection, oracle, background, scenarioDefinitions); 
 	}
 
@@ -408,6 +471,23 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		return new TripleClickGesture(arguments);		
 	}
 	
+	@Override
+	public AnyGesture visitAnyGesture(TgherkinParser.AnyGestureContext ctx) {
+		List<Argument> arguments = new ArrayList<Argument>();
+		if (ctx.PLACEHOLDER() != null) {
+			// use placeholder name without enclosing angular brackets
+			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+		}else {
+			if (ctx.TRUE() != null) {
+				arguments.add(new BooleanArgument(true)); 
+			}else {
+				if (ctx.FALSE() != null) {
+					arguments.add(new BooleanArgument(false)); 
+				}				
+			}
+		}
+		return new AnyGesture(arguments);		
+	}
 	
 	@Override 
 	public Gesture visitParameterlessGesture(TgherkinParser.ParameterlessGestureContext ctx) { 
@@ -415,9 +495,6 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			return null;
 		}	
 		List<Argument> arguments = new ArrayList<Argument>();
-		if (ctx.gestureName().ANY_NAME() != null) {
-			return new AnyGesture(arguments);
-		}
 		if (ctx.gestureName().DRAG_NAME() != null) {
 			return new DragGesture(arguments);
 		}
@@ -446,6 +523,43 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			narrative = lines.toString();
 		}
 		return narrative;
+	}
+
+	private boolean select(ExecOptions execOptions, List<Tag> featureTags, List<Tag> scenarioTags) {
+		if (execOptions == null) {
+			// no execution option defined
+			return true;
+		}
+		// search for matching exclude/include tag execution option in list of defined feature tags 
+		if (execOptions.excludeTags.size() > 0 && matchingTagExists(execOptions.excludeTags, featureTags) ) {
+			return false;
+		}
+		if (execOptions.includeTags.size() > 0 && matchingTagExists(execOptions.includeTags, featureTags) ) {
+			return true;
+		}
+		// search for matching exclude/include tag execution option in list of defined scenario tags 
+		if (execOptions.excludeTags.size() > 0 && matchingTagExists(execOptions.excludeTags, scenarioTags) ) {
+			return false;
+		}
+		if (execOptions.includeTags.size() > 0 && matchingTagExists(execOptions.includeTags, scenarioTags) ) {
+			return true;
+		}
+		// include option defined?
+		if (execOptions.includeTags.size() > 0) {
+			return false;
+		}		
+		return true;
+	}
+	
+	private boolean matchingTagExists(List<Tag> optionTags, List<Tag> tags) {
+		for(Tag optionTag : optionTags){
+			for (Tag tag : tags){
+				if (optionTag.getName().equals(tag.getName())) {
+					return true;
+				}
+			}
+		}		
+		return false;
 	}
 
 }
