@@ -37,59 +37,30 @@ package web_bitrix24;
  */
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.Random;
-
-import org.fruit.Assert;
-import org.fruit.Drag; // by urueda
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
 
-import static org.fruit.monkey.ConfigTags.*;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
-
 
 public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	

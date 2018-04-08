@@ -36,53 +36,23 @@ package desktop_swingset2;
  */
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
-import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-
-import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
-
-
 
 public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // DefaultProtocol {
 
