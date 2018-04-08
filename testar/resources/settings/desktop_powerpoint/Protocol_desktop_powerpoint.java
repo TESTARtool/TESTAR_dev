@@ -1,3 +1,5 @@
+package desktop_powerpoint;
+
 /***************************************************************************************************
 *
 * Copyright (c) 2017 Universitat Politecnica de Valencia - www.upv.es

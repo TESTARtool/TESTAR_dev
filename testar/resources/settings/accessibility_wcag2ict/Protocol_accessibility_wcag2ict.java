@@ -1,3 +1,5 @@
+package accessibility_wcag2ict;
+
 /***************************************************************************************************
 *
 * Copyright (c) 2017 Open Universiteit - www.ou.nl

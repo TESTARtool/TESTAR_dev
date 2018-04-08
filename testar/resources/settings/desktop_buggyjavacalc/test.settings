@@ -1,5 +1,5 @@
 TypingTextsForExecutedAction = 10
-SUTConnectorValue = java -jar "suts/calc.jar"
+SUTConnectorValue = java -jar "../suts/calc.jar"
 Discount = 0.95
 GraphDBEnabled = false
 ProtocolClass = desktop_buggyjavacalc/Protocol_desktop_buggyjavacalc

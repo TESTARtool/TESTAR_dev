@@ -222,10 +222,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
 		long pid, handle; String desc;
 		List<SUT> runningP = NativeLinker.getNativeProcesses();
-		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
+		// System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
+			// System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -966,7 +966,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA} start runAction");
+		// LOGGER.info("[RA] start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -1131,7 +1131,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
+        // LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1165,7 +1165,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
 			long tStart = System.currentTimeMillis();
-			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
+			// LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
 			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
@@ -1420,7 +1420,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
-			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
+			// LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
 				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
@@ -1573,7 +1573,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				// begin by urueda
 				if (GlobalScreen.isNativeHookRegistered())
 					GlobalScreen.unregisterNativeHook();
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
+				// LOGGER.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
 				// end by urueda
 				GlobalScreen.registerNativeHook();
 				//GlobalScreen.getInstance().addNativeKeyListener(this);

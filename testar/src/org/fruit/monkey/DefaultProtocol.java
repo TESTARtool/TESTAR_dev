@@ -165,6 +165,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
+			
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
@@ -186,7 +187,6 @@ public class DefaultProtocol extends AbstractProtocol{
 				sut.stop();
 			// issue starting the SUT
 			if (tryToKillIfRunning){
-				System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
 				return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
 			} else
 				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							

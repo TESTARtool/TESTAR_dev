@@ -77,15 +77,15 @@ class OrientDBRepository implements GraphDBRepository {
 
       graph.shutdown();
       long tEnd = System.currentTimeMillis();
-      LOGGER.info("[S<] # {} # stored in #{} # ms", state.get(Tags.ConcreteID), tEnd - tStart);
+      // LOGGER.info("[S<] # {} # stored in #{} # ms", state.get(Tags.ConcreteID), tEnd - tStart);
    }
 
 
    @Override
    public void addAction(final Action action, final String toStateID) {
 
-      LOGGER.info("Store Action {} ({}) from {} to {}",
-         action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
+      // LOGGER.info("Store Action {} ({}) from {} to {}",
+      //  action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
 
       long tStart = System.currentTimeMillis();
 
@@ -105,13 +105,13 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      LOGGER.info("[A<] # {} # stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
+      // LOGGER.info("[A<] # {} # stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
    }
 
    @Override
    public void addActionOnState(String stateId, Action action, String toStateID) {
-      LOGGER.info("Store Action {} ({}) from {} to {}",
-         action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
+      // LOGGER.info("Store Action {} ({}) from {} to {}",
+      // action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
       long tStart = System.currentTimeMillis();
 
       OrientGraph graph = graphFactory.getTx();
@@ -130,12 +130,12 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      LOGGER.info("[A<] # {} stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
+      // LOGGER.info("[A<] # {} stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
    }
 
    @Override
    public void addWidget(String stateID, Widget w) {
-      LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
+      // LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
       long tStart = System.currentTimeMillis();
       OrientGraph graph = graphFactory.getTx();
       try {
@@ -154,7 +154,7 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID), tEnd - tStart);
+      // LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID), tEnd - tStart);
 
    }
 
