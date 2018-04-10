@@ -110,7 +110,7 @@ public class TestSerialiser extends Thread {
 			}
 		}
 		synchronized(test){
-			System.out.println("TestSerialiser finished");
+			System.out.println("[" + getClass().getSimpleName() + "] TestSerialiser finished");
 			singletonTestSerialiser = null;
 			test.notifyAll();
 		}
@@ -157,7 +157,7 @@ public class TestSerialiser extends Thread {
 					}
 				}
 			} catch (Exception e) {} // test may be set to null when we try to sync on it		
-			//System.out.println("TestSerialisationManager exited");
+			//System.out.println("[" + getClass().getSimpleName() + "] TestSerialisationManager exited");
 			test = null;
 		}
 	}

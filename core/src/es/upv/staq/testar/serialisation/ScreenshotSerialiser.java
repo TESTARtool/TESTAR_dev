@@ -105,7 +105,7 @@ public class ScreenshotSerialiser extends Thread {
 			}
 		}
 		synchronized(testSequenceFolder){
-			System.out.println("ScreenshotSerialiser finished");
+			System.out.println("[" + getClass().getSimpleName() + "] ScreenshotSerialiser finished");
 			singletonScreenshotSerialiser = null;
 			testSequenceFolder.notifyAll();
 		}
@@ -147,7 +147,7 @@ public class ScreenshotSerialiser extends Thread {
 					}
 				}
 			} catch (Exception e) {} // testSequenceFolder may be set to null when we try to sync on it
-			//System.out.println("ScreenshotManager exited");
+			//System.out.println("[" + getClass().getSimpleName() + "] ScreenshotManager exited");
 			testSequenceFolder = null;
 		}
 	}	

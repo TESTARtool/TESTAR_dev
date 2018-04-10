@@ -56,7 +56,7 @@ public class AWTCanvasExample {
 		
 		scrshot.begin();
 		int crop = 10;
-		System.out.println(pic.width());
+		System.out.println("AWTCanvasExample => " + pic.width());
 		pic.paint(scrshot, Rect.from(crop, crop, pic.width() - 2 * crop, pic.height() - 2 * crop), 
 				Rect.from(0, 0, 200, 200));
 		

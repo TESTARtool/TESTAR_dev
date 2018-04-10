@@ -169,7 +169,7 @@ public class ProtocolEditor extends javax.swing.JDialog {
             //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
             Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java"); // by urueda
         } catch (IOException ioe) {
-            System.out.println(ioe);
+            System.out.println("[" + getClass().getSimpleName() + "]  " +  ioe);
         }
     }                                 
 

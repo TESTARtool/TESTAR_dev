@@ -56,11 +56,11 @@ public final class AWTMouse implements Mouse {
 	public String toString() { return "AWT Mouse"; }
 
 	public void press(MouseButtons k) { 
-		//System.out.println("lc down [AWTMouse]");
+		//System.out.println("[" + getClass().getSimpleName() + "] lc down [AWTMouse]");
 		robot.mousePress(k.code());}
 
 	public void release(MouseButtons k) { 
-		//System.out.println("lc up [AWTMouse]");
+		//System.out.println("[" + getClass().getSimpleName() + "] lc up [AWTMouse]");
 		robot.mouseRelease(k.code());
 	}	
 	

@@ -60,7 +60,7 @@ public abstract class PredicateBase implements IPredicate {
 		if (solutions != null && !solutions.isEmpty()){
 			String refuteMsg = ""; for (Object o : this.predicateContext) refuteMsg += o.toString() + " ";
 			refuteMsg += "predicate refuted!";
-			System.out.println(refuteMsg); PrologUtil.printSolutions(solutions);
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  refuteMsg); PrologUtil.printSolutions(solutions);
 			return new Verdict(Verdict.SEVERITY_MAX, refuteMsg);
 		}
 		return Verdict.OK;  // cannot refute predicate

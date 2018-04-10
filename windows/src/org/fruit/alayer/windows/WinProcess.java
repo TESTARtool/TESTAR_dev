@@ -183,7 +183,7 @@ public final class WinProcess extends SUTBase {
 
 		}catch(FruitException fe){
 			LogSerialiser.log(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
-			System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
+			System.out.println("[WinProcess] " + appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
 			throw new SystemStartException(fe);
 		}
 	}
@@ -193,7 +193,7 @@ public final class WinProcess extends SUTBase {
 	public static boolean isForeground(long pid){
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
+		//System.out.println("[WinProcess] foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
 		return !Windows.IsIconic(hwnd) && (wpid == pid);
 	}
 
@@ -242,7 +242,7 @@ public final class WinProcess extends SUTBase {
 		try{
 			pid = wp.pid();
 		} catch(IllegalStateException e){
-			System.out.println("SUT is not running - cannot retrieve RAM usage");
+			System.out.println("[WinProcess] SUT is not running - cannot retrieve RAM usage");
 			return -1;
 		}
 		return Windows.GetProcessMemoryInfo(pid);
@@ -256,7 +256,7 @@ public final class WinProcess extends SUTBase {
 		try{
 			pid = wp.pid();
 		} catch(IllegalStateException e){
-			System.out.println("SUT is not running - cannot retrieve CPU usage");
+			System.out.println("[WinProcess] SUT is not running - cannot retrieve CPU usage");
 			return new long[]{-1,-1};
 		}
 		return Windows.GetProcessTimes(pid);
@@ -367,7 +367,7 @@ public final class WinProcess extends SUTBase {
 			@Override
 			public void nativeReleaseAutomationElement(long elementPtr){
 				/*long refCount =*/ Windows.IUnknown_Release(elementPtr);
-				//System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
+				//System.out.println("[WinProcess] Released automation element <" + elementPtr + " > reference count: " + refCount);
 			}
 			@Override
 			public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr){

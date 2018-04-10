@@ -76,7 +76,7 @@ public class TreeWalkerTests {
         assertEquals(true, applicationNodes.size() > 1);
 
 
-        System.out.println("Galculator apps running: " + applicationNodes.size());
+        System.out.println("[" + getClass().getSimpleName() + "] Galculator apps running: " + applicationNodes.size());
 
 
         // Give user time to setup windows.
@@ -94,7 +94,7 @@ public class TreeWalkerTests {
 
 
         if (activeCalculator == null) {
-            System.out.println("No calculator is the active application.");
+            System.out.println("[" + getClass().getSimpleName() + "] No calculator is the active application.");
         } else {
 
 
@@ -105,17 +105,17 @@ public class TreeWalkerTests {
             String name = xdotools.getNameFromActiveWindow();
 
 
-            System.out.println("Active application is: '" + name + "' with PID: " + pid);
+            System.out.println("[" + getClass().getSimpleName() + "] Active application is: '" + name + "' with PID: " + pid);
 
 
             // Check if the PID matches calculator 2.
             if (pid == calc2.get_pid()) {
-                System.out.println("Calculator 2 already active - done!");
+                System.out.println("[" + getClass().getSimpleName() + "] Calculator 2 already active - done!");
                 calc1.stop();
                 calc2.stop();
                 return;
             } else if (pid == calc1.get_pid()) {
-                System.out.println("Calculator 1 is active - continuing search for calculator 2...");
+                System.out.println("[" + getClass().getSimpleName() + "] Calculator 1 is active - continuing search for calculator 2...");
             }
 
 
@@ -148,21 +148,21 @@ public class TreeWalkerTests {
                 String name = xdotools.getNameFromActiveWindow();
 
 
-                System.out.println("Active application is: '" + name + "' with PID: " + pid);
+                System.out.println("[" + getClass().getSimpleName() + "] Active application is: '" + name + "' with PID: " + pid);
 
 
                 // Check if the PID matches calculator 2.
                 if (pid == calc2.get_pid()) {
-                    System.out.println("Found calculator 2!");
+                    System.out.println("[" + getClass().getSimpleName() + "] Found calculator 2!");
                     foundCalc = true;
                     break;
                 } else if (pid == calc1.get_pid()) {
-                    System.out.println("Found calculator 1 - continuing search for calculator 2...");
+                    System.out.println("[" + getClass().getSimpleName() + "] Found calculator 1 - continuing search for calculator 2...");
                 }
 
 
             } else {
-                System.out.println("Cannot activate the application!");
+                System.out.println("[" + getClass().getSimpleName() + "] Cannot activate the application!");
             }
 
 
@@ -170,7 +170,7 @@ public class TreeWalkerTests {
 
 
         if (!foundCalc) {
-            System.out.println("Could not find calculator 2!");
+            System.out.println("[" + getClass().getSimpleName() + "] Could not find calculator 2!");
         }
 
 
@@ -273,7 +273,7 @@ public class TreeWalkerTests {
 
 
         boolean hasModals = TreeWalker.hasApplicationModalDialogs(applicationNodes.get(0));
-        System.out.println("Has modals: " + hasModals);
+        System.out.println("[" + getClass().getSimpleName() + "] Has modals: " + hasModals);
 
 
         List<AtSpiAccessible> nonModals = TreeWalker.getNonModalApplicationChildNodes(applicationNodes.get(0));
@@ -282,7 +282,7 @@ public class TreeWalkerTests {
         for (AtSpiAccessible a : nonModals) {
             a.retrieveAccessibleInfo();
         }
-        System.out.println("NonModals: " + nonModals.size());
+        System.out.println("[" + getClass().getSimpleName() + "] NonModals: " + nonModals.size());
 
 
     }
@@ -307,7 +307,7 @@ public class TreeWalkerTests {
 
 
         boolean hasModals = TreeWalker.hasApplicationModalDialogs(applicationNodes.get(0));
-        System.out.println("Has modals: " + hasModals);
+        System.out.println("[" + getClass().getSimpleName() + "] Has modals: " + hasModals);
 
 
         List<AtSpiAccessible> nonModals = TreeWalker.getNonModalApplicationChildNodes(applicationNodes.get(0));
@@ -316,7 +316,7 @@ public class TreeWalkerTests {
         for (AtSpiAccessible a : nonModals) {
             a.retrieveAccessibleInfo();
         }
-        System.out.println("NonModals: " + nonModals.size());
+        System.out.println("[" + getClass().getSimpleName() + "] NonModals: " + nonModals.size());
 
 
         List<AtSpiAccessible> modals = TreeWalker.getModalApplicationChildNodes(applicationNodes.get(0));
@@ -325,7 +325,7 @@ public class TreeWalkerTests {
         for (AtSpiAccessible a : modals) {
             a.retrieveAccessibleInfo();
         }
-        System.out.println("Modals: " + modals.size());
+        System.out.println("[" + getClass().getSimpleName() + "] Modals: " + modals.size());
 
 
     }

@@ -173,6 +173,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
     for (Widget w : state) {
       Role role = w.get(Tags.Role, Roles.Widget);
+      System.out.println("[" + getClass().getSimpleName() + "]  " +  getClass().getSimpleName() + " => role: " + role);
       if (Role.isOneOf(role, NativeLinker.getNativeRole("UIAToolBar"))) {
         browser_toolbar_filter = w.get(Tags.Shape, null).y() + w.get(Tags.Shape, null).height();
       }

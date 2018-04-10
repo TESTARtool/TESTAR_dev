@@ -94,7 +94,7 @@ public class WalkerUtil {
 				pathTargetState.add(0, cgs);
 			return pathTargetState;
 		} catch (Exception e){
-			System.out.println("WalkerUtil exception:");
+			System.out.println("[WalkerUtil] exception:");
 			e.printStackTrace();
 			return null;
 		}

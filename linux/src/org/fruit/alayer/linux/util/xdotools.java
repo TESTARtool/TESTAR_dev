@@ -71,7 +71,7 @@ public class xdotools {
             }
 
 
-            System.out.println("Could not parse '" + outputLine + "' to a PID.");
+            System.out.println("[xdotools] Could not parse '" + outputLine + "' to a PID.");
 
 
             return -1;

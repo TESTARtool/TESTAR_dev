@@ -77,7 +77,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 	
 	protected void altNumpad(SUT system, String numpadCodes){
 		if (numpadCodes == null || !numpadCodes.matches("^\\d+$")){
-			System.out.println("Unknown key: " + numpadCodes);
+			System.out.println("[" + getClass().getSimpleName() + "] Unknown key: " + numpadCodes);
 			return;
 		}               
 		Keyboard keyb = system.get(Tags.StandardKeyboard);
@@ -104,7 +104,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 		  case '7' : return KBKeys.VK_NUMPAD7;
 		  case '8' : return KBKeys.VK_NUMPAD8;
 		  case '9' : return KBKeys.VK_NUMPAD9;
-  		default  : System.out.println("AltNumpad - not a number 0-9: " + numberChar);
+  		default  : System.out.println("[" + getClass().getSimpleName() + "] AltNumpad - not a number 0-9: " + numberChar);
 		return null;
 		}
 	}

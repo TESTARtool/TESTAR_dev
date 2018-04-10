@@ -168,7 +168,7 @@ public class Main {
       }
     }
     if (sutSettings.isEmpty()) {
-      System.out.println("No SUT settings found!");
+      System.out.println("[Main] No SUT settings found!");
     }
     else {
       Object[] options = sutSettings.toArray();
@@ -186,12 +186,12 @@ public class Main {
       try {
         File f = new File("./resources/settings/" + sse);
         if (f.createNewFile()) {
-          //System.out.println("Using <" + s + "> test settings");
+          //System.out.println("[Main] Using <" + s + "> test settings");
           SSE_ACTIVATED = s;
           return;
         }
       } catch (IOException e) {
-        System.out.println("Exception creating <" + sse + "> file");
+        System.out.println("[Main] Exception creating <" + sse + "> file");
       }
     }
     SSE_ACTIVATED = null;
@@ -215,9 +215,9 @@ public class Main {
     // begin by urueda
     String[] files = getSSE();
     if (files != null && files.length > 1) {
-      System.out.println("Too many *.sse files - exactly one expected!");
+      System.out.println("[Main] Too many *.sse files - exactly one expected!");
       for (String f : files) {
-        System.out.println("Delete file <" + f + "> = " + new File(f).delete());
+        System.out.println("[Main] => Delete file <" + f + "> = " + new File(f).delete());
       }
       files = null;
     }
@@ -231,7 +231,7 @@ public class Main {
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
     String testSettings = "./resources/settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
-    System.out.println("Test settings is <" + testSettings + ">");
+    System.out.println("[Main] Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // end by urueda
 
@@ -257,7 +257,7 @@ public class Main {
         }
         LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
       } catch (Throwable t) {
-        System.out.println("Cannot initialize log file!");
+        System.out.println("[Main] Cannot initialize log file!");
         t.printStackTrace(System.out);
         System.exit(-1);
       }

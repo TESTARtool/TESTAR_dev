@@ -600,9 +600,9 @@ public final class Util {
     Writer out = new BufferedWriter(osw);
     try {
       out.write(content);
-      System.out.println("Saved <" + file + ">");
+      System.out.println("Util => " + "Saved <" + file + ">");
     } catch (IOException ioe) {
-      System.out.println("I/O exception writing file <" + file + ">: " + ioe.getMessage());
+      System.out.println("Util => " + "I/O exception writing file <" + file + ">: " + ioe.getMessage());
     } finally {
       if (out != null) {
         out.close();
@@ -729,7 +729,7 @@ public final class Util {
   // refactored from testar -> ProtocolEditor (by urueda)
   public static void compileJava(List<File> dir, String classPath) {
     for (File f : dir) {
-      System.out.println("Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
+      System.out.println("Util => " + "Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
     }
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -901,7 +901,7 @@ public final class Util {
           Long.toString(ms / 60000) + " minutes or " +
           Long.toString(ms / 3600000) + " hours";
     } catch (ParseException e) {
-      System.out.println("Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
+      System.out.println("Util => " + "Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
       e.printStackTrace();
       return e.getMessage();
     }

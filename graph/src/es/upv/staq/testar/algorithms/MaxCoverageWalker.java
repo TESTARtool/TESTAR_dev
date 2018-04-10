@@ -107,25 +107,25 @@ public class MaxCoverageWalker extends AbstractWalker {
 					}
 				}
 				if (allStatesUnexplored){
-					System.out.println("[MaxCoverageWalker] Moving to unexplored state from >" + state.get(Tags.ConcreteID) + "> through <" + ga.getConcreteID() + ">");
+					System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Moving to unexplored state from >" + state.get(Tags.ConcreteID) + "> through <" + ga.getConcreteID() + ">");
 					return a;
 				}
 			}
 		}
 
-		System.out.println("[MaxCoverageWalker] Completely explored state: " + state.get(Tags.ConcreteID));
+		System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Completely explored state: " + state.get(Tags.ConcreteID));
 		// jump to unexplored state
 		if (RestartsWalkerUtil.forceStateRestart(this,env, state)){
-			System.out.println("[MaxCoverageWalker] Trying to discover new UI states by state-restart from: " + state.get(Tags.ConcreteID));
+			System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Trying to discover new UI states by state-restart from: " + state.get(Tags.ConcreteID));
 			return super.selectProportional(env, state, actions);
 		}
 		
-		System.out.println("[MaxCoverageWalker] No unexplored UI reachable from: " + state.get(Tags.ConcreteID));
+		System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] No unexplored UI reachable from: " + state.get(Tags.ConcreteID));
 		if (RestartsWalkerUtil.getTestSquenceIdx() < MIN_WALKER_STEPS){
-			System.out.println("[MaxCoverageWalker] Test steps <" + RestartsWalkerUtil.getTestSquenceIdx() + "> lower than MIN_WALKER_STEPS < " + MIN_WALKER_STEPS + ">: doing RANDOM");
+			System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Test steps <" + RestartsWalkerUtil.getTestSquenceIdx() + "> lower than MIN_WALKER_STEPS < " + MIN_WALKER_STEPS + ">: doing RANDOM");
 			return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size())); // force random
 		} else {
-			System.out.println("[MaxCoverageWalker] Forcing test sequence end");
+			System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Forcing test sequence end");
 			return null; // force test sequence end
 		}
 	}

@@ -88,7 +88,7 @@ public class PrologUtil {
 	
 	public static void printSolutions(List<List<String>> solutions){
 		if (solutions == null || solutions.isEmpty()){
-			System.out.println(">>> Prolog: no solutions <<<\n");
+			System.out.println("[PrologUtil] >>> Prolog: no solutions <<<\n");
 			return;
 		}
 		Set<String> solSet = new HashSet<String>(); // fix equal solutions duplication
@@ -108,8 +108,8 @@ public class PrologUtil {
 		}
 		int idx = 1;
 		for (String s : solSet)
-			System.out.println("Prolog-Solution (" + (idx++) + "):\n" + s);
-		System.out.println("");
+			System.out.println("[PrologUtil] Prolog-Solution (" + (idx++) + "):\n" + s);
+		System.out.println("[PrologUtil]  ");
 	}
 
 }

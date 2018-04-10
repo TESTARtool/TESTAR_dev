@@ -183,7 +183,7 @@ public class SettingsDialog extends JFrame implements Observer {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      System.out.println("Saved current settings to <" + settingsFile + ">");
+      System.out.println("[" + getClass().getSimpleName() + "] Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
     }
@@ -201,7 +201,7 @@ public class SettingsDialog extends JFrame implements Observer {
       settingsFile = "./resources/settings/" + sutSettings + "/" + Main.SETTINGS_FILE;
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
-      System.out.println("Switched to <" + settingsFile + ">");
+      System.out.println("[" + getClass().getSimpleName() + "] Switched to <" + settingsFile + ">");
     } catch (ConfigException cfe) {
       LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
     }

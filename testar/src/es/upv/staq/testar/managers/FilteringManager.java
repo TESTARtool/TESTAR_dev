@@ -213,7 +213,7 @@ public class FilteringManager {
 			            		new Integer(filterCodeS)); // filter code
 			        		widgetsFilterList.put(element.getAttribute("wid"),wi);
 		        		} else
-		        			System.out.println("FilteringManager: WRONG FILTER");		        			
+		        			System.out.println("[" + getClass().getSimpleName() + "] FilteringManager: WRONG FILTER");		        			
 		        	}
 		        }			
 			} catch (IOException e) {

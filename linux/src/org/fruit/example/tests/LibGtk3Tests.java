@@ -72,7 +72,7 @@ public class LibGtk3Tests {
 
 
         LibGtk3.gdk_display_close(displayPointer);
-        //System.out.println("Display closed!");
+        //System.out.println("[" + getClass().getSimpleName() + "] Display closed!");
 
 
 

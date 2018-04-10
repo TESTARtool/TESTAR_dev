@@ -76,7 +76,7 @@ public final class UIAStateBuilder implements StateBuilder {
 	private void initialize(){
 
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
-		//System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
+		//System.out.println("[" + getClass().getSimpleName() + "]  " +  Windows.Get_CLSID_CUIAutomation_Ptr());
 		pAutomation = Windows.CoCreateInstance(Windows.Get_CLSID_CUIAutomation_Ptr(), 0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IUIAutomation_Ptr());
 
 		// scope and filter settings

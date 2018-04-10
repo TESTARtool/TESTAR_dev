@@ -51,7 +51,7 @@ public class PrintWidgetTree {
 	public static void main(String[] args){
 	
 		if(args.length < 1 || !new File(args[0]).exists()){
-			System.out.println("Invalid command line arguments!");
+			System.out.println("[PrintWidgetTree] Invalid command line arguments!");
 			return;
 		}
 				

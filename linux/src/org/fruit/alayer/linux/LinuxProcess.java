@@ -307,7 +307,7 @@ public class LinuxProcess extends SUTBase {
 
 
         if (applicationNodes.size() == 0) {
-            System.out.println("Could not find any applications with the name '" + applicationName + "'.");
+            System.out.println("[LinuxProcess] Could not find any applications with the name '" + applicationName + "'.");
             return false;
         }
 
@@ -339,7 +339,7 @@ public class LinuxProcess extends SUTBase {
 
 
             } else {
-                System.out.println("Cannot activate an application with the same name - continuing loop...");
+                System.out.println("[LinuxProcess] Cannot activate an application with the same name - continuing loop...");
             }
 
 
@@ -347,7 +347,7 @@ public class LinuxProcess extends SUTBase {
 
 
         // Could not find or activate the application we launched.
-        System.out.println("Could not find or activate the application!");
+        System.out.println("[LinuxProcess] Could not find or activate the application!");
         return false;
 
 
@@ -363,7 +363,7 @@ public class LinuxProcess extends SUTBase {
 
 
         if (!lp.isRunning()){
-            System.out.println("SUT is not running - cannot retrieve RAM usage!");
+            System.out.println("[LinuxProcess] SUT is not running - cannot retrieve RAM usage!");
             return 0;
         }
 
@@ -372,7 +372,7 @@ public class LinuxProcess extends SUTBase {
 
 
         if (processInfos == null || processInfos.isEmpty()) {
-            System.out.println("Running command to find process info failed - cannot retrieve RAM usage!");
+            System.out.println("[LinuxProcess] Running command to find process info failed - cannot retrieve RAM usage!");
             return 0;
         }
 
@@ -388,7 +388,7 @@ public class LinuxProcess extends SUTBase {
                 if (JavaHelper.tryParseInt(pi[SizeIndex])) {
                     return Integer.parseInt(pi[SizeIndex]);
                 } else {
-                    System.out.println("Could not parse the process info - cannot retrieve RAM usage!");
+                    System.out.println("[LinuxProcess] Could not parse the process info - cannot retrieve RAM usage!");
                     return 0;
                 }
 
@@ -397,7 +397,7 @@ public class LinuxProcess extends SUTBase {
 
         }
 
-        System.out.println("Could not find the process info - cannot retrieve RAM usage!");
+        System.out.println("[LinuxProcess] Could not find the process info - cannot retrieve RAM usage!");
         return 0;
 
 
@@ -413,7 +413,7 @@ public class LinuxProcess extends SUTBase {
 
 
         if (!lp.isRunning()){
-            System.out.println("SUT is not running - cannot retrieve CPU usage!");
+            System.out.println("[LinuxProcess] SUT is not running - cannot retrieve CPU usage!");
             return 0;
         }
 
@@ -422,7 +422,7 @@ public class LinuxProcess extends SUTBase {
 
 
         if (processInfos == null || processInfos.isEmpty()) {
-            System.out.println("Running command to find process info failed - cannot retrieve CPU usage!");
+            System.out.println("[LinuxProcess] Running command to find process info failed - cannot retrieve CPU usage!");
             return 0;
         }
 
@@ -438,7 +438,7 @@ public class LinuxProcess extends SUTBase {
                 if (JavaHelper.tryParseDouble(pi[CpuIndex])) {
                     return Double.parseDouble(pi[CpuIndex]);
                 } else {
-                    System.out.println("Could not parse the process info - cannot retrieve CPU usage!");
+                    System.out.println("[LinuxProcess] Could not parse the process info - cannot retrieve CPU usage!");
                     return 0;
                 }
 
@@ -447,7 +447,7 @@ public class LinuxProcess extends SUTBase {
 
         }
 
-        System.out.println("Could not find the process info - cannot retrieve CPU usage!");
+        System.out.println("[LinuxProcess] Could not find the process info - cannot retrieve CPU usage!");
         return 0;
 
 
@@ -747,7 +747,7 @@ public class LinuxProcess extends SUTBase {
                 Runtime.getRuntime().exec(String.format(Command_KillProcess, _pid));
                 _pid = 0;
             } catch (IOException e) {
-                System.out.println("Could not run the kill command for the process with PID: " + _pid);
+                System.out.println("[" + getClass().getSimpleName() + "] Could not run the kill command for the process with PID: " + _pid);
             }
 
         }

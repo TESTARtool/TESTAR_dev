@@ -2,7 +2,7 @@ public class Calculator{
 
     public static void hit(Calculator calc, Keys key){
         calc.hitKey(key);
-        System.out.println(calc);
+        System.out.println("[" + getClass().getSimpleName() + "]  " +  calc);
     }
 
     public static enum Keys{

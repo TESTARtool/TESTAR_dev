@@ -222,10 +222,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
 		long pid, handle; String desc;
 		List<SUT> runningP = NativeLinker.getNativeProcesses();
-		// System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
+		// System.out.println("[" + getClass().getSimpleName() + "] [" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			// System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
+			// System.out.println("[" + getClass().getSimpleName() + "] \t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -259,10 +259,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		for(ProcessHandle ph : Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))){
 			if (ph.name() != null && sut.get(Tags.Desc, "").contains(ph.name())){
 				try{
-					System.out.println("\tWill kill <" + ph.name() +"> with PID <" + ph.pid() + ">");
+					System.out.println("[" + getClass().getSimpleName() + "] \tWill kill <" + ph.name() +"> with PID <" + ph.pid() + ">");
 					ph.kill();
 				} catch (SystemStopException e){
-					System.out.println("Exception killing SUT running processes: " + e.getMessage());
+					System.out.println("[" + getClass().getSimpleName() + "] Exception killing SUT running processes: " + e.getMessage());
 					allKilled = false;
 				}
 			}
@@ -272,7 +272,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		
 	private boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
 		if (pi.sut.isRunning()){
-			System.out.println("Will kill process: " + pi.toString());
+			System.out.println("[" + getClass().getSimpleName() + "] Will kill process: " + pi.toString());
 			long now = System.currentTimeMillis(),
 				 elapsed;
 			do{
@@ -280,13 +280,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				try {
 					NativeLinker.getNativeProcessHandle(pi.pid).kill();
 				} catch (Exception e){
-					System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
+					System.out.println("[" + getClass().getSimpleName() + "] \tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
 					Util.pauseMs(500);
 				}
 			} while (pi.sut.isRunning() && elapsed < KILL_WINDOW);
 			return pi.sut.isRunning();
 		} else{
-			System.out.println("Did not kill process as it is not running: " + pi.toString());
+			System.out.println("[" + getClass().getSimpleName() + "] Did not kill process as it is not running: " + pi.toString());
 			return true;
 		}
 	}
@@ -356,7 +356,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		
 		else if (!pressed.contains(KBKeys.VK_SHIFT) &&
 				mode() == Modes.GenerateManual && userEvent == null){
-			//System.out.println("USER_EVENT key_down! " + key.toString());
+			//System.out.println("[" + getClass().getSimpleName() + "] USER_EVENT key_down! " + key.toString());
 			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 		}
 		
@@ -377,7 +377,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	public void mouseUp(MouseButtons btn, double x, double y){
 		// begin by urueda
 		if (mode() == Modes.GenerateManual && userEvent == null){
-			//System.out.println("USER_EVENT mouse_up!");
+			//System.out.println("[" + getClass().getSimpleName() + "] USER_EVENT mouse_up!");
 		    userEvent = new Object[]{
 	        	btn,
 	        	new Double(x),
@@ -502,7 +502,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						boolean print = !cursorWidgetID.equals(lastPrintParentsOf); 
 						if (print){
 							lastPrintParentsOf = cursorWidgetID;
-							System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
+							System.out.println("[" + getClass().getSimpleName() + "] Parents of: " + cursorWidget.get(Tags.Title));
 						}
 						int lvls = protocolUtil.markParents(canvas,cursorWidget,protocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
 						if (lvls > 0){
@@ -739,7 +739,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private void saveStateSnapshot(final State state){
 		try{
 			if(saveStateSnapshot){
-				//System.out.println(Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
+				//System.out.println("[" + getClass().getSimpleName() + "]  " +  Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
 				Taggable taggable = new TaggableBase();
 				taggable.set(SystemState, state);
 				LogSerialiser.log("Saving state snapshot...\n", LogSerialiser.LogLevel.Debug);
@@ -770,7 +770,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		        else if (userEvent[0] == MouseButtons.BUTTON3) // right click     
 		        	return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
 			} catch (WidgetNotFoundException we){
-				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+				System.out.println("[" + getClass().getSimpleName() + "] Mapping user event ... widget not found @(" + x + "," + y + ")");
 				return null;
 			}
 		} else if (userEvent[0] instanceof KBKeys) // key events
@@ -882,7 +882,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			}
 		}
 		do{
-			System.out.println("AdhocTest waiting for event ...");
+			System.out.println("[" + getClass().getSimpleName() + "] AdhocTest waiting for event ...");
 			try{
 				protocolUtil.adhocTestServerWriter.write("READY\r\n");
 				protocolUtil.adhocTestServerWriter.flush();
@@ -891,7 +891,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			}
 			try{
 				String socketData = protocolUtil.adhocTestServerReader.readLine().trim(); // one event per line
-				System.out.println("\t... AdhocTest event = " + socketData);
+				System.out.println("[" + getClass().getSimpleName() + "] \t... AdhocTest event = " + socketData);
 				userEvent = protocolUtil.compileAdhocTestServerEvent(socketData); // hack into userEvent
 				if (userEvent == null){
 					protocolUtil.adhocTestServerWriter.write("???\r\n"); // not found
@@ -966,7 +966,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
-		// LOGGER.info("[RA] start runAction");
+		LOGGER.info("[RA] start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -999,14 +999,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			return true; // problems
 
 		if (actionCount == firstSequenceActionNumber && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
-			System.out.println("First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
+			System.out.println("[" + getClass().getSimpleName() + "] First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
 			Util.pauseMs(NOP_WAIT_WINDOW); // hold-on for UI to react (e.g. scenario: SUT loading ... logo)
 			actionStatus.setAction(new NOP());
 			CodingManager.buildIDs(state, actionStatus.getAction());
 			nopAttempts++; escAttempts = 0;
 		} else
 			nopAttempts = 0;
-		//System.out.println("Selected action: " + action.toShortString() + " ... count of ESC/NOP = " + escAttempts + "/" + nopAttempts);;
+		//System.out.println("[" + getClass().getSimpleName() + "] Selected action: " + action.toShortString() + " ... count of ESC/NOP = " + escAttempts + "/" + nopAttempts);;
 		// end by urueda
 		
 		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
@@ -1084,7 +1084,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 }*/
 // temp end
 				if (settings().get(ConfigTags.PrologActivated))
-					System.out.println(" ... prolog: " + jipWrapper.debugPrologBase());
+					System.out.println("[" + getClass().getSimpleName() + "]  ... prolog: " + jipWrapper.debugPrologBase());
 				else
 					System.out.print("\n");
 				//logln(Grapher.getExplorationCurveSample(),LogLevel.Info);
@@ -1126,12 +1126,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
 			//TODO this does not work in all cases check (the last executed action tag does not always have a description
-			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
+			//System.out.println("[" + getClass().getSimpleName() + "] No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
 			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-        // LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
+        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1165,7 +1165,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
 			long tStart = System.currentTimeMillis();
-			// LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
+			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
 			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
@@ -1353,7 +1353,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 								
 				finishSequence(currentSeq);
 	
-				System.out.println("currentseq: " + currentSeq);
+				System.out.println("[" + getClass().getSimpleName() + "] currentseq: " + currentSeq);
 				
 				Verdict finalVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
 				
@@ -1411,7 +1411,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				int i=1; StringBuffer trace = new StringBuffer();
 				for(StackTraceElement t : e.getStackTrace())
 				   trace.append("\n\t[" + i++ + "] " + t.toString());
-				System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
+				System.out.println("[" + getClass().getSimpleName() + "] Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
 				stopSystem(system);
 				if (system != null && system.isRunning())
 					system.stop();
@@ -1420,12 +1420,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
-			// LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
+			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
 				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
 			this.forceToSequenceLengthAfterFail = true;
-			System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
+			System.out.println("[" + getClass().getSimpleName() + "] Resuming test after FAIL at action number <" + this.actionCount + ">");
  			runTest(); // continue testing
 		} else
 			this.forceToSequenceLengthAfterFail = false;			
@@ -1526,14 +1526,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					 (env.getGraphStates().size() - 2) * STATES_WEIGHT +
 					 (1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
 					 (sutRAMpeak + sutCPUpeak) * SUT_WEIGHT +
-					 (1 / (1 + testRAMpeak + testCPUpeak*1000)) * TEST_WEIGHT // avoid division by 0
+					 (1 / (1 + testRAMpeak + testCPUpeak*1000)) * TEST_WEIGHT    // avoid division by 0
 					);
 				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
 					(problems ? "FAIL" : "PASS"),		  // verdict
 					this.testFailTimes,					  // test FAIL count
 					String.format("%.2f", cvgMetrics.getMinCoverage()),
 					String.format("%.2f", cvgMetrics.getMaxCoverage()),
-					env.getLongestPathLength(), 			  // longest path
+					env.getLongestPathLength(), 		  // longest path
 					env.getGraphStates().size() - 2,	  // graph states
 					env.getGraphStateClusters().size(),	  // abstract states
 					env.getGraphActions().size() - 2,	  // graph actions
@@ -1542,11 +1542,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					String.format("%.2f",sutCPUpeak),	  // SUT CPU peak
 					testRAMpeak,						  // TESTAR RAM peak
 					String.format("%.3f",testCPUpeak), 	  // TESTAR CPU peak
-					fitness		  // fitness
+					fitness		                          // fitness
 					);
 				ps.print(metrics);
 				ps.close();
-				System.out.println(heading + "\n" + metrics);
+				System.out.println("[" + getClass().getSimpleName() + "] [" + getClass().getSimpleName() + "]  " +  heading + "\n" + metrics);
 			} catch (NoSuchTagException | FileNotFoundException e) {
 				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
 			//} catch (FileNotFoundException e) {
@@ -1677,7 +1677,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						if(tries < 2){
 							// begin by urueda
 							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							System.out.println(replayMessage);
+							System.out.println("[" + getClass().getSimpleName() + "]  " +  replayMessage);
 							// end by urueda
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						 }else{
@@ -1732,12 +1732,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		if(success){
 			String msg = "Sequence successfully replayed!\n";
-			System.out.println(msg);
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 			
 		} else{
 			String msg = "Failed to replay sequence.\n";
-			System.out.println(msg);
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
 		}
 		// begin by urueda

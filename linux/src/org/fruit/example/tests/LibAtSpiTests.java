@@ -65,7 +65,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("Desktop pointer: " + desktopPointer);
+        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
 
 
         // Get the name of the accessible object - for now the pointer to pointer for an error object can be null.
@@ -174,7 +174,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("Desktop pointer: " + desktopPointer);
+        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
 
 
         // Launch gedit.
@@ -242,11 +242,11 @@ public class LibAtSpiTests {
         focusable.retrieveAccessibleInfo();
 
 
-        System.out.println("BoundingBox Screen:" + focusable.component().extentsOnScreen().toString());
-        System.out.println("BoundingBox Window:" + focusable.component().extentsOnWindow().toString());
-        System.out.println("Position Screen:" + focusable.component().positionOnScreen().toString());
-        System.out.println("Position Window:" + focusable.component().positionOnWindow().toString());
-        System.out.println("Size:" + focusable.component().size().toString());
+        System.out.println("[" + getClass().getSimpleName() + "] BoundingBox Screen:" + focusable.component().extentsOnScreen().toString());
+        System.out.println("[" + getClass().getSimpleName() + "] BoundingBox Window:" + focusable.component().extentsOnWindow().toString());
+        System.out.println("[" + getClass().getSimpleName() + "] Position Screen:" + focusable.component().positionOnScreen().toString());
+        System.out.println("[" + getClass().getSimpleName() + "] Position Window:" + focusable.component().positionOnWindow().toString());
+        System.out.println("[" + getClass().getSimpleName() + "] Size:" + focusable.component().size().toString());
 
 
         boolean successfullFocus = focusable.component().grabFocus();
@@ -317,7 +317,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("Desktop pointer: " + desktopPointer);
+        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
 
 
         // Test the child count - get a reference for the current state.

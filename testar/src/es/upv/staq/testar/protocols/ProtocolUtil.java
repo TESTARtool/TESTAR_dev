@@ -105,9 +105,9 @@ public class ProtocolUtil {
 				int port = 47357;
 				try {
 					adhocTestServerSocket = new ServerSocket(port);
-					System.out.println("AdhocTest Server started @" + port);
+					System.out.println("[" + getClass().getSimpleName() + "] AdhocTest Server started @" + port);
 					adhocTestSocket = adhocTestServerSocket.accept();
-					System.out.println("AdhocTest Client engaged");
+					System.out.println("[" + getClass().getSimpleName() + "] AdhocTest Client engaged");
 					adhocTestServerReader = new BufferedReader(new InputStreamReader(adhocTestSocket.getInputStream()));
 					adhocTestServerWriter = new BufferedWriter(new OutputStreamWriter(adhocTestSocket.getOutputStream()));
 				} catch(Exception e){
@@ -129,7 +129,7 @@ public class ProtocolUtil {
 					adhocTestSocket.close();
 				adhocTestServerSocket.close();
 				adhocTestServerSocket = null;				
-				System.out.println(" AdhocTest Server sttopped  " );		
+				System.out.println("[" + getClass().getSimpleName() + "]  AdhocTest Server sttopped  " );		
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -201,7 +201,7 @@ public class ProtocolUtil {
 		shape.paint(canvas, mark);
 		
 		if (print)
-			System.out.println("Ancestor(" + colorS + "):\n" + w.getRepresentation("\t"));
+			System.out.println("[" + getClass().getSimpleName() + "] Ancestor(" + colorS + "):\n" + w.getRepresentation("\t"));
 		
 		return markParents(canvas,parent,it,lvl+1,print);
 	}	

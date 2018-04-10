@@ -574,7 +574,7 @@ public class AccessBridgeControlTypes {
 	 */
 	public static long toUIA(String accessibleRole){
 		if (accessibleRole == null || accessibleRole.isEmpty()){
-			System.out.println("WARNING - null/empty accessible role <" + accessibleRole + ">");
+			System.out.println("[AccessBridgeControlTypes] WARNING - null/empty accessible role <" + accessibleRole + ">");
 			return MISSING_UIA;
 		}
 		
@@ -582,7 +582,7 @@ public class AccessBridgeControlTypes {
 		if (uia != null)
 			return uia.longValue();
 
-		System.out.println("WARNING - missed accessible role <" + accessibleRole + ">");
+		System.out.println("[AccessBridgeControlTypes] WARNING - missed accessible role <" + accessibleRole + ">");
 		return MISSING_UIA;		
 	}
 

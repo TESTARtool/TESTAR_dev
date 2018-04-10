@@ -181,7 +181,7 @@ public class StateFetcher implements Callable<UIAState>{
 		for(long hwnd : visibleTopLevelWindows){
 			//long exStyle = Windows.GetWindowLong(hwnd, Windows.GWL_EXSTYLE);				
 			//if((exStyle & Windows.WS_EX_NOACTIVATE) != 0)
-			//	System.out.println(hwnd  + "   " + Windows.GetWindowText(hwnd) + "   " + Windows.GetClassName(hwnd));
+			//	System.out.println("[" + getClass().getSimpleName() + "]  " +  hwnd  + "   " + Windows.GetWindowText(hwnd) + "   " + Windows.GetClassName(hwnd));
 
 			UIAElement wnd = uiaRoot.hwndMap.get(hwnd);
 
@@ -238,7 +238,7 @@ public class StateFetcher implements Callable<UIAState>{
 					ret.addFirst(hwnd);
 					// begin by urueda
 					if (System.getProperty("DEBUG_WINDOWS_PROCESS_NAMES") != null)
-						System.out.println("<" + hwnd + "> window' process name <" + Windows.GetProcessNameFromHWND(hwnd) + ">");
+						System.out.println("[" + getClass().getSimpleName() + "] <" + hwnd + "> window' process name <" + Windows.GetProcessNameFromHWND(hwnd) + ">");
 					// end by urueda					
 				}				
 			}

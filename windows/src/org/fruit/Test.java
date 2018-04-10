@@ -94,8 +94,8 @@ public final class Test{
 
 		String info;
 		info = queryAllTags(s);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
-		System.out.println(Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
+		System.out.println("[Test] Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
+		System.out.println("[Test] " + Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
 
 		//s.set(Tags.Screenshot, AWTCanvas.fromScreenshot(Rect.from(0, 0, 1920, 1080), AWTCanvas.StorageFormat.PNG, 1));
 
@@ -105,9 +105,9 @@ public final class Test{
 			oos.reset();
 		}
 
-		System.out.println(Util.time() - tuff1);
+		System.out.println("[Test] " + (Util.time() - tuff1));
 		info = queryAllTags(s);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
+		System.out.println("[Test] " + "Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 
 		oos.close();
 		bos.close();
@@ -125,7 +125,7 @@ public final class Test{
 
 		ois.close();
 		info = queryAllTags(rs);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
+		System.out.println("[Test] " + "Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 
 
 	}
@@ -197,7 +197,7 @@ public final class Test{
 				Shape s = under.get(Tags.Shape, null);
 				if(s != null){
 					s.paint(cv, cv.defaultPen());
-					//System.out.println("under cursor: " + under.get(Tags.Desc, null) + ",  " + under.get(Tags.ZIndex) + ",  " + under.get(Tags.Role, Roles.Widget));
+					//System.out.println("[" + getClass().getSimpleName() + "] under cursor: " + under.get(Tags.Desc, null) + ",  " + under.get(Tags.ZIndex) + ",  " + under.get(Tags.Role, Roles.Widget));
 				}
 			}
 
@@ -228,18 +228,18 @@ public final class Test{
 		
 		
 		double t2 = Util.time();
-		System.out.println("Writing took: " + writeTime + " seconds.");
-		System.out.println("Size of generated file: " + file.length() / 1000.0 + " kilo bytes.");
-		System.out.println("Overall time: " + (t2 - t1) + " seconds.");
+		System.out.println("[Test] " + "Writing took: " + writeTime + " seconds.");
+		System.out.println("[Test] " + "Size of generated file: " + file.length() / 1000.0 + " kilo bytes.");
+		System.out.println("[Test] " + "Overall time: " + (t2 - t1) + " seconds.");
 
-		System.out.println("stopping system...");
+		System.out.println("[Test] " + "stopping system...");
 		Util.stop(system);
-		System.out.println("system stopped");
+		System.out.println("[Test] " + "system stopped");
 		
 		//System.exit(0);
 
 		sb.release();
-		//System.out.println("sb released");
+		//System.out.println("[" + getClass().getSimpleName() + "] sb released");
 		
 //		if(1==1)
 //			return;
@@ -268,6 +268,6 @@ public final class Test{
 		ois.close();
 		
 		t2 = Util.time();
-		System.out.println("Reading took: " + (t2 - t1) + " seconds.");	
+		System.out.println("[Test] " + "Reading took: " + (t2 - t1) + " seconds.");	
 	}
 }

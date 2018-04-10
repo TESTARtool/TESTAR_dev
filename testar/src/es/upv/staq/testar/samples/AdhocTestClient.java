@@ -54,7 +54,7 @@ public class AdhocTestClient {
 		do{
 			try {
 				socketClient = new Socket("localhost", 47357); // TESTAR must be on "AdhocTest" mode
-				System.out.println("AdhocTest client engaged");
+				System.out.println("[AdhocTest] client engaged");
 				BufferedReader reader = new BufferedReader(
 						new InputStreamReader(socketClient.getInputStream()));
 				BufferedWriter writer = new BufferedWriter(
@@ -75,20 +75,20 @@ public class AdhocTestClient {
 					writer.flush();
 					result = reader.readLine().trim();
 					if (result.equals("???"))
-						System.out.println("[" + i + "] Unrecognised action: " + action);
+						System.out.println("[AdhocTest] [" + i + "] Unrecognised action: " + action);
 					else if (result.equals("404"))
-						System.out.println("[" + i + "] Invalid action:      " + action);
+						System.out.println("[AdhocTest] [" + i + "] Invalid action:      " + action);
 					else if (result.equals("FAIL"))
-						System.out.println("[" + i + "] Action failed:       " + action);
+						System.out.println("[AdhocTest] [" + i + "] Action failed:       " + action);
 					else if (result.equals("OK"))
-						System.out.println("[" + i + "] Action succeded:     " + action);
+						System.out.println("[AdhocTest] [" + i + "] Action succeded:     " + action);
 					else{
-						System.out.println("[" + i + "] Unexpected server token: " + result);
+						System.out.println("[AdhocTest] [" + i + "] Unexpected server token: " + result);
 						alive = false;
 					}
 				}
 			} catch (java.io.IOException e){
-				System.out.println("AdhocTest client waiting for server ...");
+				System.out.println("[AdhocTest] client waiting for server ...");
 			} catch (java.lang.NullPointerException npe){} // socket channels vanished
 			if (socketClient != null){
 				try {
@@ -97,7 +97,7 @@ public class AdhocTestClient {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("AdhocTest client finished");
+			System.out.println("[AdhocTest] client finished");
 		} while(notrun); 
 	}
 

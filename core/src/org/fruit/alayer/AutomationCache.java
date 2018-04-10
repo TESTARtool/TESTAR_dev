@@ -77,7 +77,7 @@ public abstract class AutomationCache {
 			if (propertyValue != null)
 				SCRSHOT_SIMILARITY_THRESHOLD = new Float(propertyValue).floatValue();
 		} catch (Exception e){
-			System.out.println("Automation cache caught exception <" + e.getMessage() + ">");
+			System.out.println("[" + getClass().getSimpleName() + "] Automation cache caught exception <" + e.getMessage() + ">");
 		}
 	}
 	
@@ -99,14 +99,14 @@ public abstract class AutomationCache {
 			//this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
-		System.out.println("Automation cache SIZE <" + automationCache.size() + "> HITS <" + cacheHits + "> MISSES  <" + cacheMisses + ">");
+		System.out.println("[" + getClass().getSimpleName() + "] Automation cache SIZE <" + automationCache.size() + "> HITS <" + cacheHits + "> MISSES  <" + cacheMisses + ">");
 		for (CachedAutomationElement ac : automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])){
 			if (ac.getCacheAge() > AUTOMATION_CACHE_AGE_MAX || isSoftCacheCandidate(ac)) // soft reference implementation
 				releaseCachedAutomationElement(ac);
 		}
 		long uiaPtr = nativeGetAutomationElementFromHandle(pAutomation, hwnd);
 		if (uiaPtr == 0){ // failed to retrieve automation element?
-			System.out.println("Failed to retrieve automation element - bypassing caching");
+			System.out.println("[" + getClass().getSimpleName() + "] Failed to retrieve automation element - bypassing caching");
 			this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
@@ -138,7 +138,7 @@ public abstract class AutomationCache {
 			this.cacheMisses++;
 			return r;
 		} catch (Exception e) {
-			System.out.println("Widget-tree build cache caught exception: " + e.getMessage());
+			System.out.println("[" + getClass().getSimpleName() + "] Widget-tree build cache caught exception: " + e.getMessage());
 			this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}

@@ -145,7 +145,7 @@ public class TreeWalker {
 
 
         if (applicationNodes.size() == 0) {
-            System.out.println("Could not find a single running application by the supplied name.");
+            System.out.println("[TreeWalker] Could not find a single running application by the supplied name.");
         }
 
 
@@ -176,14 +176,14 @@ public class TreeWalker {
 
 
             } else {
-                System.out.println("Cannot activate an application with the same name - continuing loop...");
+                System.out.println("[TreeWalker] Cannot activate an application with the same name - continuing loop...");
             }
 
 
         }
 
 
-        System.out.println("Cannot find an application node in the list belonging to an application with PID '" + pid + "'.");
+        System.out.println("[TreeWalker] Cannot find an application node in the list belonging to an application with PID '" + pid + "'.");
         return null;
 
 
@@ -236,12 +236,12 @@ public class TreeWalker {
 
 
         if (focusableNode == null) {
-            System.out.println("Could not find a focusable application element node for '" + applicationNode.name() + "'.");
+            System.out.println("[TreeWalker] Could not find a focusable application element node for '" + applicationNode.name() + "'.");
             return false;
         }
 
         if (focusableNode.component() == null) {
-            System.out.println("The component of the a focusable application element node is null for '" + applicationNode.name() + "'.");
+            System.out.println("[TreeWalker] The component of the a focusable application element node is null for '" + applicationNode.name() + "'.");
             return false;
         }
 

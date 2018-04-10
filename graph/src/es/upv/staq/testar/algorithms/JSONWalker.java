@@ -162,18 +162,18 @@ public class JSONWalker extends AbstractWalker {
 				jsonObject = iterator.next();
 				this.jsonIF.add(((String) jsonObject.get(JSON_STRUCTURE_IF)).replaceAll("'","")); // no quotes
 				this.jsonTHEN.add(((String) jsonObject.get(JSON_STRUCTURE_THEN)).replaceAll("'","")); // no quotes
-				System.out.println(EVOTESTAR_OUT_TAG + "IF: " + jsonIF);
-				System.out.println(EVOTESTAR_OUT_TAG + "THEN: " + jsonTHEN);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "IF: " + jsonIF);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "THEN: " + jsonTHEN);
 				this.jsonSyntaxValid = true;
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println(EVOTESTAR_OUT_TAG + "File <" + jsonFilePath + "> not found");
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "File <" + jsonFilePath + "> not found");
 			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println(EVOTESTAR_OUT_TAG + "I/O exception in <" + jsonFilePath + ">");
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "I/O exception in <" + jsonFilePath + ">");
 			e.printStackTrace();
 		} catch (ParseException e) {
-			System.out.println(EVOTESTAR_OUT_TAG + "Parsing exception in <" + jsonFilePath + ">");
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "Parsing exception in <" + jsonFilePath + ">");
 			e.printStackTrace();
 		}
 	}
@@ -215,7 +215,7 @@ public class JSONWalker extends AbstractWalker {
 	}	
 	
 	private boolean processJsonCondition(String condition) throws Exception{
-		//System.out.println(EVOTESTAR_OUT_TAG + "processing json condition <" + condition + ">");
+		//System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "processing json condition <" + condition + ">");
 		String[] jsonConditionTags = condition.split(",");
 		for(int i=0; i<jsonConditionTags.length; i++){
 			String jsonConditionTag = jsonConditionTags[i];
@@ -245,7 +245,7 @@ public class JSONWalker extends AbstractWalker {
 	}
 	
 	private boolean processJsonIF(String jsonIF, boolean partialResult) throws Exception{
-		//System.out.println(EVOTESTAR_OUT_TAG +  "processing jsonIF: " + jsonIF + " (" + partialResult + ")");
+		//System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG +  "processing jsonIF: " + jsonIF + " (" + partialResult + ")");
 		if (jsonIF == null || jsonIF.isEmpty())
 			return partialResult;
 
@@ -286,7 +286,7 @@ public class JSONWalker extends AbstractWalker {
 	}
 	
 	private Action processJsonAction(String jsonAction) throws Exception{
-		//System.out.println(EVOTESTAR_OUT_TAG + "processing jsonAction: <" + jsonAction + ">");
+		//System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "processing jsonAction: <" + jsonAction + ">");
 		if (jsonAction == null || jsonAction.isEmpty())
 			return null; // did not found a suitable action
 		
@@ -296,7 +296,7 @@ public class JSONWalker extends AbstractWalker {
 		else {
 			String[] jsonActionTags = jsonAction.replaceAll(" ", "").split(",");
 			String jsonFunctionTag = jsonActionTags[0];			
-			//System.out.println(EVOTESTAR_OUT_TAG + "\tjsonFunction: <" + jsonFunctionTag + ">");
+			//System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "\tjsonFunction: <" + jsonFunctionTag + ">");
 			//System.out.print(EVOTESTAR_OUT_TAG + "\tjsonParameters: ");
 			//for (int i=1; i<jsonActionTags.length; i++)
 			//	System.out.print("<" + jsonActionTags[i] + ">, ");
@@ -319,7 +319,7 @@ public class JSONWalker extends AbstractWalker {
 					try {
 						percent = new Float(jsonActionTags[2]).floatValue();
 					} catch(java.lang.NumberFormatException nfe){
-						System.out.println(EVOTESTAR_OUT_TAG + "Not a 0..1 range <" + jsonActionTags[2] + ">");
+						System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "Not a 0..1 range <" + jsonActionTags[2] + ">");
 					}
 					switchJumpTo = JSON_FUNCTION_pickSameAs; continue; // goto switch
 				case JSON_FUNCTION_pickSameAs:
@@ -436,15 +436,15 @@ public class JSONWalker extends AbstractWalker {
 				try {
 					scanActionsTypes(actions);
 					boolean jsonConditionValue = processJsonIF(ruleIF,true); // true = neutral boolean
-					System.out.println(EVOTESTAR_OUT_TAG + "json <IF> evalutes to: " + jsonConditionValue);
+					System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json <IF> evalutes to: " + jsonConditionValue);
 					selectedAction = (jsonConditionValue ? processJsonAction(ruleTHEN) : null);
 					if (selectedAction != null)
-						System.out.println(EVOTESTAR_OUT_TAG + "json <action> selected: " + selectedAction.get(Tags.ConcreteID));
+						System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json <action> selected: " + selectedAction.get(Tags.ConcreteID));
 				} catch (PatternSyntaxException pse){
-					System.out.println(EVOTESTAR_OUT_TAG + "json pattern syntax exception selecting action: " + pse.getMessage());
+					System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json pattern syntax exception selecting action: " + pse.getMessage());
 					selectedAction = null;
 				} catch (Exception e){
-					System.out.println(EVOTESTAR_OUT_TAG + "json exception selecting action: " + e.getMessage());
+					System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json exception selecting action: " + e.getMessage());
 					e.printStackTrace(); // debug
 					selectedAction = null;
 				}
@@ -455,9 +455,9 @@ public class JSONWalker extends AbstractWalker {
 		if (selectedAction == null){ // json individual unable to select an action
 			//selectedAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE); // (ESC should penalize its fitness, but NOP could be better)
 			//CodingManager.buildIDs(this.currentState, selectedAction);
-			//System.out.println(EVOTESTAR_OUT_TAG + "json <action> = <ESC>");
+			//System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json <action> = <ESC>");
 			selectedAction = new ArrayList<Action>(this.currentActions).get(rnd.nextInt(this.currentActions.size())); // default: random
-			System.out.println(EVOTESTAR_OUT_TAG + "json <action> selected: <RANDOM>");
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "json <action> selected: <RANDOM>");
 		}
 		this.lastAction = selectedAction;
 		return selectedAction;
@@ -505,7 +505,7 @@ public class JSONWalker extends AbstractWalker {
 		if (sourceActions.isEmpty())
 			return null; // did not find a suitable action
 		if (percent < 0.0f || percent > 1.0f){
-			System.out.println(EVOTESTAR_OUT_TAG + "Action range <" + percent + "> out of scope");
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  EVOTESTAR_OUT_TAG + "Action range <" + percent + "> out of scope");
 			return new ArrayList<Action>(sourceActions).get(rnd.nextInt(sourceActions.size())); // random
 		}
 		return sort(sourceActions,sorder)[Math.round(((float)sourceActions.size()-1.0f)*percent)];		

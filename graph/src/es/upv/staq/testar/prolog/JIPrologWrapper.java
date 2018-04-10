@@ -192,41 +192,41 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 	}
 
 	private void debugStateFactsNrules(){
-		System.out.println("\n>>> State-Rules <<<\n-------------------\n");
+		System.out.println("[" + getClass().getSimpleName() + "] \n>>> State-Rules <<<\n-------------------\n");
 		if (this.prologBase.stateRules != null){
 			for (String s : this.prologBase.stateRules)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
-		System.out.println("\n>>> State-Facts <<<\n-------------------\n");    	
+		System.out.println("[" + getClass().getSimpleName() + "] \n>>> State-Facts <<<\n-------------------\n");    	
 		if (this.prologBase.stateFacts != null){
 			for (String s : this.prologBase.stateFacts)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
 	}
 	
 	private void debugActionFactsNrules(){    	
-		System.out.println(">>> Action-Rules <<<\n--------------------\n");
+		System.out.println("[" + getClass().getSimpleName() + "] >>> Action-Rules <<<\n--------------------\n");
 		if (this.prologBase.actionRules != null){
 			for (String s : this.prologBase.actionRules)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
-		System.out.println(">>> Action-Facts <<<\n--------------------\n");
+		System.out.println("[" + getClass().getSimpleName() + "] >>> Action-Facts <<<\n--------------------\n");
 		if (this.prologBase.actionFacts != null){
 			for (String s : this.prologBase.actionFacts)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
 	}
 
 	private void debugEnvironmentFactsNrules(){
-		System.out.println(">>> Environment-Rules <<<\n-------------------------\n");
+		System.out.println("[" + getClass().getSimpleName() + "] >>> Environment-Rules <<<\n-------------------------\n");
 		if (this.prologBase.envRules != null){
 			for (String s : this.prologBase.envRules)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
-		System.out.println(">>> Environment-Facts <<<\n-------------------------\n");    	
+		System.out.println("[" + getClass().getSimpleName() + "] >>> Environment-Facts <<<\n-------------------------\n");    	
 		if (this.prologBase.envFacts != null){
 			for (String s : this.prologBase.envFacts)
-				System.out.println(s);
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
 		}
 	}
 
@@ -242,7 +242,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 					this.prologBase.stateRules,this.prologBase.actionRules,this.prologBase.envRules,
 					this.prologBase.stateFacts, this.prologBase.actionFacts, this.prologBase.envFacts,
 					this.prologBase.factsNrules);
-			if (DEBUG_FACTS_N_RULES || DEBUG_QUERIES) System.out.println("Prolog-base:\n" + prologString);
+			if (DEBUG_FACTS_N_RULES || DEBUG_QUERIES) System.out.println("[" + getClass().getSimpleName() + "] Prolog-base:\n" + prologString);
 			setPrologFactsNrules(prologString);
 	
 			if (DEBUG_QUERIES){
@@ -261,11 +261,11 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 		try{
 			this.jipEngine.consultStream(new ByteArrayInputStream(prologBase.getBytes("UTF-8")), "UTF8ByteArrayStream");
 		} catch (UnsupportedEncodingException uee) {
-			System.out.println("Prolog-Facts/Rules unsupported encoding: " + uee.getMessage());
-			System.out.println(prologBase);
+			System.out.println("[" + getClass().getSimpleName() + "] Prolog-Facts/Rules unsupported encoding: " + uee.getMessage());
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  prologBase);
 		} catch(JIPSyntaxErrorException jsee){
-			System.out.println("Prolog-Facts/Rules are not correct: " + jsee.getMessage());
-			System.out.println(prologBase);
+			System.out.println("[" + getClass().getSimpleName() + "] Prolog-Facts/Rules are not correct: " + jsee.getMessage());
+			System.out.println("[" + getClass().getSimpleName() + "]  " +  prologBase);
 		}    	
 	}
 
@@ -280,7 +280,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 	}
 	
 	public void debugQuery(String query){
-		System.out.println("Prolog-Query: " + query);
+		System.out.println("[" + getClass().getSimpleName() + "] Prolog-Query: " + query);
 		PrologUtil.printSolutions(this.setQuery(query));
 	}
 	
@@ -293,7 +293,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 		try{
 			jipTerm = this.jipEngine.getTermParser().parseTerm(queryString);
 		} catch(JIPSyntaxErrorException jsee){
-			System.out.println("Prolog-Query is not correct: " + jsee.getMessage());
+			System.out.println("[" + getClass().getSimpleName() + "] Prolog-Query is not correct: " + jsee.getMessage());
 			return null;
 		}
 		// synchronized(this.jipEngine){
@@ -318,7 +318,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
 				solutions.add(solution);
 			}
 		}
-		//System.out.println(">>> Prolog-Query: " + queryString + "\n-----------------");
+		//System.out.println("[" + getClass().getSimpleName() + "] >>> Prolog-Query: " + queryString + "\n-----------------");
 		return solutions;
 	}
 
@@ -330,7 +330,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public void openNotified(JIPEvent jipEvent){
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle())
-                System.out.println("Prolog-Query is open");
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Query is open");
         }
     }
 
@@ -338,7 +338,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public void moreNotified(JIPEvent jipEvent){
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle())
-                System.out.println("Prolog-Query: " + jipEvent.getTerm().toString());
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Query: " + jipEvent.getTerm().toString());
         }
     }
 
@@ -347,10 +347,10 @@ public class JIPrologWrapper{ // implements JIPEventListener{
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle()){
                 JIPTerm jipTerm = jipEvent.getTerm();
-                System.out.println("Prolog-Solution: " + jipTerm);
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Solution: " + jipTerm);
                 for (JIPVariable termVar : jipTerm.getVariables()) {
                     if (!termVar.isAnonymous())
-                        System.out.println("\t" + termVar.getName() + ": " + termVar.toString(jipEvent.getSource()));
+                        System.out.println("[" + getClass().getSimpleName() + "] \t" + termVar.getName() + ": " + termVar.toString(jipEvent.getSource()));
                 }
                 jipEvent.getSource().nextSolution(jipEvent.getQueryHandle());
             }
@@ -361,7 +361,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public void termNotified(JIPEvent jipEvent){
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle())
-                System.out.println("Prolog-Term: " + jipEvent.getTerm());
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Term: " + jipEvent.getTerm());
         }
     }
 
@@ -369,7 +369,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public synchronized void endNotified(JIPEvent jipEvent){
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle()){
-                System.out.println("Prolog-End");
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-End");
                 jipEvent.getSource().closeQuery(this.queryHandle);
                 this.queryHandle = -1;
             }
@@ -380,7 +380,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public synchronized void closeNotified(JIPEvent jipEvent){
         synchronized(jipEvent.getSource()){
             if(this.queryHandle == jipEvent.getQueryHandle())
-                System.out.println("Prolog-Close");
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Close");
         }
     }
 
@@ -388,7 +388,7 @@ public class JIPrologWrapper{ // implements JIPEventListener{
     public synchronized void errorNotified(JIPErrorEvent jipErrorEvent){
         synchronized(jipErrorEvent.getSource()){
             if(this.queryHandle == jipErrorEvent.getQueryHandle()){
-                System.out.println("Prolog-Error: " + jipErrorEvent.getError());
+                System.out.println("[" + getClass().getSimpleName() + "] Prolog-Error: " + jipErrorEvent.getError());
                 jipErrorEvent.getSource().closeQuery(this.queryHandle);
             }
         }

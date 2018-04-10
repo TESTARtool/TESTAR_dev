@@ -98,14 +98,14 @@ public class LibWnckTests {
 
 
         long activeWindowPtr = LibWnck.wnck_screen_get_active_window(screenPointer);
-        System.out.println("Active window ptr: " + activeWindowPtr);
+        System.out.println("[" + getClass().getSimpleName() + "] Active window ptr: " + activeWindowPtr);
         assertTrue(activeWindowPtr > 0);
 
 
         WnckWindow activeWindow = WnckWindow.CreateInstance(activeWindowPtr);
         assertNotNull(activeWindow);
         assert activeWindow != null;
-        System.out.println("Active window name: " + activeWindow.name());
+        System.out.println("[" + getClass().getSimpleName() + "] Active window name: " + activeWindow.name());
         activeWindow.fillDebug();
 
 
@@ -146,7 +146,7 @@ public class LibWnckTests {
 
         // Check if the window pointer changed.
         long activeWindowPtr2 = LibWnck.wnck_screen_get_active_window(screenPointer);
-        System.out.println("Active window ptr 2: " + activeWindowPtr2);
+        System.out.println("[" + getClass().getSimpleName() + "] Active window ptr 2: " + activeWindowPtr2);
         assertTrue(activeWindowPtr2 > 0);
         assertNotEquals(activeWindowPtr, activeWindowPtr2);
 
@@ -154,7 +154,7 @@ public class LibWnckTests {
         WnckWindow activeWindow2 = WnckWindow.CreateInstance(activeWindowPtr);
         assertNotNull(activeWindow2);
         assert activeWindow2 != null;
-        System.out.println("Active window name 2: " + activeWindow2.name());
+        System.out.println("[" + getClass().getSimpleName() + "] Active window name 2: " + activeWindow2.name());
         activeWindow2.fillDebug();
         assertNotEquals(activeWindow.name(), activeWindow2.name());
 
@@ -167,7 +167,7 @@ public class LibWnckTests {
 
         // Check if the window pointer changed.
         long activeWindowPtr3 = LibWnck.wnck_screen_get_active_window(screenPointer);
-        System.out.println("Active window ptr 3: " + activeWindowPtr2);
+        System.out.println("[" + getClass().getSimpleName() + "] Active window ptr 3: " + activeWindowPtr2);
         assertTrue(activeWindowPtr3 > 0);
         assertNotEquals(activeWindowPtr2, activeWindowPtr3);
 
@@ -175,7 +175,7 @@ public class LibWnckTests {
         WnckWindow activeWindow3 = WnckWindow.CreateInstance(activeWindowPtr);
         assertNotNull(activeWindow3);
         assert activeWindow3 != null;
-        System.out.println("Active window name 3: " + activeWindow3.name());
+        System.out.println("[" + getClass().getSimpleName() + "] Active window name 3: " + activeWindow3.name());
         activeWindow3.fillDebug();
         assertNotEquals(activeWindow2.name(), activeWindow3.name());
 

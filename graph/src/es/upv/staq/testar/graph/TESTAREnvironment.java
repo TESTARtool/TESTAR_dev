@@ -212,7 +212,7 @@ public class TESTAREnvironment implements IEnvironment {
       }
     }
     if (graphStates.size() < targetStates.size()) {
-      System.out.println("WARNING - action <" + action.getConcreteID() +
+      System.out.println("[" + getClass().getSimpleName() + "] WARNING - action <" + action.getConcreteID() +
           "> from <" + action.getSourceStateID() +
           "> has <" + (targetStates.size() - graphStates.size()) +
           "> null targets: " + targetStates.toString());

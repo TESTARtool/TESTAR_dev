@@ -123,7 +123,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	protected void finishSequence(File recordedSequence){
-		System.out.println("Finish sequence");
+		System.out.println("[" + getClass().getSimpleName() + "] Finish sequence");
 		this.killTestLaunchedProcesses(); // by urueda
 	}
 	
@@ -173,11 +173,11 @@ public class DefaultProtocol extends AbstractProtocol{
 			State state;
 			do{
 				if (sut.isRunning()){
-					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
+					System.out.println("[" + getClass().getSimpleName() + "] SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 					state = builder.apply(sut);
 					if (state != null && state.childCount() > 0){
 						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-						System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+						System.out.println("[" + getClass().getSimpleName() + "] SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 						return sut;
 					}
 				}
@@ -196,10 +196,10 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
+		System.out.println("[" + getClass().getSimpleName() + "] Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
 		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
+			System.out.println("[" + getClass().getSimpleName() + "] Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
 		} else // unable to kill SUT
 			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
@@ -219,7 +219,7 @@ public class DefaultProtocol extends AbstractProtocol{
 				for (SUT theSUT : suts){
 					desc = theSUT.get(Tags.Desc, null);
 					if (desc != null && desc.contains(processName)){
-						System.out.println("SUT with Process Name -" + processName + "- DETECTED!");
+						System.out.println("[" + getClass().getSimpleName() + "] SUT with Process Name -" + processName + "- DETECTED!");
 						return theSUT;
 					}
 				}
@@ -247,7 +247,7 @@ public class DefaultProtocol extends AbstractProtocol{
 							if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
 								title = w.get(Tags.Title, null);
 								if (title != null && title.contains(windowTitle)){
-									System.out.println("SUT with Window Title -" + windowTitle + "- DETECTED!");
+									System.out.println("[" + getClass().getSimpleName() + "] SUT with Window Title -" + windowTitle + "- DETECTED!");
 									return theSUT;
 								}
 							}
@@ -313,7 +313,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		// begin by urueda
 		if (this.suspiciousTitlesPattern == null)
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
+		//System.out.println("[" + getClass().getSimpleName() + "]  " +  this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
 		Matcher m;
 		// end by urueda
 		// search all widgets for suspicious titles
@@ -361,7 +361,7 @@ public class DefaultProtocol extends AbstractProtocol{
 				   process.right() != null && process.right().matches(processRE)){ // pid x name
 					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right(); // by urueda
-					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
+					System.out.println("[" + getClass().getSimpleName() + "] will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
 				}
 			}
@@ -443,7 +443,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			return false;
 		if (this.clickFilterPattern == null)
 			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-		// System.out.println(this.clickFilterMatchers.size() + " clickFilter matchers");
+		// System.out.println("[" + getClass().getSimpleName() + "]  " +  this.clickFilterMatchers.size() + " clickFilter matchers");
 		String title = w.get(Title, "");
 		if (title == null || title.isEmpty())
 			return true;

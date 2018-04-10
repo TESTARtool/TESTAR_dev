@@ -66,7 +66,7 @@ public class Main {
 
 
         if (lp == null) {
-            System.out.println("Failed to launch the requested application.");
+            System.out.println("[Linux/Main] Failed to launch the requested application.");
         }
 
 
@@ -79,7 +79,7 @@ public class Main {
      */
     private static void testAtSpi() {
 
-        System.out.println("Desktop count: " +  LibAtSpi.atspi_get_desktop_count());
+        System.out.println("[Linux/Main] Desktop count: " +  LibAtSpi.atspi_get_desktop_count());
 
     }
 
@@ -96,30 +96,30 @@ public class Main {
 //
 //
 //        if (displayPointer == 0) {
-//            System.out.println("Cannot open the display!");
+//            System.out.println("[" + getClass().getSimpleName() + "] Cannot open the display!");
 //            return;
 //        }
 //
 //
 //        // Get the string used to retrieve the display.
 //        Pointer<Byte> displayStringPtr = LibX11.XDisplayString(displayPointer);
-//        System.out.println("Display opened with string: '"  + displayStringPtr.getCString() + "'.");
+//        System.out.println("[" + getClass().getSimpleName() + "] Display opened with string: '"  + displayStringPtr.getCString() + "'.");
 //
 //
 //        // Get the default screen number of the current display.
 //        int defaultScreenNumber = LibX11.XDefaultScreen(displayPointer);
-//        System.out.println("Default display screen number: '"  + defaultScreenNumber + "'.");
+//        System.out.println("[" + getClass().getSimpleName() + "] Default display screen number: '"  + defaultScreenNumber + "'.");
 //
 //
 //        // Get the dimensions of the display.
 //        int displayHeighth = LibX11.XDisplayHeight(displayPointer, defaultScreenNumber);
 //        int displayWidth = LibX11.XDisplayWidth(displayPointer, defaultScreenNumber);
-//        System.out.println("Display dimensions: '"  + displayWidth + "x" + displayHeighth + "'.");
+//        System.out.println("[" + getClass().getSimpleName() + "] Display dimensions: '"  + displayWidth + "x" + displayHeighth + "'.");
 //
 //
 //        // Get the number of screens connected to the display adapter.
 //        int screenCount = LibX11.XScreenCount(displayPointer);
-//        System.out.println("Number of screens connected to the display adapter: '" + screenCount + "'.");
+//        System.out.println("[" + getClass().getSimpleName() + "] Number of screens connected to the display adapter: '" + screenCount + "'.");
 //
 //
 //
@@ -146,7 +146,7 @@ public class Main {
 //
 //        // Close connection to the opened display.
 //        LibX11.XCloseDisplay(displayPointer);
-//        System.out.println("Display closed!");
+//        System.out.println("[" + getClass().getSimpleName() + "] Display closed!");
 //
 //
 //    }

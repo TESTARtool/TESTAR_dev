@@ -161,7 +161,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
                 currentTry += 1;
-                System.out.println("AT-SPI did not find the application with name: " + applicationName + "! Retrying, try " + currentTry +  "/ " + _retryCountFindSut + "...");
+                System.out.println("[" + getClass().getSimpleName() + "] AT-SPI did not find the application with name: " + applicationName + "! Retrying, try " + currentTry +  "/ " + _retryCountFindSut + "...");
 
 
                 // Short pause to give the AT-SPI time to update.
@@ -225,7 +225,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
                 boolean markingSuccess = findAndMarkBlocked(a, atSpiRootElement);
 
                 if (!markingSuccess) {
-                    System.out.println("Could not find non-modal element '" + a.name() + "' and mark it and its children blocked.");
+                    System.out.println("[" + getClass().getSimpleName() + "] Could not find non-modal element '" + a.name() + "' and mark it and its children blocked.");
                 }
 
             }
@@ -245,7 +245,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
                 boolean markingSuccess = findAndMarkBlocked(a, atSpiRootElement);
 
                 if (!markingSuccess) {
-                    System.out.println("Could not find modal element '" + a.name() + " and mark it and its children blocked.");
+                    System.out.println("[" + getClass().getSimpleName() + "] Could not find modal element '" + a.name() + " and mark it and its children blocked.");
                 }
 
             }
@@ -544,7 +544,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         }
 
 
-        //System.out.println("Could not find frame, window, dialog element and set the z-index on it and its children.");
+        //System.out.println("[" + getClass().getSimpleName() + "] Could not find frame, window, dialog element and set the z-index on it and its children.");
         return false;
 
 

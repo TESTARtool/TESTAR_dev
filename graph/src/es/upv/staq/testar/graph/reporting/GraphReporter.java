@@ -562,28 +562,28 @@ public class GraphReporter {
 				try {
 					int p1Status = p1.waitFor();
 					if (p1Status != 0)
-						System.out.println("WARNING: dot2svg exit value = " + p1Status); // tiny
+						System.out.println("[GrapherReporter] WARNING: dot2svg exit value = " + p1Status); // tiny
 					int p2Status = p2.waitFor();
 					if (p2Status != 0)
-						System.out.println("WARNING: dot2svg (screenshoted) exit value = " + p2Status); // screenshot
+						System.out.println("[GrapherReporter] WARNING: dot2svg (screenshoted) exit value = " + p2Status); // screenshot
 					int p3Status = p3.waitFor();
 					if (p3Status != 0)
-						System.out.println("WARNING: dot2svg (minimal) exit value = " + p3Status); // minimal
+						System.out.println("[GrapherReporter] WARNING: dot2svg (minimal) exit value = " + p3Status); // minimal
 					int p4Status = p4.waitFor();
 					if (p4Status != 0)
-						System.out.println("WARNING: dot2svg (abstract) exit value = " + p4Status); // tiny abstract	
+						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract) exit value = " + p4Status); // tiny abstract	
 					int p5Status = p5.waitFor();
 					if (p5Status != 0)
-						System.out.println("WARNING: dot2svg (abstract minimal) exit value = " + p5Status); // minimal abstract		
+						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract minimal) exit value = " + p5Status); // minimal abstract		
 					int p6Status = p6.waitFor();
 					if (p6Status != 0)
-						System.out.println("WARNING: dot2svg (abstract screenshoted) exit value = " + p6Status); // screenshot abstract			
+						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract screenshoted) exit value = " + p6Status); // screenshot abstract			
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				// PNG version discarded (due to large explored spaces)
 			} catch (IOException e) {
-				System.out.println("Unable to convert graphs from .dot to .svg ... is tools\\graphviz-2.38\\release\\bin at PATH environment variable?");
+				System.out.println("[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\\graphviz-2.38\\release\\bin at PATH environment variable?");
 			}
 		}
 	}
@@ -599,11 +599,11 @@ public class GraphReporter {
 	public static void saveGraph(IEnvironment env, TESTARGraph g){
 		//System.out.print("\tExporting graph to xml ...");
 		g.saveToXML(env, OUT_DIR + testSequenceFolder + "/" + "graph_" + usingGraphTime + ".xml");
-		//System.out.println("\t... xml graph export finished!");
+		//System.out.println("[" + getClass().getSimpleName() + "] \t... xml graph export finished!");
 		
 		//System.out.print("\tPopulating .dot contents ...");
 		String[] graphString = buildGraph(env,g);
-		//System.out.println("\t... .dot contents populated!");
+		//System.out.println("[" + getClass().getSimpleName() + "] \t... .dot contents populated!");
 		String scrshotedGraph = graphString[0],
 			   scrshotedAbstractGraph = graphString[3];		
 		String nullshotGraph = graphString[1];
@@ -611,7 +611,7 @@ public class GraphReporter {
 		//System.out.print("\tConverting .dot contents to minimal ...");
 		String minimalGraph = graphString[2], //convertToMinimal(nullshotGraph),
 			   minimalAbstractGraph = graphString[5]; //convertToMinimal(abstractNullshotGraph);
-		//System.out.println("\t... minimal conversion done!");
+		//System.out.println("[" + getClass().getSimpleName() + "] \t... minimal conversion done!");
 						
 		PrintWriter writer;
         final String scrshotedDotPath = "graph_" + usingGraphTime + "_scrshoted.dot",
@@ -676,17 +676,17 @@ public class GraphReporter {
 		if (g.vertexSet().isEmpty() || g.edgeSet().isEmpty())
 			return null; // empty graph
 		else if (!mapToAbstractStateIDs.isEmpty()){
-			System.out.println("WARNING - Last report not finished? Doing cleanup");
+			System.out.println("[GrapherReporter] WARNING - Last report not finished? Doing cleanup");
 			mapToAbstractStateIDs.clear();
 		}
 
-		//System.out.println("\tWill save graphs ...");
+		//System.out.println("[" + getClass().getSimpleName() + "] \tWill save graphs ...");
 		saveGraph(env,g);
-		//System.out.println("\t... graphs saved!");
+		//System.out.println("[" + getClass().getSimpleName() + "] \t... graphs saved!");
 		
 		//System.out.print("\tWill generate graph report ...");
 		return reportGraphStats(env,g, firstSequenceActionNumber);
-		//System.out.println("\t... graph report generated!");
+		//System.out.println("[" + getClass().getSimpleName() + "] \t... graph report generated!");
 					
 	}
 	

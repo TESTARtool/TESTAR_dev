@@ -892,10 +892,10 @@ public final class Windows{
 	private static void loadExternalLib(String name) throws IOException {
 		File f = new File(name);
 		if (f.exists()){
-			System.out.println("Loading external lib ... " + name);
+			System.out.println("[Test] Loading external lib ... " + name);
 			System.load(f.getAbsolutePath());
 		} else{
-			System.out.println("Loading resource lib ... " + name);
+			System.out.println("[Windows] Loading resource lib ... " + name);
 			loadLib(name);
 		}
 	}

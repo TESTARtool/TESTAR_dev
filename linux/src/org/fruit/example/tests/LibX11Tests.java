@@ -57,7 +57,7 @@ public class LibX11Tests {
 
 
         if (displayPointer == 0) {
-            System.out.println("Cannot open the display!");
+            System.out.println("[" + getClass().getSimpleName() + "] Cannot open the display!");
             return;
         }
         assertEquals(true, displayPointer > 0);
@@ -65,26 +65,26 @@ public class LibX11Tests {
 
         // Get the string used to retrieve the display.
         Pointer<Byte> displayStringPtr = LibX11.XDisplayString(displayPointer);
-        System.out.println("Display opened with string: '"  + displayStringPtr.getCString() + "'.");
+        System.out.println("[" + getClass().getSimpleName() + "] Display opened with string: '"  + displayStringPtr.getCString() + "'.");
         assertEquals(":0", displayStringPtr.getCString());
 
 
         // Get the default screen number of the current display.
         int defaultScreenNumber = LibX11.XDefaultScreen(displayPointer);
-        System.out.println("Default display screen number: '"  + defaultScreenNumber + "'.");
+        System.out.println("[" + getClass().getSimpleName() + "] Default display screen number: '"  + defaultScreenNumber + "'.");
         assertEquals(0, defaultScreenNumber);
 
 
         // Get the dimensions of the display.
         int displayHeighth = LibX11.XDisplayHeight(displayPointer, defaultScreenNumber);
         int displayWidth = LibX11.XDisplayWidth(displayPointer, defaultScreenNumber);
-        System.out.println("Display dimensions: '"  + displayWidth + "x" + displayHeighth + "'.");
+        System.out.println("[" + getClass().getSimpleName() + "] Display dimensions: '"  + displayWidth + "x" + displayHeighth + "'.");
         assertEquals(1920, displayWidth);
 
 
         // Get the number of screens connected to the display adapter.
         int screenCount = LibX11.XScreenCount(displayPointer);
-        System.out.println("Number of screens connected to the display adapter: '" + screenCount + "'.");
+        System.out.println("[" + getClass().getSimpleName() + "] Number of screens connected to the display adapter: '" + screenCount + "'.");
         assertEquals(1, screenCount);
 
 
@@ -100,7 +100,7 @@ public class LibX11Tests {
 
         // Find the Atom specifying the PID.
         long netWmPid = LibX11.XInternAtom(displayPointer, BridJHelper.convertToPointer("_NET_WM_PID"), true);
-        System.out.println("_NET_WM_PID: '" + netWmPid + "'.");
+        System.out.println("[" + getClass().getSimpleName() + "] _NET_WM_PID: '" + netWmPid + "'.");
         assertEquals(true, netWmPid > 0);
 
 
@@ -129,7 +129,7 @@ public class LibX11Tests {
 
         // Close connection to the opened display.
         LibX11.XCloseDisplay(displayPointer);
-        System.out.println("Display closed!");
+        System.out.println("[" + getClass().getSimpleName() + "] Display closed!");
 
 
     }

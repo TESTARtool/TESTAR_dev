@@ -207,7 +207,7 @@ public class DataManager {
 		        			typeS.length() > 0 && desc.length() > 0 && example.length() > 0){
 		        			DATA_TYPES.put(desc + "(" + example + ")", new Integer(typeS));
 		        		} else
-		        			System.out.println("DataManager: WRONG DATA TYPE");
+		        			System.out.println("[" + getClass().getSimpleName() + "] DataManager: WRONG DATA TYPE");
 		        	}
 				}
 		        		        
@@ -230,7 +230,7 @@ public class DataManager {
 		        			}
 		        			typeValues.add(valueS);
 		        		} else
-		        			System.out.println("DataManager: WRONG INPUT VALUE");
+		        			System.out.println("[" + getClass().getSimpleName() + "] DataManager: WRONG INPUT VALUE");
 		        	}
 		        }
 				printData();		        
@@ -248,15 +248,15 @@ public class DataManager {
 	}
 	
 	public static void printData(){
-		System.out.println("DATA TYPES (description x type_number):");
+		System.out.println("[DataManager] DATA TYPES (description x type_number):");
 		for (String key : DATA_TYPES.keySet())
-			System.out.println("\t" + key + ": " + DATA_TYPES.get(key).intValue());
-		System.out.println("DATA VALUES (type_number x value):");
+			System.out.println("[DataManager] \t" + key + ": " + DATA_TYPES.get(key).intValue());
+		System.out.println("[DataManager] DATA VALUES (type_number x value):");
 		Set<String> values;
 		for (Integer key : INPUT_VALUES.keySet()){
 			values = INPUT_VALUES.get(key);
 			for (String v : values)
-				System.out.println("\t" + key + ": " + v);
+				System.out.println("[DataManager] \t" + key + ": " + v);
 		}
 	}
 	
