@@ -103,7 +103,7 @@ public class LogSerialiser extends Thread {
 		log.flush();
 		log.close();
 		synchronized(log){
-			System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
+			System.out.println("[LogSerialiser] <" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
 			singletonLogSerialiser = null;
 			log.notifyAll();
 		}
@@ -154,7 +154,7 @@ public class LogSerialiser extends Thread {
 					}
 				}
 			} catch (Exception e) {} // log may be set to null when we try to sync on it	
-			//System.out.println("LogManager exited");
+			//System.out.println("[" + getClass().getSimpleName() + "] LogManager exited");
 			log = null;
 		}
 	}

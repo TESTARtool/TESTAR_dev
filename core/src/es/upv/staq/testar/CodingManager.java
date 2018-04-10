@@ -264,7 +264,7 @@ public class CodingManager {
 				idCollisions++;
 			if (idCollisions > 0 && debugCounter++ > 1000){
 				debugCounter = 0;
-				System.out.println(idCollisions + " ID collisions! (" + idMap.size() + ")");
+				System.out.println("[" + getClass().getSimpleName() + "]  " +  idCollisions + " ID collisions! (" + idMap.size() + ")");
 			}
 			return id;
 		} else*/

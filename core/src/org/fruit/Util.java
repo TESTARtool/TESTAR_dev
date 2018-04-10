@@ -600,9 +600,9 @@ public final class Util {
     Writer out = new BufferedWriter(osw);
     try {
       out.write(content);
-      System.out.println("Util => " + "Saved <" + file + ">");
+      System.out.println("[Util] Saved <" + file + ">");
     } catch (IOException ioe) {
-      System.out.println("Util => " + "I/O exception writing file <" + file + ">: " + ioe.getMessage());
+      System.out.println("[Util] I/O exception writing file <" + file + ">: " + ioe.getMessage());
     } finally {
       if (out != null) {
         out.close();
@@ -729,7 +729,7 @@ public final class Util {
   // refactored from testar -> ProtocolEditor (by urueda)
   public static void compileJava(List<File> dir, String classPath) {
     for (File f : dir) {
-      System.out.println("Util => " + "Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
+      System.out.println("[Util] Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
     }
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -795,7 +795,7 @@ public final class Util {
             compilationUnits);
         if (!task.call()) {
           for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
-            System.err.format("Error on line %d in %s",
+            System.err.format("[Util] Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
           }
           throw new RuntimeException("compile errors");
@@ -807,7 +807,7 @@ public final class Util {
     }
     catch (Throwable t) {
       t.printStackTrace();
-      throw new RuntimeException("Exception: " + t.getMessage());
+      throw new RuntimeException("[Util] Exception: " + t.getMessage());
     }
   }
 
@@ -901,7 +901,7 @@ public final class Util {
           Long.toString(ms / 60000) + " minutes or " +
           Long.toString(ms / 3600000) + " hours";
     } catch (ParseException e) {
-      System.out.println("Util => " + "Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
+      System.out.println("[Util] Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
       e.printStackTrace();
       return e.getMessage();
     }

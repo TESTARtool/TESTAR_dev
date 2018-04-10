@@ -67,7 +67,7 @@ public class ProgressFileInputStream  extends FileInputStream {
     	progress = (float)(this.fileLength - remaining) / (float)this.fileLength * 100f;
     	if (progress - lastProgress > 1f){
     		lastProgress = progress;
-    		System.out.println("<" + this.fileName + "> remaining bytes = <" + remaining + "> progress (%) = <" + progress + ">");
+    		System.out.println("[" + getClass().getSimpleName() + "] <" + this.fileName + "> remaining bytes = <" + remaining + "> progress (%) = <" + progress + ">");
     	}		
 	}
 

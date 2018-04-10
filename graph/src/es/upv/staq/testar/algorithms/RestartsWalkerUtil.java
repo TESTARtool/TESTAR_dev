@@ -71,7 +71,7 @@ public class RestartsWalkerUtil {
 		if (TEST_SEQUENCE_LENGTH == 0){ // not initialized?
 			RESTART_INTERVAL = Integer.MAX_VALUE;
 			RESTART_WINDOW_SCALE = 1;
-			System.out.println("RestartWalkerUtil => -------- DEBUG> " + "TEST_SEQUENCE_LENGTH is 0");
+			System.out.println("[RestartWalkerUtil] DEBUG> TEST_SEQUENCE_LENGTH is 0");
 			return;
 		}
 
@@ -81,7 +81,7 @@ public class RestartsWalkerUtil {
 		if (pendingLength < THRESHOLD / 2){
 			RESTART_INTERVAL = Integer.MAX_VALUE; // prevent restarts
 			RESTART_WINDOW_SCALE = 1;
-			System.out.println("RestartWalkerUtil => " + "-------- DEBUG> " + "pendingLength <" + pendingLength + "> less than half threshold <" + (THRESHOLD/2) + ">");
+			System.out.println("[RestartWalkerUtil] DEBUG> pendingLength <" + pendingLength + "> less than half threshold <" + (THRESHOLD/2) + ">");
 			return;
 		}
 		
@@ -89,7 +89,7 @@ public class RestartsWalkerUtil {
 		if (graphSize == 0){
 			RESTART_INTERVAL = THRESHOLD / 4;
 			RESTART_WINDOW_SCALE = 2;
-			System.out.println("RestartWalkerUtil => " + "-------- DEBUG> " + "graphSize is 0");
+			System.out.println("[RestartWalkerUtil] DEBUG> graphSize is 0");
 			return;
 		}
 				
@@ -97,14 +97,14 @@ public class RestartsWalkerUtil {
 		if (pendingLength < longestPath * 2){
 			RESTART_INTERVAL = Integer.MAX_VALUE; // prevent restarts
 			RESTART_WINDOW_SCALE = 1;
-			System.out.println("RestartWalkerUtil => " + "-------- DEBUG> " + "pendingLength <" + pendingLength + "> less than double longest path <" + (longestPath * 2) + ">");
+			System.out.println("[RestartWalkerUtil] DEBUG> pendingLength <" + pendingLength + "> less than double longest path <" + (longestPath * 2) + ">");
 			return;
 		}
 		
 		if (sequenceIdx == 0){
 			RESTART_INTERVAL = 1; restartCounter = RESTART_INTERVAL; // force restart
 			RESTART_WINDOW_SCALE = (int) Math.log((double)longestPath + 1.0d);
-			System.out.println("RestartWalkerUtil => " + "-------- DEBUG> " + "sequenceIdx is 0");
+			System.out.println("[RestartWalkerUtil] DEBUG> sequenceIdx is 0");
 			return;
 		}
 
@@ -113,7 +113,7 @@ public class RestartsWalkerUtil {
 			RESTART_INTERVAL = THRESHOLD * 2;
 		RESTART_WINDOW_SCALE = (int) Math.log((double)longestPath + 1.0d);;
 		
-		System.out.println("RestartWalkerUtil => " + "-------- DEBUG> " + "RESTART_INTERVAL <" + RESTART_INTERVAL + "> and RESTART_WINDOW_SCALE <" + RESTART_WINDOW_SCALE + ">");
+		System.out.println("[RestartWalkerUtil] DEBUG> RESTART_INTERVAL <" + RESTART_INTERVAL + "> and RESTART_WINDOW_SCALE <" + RESTART_WINDOW_SCALE + ">");
 
 	}
 
@@ -175,7 +175,7 @@ public class RestartsWalkerUtil {
 				pathTargetState.clear(); // target state reached!
 				pathTargetState = null;
 				restartWindowCounter = -1;
-				System.out.println("RestartWalkerUtil => " + "[RestartsWalkerUtil] Walker restart successful!");
+				System.out.println("[RestartWalkerUtil] Walker restart successful!");
 
 			}
 		}

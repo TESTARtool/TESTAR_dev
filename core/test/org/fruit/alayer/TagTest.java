@@ -48,7 +48,7 @@ public class TagTest {
 
       File file = new File("dummy.dat");
       if (!file.delete()) {
-         System.out.println("TagTest => " + "File could not be removed");
+         System.out.println("[TagTest] File could not be removed");
       }
    }
 
