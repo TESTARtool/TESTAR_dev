@@ -48,7 +48,7 @@ code.
 
 ## Known issue
 - TESTAR can not be excuted using the gradle task .\gradlew run. (see issue #25)
-- Currently, only the protocols ``Protocol_desktop_genertic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
+- Currently, only the protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
 support the graph database. Other protocols need to be adapted  (see issue #52)
 
 ## Graph database support
@@ -57,10 +57,9 @@ Currently Widget's, Actions, States and there relation are recorded to the graph
 
 ### Restrictions on the use of the graph database
 The model currently implemented consists of States, Actions and Widgets. The widgets are stored from
-the method derriveActions. The protocols ``Protocol_desktop_genertic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict`` 
+the method deriveActions. The protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict`` 
 contain an implementation which shows how the method storeWidget could be used.
-When the storeWidget method is not called, it is not possible to add Actions to the database since Actions are
-related to a widget most of the time.
+When the storeWidget method is not called, TESTAR will raise an exception and stop working.
 
 ### using graphdb on the local filesystem
 The easiest way to use the graph database support is to write the database to the local file system
