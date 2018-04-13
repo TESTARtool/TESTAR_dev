@@ -51,7 +51,11 @@ code.
 
 ## GraphDb support
 This version of TESTAR supports the output of data to an http://orientdb.com database.
-Currently Widget's, Actions, States and there relation are recorded to the graph database. 
+Currently Widget's, Actions, States and there relation are recorded to the graph database.
+
+### Integration with graphdb
+The model currently implemented consists of States, Actions and Widgets. The widgets are stored from
+the method derriveActions. 
 
 ### using graphdb on the local filesystem
 The easiest way to use the graph database support is to write the database to the local file system
