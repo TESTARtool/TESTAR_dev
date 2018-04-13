@@ -1,34 +1,32 @@
-/*************************************************************************************
- *
- * COPYRIGHT (2017):
- *
- * Open Universiteit
- * www.ou.nl<http://www.ou.nl>
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- * 3. Neither the name of mosquitto nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- ************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2017 Open Universiteit - www.ou.nl
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
 
 package nl.ou.testar.a11y.protocols;
 
@@ -113,7 +111,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		html.writeHeader()
 		.writeHeading(2, "General information")
 		.writeParagraph("Report type: " +
-				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "Ad-hoc"))
+				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "On-the-fly"))
 		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
 		.writeParagraph("Sequence number: " + sequenceCount());
 	}
@@ -143,8 +141,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		state.set(A11yTags.A11yErrorCount, results.getErrorCount());
 		state.set(A11yTags.A11yHasViolations, results.hasViolations());
 		if (!settings().get(ConfigTags.GraphDBEnabled))
-			// ad-hoc analysis (spammy)
-			writeAdHocResults(results);
+			writeOnTheFlyEvaluationResults(results);
 		return upstreamProblem ? verdict : results.getOverallVerdict();
 	}
 
@@ -172,26 +169,25 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
 		if (settings().get(ConfigTags.GraphDBEnabled)) {
-			// proper offline analysis
 			writeGraphDBResults();
-			offlineAnalysis();
+			offlineEvaluation();
 		}
 		html.writeFooter().close();
 	}
 	
 	/**
-	 * Perform offline analysis, e.g. with a graph database
+	 * Perform offline evaluation, e.g. with a graph database
 	 */
-	protected void offlineAnalysis() {
+	protected void offlineEvaluation() {
 		EvaluationResults results = evaluator.query(graphDB());
-		writeOfflineAnalysisResults(results);
+		writeOfflineEvaluationResults(results);
 	}
 	
 	/**
-	 * Write implementation-specific ad-hoc evaluation result details to the HTML report
+	 * Write implementation-specific on-the-fly evaluation result details to the HTML report
 	 * @param results The evaluation results.
 	 */
-	protected void writeAdHocResultsDetails(EvaluationResults results) {
+	protected void writeOnTheFlyEvaluationResultsDetails(EvaluationResults results) {
 		boolean hadViolations = false;
 		html.writeHeading(3, "Violations")
 		.writeUListStart();
@@ -213,9 +209,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {}
 	
 	/**
-	 * Write implementation-specific offline analysis result details to the HTML report
+	 * Write implementation-specific offline evaluation result details to the HTML report
 	 */
-	protected void writeOfflineAnalysisResultsDetails(EvaluationResults results) {}
+	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {}
 	
 	/**
 	 * Gets the title of the widget with the given concrete ID from a graph database
@@ -224,11 +220,10 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 */
 	protected String getWidgetTitleFromGraphDB(String concreteID) {
 		String gremlinWidget = "_().has('@class','Widget').has('" +
-				Tags.ConcreteID.name() + "','" + concreteID +"').Title";
+				Tags.ConcreteID.name() + "','" + concreteID + "').Title";
 		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget,
 				GremlinStart.VERTICES);
 		if (widgets.size() != 1) { // no matches or too many matches
-			System.out.println("<---> Failed " + concreteID + " found " + widgets.size());
 			return "N/A";
 		}
 		return (String)widgets.get(0);
@@ -248,7 +243,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		return widgets;
 	}
 	
-	private void writeAdHocResults(EvaluationResults results) {
+	private void writeOnTheFlyEvaluationResults(EvaluationResults results) {
 		html.writeHeading(2, "State: " + state.get(Tags.ConcreteID))
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
@@ -257,7 +252,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeTableRow("Pass", Integer.toString(results.getPassCount()))
 		.writeTableRow("Total", Integer.toString(results.getResultCount()))
 		.writeTableEnd();
-		writeAdHocResultsDetails(results);
+		writeOnTheFlyEvaluationResultsDetails(results);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -296,13 +291,13 @@ public class AccessibilityProtocol extends DefaultProtocol {
 				SCREENSHOT_PATH_PREFIX + stateProps.get(Tags.ScreenshotPath.name()), true);
 	}
 	
-	private void writeOfflineAnalysisResults(EvaluationResults results) {
-		html.writeHeading(2, "Offline analysis");
-		writeGeneralOfflineAnalysisResults(results);
-		writeOfflineAnalysisResultsDetails(results);
+	private void writeOfflineEvaluationResults(EvaluationResults results) {
+		html.writeHeading(2, "Offline evaluation");
+		writeGeneralOfflineEvaluationResults(results);
+		writeOfflineEvaluationResultsDetails(results);
 	}
 	
-	private void writeGeneralOfflineAnalysisResults(EvaluationResults results) {
+	private void writeGeneralOfflineEvaluationResults(EvaluationResults results) {
 		html.writeHeading(3, "General information")
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
