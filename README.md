@@ -50,6 +50,13 @@ code.
 TESTAR can be started using a gradle command from the root of the project.
 1. .\gradlew runTestar
 
+#### Debug TESTAR from Gradle
+In order to debug the TESTAR code, you must run;
+1. .\gradlew -DDEBUG=true runTestar.  
+
+Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the result to 
+the machine where you want to run TESTAR and run TESTAR on the target machine. This allows
+the user to debug TESTAR from a different machine. 
 
 ## Known issue
 - Currently, only the protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
