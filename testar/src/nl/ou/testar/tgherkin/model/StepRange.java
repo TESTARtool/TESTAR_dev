@@ -93,7 +93,7 @@ public class StepRange extends Step {
 	}
 	
     /**
-     * Checks whether the step has a next actions.
+     * Checks whether the step has a next action.
      * @return true if step has a next action otherwise false
      */
     protected boolean hasNextAction() {

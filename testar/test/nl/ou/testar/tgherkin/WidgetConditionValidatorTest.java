@@ -26,6 +26,7 @@ import nl.ou.testar.tgherkin.model.TableRow;
 
 /**
  * Test WidgetConditionValidator class.
+ * This JUnit test verifies whether an expression is a valid widget condition expression. 
  *
  */
 public class WidgetConditionValidatorTest {
@@ -49,7 +50,8 @@ public class WidgetConditionValidatorTest {
 		tableRows.add(new TableRow(tableCells));		
 		dataTable = new DataTable(tableRows);
 		dataTable.beginSequence();
-		// Create map with expression and expected validation result: is expression a valid expression for the given data table?
+		// Create map with to be tested expression and expected validation result: 
+		// is expression a valid expression for the given data table?
 		testMap.put("1 = 1", true);
 		testMap.put("1 + 2 = 3", true);
 		testMap.put("$Title =  \"Title1\"", true);

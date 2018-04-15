@@ -29,7 +29,7 @@ import nl.ou.testar.tgherkin.model.TableRow;
 
 /**
  * Test WidgetConditionEvaluator class.
- *
+ * This JUnit test verifies whether a widget condition is evaluated correctly. 
  */
 public class WidgetConditionEvaluatorTest {
 
@@ -63,7 +63,7 @@ public class WidgetConditionEvaluatorTest {
 		tableRows.add(new TableRow(tableCells));		
 		dataTable = new DataTable(tableRows);
 		dataTable.beginSequence();
-		// Create map with expression and expected result
+		// Create map with to be tested expression and expected result
 		testMap.put("1 = 1", true);
 		testMap.put("1 + 2 = 3", true);
 		testMap.put("1 > 2", false);

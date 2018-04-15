@@ -99,7 +99,7 @@ public class Document {
      */
 	public boolean hasFailed() {
 		if(currentFeature() != null) {
-			currentFeature().hasFailed();
+			return currentFeature().hasFailed();
 		}
 		return false;
 	}
@@ -130,12 +130,8 @@ public class Document {
     @Override
     public String toString() {
     	StringBuilder result = new StringBuilder();
-    	if (getFeatures() != null) {
-    		for (Feature feature : getFeatures()) {
-	    		result.append(feature.toString());
-		    	result.append("|");
-	    	}
-	    	result.append(System.getProperty("line.separator"));
+   		for (Feature feature : getFeatures()) {
+    		result.append(feature.toString());
     	}
     	return result.toString();    	
     }

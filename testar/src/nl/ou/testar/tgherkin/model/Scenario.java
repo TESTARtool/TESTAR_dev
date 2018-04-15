@@ -55,10 +55,12 @@ public class Scenario extends ScenarioDefinition {
 	    	result.append(getNarrative());    	
 	    	result.append(System.getProperty("line.separator"));
     	}
-    	if (getSelection() != null) {    	
-    		result.append("Selection:");
-    		result.append(getSelection().toString());    	
-    	}    	
+    	if (getSelection().size() > 0) {
+        	result.append("Selection:");
+    	}
+   		for (ConditionalGesture conditionalGesture : getSelection()) {
+   			result.append(conditionalGesture.toString());
+   		}
     	if (getOracle() != null) {    	
     		result.append("Oracle:");
     		result.append(getOracle().toString());    	

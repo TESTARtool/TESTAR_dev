@@ -18,8 +18,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
-import nl.ou.testar.tgherkin.protocol.ReportUtils;
-
 
 /**
  * Tgherkin Step.
@@ -224,7 +222,7 @@ public class Step {
 			}
 		}
 		if (settings.get(ConfigTags.ReportDerivedGestures)){
-			ReportUtils.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
+			Report.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
 		}
 		// generate actions
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
@@ -362,7 +360,7 @@ public class Step {
 	}
 
     /**
-     * Checks whether the step has a next actions.
+     * Checks whether the step has a next action.
      * @return true if step has a next action otherwise false
      */
     protected boolean hasNextAction() {

@@ -261,7 +261,7 @@ public class Feature {
 			return background.hasFailed();
 		}
 		if(currentScenarioDefinition() != null) {
-			currentScenarioDefinition().hasFailed();
+			return currentScenarioDefinition().hasFailed();
 		}
 		return false;
 	}
