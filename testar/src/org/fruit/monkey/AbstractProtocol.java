@@ -1,43 +1,97 @@
-/******************************************************************************************
- * COPYRIGHT:                                                                             *
- * Universitat Politecnica de Valencia 2013                                               *
- * Camino de Vera, s/n                                                                    *
- * 46022 Valencia, Spain                                                                  *
- * www.upv.es                                                                             *
- *                                                                                        * 
- * D I S C L A I M E R:                                                                   *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)      *
- * in the context of the european funded FITTEST project (contract number ICT257574)      *
- * of which the UPV is the coordinator. As the sole developer of this source code,        *
- * following the signed FITTEST Consortium Agreement, the UPV should decide upon an       *
- * appropriate license under which the source code will be distributed after termination  *
- * of the project. Until this time, this code can be used by the partners of the          *
- * FITTEST project for executing the tasks that are outlined in the Description of Work   *
- * (DoW) that is annexed to the contract with the EU.                                     *
- *                                                                                        * 
- * Although it has already been decided that this code will be distributed under an open  *
- * source license, the exact license has not been decided upon and will be announced      *
- * before the end of the project. Beware of any restrictions regarding the use of this    *
- * work that might arise from the open source license it might fall under! It is the      *
- * UPV's intention to make this work accessible, free of any charge.                      *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
 
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit.monkey;
 
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.Role;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Visualizer;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.EventHandler;
+import es.upv.staq.testar.FlashFeedback;
+import es.upv.staq.testar.IEventListener;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.graph.IEnvironment;
+import es.upv.staq.testar.graph.IGraphState;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.GraphDB;
+import org.fruit.Assert;
+import org.fruit.UnProc;
+import org.fruit.Util;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Canvas;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Finder;
+import org.fruit.alayer.Pen;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Rect;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Taggable;
+import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.UsedResources;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Visualizer;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.actions.ActivateSystem;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.KillProcess;
+import org.fruit.alayer.actions.NOP;
+import org.fruit.alayer.devices.AWTMouse;
+import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Mouse;
+import org.fruit.alayer.devices.MouseButtons;
+import org.fruit.alayer.devices.ProcessHandle;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.ActionFailedException;
+import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.exceptions.WidgetNotFoundException;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -65,65 +119,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
-import nl.ou.testar.GraphDB;
-import org.fruit.Assert;
-import org.fruit.UnProc;
-import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.ActionRoles;
-import org.fruit.alayer.actions.ActivateSystem;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.KillProcess;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.devices.AWTMouse;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.devices.MouseButtons;
-import org.fruit.alayer.devices.ProcessHandle;
-import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.EventHandler;
-import es.upv.staq.testar.FlashFeedback;
-import es.upv.staq.testar.IEventListener;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphState;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.protocols.ProtocolUtil;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.Role;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Visualizer;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
 												  IEventListener { // by urueda
@@ -136,19 +142,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	protected boolean faultySequence; // by urueda (refactored from DefaultProtocol)
 
-	Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);	
+	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 	private Settings settings;
 	private Modes mode;
 	protected Mouse mouse = AWTMouse.build();
 	private boolean saveStateSnapshot = false,
 					markParentWidget = false; // by urueda
-	int actionCount, sequenceCount,
-		firstSequenceActionNumber, lastSequenceActionNumber; // by urueda
+	private int actionCount, sequenceCount,
+		firstSequenceActionNumber;
+	protected int lastSequenceActionNumber; // by urueda
 	double startTime;
 	
 	// begin by urueda
 	
-	public static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
 
 	// Verdict severities
 	// PASS
@@ -157,6 +164,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// FAIL
 	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
 	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
+
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
 
 	protected double passSeverity = Verdict.SEVERITY_OK;
 	private int generatedSequenceNumber = -1;
@@ -183,7 +192,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private boolean forceToSequenceLengthAfterFail = false;
 	private int testFailTimes = 0;
     private final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
-	private GraphDB graphDB;
+	protected GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
     
@@ -203,7 +212,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 	protected List<ProcessInfo> contextRunningProcesses = null;
-	
+
+	/**
+	 * Retrieve a list of Running processes
+	 * @param debugTag Tag used in debug output
+	 * @return a list of running processes
+	 */
 	protected List<ProcessInfo> getRunningProcesses(String debugTag){
 		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
 		long pid, handle; String desc;
@@ -211,7 +225,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			System.out.println("\t[" + (i++) +  "] " + /*sut.toString() + "\t - " +*/ sut.getStatus());			
+			System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -401,7 +415,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			default: break;
 			}		
 		}
-		//logln("'" + mode + "' mode active.", LogLevel.Info);
+
 		// begin by urueda
 		String modeParamS = "";
 		if (mode == Modes.GenerateManual)
@@ -422,6 +436,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
+	protected final GraphDB graphDB(){ return graphDB; }
 	protected void beginSequence() {}
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;
@@ -721,7 +736,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// note /by urueda): could be more interesting as XML (instead of Java Serialisation)
-	private void saveStateSnapshot(State state){
+	private void saveStateSnapshot(final State state){
 		try{
 			if(saveStateSnapshot){
 				//System.out.println(Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
@@ -950,6 +965,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda (refactor run() method)
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
+		long tStart = System.currentTimeMillis();
+		LOGGER.info("[RA} start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -1025,7 +1042,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){ // by urueda					
 				//logln(String.format("Executed (%d): %s...", actionCount, action.get(Desc, action.toString())), LogLevel.Info);
 				// begin by urueda
-				cv.begin(); Util.clear(cv); cv.end(); // by urueda (overlay is invalid until new state/actions scan)
+				cv.begin();
+				Util.clear(cv);
+				cv.end(); // by urueda (overlay is invalid until new state/actions scan)
 				stampLastExecutedAction = System.currentTimeMillis();
 				actionExecuted(system,state,actionStatus.getAction()); // notification
 				if (actionStatus.isUserEventAction())
@@ -1042,6 +1061,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
 						actionRepresentation[0]) + "\n",
 						LogSerialiser.LogLevel.Info);
+
 				System.out.print(String.format(
 						"S[%1$" + (1 + (int)Math.log10((double)settings.get(ConfigTags.Sequences))) + "d=%2$" + (1 + (int)Math.log10((double)generatedSequenceNumber)) + "d]-" + // S = test Sequence
 						"A[%3$" + (1 + (int)Math.log10((double)settings().get(ConfigTags.SequenceLength))) + // A = Action
@@ -1099,18 +1119,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 		
 		lastExecutedAction = actionStatus.getAction(); // by urueda
-
+		lastExecutedAction.set(Tags.UsedResources, new UsedResources(lastCPU[0],lastCPU[1],sutRAMbase,sutRAMpeak).toString());
+		lastExecutedAction.set(Tags.Representation, Action.getActionRepresentation(state,lastExecutedAction,"\t")[1]);
 		State newState = getState(system);
 		graphDB.addState(newState);
 
 		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
 			//TODO this does not work in all cases check (the last executed action tag does not always have a description
-		   //System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc));
+			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
 			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-
+        LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1143,6 +1164,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// end by urueda		
 		boolean problems;
 		while(mode() != Modes.Quit && moreSequences()){
+			long tStart = System.currentTimeMillis();
+			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
 			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
@@ -1253,7 +1276,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
 				//Store ( initial )state
-				graphDB.addState(state);
+				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 	
@@ -1397,6 +1420,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
+			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
 				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
@@ -1487,7 +1511,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					);
 				ps.println(heading);
 				IEnvironment env = Grapher.getEnvironment();
-				double[] cvgMetrics = env.getCoverageMetrics();
+				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
 				final int VERDICT_WEIGHT = 	1000,
 						  CVG_WEIGHT = 		  10,
 						  PATH_WEIGHT = 	 100,
@@ -1497,7 +1521,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						  TEST_WEIGHT = 	1000;
 				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
 					((problems ? 1 : 0) * VERDICT_WEIGHT +
-					 cvgMetrics[0] + cvgMetrics[1] * CVG_WEIGHT +
+					 cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
 					 env.getLongestPathLength() * PATH_WEIGHT +
 					 (env.getGraphStates().size() - 2) * STATES_WEIGHT +
 					 (1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
@@ -1507,8 +1531,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
 					(problems ? "FAIL" : "PASS"),		  // verdict
 					this.testFailTimes,					  // test FAIL count
-					String.format("%.2f", cvgMetrics[0]), // min coverage);
-					String.format("%.2f", cvgMetrics[1]), // max coverage
+					String.format("%.2f", cvgMetrics.getMinCoverage()),
+					String.format("%.2f", cvgMetrics.getMaxCoverage()),
 					env.getLongestPathLength(), 			  // longest path
 					env.getGraphStates().size() - 2,	  // graph states
 					env.getGraphStateClusters().size(),	  // abstract states

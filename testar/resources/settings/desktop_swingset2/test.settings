@@ -26,6 +26,17 @@ SUTConnector = COMMAND_LINE
 SUTConnectorValue = java -jar "suts/SwingSet2.jar"
 
 #################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = true
+
+#################################################################
 # Sequences
 #
 # Number of sequences and the length of these sequences
