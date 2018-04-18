@@ -223,14 +223,126 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String toFileString(){
+	public String toFileString() throws IOException{
 		StringBuilder sb = new StringBuilder();
 
-		for(Tag<?> t : tags()){			
-			sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
-		}
+		try {
+			//test.setting default structure
+			sb.append("#################################################################\n"
+					+"# TESTAR mode\n"
+					+"#\n"
+					+"# Set the mode you want TESTAR to start in: Spy, Generate, Replay\n"
+					+"#################################################################\n"
+					+"\n"
+					+"Mode =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Connect to the System Under Test (SUT)\n"
+					+"#\n"
+					+"# Indicate how you want to connect to the SUT:\n"
+					+"#\n"
+					+"# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that\n"
+					+"# starts the SUT.\n"
+					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
+					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
+					+"#\n"
+					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
+					+"# in the SUT main window. The SUT must be manually started and closed.\n"
+					+"#\n"
+					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.\n"
+					+"# The SUT must be manually started and closed.\n"
+					+"#################################################################\n"
+					+"SUTConnector = " + Util.lineSep()
+					+"SUTConnectorValue = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Java Swing applications & Access Bridge Enabled\n"
+					+"#\n"
+					+"# Activate the Java Access Bridge in your Windows System:\n"
+					+"#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)\n"
+					+"#\n"
+					+"# Enable the variable Access Bridge Enabled in TESTAR as true\n"
+					+"#################################################################\n"
+					+"\n"
+					+"AccessBridgeEnabled = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Sequences\n"
+					+"#\n"
+					+"# Number of sequences and the length of these sequences\n"
+					+"#################################################################\n"
+					+"\n"
+					+"Sequences = " + Util.lineSep()
+					+"SequenceLength = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Oracles based on suspicious titles\n"
+					+"#\n"
+					+"# Regular expression\n"
+					+"#################################################################\n"
+					+"\n"
+					+"SuspiciousTitles = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Actionfilter\n"
+					+"#\n"
+					+"# Regular expression. More filters can be added in Spy mode,\n"
+					+"# these will be added to the protocol_filter.xml file.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ClickFilter = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Processfilter\n"
+					+"#\n"
+					+"# Regular expression. Kill the processes that your SUT can start up\n"
+					+"# but that you do not want to test.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"SUTProcesses =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Protocolclass\n"
+					+"#\n"
+					+"# Indicate the location of the protocol class for your specific SUT.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProtocolClass = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Graphdatabase settings (experimental)\n"
+					+"#################################################################\n"
+					+"GraphDBEnabled = false" + Util.lineSep()
+					+"GraphDBUrl =" + Util.lineSep()
+					+"GraphDBUser =" + Util.lineSep()
+					+"GraphDBPassword =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Other more advanced settings\n"
+					+"#################################################################\n");
+
+
+			for(Tag<?> t : tags()){
+				
+				int ini = sb.indexOf(t.name()+" =");
+				int end = sb.indexOf(System.lineSeparator(), ini);
+
+				if(ini!=-1) { // Overwrite default tags with the new value
+
+					sb = sb.delete(ini, end);
+					sb.insert(ini, t.name() +" = "+ escapeBackslash(print((Tag<Object>)t, get(t))));
+
+				}else { // This tag is new a variable
+
+					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
+				}
+			}
+			
+		}catch(Exception e){System.out.println("Error trying to save current settings "+e);}
+
 		return sb.toString();
 	}
+	
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 }

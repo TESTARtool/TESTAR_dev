@@ -2571,7 +2571,7 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
   * by urueda (copy from Windows 7) */			   
 char* wchart2String(JNIEnv * env, wchar_t *value){
 
-	static char bf[sizeof(value)/sizeof(wchar_t)];
+	char bf[sizeof(value)/sizeof(wchar_t)];
 		
 	sprintf(bf, "%ws", value);
 	
@@ -2583,7 +2583,7 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
   * by urueda (copy from Windows 7) */			   
 char* jint2String(JNIEnv * env, jint value){
 
-	static char bf[64];
+	char bf[64];
 	
 	sprintf(bf, "%d", value);
 	
