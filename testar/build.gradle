@@ -24,6 +24,8 @@ sourceSets {
  * Note this version only works on Windows.
  */
 task runTestar(type: Exec) {
+    group = 'custom_testar'
+    description ='runTESTAR'
     workingDir 'target/install/testar/bin'
     commandLine 'cmd', '/c', 'testar.bat'
 }

@@ -46,9 +46,14 @@ code.
 3. Select Gradle -> Existing Gradle project to open te import dialog 
 4. Select the folder that contains the root of the source code and start the import
 
+
 #### Running TESTAR from Gradle
 TESTAR can be started using a gradle command from the root of the project.
 1. .\gradlew runTestar
+
+##### In Eclipse
+Within Eclipse, TESTAR can be executed by running the task runTestar which is available in the map custom_testar.
+To debug the application with the runTestar task, provide your onw run configuration in which the option -DDEBUG is set.
 
 #### Debug TESTAR from Gradle
 In order to debug the TESTAR code, you must run;
