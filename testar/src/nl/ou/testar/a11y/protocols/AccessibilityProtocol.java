@@ -109,6 +109,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		catch (Exception e) {
 			LogSerialiser.log("Failed to open the HTML report: " + e.getMessage(),
 					LogSerialiser.LogLevel.Critical);
+			System.exit(-1);
 		}
 		html.writeHeader()
 		.writeHeading(2, "General information")
