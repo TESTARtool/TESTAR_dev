@@ -74,7 +74,8 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
-		SuccessCriterion sc = getSuccessCriterionByName("No Keyboard Trap");
+		SuccessCriterion scKbd = getSuccessCriterionByName("Keyboard"),
+				scTrap = getSuccessCriterionByName("No Keyboard Trap");
 		int shortcutKeyCount = 0;
 		for (Widget w : widgets) {
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
@@ -84,10 +85,10 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				if (lastConcreteWidgetID.equals(concreteID)) {
 					sameWidgetCount++;
 					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD)
-						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+						results.add(new WCAG2EvaluationResult(scTrap, WCAG2EvaluationResult.Type.WARNING,
 								"Possible keyboard trap", w));
 					else
-						results.add(evaluationPassed(sc));
+						results.add(evaluationPassed(scTrap));
 				}
 				else {
 					sameWidgetCount = 0;
@@ -101,12 +102,11 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					|| (key2 != null && !key2.isEmpty()))
 				shortcutKeyCount++;
 		}
-		sc = getSuccessCriterionByName("Keyboard");
 		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size())
-			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+			results.add(new WCAG2EvaluationResult(scKbd, WCAG2EvaluationResult.Type.WARNING,
 					"Possible widgets missing shortcut keys"));
 		else
-			results.add(evaluationPassed(sc));
+			results.add(evaluationPassed(scKbd));
 		return results;
 	}
 	
