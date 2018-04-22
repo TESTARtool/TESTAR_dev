@@ -23,5 +23,4 @@ subprojects {
     }
 
     buildDir = new File('./target')
-
 }

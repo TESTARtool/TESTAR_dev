@@ -1,26 +1,33 @@
-/******************************************************************************************
- * COPYRIGHT:                                                                             *
- * Universitat Politecnica de Valencia 2013                                               *
- * Camino de Vera, s/n                                                                    *
- * 46022 Valencia, Spain                                                                  *
- * www.upv.es                                                                             *
- *                                                                                        * 
- * D I S C L A I M E R:                                                                   *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)      *
- * in the context of the european funded FITTEST project (contract number ICT257574)      *
- * of which the UPV is the coordinator. As the sole developer of this source code,        *
- * following the signed FITTEST Consortium Agreement, the UPV should decide upon an       *
- * appropriate license under which the source code will be distributed after termination  *
- * of the project. Until this time, this code can be used by the partners of the          *
- * FITTEST project for executing the tasks that are outlined in the Description of Work   *
- * (DoW) that is annexed to the contract with the EU.                                     *
- *                                                                                        * 
- * Although it has already been decided that this code will be distributed under an open  *
- * source license, the exact license has not been decided upon and will be announced      *
- * before the end of the project. Beware of any restrictions regarding the use of this    *
- * work that might arise from the open source license it might fall under! It is the      *
- * UPV's intention to make this work accessible, free of any charge.                      *
- *****************************************************************************************/
+/***************************************************************************************************
+*
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its
+* contributors may be used to endorse or promote products derived from
+* this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************************************/
+
+
 
 /**
  *  @author Sebastian Bauersfeld
@@ -216,14 +223,126 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String toFileString(){
+	public String toFileString() throws IOException{
 		StringBuilder sb = new StringBuilder();
 
-		for(Tag<?> t : tags()){			
-			sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
-		}
+		try {
+			//test.setting default structure
+			sb.append("#################################################################\n"
+					+"# TESTAR mode\n"
+					+"#\n"
+					+"# Set the mode you want TESTAR to start in: Spy, Generate, Replay\n"
+					+"#################################################################\n"
+					+"\n"
+					+"Mode =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Connect to the System Under Test (SUT)\n"
+					+"#\n"
+					+"# Indicate how you want to connect to the SUT:\n"
+					+"#\n"
+					+"# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that\n"
+					+"# starts the SUT.\n"
+					+"# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).\n"
+					+"# For web applications, follow the next format: web_browser_path SUT_URL.\n"
+					+"#\n"
+					+"# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed\n"
+					+"# in the SUT main window. The SUT must be manually started and closed.\n"
+					+"#\n"
+					+"# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.\n"
+					+"# The SUT must be manually started and closed.\n"
+					+"#################################################################\n"
+					+"SUTConnector = " + Util.lineSep()
+					+"SUTConnectorValue = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Java Swing applications & Access Bridge Enabled\n"
+					+"#\n"
+					+"# Activate the Java Access Bridge in your Windows System:\n"
+					+"#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)\n"
+					+"#\n"
+					+"# Enable the variable Access Bridge Enabled in TESTAR as true\n"
+					+"#################################################################\n"
+					+"\n"
+					+"AccessBridgeEnabled = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Sequences\n"
+					+"#\n"
+					+"# Number of sequences and the length of these sequences\n"
+					+"#################################################################\n"
+					+"\n"
+					+"Sequences = " + Util.lineSep()
+					+"SequenceLength = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Oracles based on suspicious titles\n"
+					+"#\n"
+					+"# Regular expression\n"
+					+"#################################################################\n"
+					+"\n"
+					+"SuspiciousTitles = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Actionfilter\n"
+					+"#\n"
+					+"# Regular expression. More filters can be added in Spy mode,\n"
+					+"# these will be added to the protocol_filter.xml file.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ClickFilter = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Processfilter\n"
+					+"#\n"
+					+"# Regular expression. Kill the processes that your SUT can start up\n"
+					+"# but that you do not want to test.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"SUTProcesses =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Protocolclass\n"
+					+"#\n"
+					+"# Indicate the location of the protocol class for your specific SUT.\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProtocolClass = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Graphdatabase settings (experimental)\n"
+					+"#################################################################\n"
+					+"GraphDBEnabled = false" + Util.lineSep()
+					+"GraphDBUrl =" + Util.lineSep()
+					+"GraphDBUser =" + Util.lineSep()
+					+"GraphDBPassword =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Other more advanced settings\n"
+					+"#################################################################\n");
+
+
+			for(Tag<?> t : tags()){
+				
+				int ini = sb.indexOf(t.name()+" =");
+				int end = sb.indexOf(System.lineSeparator(), ini);
+
+				if(ini!=-1) { // Overwrite default tags with the new value
+
+					sb = sb.delete(ini, end);
+					sb.insert(ini, t.name() +" = "+ escapeBackslash(print((Tag<Object>)t, get(t))));
+
+				}else { // This tag is new a variable
+
+					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
+				}
+			}
+			
+		}catch(Exception e){System.out.println("Error trying to save current settings "+e);}
+
 		return sb.toString();
 	}
+	
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 }
