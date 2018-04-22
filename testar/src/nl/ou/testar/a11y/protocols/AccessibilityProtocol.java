@@ -78,7 +78,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 * The relevant widgets
 	 * This needs to be updated after every state change.
 	 */
-	protected List<Widget> relevantWidgets;
+	protected List<Widget> relevantWidgets = new ArrayList<>();
 	
 	/**
 	 * The HTML reporter to store the evaluation results
@@ -86,7 +86,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected HTMLReporter html = null;
 
 	/**
-	 * Constructs a new WCAG2ICT test protocol
+	 * Constructs a new accessibility test protocol
 	 */
 	public AccessibilityProtocol(Evaluator evaluator) {
 		super();
