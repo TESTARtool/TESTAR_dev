@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -110,11 +111,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
 			System.exit(-1);
 		}
 		html.writeHeader()
-		.writeHeading(2, "General information")
-		.writeParagraph("Report type: " +
+		.writeHeading(2, "General Information")
+		.writeUListStart()
+		.writeListItem("Report time: " + Util.dateString("yyyy-MM-dd HH:mm:ss"))
+		.writeListItem("Report type: " +
 				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "On-the-fly"))
-		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
-		.writeParagraph("Sequence number: " + sequenceCount());
+		.writeListItem("Guidelines version: " + evaluator.getImplementationVersion())
+		.writeListItem("Sequence number: " + sequenceCount())
+		.writeUListEnd();
 	}
 
 	/**
@@ -264,8 +268,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 				A11yTags.A11yHasViolations.name() + "',true).map";
 		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties,
 				GremlinStart.VERTICES);
-		html.writeParagraph("Unique states: " + stateMaps.size())
-		.writeHeading(2, "States with violations");
+		html.writeHeading(2, "States with Violations")
+		.writeParagraph("Unique states with violations: " + stateMaps.size());
 		for (Object stateMap : stateMaps) {
 			Map<String, Object> stateProps = (Map<String, Object>)stateMap;
 			writeGeneralGraphDBResults(stateProps);
@@ -293,13 +297,13 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	private void writeOfflineEvaluationResults(EvaluationResults results) {
-		html.writeHeading(2, "Offline evaluation");
+		html.writeHeading(2, "Offline Evaluation");
 		writeGeneralOfflineEvaluationResults(results);
 		writeOfflineEvaluationResultsDetails(results);
 	}
 	
 	private void writeGeneralOfflineEvaluationResults(EvaluationResults results) {
-		html.writeHeading(3, "General information")
+		html.writeHeading(3, "General Information")
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
 		.writeTableRow("Error", results.getErrorCount())
