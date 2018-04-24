@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -241,10 +242,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
-
-		return super.selectAction(state, actions);
-
+	protected Action selectAction(State state, Set<Action> actions){
+	    // using purely random selection:
+		return RandomActionSelector.selectAction(actions);
+		//return super.selectAction(state, actions);
 	}
 
 	/**
