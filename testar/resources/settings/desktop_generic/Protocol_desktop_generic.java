@@ -203,8 +203,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 		
 		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
 			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
+			// iterate through all widgets:
+			for(Widget w : state){
+			//TODO optional: iterate through top level widgets based on Z-index:
+			//for(Widget w : getTopWidgets(state)){
 				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						//storeWidget(state.get(Tags.ConcreteID), w);
