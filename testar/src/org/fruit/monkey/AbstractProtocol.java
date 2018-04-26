@@ -1568,19 +1568,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				settings.get(ConfigTags.GraphDBPassword));
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
+			if (!settings.get(ConfigTags.UnattendedTests)){
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				// begin by urueda
-				if (GlobalScreen.isNativeHookRegistered())
+				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				logger.setLevel(Level.OFF);
+				logger.setUseParentHandlers(false);
+
+				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
-				// end by urueda
+				}
 				GlobalScreen.registerNativeHook();
-				//GlobalScreen.getInstance().addNativeKeyListener(this);
-				GlobalScreen.getInstance().addNativeKeyListener(eventHandler); // by urueda (refactored)
-				//GlobalScreen.getInstance().addNativeMouseListener(this);
-				GlobalScreen.getInstance().addNativeMouseListener(eventHandler); // by urueda (refactored)
-				GlobalScreen.getInstance().addNativeMouseMotionListener(eventHandler); // by urueda
+				GlobalScreen.addNativeKeyListener(eventHandler);
+				GlobalScreen.addNativeMouseListener(eventHandler);
+				GlobalScreen.addNativeMouseMotionListener(eventHandler);
 				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
 			}
 
@@ -1598,12 +1598,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
 		}finally{
 			try{
-				if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
-					if (GlobalScreen.isNativeHookRegistered()){
+				if (!settings.get(ConfigTags.UnattendedTests)) {
+					if (GlobalScreen.isNativeHookRegistered()) {
 						LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-						GlobalScreen.getInstance().removeNativeMouseMotionListener(eventHandler);
-						GlobalScreen.getInstance().removeNativeMouseListener(eventHandler);
-						GlobalScreen.getInstance().removeNativeKeyListener(eventHandler);
+						GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+						GlobalScreen.removeNativeMouseListener(eventHandler);
+						GlobalScreen.removeNativeKeyListener(eventHandler);
 						GlobalScreen.unregisterNativeHook();
 					}
 				}
