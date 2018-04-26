@@ -84,11 +84,13 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				String concreteID = w.get(Tags.ConcreteID, "");
 				if (lastConcreteWidgetID.equals(concreteID)) {
 					sameWidgetCount++;
-					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD)
+					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD) {
 						results.add(new WCAG2EvaluationResult(scTrap, WCAG2EvaluationResult.Type.WARNING,
 								"Possible keyboard trap", w));
-					else
+					}
+					else {
 						results.add(evaluationPassed(scTrap));
+					}
 				}
 				else {
 					sameWidgetCount = 0;
@@ -102,11 +104,13 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 					|| (key2 != null && !key2.isEmpty()))
 				shortcutKeyCount++;
 		}
-		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size())
+		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size()) {
 			results.add(new WCAG2EvaluationResult(scKbd, WCAG2EvaluationResult.Type.WARNING,
 					"Possible widgets missing shortcut keys"));
-		else
+		}
+		else {
 			results.add(evaluationPassed(scKbd));
+		}
 		return results;
 	}
 	
