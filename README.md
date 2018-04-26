@@ -46,12 +46,36 @@ code.
 3. Select Gradle -> Existing Gradle project to open te import dialog 
 4. Select the folder that contains the root of the source code and start the import
 
-## Known issue
-- TESTAR can not be excuted using the gradle task .\gradlew run. 
 
-## GraphDb support
+#### Running TESTAR from Gradle
+TESTAR can be started using a gradle command from the root of the project.
+1. .\gradlew runTestar
+
+##### In Eclipse
+Within Eclipse, TESTAR can be executed by running the task runTestar which is available in the map custom_testar.
+To debug the application with the runTestar task, provide your onw run configuration in which the option -DDEBUG is set.
+
+#### Debug TESTAR from Gradle
+In order to debug the TESTAR code, you must run;
+1. .\gradlew -DDEBUG=true runTestar.  
+
+Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the result to 
+the machine where you want to run TESTAR and run TESTAR on the target machine. This allows
+the user to debug TESTAR from a different machine. 
+
+## Known issue
+- Currently, only the protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
+support the graph database. Other protocols need to be adapted  (see issue #52)
+
+## Graph database support
 This version of TESTAR supports the output of data to an http://orientdb.com database.
-Currently Widget's, Actions, States and there relation are recorded to the graph database. 
+Currently Widget's, Actions, States and there relation are recorded to the graph database.
+
+### Restrictions on the use of the graph database
+The model currently implemented consists of States, Actions and Widgets. The widgets are stored from
+the method deriveActions. The protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict`` 
+contain an implementation which shows how the method storeWidget could be used.
+When the storeWidget method is not called, TESTAR will raise an exception and stop working.
 
 ### using graphdb on the local filesystem
 The easiest way to use the graph database support is to write the database to the local file system
