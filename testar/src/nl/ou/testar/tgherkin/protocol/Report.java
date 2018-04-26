@@ -13,15 +13,20 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.fruit.Util;
+import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.TagsBase;
 import org.fruit.alayer.Widget;
 
+import nl.ou.testar.CustomType;
+import nl.ou.testar.GraphDB;
 import nl.ou.testar.tgherkin.model.Gesture;
 import nl.ou.testar.utils.report.Reporter;
 
 /**
  * Report on DocumentProtocol execution.
+ * Output can be generated to a text file and/or a database.
  *
  */
 public class Report {
@@ -89,19 +94,31 @@ public class Report {
 	/**
 	 * Report.
 	 */
-	public static void report(){
-		StringBuilder reportDetail = new StringBuilder();
-		boolean notFirst = false;
-		for (String value : reportMap.values()) {
-			if (notFirst) {
-				reportDetail.append(REPORT_SEPARATOR);
-			}else {
-				notFirst = true;
+	public static void report(State state, Action action, GraphDB graphDB, boolean storeInTextFile, boolean storeInDB){
+		if (storeInTextFile) {
+			StringBuilder reportDetail = new StringBuilder();
+			boolean notFirst = false;
+			for (String value : reportMap.values()) {
+				if (notFirst) {
+					reportDetail.append(REPORT_SEPARATOR);
+				}else {
+					notFirst = true;
+				}
+				reportDetail.append(value);
 			}
-			reportDetail.append(value);
+			reportDetail.append(System.getProperty("line.separator"));
+			Reporter.getInstance().report(reportDetail.toString());
 		}
-		reportDetail.append(System.getProperty("line.separator"));
-		Reporter.getInstance().report(reportDetail.toString());
+		if (storeInDB) {
+			if (action != null) {
+				graphDB.addCustomType(action,"Tgherkin report", getTgherkinInfo());
+			}else {
+				if (state != null) {
+					// initial state: no action has been performed yet
+					graphDB.addCustomType(state,"Tgherkin report", getTgherkinInfo());
+				}				
+			}
+		}
 		// reset values
 		for(Column key : reportMap.keySet()) {
 			  reportMap.put(key, "");
@@ -253,6 +270,56 @@ public class Report {
 		}
 		//
 		Reporter.getInstance().report(reportName, reportContent.toString());
+	}	
+
+	private static TgherkinInfo getTgherkinInfo() {
+		TgherkinInfo info = new TgherkinInfo();
+		info.set(TgherkinTags.TGHERKIN_SEQUENCE_NR,reportMap.get(Column.SEQUENCE_NR));
+		info.set(TgherkinTags.TGHERKIN_ACTION_NR,reportMap.get(Column.ACTION_NR));
+		info.set(TgherkinTags.TGHERKIN_FEATURE,reportMap.get(Column.FEATURE));
+		info.set(TgherkinTags.TGHERKIN_SCENARIO,reportMap.get(Column.SCENARIO));
+		info.set(TgherkinTags.TGHERKIN_TYPE,reportMap.get(Column.TYPE));
+		info.set(TgherkinTags.TGHERKIN_STEP,reportMap.get(Column.STEP));
+		info.set(TgherkinTags.TGHERKIN_GIVEN,reportMap.get(Column.GIVEN));
+		info.set(TgherkinTags.TGHERKIN_GIVEN_MISMATCH,reportMap.get(Column.GIVEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_PRE_GENERATED_DERIVED_ACTIONS,reportMap.get(Column.PRE_GENERATED_DERIVED_ACTIONS));
+		info.set(TgherkinTags.TGHERKIN_WHEN_DERIVED_ACTIONS,reportMap.get(Column.WHEN_DERIVED_ACTIONS));
+		info.set(TgherkinTags.TGHERKIN_WHEN_MISMATCH,reportMap.get(Column.WHEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION,reportMap.get(Column.SELECTED_ACTION));
+		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION_DETAILS,reportMap.get(Column.SELECTED_ACTION_DETAILS));
+		info.set(TgherkinTags.TGHERKIN_THEN,reportMap.get(Column.THEN));
+		info.set(TgherkinTags.TGHERKIN_THEN_MISMATCH,reportMap.get(Column.THEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_VERDICT,reportMap.get(Column.VERDICT));
+		return info;
 	}
+
 	
 }
+
+class TgherkinInfo extends CustomType {
+	private static final long serialVersionUID = -6248265781837738827L;
+	private static final String TYPE = "TgherkinInfo";
+	public TgherkinInfo() {
+		super(TYPE,"Report");
+	}
+}
+
+class TgherkinTags extends TagsBase {
+	 public static Tag<String> TGHERKIN_SEQUENCE_NR = from("tgherkin_sequence_nr", String.class);
+	 public static Tag<String> TGHERKIN_ACTION_NR = from("tgherkin_action_nr", String.class);
+	 public static Tag<String> TGHERKIN_FEATURE = from("tgherkin_feature", String.class);
+	 public static Tag<String> TGHERKIN_SCENARIO = from("tgherkin_scenario", String.class);
+	 public static Tag<String> TGHERKIN_TYPE = from("tgherkin_type", String.class);
+	 public static Tag<String> TGHERKIN_STEP = from("tgherkin_step", String.class); 
+	 public static Tag<String> TGHERKIN_GIVEN = from("tgherkin_given", String.class);
+	 public static Tag<String> TGHERKIN_GIVEN_MISMATCH = from("tgherkin_given_mismatch", String.class);
+	 public static Tag<String> TGHERKIN_PRE_GENERATED_DERIVED_ACTIONS = from("tgherkin_pre_generated_derived_actions", String.class);
+	 public static Tag<String> TGHERKIN_WHEN_DERIVED_ACTIONS = from("tgherkin_when_derived_actions", String.class);
+	 public static Tag<String> TGHERKIN_WHEN_MISMATCH = from("tgherkin_when_mismatch", String.class);
+	 public static Tag<String> TGHERKIN_SELECTED_ACTION = from("tgherkin_selected_action", String.class);
+	 public static Tag<String> TGHERKIN_SELECTED_ACTION_DETAILS = from("tgherkin_selected_action_details", String.class);
+	 public static Tag<String> TGHERKIN_THEN = from("tgherkin_then", String.class);
+	 public static Tag<String> TGHERKIN_THEN_MISMATCH = from("tgherkin_then_mismatch", String.class);
+	 public static Tag<String> TGHERKIN_VERDICT = from("tgherkin_verdict", String.class);
+}
+

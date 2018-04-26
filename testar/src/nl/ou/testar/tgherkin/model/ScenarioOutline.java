@@ -124,9 +124,7 @@ public class ScenarioOutline extends ScenarioDefinition {
 		// scenario level
 		if (getOracle() != null && !getOracle().evaluate(state, examples.getDataTable())){
 			setFailed();
-			if (settings.get(ConfigTags.GenerateTgherkinReport)){
-				Report.appendReportDetail(Report.Column.THEN,"false");
-			}
+			Report.appendReportDetail(Report.Column.THEN,"false");
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!");
 		}
 		// step level

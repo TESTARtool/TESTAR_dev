@@ -82,7 +82,7 @@ narrativeLine:
 	| EOL
     )
   ~EOL*
-   EOL*;
+   EOL+;
    
 tagname : TAGNAME EOL*;	
 

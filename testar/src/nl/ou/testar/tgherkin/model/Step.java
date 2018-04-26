@@ -159,22 +159,16 @@ public class Step {
 	 */
 	public boolean evaluateGivenCondition(State state, Settings settings, DataTable dataTable, boolean mismatchOccurred) {
 		// Step
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.STEP,getTitle());
-		}
+		Report.appendReportDetail(Report.Column.STEP,getTitle());
 		boolean result = true;
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			if (givenCondition != null) {
 				result = givenCondition.evaluate(state, dataTable);
 				if (result) {
-					if (settings.get(ConfigTags.GenerateTgherkinReport)){
-						Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"false");
-					}
+					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"false");
 				}else {
 					setMismatch(true);
-					if (settings.get(ConfigTags.GenerateTgherkinReport)){
-						Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"true");
-					}
+					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"true");
 					if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 						setStatus(Status.FAILED);
 					}else {
@@ -183,9 +177,7 @@ public class Step {
 				}
 			}
 		}
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.GIVEN,"" + result);
-		}
+		Report.appendReportDetail(Report.Column.GIVEN,"" + result);
 		return result;
 	}
     
@@ -206,9 +198,7 @@ public class Step {
 			if (map.size() == 0) {
 				// current step level execution resulted in mismatch
 				setMismatch(true);
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + true);
-				}
+				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + true);
 				if (settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					// restore map if default should be applied 
 					map = oldMap;
@@ -216,9 +206,7 @@ public class Step {
 					setStatus(Status.FAILED);
 				}
 			}else {
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + false);
-				}
+				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + false);
 			}
 		}
 		if (settings.get(ConfigTags.ReportDerivedGestures)){
@@ -234,9 +222,7 @@ public class Step {
 				actions.addAll(gesture.getActions(widget, proxy, table));
 			}
 		}
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.WHEN_DERIVED_ACTIONS,"" + actions.size());
-		}
+		Report.appendReportDetail(Report.Column.WHEN_DERIVED_ACTIONS,"" + actions.size());
 		return actions;
 	}
 	
@@ -310,31 +296,26 @@ public class Step {
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			if (thenCondition != null && !thenCondition.evaluate(state, dataTable)) { 
 				setMismatch(true);
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.THEN_MISMATCH,"true");
-				}
+				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"true");
 				if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					setStatus(Status.FAILED);
-					if (settings.get(ConfigTags.GenerateTgherkinReport)){
-						Report.appendReportDetail(Report.Column.THEN,"false");					
-					}
+					Report.appendReportDetail(Report.Column.THEN,"false");					
 					return new Verdict(TGHERKIN_FAILURE, "Tgherkin step oracle failure!");
 				}
 			}else {
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.THEN_MISMATCH,"false");
-				}
+				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"false");
 			}
 		}
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.THEN,"true");
-		}
+		Report.appendReportDetail(Report.Column.THEN,"true");
 		if (getStatus() == Status.FAILED) {
 			return new Verdict(TGHERKIN_FAILURE, "Tgherkin step failure!");
 		}else {
 			setStatus(Status.PASSED);
-			if (mismatchOccurred || isMismatch()) {
+			if (isMismatch()) {
 				return new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch");
+			}
+			if (mismatchOccurred && settings.get(ConfigTags.ContinueToApplyDefault)) {
+				return new Verdict(Verdict.SEVERITY_MIN, "Default applied after a Tgherkin step mismatch");
 			}
 			return Verdict.OK;
 		}

@@ -13,11 +13,13 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.StdWidget;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -81,6 +83,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID3");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID3");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID3");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -92,6 +97,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID4");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID4");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID4");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -103,6 +111,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID5");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID5");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID5");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -114,6 +125,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID6");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID6");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID6");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -125,6 +139,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID7");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID7");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID7");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -136,6 +153,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID8");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID8");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID8");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -147,6 +167,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID9");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID9");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID9");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -158,6 +181,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID10");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID10");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID10");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -169,6 +195,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID11");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID11");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID11");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -180,6 +209,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID12");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID12");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID12");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -191,6 +223,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID13");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID13");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID13");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -202,6 +237,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID14");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID14");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID14");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
@@ -213,14 +251,98 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID15");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID15");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID15");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		generalWidgets.add(widget);
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteIDxpower2Button");
+		widget.set(Tags.Role, UIAButton);
+		widget.set(UIATags.UIAAutomationId, "xpower2Button");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID16");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID16");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID16");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		generalWidgets.add(widget);
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteIDsquareRootButton");
+		widget.set(Tags.Role, UIAButton);
+		widget.set(UIATags.UIAAutomationId, "squareRootButton");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID17");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID17");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID17");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		generalWidgets.add(widget);
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteIDText");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "Text");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID18");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID18");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID18");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		generalWidgets.add(widget);
 		return generalWidgets;
 	}
 	
+	private State setUpGeneralState() {
+		List<Widget> stateWidgets = setUpGeneralWidgets();
+		State state = new TestState(stateWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		return state;
+	}
+
+	private List<State> setUpGeneralstates(int numberOfStates) {
+		List<State> states = new ArrayList<State>();
+		for (int index = 1;index <= numberOfStates;index++){
+			states.add(setUpGeneralState());	
+		}
+		return states;
+	}
+	
 	private List<Item> setUpItems(){
-		// Create settings
+		List<Item> itemList = new ArrayList<Item>();
+		itemList.add(setupItem1());
+		itemList.add(setupItem2());
+		itemList.add(setupItem3());
+		itemList.add(setupItem4());
+		itemList.add(setupItem5());
+		itemList.add(setupItem6());
+		itemList.add(setupItem7());
+		itemList.add(setupItem8());
+		itemList.add(setupItem9());
+		itemList.add(setupItem10());
+		itemList.add(setupItem11());
+		itemList.add(setupItem12());
+		itemList.add(setupItem13());
+		itemList.add(setupItem14());
+		itemList.add(setupItem15());
+		itemList.add(setupItem16());
+		itemList.add(setupItem17());
+		itemList.add(setupItem18());
+		itemList.add(setupItem19());
+		return itemList; 
+	}
+	
+	private Item setupItem1(){
+		// settings
 		Settings settings = new Settings();
 		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
@@ -229,12 +351,9 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
-		settings.set(ConfigTags.ClickFilter,"(?!x)x");
-		// Create proxy
+		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
-		//
-		List<Item> itemList = new ArrayList<Item>();
-		// test case 1
+		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
 				"	Selection: click()\r\n" + 
@@ -244,33 +363,43 @@ public class DocumentTest {
 				"		When  $Title=\"Title1\" click()\r\n" + 
 				"    Step: Step 2 \r\n" + 
 				"		When  $Title=\"Title1\" or $Title=\"Title2\" or $Title=\"Title3\" click()";
-		List<State> states = new ArrayList<State>();
-		List<Widget> stateWidgets = setUpGeneralWidgets();
-		State state = new TestState(stateWidgets);	
-		state.set(Tags.MaxZIndex, 15.0);
-		// use same state for all steps
-		for (int index = 1;index <= 3;index++){
-			states.add(state);	
-		}
+		// states
+		List<State> states = setUpGeneralstates(3);
+		// action set sizes
 		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		actionSetSizes.add(1);
 		actionSetSizes.add(2);
-		List<Set<String>> actionSetList = new ArrayList<Set<String>>();
-		Set<String> actionSet = new HashSet<String>();
-		actionSet.add("ConcreteID1");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteID1",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteID1");
-		actionSet.add("ConcreteID2");
-		actionSetList.add(actionSet);		
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteID1",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteID2",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
-		// use same verdict for all steps
 		for (int index = 1;index <= 2;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		itemList.add(new Item(settings, proxy, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts));
-		// test case 2
-		expression = "Feature: Feature 1 \r\n" + 
+		return new Item(settings, proxy, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem2(){
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
 				"\r\n" + 
 				"	Selection: click()\r\n" + 
 				"\r\n" + 
@@ -280,33 +409,47 @@ public class DocumentTest {
 				"    Step: Step 2 \r\n" + 
 				"		Range 10 10\r\n" + 
 				"		When  $Title=\"Title1\" or $Title=\"Title2\" or $Title=\"Title3\" click()";
-		// use same state for all steps
-		for (int index = 1;index <= 12;index++){
-			states.add(state);	
-		}
-		actionSetSizes = new ArrayList<Integer>();
+		// states
+		List<State> states = setUpGeneralstates(12);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		actionSetSizes.add(1);
 		for (int index = 1;index <= 10;index++){
 			actionSetSizes.add(2);
 		}
-		actionSetList = new ArrayList<Set<String>>();
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteID1");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteID1",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteID1");
-		actionSet.add("ConcreteID2");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteID1",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteID2",ActionRoles.LeftClickAt));
 		for (int index = 1;index <= 10; index++) {
 			actionSetList.add(actionSet);
 		}
-		verdicts = new ArrayList<Verdict>();
-		// use same verdict for all steps
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
 		for (int index = 1;index <= 11;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		itemList.add(new Item(settings, proxy, expression, 1, 11, states, actionSetSizes, actionSetList, verdicts));
-		// test case 3
-		expression = "Feature: Perform calculations with windows calculator \r\n" + 
+		return new Item(settings, proxy, expression, 1, 11, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem3(){
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
 				"  Background: Clear.\r\n" + 
 				"    Step: Select Clear\r\n" + 
@@ -345,88 +488,100 @@ public class DocumentTest {
 				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
 				"    Step: Select = \r\n" + 
 				"		When  $UIAAutomationId=\"equalButton\" click()\r\n";
-		// use same state for all steps
-		for (int index = 1;index <= 21;index++){
-			states.add(state);	
-		}
-		actionSetSizes = new ArrayList<Integer>();
+		// states
+		List<State> states = setUpGeneralstates(21);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		for (int index = 1;index <= 20;index++){
 			actionSetSizes.add(1);
 		}
-		//
-		actionSetList = new ArrayList<Set<String>>();
-		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum2Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum3Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum3Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
-		actionSetList.add(actionSet);
-		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
-		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum9Button");
-		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
-		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum4Button");
-		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum7Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum9Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum6Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum4Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum8Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum7Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum1Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum6Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		//
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum8Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
-		verdicts = new ArrayList<Verdict>();
-		// use same verdict for all steps
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
 		for (int index = 1;index <= 20;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		itemList.add(new Item(settings, proxy, expression, 4, 20, states, actionSetSizes, actionSetList, verdicts));
-		// test case 4
-		expression = "Feature: Perform calculations with windows calculator \r\n" + 
+		return new Item(settings, proxy, expression, 4, 20, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem4(){
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
 				"  Background: Clear.\r\n" + 
 				"    Step: Select Clear\r\n" + 
@@ -467,94 +622,107 @@ public class DocumentTest {
 				"    |  num9Button  |  num4Button |\r\n" + 
 				"    |  num7Button  |  num6Button  |  \r\n" + 
 				"    |  num1Button  |  num2Button  |  	";
-		// use same state for all steps
-		for (int index = 1;index <= 23;index++){
-			states.add(state);	
-		}
-		actionSetSizes = new ArrayList<Integer>();
+		// states
+		List<State> states = setUpGeneralstates(23);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		for (int index = 1;index <= 22;index++){
 			actionSetSizes.add(1);
 		}
-		actionSetList = new ArrayList<Set<String>>();
-		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum2Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum3Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum3Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDclearButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum8Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum8Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum1Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum9Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum9Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum4Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum4Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum7Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum7Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum6Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum6Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
 		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum1Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum2Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
-		verdicts = new ArrayList<Verdict>();
-		// use same verdict for all steps
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
 		for (int index = 1;index <= 22;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		itemList.add(new Item(settings, proxy, expression, 5, 22, states, actionSetSizes, actionSetList, verdicts));
-		// test case 5
-		expression = "Feature: Perform calculations with windows calculator \r\n" + 
+		return new Item(settings, proxy, expression, 5, 22, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem5(){
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
 				"  Scenario: Add two numbers\r\n" + 
 				"    Step: Select 2\r\n" + 
@@ -569,13 +737,13 @@ public class DocumentTest {
 				"    Step: Select = \r\n" + 
 				"		When  $UIAAutomationId=\"equalButton\" click()\r\n" + 
 				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*5$\")";
-		states = new ArrayList<State>();
-		// Create begin state
-		states.add(state);
+		// states
+		List<State> states = new ArrayList<State>();
+		states.add(setUpGeneralState());
 		// Create after state for Step 1
 		List<Widget> stepWidgets = setUpGeneralWidgets();
 		Widget widget = new StdWidget();		
-		widget.set(Tags.ConcreteID, "ConcreteID16");
+		widget.set(Tags.ConcreteID, "ConcreteID101");
 		widget.set(Tags.Role, UIAText);
 		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
 		widget.set(Tags.Title, "Weergave is 2");
@@ -583,16 +751,19 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		State state = new TestState(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 2
 		stepWidgets = setUpGeneralWidgets();
 		widget = new StdWidget();		
-		widget.set(Tags.ConcreteID, "ConcreteID17");
+		widget.set(Tags.ConcreteID, "ConcreteID102");
 		widget.set(Tags.Role, UIAText);
 		widget.set(UIATags.UIAAutomationId, "CalculatorExpression");
 		widget.set(Tags.Title, "Weergave is 2 + ");
@@ -600,6 +771,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
@@ -609,7 +783,7 @@ public class DocumentTest {
 		// Create after state for Step 3
 		stepWidgets = setUpGeneralWidgets();
 		widget = new StdWidget();		
-		widget.set(Tags.ConcreteID, "ConcreteID18");
+		widget.set(Tags.ConcreteID, "ConcreteID103");
 		widget.set(Tags.Role, UIAText);
 		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
 		widget.set(Tags.Title, "Weergave is 3");
@@ -617,6 +791,9 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
@@ -626,7 +803,7 @@ public class DocumentTest {
 		// Create after state for Step 4
 		stepWidgets = setUpGeneralWidgets();		
 		widget = new StdWidget();		
-		widget.set(Tags.ConcreteID, "ConcreteID19");
+		widget.set(Tags.ConcreteID, "ConcreteID104");
 		widget.set(Tags.Role, UIAText);
 		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
 		widget.set(Tags.Title, "Weergave is 5");
@@ -634,50 +811,69 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID104");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID104");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID104");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
 		state = new TestState(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);	
-		actionSetSizes = new ArrayList<Integer>();
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		for (int index = 1;index <= 4;index++){
 			actionSetSizes.add(1);
 		}
-		actionSetList = new ArrayList<Set<String>>();
-		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum2Button");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDplusButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum3Button");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum3Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDequalButton");
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);		
-		verdicts = new ArrayList<Verdict>();
-		// use same verdict for all steps
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
 		for (int index = 1;index <= 4;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		itemList.add(new Item(settings, proxy, expression, 1, 4, states, actionSetSizes, actionSetList, verdicts));
-		// test case: step oracle failure 
-		expression = "Feature: Perform calculations with windows calculator \r\n" + 
+		return new Item(settings, proxy, expression, 1, 4, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem6(){
+		// test case 6: step oracle failure 
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
 				"  Scenario: Add two numbers\r\n" + 
 				"    Step: Select 2\r\n" + 
 				"		When  $UIAAutomationId=\"num2Button\" click()\r\n" + 
 				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*9$\")\r\n";  
-		states = new ArrayList<State>();
-		// Create begin state
-		states.add(state);
+		// states
+		List<State> states = new ArrayList<State>();
+		states.add(setUpGeneralState());
 		// Create after state for Step 1
-		stepWidgets = setUpGeneralWidgets();
-		widget = new StdWidget();		
-		widget.set(Tags.ConcreteID, "ConcreteID16");
+		List<Widget> stepWidgets = setUpGeneralWidgets();
+		Widget widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID101");
 		widget.set(Tags.Role, UIAText);
 		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
 		widget.set(Tags.Title, "Weergave is 2");
@@ -685,24 +881,33 @@ public class DocumentTest {
 		widget.set(Tags.Enabled, true);
 		widget.set(UIATags.UIAIsKeyboardFocusable,true);
 		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		State state = new TestState(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
-		actionSetSizes = new ArrayList<Integer>();
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
 		actionSetSizes.add(1);
-		actionSetList = new ArrayList<Set<String>>();
-		//
-		actionSet = new HashSet<String>();
-		actionSet.add("ConcreteIDnum2Button");
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
 		actionSetList.add(actionSet);
-		verdicts = new ArrayList<Verdict>();
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));	
-		itemList.add(new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts));
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem7(){
 		// test case 7: same as test case 6, but ApplyDefaultOnMismatch set to true
-		settings = new Settings();
+		// settings
+		Settings settings = new Settings();
 		settings.set(ConfigTags.ApplyDefaultOnMismatch, true);
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
@@ -710,14 +915,729 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
-		settings.set(ConfigTags.ClickFilter,"(?!x)x");
-		verdicts = new ArrayList<Verdict>();
-		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));	
-		itemList.add(new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts));
-		return itemList;
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
+				"\r\n" + 
+				"  Scenario: Add two numbers\r\n" + 
+				"    Step: Select 2\r\n" + 
+				"		When  $UIAAutomationId=\"num2Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*9$\")\r\n";  
+		// states
+		List<State> states = new ArrayList<State>();
+		states.add(setUpGeneralState());
+		// Create after state for Step 1
+		List<Widget> stepWidgets = setUpGeneralWidgets();
+		Widget widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID101");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 2");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		State state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));			
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
+	private Item setupItem8(){
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
+				"  Selection: click()\r\n" +
+				"  Scenario: Take power 2 of a two digit number\r\n" + 
+				"    Step: Select 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*1$\")\r\n" + 
+				"    Step: Select 0\r\n" + 
+				"		When  $UIAAutomationId=\"num0Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*10$\")\r\n" + 
+				"    Step: Select x power 2\r\n" + 
+				"		When  $UIAAutomationId=\"xpower2Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*100$\")\r\n";  
+		// states
+		List<State> states = new ArrayList<State>();
+		// Create begin state
+		states.add(setUpGeneralState());
+		// Create after state for Step 1
+		List<Widget> stepWidgets = setUpGeneralWidgets();
+		Widget widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID101");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 1");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		State state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// Create after state for Step 2
+		stepWidgets = setUpGeneralWidgets();
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID102");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 9999999");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		for (int index = 1;index <= 2;index++){
+			actionSetSizes.add(1);
+		}
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum0Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));
+		return new Item(settings, proxy, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
+	}
 	
+	private Item setupItem9(){
+		// test case 9: case 8, but ApplyDefaultOnMismatch is true
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, true);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
+				"  Selection: click()\r\n" +
+				"  Scenario: Take power 2 of a two digit number\r\n" + 
+				"    Step: Select 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*1$\")\r\n" + 
+				"    Step: Select 0\r\n" + 
+				"		When  $UIAAutomationId=\"num0Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*10$\")\r\n" + 
+				"    Step: Select x power 2\r\n" + 
+				"		When  $UIAAutomationId=\"xpower2Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*100$\")\r\n";  
+		// states
+		List<State> states = new ArrayList<State>();
+		// Create begin state
+		states.add(setUpGeneralState());
+		// Create after state for Step 1
+		List<Widget>stepWidgets = setUpGeneralWidgets();
+		Widget widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID101");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 1");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		State state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// Create after state for Step 2
+		stepWidgets = setUpGeneralWidgets();
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID102");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 9999999");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// Create after state for Step 3
+		stepWidgets = setUpGeneralWidgets();
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID103");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 100");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		for (int index = 1;index <= 3;index++){
+			actionSetSizes.add(1);
+		}
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum0Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDxpower2Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));
+		verdicts.add(Verdict.OK);
+		return new Item(settings, proxy, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem10(){
+		// test case 10: case 9, but ContinueToApplyDefault is true
+		// settings
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, true);
+		settings.set(ConfigTags.ContinueToApplyDefault, true);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
+				"  Selection: click()\r\n" +
+				"  Scenario: Take power 2 of a two digit number\r\n" + 
+				"    Step: Select 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*1$\")\r\n" + 
+				"    Step: Select 0\r\n" + 
+				"		When  $UIAAutomationId=\"num0Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*10$\")\r\n" + 
+				"    Step: Select x power 2\r\n" + 
+				"		When  $UIAAutomationId=\"xpower2Button\" click()\r\n" + 
+				"		Then  $UIAAutomationId=\"CalculatorResults\" and matches($Title,\"^.*100$\")\r\n";  
+		// states
+		List<State> states = new ArrayList<State>();
+		// Create begin state
+		states.add(setUpGeneralState());
+		// Create after state for Step 1
+		List<Widget>stepWidgets = setUpGeneralWidgets();
+		Widget widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID101");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 1");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		State state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// Create after state for Step 2
+		stepWidgets = setUpGeneralWidgets();
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID102");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 9999999");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// Create after state for Step 3
+		stepWidgets = setUpGeneralWidgets();
+		widget = new StdWidget();		
+		widget.set(Tags.ConcreteID, "ConcreteID103");
+		widget.set(Tags.Role, UIAText);
+		widget.set(UIATags.UIAAutomationId, "CalculatorResults");
+		widget.set(Tags.Title, "Weergave is 100");
+		widget.set(Tags.Blocked, false);
+		widget.set(Tags.Enabled, true);
+		widget.set(UIATags.UIAIsKeyboardFocusable,true);
+		widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+		widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
+		widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
+		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
+		widget.set(Tags.MaxZIndex, 15.0);
+		widget.set(Tags.ZIndex, 15.0);
+		stepWidgets.add(widget);		
+		state = new TestState(stepWidgets);	
+		state.set(Tags.MaxZIndex, 15.0);
+		states.add(state);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		for (int index = 1;index <= 2;index++){
+			actionSetSizes.add(1);
+		}
+		actionSetSizes.add(17);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum0Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteID1",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteID2",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum0Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum2Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum3Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum4Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum5Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum6Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum7Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum8Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum9Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDxpower2Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDsquareRootButton",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDequalButton",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDclearButton",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDplusButton",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));
+		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied after a Tgherkin step mismatch"));
+		return new Item(settings, proxy, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem11(){
+		// test case 11: step oracle failure on step 1
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Oracle: $Title=\"Title1\"\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"	Oracle: $Title=\"Title2\"\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $Title=\"Title3\"\r\n" + 
+				"    Step: Step 2\r\n" + 
+				"		When  $UIAAutomationId=\"num2Button\" click()\r\n" + 
+				"		Then  $Title=\"Title1\"";  
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));			
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem12(){
+		// test case 12: scenario oracle failure on step 1
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Oracle: $Title=\"Title1\"\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"	Oracle: $Title=\"Title3\"\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $Title=\"Title2\"\r\n" + 
+				"    Step: Step 2\r\n" + 
+				"		When  $UIAAutomationId=\"num2Button\" click()\r\n" + 
+				"		Then  $Title=\"Title1\"";  
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!"));	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem13(){
+		// test case 13: feature oracle failure on step 1
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Oracle: $Title=\"Title3\"\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"	Oracle: $Title=\"Title1\"\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" click()\r\n" + 
+				"		Then  $Title=\"Title2\"\r\n" + 
+				"    Step: Step 2\r\n" + 
+				"		When  $UIAAutomationId=\"num2Button\" click()\r\n" + 
+				"		Then  $Title=\"Title1\"";  
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin feature oracle failure!"));	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem14(){
+		// test case 14: scenario outline oracle failure on step 1
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Oracle: $Title=\"Title1\"\r\n" + 
+				"  Scenario Outline: Scenario 1\r\n" + 
+				"	Oracle: $Title=\"Title3\"\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=<buttonID1> click()\r\n" + 
+				"		Then  $Title=\"Title2\"\r\n" + 
+				"    Step: Step 2\r\n" + 
+				"		When  $UIAAutomationId=<buttonID2> click()\r\n" + 
+				"		Then  $Title=\"Title1\"\r\n" + 
+				"    Examples:\r\n" + 
+				"	|buttonID1|buttonID2|	\r\n" + 
+				"	|num1Button|num2Button|\r\n";  
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!"));	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+	
+	private Item setupItem15(){
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"Text\" anyGesture()\r\n"; 
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(4);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.ClickTypeInto));
+		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.MouseMove));
+		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.DropDown));
+		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.RightClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem16(){
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" anyGesture()\r\n"; 
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(6);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LDoubleClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.MouseMove));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.DropDown));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.RightClickAt));
+		// triple click has no role!
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",null));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem17(){
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Selection: click() rightClick()\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" anyGesture()\r\n"; 
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(2);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.RightClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem18(){
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Selection: click() rightClick()\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"  Selection: anyGesture()\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" anyGesture()\r\n"; 
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(2);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.RightClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
+
+	private Item setupItem19(){
+		// settings		
+		Settings settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		// proxy
+		ActionWidgetProxy proxy = new TestProtocol();
+		// expression
+		String expression = "Feature: Feature 1 \r\n" + 
+				"  Selection: click() rightClick()\r\n" + 
+				"  Scenario: Scenario 1\r\n" + 
+				"  Selection: rightClick()\r\n" + 
+				"    Step: Step 1\r\n" + 
+				"		When  $UIAAutomationId=\"num1Button\" anyGesture()\r\n"; 
+		// states
+		List<State> states = setUpGeneralstates(2);
+		// action set sizes
+		List<Integer> actionSetSizes = new ArrayList<Integer>();
+		actionSetSizes.add(1);
+		// action sets
+		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
+		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.RightClickAt));
+		actionSetList.add(actionSet);
+		// verdicts
+		List<Verdict> verdicts = new ArrayList<Verdict>();
+		verdicts.add(Verdict.OK);	
+		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+	}
 	
 	@Test
 	public void test() {
@@ -767,15 +1687,22 @@ public class DocumentTest {
 		return document;
 	}
 	
-	private boolean actionSetValid(Set<Action> actions, Set<String> expectedActions) {
+	private boolean actionSetValid(Set<Action> actions, Set<ActionMatcher> expectedActions) {
 		if (actions.size() != expectedActions.size()) {
 			return false;
 		}
 		// match on target id
 		for (Action action :actions) {
-			if (!expectedActions.contains(action.get(Tags.TargetID, ""))) {
-				return false;
+			boolean matchFound = false;
+			for (ActionMatcher actionMatcher: expectedActions) {
+				if (actionMatcher.match(action)) {
+					matchFound = true;
+					break;
+				}
 			}
+			if (!matchFound) {
+				return false;
+			}			
 		}
 		return true;
 	}
@@ -787,17 +1714,40 @@ public class DocumentTest {
 		}
 	}
 	
+	// matching of an action occurs on target id and role, except for mouse moves
+	private class ActionMatcher{		
+		private String targetID;
+		private Role role;
+		private ActionMatcher(String targetID, Role role) {
+			super();
+			this.targetID = targetID;
+			this.role = role;
+		}
+		private boolean match(Action action){
+			if (role == null) {
+				if (action.get(Tags.Role, null) == null) {
+					return targetID.equals(action.get(Tags.TargetID, ""));
+				}
+			}
+			if (role.equals(ActionRoles.MouseMove)) {
+				// mouse move action has no TargetID tag
+				return role.equals(action.get(Tags.Role, null));
+			}
+			return targetID.equals(action.get(Tags.TargetID, "")) && role.equals(action.get(Tags.Role, null));
+		}
+	}
+	
 	private class Item{
-		Settings settings;
-		ActionWidgetProxy proxy;		
-		String expression;
-		int sequences;
-		int steps;
-		List<State> states;
-		List<Integer> actionSetSizes;
-		List<Set<String>> actionSetList;
-		List<Verdict> verdicts;
-		private Item(Settings settings, ActionWidgetProxy proxy, String expression, int sequences, int steps, List<State> states, List<Integer> actionSetSizes, List<Set<String>> actionSetList, List<Verdict> verdicts) {
+		private Settings settings;
+		private ActionWidgetProxy proxy;		
+		private String expression;
+		private int sequences;
+		private int steps;
+		private List<State> states;
+		private List<Integer> actionSetSizes;
+		private List<Set<ActionMatcher>> actionSetList;
+		private List<Verdict> verdicts;
+		private Item(Settings settings, ActionWidgetProxy proxy, String expression, int sequences, int steps, List<State> states, List<Integer> actionSetSizes, List<Set<ActionMatcher>> actionSetList, List<Verdict> verdicts) {
 			super();
 			this.settings = settings;
 			this.proxy = proxy;
@@ -830,7 +1780,7 @@ public class DocumentTest {
 		private List<Integer> getActionSetSizes() {
 			return actionSetSizes;
 		}
-		private List<Set<String>> getActionSetList() {
+		private List<Set<ActionMatcher>> getActionSetList() {
 			return actionSetList;
 		}
 		private List<Verdict> getVerdicts() {

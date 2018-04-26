@@ -37,6 +37,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	private Document document;
 	private boolean documentActionExecuted;
 	private boolean actionSwitchesOn;
+	private Action lastAction;
 	
 	/**
      * Constructor.
@@ -79,10 +80,8 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 				}
 				throw new TgherkinException("Invalid Tgherkin document, see log for details");
 			}
-			if (settings().get(ConfigTags.GenerateTgherkinReport)){
-				// report header
-				Report.report();			
-			}
+			// report header
+			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);			
 		}
 	}
 	
@@ -113,9 +112,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 					verdict = document.getVerdict(state, settings());
 				}
 			}
-			if (settings().get(ConfigTags.GenerateTgherkinReport)){
-				Report.appendReportDetail(Report.Column.VERDICT, verdict.toString());
-			}
+			Report.appendReportDetail(Report.Column.VERDICT, verdict.toString());
 		}
 		return verdict;				
 	}
@@ -139,9 +136,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 		Set<Action> actions = super.deriveActions(system,state);
 		if (documentExecutionMode()) {		
-			if (settings().get(ConfigTags.GenerateTgherkinReport)){
-				Report.appendReportDetail(Report.Column.PRE_GENERATED_DERIVED_ACTIONS,"" + actions.size());
-			}
+			Report.appendReportDetail(Report.Column.PRE_GENERATED_DERIVED_ACTIONS,"" + actions.size());
 			// if an action switch is on then do not process document step
 			if (!checkActionSwitches()) {
 				actions.addAll(document.deriveActions(state, settings(), this));
@@ -158,7 +153,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	 */
 	protected Action selectAction(State state, Set<Action> actions){ 
 		Action action = super.selectAction(state, actions);
-		if (documentExecutionMode() && action != null && settings().get(ConfigTags.GenerateTgherkinReport)) {		
+		if (documentExecutionMode() && action != null) {		
 			String data = Util.toString((Object)action.get(Tags.Desc, null));
 			Report.appendReportDetail(Report.Column.SELECTED_ACTION,data);			
 			data = action.toString();
@@ -179,6 +174,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		if (documentExecutionMode() && !actionSwitchesOn) {
 			documentActionExecuted = true;
 		}
+		lastAction = action;
 		return super.executeAction(system, state, action);
 	}
 	
@@ -193,13 +189,12 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	protected boolean moreActions(State state) {
 		if (documentExecutionMode()) {
 			documentActionExecuted = false;
-			if (settings().get(ConfigTags.GenerateTgherkinReport)){
-				Report.appendReportDetail(Report.Column.SEQUENCE_NR,"" + sequenceCount());
-				Report.appendReportDetail(Report.Column.ACTION_NR,"" + (actionCount() - 1));
-				Report.report();			
-			}
+			Report.appendReportDetail(Report.Column.SEQUENCE_NR,"" + sequenceCount());
+			Report.appendReportDetail(Report.Column.ACTION_NR,"" + (actionCount() - 1));
+			Report.report(state,lastAction, graphDB, settings().get(ConfigTags.GenerateTgherkinReport), true);			
 			return super.moreActions(state) && document.moreActions(settings());
 		}
+		lastAction = null;
 		return super.moreActions(state);
 	}
 
@@ -231,6 +226,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		if (documentExecutionMode()) {
 			boolean result = super.moreSequences() && document.moreSequences();
 			if (!result && settings().get(ConfigTags.GenerateTgherkinReport)) {
+				// finish consumption 
 				Reporter.getInstance().finish();			
 			}
 			return result;

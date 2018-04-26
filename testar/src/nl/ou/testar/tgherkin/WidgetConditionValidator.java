@@ -2,6 +2,8 @@ package nl.ou.testar.tgherkin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParserBaseVisitor;
@@ -53,6 +55,8 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 		}else {
 			if (!dataTable.isColumnName(columnName)){
 				errorList.add("Widget condition validation error - invalid logical placeholder : " + columnName + System.getProperty("line.separator"));
+			}else {
+				checkTableContent(columnName, new Boolean(true));
 			}
 		}
 		return visitChildren(ctx);
@@ -68,6 +72,8 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 		}else {
 			if (!dataTable.isColumnName(columnName)){
 				errorList.add("Widget condition validation error - invalid numeric placeholder : " + columnName + System.getProperty("line.separator"));
+			}else {
+				checkTableContent(columnName, new Double(0));
 			}
 		}
 		return visitChildren(ctx);
@@ -82,9 +88,58 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 		}else {
 			if (!dataTable.isColumnName(columnName)){
 				errorList.add("Widget condition validation error - invalid string placeholder : " + columnName + System.getProperty("line.separator"));
+			}else {
+				checkTableContent(columnName, new String());
 			}
 		}
 		return visitChildren(ctx);
 	}		
+	
+	@Override
+	public Boolean visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx) { 
+		String regex = ctx.STRING().getText();
+		// unquote regex
+		regex = regex.substring(1, regex.length()-1);
+		boolean result = false;
+		try {
+			Pattern.compile(regex);
+		}
+		catch(PatternSyntaxException e){
+			errorList.add("Widget condition validation error - invalid regular expression : " + regex + System.getProperty("line.separator"));		
+		}
+		return result;
+	}
+	
+	private void checkTableContent(String columnName, Object type) {
+		if (dataTable != null){
+			int rows = 0;
+			while (dataTable.moreSequences()) {
+				dataTable.beginSequence();
+				rows++;
+				try {
+					String value = dataTable.getPlaceholderValue(columnName);
+					if (type instanceof Boolean) {
+						if (!(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false"))) {
+							errorList.add("Widget condition validation error - invalid boolean table value at row " + rows + " for placeholder " + columnName + " : " + value + System.getProperty("line.separator"));
+						}
+					}else {
+						if (type instanceof Double) {
+							try {
+								System.out.println("Checking double "  + value);								
+								Double.valueOf(value);
+							}
+							catch(Exception e) {
+								errorList.add("Widget condition validation error - invalid double table value at row " + rows + " for placeholder " + columnName + " : " + value + System.getProperty("line.separator"));					
+							}
+						}						
+					}
+				}
+				catch(Exception e) {
+					errorList.add("Widget condition validation error - invalid table value at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
+				}
+			}
+			dataTable.reset();
+		}
+	}
 	
 }

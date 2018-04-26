@@ -164,23 +164,16 @@ public class Feature {
 	 * @return true if condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(State state, Settings settings) {
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.FEATURE,getTitle());
-			Report.appendReportDetail(Report.Column.SCENARIO,currentScenarioDefinition().getTitle());
-		}
-	
+		Report.appendReportDetail(Report.Column.FEATURE,getTitle());
+		Report.appendReportDetail(Report.Column.SCENARIO,currentScenarioDefinition().getTitle());
 		if (backgroundRun ) {
 			if (background.moreActions()){
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.TYPE,background.getClass().getSimpleName());
-				}
+				Report.appendReportDetail(Report.Column.TYPE,background.getClass().getSimpleName());
 				return background.evaluateGivenCondition(state, settings);
 			}	
 			backgroundRun = false;
 		}
-		if (settings.get(ConfigTags.GenerateTgherkinReport)){
-			Report.appendReportDetail(Report.Column.TYPE,currentScenarioDefinition().getClass().getSimpleName());
-		}
+		Report.appendReportDetail(Report.Column.TYPE,currentScenarioDefinition().getClass().getSimpleName());
 		return currentScenarioDefinition().evaluateGivenCondition(state, settings);
 	}
 	
@@ -240,9 +233,7 @@ public class Feature {
 				}else {
 					currentScenarioDefinition().setFailed();
 				}
-				if (settings.get(ConfigTags.GenerateTgherkinReport)){
-					Report.appendReportDetail(Report.Column.THEN,"false");
-				}
+				Report.appendReportDetail(Report.Column.THEN,"false");
 				return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin feature oracle failure!");
 		}
 		// scenario level
