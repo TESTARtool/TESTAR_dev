@@ -49,27 +49,29 @@ public class ConditionalGesture {
 	
 	/**
 	 * Check whether widget is a candidate for the conditional gesture.
+	 * @param settings given settings
 	 * @param proxy given action widget proxy
+	 * @param state given state
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return true if widget is a candidate, otherwise false
 	 */
-	public boolean isCandidate(ActionWidgetProxy proxy, Widget widget, DataTable dataTable) {
-		return getGesture().gesturePossible(widget, proxy, dataTable) && (getWidgetCondition() == null || getWidgetCondition().evaluate(widget, dataTable));
+	public boolean isCandidate(Settings settings, ActionWidgetProxy proxy, State state, Widget widget, DataTable dataTable) {
+		return getGesture().gesturePossible(widget, proxy, dataTable) && (getWidgetCondition() == null || getWidgetCondition().evaluate(settings, state, widget, dataTable));
 	}
 
 	/**	  
 	 * Evaluate when condition.
+	 * @param settings given settings
 	 * @param state the SUT's current state
-	 * @param settings settings
 	 * @param proxy given action widget proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return  set of derived actions 
 	 */
-	public Set<Action> evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy, Widget widget, DataTable dataTable) {
+	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Widget widget, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();
-		if (isCandidate(proxy, widget, dataTable)) {
+		if (isCandidate(settings, proxy, state, widget, dataTable)) {
 			// widget is target for the gesture: return corresponding action 
 			actions.addAll(getGesture().getActions(widget, proxy, dataTable));	
 		}

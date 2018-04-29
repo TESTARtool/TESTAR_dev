@@ -11,7 +11,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
@@ -132,11 +131,11 @@ public abstract class ScenarioDefinition {
     
 	/**	  
 	 * Evaluate given condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @return true if given condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(State state, Settings settings) {
+	public boolean evaluateGivenCondition(Settings settings, State state) {
 		if (currentStep() != null && currentStep().hasNextAction()) {
 			// current step has more actions
 			currentStep().nextAction();
@@ -150,40 +149,40 @@ public abstract class ScenarioDefinition {
 				}
 			}
 		}
-		return currentStep().evaluateGivenCondition(state, settings, null, mismatchOccurred());
+		return currentStep().evaluateGivenCondition(settings, state, null, mismatchOccurred());
 	}
 
 	/**	  
 	 * Evaluate when condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @param map widget-list of gestures map
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map) {
+	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map) {
 		// apply scenario level selection
-		Step.evaluateWhenCondition(state, settings, proxy, map, selection, null);
+		Step.evaluateWhenCondition(settings, state, proxy, map, selection, null);
 		// apply step level selection		
-		return currentStep().evaluateWhenCondition(state, settings, proxy, map, null, mismatchOccurred());
+		return currentStep().evaluateWhenCondition(settings, state, proxy, map, null, mismatchOccurred());
 	}
 	
 
 	/**	  
 	 * Get verdict.
+	 * @param settings given settings
 	 * @param state the SUT's current state
-	 * @param settings given
 	 * @return oracle verdict, which determines whether the state is erroneous and why  
 	 */
-	public Verdict getVerdict(State state, Settings settings) {
+	public Verdict getVerdict(Settings settings, State state) {
 		// scenario level
-		if (oracle != null && !oracle.evaluate(state, null)){
+		if (oracle != null && !oracle.evaluate(settings, state, null)){
 			setFailed();
-			Report.appendReportDetail(Report.Column.THEN,"false");
+			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!");
 		}
 		// step level
-		return currentStep().getVerdict(state, settings, null, mismatchOccurred());
+		return currentStep().getVerdict(settings, state, null, mismatchOccurred());
 	}
 
 	/**

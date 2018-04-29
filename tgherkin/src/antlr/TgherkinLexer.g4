@@ -80,6 +80,8 @@ COMMA: ',';
 
 // function names
 MATCHES_NAME: 'matches' ;
+XPATH_NAME: 'xpath' ;
+IMAGE_NAME: 'image' ;
 
 // gesture names
 CLICK_NAME: 'click' ;

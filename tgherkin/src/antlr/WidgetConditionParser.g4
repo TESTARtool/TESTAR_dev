@@ -37,9 +37,11 @@ arithmetic_expr:
 
 string_expr : string_entity; 
  
-booleanFunction: matchesFunction;
+booleanFunction: matchesFunction | xpathFunction | imageFunction;
 
 matchesFunction: MATCHES_NAME LPAREN STRING_VARIABLE COMMA STRING RPAREN; 
+xpathFunction: XPATH_NAME LPAREN STRING RPAREN;
+imageFunction: IMAGE_NAME LPAREN STRING RPAREN;
  
 bool: TRUE | FALSE;
 				

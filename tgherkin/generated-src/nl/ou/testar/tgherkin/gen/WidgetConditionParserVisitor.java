@@ -143,6 +143,18 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#xpathFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#imageFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#bool}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

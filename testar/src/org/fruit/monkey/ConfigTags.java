@@ -109,6 +109,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> ContinueToApplyDefault = Tag.from("ContinueToApplyDefault", Boolean.class);
   public static final Tag<Boolean> RepeatTgherkinScenarios = Tag.from("RepeatTgherkinScenarios", Boolean.class);
   public static final Tag<Boolean> GenerateTgherkinReport = Tag.from("GenerateTgherkinReport", Boolean.class);
+  public static final Tag<Boolean> StoreTgherkinReport = Tag.from("StoreTgherkinReport", Boolean.class);
   public static final Tag<Boolean> ReportDerivedGestures = Tag.from("ReportDerivedGestures", Boolean.class);
   public static final Tag<Boolean> ReportState = Tag.from("Reportstate", Boolean.class);
+  public static final Tag<Double> ConfidenceThreshold = Tag.from("ConfidenceThreshold", Double.class);
 }

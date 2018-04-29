@@ -1,12 +1,8 @@
 package nl.ou.testar.tgherkin.protocol;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -17,13 +13,9 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.tgherkin.DocumentBuilder;
-import nl.ou.testar.tgherkin.TgherkinErrorListener;
-import nl.ou.testar.tgherkin.TgherkinException;
-import nl.ou.testar.tgherkin.gen.TgherkinLexer;
-import nl.ou.testar.tgherkin.gen.TgherkinParser;
+import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.ActionWidgetProxy;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.utils.report.Reporter;
@@ -55,31 +47,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	protected void initialize(Settings settings){
 		super.initialize(settings);
 		if (documentExecutionMode()) {
-			String fileName = settings.get(ConfigTags.TgherkinDocument);
-			ANTLRInputStream inputStream;
-			try {
-				inputStream = new ANTLRInputStream(new FileInputStream(fileName));
-			}catch (IOException e) {
-				throw new TgherkinException("Unable to open character stream for Tgherkin file: " + fileName);
-			}        
-			TgherkinLexer lexer = new TgherkinLexer(inputStream);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-		    TgherkinParser parser = new TgherkinParser(tokens);
-			TgherkinErrorListener errorListener = new TgherkinErrorListener();
-			parser.removeErrorListeners();
-			parser.addErrorListener(errorListener);
-			document = new DocumentBuilder().visitDocument(parser.document());
-			List<String> errorList = errorListener.getErrorList();
-			if (errorList.size() == 0) {
-				// post-processing check
-				errorList = document.check();
-			}
-			if (errorList.size() != 0) {
-				for(String errorText : errorList) {
-					LogSerialiser.log(errorText, LogSerialiser.LogLevel.Info);
-				}
-				throw new TgherkinException("Invalid Tgherkin document, see log for details");
-			}
+			document = Utils.getDocumentModel(settings.get(ConfigTags.TgherkinDocument));
 			// report header
 			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);			
 		}
@@ -109,10 +77,10 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 			if (documentActionExecuted) {
 				if (verdict.severity() < settings().get(ConfigTags.FaultThreshold)) {
 					// no fault yet: determine document verdict
-					verdict = document.getVerdict(state, settings());
+					verdict = document.getVerdict(settings(), state);
 				}
 			}
-			Report.appendReportDetail(Report.Column.VERDICT, verdict.toString());
+			Report.appendReportDetail(Report.StringColumn.VERDICT, verdict.toString());
 		}
 		return verdict;				
 	}
@@ -136,10 +104,10 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 		Set<Action> actions = super.deriveActions(system,state);
 		if (documentExecutionMode()) {		
-			Report.appendReportDetail(Report.Column.PRE_GENERATED_DERIVED_ACTIONS,"" + actions.size());
+			Report.appendReportDetail(Report.IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS,actions.size());
 			// if an action switch is on then do not process document step
 			if (!checkActionSwitches()) {
-				actions.addAll(document.deriveActions(state, settings(), this));
+				actions.addAll(document.deriveActions(settings(), state, this));
 			}
 		}
 		return actions;		
@@ -155,10 +123,10 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		Action action = super.selectAction(state, actions);
 		if (documentExecutionMode() && action != null) {		
 			String data = Util.toString((Object)action.get(Tags.Desc, null));
-			Report.appendReportDetail(Report.Column.SELECTED_ACTION,data);			
+			Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION,data);			
 			data = action.toString();
 			data = data.replaceAll("(\\r|\\n|\\t)", "");
-			Report.appendReportDetail(Report.Column.SELECTED_ACTION_DETAILS,data);
+			Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION_DETAILS,data);
 		}
 		return action;
 	}
@@ -189,9 +157,9 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	protected boolean moreActions(State state) {
 		if (documentExecutionMode()) {
 			documentActionExecuted = false;
-			Report.appendReportDetail(Report.Column.SEQUENCE_NR,"" + sequenceCount());
-			Report.appendReportDetail(Report.Column.ACTION_NR,"" + (actionCount() - 1));
-			Report.report(state,lastAction, graphDB, settings().get(ConfigTags.GenerateTgherkinReport), true);			
+			Report.appendReportDetail(Report.IntegerColumn.SEQUENCE_NR,sequenceCount());
+			Report.appendReportDetail(Report.IntegerColumn.ACTION_NR,actionCount() - 1);
+			Report.report(state,lastAction, graphDB, settings().get(ConfigTags.GenerateTgherkinReport), settings().get(ConfigTags.StoreTgherkinReport));			
 			return super.moreActions(state) && document.moreActions(settings());
 		}
 		lastAction = null;
@@ -264,11 +232,19 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		return super.getTopWidgets(state);
 	}
     
+	/**
+	 * Retrieve sequence count.
+	 * @return sequence count
+	 */
     // change visibility from protected to public    
     public int getSequenceCount(){
     	return super.sequenceCount();
     }
 
+	/**
+	 * Retrieve action count.
+	 * @return action count
+	 */
     // change visibility from protected to public    
     public int getActionCount(){
     	return super.actionCount();

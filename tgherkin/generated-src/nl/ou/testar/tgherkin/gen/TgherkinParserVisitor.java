@@ -344,6 +344,18 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMatchesFunction(TgherkinParser.MatchesFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#xpathFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathFunction(TgherkinParser.XpathFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#imageFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImageFunction(TgherkinParser.ImageFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#bool}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

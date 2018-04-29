@@ -49,7 +49,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 	/**
 	 * Margin width in pixels.
 	 */
-	public final int MARGIN_WIDTH_PX = 28;
+	public static final int MARGIN_WIDTH_PX = 28;
 	private static final long serialVersionUID = 3388045245131983479L;
 	private String fileName;	
 
@@ -138,22 +138,20 @@ public class TgherkinEditor extends javax.swing.JDialog{
 
 	private void check() {
 		try {
-			console.setText("Lexing and parsing..." + System.getProperty("line.separator"));
+			console.setText("Saving file..." + System.getProperty("line.separator"));
 			console.update(console.getGraphics());
 			Util.saveToFile(codeEditor.getText(), fileName);
-			ANTLRInputStream inputStream;
-			inputStream = new ANTLRInputStream(new FileInputStream(fileName));
-			TgherkinLexer lexer = new TgherkinLexer(inputStream);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			TgherkinParser parser = new TgherkinParser(tokens);
+			console.setText("Lexing and parsing..." + System.getProperty("line.separator"));
+			console.update(console.getGraphics());
+			TgherkinParser parser = Utils.getTgherkinParser(codeEditor.getText());
 			TgherkinErrorListener errorListener = new TgherkinErrorListener();
-			parser.removeErrorListeners();
 			parser.addErrorListener(errorListener);
 			Document document = new DocumentBuilder().visitDocument(parser.document());
 			List<String> errorList = errorListener.getErrorList();
 			if (errorList.size() == 0) {
 				// post-processing check
 				console.setText(console.getText() + "Post-processing..." + System.getProperty("line.separator"));
+				console.update(console.getGraphics());
 				errorList = document.check();
 			}
 			if (errorList.size() == 0) {
@@ -163,8 +161,9 @@ public class TgherkinEditor extends javax.swing.JDialog{
 				for(String errorText : errorList) {
 					stringBuilder.append(errorText);
 				}
-				console.setText(stringBuilder.toString());
+				console.setText(console.getText() + stringBuilder.toString());
 			}
+			console.update(console.getGraphics());
 		} catch (Throwable t) {
 			console.setText(console.getText() + System.getProperty("line.separator") + t.getMessage());
 		}
@@ -219,14 +218,15 @@ public class TgherkinEditor extends javax.swing.JDialog{
 	class LineNumbersView extends JComponent implements DocumentListener, CaretListener, ComponentListener {
 
 		private static final long serialVersionUID = 1L;
-
 		private JTextComponent editor;
-
 		private Font font;
 
-		public LineNumbersView(JTextComponent editor) {
+		/**
+		 * Constructor.
+		 * @param editor given editor
+		 */
+		LineNumbersView(JTextComponent editor) {
 			this.editor = editor;
-
 			editor.getDocument().addDocumentListener(this);
 			editor.addComponentListener(this);
 			editor.addCaretListener(this);
@@ -235,26 +235,26 @@ public class TgherkinEditor extends javax.swing.JDialog{
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-
 			Rectangle clip = g.getClipBounds();
 			int startOffset = editor.viewToModel(new Point(0, clip.y));
 			int endOffset = editor.viewToModel(new Point(0, clip.y + clip.height));
-
 			while (startOffset <= endOffset) {
 				try {
 					String lineNumber = getLineNumber(startOffset);
 					if (lineNumber != null) {
 						int x = getInsets().left + 2;
 						int y = getOffsetY(startOffset);
-
-						font = font != null ? font : new Font(Font.MONOSPACED, Font.BOLD, editor.getFont().getSize());
+						if (font == null) {
+							font = new Font(Font.MONOSPACED, Font.BOLD, editor.getFont().getSize()); 
+						}
 						g.setFont(font);
-
-						g.setColor(isCurrentLine(startOffset) ? Color.RED : Color.BLACK);
-
+						if (isCurrentLine(startOffset)) {
+							g.setColor(Color.RED);
+						}else {
+							g.setColor(Color.BLACK);
+						}
 						g.drawString(lineNumber, x, y);
 					}
-
 					startOffset = Utilities.getRowEnd(editor, startOffset) + 1;
 				} catch (BadLocationException e) {
 					e.printStackTrace();
@@ -272,8 +272,10 @@ public class TgherkinEditor extends javax.swing.JDialog{
 			Element root = editor.getDocument().getDefaultRootElement();
 			int index = root.getElementIndex(offset);
 			Element line = root.getElement(index);
-
-			return line.getStartOffset() == offset ? String.format("%3d", index + 1) : null;
+			if (line.getStartOffset() == offset) {
+				return String.format("%3d", index + 1);
+			}
+			return null;
 		}
 
 		/**
@@ -283,10 +285,8 @@ public class TgherkinEditor extends javax.swing.JDialog{
 		private int getOffsetY(int offset) throws BadLocationException {
 			FontMetrics fontMetrics = editor.getFontMetrics(editor.getFont());
 			int descent = fontMetrics.getDescent();
-
 			Rectangle r = editor.modelToView(offset);
 			int y = r.y + r.height - descent;
-
 			return y;
 		}
 
@@ -358,6 +358,5 @@ public class TgherkinEditor extends javax.swing.JDialog{
 		public void componentHidden(ComponentEvent e) {
 		}
 	}
-
 
 }

@@ -26,7 +26,7 @@ public class TestState extends StdState{
 	 * Constructor.
 	 * @param widgets given list of widgets
 	 */
-	TestState(List<Widget> widgets) {
+	public TestState(List<Widget> widgets) {
 		super();
 		this.widgets = widgets;
 	}

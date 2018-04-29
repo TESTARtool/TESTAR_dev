@@ -390,8 +390,10 @@ public class Main {
       defaults.add(Pair.from(ContinueToApplyDefault, true));
       defaults.add(Pair.from(RepeatTgherkinScenarios, true));
       defaults.add(Pair.from(GenerateTgherkinReport, false));		
+      defaults.add(Pair.from(StoreTgherkinReport, false));
       defaults.add(Pair.from(ReportDerivedGestures, false));
       defaults.add(Pair.from(ReportState, false));
+      defaults.add(Pair.from(ConfidenceThreshold, 1.0));
 
       return Settings.fromFile(defaults, file);
     } catch (IOException ioe) {

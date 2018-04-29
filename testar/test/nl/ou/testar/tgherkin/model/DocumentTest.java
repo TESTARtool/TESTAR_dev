@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Role;
@@ -24,18 +22,12 @@ import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.tgherkin.DocumentBuilder;
-import nl.ou.testar.tgherkin.TgherkinErrorListener;
-import nl.ou.testar.tgherkin.TgherkinException;
-import nl.ou.testar.tgherkin.gen.TgherkinLexer;
-import nl.ou.testar.tgherkin.gen.TgherkinParser;
-import nl.ou.testar.tgherkin.model.ActionWidgetProxy;
-import nl.ou.testar.tgherkin.model.Document;
+import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 
 
 /**
+ * JUnit test for the Document class. 
  * This class tests execution of the document model:
  * - verification of the number of generated sequences and actions
  * - verification of the number of derived actions and verdict severity
@@ -351,6 +343,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -396,6 +389,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -446,6 +440,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -578,6 +573,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -719,6 +715,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -858,6 +855,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -915,6 +913,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -971,6 +970,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1061,6 +1061,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1175,6 +1176,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1306,6 +1308,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1346,6 +1349,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1386,6 +1390,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1426,6 +1431,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1468,6 +1474,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1504,6 +1511,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1543,6 +1551,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1578,6 +1587,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1614,6 +1624,7 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// proxy
 		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
@@ -1639,10 +1650,13 @@ public class DocumentTest {
 		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
+	/**
+	 * Test document.
+	 */
 	@Test
 	public void test() {
 		for (Item item : setUpItems()) {
-			Document document = getModel(item.getExpression());
+			Document document = Utils.getDocumentModel(item.getExpression());
 			// process document in sequences and actions
 			int index = 0;
 			int sequenceCount = 0;
@@ -1652,10 +1666,10 @@ public class DocumentTest {
 				document.beginSequence();
 				while (document.moreActions(item.getSettings())) {
 					stepCount++;
-					Set<Action> actions = document.deriveActions(item.getStates().get(index), item.getSettings(), item.getProxy());
+					Set<Action> actions = document.deriveActions(item.getSettings(), item.getStates().get(index), item.getProxy());
 					assertSame(actions.size(), item.getActionSetSizes().get(index));
 					assertTrue(actionSetValid(actions, item.getActionSetList().get(index))); 
-					Verdict verdict = document.getVerdict(item.getStates().get(index + 1), item.getSettings());
+					Verdict verdict = document.getVerdict(item.getSettings(), item.getStates().get(index + 1));
 					assertEquals(verdict, item.getVerdicts().get(index));
 					index++;
 				}
@@ -1665,28 +1679,6 @@ public class DocumentTest {
 		}
 	}
 		
-	private Document getModel(String expression) {
-		ANTLRInputStream inputStream = new ANTLRInputStream(expression);
-		TgherkinLexer lexer = new TgherkinLexer(inputStream);
-		TgherkinParser parser = new TgherkinParser(new CommonTokenStream(lexer));
-	    TgherkinErrorListener errorListener = new TgherkinErrorListener();
-		parser.removeErrorListeners();
-		parser.addErrorListener(errorListener);
-		Document document = new DocumentBuilder().visitDocument(parser.document());
-		List<String> errorList = errorListener.getErrorList();
-		if (errorList.size() == 0) {
-			// post-processing check
-			errorList = document.check();
-		}
-		if (errorList.size() != 0) {
-			for(String errorText : errorList) {
-				LogSerialiser.log(errorText, LogSerialiser.LogLevel.Info);
-			}
-			throw new TgherkinException("Invalid Tgherkin document, see log for details");
-		}
-		return document;
-	}
-	
 	private boolean actionSetValid(Set<Action> actions, Set<ActionMatcher> expectedActions) {
 		if (actions.size() != expectedActions.size()) {
 			return false;

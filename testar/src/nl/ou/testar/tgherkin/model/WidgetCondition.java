@@ -5,8 +5,11 @@ import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.fruit.Assert;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.Settings;
 
+import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.WidgetConditionEvaluator;
 import nl.ou.testar.tgherkin.WidgetConditionValidator;
 import nl.ou.testar.tgherkin.gen.TgherkinLexer;
@@ -23,12 +26,19 @@ public class WidgetCondition {
 	 *
 	 */
 	public enum Type {
+	    /**
+	     * Also type: logical and. 
+	     */
 	    ALSO,
+	    /**
+	     * Either type: logical or.
+	     */
 	    EITHER
 	  }
 	
 	private final Type type;
 	private final String code;
+	private WidgetConditionEvaluator evaluator;
 	
 	/**
 	 * WidgetCondition Constructor.
@@ -69,17 +79,22 @@ public class WidgetCondition {
 	
 	/**
 	 * Evaluate widget condition.
+	 * @param settings given settings
+	 * @param state given state
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return  true if condition is applicable for widget, otherwise false 
 	 */
-	public boolean evaluate(Widget widget, DataTable dataTable) {				
-		ANTLRInputStream inputStream = new ANTLRInputStream(getCode());
-		TgherkinLexer lexer = new TgherkinLexer(inputStream);
-		WidgetConditionParser parser = new WidgetConditionParser(new CommonTokenStream(lexer));
+	public boolean evaluate(Settings settings, State state, Widget widget, DataTable dataTable) {				
+		if (evaluator == null) {
+			evaluator = new WidgetConditionEvaluator(settings, state, widget, dataTable);
+		}else {
+			evaluator.set(state, widget, dataTable);
+		}
+		WidgetConditionParser parser = Utils.getWidgetConditionParser(getCode());
 		Boolean result = false;
 		try {
-			result = (Boolean)new WidgetConditionEvaluator(widget, dataTable).visit(parser.widget_condition());
+			result = (Boolean)evaluator.visit(parser.widget_condition());
 		}catch (Exception e) {}
 		return result;
 	}

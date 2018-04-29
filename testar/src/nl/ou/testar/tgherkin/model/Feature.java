@@ -15,7 +15,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
@@ -159,32 +158,32 @@ public class Feature {
 	
 	/**	  
 	 * Evaluate given condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @return true if condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(State state, Settings settings) {
-		Report.appendReportDetail(Report.Column.FEATURE,getTitle());
-		Report.appendReportDetail(Report.Column.SCENARIO,currentScenarioDefinition().getTitle());
+	public boolean evaluateGivenCondition(Settings settings, State state) {
+		Report.appendReportDetail(Report.StringColumn.FEATURE,getTitle());
+		Report.appendReportDetail(Report.StringColumn.SCENARIO,currentScenarioDefinition().getTitle());
 		if (backgroundRun ) {
 			if (background.moreActions()){
-				Report.appendReportDetail(Report.Column.TYPE,background.getClass().getSimpleName());
-				return background.evaluateGivenCondition(state, settings);
+				Report.appendReportDetail(Report.StringColumn.TYPE,background.getClass().getSimpleName());
+				return background.evaluateGivenCondition(settings, state);
 			}	
 			backgroundRun = false;
 		}
-		Report.appendReportDetail(Report.Column.TYPE,currentScenarioDefinition().getClass().getSimpleName());
-		return currentScenarioDefinition().evaluateGivenCondition(state, settings);
+		Report.appendReportDetail(Report.StringColumn.TYPE,currentScenarioDefinition().getClass().getSimpleName());
+		return currentScenarioDefinition().evaluateGivenCondition(settings, state);
 	}
 	
 	/**	  
 	 * Evaluate when condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy) {
+	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy) {
 		Map<Widget,List<Gesture>> map = new HashMap<Widget, List<Gesture>>();
 		List<Gesture> list;
 		// for gestures only look at top widgets
@@ -196,13 +195,13 @@ public class Feature {
 					// no selection defined: all possible gestures are in scope
 					Gesture gesture = new AnyGesture(new ArrayList<Argument>());
 					ConditionalGesture conditionalGesture = new ConditionalGesture(null, gesture); 
-					if (conditionalGesture.isCandidate(proxy, widget, null)) {
+					if (conditionalGesture.isCandidate(settings, proxy, state, widget, null)) {
 						list.add(gesture);
 						map.put(widget, list);
 					}
 				}else {
 					for(ConditionalGesture conditionalGesture : selection) {
-						if (conditionalGesture.isCandidate(proxy, widget, null)) {
+						if (conditionalGesture.isCandidate(settings, proxy, state, widget, null)) {
 							list.add(conditionalGesture.getGesture());
 						}
 					}
@@ -213,34 +212,34 @@ public class Feature {
 			}
 		}
 		if (backgroundRun ) {
-			return background.evaluateWhenCondition(state, settings, proxy, map);
+			return background.evaluateWhenCondition(settings, state, proxy, map);
 		}
-		return currentScenarioDefinition().evaluateWhenCondition(state, settings, proxy, map);
+		return currentScenarioDefinition().evaluateWhenCondition(settings, state, proxy, map);
 	}
 	
 
 	/**	  
 	 * Get verdict.
-	 * @param state the SUT's current state
 	 * @param settings settings
+	 * @param state the SUT's current state
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(State state, Settings settings) {
+	public Verdict getVerdict(Settings settings, State state) {
 		// feature level
-		if (oracle != null && !oracle.evaluate(state, null)) {
+		if (oracle != null && !oracle.evaluate(settings, state, null)) {
 				if (backgroundRun ) {
 					background.setFailed();
 				}else {
 					currentScenarioDefinition().setFailed();
 				}
-				Report.appendReportDetail(Report.Column.THEN,"false");
+				Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 				return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin feature oracle failure!");
 		}
 		// scenario level
 		if (backgroundRun ) {
-			return background.getVerdict(state, settings);
+			return background.getVerdict(settings, state);
 		}
-		return currentScenarioDefinition().getVerdict(state, settings);
+		return currentScenarioDefinition().getVerdict(settings, state);
 	}
 	
 	/**
@@ -345,6 +344,5 @@ public class Feature {
     	}
     	return scenarioDefinitions.get(index);
     }
-    
     
 }

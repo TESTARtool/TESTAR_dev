@@ -65,6 +65,12 @@ public abstract class Gesture {
      */
     public abstract Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable);
     
+    /**
+     * Get string argument.
+     * @param index given index
+     * @param dataTable given data table
+     * @return string argument
+     */
     protected String getStringArgument(int index, DataTable dataTable) {
     	Argument argument = getArguments().get(index);
     	if (argument instanceof PlaceholderArgument) {
@@ -78,6 +84,12 @@ public abstract class Gesture {
     	return null;
     }
     
+    /**
+     * Get boolean argument.
+     * @param index given index
+     * @param dataTable given data table
+     * @return boolean argument
+     */
     protected Boolean getBooleanArgument(int index, DataTable dataTable) {
     	Argument argument = getArguments().get(index);
     	if (argument instanceof PlaceholderArgument) {
@@ -113,6 +125,10 @@ public abstract class Gesture {
     @Override
     public abstract String toString();
     
+    /* 
+     * Determine whether this Gesture instance is equal to the passed object.
+     * @return true if this Gesture instance is equal to the passed object, otherwise false.
+     */
     @Override
     public boolean equals(Object object) {
     	if (object == null) {
@@ -123,6 +139,16 @@ public abstract class Gesture {
     	}
     	return true;
     }
+    
+    /* 
+     * Get hashcode.
+     * @return hash code
+     */
+    @Override
+    public int hashCode(){
+        return getClass().hashCode();
+      }
+
     
     
     /**

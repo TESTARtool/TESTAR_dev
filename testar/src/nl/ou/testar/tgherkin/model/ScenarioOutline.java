@@ -11,7 +11,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
@@ -63,6 +62,7 @@ public class ScenarioOutline extends ScenarioDefinition {
 	 * Check whether more sequences exist.
 	 * @return true if more sequences exist, otherwise false
 	 */
+    @Override
 	public boolean moreSequences() {
 		return getExamples().moreSequences();
 	}
@@ -70,6 +70,7 @@ public class ScenarioOutline extends ScenarioDefinition {
 	/**
 	 * Begin sequence.
 	 */
+    @Override
 	public void beginSequence() {
 		super.beginSequence();
 		super.reset();
@@ -78,11 +79,12 @@ public class ScenarioOutline extends ScenarioDefinition {
 	
 	/**	  
 	 * Evaluate given condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @return true if given condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(State state, Settings settings) {
+    @Override
+	public boolean evaluateGivenCondition(Settings settings, State state) {
 		if (currentStep() != null && currentStep().hasNextAction()) {
 			// current step has more actions
 			currentStep().nextAction();
@@ -96,44 +98,47 @@ public class ScenarioOutline extends ScenarioDefinition {
 				}
 			}
 		}
-		return currentStep().evaluateGivenCondition(state, settings, examples.getDataTable(), mismatchOccurred());
+		return currentStep().evaluateGivenCondition(settings, state, examples.getDataTable(), mismatchOccurred());
 	}
 	
 	/**	  
 	 * Evaluate when condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @param map widget-list of gestures map
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map) {
+    @Override
+	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map) {
 		// apply scenario level selection
-		Step.evaluateWhenCondition(state, settings, proxy, map, getSelection(), examples.getDataTable());
+		Step.evaluateWhenCondition(settings, state, proxy, map, getSelection(), examples.getDataTable());
 		// apply step level selection
-		return currentStep().evaluateWhenCondition(state, settings, proxy, map, examples.getDataTable(), mismatchOccurred());
+		return currentStep().evaluateWhenCondition(settings, state, proxy, map, examples.getDataTable(), mismatchOccurred());
 	}
 	
 	/**	  
 	 * Get verdict.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @return oracle verdict, which determines whether the state is erroneous and why  
 	 */
-	public Verdict getVerdict(State state, Settings settings) {
+    @Override
+	public Verdict getVerdict(Settings settings, State state) {
 		// scenario level
-		if (getOracle() != null && !getOracle().evaluate(state, examples.getDataTable())){
+		if (getOracle() != null && !getOracle().evaluate(settings, state, examples.getDataTable())){
 			setFailed();
-			Report.appendReportDetail(Report.Column.THEN,"false");
+			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!");
 		}
 		// step level
-		return currentStep().getVerdict(state, settings, examples.getDataTable(), mismatchOccurred());
+		return currentStep().getVerdict(settings, state, examples.getDataTable(), mismatchOccurred());
 	}
 
 	/**
      * Reset scenario definition.
      */
+    @Override
 	public void reset() {
 		super.reset();
 		getExamples().reset();
@@ -143,6 +148,7 @@ public class ScenarioOutline extends ScenarioDefinition {
      * Check.
      * @return list of error descriptions
      */
+    @Override
 	public List<String> check() {
 		List<String> list = new ArrayList<String>();
    		for (ConditionalGesture conditionalGesture : getSelection()) {

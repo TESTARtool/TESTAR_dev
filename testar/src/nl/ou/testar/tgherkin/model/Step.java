@@ -35,8 +35,17 @@ public class Step {
 	 *
 	 */
 	public enum Status {
+		/**
+		 * Status undetermined. 
+		 */
 		UNDETERMINED,
+		/**
+		 * Status passed.
+		 */
 		PASSED,
+		/**
+		 * Status failed.
+		 */
 		FAILED
 	}
 
@@ -151,24 +160,24 @@ public class Step {
     
 	/**	  
 	 * Evaluate given condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return  true if given condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(State state, Settings settings, DataTable dataTable, boolean mismatchOccurred) {
+	public boolean evaluateGivenCondition(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
 		// Step
-		Report.appendReportDetail(Report.Column.STEP,getTitle());
+		Report.appendReportDetail(Report.StringColumn.STEP,getTitle());
 		boolean result = true;
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			if (givenCondition != null) {
-				result = givenCondition.evaluate(state, dataTable);
+				result = givenCondition.evaluate(settings, state, dataTable);
 				if (result) {
-					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"false");
+					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,false);
 				}else {
 					setMismatch(true);
-					Report.appendReportDetail(Report.Column.GIVEN_MISMATCH,"true");
+					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,true);
 					if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 						setStatus(Status.FAILED);
 					}else {
@@ -177,28 +186,29 @@ public class Step {
 				}
 			}
 		}
-		Report.appendReportDetail(Report.Column.GIVEN,"" + result);
+		Report.appendReportDetail(Report.BooleanColumn.GIVEN,result);
 		return result;
 	}
     
 	/**	  
 	 * Evaluate when condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @param map widget-list of gestures map
+	 * @param table data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, DataTable table, boolean mismatchOccurred) {
+	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, DataTable table, boolean mismatchOccurred) {
 		Set<Action> actions = new HashSet<Action>();
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
 			Map<Widget,List<Gesture>> oldMap = copy(map);
-			evaluateWhenCondition(state, settings, proxy, map, whenGestures, table);
+			evaluateWhenCondition(settings, state, proxy, map, whenGestures, table);
 			if (map.size() == 0) {
 				// current step level execution resulted in mismatch
 				setMismatch(true);
-				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + true);
+				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,true);
 				if (settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					// restore map if default should be applied 
 					map = oldMap;
@@ -206,7 +216,7 @@ public class Step {
 					setStatus(Status.FAILED);
 				}
 			}else {
-				Report.appendReportDetail(Report.Column.WHEN_MISMATCH,"" + false);
+				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 			}
 		}
 		if (settings.get(ConfigTags.ReportDerivedGestures)){
@@ -222,20 +232,20 @@ public class Step {
 				actions.addAll(gesture.getActions(widget, proxy, table));
 			}
 		}
-		Report.appendReportDetail(Report.Column.WHEN_DERIVED_ACTIONS,"" + actions.size());
+		Report.appendReportDetail(Report.IntegerColumn.WHEN_DERIVED_ACTIONS,actions.size());
 		return actions;
 	}
 	
 	/**
 	 * Evaluate when condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @param map widget-list of gestures map
 	 * @param select given list of conditional gestures
 	 * @param table given data table
 	 */
-	protected static void evaluateWhenCondition(State state, Settings settings, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, List<ConditionalGesture> select, DataTable table) {
+	protected static void evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, List<ConditionalGesture> select, DataTable table) {
 		if (select.size() > 0) {
 			Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -244,7 +254,7 @@ public class Step {
 				List<Gesture> originalList = entrySet.getValue();
 				List<Gesture> newList = new ArrayList<Gesture>();
 				for(ConditionalGesture conditionalGesture : select) {
-					if (conditionalGesture.isCandidate(proxy, widget, table)) {
+					if (conditionalGesture.isCandidate(settings, proxy, state, widget, table)) {
 						newList.addAll(getFilteredGestures(originalList, conditionalGesture.getGesture()));
 					}
 				}
@@ -286,27 +296,27 @@ public class Step {
 
 	/**	  
 	 * Get verdict.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(State state, Settings settings, DataTable dataTable, boolean mismatchOccurred) {
+	public Verdict getVerdict(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
 		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
-			if (thenCondition != null && !thenCondition.evaluate(state, dataTable)) { 
+			if (thenCondition != null && !thenCondition.evaluate(settings, state, dataTable)) { 
 				setMismatch(true);
-				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"true");
+				Report.appendReportDetail(Report.BooleanColumn.THEN_MISMATCH,true);
 				if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
 					setStatus(Status.FAILED);
-					Report.appendReportDetail(Report.Column.THEN,"false");					
+					Report.appendReportDetail(Report.BooleanColumn.THEN,false);					
 					return new Verdict(TGHERKIN_FAILURE, "Tgherkin step oracle failure!");
 				}
 			}else {
-				Report.appendReportDetail(Report.Column.THEN_MISMATCH,"false");
+				Report.appendReportDetail(Report.BooleanColumn.THEN_MISMATCH,false);
 			}
 		}
-		Report.appendReportDetail(Report.Column.THEN,"true");
+		Report.appendReportDetail(Report.BooleanColumn.THEN,true);
 		if (getStatus() == Status.FAILED) {
 			return new Verdict(TGHERKIN_FAILURE, "Tgherkin step failure!");
 		}else {

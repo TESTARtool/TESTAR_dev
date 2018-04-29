@@ -50,16 +50,17 @@ public class StepRange extends Step {
 
 	/**	  
 	 * Evaluate given condition.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return  true if given condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(State state, Settings settings, DataTable dataTable, boolean mismatchOccurred) {
+	@Override
+	public boolean evaluateGivenCondition(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
 		// reset status
 		setStatus(Status.UNDETERMINED);
-		return super.evaluateGivenCondition(state, settings, dataTable, mismatchOccurred);
+		return super.evaluateGivenCondition(settings, state, dataTable, mismatchOccurred);
 	}
 	
 	
@@ -68,6 +69,7 @@ public class StepRange extends Step {
      * @param dataTable given data table
      * @return list of error descriptions
      */
+	@Override
 	public List<String> check(DataTable dataTable) {
 		List<String> list = super.check(dataTable);
 		if (fromRange > toRange) {
@@ -80,6 +82,7 @@ public class StepRange extends Step {
     /**
 	 * Begin step.
 	 */
+	@Override
 	public void beginSequence() {
 		super.beginSequence();
 		if (fromRange == toRange) {
@@ -96,6 +99,7 @@ public class StepRange extends Step {
      * Checks whether the step has a next action.
      * @return true if step has a next action otherwise false
      */
+	@Override
     protected boolean hasNextAction() {
     	return currentAction < targetedActions;
     }
@@ -103,6 +107,7 @@ public class StepRange extends Step {
     /**
      * Proceed to next action.
      */
+	@Override
     protected void nextAction() {
     	super.nextAction();
     	currentAction++;

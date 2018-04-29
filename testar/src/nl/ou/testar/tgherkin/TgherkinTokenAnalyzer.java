@@ -21,7 +21,7 @@ import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
  */
 public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 
-	List<Integer> tokenList = new ArrayList<Integer>();
+	private List<Integer> tokenList = new ArrayList<Integer>();
 
 	@Override 
 	public List<Integer> visitDocument(TgherkinParser.DocumentContext ctx) { 
@@ -155,8 +155,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 
 	@Override 
 	public Object visitTypeGesture(TgherkinParser.TypeGestureContext ctx) { 
-		if (ctx.TYPE_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.TYPE_NAME().getSourceInterval().a);
+		if (ctx.TYPE_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.TYPE_NAME().getSourceInterval().a);	
+			}			
 		}
 		if (ctx.PLACEHOLDER() != null) {
 			tokenList.add(ctx.PLACEHOLDER().getSourceInterval().a);
@@ -169,8 +171,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 
 	@Override
 	public Object visitClickGesture(TgherkinParser.ClickGestureContext ctx) {
-		if (ctx.CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.CLICK_NAME().getSourceInterval().a);
+		if (ctx.CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.CLICK_NAME().getSourceInterval().a);
+			}
 		}
 		if (ctx.PLACEHOLDER() != null) {
 			tokenList.add(ctx.PLACEHOLDER().getSourceInterval().a);
@@ -188,8 +192,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 	
 	@Override
 	public Object visitDoubleClickGesture(TgherkinParser.DoubleClickGestureContext ctx) {
-		if (ctx.DOUBLE_CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.DOUBLE_CLICK_NAME().getSourceInterval().a);
+		if (ctx.DOUBLE_CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.DOUBLE_CLICK_NAME().getSourceInterval().a);
+			}
 		}
 		if (ctx.PLACEHOLDER() != null) {
 			tokenList.add(ctx.PLACEHOLDER().getSourceInterval().a);
@@ -207,8 +213,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 	
 	@Override
 	public Object visitTripleClickGesture(TgherkinParser.TripleClickGestureContext ctx) {
-		if (ctx.TRIPLE_CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.TRIPLE_CLICK_NAME().getSourceInterval().a);
+		if (ctx.TRIPLE_CLICK_NAME() != null && ctx.LPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.TRIPLE_CLICK_NAME().getSourceInterval().a);
+			}	
 		}
 		if (ctx.PLACEHOLDER() != null) {
 			tokenList.add(ctx.PLACEHOLDER().getSourceInterval().a);
@@ -226,8 +234,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 	
 	@Override
 	public Object visitAnyGesture(TgherkinParser.AnyGestureContext ctx) {
-		if (ctx.ANY_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.ANY_NAME().getSourceInterval().a);
+		if (ctx.ANY_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.ANY_NAME().getSourceInterval().a);
+			}
 		}
 		if (ctx.PLACEHOLDER() != null) {
 			tokenList.add(ctx.PLACEHOLDER().getSourceInterval().a);
@@ -248,20 +258,28 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 		if (ctx.gestureName() == null) {
 			return null;
 		}	
-		if (ctx.gestureName().DRAG_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.gestureName().DRAG_NAME().getSourceInterval().a);
+		if (ctx.gestureName().DRAG_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.gestureName().DRAG_NAME().getSourceInterval().a);
+			}	
 			return null;
 		}
-		if (ctx.gestureName().RIGHT_CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.gestureName().RIGHT_CLICK_NAME().getSourceInterval().a);
+		if (ctx.gestureName().RIGHT_CLICK_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null ) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.gestureName().RIGHT_CLICK_NAME().getSourceInterval().a);
+			}
 			return null;
 		}
-		if (ctx.gestureName().MOUSE_MOVE_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.gestureName().MOUSE_MOVE_NAME().getSourceInterval().a);
+		if (ctx.gestureName().MOUSE_MOVE_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null ) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.gestureName().MOUSE_MOVE_NAME().getSourceInterval().a);
+			}
 			return null;
 		}
-		if (ctx.gestureName().DROP_DOWN_AT_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.gestureName().DROP_DOWN_AT_NAME().getSourceInterval().a);
+		if (ctx.gestureName().DROP_DOWN_AT_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null ) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.gestureName().DROP_DOWN_AT_NAME().getSourceInterval().a);
+			}
 			return null;
 		}
 		return null;
@@ -269,8 +287,10 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 	
 	@Override 
 	public Object visitMatchesFunction(TgherkinParser.MatchesFunctionContext ctx) { 
-		if (ctx.MATCHES_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null && ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
-			tokenList.add(ctx.MATCHES_NAME().getSourceInterval().a);
+		if (ctx.MATCHES_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.MATCHES_NAME().getSourceInterval().a);
+			}
 		}
 		if (ctx.STRING() != null) {
 			tokenList.add(ctx.STRING().getSourceInterval().a);
@@ -281,6 +301,19 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 		return visitChildren(ctx); 
 	}
 	
+	@Override 
+	public Object visitXpathFunction(TgherkinParser.XpathFunctionContext ctx) { 
+		if (ctx.XPATH_NAME() != null && ctx.LPAREN() != null && ctx.RPAREN() != null) {
+			if (ctx.LPAREN().getText().equals("(") && ctx.RPAREN().getText().equals(")")) {
+				tokenList.add(ctx.XPATH_NAME().getSourceInterval().a);
+			}
+		}
+		if (ctx.STRING() != null) {
+			tokenList.add(ctx.STRING().getSourceInterval().a);
+		}
+		return visitChildren(ctx); 
+	}
+
 	@Override 
 	public Object visitBool(TgherkinParser.BoolContext ctx) { 
 		if (ctx.FALSE() != null) {

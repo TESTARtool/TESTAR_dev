@@ -47,19 +47,28 @@ import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
  *
  */
 public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
+	
+	/**
+	 * Data separator meta.
+	 */
+	public static final String DATA_SEPARTATOR_META = "\\|";
+
 	private class ExecOptions{		
-		List<Tag> excludeTags;
-		List<Tag> includeTags;
+		private List<Tag> excludeTags;
+		private List<Tag> includeTags;
 		private ExecOptions(List<Tag> excludeTags, List<Tag> includeTags) {
 			super();
 			this.excludeTags = excludeTags;
 			this.includeTags = includeTags;
 		}
+		private List<Tag> getExcludeTags() {
+			return excludeTags;
+		}
+		private List<Tag> getIncludeTags() {
+			return includeTags;
+		}
 	}
-	/**
-	 * Data separator meta.
-	 */
-	public static final String DATA_SEPARTATOR_META = "\\|";
+	
 	private ExecOptions execOptions;
 	private List<WidgetCondition> widgetConditions;
 	private Queue<WidgetCondition.Type> operatorQueue = new LinkedList<WidgetCondition.Type>();
@@ -533,17 +542,17 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			return true;
 		}
 		// search for matching exclude/include tag execution option in list of defined feature tags 
-		if (execOptions.excludeTags.size() > 0 && matchingTagExists(execOptions.excludeTags, featureTags) ) {
+		if (execOptions.getExcludeTags().size() > 0 && matchingTagExists(execOptions.getExcludeTags(), featureTags) ) {
 			return false;
 		}
-		if (execOptions.includeTags.size() > 0 && matchingTagExists(execOptions.includeTags, featureTags) ) {
+		if (execOptions.getIncludeTags().size() > 0 && matchingTagExists(execOptions.getIncludeTags(), featureTags) ) {
 			return true;
 		}
 		// search for matching exclude/include tag execution option in list of defined scenario tags 
-		if (execOptions.excludeTags.size() > 0 && matchingTagExists(execOptions.excludeTags, scenarioTags) ) {
+		if (execOptions.getExcludeTags().size() > 0 && matchingTagExists(execOptions.getExcludeTags(), scenarioTags) ) {
 			return false;
 		}
-		if (execOptions.includeTags.size() > 0 && matchingTagExists(execOptions.includeTags, scenarioTags) ) {
+		if (execOptions.getIncludeTags().size() > 0 && matchingTagExists(execOptions.getIncludeTags(), scenarioTags) ) {
 			return true;
 		}
 		// include option defined?

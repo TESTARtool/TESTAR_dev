@@ -12,6 +12,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -22,6 +24,8 @@ import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 import javax.swing.JLabel;
 
 import static org.fruit.monkey.ConfigTags.MyClassPath;
+import static org.fruit.monkey.dialog.ToolTipTexts.maxTestTimeTTT;
+
 import org.fruit.UnProc;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -29,14 +33,24 @@ import java.util.Arrays;
 import java.util.List;
 
 
+/**
+ * Maintenance Tgherkin settings.
+ *
+ */
 public class TgherkinPanel extends JPanel {
+	/**
+	 * Serial version UID. 
+	 */
+	private static final long serialVersionUID = 9033457654990065279L;
 	private JComboBox<String> tgComboBoxTgherkinDocument;
 	private JCheckBox tgApplyDefaultOnMismatchCheckBox;
 	private JCheckBox tgContinueToApplyDefaultCheckBox;
 	private JCheckBox tgRepeatTgherkinScenariosCheckBox;
 	private JCheckBox tgGenerateTgherkinReportCheckBox;
+	private JCheckBox tgStoreTgherkinReportCheckBox;
 	private JCheckBox tgReportDerivedGesturesCheckBox;
 	private JCheckBox tgReportStateCheckBox;
+	private JSpinner tgConfidenceThreshold;
 	private JButton btnEditTgherkinDocument;
 	private String tgherkinDocument;
 	private String protocolClass;
@@ -68,6 +82,9 @@ public class TgherkinPanel extends JPanel {
 		this.active = active;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public TgherkinPanel() {
 		setLayout(null);
 		addTgherkinControls();
@@ -122,21 +139,37 @@ public class TgherkinPanel extends JPanel {
 		tgGenerateTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be generated.\n</html>");
 		add(tgGenerateTgherkinReportCheckBox);
 
+		tgStoreTgherkinReportCheckBox = new JCheckBox("Store Tgherkin report in GraphDB");
+		tgStoreTgherkinReportCheckBox.setBounds(10, 221, 300, 23);
+		tgStoreTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be stored in the GraphDB database.\n</html>");
+		add(tgStoreTgherkinReportCheckBox);
+
 		tgReportDerivedGesturesCheckBox = new JCheckBox("Report Tgherkin derived gestures");
-		tgReportDerivedGesturesCheckBox.setBounds(10, 221, 300, 23);
+		tgReportDerivedGesturesCheckBox.setBounds(10, 245, 300, 23);
 		tgReportDerivedGesturesCheckBox.setToolTipText("<html>\nIndicates whether Tgherkin derived gestures should be reported.\n</html>");
 		add(tgReportDerivedGesturesCheckBox);
 
 		tgReportStateCheckBox = new JCheckBox("Report state");
-		tgReportStateCheckBox.setBounds(10, 245, 300, 23);
+		tgReportStateCheckBox.setBounds(10, 269, 300, 23);
 		tgReportStateCheckBox.setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
 		add(tgReportStateCheckBox);
+		
+		tgConfidenceThreshold = new JSpinner();
+		tgConfidenceThreshold.setBounds(280, 293, 100, 31);
+		tgConfidenceThreshold.setModel(new SpinnerNumberModel(0.0d, 0.0d, 1.0d, 0.01d));
+		tgConfidenceThreshold.setToolTipText(maxTestTimeTTT);
+	    add(tgConfidenceThreshold);
+
 	}
 
 	private void addTgherkinLabels() {
 		JLabel tgTgherkinDocumentLabel = new JLabel("Tgherkin document:");
 		tgTgherkinDocumentLabel.setBounds(10, 77, 120, 23);
 		add(tgTgherkinDocumentLabel);		
+
+		JLabel tgConfidenceThresholdLabel = new JLabel("Confidence threshold for image recognition:");
+		tgConfidenceThresholdLabel.setBounds(10, 293, 270, 23);
+		add(tgConfidenceThresholdLabel);		
 
 	}
 
@@ -150,8 +183,10 @@ public class TgherkinPanel extends JPanel {
 		tgContinueToApplyDefaultCheckBox.setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
 		tgRepeatTgherkinScenariosCheckBox.setSelected(settings.get(ConfigTags.RepeatTgherkinScenarios));
 		tgGenerateTgherkinReportCheckBox.setSelected(settings.get(ConfigTags.GenerateTgherkinReport));
+		tgStoreTgherkinReportCheckBox.setSelected(settings.get(ConfigTags.StoreTgherkinReport));
 		tgReportDerivedGesturesCheckBox.setSelected(settings.get(ConfigTags.ReportDerivedGestures));
 		tgReportStateCheckBox.setSelected(settings.get(ConfigTags.ReportState));
+		tgConfidenceThreshold.setValue(settings.get(ConfigTags.ConfidenceThreshold));
 		tgherkinDocument = settings.get(ConfigTags.TgherkinDocument);
 		protocolClass = settings.get(ConfigTags.ProtocolClass); 
 		myClassPath = settings.get(MyClassPath);
@@ -175,8 +210,10 @@ public class TgherkinPanel extends JPanel {
 		settings.set(ConfigTags.ContinueToApplyDefault, tgContinueToApplyDefaultCheckBox.isSelected());
 		settings.set(ConfigTags.RepeatTgherkinScenarios, tgRepeatTgherkinScenariosCheckBox.isSelected());
 		settings.set(ConfigTags.GenerateTgherkinReport, tgGenerateTgherkinReportCheckBox.isSelected());	
+		settings.set(ConfigTags.StoreTgherkinReport, tgStoreTgherkinReportCheckBox.isSelected());	
 		settings.set(ConfigTags.ReportDerivedGestures, tgReportDerivedGesturesCheckBox.isSelected());
 		settings.set(ConfigTags.ReportState, tgReportStateCheckBox.isSelected());
+		settings.set(ConfigTags.ConfidenceThreshold, (Double) tgConfidenceThreshold.getValue());
 	}
 
 	private void btnEditTgherkinDocumentActionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,19 +230,22 @@ public class TgherkinPanel extends JPanel {
 		URLClassLoader loader = null;
 		try {
 			URL[] classPath = new URL[myClassPath.size()];
-			for(int i = 0; i < myClassPath.size(); i++)
+			for(int i = 0; i < myClassPath.size(); i++) {
 				classPath[i] = new File(myClassPath.get(i)).toURI().toURL();
+			}	
 			loader = new URLClassLoader(classPath);
 			@SuppressWarnings("unchecked")
 			UnProc<Settings> protocol = (UnProc<Settings>)loader.loadClass(protocolClass.split("/")[1]).getConstructor().newInstance();
 			if (DocumentProtocol.class.isAssignableFrom(protocol.getClass())){
 				documentProtocol = true;
 			}
-		}
-		catch(Exception e) {}
-		finally {
-			if (loader != null)
-				try { loader.close(); } catch (IOException e) {}
+		}catch(Exception e) {
+		}finally {
+			if (loader != null) {
+				try { 
+					loader.close(); 
+				}catch (IOException e) {}
+			}	
 		}
 	}	
 	
@@ -218,12 +258,16 @@ public class TgherkinPanel extends JPanel {
 		});
 		Arrays.sort(tgherkinDocuments);
 		tgComboBoxTgherkinDocument.setModel(new DefaultComboBoxModel<String>(tgherkinDocuments));
-		tgComboBoxTgherkinDocument.setMaximumRowCount(tgherkinDocuments.length > 16 ? 16 : tgherkinDocuments.length);
+		int maxRows = 16;
+		if (tgherkinDocuments.length < maxRows) {
+			maxRows = tgherkinDocuments.length;
+		}
+		tgComboBoxTgherkinDocument.setMaximumRowCount(maxRows);
 		if (tgherkinDocument.length() > 0) {
 			// set selection to tgherkin document in settings
 			String[] parts = tgherkinDocument.split("/");
-			if (parts.length == 4) {
-				String tgherkinDocumentName = parts[3];
+			if (parts.length > 0) {
+				String tgherkinDocumentName = parts[parts.length - 1];
 				tgComboBoxTgherkinDocument.setSelectedItem(tgherkinDocumentName);
 			}				
 		}

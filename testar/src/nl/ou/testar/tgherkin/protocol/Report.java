@@ -16,10 +16,8 @@ import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
-import org.fruit.alayer.TagsBase;
 import org.fruit.alayer.Widget;
 
-import nl.ou.testar.CustomType;
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.tgherkin.model.Gesture;
 import nl.ou.testar.utils.report.Reporter;
@@ -31,55 +29,119 @@ import nl.ou.testar.utils.report.Reporter;
  */
 public class Report {
 
+	private static final String DOUBLE_QUOTE = "\"";
+	
 	private Report() {		
 	}
 	
 	/**
-	 * Report column.
+	 * String report column.
 	 *
 	 */
-	public static enum Column {
-		SEQUENCE_NR,
-		ACTION_NR,
-		FEATURE, 
-		SCENARIO, 
+	public enum StringColumn {
+		/**
+		 * Feature column.
+		 */
+		FEATURE,
+		/**
+		 * Scenario column.
+		 */
+		SCENARIO,
+		/**
+		 * Type column.
+		 */
 		TYPE,
-		STEP, 
-		GIVEN, 
-		GIVEN_MISMATCH, 
-		PRE_GENERATED_DERIVED_ACTIONS, 
-		WHEN_DERIVED_ACTIONS, 
-		WHEN_MISMATCH, 
-		SELECTED_ACTION, 
-		SELECTED_ACTION_DETAILS, 
-		THEN, 
-		THEN_MISMATCH, 
-		VERDICT
+		/**
+		 * Step column.
+		 */
+		STEP,
+		/**
+		 * Selected action column.
+		 */
+		SELECTED_ACTION,
+		/**
+		 * Selected action details column.
+		 */
+		SELECTED_ACTION_DETAILS,
+		/**
+		 * Verdict column.
+		 */
+		VERDICT; 
+	}
+
+	/**
+	 * Boolean report column.
+	 *
+	 */
+	public enum BooleanColumn {
+		/**
+		 * Given column.
+		 */
+		GIVEN,
+		/**
+		 * Given mismatch column.
+		 */
+		GIVEN_MISMATCH,
+		/**
+		 * When column.
+		 */
+		WHEN_MISMATCH,
+		/**
+		 * Then column.
+		 */
+		THEN,
+		/**
+		 * Then mismatch column.
+		 */
+		THEN_MISMATCH;
+	}
+	
+	/**
+	 * Integer report column.
+	 *
+	 */
+	public enum IntegerColumn {
+		/**
+		 * Sequence number column.
+		 */
+		SEQUENCE_NR,
+		/**
+		 * Action number column.
+		 */
+		ACTION_NR,
+		/**
+		 * Pre-generated derived actions column.
+		 */
+		PRE_GENERATED_DERIVED_ACTIONS,
+		/**
+		 * When derived actions column.
+		 */
+		WHEN_DERIVED_ACTIONS;
 	}
 
 	/**
 	 * Report separator.
 	 */
 	public static final String REPORT_SEPARATOR = "|";
-	private static Map<Column,String> reportMap = new LinkedHashMap<Column,String>(){
+	private static Map<Enum<?>,Object> reportMap = new LinkedHashMap<Enum<?>,Object>(){
 		private static final long serialVersionUID = 3224898550792301262L;
 	{
-		put(Column.SEQUENCE_NR, "SequenceNr");
-		put(Column.ACTION_NR,"ActionNr");
-		put(Column.FEATURE,"Feature");
-		put(Column.SCENARIO,"Scenario");
-		put(Column.TYPE,"Type");
-		put(Column.STEP,"Step");
-		put(Column.GIVEN,"Given");
-		put(Column.GIVEN_MISMATCH,"Given mismatch");
-		put(Column.PRE_GENERATED_DERIVED_ACTIONS,"Pre-generated derived actions");
-		put(Column.WHEN_DERIVED_ACTIONS,"When derived actions");
-		put(Column.WHEN_MISMATCH,"When mismatch");
-		put(Column.SELECTED_ACTION,"Selected action");
-		put(Column.SELECTED_ACTION_DETAILS,"Selected action details");
-		put(Column.THEN,"Then");
-		put(Column.THEN_MISMATCH,"Then mismatch");
-		put(Column.VERDICT,"Verdict");
+		put(IntegerColumn.SEQUENCE_NR, "SequenceNr");
+		put(IntegerColumn.ACTION_NR,"ActionNr");
+		put(StringColumn.FEATURE,"Feature");
+		put(StringColumn.SCENARIO,"Scenario");
+		put(StringColumn.TYPE,"Type");
+		put(StringColumn.STEP,"Step");
+		put(BooleanColumn.GIVEN,"Given");
+		put(BooleanColumn.GIVEN_MISMATCH,"Given mismatch");
+		put(IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS,"Pre-generated derived actions");
+		put(IntegerColumn.WHEN_DERIVED_ACTIONS,"When derived actions");
+		put(BooleanColumn.WHEN_MISMATCH,"When mismatch");
+		put(StringColumn.SELECTED_ACTION,"Selected action");
+		put(StringColumn.SELECTED_ACTION_DETAILS,"Selected action details");
+		put(BooleanColumn.THEN,"Then");
+		put(BooleanColumn.THEN_MISMATCH,"Then mismatch");
+		put(StringColumn.VERDICT,"Verdict");
 	}};
 	
 	/**
@@ -87,41 +149,66 @@ public class Report {
      * @param column given column name
      * @param value given column value 
      */
-	public static void appendReportDetail(Column column, String value) {
+	public static void appendReportDetail(StringColumn column, String value) {
+		reportMap.put(column, value);
+	}
+
+	/**
+     * Append report detail.
+     * @param column given column name
+     * @param value given column value 
+     */
+	public static void appendReportDetail(BooleanColumn column, Boolean value) {
+		reportMap.put(column, value);
+	}
+
+	/**
+     * Append report detail.
+     * @param column given column name
+     * @param value given column value 
+     */
+	public static void appendReportDetail(IntegerColumn column, Integer value) {
 		reportMap.put(column, value);
 	}
 
 	/**
 	 * Report.
+	 * @param state given state
+	 * @param action given action
+	 * @param graphDB given database
+	 * @param storeInTextFile indicator store in text file
+	 * @param storeInDB indicator store in database
 	 */
 	public static void report(State state, Action action, GraphDB graphDB, boolean storeInTextFile, boolean storeInDB){
 		if (storeInTextFile) {
 			StringBuilder reportDetail = new StringBuilder();
 			boolean notFirst = false;
-			for (String value : reportMap.values()) {
+			for (Object value : reportMap.values()) {
 				if (notFirst) {
 					reportDetail.append(REPORT_SEPARATOR);
 				}else {
 					notFirst = true;
 				}
-				reportDetail.append(value);
+				if (value != null) {
+					reportDetail.append(transformReportValue(value.toString()));	
+				}
 			}
 			reportDetail.append(System.getProperty("line.separator"));
 			Reporter.getInstance().report(reportDetail.toString());
 		}
 		if (storeInDB) {
 			if (action != null) {
-				graphDB.addCustomType(action,"Tgherkin report", getTgherkinInfo());
+				graphDB.addCustomType(action,"ReportedBy", getTgherkinInfo());
 			}else {
 				if (state != null) {
 					// initial state: no action has been performed yet
-					graphDB.addCustomType(state,"Tgherkin report", getTgherkinInfo());
+					graphDB.addCustomType(state,"ReportedBy", getTgherkinInfo());
 				}				
 			}
 		}
 		// reset values
-		for(Column key : reportMap.keySet()) {
-			  reportMap.put(key, "");
+		for(Enum<?> key : reportMap.keySet()) {
+			  reportMap.put(key, null);
 		}
 	}
 
@@ -176,10 +263,10 @@ public class Report {
 				notFirst = true;
 			}
 			if (columnName.startsWith("#")) {
-				// skip underscore (used to gestures in front of the widget tag columns)
-				reportContent.append(columnName.substring(1));
+				// skip underscore (used to get gestures in front of the widget tag columns)
+				reportContent.append(transformReportValue(columnName.substring(1)));
 			}else {
-				reportContent.append(columnName);
+				reportContent.append(transformReportValue(columnName));
 			}
 		}
 		reportContent.append(System.getProperty("line.separator"));
@@ -196,7 +283,7 @@ public class Report {
 				}
 				String value = reportLine.get(columnName);
 				if (value != null) {
-					reportContent.append(value);	
+					reportContent.append(transformReportValue(value));	
 				}				
 			}
 			reportContent.append(System.getProperty("line.separator"));
@@ -247,7 +334,7 @@ public class Report {
 			}else {
 				notFirst = true;
 			}
-			reportContent.append(columnName);
+			reportContent.append(transformReportValue(columnName));
 		}
 		reportContent.append(System.getProperty("line.separator"));
 		// Data Lines
@@ -263,7 +350,7 @@ public class Report {
 				}
 				String value = reportLine.get(columnName);
 				if (value != null) {
-					reportContent.append(value);	
+					reportContent.append(transformReportValue(value));	
 				}				
 			}
 			reportContent.append(System.getProperty("line.separator"));
@@ -271,55 +358,63 @@ public class Report {
 		//
 		Reporter.getInstance().report(reportName, reportContent.toString());
 	}	
+	
+	private static String transformReportValue(String value){
+		// if value contains report separator: escape any double quotes and enclose value by double quotes 
+		if (value.contains(REPORT_SEPARATOR)) {			
+			value = value.replace(DOUBLE_QUOTE, DOUBLE_QUOTE + DOUBLE_QUOTE);
+			value = DOUBLE_QUOTE + value + DOUBLE_QUOTE;
+		}
+		return value;
+		
+	}
 
 	private static TgherkinInfo getTgherkinInfo() {
-		TgherkinInfo info = new TgherkinInfo();
-		info.set(TgherkinTags.TGHERKIN_SEQUENCE_NR,reportMap.get(Column.SEQUENCE_NR));
-		info.set(TgherkinTags.TGHERKIN_ACTION_NR,reportMap.get(Column.ACTION_NR));
-		info.set(TgherkinTags.TGHERKIN_FEATURE,reportMap.get(Column.FEATURE));
-		info.set(TgherkinTags.TGHERKIN_SCENARIO,reportMap.get(Column.SCENARIO));
-		info.set(TgherkinTags.TGHERKIN_TYPE,reportMap.get(Column.TYPE));
-		info.set(TgherkinTags.TGHERKIN_STEP,reportMap.get(Column.STEP));
-		info.set(TgherkinTags.TGHERKIN_GIVEN,reportMap.get(Column.GIVEN));
-		info.set(TgherkinTags.TGHERKIN_GIVEN_MISMATCH,reportMap.get(Column.GIVEN_MISMATCH));
-		info.set(TgherkinTags.TGHERKIN_PRE_GENERATED_DERIVED_ACTIONS,reportMap.get(Column.PRE_GENERATED_DERIVED_ACTIONS));
-		info.set(TgherkinTags.TGHERKIN_WHEN_DERIVED_ACTIONS,reportMap.get(Column.WHEN_DERIVED_ACTIONS));
-		info.set(TgherkinTags.TGHERKIN_WHEN_MISMATCH,reportMap.get(Column.WHEN_MISMATCH));
-		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION,reportMap.get(Column.SELECTED_ACTION));
-		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION_DETAILS,reportMap.get(Column.SELECTED_ACTION_DETAILS));
-		info.set(TgherkinTags.TGHERKIN_THEN,reportMap.get(Column.THEN));
-		info.set(TgherkinTags.TGHERKIN_THEN_MISMATCH,reportMap.get(Column.THEN_MISMATCH));
-		info.set(TgherkinTags.TGHERKIN_VERDICT,reportMap.get(Column.VERDICT));
+		TgherkinInfo info = new TgherkinInfo(
+				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) +
+				" " + reportMap.get(IntegerColumn.SEQUENCE_NR) + "-" + reportMap.get(IntegerColumn.ACTION_NR));
+		// for now, do not pass null values to database
+		info.set(TgherkinTags.TGHERKIN_SEQUENCE_NR,getTgherkinValue(IntegerColumn.SEQUENCE_NR));
+		info.set(TgherkinTags.TGHERKIN_ACTION_NR,getTgherkinValue(IntegerColumn.ACTION_NR));
+		info.set(TgherkinTags.TGHERKIN_FEATURE,getTgherkinValue(StringColumn.FEATURE));
+		info.set(TgherkinTags.TGHERKIN_SCENARIO,getTgherkinValue(StringColumn.SCENARIO));
+		info.set(TgherkinTags.TGHERKIN_TYPE,getTgherkinValue(StringColumn.TYPE));
+		info.set(TgherkinTags.TGHERKIN_STEP,getTgherkinValue(StringColumn.STEP));
+		info.set(TgherkinTags.TGHERKIN_GIVEN,getTgherkinValue(BooleanColumn.GIVEN));
+		info.set(TgherkinTags.TGHERKIN_GIVEN_MISMATCH,getTgherkinValue(BooleanColumn.GIVEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_PRE_GENERATED_DERIVED_ACTIONS,getTgherkinValue(IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS));
+		info.set(TgherkinTags.TGHERKIN_WHEN_DERIVED_ACTIONS,getTgherkinValue(IntegerColumn.WHEN_DERIVED_ACTIONS));
+		info.set(TgherkinTags.TGHERKIN_WHEN_MISMATCH,getTgherkinValue(BooleanColumn.WHEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION,getTgherkinValue(StringColumn.SELECTED_ACTION));
+		info.set(TgherkinTags.TGHERKIN_SELECTED_ACTION_DETAILS,getTgherkinValue(StringColumn.SELECTED_ACTION_DETAILS));
+		info.set(TgherkinTags.TGHERKIN_THEN,getTgherkinValue(BooleanColumn.THEN));
+		info.set(TgherkinTags.TGHERKIN_THEN_MISMATCH,getTgherkinValue(BooleanColumn.THEN_MISMATCH));
+		info.set(TgherkinTags.TGHERKIN_VERDICT,getTgherkinValue(StringColumn.VERDICT));
 		return info;
 	}
-
 	
-}
-
-class TgherkinInfo extends CustomType {
-	private static final long serialVersionUID = -6248265781837738827L;
-	private static final String TYPE = "TgherkinInfo";
-	public TgherkinInfo() {
-		super(TYPE,"Report");
+	private static String getTgherkinValue(StringColumn column) {
+		String value = (String)reportMap.get(column);
+		if (value == null) {
+			return "";
+		}	
+		return value;
 	}
-}
 
-class TgherkinTags extends TagsBase {
-	 public static Tag<String> TGHERKIN_SEQUENCE_NR = from("tgherkin_sequence_nr", String.class);
-	 public static Tag<String> TGHERKIN_ACTION_NR = from("tgherkin_action_nr", String.class);
-	 public static Tag<String> TGHERKIN_FEATURE = from("tgherkin_feature", String.class);
-	 public static Tag<String> TGHERKIN_SCENARIO = from("tgherkin_scenario", String.class);
-	 public static Tag<String> TGHERKIN_TYPE = from("tgherkin_type", String.class);
-	 public static Tag<String> TGHERKIN_STEP = from("tgherkin_step", String.class); 
-	 public static Tag<String> TGHERKIN_GIVEN = from("tgherkin_given", String.class);
-	 public static Tag<String> TGHERKIN_GIVEN_MISMATCH = from("tgherkin_given_mismatch", String.class);
-	 public static Tag<String> TGHERKIN_PRE_GENERATED_DERIVED_ACTIONS = from("tgherkin_pre_generated_derived_actions", String.class);
-	 public static Tag<String> TGHERKIN_WHEN_DERIVED_ACTIONS = from("tgherkin_when_derived_actions", String.class);
-	 public static Tag<String> TGHERKIN_WHEN_MISMATCH = from("tgherkin_when_mismatch", String.class);
-	 public static Tag<String> TGHERKIN_SELECTED_ACTION = from("tgherkin_selected_action", String.class);
-	 public static Tag<String> TGHERKIN_SELECTED_ACTION_DETAILS = from("tgherkin_selected_action_details", String.class);
-	 public static Tag<String> TGHERKIN_THEN = from("tgherkin_then", String.class);
-	 public static Tag<String> TGHERKIN_THEN_MISMATCH = from("tgherkin_then_mismatch", String.class);
-	 public static Tag<String> TGHERKIN_VERDICT = from("tgherkin_verdict", String.class);
-}
+	private static Boolean getTgherkinValue(BooleanColumn column) {
+		Boolean value = (Boolean)reportMap.get(column);
+		if (value == null) {
+			return false;
+		}	
+		return value;
+	}
+	
+	private static Integer getTgherkinValue(IntegerColumn column) {
+		Integer value = (Integer)reportMap.get(column);
+		if (value == null) {
+			return 0;
+		}	
+		return value;
+	}
 
+}

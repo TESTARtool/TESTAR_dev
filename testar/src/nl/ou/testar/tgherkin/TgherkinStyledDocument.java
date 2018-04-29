@@ -11,7 +11,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
@@ -91,12 +90,7 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 	}       
 
 	private List<Integer> getIndexRelevantTokens(String expression) {
-		ANTLRInputStream inputStream = new ANTLRInputStream(expression);
-		TgherkinLexer lexer = new TgherkinLexer(inputStream);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TgherkinParser parser = new TgherkinParser(tokens);
-		// remove error listener that generates output to the console
-		parser.removeErrorListeners();
+		TgherkinParser parser = Utils.getTgherkinParser(expression);
 		return new TgherkinTokenAnalyzer().visitDocument(parser.document());
 	}
 
@@ -113,6 +107,8 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.TYPE_NAME:
 			return gestureStyle;
 		case TgherkinLexer.MATCHES_NAME:
+		case TgherkinLexer.XPATH_NAME:	
+		case TgherkinLexer.IMAGE_NAME:
 			return functionStyle;
 		case TgherkinLexer.BACKGROUND_KEYWORD:
 		case TgherkinLexer.EXAMPLES_KEYWORD:

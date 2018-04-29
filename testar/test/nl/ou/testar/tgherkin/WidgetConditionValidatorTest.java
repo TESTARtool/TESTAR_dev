@@ -12,13 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import nl.ou.testar.tgherkin.WidgetConditionValidator;
-import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.TableCell;
@@ -34,6 +30,10 @@ public class WidgetConditionValidatorTest {
 	private Map<String, Boolean> testMap = new HashMap<String, Boolean>();
 	private DataTable dataTable;
 	
+	/**
+	 * Set up test.
+	 * @throws Exception if a problem occurs
+	 */
 	@Before
 	public void setUp() throws Exception {
 		// Create test data table
@@ -60,6 +60,9 @@ public class WidgetConditionValidatorTest {
 		testMap.put("$Title =  <header99>", false);
 	}
 
+	/**
+	 * Execute test.
+	 */
 	@Test
 	public void test() {
 		Iterator<Entry<String,Boolean>> iterator = testMap.entrySet().iterator();
@@ -67,9 +70,7 @@ public class WidgetConditionValidatorTest {
 			Entry<String,Boolean> entry = iterator.next();
 			String expression = entry.getKey();
 			Boolean expectedResult = entry.getValue();
-			ANTLRInputStream inputStream = new ANTLRInputStream(expression);
-			TgherkinLexer lexer = new TgherkinLexer(inputStream);
-			WidgetConditionParser parser = new WidgetConditionParser(new CommonTokenStream(lexer));
+			WidgetConditionParser parser = Utils.getWidgetConditionParser(expression);
 			WidgetConditionValidator validator = new WidgetConditionValidator(dataTable);
 			validator.visit(parser.widget_condition());
 			Boolean result = validator.getErrorList().size() == 0;

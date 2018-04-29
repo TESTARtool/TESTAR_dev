@@ -12,13 +12,10 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.StdWidget;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+import org.junit.Before;
 import org.junit.Test;
-
-import nl.ou.testar.tgherkin.model.DataTable;
-import nl.ou.testar.tgherkin.model.TableCell;
-import nl.ou.testar.tgherkin.model.TableRow;
-import nl.ou.testar.tgherkin.model.WidgetCondition;
-import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 
 /**
  * Test WidgetConditionEvaluator class.
@@ -31,12 +28,27 @@ public class WidgetTreeConditionTest {
 	 * Quote.
 	 */
 	static final String QUOTE = "\"";
+
+	private Settings settings;
+	private State state;
+	private DataTable  dataTable;
 	
 	/**
-	 * Test.
+	 * Set up test.
+	 * @throws Exception if a problem occurs
 	 */
-	@Test
-	public void test() {
+	@Before
+	public void setUp() throws Exception {
+		// settings
+		settings = new Settings();
+		settings.set(ConfigTags.ApplyDefaultOnMismatch, false);
+		settings.set(ConfigTags.ContinueToApplyDefault, false);
+		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
+		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.ReportDerivedGestures, false);
+		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		List<Widget> testWidgets = new ArrayList<Widget>();
 		// Create test widget
 		Widget widget = new StdWidget();
@@ -61,54 +73,8 @@ public class WidgetTreeConditionTest {
 		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID2");
 		testWidgets.add(widget);
 		// Create state
-		State state = new TestState(testWidgets);		
-		// Test case 1
-		List<WidgetCondition> conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title2" + QUOTE));
-		WidgetTreeCondition widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),true);
-		// Test case 2
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title3" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),false);
-		// Test case 3
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title2" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),true);
-		// Test case 4
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),true);
-		// Test case 5
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "Title2" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),true);
-		// Test case 6
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "TitleUnknown" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),false);
-		// Test case 7
-		conditions = new ArrayList<WidgetCondition>();
-		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "TitleUnknown" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
-		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title1" + QUOTE));
-		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, null),true);
-		// Test case 8
-		// Create test data table
+		state = new TestState(testWidgets);		
+		// Create data table
 		List<TableRow> tableRows = new ArrayList<TableRow>();
 		List<TableCell> tableCells = new ArrayList<TableCell>();
 		tableCells.add(new TableCell("header1"));
@@ -120,13 +86,66 @@ public class WidgetTreeConditionTest {
 		tableCells.add(new TableCell("Title2"));
 		tableCells.add(new TableCell("Title3"));
 		tableRows.add(new TableRow(tableCells));		
-		DataTable  dataTable = new DataTable(tableRows);
+		dataTable = new DataTable(tableRows);
 		dataTable.beginSequence();
+	}
+	
+	/**
+	 * Execute test.
+	 */
+	@Test
+	public void test() {
+		// Test case 1
+		List<WidgetCondition> conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title2" + QUOTE));
+		WidgetTreeCondition widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		// Test case 2
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title3" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),false);
+		// Test case 3
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title2" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		// Test case 4
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		// Test case 5
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "Title2" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		// Test case 6
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "TitleUnknown" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),false);
+		// Test case 7
+		conditions = new ArrayList<WidgetCondition>();
+		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "TitleUnknown" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
+		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title1" + QUOTE));
+		widgetTreeCondition = new WidgetTreeCondition(conditions);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		// Test case 8
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title=<header1>"));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title=<header2>"));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(state, dataTable),true);
+		assertEquals(widgetTreeCondition.evaluate(settings, state, dataTable),true);
 	}
 
 }

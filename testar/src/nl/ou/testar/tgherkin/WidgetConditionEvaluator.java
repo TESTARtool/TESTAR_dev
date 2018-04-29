@@ -1,14 +1,18 @@
 package nl.ou.testar.tgherkin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.fruit.alayer.Shape;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.linux.AtSpiTags;
 import org.fruit.alayer.windows.UIATags;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
@@ -24,16 +28,23 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	private static final double TOLERANCE = 5E-16;
 	private static Map<String, Tag<?>> tagMap;
 	
-	private final Widget widget;
-	private final DataTable dataTable;
-	
+	private double confidenceThreshold;
+	private State state;
+	private Widget widget;
+	private DataTable dataTable;
+	private Map<String,List<Widget>> xPathMap = new HashMap<String,List<Widget>>();
+	private Map<String,List<Widget>> imageMap = new HashMap<String,List<Widget>>();
 
 	/**
 	 * Constructor.
+	 * @param settings given settings
+	 * @param state given state
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 */
-	public WidgetConditionEvaluator(Widget widget, DataTable dataTable) {
+	public WidgetConditionEvaluator(Settings settings, State state, Widget widget, DataTable dataTable) {
+		this.confidenceThreshold = settings.get(ConfigTags.ConfidenceThreshold);
+		this.state = state;
 		this.widget = widget;
 		this.dataTable = dataTable;
 		if (tagMap == null) {
@@ -47,6 +58,23 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 				tagMap.put(nativeTag.name(), nativeTag);
 			}
 		}
+	}
+	
+	/**
+	 * Set data attributes.
+	 * @param state given state
+	 * @param widget given widget
+	 * @param dataTable given data table
+	 */
+	public void set(State state, Widget widget, DataTable dataTable) {
+		if (this.state != state ) {
+			// reset xpath and image recognition results upon new state
+			xPathMap.clear();
+			imageMap.clear();
+		}
+		this.state = state;
+		this.widget = widget;
+		this.dataTable = dataTable;
 	}
 
 
@@ -177,6 +205,29 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	}
 
 	@Override 
+	public Boolean visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx) { 
+		String xpathExpr = ctx.STRING().getText();
+		// unquote 
+		xpathExpr = xpathExpr.substring(1, xpathExpr.length()-1);	
+		if (!xPathMap.containsKey(xpathExpr)) {
+			xPathMap.put(xpathExpr, Utils.getXpathResult(state, xpathExpr));
+		}
+		return xPathMap.get(xpathExpr).contains(widget);
+	}	
+	
+	@Override 
+	public Boolean visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx) {
+		String imageFile = ctx.STRING().getText();
+		// unquote 
+		imageFile = imageFile.substring(1, imageFile.length()-1);	
+		if (!imageMap.containsKey(imageFile)) {
+			imageMap.put(imageFile, Utils.getImageRecognitionResult(state, imageFile, confidenceThreshold));
+		}
+		return imageMap.get(imageFile).contains(widget);
+	}
+	
+	
+	@Override 
 	public Boolean visitLogicalConst(WidgetConditionParser.LogicalConstContext ctx) { 
 		return Boolean.valueOf(ctx.bool().getText()); 
 	}
@@ -267,24 +318,23 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	}	
 	
 	private Object getTagValue(Widget widget, String tagName) {
-		if (tagName.equals("Shape.x")){
+		if ("Shape.x".equals(tagName)){
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.x();
 		}
-		if (tagName.equals("Shape.y")){
+		if ("Shape.y".equals(tagName)){
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.y();
 		}
-		if (tagName.equals("Shape.width")){
+		if ("Shape.width".equals(tagName)){
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.width();
 		}
-		if (tagName.equals("Shape.height")){
+		if ("Shape.height".equals(tagName)){
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.height();
 		}
 		return widget.get(tagMap.get(tagName), null);		
 	}
-	
-	
+
 }

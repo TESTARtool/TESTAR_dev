@@ -72,25 +72,25 @@ public class Document {
     
 	/**
 	 * Derive actions.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @param proxy given action widget proxy
 	 * @return set of derived actions, empty set if no action was found 
 	 */
-	public Set<Action> deriveActions(State state, Settings settings, ActionWidgetProxy proxy) {
-		currentFeature().evaluateGivenCondition(state, settings);
-		return currentFeature().evaluateWhenCondition(state, settings, proxy);
+	public Set<Action> deriveActions(Settings settings, State state, ActionWidgetProxy proxy) {
+		currentFeature().evaluateGivenCondition(settings, state);
+		return currentFeature().evaluateWhenCondition(settings, state, proxy);
 	}
 	
 
 	/**	  
 	 * Get verdict.
-	 * @param state the SUT's current state
 	 * @param settings given settings
+	 * @param state the SUT's current state
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(State state, Settings settings) {
-		return currentFeature().getVerdict(state, settings);
+	public Verdict getVerdict(Settings settings, State state) {
+		return currentFeature().getVerdict(settings, state);
 	}
 
 	/**
