@@ -35,6 +35,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
+
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -121,8 +122,9 @@ public class SettingsDialog extends JFrame implements Observer {
     this.setVisible(true);
     populateInformation(settings);
 
-    while (this.isShowing())
+    while (this.isShowing()) {
       Util.pause(0.1);
+    }
 
     return ret;
   }

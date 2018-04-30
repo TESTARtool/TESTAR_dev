@@ -31,14 +31,12 @@
 package org.fruit.alayer.linux;
 
 import org.fruit.Util;
-import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.enums.AtSpiElementOrientations;
 
 import java.util.Collections;
 import java.util.Set;
-
 
 /**
  * Creates and holds tags specific to AT-SPI info.

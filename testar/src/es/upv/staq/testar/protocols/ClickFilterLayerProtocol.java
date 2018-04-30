@@ -80,20 +80,24 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     public void keyDown(KBKeys key) {    	
         super.keyDown(key);        
         if (mode() == Modes.Spy){ 
-        	if (key == KBKeys.VK_CAPS_LOCK)
+        	if (key == KBKeys.VK_CAPS_LOCK) {
         		displayWhiteTabu = !displayWhiteTabu;
-        	else if (key == KBKeys.VK_TAB)
+        	}
+        	else if (key == KBKeys.VK_TAB) {
         		preciseCoding = !preciseCoding;
-        	else if (key == KBKeys.VK_SHIFT)
+        	}
+        	else if (key == KBKeys.VK_SHIFT) {
         		shiftPressed = true;
+        	}
 	    	else if (key == KBKeys.VK_CONTROL){
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
 	    	} else if (key == KBKeys.VK_ALT){
 	    		altPressed = true;
-	    		if (!ctrlPressed && !shiftPressed)
+	    		if (!ctrlPressed && !shiftPressed) {
 	    			filteringManager.setWidgetFilter(this.state,this.mouse,preciseCoding);
+	    		}
 	    	}
         }
     }
@@ -102,15 +106,17 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
         if (mode() == Modes.Spy){
-        	if (key == KBKeys.VK_SHIFT)
+        	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
+        	}
         	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(this.state,this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == KBKeys.VK_ALT)
+	    	} else if (key == KBKeys.VK_ALT) {
 	    		altPressed = false;
+	    	}
         }
     }
     	
@@ -123,8 +129,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		super.visualizeActions(canvas, state, actions);
-    	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
+    	if(displayWhiteTabu && (mode() == Modes.Spy)) {// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){ 
     		filteringManager.visualizeActions(canvas,state);
+    		}
 	}
     
     protected boolean blackListed(Widget w){
@@ -138,10 +145,12 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     @Override
     protected String getRandomText(Widget w){
     	String randomText = filteringManager.getRandomText(w);
-    	if (randomText == null || randomText.length() == 0)
+    	if (randomText == null || randomText.length() == 0) {
     		return super.getRandomText(w);
-    	else
+    	}
+    	else {
     		return randomText;
+    	}
     }
         
 }

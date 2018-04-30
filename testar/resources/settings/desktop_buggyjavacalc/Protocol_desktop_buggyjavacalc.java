@@ -2,7 +2,7 @@ package desktop_buggyjavacalc;
 
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -58,7 +58,7 @@ import static org.fruit.alayer.Tags.Enabled;
 public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { // DefaultProtocol {
 
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -70,7 +70,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	
 
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	protected void beginSequence(){
 
@@ -157,16 +157,18 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				
+				// 2050104349ln("Prot "+ w.getRepresentation("\t"));
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 					
 					// left clicks
-					if(whiteListed(w) || isClickable(w))
+					if(whiteListed(w) || isClickable(w)) {
 						actions.add(ac.leftClickAt(w));
+					}
 	
 					// type into text boxes
-					if(isTypeable(w))
+					if(isTypeable(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+					}
 				}	
 			}
 		}

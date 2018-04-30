@@ -224,7 +224,6 @@ public class AtSpiWidget implements Widget, Serializable {
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
 
-
         boolean hasScroll = get(AtSpiCanScroll, null);
         if (!hasScroll) {
             return null;

@@ -70,10 +70,10 @@ public class GraphReporter {
 	
 	private static final String OUT_DIR = "output/graphs/";
 	
-	final static String THICK_PROPERTY = ", penwidth=3",
+	static final String THICK_PROPERTY = ", penwidth=3",
 						CLUSTER_THICK_PROPERTY = ", penwidth=5";
 	
-	final static String WARNING_COLOR = "#FF7F00";
+	static final String WARNING_COLOR = "#FF7F00";
 	
 	private static String STYLE_NORMAL = ", style=solid",
 						  STYLE_KNOWN = ", style=dotted",

@@ -48,7 +48,7 @@ import org.fruit.Assert;
 
 public final class Role implements Serializable{
 	private static final long serialVersionUID = 4301814192425648282L;	
-	private final static ConcurrentHashMap<Role, Role> existingRoles = new ConcurrentHashMap<Role, Role>();
+	private static final ConcurrentHashMap<Role, Role> existingRoles = new ConcurrentHashMap<Role, Role>();
 	private Set<Role> parents;
 	transient private Set<Role> ancestors;
 	private final String name;

@@ -47,6 +47,7 @@ import java.util.Observable;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 public class GeneralPanel extends JPanel {
+  private static final long serialVersionUID = 1L;
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
   private JTextArea txtSutPath;

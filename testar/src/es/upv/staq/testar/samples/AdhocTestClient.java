@@ -48,7 +48,7 @@ public class AdhocTestClient {
 	private static final KBKeys key = KBKeys.VK_K; // event parameter
 	private static final String text = "something"; // event parameter
 	
-	public static void main(String argv[]) {
+	public static void main(String[] argv) {
 		boolean notrun = true;
 		Socket socketClient = null;
 		do{
@@ -64,24 +64,30 @@ public class AdhocTestClient {
 				boolean alive = true;
 				String action, result;
 				while (reader.readLine().trim().equals("READY") && alive){
-					if (i == 0)
+					if (i == 0) {
 						//action = BriefActionRolesMap.LC + "(" + x + "," + y + ")"; // mouse_left_click at (x,y) point
 						action = "LC(" + x + "," + y + ")"; // mouse_left_click at (x,y) point
-					else
+					}
+					else {
 					  //action = BriefActionRolesMap.T + "(" + /*key*/ text + ")"; // adhoc test sequence consisting of a repeating event
 					  action = "T(" + /*key*/ text + ")"; // adhoc test sequence consisting of a repeating event
+					}
 					i++;
 					writer.write(action + "\r\n");
 					writer.flush();
 					result = reader.readLine().trim();
-					if (result.equals("???"))
+					if (result.equals("???")) {
 						System.out.println("[AdhocTest] [" + i + "] Unrecognised action: " + action);
-					else if (result.equals("404"))
+						}
+					else if (result.equals("404")) {
 						System.out.println("[AdhocTest] [" + i + "] Invalid action:      " + action);
-					else if (result.equals("FAIL"))
+					}
+					else if (result.equals("FAIL")) {
 						System.out.println("[AdhocTest] [" + i + "] Action failed:       " + action);
-					else if (result.equals("OK"))
+						}
+					else if (result.equals("OK")) {
 						System.out.println("[AdhocTest] [" + i + "] Action succeded:     " + action);
+					}
 					else{
 						System.out.println("[AdhocTest] [" + i + "] Unexpected server token: " + result);
 						alive = false;

@@ -277,8 +277,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 			img = awtc;
 		}
 
-		if(img.width() != buffer.getWidth() || img.height() != buffer.getHeight())
+		if(img.width() != buffer.getWidth() || img.height() != buffer.getHeight()) {
 			buffer = new BufferedImage((int)img.width(), (int)img.height(), BufferedImage.TYPE_INT_ARGB);
+		}
 
 		AWTCanvas cv = new AWTCanvas(0.0, 0.0, buffer, AWTCanvas.StorageFormat.PNG, 1);
 		cv.begin();
@@ -333,8 +334,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 	// by urueda
 	public void beginPic() throws IOException, ClassNotFoundException{
 		synchronized(cachedSequence){			
-			if (sequenceViewIndex <= 0)
+			if (sequenceViewIndex <= 0) {
 				return; // next must be invoked first! 
+			}
 	
 			int steps = sequenceViewIndex;
 			sequenceViewIndex = 0;		
@@ -345,8 +347,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 	// by urueda
 	public void prevPic() throws IOException, ClassNotFoundException{
 		synchronized(cachedSequence){			
-			if (sequenceViewIndex <= 0)
+			if (sequenceViewIndex <= 0) {
 				return; // next must be invoked first! 
+			}
 	
 			sequenceViewIndex--;		
 			movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS); // refactor
@@ -365,14 +368,16 @@ public class SequenceViewer extends javax.swing.JFrame{
 			Taggable fragment = null;
 
 			// begin by urueda
-			if (sequenceViewIndex < cachedSequence.size() - 1)
+			if (sequenceViewIndex < cachedSequence.size() - 1) {
 				fragment = cachedSequence.get(sequenceViewIndex + 1);
-			else {
+			} else {
 				// end by urueda
 				try{
 					fragment = (Taggable) stream.readObject();
 					cachedSequence.add(fragment); // by urueda
-				} catch (IOException ioe){ return; }
+				} catch (IOException ioe){ 
+					return; 
+				}
 			}
 
 			// begin by urueda

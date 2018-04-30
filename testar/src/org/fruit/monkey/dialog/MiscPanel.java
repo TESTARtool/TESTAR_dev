@@ -51,6 +51,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.copyFilesTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.deleteFiles;
 
 public class MiscPanel extends JPanel {
+  private static final long serialVersionUID = 1L;
   private File currentDirectory;
   private JTable tblCopyFromTo;
   private JTable tblDelete;

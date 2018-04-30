@@ -47,7 +47,7 @@ import org.fruit.Util;
  * They have a name and a type and are associated with values who must be of that type. 
  */
 public final class Tag<T> implements Serializable{
-	private final static ConcurrentHashMap<Tag<?>, Tag<?>> existingTags = new ConcurrentHashMap<Tag<?>, Tag<?>>();
+	private static final ConcurrentHashMap<Tag<?>, Tag<?>> existingTags = new ConcurrentHashMap<Tag<?>, Tag<?>>();
 
 	/**
 	 * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>. 

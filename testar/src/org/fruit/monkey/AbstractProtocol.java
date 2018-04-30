@@ -113,8 +113,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -134,7 +132,7 @@ import static org.fruit.monkey.ConfigTags.OutputDir;
 public abstract class AbstractProtocol implements UnProc<Settings>,
 												  IEventListener { // by urueda
 	
-	public static enum Modes{
+	public enum Modes{
 		Spy,
 		GenerateManual, // by urueda
 		Generate, GenerateDebug, Quit, View, AdhocTest, Replay, ReplayDebug;
@@ -183,7 +181,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	protected JIPrologWrapper jipWrapper;
 	private double delay = Double.MIN_VALUE;
-	private final static double SLOW_MOTION = 2.0;
+	private static final double SLOW_MOTION = 2.0;
     
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false,
@@ -214,7 +212,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected List<ProcessInfo> contextRunningProcesses = null;
 
 	/**
-	 * Retrieve a list of Running processes
+	 * Retrieve a list of Running processes.
 	 * @param debugTag Tag used in debug output
 	 * @return a list of running processes
 	 */
@@ -223,7 +221,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		long pid, handle; String desc;
 		List<SUT> runningP = NativeLinker.getNativeProcesses();
 		// System.out.println("[" + getClass().getSimpleName() + "] [" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
-		int i = 1;
+		// int i = 1;
 		for (SUT sut : runningP){
 			// System.out.println("[" + getClass().getSimpleName() + "] \t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
@@ -236,7 +234,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return runningProcesses;
 	}
 	
-	final static long MAX_KILL_WINDOW = 10000; // 10 seconds
+	static final long MAX_KILL_WINDOW = 10000; // 10 seconds
 	
 	protected void killTestLaunchedProcesses(){
 		boolean kill;
@@ -248,8 +246,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					break;
 				}
 			}
-			if (kill)
+			if (kill) {
 				killProcess(pi1,MAX_KILL_WINDOW);
+			}
 		}
 	}
 
@@ -310,16 +309,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
         // end by urueda
 		
 		// state snapshot
-		if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT))
+		if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)) {
 			saveStateSnapshot = true;
+		}
 
 		// change mode with shift + right (forward)
-		else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT))
+		else { 
+			if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT)) {
 			nextMode(true);
+			}
 
 		// change mode with shift + left (backward)
-		else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT))
+		else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT)) {
 			nextMode(false);
+			}
 
 		// quit with shift + down
 		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
@@ -329,24 +332,29 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 
 		// toggle action visualization
-		else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));		
+		else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT)) {
+			settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));	
+		}
 
 		// toggle widget mark visualization
-		else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));		
+		else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT)) {
+			    settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
+			}	
 
 		// toggle widget info visualization
-		else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));		
+		else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT)) {
+			    settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));	
+		     }
 		
 		// begin by urueda (method structure changed from if* to <if, elseif*, else>)
 		
-		else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
+		else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT)) {
 			settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
+		}
 
-		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
+		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT)) {
 			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
+		}
 
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
 			protocolUtil.startAdhocServer();
@@ -358,10 +366,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				mode() == Modes.GenerateManual && userEvent == null){
 			//System.out.println("[" + getClass().getSimpleName() + "] USER_EVENT key_down! " + key.toString());
 			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
+		     }
 		}
 		
-		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT))
+		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT)) {
 			markParentWidget = !markParentWidget;
+		}
+		
 		// end by urueda
 	}
 
@@ -387,9 +398,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// end by urueda				
 	}
 	
-	public synchronized Modes mode(){ return mode; }
+	public synchronized Modes mode() { 
+		return mode; 
+	}
 
-	private synchronized void nextMode(boolean forward){
+	private synchronized void nextMode(boolean forward) {
 		if(forward){
 			switch(mode){
 			//case Spy: mode = Modes.Generate; break;
@@ -418,8 +431,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		// begin by urueda
 		String modeParamS = "";
-		if (mode == Modes.GenerateManual)
+		if (mode == Modes.GenerateManual) {
 			modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
+		}
 		String modeNfo = "'" + mode + "' mode active." + modeParamS;
 		LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
 		FlashFeedback.flash(modeNfo);
@@ -428,28 +442,62 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	// by urueda
 	protected synchronized void setMode(Modes mode){
-		if (mode() == mode) return;
+		if (mode() == mode) {
+			return;
+		}
 		List<Modes> modesList = Arrays.asList(Modes.values());
-		while (mode() != mode)
+		while (mode() != mode) {
 			nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
+		}
 	}
 
-	protected final double timeElapsed(){ return Util.time() - startTime; }
-	protected final Settings settings(){ return settings; }
-	protected final GraphDB graphDB(){ return graphDB; }
-	protected void beginSequence() {}
-	protected void finishSequence(File recordedSequence) {}
+	protected final double timeElapsed(){ 
+		return Util.time() - startTime; 
+	}
+	
+	protected final Settings settings(){ 
+		return settings; 
+	}
+	
+	protected final GraphDB graphDB(){ 
+		return graphDB; 
+	}
+	
+	protected void beginSequence() {	
+		
+	}
+	
+	protected void finishSequence(File recordedSequence) {
+		
+	}
+	
 	protected abstract SUT startSystem() throws SystemStartException;
+	
 	protected abstract void stopSystem(SUT system); // by urueda
+	
 	protected abstract State getState(SUT system) throws StateBuildException;
+	
 	protected abstract Verdict getVerdict(State state); // by urueda
+	
 	protected abstract Set<Action> deriveActions(SUT system, State state) throws ActionBuildException;
+	
 	protected abstract Canvas buildCanvas();
+	
 	protected abstract boolean moreActions(State state);
+	
 	protected abstract boolean moreSequences();
-	protected final int actionCount(){ return actionCount; }
-	protected final int sequenceCount(){ return sequenceCount; }
-	protected void initialize(Settings settings){}
+	
+	protected final int actionCount(){ 
+		return actionCount; 
+	}
+	
+	protected final int sequenceCount(){ 
+		return sequenceCount; 
+	}
+	
+	protected void initialize(Settings settings){
+		
+	}
 	
 	private String lastPrintParentsOf = "null-id"; // by urueda
 
@@ -463,8 +511,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 			if(cursorWidget != null){
 				Widget rootW = cursorWidget;
-				while (rootW.parent() != null && rootW.parent() != rootW)
+				while (rootW.parent() != null && rootW.parent() != rootW) {
 					rootW = rootW.parent();
+				}
 				Shape cwShape = cursorWidget.get(Tags.Shape, null);
 
 				if(cwShape != null){
@@ -477,7 +526,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							   roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
 							   idxText = "Path: " + cursorWidget.get(Tags.Path);
 
-						double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
+						double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; 
+						if (miniwidgetInfoW < 256) {
+							miniwidgetInfoW = 256;
+						}
 						double miniwidgetInfoH = 80; // 20 * 4
 						Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
 													  cwShape.y() + cwShape.height()/2 + 32,
@@ -486,7 +538,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						if (repositionShape != minicwShape){
 							double x = repositionShape.x() - repositionShape.width() - 32,
 								   y = repositionShape.y() - repositionShape.height() - 32;
-							if (x < 0) x = 0; if (y < 0) y = 0;
+							if (x < 0) {
+								x = 0; 
+							}
+							if (y < 0) {
+								y = 0;
+							}
 							minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
 						}
 						canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
@@ -519,7 +576,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
 								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
 								canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i*25, 0, l);
-								canvas.text(Pen.PEN_BLACK, legendShape.x()         , legendShape.y() + i*25         , 0, l);								
+								canvas.text(Pen.PEN_BLACK, legendShape.x(), legendShape.y() + i*25, 0, l);								
 							}
 						}
 					}
@@ -560,11 +617,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 								sb.append("\t");
 							}
 						}
-						if (i > 0)
+						if (i > 0) {
 							canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
+						}
 						// end by urueda
 						
-						for(Tag<?> t : cursorWidget.tags()){
+						for(Tag<?> t : cursorWidget.tags()) {
 							canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
 										 cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
 							// begin by urueda (multi-line display without abbreviation)
@@ -604,10 +662,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		try{
 			String targetID = a.get(Tags.TargetID);
 			Widget w;
-			if (targetID != null){
+			if (targetID != null) {
 				w = getWidget(state,targetID);
-				if (w != null)
+				if (w != null) {
 					return (int)w.get(Tags.ZIndex).doubleValue();
+				}
 			}
 		} catch(NoSuchTagException ex){}
 		return 1; // default
@@ -627,10 +686,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				// begin by urueda
 				zindex = getTargetZindex(state,a);
 				zindexes.put(a, new Integer(zindex));
-				if (zindex < minz)
+				if (zindex < minz) {
 					minz = zindex;
-				if (zindex > maxz)
+				}
+				if (zindex > maxz) {
 					maxz = zindex;
+				}
 			}
 			int alfa;
 			for(Action a : actions){
@@ -638,16 +699,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				Pen vp = Pen.PEN_IGNORE;
 				if (env != null){ // graphs enabled
 					Integer widgetExeCount = env.get(state).getStateWidgetsExecCount().get(env.get(a).getTargetWidgetID());
-					if (widgetExeCount != null && widgetExeCount.intValue() > 0)
+					if (widgetExeCount != null && widgetExeCount.intValue() > 0) {
 						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,0,255,255),1.0/(1 + (widgetExeCount.intValue()/10)))).build(); // mark executed widgets with a different color
-					else{
+					}
+					else {
 						zindex = zindexes.get(a).intValue();
-						if (minz == maxz || zindex == maxz)
-							alfa = 255;							
-						else if (zindex == minz)
+						if (minz == maxz || zindex == maxz) {
+							alfa = 255;	
+						}
+						else if (zindex == minz) {
 							alfa = 64;
-						else
+						}
+						else {
 							alfa = 128;
+						}
 						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,255,0,alfa),1.0)).build(); // color depends on widgets zindex
 					}
 				}
@@ -683,32 +748,33 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
     
     // by urueda
 	protected Action selectAction(State state, Set<Action> actions){
+		Action ac = null;
 		Assert.isTrue(actions != null && !actions.isEmpty());
 		if (this.forceKillProcess != null){
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildIDs(state, a);
-			this.forceKillProcess = null;
-			return a;
+			ac = KillProcess.byName(this.forceKillProcess, 0);
+			ac.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildIDs(state, ac);
+			this.forceKillProcess = null;	
 		} else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
+			ac = new ActivateSystem();
+			ac.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildIDs(state, ac);
 			this.forceToForeground = false;
-			return a;
 		} else if (this.forceNextActionESC){
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, a);
-			this.forceNextActionESC = false;
-			return a;
-		} else
-			return Grapher.selectAction(state,actions);
+			ac = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildIDs(state, ac);
+			this.forceNextActionESC = false;	
+		} else {
+			ac = Grapher.selectAction(state,actions);	
+		}
+		
+		return ac;
 	}
 	
-	final static double MAX_ACTION_WAIT_FRAME = 1.0; // by urueda (seconds)
+	static final double MAX_ACTION_WAIT_FRAME = 1.0; // by urueda (seconds)
 
 	protected boolean executeAction(SUT system, State state, Action action){
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
@@ -765,22 +831,27 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			try {
 				w = Util.widgetFromPoint(state, x, y);
 				x = 0.5; y = 0.5;
-		        if (userEvent[0] == MouseButtons.BUTTON1) // left click
+		        if (userEvent[0] == MouseButtons.BUTTON1) { // left click
 		        	return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-		        else if (userEvent[0] == MouseButtons.BUTTON3) // right click     
+		        }
+		        else if (userEvent[0] == MouseButtons.BUTTON3) {// right click     
 		        	return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+		        }
 			} catch (WidgetNotFoundException we){
 				System.out.println("[" + getClass().getSimpleName() + "] Mapping user event ... widget not found @(" + x + "," + y + ")");
 				return null;
 			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
+		} else if (userEvent[0] instanceof KBKeys) {// key events
 			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+		}
 		else if (userEvent[0] instanceof String){ // type events
-			if (lastExecutedAction == null)
+			if (lastExecutedAction == null) {
 				return null;
+			}
 			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
+			if (targets == null || targets.size() != 1) {
 				return null;
+			}
 			try {
 				Widget w = targets.get(0).apply(state);
 				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
@@ -805,8 +876,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		Role r = action.get(Tags.Role, null);
 		if (r != null && r.isA(ActionRoles.HitKey)){
 			String desc = action.get(Tags.Desc, null);
-			if (desc != null && desc.contains("VK_ESCAPE"))
+			if (desc != null && desc.contains("VK_ESCAPE")) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -814,10 +886,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	// by urueda
 	private boolean isNOP(Action action){
 		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID))
+		if (as != null && as.equals(NOP.NOP_ID)) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 	
 	// begin by urueda
@@ -852,7 +925,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			//Util.clear(cv);
 			visualizeState(cv, state, system);
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);;
+			CodingManager.buildIDs(state, actions);
 			visualizeActions(cv, state, actions);
 			//cv.end();
 		}		
@@ -939,17 +1012,22 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			CodingManager.buildIDs(state, escAction);
 			actions.add(escAction);
 			escAttempts++;
-		} else
+		} else {
 			escAttempts = 0;
+		}
 		// end by urueda
 		
 		fragment.set(ActionSet, actions);
 		LogSerialiser.log("Built action set!\n", LogSerialiser.LogLevel.Debug);
 		visualizeActions(cv, state, actions);
 
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
+		if(mode() == Modes.Quit) {
+			return actionStatus.isProblems();
+		}
 		LogSerialiser.log("Selecting action...\n", LogSerialiser.LogLevel.Debug);
-		if(mode() == Modes.Spy) return false; // by urueda
+		if(mode() == Modes.Spy) {
+			return false; // by urueda
+		}
 		actionStatus.setAction(selectAction(state, actions));
 		
 		if (actionStatus.getAction() == null){ // by urueda (no suitable actions?)
@@ -966,7 +1044,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 // return: problems?
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA] start runAction");
+		// LOGGER.info("[RA] start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 		waitUserActionLoop(cv,system,state,actionStatus);
 
@@ -983,7 +1061,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				cv.end(); // by urueda
 				return true; // problems
 			}
-		} else{ // automatically derived action
+		} else { // automatically derived action
 			if (waitAutomaticAction(system,state,fragment,actionStatus)){
 				cv.end(); // by urueda
 				return true; // problems
@@ -995,8 +1073,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		// begin by urueda
 		cv.end();
 
-		if (actionStatus.getAction() == null)
+		if (actionStatus.getAction() == null) {
 			return true; // problems
+		}
 
 		if (actionCount == firstSequenceActionNumber && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
 			System.out.println("[" + getClass().getSimpleName() + "] First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
@@ -1004,36 +1083,41 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			actionStatus.setAction(new NOP());
 			CodingManager.buildIDs(state, actionStatus.getAction());
 			nopAttempts++; escAttempts = 0;
-		} else
+		} else {
 			nopAttempts = 0;
+		}
 		//System.out.println("[" + getClass().getSimpleName() + "] Selected action: " + action.toShortString() + " ... count of ESC/NOP = " + escAttempts + "/" + nopAttempts);;
 		// end by urueda
 		
 		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
-
 		visualizeSelectedAction(cv, state, actionStatus.getAction());
 
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
+		if (mode() == Modes.Quit) {
+			return actionStatus.isProblems();
+		}
 		
 		boolean isTestAction = nopAttempts >= MAX_NOP_ATTEMPTS || !isNOP(actionStatus.getAction()); // by urueda
 			
-		if(mode() != Modes.Spy){
+		if (mode() != Modes.Spy){
 			// begin by urueda
 			String[] actionRepresentation = Action.getActionRepresentation(state,actionStatus.getAction(),"\t");
 			int memUsage = NativeLinker.getMemUsage(system);
-			if (memUsage < sutRAMbase)
+			if (memUsage < sutRAMbase) {
 				sutRAMbase = memUsage;
-			if (memUsage - sutRAMbase > sutRAMpeak)
+			}
+			if (memUsage - sutRAMbase > sutRAMpeak) {
 				sutRAMpeak = memUsage - sutRAMbase;
+			}
 			long currentCPU[] = NativeLinker.getCPUsage(system),
 				 userms = currentCPU[0] - lastCPU[0],
 				 sysms = currentCPU[1] - lastCPU[1],
 				 cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
 			lastCPU = currentCPU;
-			if (isTestAction)
+			if (isTestAction) {
 				Grapher.notify(state,state.get(Tags.ScreenshotPath, null),
 							   actionStatus.getAction(),protocolUtil.getActionshot(state,actionStatus.getAction()),actionRepresentation[1],
 						   	   memUsage, cpuUsage);
+			}
 			// end by urueda
 			LogSerialiser.log(String.format("Executing (%d): %s...", actionCount,
 				actionStatus.getAction().get(Desc, actionStatus.getAction().toString())) + "\n", LogSerialiser.LogLevel.Debug);
@@ -1047,11 +1131,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				cv.end(); // by urueda (overlay is invalid until new state/actions scan)
 				stampLastExecutedAction = System.currentTimeMillis();
 				actionExecuted(system,state,actionStatus.getAction()); // notification
-				if (actionStatus.isUserEventAction())
+				if (actionStatus.isUserEventAction()) {
 					Util.pause(settings.get(ConfigTags.TimeToWaitAfterAction)); // wait between actions
+				}
 				double sutCPU = ((cpuUsage[0] + cpuUsage[1]) / (double)cpuUsage[2] * 100);
-				if (sutCPU > sutCPUpeak)
-					sutCPUpeak = sutCPU;
+				if (sutCPU > sutCPUpeak) {
+					sutCPUpeak = sutCPU;				
+				}
 				String cpuPercent = String.format("%.2f", sutCPU) + "%";
 				LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
 						actionCount,
@@ -1061,32 +1147,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
 						actionRepresentation[0]) + "\n",
 						LogSerialiser.LogLevel.Info);
-
-				System.out.print(String.format(
-						"S[%1$" + (1 + (int)Math.log10((double)settings.get(ConfigTags.Sequences))) + "d=%2$" + (1 + (int)Math.log10((double)generatedSequenceNumber)) + "d]-" + // S = test Sequence
-						"A[%3$" + (1 + (int)Math.log10((double)settings().get(ConfigTags.SequenceLength))) + // A = Action
-						"d] <%4$3s@%5$3s KCVG>... SR = %6$8d KB / SC = %7$7s ... ", // KCVG = % CVG of Known UI space @ known UI space scale; SR = SUT_RAM; SC = SUT_CPU
-						sequenceCount, generatedSequenceNumber, actionCount,
-						Grapher.GRAPHS_ACTIVATED ? Grapher.getEnvironment().getExplorationCurveSampleCvg() : -1,
-						Grapher.GRAPHS_ACTIVATED ? Grapher.getEnvironment().convertKCVG(Grapher.getEnvironment().getExplorationCurveSampleScale()) : -1,
-						memUsage, cpuPercent)); debugResources();
-				System.out.print(" ... L/S/T: " + LogSerialiser.queueLength() + "/" + ScreenshotSerialiser.queueLength() + "/" + TestSerialiser.queueLength()); // L/S/T = Log/Scr/Test queues
 				//Example: Seq[1]-Action[1] <  0 KCVG>... SUT_RAM =    17292 KB / SUT_CPU =  17.42% ... TESTAR_CPU: 1.550 s / TESTAR_RAM: 491.0 MB ... Log/Scr/Test queues: 2/2/0				
-// temp begin
-/*if (Grapher.getEnvironment() != null){
-	int totalWidgets = 0,
-	    totalUnxActions = 0;
-	for (IGraphState gs : Grapher.getEnvironment().getGraphStates()){
-		totalWidgets += gs.getStateWidgets().size();
-		totalUnxActions += gs.getUnexploredActions().size();
-	}
-	System.out.print("\n\t" + String.format("%7d",totalWidgets) + " x " + String.format("%7d",totalUnxActions) + "\t(widgets x unexplored actions)");
-}*/
-// temp end
-				if (settings().get(ConfigTags.PrologActivated))
+
+				if (settings().get(ConfigTags.PrologActivated)) {
 					System.out.println("[" + getClass().getSimpleName() + "]  ... prolog: " + jipWrapper.debugPrologBase());
-				else
+				} else {
 					System.out.print("\n");
+				}
 				//logln(Grapher.getExplorationCurveSample(),LogLevel.Info);
 				//logln(Grapher.getLongestPath() + "\n",LogLevel.Info);
 				if (mode() == Modes.AdhocTest){
@@ -1097,8 +1164,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				}
 				// end by urueda
 
-				if (isTestAction && actionStatus.isActionSucceeded()) // by urueda
+				if (isTestAction && actionStatus.isActionSucceeded()) { // by urueda
 					actionCount++;
+				}
 				fragment.set(ExecutedAction, actionStatus.getAction());
 				fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 				fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
@@ -1107,7 +1175,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				TestSerialiser.write(fragment); // by urueda
 	
 				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-			}else{
+			} else {
 				LogSerialiser.log("Execution of action failed!\n");
 				try {
 					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
@@ -1132,7 +1200,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
         LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
+		if(mode() == Modes.Quit) {
+			return actionStatus.isProblems();
+		}
 		if(!actionStatus.isActionSucceeded()){
 			return true;
 		}
@@ -1144,11 +1214,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private void debugResources(){
 		long nowStamp = System.currentTimeMillis();
 		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;		
-		if (testRAM > testRAMpeak)
+		if (testRAM > testRAMpeak) {
 			testRAMpeak = testRAM;
+		}
 		double testCPU = (nowStamp - lastStamp)/1000.0;
-		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
+		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber) {
 			testCPUpeak = testCPU;
+		}
 		System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
 						 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
 		lastStamp = nowStamp;
@@ -1167,7 +1239,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			long tStart = System.currentTimeMillis();
 			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
 
-			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName(); // by urueda
 			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
 			// begin by urueda
@@ -1179,15 +1250,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log")))),
 					settings.get(LogLevel));
 			} catch (NoSuchTagException e3) {
-				// TODO Auto-generated catch block
 				e3.printStackTrace();
 			} catch (FileNotFoundException e3) {
-				// TODO Auto-generated catch block
 				e3.printStackTrace();
 			}
 			
-			if (mode() == Modes.GenerateManual)
+			if (mode() == Modes.GenerateManual) {
 				setMode(Modes.Spy);
+			}
 			jipWrapper = new JIPrologWrapper();
 			Grapher.grapher(generatedSequence,
 							settings.get(ConfigTags.SequenceLength),
@@ -1209,18 +1279,21 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			// end by urueda
 			
 			problems = false;
-			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK; // by urueda
+			if (!forceToSequenceLengthAfterFail) {
+				passSeverity = Verdict.SEVERITY_OK; // by urueda
+			}
 			//actionCount = 0;
 			// begin by urueda
 			if (this.forceToSequenceLengthAfterFail){
 				this.forceToSequenceLengthAfterFail = false;
 				this.testFailTimes++;
 				this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
-			} else{
-				if (settings.get(ConfigTags.GraphsActivated) && settings.get(ConfigTags.GraphResuming))
+			} else {
+				if (settings.get(ConfigTags.GraphsActivated) && settings.get(ConfigTags.GraphResuming)) {
 					actionCount = Grapher.getEnvironment().getGraphActions().size() + 1;
-				else
+				} else {
 					actionCount = 1;
+				}
 				this.testFailTimes = 0;
 				lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 			}
@@ -1284,17 +1357,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				fragment.set(SystemState, state);
 							
 				Verdict verdict = state.get(OracleVerdict, Verdict.OK);
-				if (faultySequence) problems = true;
+				if (faultySequence) {
+					problems = true;
+				}
 				fragment.set(OracleVerdict, verdict); // by urueda					
 				int waitCycleIdx = 0;
 				long[] waitCycles = new long[]{1, 10, 25, 50}; // ms
 				long spyCycle = -1;
 				String stateID, lastStateID = state.get(Tags.ConcreteID);
 				// end by urueda
-				while(mode() != Modes.Quit && moreActions(state)){
-					if (problems)
+				while(mode() != Modes.Quit && moreActions(state)){				
+					if (problems) {
 						faultySequence = true; // by urueda
-					else{
+					} else {
 						problems = runAction(cv,system,state,fragment);
 						// begin by urueda
 						if (mode() == Modes.Spy){
@@ -1302,20 +1377,25 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							if (stateID.equals(lastStateID)){
 								if (System.currentTimeMillis() - spyCycle > waitCycles[waitCycleIdx]){
 									spyCycle = System.currentTimeMillis();
-									if (waitCycleIdx < waitCycles.length - 1)
+									if (waitCycleIdx < waitCycles.length - 1) {
 										waitCycleIdx++;
-								} else
+									}
+								} else {
 									continue;
-							} else{
+								}
+							} else {
 								lastStateID = stateID;
 								waitCycleIdx = 0;
 							}
 						}
+						
 						// end by urueda
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 						state = getState(system);
 						graphDB.addState(state);
-						if (faultySequence) problems = true; // by urueda
+						if (faultySequence) {
+							problems = true; // by urueda
+						}
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){ // by urueda
 							saveStateSnapshot(state);
@@ -1331,8 +1411,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				// begin by urueda
 				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
 				stopSystem(system);
-				if (system != null && system.isRunning())
+				if (system != null && system.isRunning()) {
 					system.stop();
+				}
 				//logln("System has been shut down!", LogLevel.Debug);
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);								
 				
@@ -1348,9 +1429,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						 			 protocolUtil.getStateshot(state));
 				
 				LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
-				if(problems)
+				if(problems) {
 					LogSerialiser.log("Sequence contained problems!\n", LogSerialiser.LogLevel.Critical);
-								
+				}				
 				finishSequence(currentSeq);
 	
 				System.out.println("[" + getClass().getSimpleName() + "] currentseq: " + currentSeq);
@@ -1374,17 +1455,18 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					}
 					copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 				}
-				if(!problems)
+				if(!problems) {
 					this.forceToSequenceLengthAfterFail = false;
-	
+				}
 				LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
 				cv.release();
 				
 				saveSequenceMetrics(generatedSequence,problems);
 				
 				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
-				if (reportPages == null)
+				if (reportPages == null) {
 					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
+				}
 				TestSerialiser.exit();
 				String stopDateString =  Util.dateString(DATE_FORMAT),
 					   durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
@@ -1392,7 +1474,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
+				if (reportPages != null) {
+					this.saveReport(reportPages, generatedSequence); // save report
+				}
 
 				// end by urueda
 				
@@ -1404,20 +1488,26 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				ScreenshotSerialiser.finish();
 				TestSerialiser.finish();				
 				Grapher.walkFinished(false, null, null);
-				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber);  // screenshots must be serialised
-				if (reportPages == null)
+				ScreenshotSerialiser.exit(); 
+				final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber);  // screenshots must be serialised
+				if (reportPages == null) {
 					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
+				}
 				LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
 				int i=1; StringBuffer trace = new StringBuffer();
-				for(StackTraceElement t : e.getStackTrace())
+				for(StackTraceElement t : e.getStackTrace()) {
 				   trace.append("\n\t[" + i++ + "] " + t.toString());
+				}
 				System.out.println("[" + getClass().getSimpleName() + "] Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
 				stopSystem(system);
-				if (system != null && system.isRunning())
+				if (system != null && system.isRunning()) {
 					system.stop();
+				}
 				TestSerialiser.exit();
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
+				if (reportPages != null) {
+					this.saveReport(reportPages, generatedSequence); // save report
+				}
 				this.mode = Modes.Quit; // System.exit(1);
 			}
 			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
@@ -1427,8 +1517,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			this.forceToSequenceLengthAfterFail = true;
 			System.out.println("[" + getClass().getSimpleName() + "] Resuming test after FAIL at action number <" + this.actionCount + ">");
  			runTest(); // continue testing
-		} else
-			this.forceToSequenceLengthAfterFail = false;			
+		} else {
+			this.forceToSequenceLengthAfterFail = false;		
+		}
 		// end by urueda
 	}
 
@@ -1459,20 +1550,26 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
 		final double sev = verdict.severity();
-		if (sev == Verdict.SEVERITY_OK)
+		if (sev == Verdict.SEVERITY_OK) {
 			targetFolder = "sequences_ok";
-		else if (sev == SEVERITY_WARNING)
+		}
+		else if (sev == SEVERITY_WARNING) {
 			targetFolder = "sequences_warning";
-		else if (sev == SEVERITY_SUSPICIOUS_TITLE)
+		}
+		else if (sev == SEVERITY_SUSPICIOUS_TITLE) {
 			targetFolder = "sequences_suspicioustitle";
-		else if (sev == SEVERITY_NOT_RESPONDING)
+		}
+		else if (sev == SEVERITY_NOT_RESPONDING) {
 			targetFolder = "sequences_unresponsive";
-		else if (sev == SEVERITY_NOT_RUNNING)
+		}
+		else if (sev == SEVERITY_NOT_RUNNING) {
 			targetFolder = "sequences_unexpectedclose";
-		else if (sev == Verdict.SEVERITY_FAIL)
+		}
+		else if (sev == Verdict.SEVERITY_FAIL) {
 			targetFolder = "sequencces_fail";
-		else
+		} else {
 			targetFolder = "sequences_other";
+		}
 		LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
 		try {
 			Util.copyToDirectory(currentSeq.getAbsolutePath(), 
@@ -1571,8 +1668,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
 				// begin by urueda
-				if (GlobalScreen.isNativeHookRegistered())
+				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
+				}
 				// LOGGER.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
 				// end by urueda
 				GlobalScreen.registerNativeHook();
@@ -1588,9 +1686,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 			if(mode() == Modes.View){
 				new SequenceViewer(settings).run();
-			}else if(mode() == Modes.Replay || mode() == Modes.ReplayDebug){
+			} else if(mode() == Modes.Replay || mode() == Modes.ReplayDebug) {
 				replay();
-			}else if(mode() == Modes.Generate || mode() == Modes.Spy || mode() == Modes.GenerateDebug){
+			} else if(mode() == Modes.Generate || mode() == Modes.Spy || mode() == Modes.GenerateDebug) {
 				runTest();
 			}
 		} catch (NativeHookException e) {
@@ -1665,10 +1763,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					visualizeState(cv, state, system); // by urueda
 					cv.end();
 
-					if(mode() == Modes.Quit) break;
+					if(mode() == Modes.Quit) {
+						break;
+					}
 					Action action = fragment.get(ExecutedAction, new NOP());
 					visualizeSelectedAction(cv, state, action);
-					if(mode() == Modes.Quit) break;
+					if(mode() == Modes.Quit) {
+						break;
+					}
 
 					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
 					double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
@@ -1680,11 +1782,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							System.out.println("[" + getClass().getSimpleName() + "]  " +  replayMessage);
 							// end by urueda
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-						 }else{
-							if(tries % 50 == 0)
+						 } else {
+							if(tries % 50 == 0) {
 								LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-							else
-								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
+							}
+							else {
+								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);}
 						}
 
 						action.run(system, state, actionDuration);
@@ -1695,7 +1798,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 					Util.pause(actionDelay);
 
-					if(mode() == Modes.Quit) break;
+					if(mode() == Modes.Quit) {
+						break;
+					}
 					state = getState(system);
 				}
 
@@ -1704,8 +1809,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			cv.release();
 			//ois.close();
 			stopSystem(system); // by urueda
-			if (system != null && system.isRunning()) // by urueda
+			if (system != null && system.isRunning()) { // by urueda
 				system.stop();
+			}
 
 		} catch(IOException ioe){
 			throw new RuntimeException("Cannot read file.", ioe);
@@ -1713,21 +1819,39 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
-				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
+				try { 
+					ois.close(); 
+				} catch (IOException e) { 
+					e.printStackTrace();
+				}
 			}
 			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
+				try {
+					gis.close(); 
+				} catch (IOException e) {
+					e.printStackTrace(); 
+				}
 			}
 			if (bis != null){
-				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+				try { 
+					bis.close(); 
+				} catch (IOException e) { 
+					e.printStackTrace(); 
+				}
 			}
 			if (fis != null){
-				try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
+				try { 
+					fis.close(); 
+				} catch (IOException e) { 
+					e.printStackTrace(); 
+				}
 			}
-			if (cv != null)
+			if (cv != null) {
 				cv.release();
-			if (system != null)
-				system.stop();			
+			}
+			if (system != null) {
+				system.stop();	
+			}
 		}
 
 		if(success){

@@ -116,7 +116,7 @@ public class FilteringManager {
     	String role, parentRole;
     	String title, parentTitle;
     	Integer treeDepth, children, filterCode;
-    	public WidgetInfo(String idType, String role, String parentRole, String title, String parentTitle,
+    	WidgetInfo(String idType, String role, String parentRole, String title, String parentTitle,
     			          Integer treeDepth, Integer children, Integer filterCode){
     		this.idType = idType;
     		this.role = role; this.parentRole = parentRole;
@@ -154,8 +154,9 @@ public class FilteringManager {
 			writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.WIDGET_ACTION_TABU_FILTER + "\" desc=\"TABU LIST\"/>\n");
 			writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.WIDGET_ACTION_WHITE_FILTER + "\" desc=\"WHITE LIST\"/>\n");
 			if (DataManager.DATA_TYPES != null){
-				for (String type : DataManager.DATA_TYPES.keySet())
+				for (String type : DataManager.DATA_TYPES.keySet()) {
 					writer.write("\t\t<" + XML_TAG_UI_FILTERING + " type=\"" + DataManager.DATA_TYPES.get(type).toString() + "\" desc=\"" + type + "\"/>\n");
+				}
 			}
 			writer.write("\t</" + XML_TAG_UI_FILTERING_TYPES +  ">\n");
 			// filters
@@ -208,12 +209,13 @@ public class FilteringManager {
 			            		element.getAttribute(XML_ATTRIBUTE_PARENT_ROLE), // parent role
 			            		element.getAttribute(XML_ATTRIBUTE_TITLE), // title 
 			            		element.getAttribute(XML_ATTRIBUTE_PARENT_TITLE), // parent title
-			            		depthS == null || depthS == "" ? new Integer(-1) : new Integer(depthS), // tree depth
-			            		childrenS == null || childrenS == "" ? new Integer(-1) : new Integer(childrenS), // children count
+			            		depthS == null || "".equals(depthS) ? new Integer(-1) : new Integer(depthS), // tree depth
+			            		childrenS == null || "".equals(childrenS) ? new Integer(-1) : new Integer(childrenS), // children count
 			            		new Integer(filterCodeS)); // filter code
 			        		widgetsFilterList.put(element.getAttribute("wid"),wi);
-		        		} else
-		        			System.out.println("[" + getClass().getSimpleName() + "] FilteringManager: WRONG FILTER");		        			
+		        		} else {
+		        			System.out.println("[" + getClass().getSimpleName() + "] WRONG FILTER");
+		        		}
 		        	}
 		        }			
 			} catch (IOException e) {
@@ -233,7 +235,9 @@ public class FilteringManager {
     	String parentRole = "null", parentTitle = "null";
     	if (w.parent() != null){
     		Role r = w.parent().get(Tags.Role, null);
-    		if (r != null) parentRole = r.toString();
+    		if (r != null) {
+    			parentRole = r.toString();
+    		}
     		parentTitle = w.parent().get(Tags.Title, "null");
     	}
 		WidgetInfo wi = new WidgetInfo(
@@ -256,6 +260,9 @@ public class FilteringManager {
     	case CodingManager.ABSTRACT_R_T_P_ID:
     		widgetID = w.get(Tags.Abstract_R_T_P_ID);
     		break;
+    	default: 
+    		System.out.println("[" + getClass().getSimpleName() + "] invalid idType");
+    	    System.exit(0);
     	}
     	WidgetInfo winfo = widgetsFilterList.get(widgetID);
     	switch(widgetFilter){
@@ -263,30 +270,40 @@ public class FilteringManager {
     		widgetsFilterList.remove(widgetID);
     		break;
     	case DataManager.WIDGET_ACTION_TABU_FILTER: // cycle: white -> regular -> tabu
-        	if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_WHITE_FILTER)
+        	if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_WHITE_FILTER) {
         		widgetsFilterList.remove(widgetID);
-        	else
+        	}
+        	else {
         		widgetsFilterList.put(widgetID,wi);
+        		}
         	break;
     	case DataManager.WIDGET_ACTION_WHITE_FILTER: // cycle: tabu -> regular -> white
-        	if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_TABU_FILTER)
+        	if (winfo != null && winfo.filterCode.intValue() == DataManager.WIDGET_ACTION_TABU_FILTER) {
         		widgetsFilterList.remove(widgetID);
-        	else
-        		widgetsFilterList.put(widgetID,wi);    	
+        	}
+        	else {
+        		widgetsFilterList.put(widgetID,wi);  
+        	}
         	break;
         default:
-        	if (winfo != null && winfo.filterCode.intValue() == widgetFilter)
+        	if (winfo != null && winfo.filterCode.intValue() == widgetFilter) {
         		widgetsFilterList.remove(widgetID);
-        	else
-        		widgetsFilterList.put(widgetID,wi);    	
+        	}
+        	else {
+        		widgetsFilterList.put(widgetID,wi);
+        	}
     	}
     }
     
     private Set<Widget> getDragWidgets(State state, double[] filterArea){
-    	if (state == null) return null;
+    	if (state == null) {
+    		return null;
+    	}
     	double areaW = Math.abs(filterArea[0] - filterArea[2]);
     	double areaH = Math.abs(filterArea[1] - filterArea[3]);
-    	if (areaW == 0 || areaH == 0 || areaW > 1048576 || areaH > 1048576) return null;
+    	if (areaW == 0 || areaH == 0 || areaW > 1048576 || areaH > 1048576) {
+    		return null;
+    	}
     	Rect r = Rect.from(filterArea[0] < filterArea[2] ? filterArea[0] : filterArea[2],
     					   filterArea[1] < filterArea[3] ? filterArea[1] : filterArea[3],
     					   areaW, areaH);
@@ -299,11 +316,14 @@ public class FilteringManager {
     	Set<Widget> widgets = getDragWidgets(state,filterArea);
     	if (widgets == null || widgets.isEmpty()){
     		Widget cursorWidget = ProtocolUtil.getWidgetUnderCursor(state,mouse);
-    		if (cursorWidget == null) return;
+    		if (cursorWidget == null) {
+    			return;
+    		}
     		manageWhiteTabuLists(cursorWidget, whiteTabuMode, preciseCoding);
-    	} else{
-    		for (Widget w : widgets)
+    	} else {
+    		for (Widget w : widgets) {
         		manageWhiteTabuLists(w,whiteTabuMode,preciseCoding);
+    		}
     	}
     }
     
@@ -315,7 +335,9 @@ public class FilteringManager {
     
     public void setWidgetFilter(State state, Mouse mouse, boolean preciseCoding){
     	Widget cursorWidget = ProtocolUtil.getWidgetUnderCursor(state,mouse);
-        if (cursorWidget == null || DataManager.DATA_TYPES == null || DataManager.DATA_TYPES.isEmpty()) return;
+        if (cursorWidget == null || DataManager.DATA_TYPES == null || DataManager.DATA_TYPES.isEmpty()) {
+        	return;
+        }
         Object[] options = DataManager.DATA_TYPES.keySet().toArray();
     	String s = (String) JOptionPane.showInputDialog(new JFrame(),"Input values:","Widget input value type",
     		JOptionPane.PLAIN_MESSAGE,null,options,options[0]);
@@ -327,31 +349,37 @@ public class FilteringManager {
     
     public boolean blackListed(Widget w){
     	WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
-    	if (wi == null)
+    	if (wi == null) {
     		wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
+    	}
     	return (wi != null && wi.filterCode.intValue() == DataManager.WIDGET_ACTION_TABU_FILTER);
     }
 
     public boolean whiteListed(Widget w){
     	WidgetInfo wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_P_ID));
-    	if (wi == null)
+    	if (wi == null) {
     		wi = widgetsFilterList.get(w.get(Tags.Abstract_R_T_ID));
+    	}
     	return (wi != null && wi.filterCode.intValue() == DataManager.WIDGET_ACTION_WHITE_FILTER);
     }
     
     public String getRandomText(Widget w){
-    	String wid = w.get(Tags.Abstract_R_T_P_ID);;
-    	if (!widgetsFilterList.containsKey(wid))
-        	wid = w.get(Tags.Abstract_R_T_ID);    		
+    	String wid = w.get(Tags.Abstract_R_T_P_ID);
+    	if (!widgetsFilterList.containsKey(wid)) {
+        	wid = w.get(Tags.Abstract_R_T_ID);    
+    	}
     	if (widgetsFilterList.containsKey(wid)){
         	int widgetFilter = widgetsFilterList.get(wid).filterCode;
-        	if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_NUMBER)
+        	if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_NUMBER) {
         		return DataManager.getRandomPrimitiveDataTypeNumber();
-        	else if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_TEXT)
+        	}
+        	else if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_TEXT) {
         		return DataManager.getRandomPrimitiveDataTypeText();
+        	}
         	Set<String> dataSamples = DataManager.INPUT_VALUES.get(widgetFilter);
-        	if (dataSamples != null)
+        	if (dataSamples != null) {
         		return DataManager.getRandom(dataSamples);
+        	}
     	}
     	return null;
     }    
@@ -360,12 +388,14 @@ public class FilteringManager {
 		String wid;
 		for(Widget w : state){
 			wid = w.get(Tags.Abstract_R_T_P_ID);
-			if (widgetsFilterList.containsKey(wid))
+			if (widgetsFilterList.containsKey(wid)) {
 				visualizeActions(canvas,state,w,wid,true);
-			else{
+			}
+			else {
 				wid = w.get(Tags.Abstract_R_T_ID);
-				if (widgetsFilterList.containsKey(wid))
+				if (widgetsFilterList.containsKey(wid)) {
 					visualizeActions(canvas,state,w,wid,false);
+				}
 			}
 		}    	
     }
@@ -386,8 +416,12 @@ public class FilteringManager {
 		Shape shape = widget.get(Tags.Shape);
 		if (preciseCoding){
 			double width =  shape.width() - 6, height = shape.height() - 6;
-			if (width < 1) width = 1;
-			if (height < 1) height = 1;
+			if (width < 1) {
+				width = 1;
+			}
+			if (height < 1) {
+				height = 1;
+			}
 			shape = Rect.from(shape.x() + 3, shape.y() + 3, width, height);
 		}
 		new ShapeVisualizer(pen, shape, "", 0.5, 0.5).run(state, canvas, Pen.PEN_IGNORE);

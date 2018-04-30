@@ -210,7 +210,7 @@ public abstract class Pen implements Serializable {
 	}
 	
 	
-	private final static class MergedPen extends Pen{
+	private static final class MergedPen extends Pen{
 		private static final long serialVersionUID = 6526439728542225584L;
 		final Pen pen1, pen2;
 		private MergedPen(Pen pen1, Pen pen2){

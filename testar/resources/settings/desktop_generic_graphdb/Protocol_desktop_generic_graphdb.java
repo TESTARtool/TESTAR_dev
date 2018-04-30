@@ -60,12 +60,12 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol { // DefaultProtocol {
 
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
+	private static final double SCROLLARROWSIZE = 36; // sliding arrows
+	private static final double SCROLLTHICK = 16; //scroll thickness
 	private long sequence=0;
 
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -78,7 +78,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	
 
 	/**
-	 * This method is invoked each time the TESTAR starts to generate a new sequence
+	 * This method is invoked each time the TESTAR starts to generate a new sequence.
 	 */
 	 @Override
 	protected void beginSequence(){
@@ -190,7 +190,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+						addSlidingActions(actions,ac,SCROLLARROWSIZE,SCROLLTHICK,w);
 
 					}
 				}
@@ -278,7 +278,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		
 		private static final String TYPE = "ButtonColor";
 
-		public ButtonColor(final String rgb) {
+		ButtonColor(final String rgb) {
 			super(TYPE,rgb);
 		}
 

@@ -72,17 +72,17 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 	
-	static final String LOGIN_USER_EMAIL = "odoo_login_user_email"; // set the value as required
+	private static final String LOGIN_USER_EMAIL = "odoo_login_user_email"; // set the value as required
 	
 	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-	static Role webText; // browser dependent
-	static double browser_toolbar_filter;
+	private static Role webText; // browser dependent
+	private static double browserToolbarFilter;
 	
-	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-	static double scrollThick = 16; //scroll thickness (iexplorer)
+	private static final double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
+	private static final double SCROLLTHICK = 16; //scroll thickness (iexplorer)
 	
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -97,14 +97,16 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 	private void initBrowser(){
 		webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
 		String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-		if (sutPath.contains("iexplore.exe"))
+		if (sutPath.contains("iexplore.exe")) {
 			webText = NativeLinker.getNativeRole("UIAEdit");
-		else if (sutPath.contains("firefox"))
+		}
+		else if (sutPath.contains("firefox")) {
 			webText = NativeLinker.getNativeRole("UIAText");
+		}
 	}
 	
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	protected void beginSequence(){
 		
@@ -162,8 +164,9 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 
         for(Widget w : state){
             Role role = w.get(Tags.Role, Roles.Widget);
-            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
-            	browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+            	browserToolbarFilter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            }
         }
 		
 		return state;
@@ -220,16 +223,18 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w))
+						if(whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
+						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
+						if(whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						}
 
 						// slides
 						Drag[] drags = null;
-						if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+						if((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null){
 							for (Drag drag : drags){
 								actions.add(ac.dragFromTo(
 									new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
@@ -251,28 +256,31 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 	// by urueda
 	@Override
 	protected boolean isClickable(Widget w){
-		if (isAtBrowserCanvas(w))
+		if (isAtBrowserCanvas(w)) {
 			return super.isClickable(w);
-		else
-			return false;		
+		} else {
+			return false;
+		}
 	} 
 
 	// by urueda
 	@Override
 	protected boolean isTypeable(Widget w){
-		if (isAtBrowserCanvas(w))
+		if (isAtBrowserCanvas(w)) {
 			return super.isTypeable(w);
-		else
-			return false;		
+		} else {
+			return false;	
+		}
 	}
 	
 	// by urueda
 	private boolean isAtBrowserCanvas(Widget w){
 		Shape shape = w.get(Tags.Shape,null);
-		if (shape != null && shape.y() > browser_toolbar_filter)
+		if (shape != null && shape.y() > browserToolbarFilter) {
 			return true;
-		else
-			return false;		
+		} else {
+			return false;	
+		}
 	}
 	
 	/**

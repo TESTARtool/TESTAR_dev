@@ -41,14 +41,14 @@ import org.fruit.alayer.devices.MouseButtons;
  */
 public interface IEventListener {
 
-	public abstract void keyDown(KBKeys key);
+	void keyDown(KBKeys key);
 
-	public abstract void keyUp(KBKeys key);
+	void keyUp(KBKeys key);
 
-	public abstract void mouseDown(MouseButtons btn, double x, double y);
+	void mouseDown(MouseButtons btn, double x, double y);
 
-	public abstract void mouseUp(MouseButtons btn, double x, double y);
+	void mouseUp(MouseButtons btn, double x, double y);
 
-	public abstract void mouseMoved(double x, double y);
+	void mouseMoved(double x, double y);
 	
 }

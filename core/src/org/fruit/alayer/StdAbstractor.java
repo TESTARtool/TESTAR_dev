@@ -53,7 +53,7 @@ public final class StdAbstractor implements Abstractor {
 		bestScore = sum;
 	}
 	
-	private final static class StdFinder implements Finder{
+	private static final class StdFinder implements Finder{
 		private static final long serialVersionUID = 5934623634863977010L;
 		transient private final Widget cachedWidget;
 		private final Tag<?>[] tags;

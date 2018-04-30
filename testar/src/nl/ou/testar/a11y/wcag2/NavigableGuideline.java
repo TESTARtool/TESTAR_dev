@@ -44,7 +44,7 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * A WCAG 2.0 guideline
+ * A WCAG 2.0 guideline.
  * @author Davy Kager
  *
  */
@@ -75,9 +75,10 @@ public final class NavigableGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
-		for (Widget w : widgets)
+		for (Widget w : widgets) {
 			// used during offline evaluation
 			w.set(WCAG2Tags.WCAG2IsWindow, AccessibilityUtil.isWindow(w));
+		}
 		return results;
 	}
 	
@@ -102,8 +103,9 @@ public final class NavigableGuideline extends AbstractGuideline {
 						"\" appeared " + entry.getValue() + " times"));
 			}
 		}
-		if (!hasViolations)
+		if (!hasViolations) {
 			results.add(evaluationPassed(sc));
+		}
 		return results;
 	}
 

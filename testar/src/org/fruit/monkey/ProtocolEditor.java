@@ -174,13 +174,15 @@ public class ProtocolEditor extends javax.swing.JDialog {
     }                                 
 
     private void consoleKeyPressed(java.awt.event.KeyEvent evt) {                                   
-        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
+        }
     }                                  
 
     private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {                                      
-        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
+        }
     }                                     
 
     private javax.swing.JButton btnCompile;

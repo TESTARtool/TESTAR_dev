@@ -41,6 +41,7 @@ import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
 
 public class OraclePanel extends JPanel {
+  private static final long serialVersionUID = 1L;
   private JTextArea txtSuspTitles;
   private JSpinner spnFreezeTime;
 

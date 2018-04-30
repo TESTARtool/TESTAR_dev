@@ -46,7 +46,7 @@ public final class ElementMap implements Serializable {
 	final List<UIAElement> elements;
 
 	private static class ElementComp implements Comparator<UIAElement>{
-		final static int WORSE = 1, BETTER = -1, EVEN = 0;
+		static final int WORSE = 1, BETTER = -1, EVEN = 0;
 		public int compare(UIAElement o1, UIAElement o2) {
 			if(o1.zindex < o2.zindex){
 				return WORSE;

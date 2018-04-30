@@ -34,7 +34,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
 /**
- * Accessibility tags
+ * Accessibility tags.
  * @author Davy Kager
  *
  */

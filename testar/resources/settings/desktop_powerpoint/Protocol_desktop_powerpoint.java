@@ -34,61 +34,34 @@ package desktop_powerpoint;
  * A general Powerpoint protocol
  * @author: Urko Rueda Molina
  */
-import static org.fruit.alayer.windows.UIARoles.*;
-
 import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-import org.fruit.Assert;
 import org.fruit.Drag;
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.KBKeys;
-import static org.fruit.alayer.windows.UIATags.*;
-import static org.fruit.monkey.ConfigTags.*;
-import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Enabled;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 import org.fruit.monkey.ConfigTags;
 
 public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
+	private static final double SCROLLARROWSIZE = 36; // sliding arrows
+	private static final double SCROLLTHICK = 16; //scroll thickness
 	
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -97,7 +70,7 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 	}
 	
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	protected void beginSequence(){
 		super.beginSequence();
@@ -180,16 +153,18 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w))
+						if(whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
+						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
+						if(whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						}
 
 						// slides
 						Drag[] drags = null;
-						if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+						if((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null){
 							for (Drag drag : drags){
 								actions.add(ac.dragFromTo(
 									new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),

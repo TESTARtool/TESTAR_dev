@@ -40,6 +40,7 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 
 public class AboutPanel extends JPanel {
+  private static final long serialVersionUID = 1L;
   private JLabel lblUPVLogo = getLogo("/icons/logos/upv.png");
   private JLabel testarLogo = getLogo("/icons/logos/testar_logo.png");
   private JLabel prosLogo = getLogo("/icons/logos/pros.png");

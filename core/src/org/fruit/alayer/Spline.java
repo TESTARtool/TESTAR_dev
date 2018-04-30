@@ -38,7 +38,7 @@ import org.fruit.Util;
 
 public final class Spline{
 
-	private final static class Polynom {
+	private static final class Polynom {
 		private final double a, b, c, d;
 
 		public Polynom(double a, double b, double c, double d){

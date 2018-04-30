@@ -45,7 +45,7 @@ public final class NativePeerPool {
 		boolean valid();
 	}
 	
-	private final static class InvalidPeer implements NativePeer{
+	private static final class InvalidPeer implements NativePeer{
 		private InvalidPeer(){};
 		public long access() { throw new IllegalStateException(); }
 		public void release() { }

@@ -81,8 +81,9 @@ public class OraclesLayerProtocol extends DefaultProtocol {
     		ctrlPressed = true;
     		filterArea[0] = mouseX;
     		filterArea[1] = mouseY;
-    		if (oracleContext == null)
+    		if (oracleContext == null) {
     			super.keyDown(key);
+    		}
     	} else if (key == KBKeys.VK_S && ctrlPressed){ // Specify oracle
     		if (oracleContext == null){
 	    		if (mode() != Modes.GenerateManual){
@@ -108,8 +109,9 @@ public class OraclesLayerProtocol extends DefaultProtocol {
 	    		}
 	    		FlashFeedback.flash("NEW ORACLES = " + newOracles.size());
     		}
-    	} else
+    	} else {
     		super.keyDown(key);
+    	}
     }
 
     @Override
@@ -138,33 +140,38 @@ public class OraclesLayerProtocol extends DefaultProtocol {
 	@Override
 	protected boolean moreActions(State state){
 		boolean ret = super.moreActions(state);
-		if (changeSequence)
+		if (changeSequence) {
 			return false;
-		else
+		}
+		else {
 			return ret;
+		}
 	}
 	
 	@Override
 	protected State getState(SUT system){
 		State state = super.getState(system);
-		if (oracleContext != null)
+		if (oracleContext != null) {
 			oracleContext.notifyState(state);
+		}
 		return state;
 	}
 	
 	@Override
 	protected void actionExecuted(SUT system, State state, Action action){
 		super.actionExecuted(system, state, action);
-		if (oracleContext != null)
+		if (oracleContext != null) {
 			oracleContext.notifyAction(state, action);
+		}
 	}
 	
 	@Override
 	protected Verdict getVerdict(State state){
 		Verdict verdict = super.getVerdict(state);
-		if (!changeSequence){
-			for (Oracle o : oracles)
+		if (!changeSequence) {
+			for (Oracle o : oracles) {
 				verdict = verdict.join(o.getVerdict(this.jipWrapper));
+			}
 		}
 		return verdict;
 	}

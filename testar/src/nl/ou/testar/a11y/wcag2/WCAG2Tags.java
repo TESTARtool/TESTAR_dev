@@ -34,7 +34,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
 /**
- * WCAG2ICT tags
+ * WCAG2ICT tags.
  * @author Davy Kager
  *
  */

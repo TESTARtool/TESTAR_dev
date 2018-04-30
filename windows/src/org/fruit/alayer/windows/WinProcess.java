@@ -157,7 +157,7 @@ public final class WinProcess extends SUTBase {
 
 
 			// Process handle to Core.
-			long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION + Windows.PROCESS_TERMINATE, false, pid);
+			// long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION + Windows.PROCESS_TERMINATE, false, pid);
 
 
 			// SUT startup time.

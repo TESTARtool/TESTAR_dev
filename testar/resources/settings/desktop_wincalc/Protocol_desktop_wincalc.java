@@ -63,7 +63,7 @@ import static org.fruit.alayer.Tags.Enabled;
 public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // DefaultProtocol {
 
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -76,7 +76,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	
 
 	/**
-	 * This method is invoked each time the TESTAR starts to generate a new sequence
+	 * This method is invoked each time the TESTAR starts to generate a new sequence.
 	 */
 	 @Override
 	protected void beginSequence(){
@@ -197,12 +197,14 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w))
+						if(whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
+						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
+						if(whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						}
 					
 					}
 				}

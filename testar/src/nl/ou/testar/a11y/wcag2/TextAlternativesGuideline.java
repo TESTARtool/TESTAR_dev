@@ -40,7 +40,7 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * A WCAG 2.0 guideline
+ * A WCAG 2.0 guideline.
  * @author Davy Kager
  *
  */
@@ -58,16 +58,20 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Non-text Content");
-		for (Widget w : widgets)
-			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				if (AccessibilityUtil.isKeyboardFocusable(w)) // focusable images must have a text alternative
+		for (Widget w : widgets) {
+			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
+				if (AccessibilityUtil.isKeyboardFocusable(w)) {// focusable images must have a text alternative
 					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 							"Missing text alternative", w));
-				else
+				} else {
 					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 							"Possible missing text alternative", w));
-			else
+					}
+				
+			} else {
 				results.add(evaluationPassed(sc));
+			}
+		}
 		return results;
 	}
 

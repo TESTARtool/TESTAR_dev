@@ -216,8 +216,10 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 				if (super.addVertex(v.getConcreteID())){
 					this.graphStates.put(v.getConcreteID(),v);
 					updateCluster(v);
-				} else
-					System.out.println("[" + getClass().getSimpleName() + "] WARNING - failed to add new state vertex to graph: " + v.toString());
+				} else {
+					System.out.println("[" 	+ getClass().getSimpleName() 
+				    + "] WARNING - failed to add new state vertex to graph: " + v.toString());
+				}
 			}
 		}
 	}
@@ -291,11 +293,13 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 	 */
 	public void addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
 		if (!this.containsVertex(from.getConcreteID())){
-			System.out.println("[" + getClass().getSimpleName() + "] WARNING - Adding missing vertex: " + from.getConcreteID());
+			// TEMP System.out.println("[" + getClass().getSimpleName() + 
+			// TEMP		"] WARNING - Adding missing vertex: " + from.getConcreteID());
 			this.addVertex(env, from);
 		}
 		if (!this.containsVertex(to.getConcreteID())){
-			System.out.println("[" + getClass().getSimpleName() + "] WARNING - Adding missing vertex: " + to.getConcreteID());
+			// TEMP.out.println("[" + getClass().getSimpleName() + 
+			// TEMP		"] WARNING - Adding missing vertex: " + to.getConcreteID());
 			this.addVertex(env, to);
 		}
 		GraphEdge edge = new GraphEdge(e.getConcreteID(),to.getConcreteID());
@@ -309,7 +313,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 					edgeAdded(e,edge);
 					e.addTargetStateID(to.getConcreteID());
 				} else
-					System.out.println("[" + getClass().getSimpleName() + "] WARNING - failed to add multi-target edge to graph: " + edge.toString());
+					System.out.println("[" + getClass().getSimpleName() + 
+							"] WARNING - failed to add multi-target edge to graph: " + edge.toString());
 			} else{
 				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
 					edgeAdded(e,edge);
@@ -318,7 +323,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 					this.graphActions.put(e.getConcreteID(),e);
 					updateCluster(e);
 				} else
-					System.out.println("[" + getClass().getSimpleName() + "] WARNING - failed to add new action edge to graph: " + edge.toString());
+					System.out.println("[" + getClass().getSimpleName() + 
+							"] WARNING - failed to add new action edge to graph: " + edge.toString());
 			}
 		}
 	}
@@ -418,7 +424,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
     	progress = Math.round(nidx / nlength * 100.0);
     	if (progress - lastProgress > 1){
     		lastProgress = progress;
-    		System.out.println("[" + getClass().getSimpleName() + "] \t[" + (int)nidx + "] / [" + nlength + "]");
+    		// TEMP System.out.println("[" + getClass().getSimpleName() + 
+    		// TEMP		"] \t[" + (int)nidx + "] / [" + nlength + "]");
     	}
 	}
 	
@@ -462,7 +469,9 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 				
 				Node node; Element element;
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_STATE);
-		        lastProgress = 0; System.out.println("[" + getClass().getSimpleName() + "] Loading graph vertex nodes [" + nList.getLength() + "]:");
+		        lastProgress = 0; 
+		        // TEMP System.out.println("[" + getClass().getSimpleName() + 
+		        // TEMP		"] Loading graph vertex nodes [" + nList.getLength() + "]:");
 		        int nListLength = nList.getLength();
 		        for (int nidx = 0; nidx < nListLength; nidx++){
 		        	printGraphLoadingProgress((float)nidx,(float)nListLength);
@@ -515,7 +524,9 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		        
 				int graphActionsCount = 0;
 		        nList = doc.getElementsByTagName(XML_TAG_ACTION);
-		        lastProgress = 0; System.out.println("[" + getClass().getSimpleName() + "] Loading graph edge nodes [" + nList.getLength() + "]:");
+		        lastProgress = 0; 
+		        // TEMP System.out.println("[" + getClass().getSimpleName() + 
+		        // TEMP		"] Loading graph edge nodes [" + nList.getLength() + "]:");
 		        String wid, absid, from, to = null;
 		        nListLength = nList.getLength();
 		        for (int nidx = 0; nidx < nListLength; nidx++){
@@ -539,12 +550,14 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		        		graphActionsCount++;
 		        	}
 		        }
-		        if (to != null)
+		        if (to != null) {
 		        	Grapher.notify(graphStates.get(to),null); // ending state
-		        else
-		        	System.out.println("[" + getClass().getSimpleName() + "] End state missing at XML loading");
+		        } else {
+		        	// TEMP System.out.println("[" + getClass().getSimpleName() + "] End state missing at XML loading");
 
-				System.out.println("[" + getClass().getSimpleName() + "] \tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
+				// TEMP System.out.println("[" + getClass().getSimpleName() + 
+		        // TEMP 	"] \tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
+		        }
 			}
 		} else
 			LogSerialiser.log("Graph file does not exist: " + xmlPath, LogSerialiser.LogLevel.Critical);
@@ -558,5 +571,4 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 
 		return graphMovements;
 	}
-	
 }

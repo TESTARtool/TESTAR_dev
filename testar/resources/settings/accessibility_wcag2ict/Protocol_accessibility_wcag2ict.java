@@ -47,13 +47,13 @@ import nl.ou.testar.a11y.wcag2.WCAG2ICT;
 import nl.ou.testar.a11y.wcag2.WCAG2Tags;
 
 /**
- * An accessibility evaluation protocol based on WCAG2ICT
+ * An accessibility evaluation protocol based on WCAG2ICT.
  * @author Davy Kager
  */
 public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 
 	/**
-	 * Constructs a new protocol
+	 * Constructs a new protocol.
 	 */
 	public Protocol_accessibility_wcag2ict() {
 		super(new WCAG2ICT());
@@ -118,8 +118,9 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 		html.writeTableStart()
 		.writeTableHeadings("Type", "Criterion", "Level", "Message");
 		for (EvaluationResult r : results.getResults()) {
-			if (r.getType().equals(EvaluationResult.Type.OK))
+			if (r.getType().equals(EvaluationResult.Type.OK)) {
 				continue;
+			}
 			WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
 			SuccessCriterion sc = result.getSuccessCriterion();
 			String url = SuccessCriterion.URL_BASE + sc.getURLSuffix();

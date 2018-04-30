@@ -136,7 +136,7 @@ class OrientDBRepository implements GraphDBRepository {
    @Override
    public void addWidget(String stateID, Widget w) {
       // LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
-      long tStart = System.currentTimeMillis();
+      // long tStart = System.currentTimeMillis();
       OrientGraph graph = graphFactory.getTx();
       try {
          Vertex state = getStateVertex(stateID, graph);

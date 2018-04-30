@@ -255,6 +255,7 @@ public class StdActionCompiler {
 		// end by urueda
 	}
 
+
 	public Action clickTypeInto(Widget w, String text){
 		return clickTypeInto(w, 0.5, 0.5, text);
 	}
@@ -263,7 +264,9 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = clickTypeInto(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		// by urueda
+		
 		return ret;
 	}
 	

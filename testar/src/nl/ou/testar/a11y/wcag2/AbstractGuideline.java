@@ -55,12 +55,12 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	private static final long serialVersionUID = -2941524827644792263L;
 	
 	/**
-	 * The list of all the success criteria in this guideline
+	 * The list of all the success criteria in this guideline.
 	 */
 	protected final List<SuccessCriterion> criteria = new ArrayList<>();
 	
 	/**
-	 * Constructs a new guideline
+	 * Constructs a new guideline.
 	 * @param nr The number of the guideline.
 	 * @param name The name of the guideline.
 	 * @param parent The principle (parent) this guideline belongs to.
@@ -70,7 +70,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Gets all success criteria in this guideline
+	 * Gets all success criteria in this guideline.
 	 * @return The list of success criteria.
 	 */
 	public List<SuccessCriterion> getSuccessCriteria() {
@@ -78,20 +78,22 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Gets a success criterion by its name (case-insensitive)
+	 * Gets a success criterion by its name (case-insensitive).
 	 * @param name The name.
 	 * @return The success criterion, or null if not found.
 	 */
 	protected SuccessCriterion getSuccessCriterionByName(String name) {
 		Assert.notNull(name);
-		for (SuccessCriterion criterion : criteria)
-			if (criterion.getName().equalsIgnoreCase(name))
+		for (SuccessCriterion criterion : criteria) {
+			if (criterion.getName().equalsIgnoreCase(name)) {
 				return criterion;
+			}
+		}
 		return null;
 	}
 	
 	/**
-	 * Evaluates the accessibility of the given state
+	 * Evaluates the accessibility of the given state.
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
 	 * This method executes oracles in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
@@ -103,7 +105,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Derives the possible actions from the given state
+	 * Derives the possible actions from the given state.
 	 * This will include zero or more actions for each success criterion in this guideline.
 	 * The actions are specific to accessibility.
 	 * This method derives actions in on-the-fly evaluation.
@@ -116,7 +118,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database.
 	 * This will include zero or more evaluation results for each success criterion in this guideline.
 	 * This method executes oracles in offline evaluation.
 	 * @param graphDB The graph database.
@@ -133,7 +135,7 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Constructs a new EvaluationResult indicating that the given success criterion was passed
+	 * Constructs a new EvaluationResult indicating that the given success criterion was passed.
 	 * @param criterion The success criterion.
 	 * @return A new EvaluationResult.
 	 */

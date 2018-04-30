@@ -446,7 +446,7 @@ public final class Util {
     }
 
     Comparator<Widget> comp = new Comparator<Widget>() {
-      final static int WORSE = -1, BETTER = 1, EVEN = 0;
+      static final int WORSE = -1, BETTER = 1, EVEN = 0;
 
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);

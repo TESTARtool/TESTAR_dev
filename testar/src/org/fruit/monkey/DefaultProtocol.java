@@ -97,7 +97,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	
 	private StateBuilder builder;
 
-	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
+	protected static final Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
 							   BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
@@ -135,7 +135,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	/**
 	 * @author urueda
 	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
-	 * @return
+	 * @return running SUT
 	 * @throws SystemStartException
 	 */
 	protected SUT startSystem(String mustContain) throws SystemStartException{
@@ -146,22 +146,28 @@ public class DefaultProtocol extends AbstractProtocol{
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
 		this.contextRunningProcesses = getRunningProcesses("START");
 		try{// refactored from "protected SUT startSystem() throws SystemStartException"
-			for(String d : settings().get(ConfigTags.Delete))
+			for(String d : settings().get(ConfigTags.Delete)) {
 				Util.delete(d);
-			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo))
+			}
+			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo)) {
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
+			}
 		}catch(IOException ioe){
 			throw new SystemStartException(ioe);
 		} // end refactoring
 		String sutConnector = settings().get(ConfigTags.SUTConnector);
-		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE))
+		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
-		else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
+		}
+		else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
-		else if (sutConnector.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE))
-			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue));
-		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
+			}
+		else if (sutConnector.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
+			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue)); 
+			}
+		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
+		}
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
@@ -183,13 +189,15 @@ public class DefaultProtocol extends AbstractProtocol{
 				}
 				Util.pauseMs(500);				
 			} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-			if (sut.isRunning())
+			if (sut.isRunning()) {
 				sut.stop();
+			}
 			// issue starting the SUT
-			if (tryToKillIfRunning){
+			if (tryToKillIfRunning) {
 				return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-			} else
+			} else {
 				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+			}
 		}
 	}
 	
@@ -201,8 +209,9 @@ public class DefaultProtocol extends AbstractProtocol{
 			// retry start system
 			System.out.println("[" + getClass().getSimpleName() + "] Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
-		} else // unable to kill SUT
+		} else {// unable to kill SUT
 			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
+		}
 	}
 
 	// by urueda
@@ -299,21 +308,24 @@ public class DefaultProtocol extends AbstractProtocol{
 		//-------------------		
 
 		// if the SUT is not running, we assume it crashed
-		if(!state.get(IsRunning, false))
+		if(!state.get(IsRunning, false)) {
 			return new Verdict(SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+		}
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
-		if(state.get(Tags.NotResponding, false))
+		if(state.get(Tags.NotResponding, false)) {
 			return new Verdict(SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+		}
 
 		//------------------------
 		// ORACLES ALMOST FOR FREE
 		//------------------------
 		
 		// begin by urueda
-		if (this.suspiciousTitlesPattern == null)
+		if (this.suspiciousTitlesPattern == null) {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
 		//System.out.println("[" + getClass().getSimpleName() + "]  " +  this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
+		}
 		Matcher m;
 		// end by urueda
 		// search all widgets for suspicious titles
@@ -329,8 +341,9 @@ public class DefaultProtocol extends AbstractProtocol{
 				if (m.matches()){ // end by urueda
 					Visualizer visualizer = Util.NullVisualizer;
 					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null)
+					if(w.get(Tags.Shape, null) != null) {
 						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+					}
 					return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
 				}
 			}
@@ -383,8 +396,9 @@ public class DefaultProtocol extends AbstractProtocol{
 			Widget w;
 			for (String wid : PrologUtil.getSolutions("W", solutions)){
 				w = getWidget(state,wid);
-				if (w != null)
+				if (w != null) {
 					actions.add(ac.leftClickAt(w));
+				}
 			}
 		}
 		// end by urueda
@@ -404,10 +418,12 @@ public class DefaultProtocol extends AbstractProtocol{
 				zindex;
 		for (Widget w : state){
 			zindex = w.get(Tags.ZIndex).doubleValue();
-			if (zindex < minZIndex)
+			if (zindex < minZIndex) {
 				minZIndex = zindex;
-			if (zindex > maxZIndex)
+			}
+			if (zindex > maxZIndex) {
 				maxZIndex = zindex;
+			}
 		}
 		state.set(Tags.MinZIndex, minZIndex);
 		state.set(Tags.MaxZIndex, maxZIndex);
@@ -417,16 +433,18 @@ public class DefaultProtocol extends AbstractProtocol{
 	protected List<Widget> getTopWidgets(State state){
 		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
-		for (Widget w : state)
-			if (w.get(Tags.ZIndex) == maxZIndex)
+		for (Widget w : state) {
+			if (w.get(Tags.ZIndex) == maxZIndex) {
 				topWidgets.add(w);
+			}
+		}
 		return topWidgets;
 	}
 	
 	// by urueda
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double SCROLLARROWSIZE, double SCROLLTHICK, Widget w){
 		Drag[] drags = null;
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+		if((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null){
 			for (Drag drag : drags){
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
@@ -439,14 +457,17 @@ public class DefaultProtocol extends AbstractProtocol{
 	
 	// by urueda
 	protected boolean isUnfiltered(Widget w){
-		if(!Util.hitTest(w, 0.5, 0.5))
+		if(!Util.hitTest(w, 0.5, 0.5)) {
 			return false;
-		if (this.clickFilterPattern == null)
+		}
+		if (this.clickFilterPattern == null) {
 			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
 		// System.out.println("[" + getClass().getSimpleName() + "]  " +  this.clickFilterMatchers.size() + " clickFilter matchers");
+		}
 		String title = w.get(Title, "");
-		if (title == null || title.isEmpty())
+		if (title == null || title.isEmpty()) {
 			return true;
+		}
 		Matcher m = this.clickFilterMatchers.get(title);
 		if (m == null){
 			m = this.clickFilterPattern.matcher(title);
@@ -458,8 +479,9 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
+		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			return isUnfiltered(w);
+		}
 		return false;
 	}
 	
@@ -485,11 +507,13 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	@Override
 	protected void actionExecuted(SUT system, State state, Action action){
-		if (this.lastState == null && state == null)
+		if (this.lastState == null && state == null) {
 			this.nonReactingActionNumber++;
+		}
 		else if (this.lastState != null && state != null &&
-				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
-			this.nonReactingActionNumber++;			
+				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID))) {
+			this.nonReactingActionNumber++;	
+		}
 		this.lastState = state;
 		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
 			this.nonReactingActionNumber = 0;
@@ -507,8 +531,9 @@ public class DefaultProtocol extends AbstractProtocol{
 	protected void stopSystem(SUT system) {
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
-			if (ac != null)
+			if (ac != null) {
 				ac.releaseCachedAutomationElements();
+			}
 		}
 	}
 		

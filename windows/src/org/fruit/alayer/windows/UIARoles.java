@@ -43,7 +43,7 @@ import org.fruit.alayer.Roles;
 public final class UIARoles {
 	private UIARoles(){}
 	
-	private final static Map<Long, Role> typeIdToRole = Util.newHashMap();
+	private static final Map<Long, Role> typeIdToRole = Util.newHashMap();
 
 	public static final Role
 	

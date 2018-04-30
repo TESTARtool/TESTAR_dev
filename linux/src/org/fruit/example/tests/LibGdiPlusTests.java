@@ -33,9 +33,6 @@ import org.bridj.Pointer;
 import org.fruit.alayer.linux.gdiplus.LibGdiPlus;
 import org.junit.jupiter.api.Test;
 
-
-import java.awt.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 

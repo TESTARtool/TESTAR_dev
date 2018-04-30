@@ -49,7 +49,7 @@ public final class AtSpiRolesWrapper {
 
 
     // The mapping of the navive Role wrappers with an ID (the AtSpiRoles enum value).
-    private final static Map<Long, Role> typeIdToRole = Util.newHashMap();
+    private static final Map<Long, Role> typeIdToRole = Util.newHashMap();
 
 
     // Define all native role wrappers.

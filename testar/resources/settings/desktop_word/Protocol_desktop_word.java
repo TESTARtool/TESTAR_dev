@@ -60,11 +60,11 @@ import org.fruit.monkey.ConfigTags;
 
 public class Protocol_desktop_word extends ClickFilterLayerProtocol {
 
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
+	static final double SCROLLARROWSIZE = 36; // sliding arrows
+	static final double SCROLLTHICK = 16; //scroll thickness
 	
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -73,7 +73,7 @@ public class Protocol_desktop_word extends ClickFilterLayerProtocol {
 	}
 	
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	protected void beginSequence(){
 		super.beginSequence();
@@ -156,16 +156,18 @@ public class Protocol_desktop_word extends ClickFilterLayerProtocol {
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w))
+						if(whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
+						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
+						if(whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						}
 
 						// slides
 						Drag[] drags = null;
-						if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+						if((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null){
 							for (Drag drag : drags){
 								actions.add(ac.dragFromTo(
 									new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),

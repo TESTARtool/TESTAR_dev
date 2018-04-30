@@ -67,15 +67,15 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
 	static final int BROWSER_FIREFOX = 2;
-	static int browser; // BROWSER_*
+	private static int browser; // BROWSER_*
 	static Role webController, webText; // browser dependent
 	static double browser_toolbar_filter;	
 
-	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-	static double scrollThick = 16; //scroll thickness (iexplorer)
+	static final double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
+	static final double SCROLLTHICK = 16; //scroll thickness (iexplorer)
 	
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
@@ -104,7 +104,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	}
 	
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	protected void beginSequence(){
 		
@@ -145,8 +145,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
         for(Widget w : state){
             Role role = w.get(Tags.Role, Roles.Widget);
-            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
+            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
             	browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            }
         }
 		
 		return state;
@@ -194,34 +195,40 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	}
 	
 	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title){
-		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty())
+		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty()) {
 			return new Verdict(SEVERITY_WARNING, "Not all images have an alternate textual description",
 							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
-		else
+		} else {
 			return Verdict.OK;
+		}
 	}
 
 	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape){
 		final int MINIMUM_FONT_SIZE = 8; // px
-		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
+		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE) {
 			return new Verdict(SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
 							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
-		else
+		} else {
 			return Verdict.OK;	
+		}
 	}
 	
 	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
 		final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
 		try {
 			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
-				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
+				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE) {
 					return new Verdict(SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
-				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
+									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));	
+				}
+				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE) {
 					return new Verdict(SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
+									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));	
+				}
 			}
-		} catch (NoSuchTagException nste) { return Verdict.OK; }
+		} catch (NoSuchTagException nste) { 
+			return Verdict.OK; 
+		}
 		return Verdict.OK;
 	}
 	
@@ -255,24 +262,27 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 								
 					// create left clicks
-					if(whiteListed(w) || isClickable(w))
+					if(whiteListed(w) || isClickable(w)) {
 						actions.add(ac.leftClickAt(w));
+					}
 	
 					// create double left click
 					if(whiteListed(w) || isDoubleClickable(w)){
-						if(browser == BROWSER_FIREFOX)
+						if(browser == BROWSER_FIREFOX) {
 							actions.add(ac.leftDoubleClickAt(w));
-						else if (browser == BROWSER_IEXPLORER)
+						}
+						else if (browser == BROWSER_IEXPLORER) {
 							actions.add(ac.dropDownAt(w));
+						}
 					}
 
 					// type into text boxes
-					if(isTypeable(w)){
+					if(isTypeable(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));					
 					}
 					
 					// slides
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,SCROLLARROWSIZE,SCROLLTHICK,w);
 	                
 				}
 				
@@ -287,27 +297,31 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 	@Override
 	protected boolean isClickable(Widget w){		
-		if (!isAtBrowserCanvas(w))
+		if (!isAtBrowserCanvas(w)) {
 			return false;	
+		}
 		
         String title = w.get(Title, "");
         Role role = w.get(Tags.Role, Roles.Widget);
-		if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH)
-			return super.isUnfiltered(w);
-		else
+		if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH) {
+			return super.isUnfiltered(w);		
+		} else {
 			return super.isClickable(w);
+		}
 	} 	
 
 	private boolean isDoubleClickable(Widget w){
-		if (!isAtBrowserCanvas(w))
+		if (!isAtBrowserCanvas(w)) {
 			return false;	
+		}
 		
 		if (isClickable(w)){
 			Widget wParent = w.parent();
 			if (wParent != null){
 				Role roleP = wParent.get(Tags.Role, null);
-				if (roleP != null && Role.isOneOf(roleP,webController))
+				if (roleP != null && Role.isOneOf(roleP,webController)) {
 					return isUnfiltered(w);
+				}
 			}
 		}
 		
@@ -316,12 +330,14 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 	@Override
 	protected boolean isTypeable(Widget w){
-		if (!isAtBrowserCanvas(w))
+		if (!isAtBrowserCanvas(w)) {
 			return false;	
+		}
 		
 		Role role = w.get(Tags.Role, null);
-		if (role != null && Role.isOneOf(role, webText))
+		if (role != null && Role.isOneOf(role, webText)) {
 			return isUnfiltered(w);
+		}
 		
 		return false;
 	}
@@ -329,10 +345,11 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	// by urueda
 	private boolean isAtBrowserCanvas(Widget w){
 		Shape shape = w.get(Tags.Shape,null);
-		if (shape != null && shape.y() > browser_toolbar_filter)
+		if (shape != null && shape.y() > browser_toolbar_filter) {
 			return true;
-		else
-			return false;		
+		} else {
+			return false;	
+		}
 	}
 		
 	/**

@@ -114,7 +114,7 @@ public interface Action extends Taggable, Serializable {
 				for (Finder f : targets){
 					w = f.apply(state);
 					if (w != null){
-						returnS[0] += tab + "TARGET =\n" + w.getRepresentation("\t\t");				
+						returnS[0] += tab + "TARGET =\n" + w.getRepresentation("\t\t");		
 						widgetRole = w.get(Tags.Role, null);
 						title = w.get(Tags.Title, null);
 						returnS[1] += String.format("( %1$" + CodingManager.ID_LENTGH + "s, %2$11s, %3$s )",
@@ -129,9 +129,7 @@ public interface Action extends Taggable, Serializable {
 		String desc = action.get(Tags.Desc, null);
 		if (desc != null)
 			returnS[0] += tab + "DESCRIPTION = " + desc + "\n";
-
 		returnS[0] += tab + "TEXT = " + action.toString().replaceAll("\\r\\n|\\n", "\n\t\t") + "\n";
-		
 		String params = action.toParametersString()
 				.replaceAll("\\)\\(",",")
 				.replaceAll("\\(","")
@@ -140,7 +138,6 @@ public interface Action extends Taggable, Serializable {
 				.replaceAll(",,","")
 				.replaceAll(", ",",");
 		returnS[1] += " [ " + (params.equals(",") ? "" : params + " ]");
-
 		return returnS;
 	}
 	

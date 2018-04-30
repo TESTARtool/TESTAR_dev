@@ -56,7 +56,7 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * Accessibility evaluation protocol
+ * Accessibility evaluation protocol.
  * @author Davy Kager
  *
  */
@@ -68,23 +68,23 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	private static final String SCREENSHOT_PATH_PREFIX = "../";
 	
 	/**
-	 * The accessibility evaluator
+	 * The accessibility evaluator.
 	 */
 	protected final Evaluator evaluator;
 	
 	/**
-	 * The relevant widgets
+	 * The relevant widgets.
 	 * This needs to be updated after every state change.
 	 */
 	protected List<Widget> relevantWidgets;
 	
 	/**
-	 * The HTML reporter to store the evaluation results
+	 * The HTML reporter to store the evaluation results.
 	 */
 	protected HTMLReporter html = null;
 
 	/**
-	 * Constructs a new WCAG2ICT test protocol
+	 * Constructs a new WCAG2ICT test protocol.
 	 */
 	public AccessibilityProtocol(Evaluator evaluator) {
 		super();
@@ -103,8 +103,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 			html = new HTMLReporter(
 					settings().get(ConfigTags.OutputDir) + File.separator +
 					HTML_FILENAME_PREFIX + sequenceCount() + HTML_EXTENSION);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LogSerialiser.log("Failed to open the HTML report: " + e.getMessage(),
 					LogSerialiser.LogLevel.Critical);
 		}
@@ -117,7 +116,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 
 	/**
-	 * Protocol method: evaluates the given state
+	 * Protocol method: evaluates the given state.
 	 * @param state The state.
 	 * @return The verdict.
 	 */
@@ -140,13 +139,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		state.set(A11yTags.A11yWarningCount, results.getWarningCount());
 		state.set(A11yTags.A11yErrorCount, results.getErrorCount());
 		state.set(A11yTags.A11yHasViolations, results.hasViolations());
-		if (!settings().get(ConfigTags.GraphDBEnabled))
+		if (!settings().get(ConfigTags.GraphDBEnabled)) {
 			writeOnTheFlyEvaluationResults(results);
+		}
 		return upstreamProblem ? verdict : results.getOverallVerdict();
 	}
 
 	/**
-	 * Protocol method: derives the follow-up actions from the given state
+	 * Protocol method: derives the follow-up actions from the given state.
 	 * @param state The state.
 	 * @return The set of actions.
 	 */
@@ -154,8 +154,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// first store all relevant widgets to the graph database
 		String concreteID = state.get(Tags.ConcreteID);
-		for (Widget w : relevantWidgets)
+		for (Widget w : relevantWidgets) {
 			storeWidget(concreteID, w);
+		}
 		
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
@@ -176,7 +177,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	/**
-	 * Perform offline evaluation, e.g. with a graph database
+	 * Perform offline evaluation, e.g. with a graph database.
 	 */
 	protected void offlineEvaluation() {
 		EvaluationResults results = evaluator.query(graphDB());
@@ -184,7 +185,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	/**
-	 * Write implementation-specific on-the-fly evaluation result details to the HTML report
+	 * Write implementation-specific on-the-fly evaluation result details to the HTML report.
 	 * @param results The evaluation results.
 	 */
 	protected void writeOnTheFlyEvaluationResultsDetails(EvaluationResults results) {
@@ -197,24 +198,25 @@ public class AccessibilityProtocol extends DefaultProtocol {
 				hadViolations = true;
 			}
 		}
-		if (!hadViolations)
+		if (!hadViolations) {
 			html.writeListItem("None");
+		}
 		html.writeUListEnd();
 	}
 	
 	/**
-	 * Write implementation-specific evaluation result details from a graph database to the HTML report
+	 * Write implementation-specific evaluation result details from a graph database to the HTML report.
 	 * @param stateProps The map of state properties, indexed by tag name.
 	 */
 	protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {}
 	
 	/**
-	 * Write implementation-specific offline evaluation result details to the HTML report
+	 * Write implementation-specific offline evaluation result details to the HTML report.
 	 */
 	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {}
 	
 	/**
-	 * Gets the title of the widget with the given concrete ID from a graph database
+	 * Gets the title of the widget with the given concrete ID from a graph database.
 	 * @param concreteID The concrete ID of the widget.
 	 * @return The widget title, or null if the widget is not in the graph database.
 	 */

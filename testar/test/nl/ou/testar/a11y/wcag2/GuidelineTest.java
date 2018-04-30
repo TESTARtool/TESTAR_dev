@@ -30,11 +30,7 @@
 package nl.ou.testar.a11y.wcag2;
 
 import static org.junit.Assert.*;
-
 import org.junit.Test;
-
-import nl.ou.testar.a11y.wcag2.AbstractGuideline;
-import nl.ou.testar.a11y.wcag2.AbstractPrinciple;
 
 public class GuidelineTest {
 

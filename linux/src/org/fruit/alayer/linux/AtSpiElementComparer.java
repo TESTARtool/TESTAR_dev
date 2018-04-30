@@ -40,7 +40,7 @@ import java.util.Comparator;
 public class AtSpiElementComparer implements Comparator<AtSpiElement> {
 
 
-    private final static int WORSE = 1, BETTER = -1, EVEN = 0;
+    private static final int WORSE = 1, BETTER = -1, EVEN = 0;
 
 
     /**

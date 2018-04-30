@@ -118,19 +118,19 @@ class UIAWidget implements Widget, Serializable {
 	private Drag[] getDrags(Shape shape,
 			boolean scrollOrientation, // true = horizontal, false = vertical
 			double viewSize, double scrollPercent,
-			double scrollArrowSize, double scrollThick){ // system dependent
-		double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - scrollArrowSize*2;
+			double SCROLLARROWSIZE, double SCROLLTHICK){ // system dependent
+		double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - SCROLLARROWSIZE*2;
 		double fixedH = 0.0, fixedV = 0.0;
 		if (scrollOrientation){ // horizontal
-			fixedH = shape.x() + scrollArrowSize +
+			fixedH = shape.x() + SCROLLARROWSIZE +
 					scrollableSize*scrollPercent/100.0 +
-					(scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
-			fixedV = shape.y() + shape.height() - scrollThick/2;
+					(scrollPercent < 50.0 ? SCROLLTHICK/2 : -3*SCROLLTHICK/2);
+			fixedV = shape.y() + shape.height() - SCROLLTHICK/2;
 		} else{ // vertical
-			fixedH = shape.x() + shape.width() - scrollThick/2;
-			fixedV = shape.y() + scrollArrowSize +
+			fixedH = shape.x() + shape.width() - SCROLLTHICK/2;
+			fixedV = shape.y() + SCROLLARROWSIZE +
 					scrollableSize*scrollPercent/100.0 +
-					(scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
+					(scrollPercent < 50.0 ? SCROLLTHICK/2 : -3*SCROLLTHICK/2);
 		}
 		int dragC = (int)Math.ceil(100.0 / viewSize) - 1;
 		if (dragC < 1)
@@ -143,8 +143,8 @@ class UIAWidget implements Widget, Serializable {
 			drags[i] = new Drag(
 				fixedH,
 				fixedV,
-				scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fixedH,
-				scrollOrientation ? fixedV : shape.y() + scrollArrowSize + emptyDragPoints[i]
+				scrollOrientation ? shape.x() + SCROLLARROWSIZE + emptyDragPoints[i] : fixedH,
+				scrollOrientation ? fixedV : shape.y() + SCROLLARROWSIZE + emptyDragPoints[i]
 			);
 		}
 		return drags;
@@ -152,7 +152,7 @@ class UIAWidget implements Widget, Serializable {
 		
 	// by urueda
 	@Override
-	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {		
+	public Drag[] scrollDrags(double SCROLLARROWSIZE, double SCROLLTHICK) {		
 		boolean hasScroll = get(UIAScrollPattern, null);
 		if (!hasScroll)
 			return null;
@@ -165,7 +165,7 @@ class UIAWidget implements Widget, Serializable {
 				double hScrollPercent = get(UIAScrollHorizontalPercent, -1.0);
 				Shape shape = get(Tags.Shape, null);
 				if (shape != null){
-					hDrags = getDrags(shape,true,hViewSize,hScrollPercent,scrollArrowSize,scrollThick);
+					hDrags = getDrags(shape,true,hViewSize,hScrollPercent,SCROLLARROWSIZE,SCROLLTHICK);
 				}
 			}
 		}
@@ -176,7 +176,7 @@ class UIAWidget implements Widget, Serializable {
 				double vScrollPercent = get(UIAScrollVerticalPercent, -1.0);
 				Shape shape = get(Tags.Shape, null);
 				if (shape != null){
-					vDrags = getDrags(shape,false,vViewSize,vScrollPercent,scrollArrowSize,scrollThick);
+					vDrags = getDrags(shape,false,vViewSize,vScrollPercent,SCROLLARROWSIZE,SCROLLTHICK);
 				}
 			}
 		}

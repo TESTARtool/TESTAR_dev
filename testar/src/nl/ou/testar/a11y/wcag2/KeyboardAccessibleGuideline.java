@@ -47,7 +47,7 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * A WCAG 2.0 guideline
+ * A WCAG 2.0 guideline.
  * @author Davy Kager
  *
  */
@@ -83,11 +83,13 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 				String concreteID = w.get(Tags.ConcreteID, "");
 				if (lastConcreteWidgetID.equals(concreteID)) {
 					sameWidgetCount++;
-					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD)
+					if (sameWidgetCount == KEYBOARD_TRAP_WIDGET_THRESHOLD) {
 						results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 								"Possible keyboard trap", w));
-					else
+					}
+					else {
 						results.add(evaluationPassed(sc));
+					}
 				}
 				else {
 					sameWidgetCount = 0;
@@ -98,8 +100,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 			String key1 = AccessibilityUtil.getAccessKey(w),
 					key2 = AccessibilityUtil.getAcceleratorKey(w);
 			if ((key1 != null && !key1.isEmpty())
-					|| (key2 != null && !key2.isEmpty()))
+					|| (key2 != null && !key2.isEmpty())) {
 				shortcutKeyCount++;
+			}
 		}
 		if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size()) {
 			sc = getSuccessCriterionByName("Keyboard");
@@ -119,8 +122,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 			deriveActionsAll(actions, compiler, w);
 			if (AccessibilityUtil.hasKeyboardFocus(w)) {
 				// catch inconsistent keyboard focus reporting
-				if (prevHasKeyboardFocus != null)
+				if (prevHasKeyboardFocus != null) {
 					reportDoubleFocus(prevHasKeyboardFocus, w);
+				}
 				deriveActionsFocus(actions, compiler, w);
 				prevHasKeyboardFocus = w;
 			}
@@ -159,29 +163,34 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 		String shortcutKey = AccessibilityUtil.getAcceleratorKey(w);
 		if (shortcutKey != null && !shortcutKey.isEmpty()) {
 			Action a = AccessibilityUtil.parseShortcutKey(shortcutKey);
-			if (a != null)
+			if (a != null) {
 				addShortcutKey(a);
+			}
 		}
 		
 		// find access keys
 		String accessKey = AccessibilityUtil.getAccessKey(w);
 		if (accessKey != null && !accessKey.isEmpty()) {
 			Action a = AccessibilityUtil.parseShortcutKey(accessKey);
-			if (a != null)
+			if (a != null) {
 				actions.add(a);
+			}
 		}
 	}
 		
 	private void deriveActionsFocus(Set<Action> actions, StdActionCompiler compiler,
 			Widget w) {
 		// get the applicable keys for this widget
-		for (Action a : AccessibilityUtil.getApplicableActions(w))
+		for (Action a : AccessibilityUtil.getApplicableActions(w)) {
 			actions.add(a);
+		}
 		
 		// if shortcut keys are not blocked, e.g. by a modal window, try to use one
-		if (AccessibilityUtil.canUseShortcutKeys(w))
-			for (Action a : shortcutKeysCache)
+		if (AccessibilityUtil.canUseShortcutKeys(w)) {
+			for (Action a : shortcutKeysCache) {
 				actions.add(a);
+			}
+		}
 	}
 	
 	private void deriveActionsNoFocus(Set<Action> actions, StdActionCompiler compiler,
@@ -190,11 +199,13 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 	}
 	
 	private void addShortcutKey(Action a) {
-		if (shortcutKeysCache.contains(a))
+		if (shortcutKeysCache.contains(a)) {
 			return;
+		}
 		shortcutKeysCache.addLast(Assert.notNull(a));
-		while (shortcutKeysCache.size() > MAX_CACHED_SHORTCUT_KEYS)
+		while (shortcutKeysCache.size() > MAX_CACHED_SHORTCUT_KEYS) {
 			shortcutKeysCache.removeFirst();
+		}
 	}
 	
 	private void reportDoubleFocus(Widget oldW, Widget newW) {

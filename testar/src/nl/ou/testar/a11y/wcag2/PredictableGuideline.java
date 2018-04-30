@@ -41,7 +41,7 @@ import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
- * A WCAG 2.0 guideline
+ * A WCAG 2.0 guideline.
  * @author Davy Kager
  *
  */
@@ -84,11 +84,13 @@ public final class PredictableGuideline extends AbstractGuideline {
 		List<Object> stateChanges = graphDB.getObjectsFromGremlinPipe(gremlinStateChange,
 				GremlinStart.VERTICES);
 		// the list contains the titles of the new states
-		for (Object title : stateChanges)
+		for (Object title : stateChanges) {
 			results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 					"Unexpected state change to \"" + title + "\""));
-		if (stateChanges.isEmpty())
+		}
+		if (stateChanges.isEmpty()) {
 			results.add(evaluationPassed(sc));
+		}
 		return results;
 	}
 

@@ -70,27 +70,29 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	public static <T> String print(Tag<T> tag, T value){
-		if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
+		if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
 			StringBuilder sb = new StringBuilder();
 			List<?> l = (List<?>) value;
 			
 			int i = 0;
 			for(Object o : l){
-				if(i > 0)
+				if(i > 0) {
 					sb.append(';');
+				}
 				sb.append(Util.toString(o));
 				i++;
 			}
 			return sb.toString();
-		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
+		} else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			StringBuilder sb = new StringBuilder();
 			@SuppressWarnings("unchecked")
 			List<Pair<String, String>> l = (List<Pair<String, String>>) value;
 			
 			int i = 0;
 			for(Pair<String, String> p : l){
-				if(i > 0)
+				if(i > 0) {
 					sb.append(';');
+				}
 				sb.append(p.left()).append(';').append(p.right());
 				i++;
 			}
@@ -135,18 +137,22 @@ public class Settings extends TaggableBase implements Serializable {
 		}else if(tag.type().equals(String.class)){
 			return (T)stringValue;
 		}else if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
-			if(stringValue.trim().length() == 0)
+			if(stringValue.trim().length() == 0) {
 				return (T) new ArrayList<String>();
+			}
 			return (T)Arrays.asList(stringValue.split(";"));
 		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
-			if(stringValue.trim().length() == 0)
+			if(stringValue.trim().length() == 0) {
 				return (T) new ArrayList<Pair<String, String>>();
+			}
 			List<String> pathList = Arrays.asList(stringValue.split(";"));
-			if(pathList.size() % 2 != 0)
+			if(pathList.size() % 2 != 0) {
 				throw new ConfigParseException("The number of paths must be even!");
+			}
 			List<Pair<String, String>> ret = new ArrayList<Pair<String, String>>();
-			for(int i = 0; i < pathList.size(); i += 2)
+			for(int i = 0; i < pathList.size(); i += 2) {
 				ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
+			}
 			return (T)ret;
 		}
 		throw new ConfigParseException("");
@@ -166,15 +172,23 @@ public class Settings extends TaggableBase implements Serializable {
 		Reader in = new BufferedReader(isw);
 		props.load(in);
 		in.close();			
-		if (isw != null) isw.close();
-		if (fis != null) fis.close();
+		if (isw != null) {
+			isw.close();
+		}
+		if (fis != null) {
+			fis.close();
+		}
 		// end by urueda
 		return new Settings(defaults, new Properties(props));
 	}
 
-	public Settings(){ this(new Properties()); }
+	public Settings(){ 
+		this(new Properties()); 
+	}
 
-	public Settings(Properties props){ this(new ArrayList<Pair<?, ?>>(), props); }
+	public Settings(Properties props){ 
+		this(new ArrayList<Pair<?, ?>>(), props); 
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Settings(List<Pair<?, ?>> defaults, Properties props){
@@ -232,5 +246,7 @@ public class Settings extends TaggableBase implements Serializable {
 		return sb.toString();
 	}
 	
-	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
+	private String escapeBackslash(String string){ 
+		return string.replace("\\", "\\\\");	
+	}
 }

@@ -38,16 +38,18 @@ import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
-
-import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import static org.fruit.monkey.ConfigTags.*;
 
@@ -217,7 +219,7 @@ public class Main {
     if (files != null && files.length > 1) {
       System.out.println("[Main] Too many *.sse files - exactly one expected!");
       for (String f : files) {
-        System.out.println("[Main] => Delete file <" + f + "> = " + new File(f).delete());
+        System.out.println("[Main] Delete file <" + f + "> = " + new File(f).delete());
       }
       files = null;
     }
@@ -278,18 +280,22 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
-      String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
+      // String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
+      String protocolClass = settings.get(ProtocolClass).replace("/",".");
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
+
       //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
 
       //logln("Starting monkey protocol ...", Main.LogLevel.Debug);
       LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
+      
       protocol.run(settings);
+
     } catch (ConfigException ce) {
       LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
     } catch (Throwable t) {
