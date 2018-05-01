@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -203,8 +204,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 		
 		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
 			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
+			// iterate through all widgets:
+			for(Widget w : state){
+			//TODO optional: iterate through top level widgets based on Z-index:
+			//for(Widget w : getTopWidgets(state)){
 				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
 						//storeWidget(state.get(Tags.ConcreteID), w);
@@ -239,10 +242,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
-
-		return super.selectAction(state, actions);
-
+	protected Action selectAction(State state, Set<Action> actions){
+	    // using purely random selection:
+		return RandomActionSelector.selectAction(actions);
+		//return super.selectAction(state, actions);
 	}
 
 	/**
