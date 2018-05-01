@@ -58,7 +58,7 @@ public final class HTMLReporter {
 		"<body>"
 	};
 	
-	private static final String[] FOOTER = new String[] {
+	public static final String[] FOOTER = new String[] {
 		"</body>",
 		"</html>"
 	};
@@ -77,7 +77,7 @@ public final class HTMLReporter {
 	// Constants
 	// ---------
 	
-	private final static String CHARSET = "UTF-8";
+	public final static String CHARSET = "UTF-8";
 	
 	// ----------
 	// Attributes

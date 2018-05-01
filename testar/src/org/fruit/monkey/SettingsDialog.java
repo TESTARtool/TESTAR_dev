@@ -61,6 +61,10 @@ import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 
+/**
+ * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
+ */
+
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
@@ -85,7 +89,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    * Starts the settings Dialog.
-   *
    * @throws IOException when Icons cannot be found.
    */
   SettingsDialog() throws IOException {

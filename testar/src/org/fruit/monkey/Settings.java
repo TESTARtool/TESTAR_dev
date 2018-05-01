@@ -56,11 +56,9 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	// begin by urueda
 	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
 			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
 			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
-	// end by urueda
 	
 	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
@@ -160,7 +158,6 @@ public class Settings extends TaggableBase implements Serializable {
 	public static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException{
 		Assert.notNull(path);
 		Properties props = new Properties();
-		// begin by urueda
 		FileInputStream fis = new FileInputStream(path);
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
@@ -168,7 +165,7 @@ public class Settings extends TaggableBase implements Serializable {
 		in.close();			
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
-		// end by urueda
+
 		return new Settings(defaults, new Properties(props));
 	}
 

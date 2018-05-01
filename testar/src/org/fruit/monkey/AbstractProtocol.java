@@ -132,29 +132,29 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
-												  IEventListener { // by urueda
+												  IEventListener {
 	
 	public static enum Modes{
 		Spy,
-		GenerateManual, // by urueda
+		GenerateManual,
 		Generate, GenerateDebug, Quit, View, AdhocTest, Replay, ReplayDebug;
 	}
 	
-	protected boolean faultySequence; // by urueda (refactored from DefaultProtocol)
+	protected boolean faultySequence;
 
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 	private Settings settings;
 	private Modes mode;
 	protected Mouse mouse = AWTMouse.build();
 	private boolean saveStateSnapshot = false,
-					markParentWidget = false; // by urueda
+					markParentWidget = false;
 	private int actionCount, sequenceCount,
 		firstSequenceActionNumber;
-	protected int lastSequenceActionNumber; // by urueda
+	protected int lastSequenceActionNumber;
 	double startTime;
 	
-	// begin by urueda
-	
+
+	// TODO: DATE-FORMAT
 	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
 
 	// Verdict severities
@@ -253,7 +253,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	// true if the process is not running anymore (killing might not happen)
+	/**
+	 * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
+	 * @param sut
+	 * @param KILL_WINDOW
+	 * @return
+	 */
 	protected boolean killRunningProcesses(SUT sut, long KILL_WINDOW){
 		boolean allKilled = true;
 		for(ProcessHandle ph : Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))){
@@ -269,7 +274,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 		return allKilled;
 	}
-		
+
+	/**
+	 * Kill process with info pi
+	 * @param pi
+	 * @param KILL_WINDOW indicates a time frame
+	 * @return
+	 */
 	private boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
 		if (pi.sut.isRunning()){
 			System.out.println("Will kill process: " + pi.toString());
@@ -290,14 +301,29 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			return true;
 		}
 	}
-    
-	// end by urueda
-	
+
+
+	/**
+	 * Override the default keylistener to implement the TESTAR shortcuts
+	 * SHIFT + SPACE
+	 * SHIFT + ARROW-UP
+	 * SHIFT + ARROW-RIGHT
+	 * SHIFT + ARROW-LEFT
+	 * SHIFT + ARROW-DOWN
+	 * SHIFT + {0, 1, 2, 3, 4}
+	 * SHIFT + ALT
+	 * @param key
+	 */
+	//TODO: Should this method be in the AbstractProtocol? or move somewhere else?
+
+	//TODO: Investigate better shortcut combinations to control TESTAR that does not intefere with
+	// SUT (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
+	// event is not recorded as a user event).
 	@Override
 	public void keyDown(KBKeys key){
 		pressed.add(key);
 
-		// begin by urueda
+		//  SHIFT + SPACE are pressed --> Toggle slow motion test
         if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
         	if (this.delay == Double.MIN_VALUE){
             	this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
@@ -307,75 +333,90 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
         		delay = Double.MIN_VALUE;
         	}
         }
-        // end by urueda
 		
-		// state snapshot
+		//  SHIFT + ARROW-UP are pressed --> set variable to make a state snapshot
 		if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT))
 			saveStateSnapshot = true;
 
-		// change mode with shift + right (forward)
+		// SHIFT + ARROW-RIGHT --> go to the next mode
 		else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT))
 			nextMode(true);
 
-		// change mode with shift + left (backward)
+		// SHIFT + ARROW-LEFT --> go to the previous mode
 		else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT))
 			nextMode(false);
 
-		// quit with shift + down
+		// SHIFT + ARROW-DOWN --> panic stop
 		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
 			LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
 			mode = Modes.Quit;
-			protocolUtil.stopAdhocServer(); // by urueda
+			protocolUtil.stopAdhocServer();
 		}
 
-		// toggle action visualization
+		// SHIFT + 1 --> toggle action visualization
 		else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
 			settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));		
 
-		// toggle widget mark visualization
+		// SHIFT + 2 --> toggle showing accessibility properties of the widget
 		else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
 			settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));		
 
-		// toggle widget info visualization
+		// SHIFT + 3 --> toggle basic or all accessibility properties of the widget
 		else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));		
+			settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
 		
-		// begin by urueda (method structure changed from if* to <if, elseif*, else>)
-		
+		// SHIFT + 4 --> toggle the widget tree
 		else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
 			settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
 
+		// SHIFT + 0 --> undocumented feature
 		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
 			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 
+		// TODO: Find out if this commented code is anything usefull
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
 			protocolUtil.startAdhocServer();
 			mode = Modes.AdhocTest;
 			LogSerialiser.log("'" + mode + "' mode active.\n", LogSerialiser.LogLevel.Info);
 		}*/
-		
-		else if (!pressed.contains(KBKeys.VK_SHIFT) &&
-				mode() == Modes.GenerateManual && userEvent == null){
+
+		// In GenerateManual mode you can press any key except SHIFT to add a user keyboard
+		// This is because SHIFT is used for the TESTAR shortcuts
+		// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
+		// cannot be recorded as an user event in GenerateManual....
+		else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.GenerateManual && userEvent == null){
 			//System.out.println("USER_EVENT key_down! " + key.toString());
 			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 		}
-		
+
+		// SHIFT + ALT --> Toggle widget-tree hieracrhy display
 		if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT))
 			markParentWidget = !markParentWidget;
-		// end by urueda
 	}
 
 	@Override
 	public void keyUp(KBKeys key){
 		pressed.remove(key);
 	}
-	
+
+	/**
+	 * TESTAR does not listen to mouse down clicks in any mode
+	 * @param btn
+	 * @param x
+	 * @param y
+	 */
 	@Override
 	public void mouseDown(MouseButtons btn, double x, double y){}
-	
+
+	/**
+	 * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
+	 * @param btn
+	 * @param x
+	 * @param y
+	 */
 	@Override
 	public void mouseUp(MouseButtons btn, double x, double y){
-		// begin by urueda
+		// In GenerateManual the user can add user events by clicking
 		if (mode() == Modes.GenerateManual && userEvent == null){
 			//System.out.println("USER_EVENT mouse_up!");
 		    userEvent = new Object[]{
@@ -384,20 +425,28 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	       		new Double(y)
 			};
 		}
-		// end by urueda				
 	}
-	
+
+	/**
+	 * Return the mode TESTAR is currently in
+	 * @return
+	 */
 	public synchronized Modes mode(){ return mode; }
 
+	/**
+	 * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
+	 * Show the flashfeedback in the upperleft corner of the screen
+	 * @param forward is set in keyDown method
+	 */
 	private synchronized void nextMode(boolean forward){
 		if(forward){
 			switch(mode){
 			//case Spy: mode = Modes.Generate; break;
-			case Spy: userEvent = null; mode = Modes.GenerateManual; break; // by urueda
-			case GenerateManual: mode = Modes.Generate; break; // by urueda
+			case Spy: userEvent = null; mode = Modes.GenerateManual; break;
+			case GenerateManual: mode = Modes.Generate; break;
 			case Generate: mode = Modes.GenerateDebug; break;
 			case GenerateDebug: mode = Modes.Spy; break;
-			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break; // by urueda
+			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break;
 			case Replay: mode = Modes.ReplayDebug; break;
 			case ReplayDebug: mode = Modes.Replay; break;
 			default: break;
@@ -406,27 +455,31 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			switch(mode){
 			case Spy: mode = Modes.GenerateDebug; break;
 			//case Generate: mode = Modes.Spy; break;
-			case GenerateManual: mode = Modes.Spy; break; // by urueda
-			case Generate: userEvent = null; mode = Modes.GenerateManual; break; // by urueda
+			case GenerateManual: mode = Modes.Spy; break;
+			case Generate: userEvent = null; mode = Modes.GenerateManual; break;
 			case GenerateDebug: mode = Modes.Generate; break;
-			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break; // by urueda
+			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break;
 			case Replay: mode = Modes.ReplayDebug; break;
 			case ReplayDebug: mode = Modes.Replay; break;
 			default: break;
 			}		
 		}
 
-		// begin by urueda
+		// Add some logging
+		// Add the FlashFeedback about the mode you are in in the upper left corner.
 		String modeParamS = "";
 		if (mode == Modes.GenerateManual)
 			modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
+
 		String modeNfo = "'" + mode + "' mode active." + modeParamS;
 		LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
 		FlashFeedback.flash(modeNfo);
-		// end by urueda
 	}
-	
-	// by urueda
+
+	/**
+	 * Set the mode with the given parameter value
+	 * @param mode
+	 */
 	protected synchronized void setMode(Modes mode){
 		if (mode() == mode) return;
 		List<Modes> modesList = Arrays.asList(Modes.values());
@@ -440,9 +493,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected void beginSequence() {}
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;
-	protected abstract void stopSystem(SUT system); // by urueda
+	protected abstract void stopSystem(SUT system);
 	protected abstract State getState(SUT system) throws StateBuildException;
-	protected abstract Verdict getVerdict(State state); // by urueda
+	protected abstract Verdict getVerdict(State state);
 	protected abstract Set<Action> deriveActions(SUT system, State state) throws ActionBuildException;
 	protected abstract Canvas buildCanvas();
 	protected abstract boolean moreActions(State state);
@@ -450,13 +503,20 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected final int actionCount(){ return actionCount; }
 	protected final int sequenceCount(){ return sequenceCount; }
 	protected void initialize(Settings settings){}
-	
-	private String lastPrintParentsOf = "null-id"; // by urueda
 
-	//private synchronized void visualizeState(Canvas canvas, State state){
-	private synchronized void visualizeState(Canvas canvas, State state, SUT system){ // by urueda
+	// TODO: The methods below are all about visualization of the state, widgets and actions. They need to be moved out of the Abstract Protocol
+
+	private String lastPrintParentsOf = "null-id";
+
+	/**
+	 *
+	 * @param canvas
+	 * @param state
+	 * @param system
+	 */
+	private synchronized void visualizeState(Canvas canvas, State state, SUT system){
 		if((mode() == Modes.Spy
-			|| mode() == Modes.GenerateManual // by urueda
+			|| mode() == Modes.GenerateManual
 			|| mode() == Modes.ReplayDebug) && settings().get(ConfigTags.DrawWidgetUnderCursor)){
 			Point cursor = mouse.cursor();
 			Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
@@ -469,7 +529,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 				if(cwShape != null){
 					cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
-					// begin by urueda
 					cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
 					if (!settings().get(ConfigTags.DrawWidgetInfo) && !settings().get(ConfigTags.DrawWidgetTree) && !markParentWidget){
 						String rootText = "State: " + rootW.get(Tags.ConcreteID),
@@ -529,7 +588,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 										  Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
 										 * 20;
 					cwShape = protocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
-					// end by urueda
 					
 					if(settings().get(ConfigTags.DrawWidgetInfo)){
 						//canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
@@ -580,7 +638,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							// end by urueda
 						}
 					}
-					// begin by urueda
+
 					if (settings().get(ConfigTags.DrawWidgetTree)){
 						canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
 						protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);						
@@ -593,13 +651,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						String graphDebug = "Widget <" + wid + "> count = " + gs.getStateWidgetsExecCount().get(wid);
 						canvas.text(Pen.PEN_WHITE_TEXT_12px, 10, 10, 0, graphDebug);
 					}
-					// end by urueda
 				}
 			}
 		}
 	}
 
-	// by urueda
+
 	private int getTargetZindex(State state, Action a){
 		try{
 			String targetID = a.get(Tags.TargetID);
@@ -615,16 +672,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		if((mode() == Modes.Spy ||
-			mode() == Modes.GenerateManual || // by urueda
+			mode() == Modes.GenerateManual ||
 			mode() == Modes.GenerateDebug) && settings().get(ConfigTags.VisualizeActions)){
-			// begin by urueda
 			IEnvironment env = Grapher.getEnvironment();
 			int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
 			Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
-			// end by urueda
 			for(Action a : actions){
 				//a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
-				// begin by urueda
 				zindex = getTargetZindex(state,a);
 				zindexes.put(a, new Integer(zindex));
 				if (zindex < minz)
@@ -653,7 +707,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				}
 				a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
 			}
-			// end by urueda
 		}
 	}
 
@@ -680,10 +733,21 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			}
 		}
 	}
-    
-    // by urueda
-	protected Action selectAction(State state, Set<Action> actions){
+
+	// End of all the visualization methods that need to be moved out of the Abstract protocol.
+	// END TODO
+
+
+
+
+
+    protected Action selectAction(State state, Set<Action> actions){
 		Assert.isTrue(actions != null && !actions.isEmpty());
+
+		//If deriveActions indicated that there are processes that need to be killed
+		//because they are in the process filters
+		//Then here we will select the action to do that killing
+
 		if (this.forceKillProcess != null){
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 			Action a = KillProcess.byName(this.forceKillProcess, 0);
@@ -691,14 +755,22 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			CodingManager.buildIDs(state, a);
 			this.forceKillProcess = null;
 			return a;
-		} else if (this.forceToForeground){
+		}
+		//If deriveActions indicated that the SUT should be put back in the foreground
+		//Then here we will select the action to do that
+
+		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
 			CodingManager.buildIDs(state, a);
 			this.forceToForeground = false;
 			return a;
-		} else if (this.forceNextActionESC){
+		}
+
+		//TODO: This seems not to be used yet...
+		// It is set in a method actionExecuted that is not being called anywhere (yet?)
+		else if (this.forceNextActionESC){
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			CodingManager.buildIDs(state, a);
@@ -735,7 +807,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	// note /by urueda): could be more interesting as XML (instead of Java Serialisation)
+
+	/**
+	 * Creates a file out of the given state.
+	 * note (by urueda): could be more interesting as XML instead of Java Serialisation
+	 * @param state
+	 */
 	private void saveStateSnapshot(final State state){
 		try{
 			if(saveStateSnapshot){
@@ -791,7 +868,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			
 		return null;
 	}
-	
+
+	//TODO: Is this method needed??
 	/**
 	 * Action execution listeners override.
 	 * @param system
@@ -799,7 +877,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * @param action
 	 */
 	protected abstract void actionExecuted(SUT system, State state, Action action);
-	
+
 	// by urueda
 	private boolean isESC(Action action){
 		Role r = action.get(Tags.Role, null);

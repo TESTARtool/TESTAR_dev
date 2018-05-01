@@ -345,6 +345,15 @@ public class DefaultProtocol extends AbstractProtocol{
 		return Verdict.OK;
 	}
 
+	/**
+	 * This methods prepares for deriving actions, but does not really derive them yet. This is left for lower
+	 * level protocols. Here the parameters are set in case unwanted processes need to be killed or the SUT needs to be brought back
+	 * to foreground. The latter is then done by selectActions in the AbstractProtocol.
+	 * @param system
+	 * @param state
+	 * @return
+	 * @throws ActionBuildException
+	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
 		Set<Action> actions = new HashSet<Action>();	
@@ -352,7 +361,10 @@ public class DefaultProtocol extends AbstractProtocol{
 		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// if there is an unwanted process running, kill it
+		// If there is an unwanted process running, we need to kill it.
+		// This is an unwanted process that is defined in the filter.
+		// So we set this.forceKillProcess = process.right();
+		// And then select action will take care of making the next action to select the killing of the process.
 		String processRE = settings().get(ConfigTags.ProcessesToKillDuringTest);
 		if (processRE != null && !processRE.isEmpty()){ // by urueda
 			state.set(Tags.RunningProcesses, system.getRunningProcesses()); // by urueda
@@ -360,44 +372,35 @@ public class DefaultProtocol extends AbstractProtocol{
 				if(process.left().longValue() != system.get(Tags.PID).longValue() && // by urueda
 				   process.right() != null && process.right().matches(processRE)){ // pid x name
 					//actions.add(ac.killProcessByName(process.right(), 2));
-					this.forceKillProcess = process.right(); // by urueda
+					this.forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
 				}
 			}
 		}
 
-		// if the system is in the background force it into the foreground!
+		// If the system is in the background, we need to force it into the foreground!
+		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
+		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			//actions.add(ac.activateSystem());
 			this.forceToForeground = true; // by urueda
 			return actions;
 		}
-		
-		// begin by urueda
-		if(settings().get(ConfigTags.PrologActivated)){			
-			List<List<String>> solutions = jipWrapper.setQuery(
-				"action(A,'" + state.get(Tags.ConcreteID) + "',W," + ActionRoles.LeftClick + ",0)."
-			);
-			//PrologUtil.printSolutions(solutions);
-			Widget w;
-			for (String wid : PrologUtil.getSolutions("W", solutions)){
-				w = getWidget(state,wid);
-				if (w != null)
-					actions.add(ac.leftClickAt(w));
-			}
-		}
-		// end by urueda
-		
+
+		//Note this list is always empty in this deriveActions.
 		return actions;
 	}
 	
-	// by urueda (random inputs)	
+
 	protected String getRandomText(Widget w){
 		return DataManager.getRandomData();
 	}
-	
-	// by urueda (refactored)
+
+	/**
+	 * Calculate the max and the min ZIndex of all the widgets in a state
+	 * @param state
+	 */
 	protected void calculateZIndices(State state) {
 		double minZIndex = Double.MAX_VALUE,
 				maxZIndex = Double.MIN_VALUE,
@@ -412,8 +415,12 @@ public class DefaultProtocol extends AbstractProtocol{
 		state.set(Tags.MinZIndex, minZIndex);
 		state.set(Tags.MaxZIndex, maxZIndex);
 	}
-	
-	// by urueda
+
+	/**
+	 * Return a list of widgets that have the maximal Zindex
+	 * @param state
+	 * @return
+	 */
 	protected List<Widget> getTopWidgets(State state){
 		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
@@ -422,8 +429,15 @@ public class DefaultProtocol extends AbstractProtocol{
 				topWidgets.add(w);
 		return topWidgets;
 	}
-	
-	// by urueda
+
+	/**
+	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+	 * @param actions
+	 * @param ac
+	 * @param scrollArrowSize
+	 * @param scrollThick
+	 * @param w
+	 */
 	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
 		Drag[] drags = null;
 		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
@@ -436,17 +450,33 @@ public class DefaultProtocol extends AbstractProtocol{
 			}
 		}
 	}
-	
-	// by urueda
+
+	/**
+	 * Check whether widget w should be filtered based on
+	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
+	 * that is cannot be hit
+	 * @param w
+	 * @return
+	 */
 	protected boolean isUnfiltered(Widget w){
+		//Check whether the widget can be hit
+		// If not, it should be filtered
 		if(!Util.hitTest(w, 0.5, 0.5))
 			return false;
-		if (this.clickFilterPattern == null)
-			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-		// System.out.println(this.clickFilterMatchers.size() + " clickFilter matchers");
+
+		//Check whether the widget has an empty title or no title
+		//If it has, it is unfiltered
+		//Because it cannot match the regular expression of the Action Filter.
 		String title = w.get(Title, "");
 		if (title == null || title.isEmpty())
 			return true;
+
+		//If no clickFilterPattern exists, then create it
+		//Get the clickFilterPattern from the regular expression provided by the tester in the Dialog
+		if (this.clickFilterPattern == null)
+			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
+
+		//Check whether the title matches any of the clickFilterPatterns
 		Matcher m = this.clickFilterMatchers.get(title);
 		if (m == null){
 			m = this.clickFilterPattern.matcher(title);
@@ -454,20 +484,33 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 		return !m.matches();
 	}
-	
-	// by urueda
+
+	/**
+	 * Check whether a widget is clickable
+	 * @param w
+	 * @return
+	 */
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
 		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
 			return isUnfiltered(w);
 		return false;
 	}
-	
-	// by urueda
+
+	/**
+	 * Check whether a widget is typeable
+	 * @param w
+	 * @return
+	 */
 	protected boolean isTypeable(Widget w){
 		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
-	}	
+	}
 
+	/**
+	 * STOP criteria for selecting more actions for a sequence
+	 * @param state
+	 * @return
+	 */
 	protected boolean moreActions(State state) {
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
@@ -476,33 +519,41 @@ public class DefaultProtocol extends AbstractProtocol{
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
+	/**
+	 * STOP criteria deciding whether more sequences are required in a test run
+	 * @return
+	 */
 	protected boolean moreSequences() {	
 		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
-		return sequenceCount() <= settings().get(ConfigTags.Sequences) && // by urueda		
+		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
-	// by urueda
+	// TODO: Is this method really used......??
+	/**
+	 *
+	 * @param system
+	 * @param state
+	 * @param action
+	 */
 	@Override
 	protected void actionExecuted(SUT system, State state, Action action){
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
 		else if (this.lastState != null && state != null &&
 				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
-			this.nonReactingActionNumber++;			
+			this.nonReactingActionNumber++;
 		this.lastState = state;
 		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
 			this.nonReactingActionNumber = 0;
 			this.forceNextActionESC = true;
-			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);			
+			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);
 		}
 	}
 
-	// by urueda
 	@Override
 	public void mouseMoved(double x, double y) {}
 
-	// by urueda
 	@Override
 	protected void stopSystem(SUT system) {
 		if (system != null){
