@@ -64,8 +64,7 @@ public class StdActionCompiler {
 		this.abstractor = abstractor;
 	}
 
-	// begin by urueda
-	
+
 	public Action mouseMove(Widget w){
 		Finder wf = abstractor.apply(w);
 		Position position = new WidgetPosition(wf, Tags.Shape, 0.5, 0.5, true);
@@ -77,8 +76,7 @@ public class StdActionCompiler {
 		return new CompoundAction.Builder().add(new MouseMove(position), 0).add(NOP, 1).build();		
 	}
 	
-	// end by urueda
-	
+
 	public Action leftClick(){
 		return new CompoundAction.Builder().add(LMouseDown, 0)
 				.add(LMouseUp, 0).add(NOP, 1).build();
@@ -137,12 +135,11 @@ public class StdActionCompiler {
 		Action ret = rightClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 
-	// begin by urueda
-	
+
 	public Action leftTripleClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
@@ -161,12 +158,11 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = leftTripleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets,  Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 	
-	// end by urueda
-	
+
 	public Action leftDoubleClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
