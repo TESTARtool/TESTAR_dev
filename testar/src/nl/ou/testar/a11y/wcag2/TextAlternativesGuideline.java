@@ -59,15 +59,19 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Non-text Content");
 		for (Widget w : widgets)
-			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
-				if (AccessibilityUtil.isKeyboardFocusable(w)) // focusable images must have a text alternative
+			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
+				if (AccessibilityUtil.isKeyboardFocusable(w)) { // focusable images must have a text alternative
 					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 							"Missing text alternative", w));
-				else
+				}
+				else {
 					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
 							"Possible missing text alternative", w));
-			else
+				}
+			}
+			else {
 				results.add(evaluationPassed(sc));
+			}
 		return results;
 	}
 

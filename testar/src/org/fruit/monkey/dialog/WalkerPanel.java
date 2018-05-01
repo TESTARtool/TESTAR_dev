@@ -40,6 +40,9 @@ import static org.fruit.monkey.dialog.ToolTipTexts.checkForceForegroundTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.testGeneratorTTT;
 
 public class WalkerPanel extends JPanel {
+
+  private static final long serialVersionUID = -6483480772900247792L;
+
   private JComboBox<String> comboBoxTestGenerator;
   private JCheckBox checkForceForeground;
   private JCheckBox checkFormsFilling;
