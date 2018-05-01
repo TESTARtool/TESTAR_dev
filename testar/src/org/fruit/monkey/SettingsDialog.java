@@ -239,7 +239,7 @@ public class SettingsDialog extends JFrame implements Observer {
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
     walkerPanel = new WalkerPanel();
-    jTabsPane.addTab("UI-walker", walkerPanel);
+    jTabsPane.addTab("Action Selection", walkerPanel);
     filterPanel = new FilterPanel();
     jTabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
