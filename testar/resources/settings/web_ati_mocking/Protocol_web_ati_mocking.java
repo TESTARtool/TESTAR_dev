@@ -61,12 +61,13 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	private static final String PREVENT_BY_MOCK_TITLE = "LOG ON";
 	private static final String MOCK_URL = "www.google.nl";
 	private static final String MOCK_ACTION_TITLE = "ADDRESS AND SEARCH BAR";
+	private static final String RETURN_URL = "www.youtube.com";
 	
 	// If we encounter a login URL, determine the 'login button'and force click
 	private static String loginTitle = "inloggen"; // lower case
 	private static String loginUrl = "https://login.awo.ou.nl/sso/login";
 	
-	private static boolean mockOngoing = false;
+	private static boolean mockPassed = false;
 
 	// Each browser (and locale!) uses different names for standard elements
 	private enum Browser {
@@ -255,18 +256,16 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		UrlActionCompiler ac = new UrlActionCompiler();
 		
 		for (Widget widget : getTopWidgets(state)) {
-			String title = widget.get(Tags.Title, null).toUpperCase();
-			String role = widget.get(Tags.Role).toString();
-			if (title.equalsIgnoreCase(browser.addressTitle) 
-					&& role.equalsIgnoreCase(browser.addressRole)) {
+			String title = widget.get(Tags.Title, null);
+			if (title.equalsIgnoreCase(browser.addressTitle)) {
 				System.out.println("[" + getClass().getSimpleName() 
-						+ "] Mock actie wordt geactiveerd (" + title +"; " + mockUrl + ")");
+						+ "] Url wordt geactiveerd (" + title +"; " + mockUrl + ")");
 				
 				action = ac.clickTypeUrl(widget, mockUrl);
 				action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
 				action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
 				
-				mockOngoing = true;
+				mockPassed = true;
 			}
 		}
 		return action;
@@ -302,10 +301,12 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		// iterate through all (top) widgets
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		for (Widget widget : getTopWidgets(state)) {
+			String title = widget.get(Tags.Title,null);
 			// only consider enabled and non-blocked widgets
 			if (widget.get(Enabled, true) && !widget.get(Blocked, false) && 
-				widget.get(Tags.Title,null).equalsIgnoreCase("Log on")){
-			// do not build actions for tabu widgets
+				((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && mockPassed )|| 
+				 (PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) && !mockPassed))){
+			// do not build actions for tabu widget
 			if (blackListed(widget)) {
 				continue;
 			}
@@ -378,17 +379,19 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		Action action = super.selectAction(state, actions);
 
 		// optional mock actions
-		if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE) && !mockOngoing) {
-			System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
-			action = rerouteByUrl(state, MOCK_URL);
+		if ( !mockPassed) {
+			if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE)) {
+				System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
+				action = rerouteByUrl(state, MOCK_URL);
+				}
+			return action;
+		} else {
+			if (preventByMock(state, action, MOCK_ACTION_TITLE)) {
+				System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
+				action = rerouteByUrl(state, RETURN_URL);
+			}
+			return action;
 		}
-		
-		if (preventByMock(state, action, MOCK_ACTION_TITLE) && mockOngoing) {
-			System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
-			action = rerouteByUrl(state, loginUrl);
-		}
-		
-		return action;
 	}
 
 	/**

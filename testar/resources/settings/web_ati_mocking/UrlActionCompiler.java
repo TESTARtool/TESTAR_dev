@@ -36,7 +36,7 @@ public class UrlActionCompiler extends StdActionCompiler {
 			.add(leftClickAt(position), 1)
 			.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
 		// Delete the current text
-		for ( int i=0; i< currentUrlLength; i++) {
+		for ( int i=0; i< currentUrlLength+10; i++) {
 			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
 		}
 		builder.add(new Type(text), 1);
@@ -49,7 +49,8 @@ public class UrlActionCompiler extends StdActionCompiler {
 	}
 	
 	public Action clickTypeUrl(Widget widget, double relX, double relY, String text){
-		int currentUrlLength = widget.get(Tags.ValuePattern).length();
+		String value = widget.get(Tags.ValuePattern);
+		int currentUrlLength = value.length();
 		Finder wf = abstractor.apply(widget);
 		Action ret = clickTypeUrl(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text, currentUrlLength);
 		ret.set(Tags.Targets, Util.newArrayList(wf));
