@@ -60,11 +60,13 @@ public final class ReadableGuideline extends AbstractGuideline {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
 		for (Widget w : widgets)
-			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0)
+			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0) {
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 						"Missing top-level language identifier", w));
-			else
+			}
+			else {
 				results.add(evaluationPassed(sc));
+			}
 		return results;
 	}
 

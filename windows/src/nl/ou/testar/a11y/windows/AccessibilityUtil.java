@@ -263,8 +263,7 @@ public final class AccessibilityUtil {
 	 * @return True if the widget role is unknown, else false.
 	 */
 	public static boolean isRoleUnknown(Widget w) {
-		return Role.isOneOf(getRole(w),
-				UIAUnknown, Roles.Invalid);
+		return Role.isOneOf(getRole(w), UIAUnknown);
 	}
 	
 	/**

@@ -62,15 +62,21 @@ public final class CompatibleGuideline extends AbstractGuideline {
 		SuccessCriterion sc = getSuccessCriterionByName("Name, Role, Value");
 		for (Widget w : widgets) {
 			// exclude images, they are handled by guideline "Text Alternatives"
-			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty())
+			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 						"Missing name", w));
-			else
+			}
+			else {
 				results.add(evaluationPassed(sc));
-			if (AccessibilityUtil.isRoleUnknown(w))
+			}
+			if (AccessibilityUtil.isRoleUnknown(w)) {
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 						"Unknown widget role \"" + w.get(Tags.Role).name() +
 						"\" for \"" + w.get(Tags.Title) + "\"", w));
+			}
+			else {
+				results.add(evaluationPassed(sc));
+			}
 		}
 		return results;
 	}
