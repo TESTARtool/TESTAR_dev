@@ -166,9 +166,10 @@ public class Main {
   /**
    *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
    */
+  //FIXME: This method throws a NullPointerException when you do not start testar explicitly from the bin directorybecause it cannot find the settings files
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./settings").listFiles()) {
+    for (File f : new File("./settings/").listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -399,7 +400,13 @@ public class Main {
       defaults.add(Pair.from(AlwaysCompile, true));
 
       //Overwrite the default settings with those from the file
-      return Settings.fromFile(defaults, file);
+      Settings settings = Settings.fromFile(defaults, file);
+      //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
+      //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
+      //PrologActivated is ALWAYS false.
+      //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
+      settings.set(ConfigTags.PrologActivated, false);
+      return settings;
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);
     }

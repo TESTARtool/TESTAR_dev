@@ -72,6 +72,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private String settingsFile;
   private Settings settings;
+  //TODO: what is this ret variable. Can´t you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -117,6 +118,12 @@ public class SettingsDialog extends JFrame implements Observer {
     });
   }
 
+  /**
+   *
+   * @param settings
+   * @param settingsFile
+   * @return
+   */
   public Settings run(Settings settings, String settingsFile) {
     this.settings = settings;
     this.settingsFile = settingsFile;
@@ -134,6 +141,10 @@ public class SettingsDialog extends JFrame implements Observer {
     return ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
   }
 
+  /**
+   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * @param mode indicates the MODE button that was clicked.
+   */
   private void start(AbstractProtocol.Modes mode) {
     try {
       extractInformation(settings);
@@ -192,6 +203,10 @@ public class SettingsDialog extends JFrame implements Observer {
     }
   }
 
+  /**
+   * This replaces the original test.settings file with a complete settings file
+   * @param sutSettings
+   */
   private void switchSettings(String sutSettings) {
     String previousSSE = Main.getSSE()[0];
     String sse = sutSettings + Main.SUT_SETTINGS_EXT;
@@ -242,7 +257,7 @@ public class SettingsDialog extends JFrame implements Observer {
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
     walkerPanel = new WalkerPanel();
-    jTabsPane.addTab("UI-walker", walkerPanel);
+    jTabsPane.addTab("Action Selection", walkerPanel);
     filterPanel = new FilterPanel();
     jTabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
