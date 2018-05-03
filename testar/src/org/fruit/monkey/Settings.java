@@ -205,6 +205,8 @@ public class Settings extends TaggableBase implements Serializable {
 				set((Tag)defTag, parse(value, defTag));
 			}
 
+
+
 		}
 	}
 
@@ -220,6 +222,9 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Make the default file Structure for the test.settings file
+	 */
 	public String toFileString() throws IOException{
 		StringBuilder sb = new StringBuilder();
 
@@ -324,14 +329,18 @@ public class Settings extends TaggableBase implements Serializable {
 				int ini = sb.indexOf(t.name()+" =");
 				int end = sb.indexOf(System.lineSeparator(), ini);
 
-				if(ini!=-1) { // Overwrite default tags with the new value
+				//Forced the hiding of prolog config option
+				//TODO: Take out entirely after prolog has been eradicated from TESTAR
+				if (!t.name().equals("PrologActivated")) {
+					if (ini != -1) { // Overwrite default tags with the new value
 
-					sb = sb.delete(ini, end);
-					sb.insert(ini, t.name() +" = "+ escapeBackslash(print((Tag<Object>)t, get(t))));
+						sb = sb.delete(ini, end);
+						sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>) t, get(t))));
 
-				}else { // This tag is new a variable
+					} else { // This tag is new a variable
 
-					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
+						sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
+					}
 				}
 			}
 			

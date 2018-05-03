@@ -87,13 +87,11 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol{
 
-	// begin by urueda
 	
 	protected State state = null,
 			        lastState = null;
 	protected int nonReactingActionNumber;
-	
-	// end by urueda
+
 	
 	private StateBuilder builder;
 
@@ -108,23 +106,23 @@ public class DefaultProtocol extends AbstractProtocol{
 			settings.get(ConfigTags.TimeToFreeze),
 			settings.get(ConfigTags.AccessBridgeEnabled),
 			settings.get(ConfigTags.SUTProcesses)
-			); // by urueda
+			);
 	}
 	
 	protected Canvas buildCanvas() {
 		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
-		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT); // by urueda
+		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
 	protected void beginSequence(){
-		super.beginSequence(); // by urueda
+		super.beginSequence();
 		faultySequence = false;
-		nonReactingActionNumber = 0; // by urueda
+		nonReactingActionNumber = 0;
 	}
 
 	protected void finishSequence(File recordedSequence){
 		System.out.println("Finish sequence");
-		this.killTestLaunchedProcesses(); // by urueda
+		this.killTestLaunchedProcesses();
 	}
 	
 	// refactored
@@ -133,7 +131,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 		
 	/**
-	 * @author urueda
+	 *
 	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
 	 * @return
 	 * @throws SystemStartException
@@ -142,7 +140,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 	}
 		
-	// by urueda
+
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
 		this.contextRunningProcesses = getRunningProcesses("START");
 		try{// refactored from "protected SUT startSystem() throws SystemStartException"
@@ -192,8 +190,7 @@ public class DefaultProtocol extends AbstractProtocol{
 				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
 		}
 	}
-	
-	// by urueda
+
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
 		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
@@ -205,7 +202,6 @@ public class DefaultProtocol extends AbstractProtocol{
 			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
 	}
 
-	// by urueda
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
 		Assert.hasText(processName);
 		List<SUT> suts = null;
@@ -228,7 +224,6 @@ public class DefaultProtocol extends AbstractProtocol{
 		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
 	}
 
-	// by urueda
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
 		Assert.hasText(windowTitle);
 		List<SUT> suts = null;
@@ -261,37 +256,41 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		Assert.notNull(system); // by urueda
+		Assert.notNull(system);
 		//State state = builder.apply(system);
-		state = builder.apply(system); // by urueda
+		state = builder.apply(system);
 		
-		CodingManager.buildIDs(state); // by urueda
+		CodingManager.buildIDs(state);
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state)); // by urueda
+			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state));
 		}
-		
-		// begin by urueda
+
 		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
-		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){ // begin by urueda
+			// this was added to kill the SUT if it is frozen:
+			if(verdict.severity()==SEVERITY_NOT_RESPONDING){
+				//if the SUT is frozen, we should kill it!
+				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
+				killRunningProcesses(system, 100);
+			}
+		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
-		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
-		// end by urueda
+		Grapher.notify(state, state.get(Tags.ScreenshotPath, null));
 
 		return state;
 	}
 
-	@Override // by urueda
+	@Override
 	protected Verdict getVerdict(State state){
 		Assert.notNull(state);
 		//-------------------
@@ -303,30 +302,27 @@ public class DefaultProtocol extends AbstractProtocol{
 			return new Verdict(SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
-		if(state.get(Tags.NotResponding, false))
+		if(state.get(Tags.NotResponding, false)){
 			return new Verdict(SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
-
+		}
 		//------------------------
 		// ORACLES ALMOST FOR FREE
 		//------------------------
-		
-		// begin by urueda
+
 		if (this.suspiciousTitlesPattern == null)
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
 		//System.out.println(this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
 		Matcher m;
-		// end by urueda
 		// search all widgets for suspicious titles
 		for(Widget w : state){
 			String title = w.get(Title, "");
 			if (title != null && !title.isEmpty()){
-				// begin by urueda
 				m = this.suspiciousTitlesMatchers.get(title);
 				if (m == null){
 					m = this.suspiciousTitlesPattern.matcher(title);
 					this.suspiciousTitlesMatchers.put(title, m);
 				}
-				if (m.matches()){ // end by urueda
+				if (m.matches()){
 					Visualizer visualizer = Util.NullVisualizer;
 					// visualize the problematic widget, by marking it with a red box
 					if(w.get(Tags.Shape, null) != null)
@@ -336,7 +332,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			}
 		}
 		
-		if (this.nonSuitableAction){ // by urueda
+		if (this.nonSuitableAction){
 			this.nonSuitableAction = false;
 			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
 		}
@@ -366,10 +362,10 @@ public class DefaultProtocol extends AbstractProtocol{
 		// So we set this.forceKillProcess = process.right();
 		// And then select action will take care of making the next action to select the killing of the process.
 		String processRE = settings().get(ConfigTags.ProcessesToKillDuringTest);
-		if (processRE != null && !processRE.isEmpty()){ // by urueda
-			state.set(Tags.RunningProcesses, system.getRunningProcesses()); // by urueda
+		if (processRE != null && !processRE.isEmpty()){
+			state.set(Tags.RunningProcesses, system.getRunningProcesses());
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
-				if(process.left().longValue() != system.get(Tags.PID).longValue() && // by urueda
+				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 				   process.right() != null && process.right().matches(processRE)){ // pid x name
 					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right();
@@ -384,7 +380,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			//actions.add(ac.activateSystem());
-			this.forceToForeground = true; // by urueda
+			this.forceToForeground = true;
 			return actions;
 		}
 
@@ -485,8 +481,9 @@ public class DefaultProtocol extends AbstractProtocol{
 		return !m.matches();
 	}
 
+	//TODO: seperate Clickable from Unfiltered.
 	/**
-	 * Check whether a widget is clickable
+	 * Check whether a widget is clickable and NOT filtered by the regular expression in the TESTAR SettingsDialog
 	 * @param w
 	 * @return
 	 */
@@ -495,6 +492,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
 			return isUnfiltered(w);
 		return false;
+		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
 	}
 
 	/**
@@ -504,6 +502,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	 */
 	protected boolean isTypeable(Widget w){
 		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
+		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
 	}
 
 	/**
@@ -515,7 +514,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
-				actionCount() <= lastSequenceActionNumber && // by urueda
+				actionCount() <= lastSequenceActionNumber &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
