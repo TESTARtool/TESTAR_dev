@@ -73,7 +73,7 @@ public class WidgetTreeConditionTest {
 		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID2");
 		testWidgets.add(widget);
 		// Create state
-		state = new TestState(testWidgets);		
+		state = new StateMock(testWidgets);		
 		// Create data table
 		List<TableRow> tableRows = new ArrayList<TableRow>();
 		List<TableCell> tableCells = new ArrayList<TableCell>();
@@ -99,31 +99,31 @@ public class WidgetTreeConditionTest {
 		List<WidgetCondition> conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title2" + QUOTE));
 		WidgetTreeCondition widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),true);
 		// Test case 2
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title3" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),false);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),false);
 		// Test case 3
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title2" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),true);
 		// Test case 4
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),true);
 		// Test case 5
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO,"$Title="+ QUOTE + "Title2" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),true);
 		// Test case 6
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
@@ -131,7 +131,7 @@ public class WidgetTreeConditionTest {
 		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "TitleUnknown" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),false);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),false);
 		// Test case 7
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title="+ QUOTE + "Title1" + QUOTE));
@@ -139,13 +139,13 @@ public class WidgetTreeConditionTest {
 		conditions.add(new WidgetCondition(WidgetCondition.Type.EITHER, "$Title="+ QUOTE + "Title2" + QUOTE));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title="+ QUOTE + "Title1" + QUOTE));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, null),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), null),true);
 		// Test case 8
 		conditions = new ArrayList<WidgetCondition>();
 		conditions.add(new WidgetCondition("$Title=<header1>"));
 		conditions.add(new WidgetCondition(WidgetCondition.Type.ALSO, "$Title=<header2>"));
 		widgetTreeCondition = new WidgetTreeCondition(conditions);
-		assertEquals(widgetTreeCondition.evaluate(settings, state, dataTable),true);
+		assertEquals(widgetTreeCondition.evaluate(new ProtocolProxyMock(settings, state), dataTable),true);
 	}
 
 }

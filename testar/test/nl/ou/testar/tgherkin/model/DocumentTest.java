@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -23,7 +24,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.Utils;
-import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 
 
 /**
@@ -296,7 +296,7 @@ public class DocumentTest {
 	
 	private State setUpGeneralState() {
 		List<Widget> stateWidgets = setUpGeneralWidgets();
-		State state = new TestState(stateWidgets);	
+		State state = new StateMock(stateWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		return state;
 	}
@@ -344,8 +344,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -376,7 +374,7 @@ public class DocumentTest {
 		for (int index = 1;index <= 2;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		return new Item(settings, proxy, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem2(){
@@ -390,8 +388,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"\r\n" + 
@@ -427,7 +423,7 @@ public class DocumentTest {
 		for (int index = 1;index <= 11;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		return new Item(settings, proxy, expression, 1, 11, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 11, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem3(){
@@ -441,8 +437,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -560,7 +554,7 @@ public class DocumentTest {
 		for (int index = 1;index <= 20;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		return new Item(settings, proxy, expression, 4, 20, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 4, 20, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem4(){
@@ -574,8 +568,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -702,7 +694,7 @@ public class DocumentTest {
 		for (int index = 1;index <= 22;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		return new Item(settings, proxy, expression, 5, 22, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 5, 22, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem5(){
@@ -716,8 +708,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -754,7 +744,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 2
@@ -774,7 +764,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 3
@@ -794,7 +784,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 4
@@ -814,7 +804,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);	
 		// action set sizes
@@ -841,7 +831,7 @@ public class DocumentTest {
 		for (int index = 1;index <= 4;index++){
 			verdicts.add(Verdict.OK);	
 		}
-		return new Item(settings, proxy, expression, 1, 4, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 4, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem6(){
@@ -856,8 +846,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -885,7 +873,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// action set sizes
@@ -899,7 +887,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem7(){
@@ -914,8 +902,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -943,7 +929,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// action set sizes
@@ -957,7 +943,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));			
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem8(){
@@ -971,8 +957,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1007,7 +991,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 2
@@ -1027,7 +1011,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// action set sizes
@@ -1047,7 +1031,7 @@ public class DocumentTest {
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));
-		return new Item(settings, proxy, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 2, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem9(){
@@ -1062,8 +1046,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1098,7 +1080,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 2
@@ -1118,7 +1100,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 3
@@ -1138,7 +1120,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// action set sizes
@@ -1162,7 +1144,7 @@ public class DocumentTest {
 		verdicts.add(Verdict.OK);	
 		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));
 		verdicts.add(Verdict.OK);
-		return new Item(settings, proxy, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem10(){
@@ -1177,8 +1159,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1213,7 +1193,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		State state = new TestState(stepWidgets);	
+		State state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 2
@@ -1233,7 +1213,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// Create after state for Step 3
@@ -1253,7 +1233,7 @@ public class DocumentTest {
 		widget.set(Tags.MaxZIndex, 15.0);
 		widget.set(Tags.ZIndex, 15.0);
 		stepWidgets.add(widget);		
-		state = new TestState(stepWidgets);	
+		state = new StateMock(stepWidgets);	
 		state.set(Tags.MaxZIndex, 15.0);
 		states.add(state);
 		// action set sizes
@@ -1294,7 +1274,7 @@ public class DocumentTest {
 		verdicts.add(Verdict.OK);	
 		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch"));
 		verdicts.add(new Verdict(Verdict.SEVERITY_MIN, "Default applied after a Tgherkin step mismatch"));
-		return new Item(settings, proxy, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 3, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem11(){
@@ -1309,8 +1289,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1335,7 +1313,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin step oracle failure!"));			
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem12(){
@@ -1350,8 +1328,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1376,7 +1352,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!"));	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem13(){
@@ -1391,8 +1367,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title3\"\r\n" + 
@@ -1417,7 +1391,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin feature oracle failure!"));	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem14(){
@@ -1432,8 +1406,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1461,7 +1433,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!"));	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	private Item setupItem15(){
@@ -1475,8 +1447,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Scenario: Scenario 1\r\n" + 
@@ -1486,7 +1456,7 @@ public class DocumentTest {
 		List<State> states = setUpGeneralstates(2);
 		// action set sizes
 		List<Integer> actionSetSizes = new ArrayList<Integer>();
-		actionSetSizes.add(4);
+		actionSetSizes.add(5);
 		// action sets
 		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
 		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
@@ -1494,11 +1464,12 @@ public class DocumentTest {
 		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.MouseMove));
 		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.DropDown));
 		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.RightClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDText",ActionRoles.LeftDrag));
 		actionSetList.add(actionSet);
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem16(){
@@ -1512,8 +1483,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Scenario: Scenario 1\r\n" + 
@@ -1523,7 +1492,7 @@ public class DocumentTest {
 		List<State> states = setUpGeneralstates(2);
 		// action set sizes
 		List<Integer> actionSetSizes = new ArrayList<Integer>();
-		actionSetSizes.add(6);
+		actionSetSizes.add(7);
 		// action sets
 		List<Set<ActionMatcher>> actionSetList = new ArrayList<Set<ActionMatcher>>();
 		Set<ActionMatcher> actionSet = new HashSet<ActionMatcher>();
@@ -1532,13 +1501,14 @@ public class DocumentTest {
 		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.MouseMove));
 		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.DropDown));
 		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.RightClickAt));
+		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",ActionRoles.LeftDrag));
 		// triple click has no role!
 		actionSet.add(new ActionMatcher("ConcreteIDnum1Button",null));
 		actionSetList.add(actionSet);
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem17(){
@@ -1552,8 +1522,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 
@@ -1574,7 +1542,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem18(){
@@ -1588,8 +1556,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 
@@ -1611,7 +1577,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 
 	private Item setupItem19(){
@@ -1625,8 +1591,6 @@ public class DocumentTest {
 		settings.set(ConfigTags.ReportState, false);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
-		// proxy
-		ActionWidgetProxy proxy = new TestProtocol();
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 
@@ -1647,7 +1611,7 @@ public class DocumentTest {
 		// verdicts
 		List<Verdict> verdicts = new ArrayList<Verdict>();
 		verdicts.add(Verdict.OK);	
-		return new Item(settings, proxy, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
+		return new Item(settings, expression, 1, 1, states, actionSetSizes, actionSetList, verdicts);
 	}
 	
 	/**
@@ -1656,20 +1620,22 @@ public class DocumentTest {
 	@Test
 	public void test() {
 		for (Item item : setUpItems()) {
-			Document document = Utils.getDocumentModel(item.getExpression());
+			Document document = Utils.getDocument(item.getExpression());
 			// process document in sequences and actions
 			int index = 0;
 			int sequenceCount = 0;
 			int stepCount = 0;
 			while (document.moreSequences()) {
 				sequenceCount++;
+				ProtocolProxy proxy = new ProtocolProxyMock(item.getSettings(), item.getStates().get(index));
 				document.beginSequence();
-				while (document.moreActions(item.getSettings())) {
+				while (document.moreActions(proxy)) {
 					stepCount++;
-					Set<Action> actions = document.deriveActions(item.getSettings(), item.getStates().get(index), item.getProxy());
+					Set<Action> actions = document.deriveActions(proxy);
 					assertSame(actions.size(), item.getActionSetSizes().get(index));
 					assertTrue(actionSetValid(actions, item.getActionSetList().get(index))); 
-					Verdict verdict = document.getVerdict(item.getSettings(), item.getStates().get(index + 1));
+					proxy = new ProtocolProxyMock(item.getSettings(), item.getStates().get(index + 1));
+					Verdict verdict = document.getVerdict(proxy);
 					assertEquals(verdict, item.getVerdicts().get(index));
 					index++;
 				}
@@ -1699,13 +1665,6 @@ public class DocumentTest {
 		return true;
 	}
 	
-	private class TestProtocol extends DocumentProtocol{
-		@Override
-		public boolean isUnfiltered(Widget w){
-			return true;
-		}
-	}
-	
 	// matching of an action occurs on target id and role, except for mouse moves
 	private class ActionMatcher{		
 		private String targetID;
@@ -1719,6 +1678,8 @@ public class DocumentTest {
 			if (role == null) {
 				if (action.get(Tags.Role, null) == null) {
 					return targetID.equals(action.get(Tags.TargetID, ""));
+				}else {
+					return false;
 				}
 			}
 			if (role.equals(ActionRoles.MouseMove)) {
@@ -1730,8 +1691,7 @@ public class DocumentTest {
 	}
 	
 	private class Item{
-		private Settings settings;
-		private ActionWidgetProxy proxy;		
+		private Settings settings;		
 		private String expression;
 		private int sequences;
 		private int steps;
@@ -1739,10 +1699,9 @@ public class DocumentTest {
 		private List<Integer> actionSetSizes;
 		private List<Set<ActionMatcher>> actionSetList;
 		private List<Verdict> verdicts;
-		private Item(Settings settings, ActionWidgetProxy proxy, String expression, int sequences, int steps, List<State> states, List<Integer> actionSetSizes, List<Set<ActionMatcher>> actionSetList, List<Verdict> verdicts) {
+		private Item(Settings settings, String expression, int sequences, int steps, List<State> states, List<Integer> actionSetSizes, List<Set<ActionMatcher>> actionSetList, List<Verdict> verdicts) {
 			super();
 			this.settings = settings;
-			this.proxy = proxy;
 			this.expression = expression;
 			this.sequences = sequences;
 			this.steps = steps;
@@ -1753,9 +1712,6 @@ public class DocumentTest {
 		}
 		private Settings getSettings() {
 			return settings;
-		}
-		private ActionWidgetProxy getProxy() {
-			return proxy;
 		}
 		private String getExpression() {
 			return expression;

@@ -8,28 +8,29 @@ import org.fruit.Assert;
  */
 public class PlaceholderArgument extends Argument {
 
-	private final String name;
+	private final String value;
 	
 	/**
 	 * PlaceholderArgument Constructor.
-	 * @param name given name
+	 * @param value given value
 	 */
-	public PlaceholderArgument(String name){
-		Assert.notNull(name);
-		this.name = name;
+	public PlaceholderArgument(String value){
+		Assert.notNull(value);
+		this.value = value;
 	}
 	
 	/**
-	 * Retrieve name.
-	 * @return name
+	 * Retrieve value.
+	 * @return value
 	 */
-	public String getName() {
-		return name;
+	@Override
+	public String getValue() {
+		return value;
 	}
 	
     @Override
     public String toString() {
-    	return "<" + getName() + ">";    	
+    	return "<" + getValue() + ">";    	
     }
 	
 }

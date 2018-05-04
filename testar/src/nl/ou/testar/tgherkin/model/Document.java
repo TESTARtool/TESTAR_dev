@@ -7,11 +7,8 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
 
 /**
  * Tgherkin Document.
@@ -43,11 +40,11 @@ public class Document {
     
     /**
 	 * Check whether more actions exist.
-	 * @param settings given settings
+	 * @param proxy protocol proxy
 	 * @return boolean true if more actions exist, otherwise false
 	 */
-	public boolean moreActions(Settings settings) {
-		return !(currentFeature().hasFailed() && !settings.get(ConfigTags.ForceToSequenceLength)) && currentFeature().moreActions();
+	public boolean moreActions(ProtocolProxy proxy) {
+		return !(currentFeature().hasFailed() && !proxy.getSettings().get(ConfigTags.ForceToSequenceLength)) && currentFeature().moreActions();
 	}
     
 	/**
@@ -72,25 +69,22 @@ public class Document {
     
 	/**
 	 * Derive actions.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @return set of derived actions, empty set if no action was found 
 	 */
-	public Set<Action> deriveActions(Settings settings, State state, ActionWidgetProxy proxy) {
-		currentFeature().evaluateGivenCondition(settings, state);
-		return currentFeature().evaluateWhenCondition(settings, state, proxy);
+	public Set<Action> deriveActions(ProtocolProxy proxy) {
+		currentFeature().evaluateGivenCondition(proxy);
+		return currentFeature().evaluateWhenCondition(proxy);
 	}
 	
 
 	/**	  
 	 * Get verdict.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(Settings settings, State state) {
-		return currentFeature().getVerdict(settings, state);
+	public Verdict getVerdict(ProtocolProxy proxy) {
+		return currentFeature().getVerdict(proxy);
 	}
 
 	/**

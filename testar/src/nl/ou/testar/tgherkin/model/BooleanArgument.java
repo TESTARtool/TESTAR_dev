@@ -23,6 +23,7 @@ public class BooleanArgument extends Argument {
 	 * Retrieve value.
 	 * @return value
 	 */
+	@Override
 	public Boolean getValue() {
 		return value;
 	}

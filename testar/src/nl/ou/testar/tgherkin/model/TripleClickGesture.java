@@ -26,7 +26,7 @@ public class TripleClickGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
     	if (getArguments().size() > 0 && getBooleanArgument(0, dataTable)) {    		 
     		// unchecked argument contains value true
     		return super.gesturePossible(widget, proxy, dataTable);
@@ -35,7 +35,7 @@ public class TripleClickGesture extends Gesture {
     }
     
     @Override
-    public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
     	StdActionCompiler ac = new AnnotatingActionCompiler();
     	actions.add(ac.leftTripleClickAt(widget));

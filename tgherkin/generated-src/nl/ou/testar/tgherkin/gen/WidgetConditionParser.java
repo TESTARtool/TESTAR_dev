@@ -27,20 +27,23 @@ public class WidgetConditionParser extends Parser {
 		INTEGER_NUMBER=20, PLACEHOLDER=21, STRING=22, COMMENT=23, AND=24, OR=25, 
 		NOT=26, TRUE=27, FALSE=28, POW=29, MULT=30, DIV=31, MOD=32, PLUS=33, MINUS=34, 
 		GT=35, GE=36, LT=37, LE=38, EQ=39, NE=40, LPAREN=41, RPAREN=42, COMMA=43, 
-		MATCHES_NAME=44, XPATH_NAME=45, IMAGE_NAME=46, CLICK_NAME=47, TYPE_NAME=48, 
-		DRAG_NAME=49, ANY_NAME=50, DOUBLE_CLICK_NAME=51, TRIPLE_CLICK_NAME=52, 
-		RIGHT_CLICK_NAME=53, MOUSE_MOVE_NAME=54, DROP_DOWN_AT_NAME=55, BOOLEAN_VARIABLE=56, 
-		NUMBER_VARIABLE=57, STRING_VARIABLE=58, EOL=59, WS=60, OTHER=61, BOOLEAN_VARIABLE_NAME=62, 
-		NUMBER_VARIABLE_NAME=63, STRING_VARIABLE_NAME=64;
+		MATCHES_NAME=44, XPATH_NAME=45, IMAGE_NAME=46, OCR_NAME=47, CLICK_NAME=48, 
+		TYPE_NAME=49, DRAG_SLIDER_NAME=50, ANY_NAME=51, DOUBLE_CLICK_NAME=52, 
+		TRIPLE_CLICK_NAME=53, RIGHT_CLICK_NAME=54, MOUSE_MOVE_NAME=55, DROP_DOWN_AT_NAME=56, 
+		HIT_KEY_NAME=57, DRAG_DROP_NAME=58, BOOLEAN_VARIABLE=59, NUMBER_VARIABLE=60, 
+		STRING_VARIABLE=61, EOL=62, WS=63, OTHER=64, BOOLEAN_VARIABLE_NAME=65, 
+		NUMBER_VARIABLE_NAME=66, STRING_VARIABLE_NAME=67, KB_KEY_NAME=68;
 	public static final int
 		RULE_widget_condition = 0, RULE_relational_expr = 1, RULE_relational_operator = 2, 
 		RULE_arithmetic_expr = 3, RULE_string_expr = 4, RULE_booleanFunction = 5, 
-		RULE_matchesFunction = 6, RULE_xpathFunction = 7, RULE_imageFunction = 8, 
-		RULE_bool = 9, RULE_logical_entity = 10, RULE_numeric_entity = 11, RULE_string_entity = 12;
+		RULE_stringFunction = 6, RULE_matchesFunction = 7, RULE_xpathFunction = 8, 
+		RULE_imageFunction = 9, RULE_ocrFunction = 10, RULE_bool = 11, RULE_logical_entity = 12, 
+		RULE_numeric_entity = 13, RULE_string_entity = 14;
 	public static final String[] ruleNames = {
 		"widget_condition", "relational_expr", "relational_operator", "arithmetic_expr", 
-		"string_expr", "booleanFunction", "matchesFunction", "xpathFunction", 
-		"imageFunction", "bool", "logical_entity", "numeric_entity", "string_entity"
+		"string_expr", "booleanFunction", "stringFunction", "matchesFunction", 
+		"xpathFunction", "imageFunction", "ocrFunction", "bool", "logical_entity", 
+		"numeric_entity", "string_entity"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -49,9 +52,10 @@ public class WidgetConditionParser extends Parser {
 		"'Step:'", "'Range'", "'Given'", "'When'", "'Then'", "'Also'", "'Either'", 
 		null, null, null, null, null, null, "'and'", "'or'", null, "'true'", "'false'", 
 		"'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", "'>='", "'<'", "'<='", 
-		"'='", null, "'('", "')'", "','", "'matches'", "'xpath'", "'image'", "'click'", 
-		"'type'", "'drag'", "'anyGesture'", "'doubleClick'", "'tripleClick'", 
-		"'rightClick'", "'mouseMove'", "'dropDownAt'"
+		"'='", null, "'('", "')'", "','", "'matches'", "'xpath'", "'image'", "'ocr'", 
+		"'click'", "'type'", "'dragSlider'", "'anyGesture'", "'doubleClick'", 
+		"'tripleClick'", "'rightClick'", "'mouseMove'", "'dropDownAt'", "'hitKey'", 
+		"'dragDrop'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, "OPTION_KEYWORD_INCLUDE", "OPTION_KEYWORD_EXCLUDE", "TAGNAME", "FEATURE_KEYWORD", 
@@ -62,10 +66,12 @@ public class WidgetConditionParser extends Parser {
 		"INTEGER_NUMBER", "PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", 
 		"TRUE", "FALSE", "POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", 
 		"LT", "LE", "EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "XPATH_NAME", 
-		"IMAGE_NAME", "CLICK_NAME", "TYPE_NAME", "DRAG_NAME", "ANY_NAME", "DOUBLE_CLICK_NAME", 
-		"TRIPLE_CLICK_NAME", "RIGHT_CLICK_NAME", "MOUSE_MOVE_NAME", "DROP_DOWN_AT_NAME", 
+		"IMAGE_NAME", "OCR_NAME", "CLICK_NAME", "TYPE_NAME", "DRAG_SLIDER_NAME", 
+		"ANY_NAME", "DOUBLE_CLICK_NAME", "TRIPLE_CLICK_NAME", "RIGHT_CLICK_NAME", 
+		"MOUSE_MOVE_NAME", "DROP_DOWN_AT_NAME", "HIT_KEY_NAME", "DRAG_DROP_NAME", 
 		"BOOLEAN_VARIABLE", "NUMBER_VARIABLE", "STRING_VARIABLE", "EOL", "WS", 
-		"OTHER", "BOOLEAN_VARIABLE_NAME", "NUMBER_VARIABLE_NAME", "STRING_VARIABLE_NAME"
+		"OTHER", "BOOLEAN_VARIABLE_NAME", "NUMBER_VARIABLE_NAME", "STRING_VARIABLE_NAME", 
+		"KB_KEY_NAME"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -224,7 +230,7 @@ public class WidgetConditionParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(35);
+			setState(39);
 			switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
 			case 1:
 				{
@@ -232,9 +238,9 @@ public class WidgetConditionParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(27);
+				setState(31);
 				match(NOT);
-				setState(28);
+				setState(32);
 				widget_condition(4);
 				}
 				break;
@@ -243,7 +249,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new LogicalEntityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(29);
+				setState(33);
 				logical_entity();
 				}
 				break;
@@ -252,11 +258,11 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new WidgetConditionInParenContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(30);
+				setState(34);
 				match(LPAREN);
-				setState(31);
+				setState(35);
 				widget_condition(0);
-				setState(32);
+				setState(36);
 				match(RPAREN);
 				}
 				break;
@@ -265,13 +271,13 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new RelationalExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(34);
+				setState(38);
 				relational_expr();
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(45);
+			setState(49);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -279,18 +285,18 @@ public class WidgetConditionParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(43);
+					setState(47);
 					switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 					case 1:
 						{
 						_localctx = new WidgetConditionAndContext(new Widget_conditionContext(_parentctx, _parentState));
 						((WidgetConditionAndContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_condition);
-						setState(37);
+						setState(41);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(38);
+						setState(42);
 						match(AND);
-						setState(39);
+						setState(43);
 						((WidgetConditionAndContext)_localctx).right = widget_condition(3);
 						}
 						break;
@@ -299,18 +305,18 @@ public class WidgetConditionParser extends Parser {
 						_localctx = new WidgetConditionOrContext(new Widget_conditionContext(_parentctx, _parentState));
 						((WidgetConditionOrContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_condition);
-						setState(40);
+						setState(44);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(41);
+						setState(45);
 						match(OR);
-						setState(42);
+						setState(46);
 						((WidgetConditionOrContext)_localctx).right = widget_condition(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(47);
+				setState(51);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
@@ -394,17 +400,17 @@ public class WidgetConditionParser extends Parser {
 		Relational_exprContext _localctx = new Relational_exprContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_relational_expr);
 		try {
-			setState(60);
+			setState(64);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				_localctx = new RelationalNumericExpressionWithOperatorContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(48);
+				setState(52);
 				((RelationalNumericExpressionWithOperatorContext)_localctx).left = arithmetic_expr(0);
-				setState(49);
+				setState(53);
 				relational_operator();
-				setState(50);
+				setState(54);
 				((RelationalNumericExpressionWithOperatorContext)_localctx).right = arithmetic_expr(0);
 				}
 				break;
@@ -412,11 +418,11 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new RelationalStringExpressionWithOperatorContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(52);
+				setState(56);
 				((RelationalStringExpressionWithOperatorContext)_localctx).left = string_expr();
-				setState(53);
+				setState(57);
 				relational_operator();
-				setState(54);
+				setState(58);
 				((RelationalStringExpressionWithOperatorContext)_localctx).right = string_expr();
 				}
 				break;
@@ -424,11 +430,11 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new RelationalExpressionParensContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(56);
+				setState(60);
 				match(LPAREN);
-				setState(57);
+				setState(61);
 				relational_expr();
-				setState(58);
+				setState(62);
 				match(RPAREN);
 				}
 				break;
@@ -470,7 +476,7 @@ public class WidgetConditionParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(62);
+			setState(66);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -608,7 +614,7 @@ public class WidgetConditionParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(72);
+			setState(76);
 			switch (_input.LA(1)) {
 			case MINUS:
 				{
@@ -616,9 +622,9 @@ public class WidgetConditionParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(65);
+				setState(69);
 				match(MINUS);
-				setState(66);
+				setState(70);
 				arithmetic_expr(4);
 				}
 				break;
@@ -630,7 +636,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new ArithmeticExpressionNumericEntityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(67);
+				setState(71);
 				numeric_entity();
 				}
 				break;
@@ -639,11 +645,11 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new ArithmeticExpressionParensContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(68);
+				setState(72);
 				match(LPAREN);
-				setState(69);
+				setState(73);
 				arithmetic_expr(0);
-				setState(70);
+				setState(74);
 				match(RPAREN);
 				}
 				break;
@@ -651,7 +657,7 @@ public class WidgetConditionParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(85);
+			setState(89);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -659,18 +665,18 @@ public class WidgetConditionParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(83);
+					setState(87);
 					switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
 					case 1:
 						{
 						_localctx = new ArithmeticExpressionPowContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionPowContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(74);
+						setState(78);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(75);
+						setState(79);
 						match(POW);
-						setState(76);
+						setState(80);
 						((ArithmeticExpressionPowContext)_localctx).right = arithmetic_expr(4);
 						}
 						break;
@@ -679,16 +685,16 @@ public class WidgetConditionParser extends Parser {
 						_localctx = new ArithmeticExpressionMultDivModContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionMultDivModContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(77);
+						setState(81);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(78);
+						setState(82);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << MULT) | (1L << DIV) | (1L << MOD))) != 0)) ) {
 						_errHandler.recoverInline(this);
 						} else {
 							consume();
 						}
-						setState(79);
+						setState(83);
 						((ArithmeticExpressionMultDivModContext)_localctx).right = arithmetic_expr(3);
 						}
 						break;
@@ -697,23 +703,23 @@ public class WidgetConditionParser extends Parser {
 						_localctx = new ArithmeticExpressionPlusMinusContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionPlusMinusContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(80);
+						setState(84);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(81);
+						setState(85);
 						_la = _input.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
 						_errHandler.recoverInline(this);
 						} else {
 							consume();
 						}
-						setState(82);
+						setState(86);
 						((ArithmeticExpressionPlusMinusContext)_localctx).right = arithmetic_expr(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(87);
+				setState(91);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
 			}
@@ -751,7 +757,7 @@ public class WidgetConditionParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(88);
+			setState(92);
 			string_entity();
 			}
 		}
@@ -791,26 +797,26 @@ public class WidgetConditionParser extends Parser {
 		BooleanFunctionContext _localctx = new BooleanFunctionContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_booleanFunction);
 		try {
-			setState(93);
+			setState(97);
 			switch (_input.LA(1)) {
 			case MATCHES_NAME:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(90);
+				setState(94);
 				matchesFunction();
 				}
 				break;
 			case XPATH_NAME:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(91);
+				setState(95);
 				xpathFunction();
 				}
 				break;
 			case IMAGE_NAME:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(92);
+				setState(96);
 				imageFunction();
 				}
 				break;
@@ -829,10 +835,48 @@ public class WidgetConditionParser extends Parser {
 		return _localctx;
 	}
 
+	public static class StringFunctionContext extends ParserRuleContext {
+		public OcrFunctionContext ocrFunction() {
+			return getRuleContext(OcrFunctionContext.class,0);
+		}
+		public StringFunctionContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_stringFunction; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof WidgetConditionParserVisitor ) return ((WidgetConditionParserVisitor<? extends T>)visitor).visitStringFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final StringFunctionContext stringFunction() throws RecognitionException {
+		StringFunctionContext _localctx = new StringFunctionContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_stringFunction);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(99);
+			ocrFunction();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
 	public static class MatchesFunctionContext extends ParserRuleContext {
 		public TerminalNode MATCHES_NAME() { return getToken(WidgetConditionParser.MATCHES_NAME, 0); }
 		public TerminalNode LPAREN() { return getToken(WidgetConditionParser.LPAREN, 0); }
-		public TerminalNode STRING_VARIABLE() { return getToken(WidgetConditionParser.STRING_VARIABLE, 0); }
+		public String_entityContext string_entity() {
+			return getRuleContext(String_entityContext.class,0);
+		}
 		public TerminalNode COMMA() { return getToken(WidgetConditionParser.COMMA, 0); }
 		public TerminalNode STRING() { return getToken(WidgetConditionParser.STRING, 0); }
 		public TerminalNode RPAREN() { return getToken(WidgetConditionParser.RPAREN, 0); }
@@ -849,21 +893,21 @@ public class WidgetConditionParser extends Parser {
 
 	public final MatchesFunctionContext matchesFunction() throws RecognitionException {
 		MatchesFunctionContext _localctx = new MatchesFunctionContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_matchesFunction);
+		enterRule(_localctx, 14, RULE_matchesFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(95);
+			setState(101);
 			match(MATCHES_NAME);
-			setState(96);
+			setState(102);
 			match(LPAREN);
-			setState(97);
-			match(STRING_VARIABLE);
-			setState(98);
+			setState(103);
+			string_entity();
+			setState(104);
 			match(COMMA);
-			setState(99);
+			setState(105);
 			match(STRING);
-			setState(100);
+			setState(106);
 			match(RPAREN);
 			}
 		}
@@ -896,17 +940,17 @@ public class WidgetConditionParser extends Parser {
 
 	public final XpathFunctionContext xpathFunction() throws RecognitionException {
 		XpathFunctionContext _localctx = new XpathFunctionContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_xpathFunction);
+		enterRule(_localctx, 16, RULE_xpathFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(102);
+			setState(108);
 			match(XPATH_NAME);
-			setState(103);
+			setState(109);
 			match(LPAREN);
-			setState(104);
+			setState(110);
 			match(STRING);
-			setState(105);
+			setState(111);
 			match(RPAREN);
 			}
 		}
@@ -939,17 +983,57 @@ public class WidgetConditionParser extends Parser {
 
 	public final ImageFunctionContext imageFunction() throws RecognitionException {
 		ImageFunctionContext _localctx = new ImageFunctionContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_imageFunction);
+		enterRule(_localctx, 18, RULE_imageFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(107);
+			setState(113);
 			match(IMAGE_NAME);
-			setState(108);
+			setState(114);
 			match(LPAREN);
-			setState(109);
+			setState(115);
 			match(STRING);
-			setState(110);
+			setState(116);
+			match(RPAREN);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class OcrFunctionContext extends ParserRuleContext {
+		public TerminalNode OCR_NAME() { return getToken(WidgetConditionParser.OCR_NAME, 0); }
+		public TerminalNode LPAREN() { return getToken(WidgetConditionParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(WidgetConditionParser.RPAREN, 0); }
+		public OcrFunctionContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_ocrFunction; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof WidgetConditionParserVisitor ) return ((WidgetConditionParserVisitor<? extends T>)visitor).visitOcrFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final OcrFunctionContext ocrFunction() throws RecognitionException {
+		OcrFunctionContext _localctx = new OcrFunctionContext(_ctx, getState());
+		enterRule(_localctx, 20, RULE_ocrFunction);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(118);
+			match(OCR_NAME);
+			setState(119);
+			match(LPAREN);
+			setState(120);
 			match(RPAREN);
 			}
 		}
@@ -980,12 +1064,12 @@ public class WidgetConditionParser extends Parser {
 
 	public final BoolContext bool() throws RecognitionException {
 		BoolContext _localctx = new BoolContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_bool);
+		enterRule(_localctx, 22, RULE_bool);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(112);
+			setState(122);
 			_la = _input.LA(1);
 			if ( !(_la==TRUE || _la==FALSE) ) {
 			_errHandler.recoverInline(this);
@@ -1059,16 +1143,16 @@ public class WidgetConditionParser extends Parser {
 
 	public final Logical_entityContext logical_entity() throws RecognitionException {
 		Logical_entityContext _localctx = new Logical_entityContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_logical_entity);
+		enterRule(_localctx, 24, RULE_logical_entity);
 		try {
-			setState(118);
+			setState(128);
 			switch (_input.LA(1)) {
 			case TRUE:
 			case FALSE:
 				_localctx = new LogicalConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(114);
+				setState(124);
 				bool();
 				}
 				break;
@@ -1076,7 +1160,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new LogicalVariableContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(115);
+				setState(125);
 				match(BOOLEAN_VARIABLE);
 				}
 				break;
@@ -1084,7 +1168,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new LogicalPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(116);
+				setState(126);
 				match(PLACEHOLDER);
 				}
 				break;
@@ -1094,7 +1178,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new LogicalFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(117);
+				setState(127);
 				booleanFunction();
 				}
 				break;
@@ -1163,15 +1247,15 @@ public class WidgetConditionParser extends Parser {
 
 	public final Numeric_entityContext numeric_entity() throws RecognitionException {
 		Numeric_entityContext _localctx = new Numeric_entityContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_numeric_entity);
+		enterRule(_localctx, 26, RULE_numeric_entity);
 		try {
-			setState(124);
+			setState(134);
 			switch (_input.LA(1)) {
 			case INTEGER_NUMBER:
 				_localctx = new IntegerConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(120);
+				setState(130);
 				match(INTEGER_NUMBER);
 				}
 				break;
@@ -1179,7 +1263,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new DecimalConstContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(121);
+				setState(131);
 				match(DECIMAL_NUMBER);
 				}
 				break;
@@ -1187,7 +1271,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new NumericVariableContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(122);
+				setState(132);
 				match(NUMBER_VARIABLE);
 				}
 				break;
@@ -1195,7 +1279,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new NumericPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(123);
+				setState(133);
 				match(PLACEHOLDER);
 				}
 				break;
@@ -1243,6 +1327,17 @@ public class WidgetConditionParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class StrFunctionContext extends String_entityContext {
+		public StringFunctionContext stringFunction() {
+			return getRuleContext(StringFunctionContext.class,0);
+		}
+		public StrFunctionContext(String_entityContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof WidgetConditionParserVisitor ) return ((WidgetConditionParserVisitor<? extends T>)visitor).visitStrFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 	public static class StringVariableContext extends String_entityContext {
 		public TerminalNode STRING_VARIABLE() { return getToken(WidgetConditionParser.STRING_VARIABLE, 0); }
 		public StringVariableContext(String_entityContext ctx) { copyFrom(ctx); }
@@ -1255,15 +1350,15 @@ public class WidgetConditionParser extends Parser {
 
 	public final String_entityContext string_entity() throws RecognitionException {
 		String_entityContext _localctx = new String_entityContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_string_entity);
+		enterRule(_localctx, 28, RULE_string_entity);
 		try {
-			setState(129);
+			setState(140);
 			switch (_input.LA(1)) {
 			case STRING:
 				_localctx = new StringConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(126);
+				setState(136);
 				match(STRING);
 				}
 				break;
@@ -1271,7 +1366,7 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new StringVariableContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(127);
+				setState(137);
 				match(STRING_VARIABLE);
 				}
 				break;
@@ -1279,8 +1374,16 @@ public class WidgetConditionParser extends Parser {
 				_localctx = new StringPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(128);
+				setState(138);
 				match(PLACEHOLDER);
+				}
+				break;
+			case OCR_NAME:
+				_localctx = new StrFunctionContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(139);
+				stringFunction();
 				}
 				break;
 			default:
@@ -1329,40 +1432,45 @@ public class WidgetConditionParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3B\u0086\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3F\u0091\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
-		"\13\4\f\t\f\4\r\t\r\4\16\t\16\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2"+
-		"&\n\2\3\2\3\2\3\2\3\2\3\2\3\2\7\2.\n\2\f\2\16\2\61\13\2\3\3\3\3\3\3\3"+
-		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3?\n\3\3\4\3\4\3\5\3\5\3\5\3\5\3"+
-		"\5\3\5\3\5\3\5\5\5K\n\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5V\n\5\f"+
-		"\5\16\5Y\13\5\3\6\3\6\3\7\3\7\3\7\5\7`\n\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
-		"\3\t\3\t\3\t\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\13\3\13\3\f\3\f\3\f\3\f\5\f"+
-		"y\n\f\3\r\3\r\3\r\3\r\5\r\177\n\r\3\16\3\16\3\16\5\16\u0084\n\16\3\16"+
-		"\2\4\2\b\17\2\4\6\b\n\f\16\20\22\24\26\30\32\2\6\3\2%*\3\2 \"\3\2#$\3"+
-		"\2\35\36\u008e\2%\3\2\2\2\4>\3\2\2\2\6@\3\2\2\2\bJ\3\2\2\2\nZ\3\2\2\2"+
-		"\f_\3\2\2\2\16a\3\2\2\2\20h\3\2\2\2\22m\3\2\2\2\24r\3\2\2\2\26x\3\2\2"+
-		"\2\30~\3\2\2\2\32\u0083\3\2\2\2\34\35\b\2\1\2\35\36\7\34\2\2\36&\5\2\2"+
-		"\6\37&\5\26\f\2 !\7+\2\2!\"\5\2\2\2\"#\7,\2\2#&\3\2\2\2$&\5\4\3\2%\34"+
-		"\3\2\2\2%\37\3\2\2\2% \3\2\2\2%$\3\2\2\2&/\3\2\2\2\'(\f\4\2\2()\7\32\2"+
-		"\2).\5\2\2\5*+\f\3\2\2+,\7\33\2\2,.\5\2\2\4-\'\3\2\2\2-*\3\2\2\2.\61\3"+
-		"\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\3\3\2\2\2\61/\3\2\2\2\62\63\5\b\5\2\63"+
-		"\64\5\6\4\2\64\65\5\b\5\2\65?\3\2\2\2\66\67\5\n\6\2\678\5\6\4\289\5\n"+
-		"\6\29?\3\2\2\2:;\7+\2\2;<\5\4\3\2<=\7,\2\2=?\3\2\2\2>\62\3\2\2\2>\66\3"+
-		"\2\2\2>:\3\2\2\2?\5\3\2\2\2@A\t\2\2\2A\7\3\2\2\2BC\b\5\1\2CD\7$\2\2DK"+
-		"\5\b\5\6EK\5\30\r\2FG\7+\2\2GH\5\b\5\2HI\7,\2\2IK\3\2\2\2JB\3\2\2\2JE"+
-		"\3\2\2\2JF\3\2\2\2KW\3\2\2\2LM\f\5\2\2MN\7\37\2\2NV\5\b\5\6OP\f\4\2\2"+
-		"PQ\t\3\2\2QV\5\b\5\5RS\f\3\2\2ST\t\4\2\2TV\5\b\5\4UL\3\2\2\2UO\3\2\2\2"+
-		"UR\3\2\2\2VY\3\2\2\2WU\3\2\2\2WX\3\2\2\2X\t\3\2\2\2YW\3\2\2\2Z[\5\32\16"+
-		"\2[\13\3\2\2\2\\`\5\16\b\2]`\5\20\t\2^`\5\22\n\2_\\\3\2\2\2_]\3\2\2\2"+
-		"_^\3\2\2\2`\r\3\2\2\2ab\7.\2\2bc\7+\2\2cd\7<\2\2de\7-\2\2ef\7\30\2\2f"+
-		"g\7,\2\2g\17\3\2\2\2hi\7/\2\2ij\7+\2\2jk\7\30\2\2kl\7,\2\2l\21\3\2\2\2"+
-		"mn\7\60\2\2no\7+\2\2op\7\30\2\2pq\7,\2\2q\23\3\2\2\2rs\t\5\2\2s\25\3\2"+
-		"\2\2ty\5\24\13\2uy\7:\2\2vy\7\27\2\2wy\5\f\7\2xt\3\2\2\2xu\3\2\2\2xv\3"+
-		"\2\2\2xw\3\2\2\2y\27\3\2\2\2z\177\7\26\2\2{\177\7\25\2\2|\177\7;\2\2}"+
-		"\177\7\27\2\2~z\3\2\2\2~{\3\2\2\2~|\3\2\2\2~}\3\2\2\2\177\31\3\2\2\2\u0080"+
-		"\u0084\7\30\2\2\u0081\u0084\7<\2\2\u0082\u0084\7\27\2\2\u0083\u0080\3"+
-		"\2\2\2\u0083\u0081\3\2\2\2\u0083\u0082\3\2\2\2\u0084\33\3\2\2\2\r%-/>"+
-		"JUW_x~\u0083";
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\3\2\3\2"+
+		"\3\2\3\2\3\2\3\2\5\2*\n\2\3\2\3\2\3\2\3\2\3\2\3\2\7\2\62\n\2\f\2\16\2"+
+		"\65\13\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3C\n\3\3\4"+
+		"\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5O\n\5\3\5\3\5\3\5\3\5\3\5\3\5"+
+		"\3\5\3\5\3\5\7\5Z\n\5\f\5\16\5]\13\5\3\6\3\6\3\7\3\7\3\7\5\7d\n\7\3\b"+
+		"\3\b\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\n\3\n\3\n\3\n\3\n\3\13\3\13\3\13\3"+
+		"\13\3\13\3\f\3\f\3\f\3\f\3\r\3\r\3\16\3\16\3\16\3\16\5\16\u0083\n\16\3"+
+		"\17\3\17\3\17\3\17\5\17\u0089\n\17\3\20\3\20\3\20\3\20\5\20\u008f\n\20"+
+		"\3\20\2\4\2\b\21\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36\2\6\3\2%*\3\2"+
+		" \"\3\2#$\3\2\35\36\u0098\2)\3\2\2\2\4B\3\2\2\2\6D\3\2\2\2\bN\3\2\2\2"+
+		"\n^\3\2\2\2\fc\3\2\2\2\16e\3\2\2\2\20g\3\2\2\2\22n\3\2\2\2\24s\3\2\2\2"+
+		"\26x\3\2\2\2\30|\3\2\2\2\32\u0082\3\2\2\2\34\u0088\3\2\2\2\36\u008e\3"+
+		"\2\2\2 !\b\2\1\2!\"\7\34\2\2\"*\5\2\2\6#*\5\32\16\2$%\7+\2\2%&\5\2\2\2"+
+		"&\'\7,\2\2\'*\3\2\2\2(*\5\4\3\2) \3\2\2\2)#\3\2\2\2)$\3\2\2\2)(\3\2\2"+
+		"\2*\63\3\2\2\2+,\f\4\2\2,-\7\32\2\2-\62\5\2\2\5./\f\3\2\2/\60\7\33\2\2"+
+		"\60\62\5\2\2\4\61+\3\2\2\2\61.\3\2\2\2\62\65\3\2\2\2\63\61\3\2\2\2\63"+
+		"\64\3\2\2\2\64\3\3\2\2\2\65\63\3\2\2\2\66\67\5\b\5\2\678\5\6\4\289\5\b"+
+		"\5\29C\3\2\2\2:;\5\n\6\2;<\5\6\4\2<=\5\n\6\2=C\3\2\2\2>?\7+\2\2?@\5\4"+
+		"\3\2@A\7,\2\2AC\3\2\2\2B\66\3\2\2\2B:\3\2\2\2B>\3\2\2\2C\5\3\2\2\2DE\t"+
+		"\2\2\2E\7\3\2\2\2FG\b\5\1\2GH\7$\2\2HO\5\b\5\6IO\5\34\17\2JK\7+\2\2KL"+
+		"\5\b\5\2LM\7,\2\2MO\3\2\2\2NF\3\2\2\2NI\3\2\2\2NJ\3\2\2\2O[\3\2\2\2PQ"+
+		"\f\5\2\2QR\7\37\2\2RZ\5\b\5\6ST\f\4\2\2TU\t\3\2\2UZ\5\b\5\5VW\f\3\2\2"+
+		"WX\t\4\2\2XZ\5\b\5\4YP\3\2\2\2YS\3\2\2\2YV\3\2\2\2Z]\3\2\2\2[Y\3\2\2\2"+
+		"[\\\3\2\2\2\\\t\3\2\2\2][\3\2\2\2^_\5\36\20\2_\13\3\2\2\2`d\5\20\t\2a"+
+		"d\5\22\n\2bd\5\24\13\2c`\3\2\2\2ca\3\2\2\2cb\3\2\2\2d\r\3\2\2\2ef\5\26"+
+		"\f\2f\17\3\2\2\2gh\7.\2\2hi\7+\2\2ij\5\36\20\2jk\7-\2\2kl\7\30\2\2lm\7"+
+		",\2\2m\21\3\2\2\2no\7/\2\2op\7+\2\2pq\7\30\2\2qr\7,\2\2r\23\3\2\2\2st"+
+		"\7\60\2\2tu\7+\2\2uv\7\30\2\2vw\7,\2\2w\25\3\2\2\2xy\7\61\2\2yz\7+\2\2"+
+		"z{\7,\2\2{\27\3\2\2\2|}\t\5\2\2}\31\3\2\2\2~\u0083\5\30\r\2\177\u0083"+
+		"\7=\2\2\u0080\u0083\7\27\2\2\u0081\u0083\5\f\7\2\u0082~\3\2\2\2\u0082"+
+		"\177\3\2\2\2\u0082\u0080\3\2\2\2\u0082\u0081\3\2\2\2\u0083\33\3\2\2\2"+
+		"\u0084\u0089\7\26\2\2\u0085\u0089\7\25\2\2\u0086\u0089\7>\2\2\u0087\u0089"+
+		"\7\27\2\2\u0088\u0084\3\2\2\2\u0088\u0085\3\2\2\2\u0088\u0086\3\2\2\2"+
+		"\u0088\u0087\3\2\2\2\u0089\35\3\2\2\2\u008a\u008f\7\30\2\2\u008b\u008f"+
+		"\7?\2\2\u008c\u008f\7\27\2\2\u008d\u008f\5\16\b\2\u008e\u008a\3\2\2\2"+
+		"\u008e\u008b\3\2\2\2\u008e\u008c\3\2\2\2\u008e\u008d\3\2\2\2\u008f\37"+
+		"\3\2\2\2\r)\61\63BNY[c\u0082\u0088\u008e";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

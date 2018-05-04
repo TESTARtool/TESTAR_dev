@@ -3,12 +3,15 @@ Feature: Perform calculations with windows calculator
 
   Background: Clear.
     Step: Select Clear
-		When  $UIAAutomationId="clearButton" click()
-		
+		When  matches($UIAAutomationId,"clearButton") click()
+			image("settings\tgherkin_wincalc\clearButton.png") click()
   @Sc1 @Prod
   Scenario: Add two numbers
     Step: Select 2
-		When  $UIAAutomationId="num2Button" click()
+		When  image("settings\tgherkin_wincalc\num2Button.png") click()
+			$UIAAutomationId="num2Button" click()
+			ocr()="2" click()
+
 		Then  $UIAAutomationId="CalculatorResults" and matches($Title,"^.*2$")
     Step: Select +
 		When  $UIAAutomationId="plusButton" click()

@@ -6,8 +6,15 @@ dependencies {
 }
 
 task generateVariables(type:JavaExec) {
-   main = 'nl.ou.testar.tgherkin.variables.GenerateVariables'
+   main = 'nl.ou.testar.tgherkin.grammar.GenerateVariables'
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+task generateConstants(type:JavaExec) {
+   main = 'nl.ou.testar.tgherkin.grammar.GenerateConstants'
    classpath = sourceSets.main.runtimeClasspath
 }
 
 compileJava.finalizedBy(generateVariables)
+
+compileJava.finalizedBy(generateConstants)

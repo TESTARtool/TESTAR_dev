@@ -113,4 +113,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> ReportDerivedGestures = Tag.from("ReportDerivedGestures", Boolean.class);
   public static final Tag<Boolean> ReportState = Tag.from("Reportstate", Boolean.class);
   public static final Tag<Double> ConfidenceThreshold = Tag.from("ConfidenceThreshold", Double.class);
+  public static final Tag<Boolean> TgherkinReportIncludeOCR = Tag.from("TgherkinReportIncludeOCR", Boolean.class);
+  public static final Tag<Boolean> TgherkinReportIncludeImageRecognition = Tag.from("TgherkinReportIncludeImageRecognition", Boolean.class);
 }

@@ -105,26 +105,11 @@ public class DocumentBuilderTest {
 	@Test
 	public void test() {
 		for (String expression : testList) {	
-			TgherkinParser parser = Utils.getTgherkinParser(expression);
-		    TgherkinErrorListener errorListener = new TgherkinErrorListener();
-			parser.addErrorListener(errorListener);
-			Document document = new DocumentBuilder().visitDocument(parser.document());
-			List<String> errorList = errorListener.getErrorList();
-			if (errorList.size() == 0) {
-				// post-processing check
-				errorList = document.check();
-			}
-			if (errorList.size() != 0) {
-				for(String errorText : errorList) {
-					LogSerialiser.log(errorText, LogSerialiser.LogLevel.Info);
-				}
-				throw new TgherkinException("Invalid Tgherkin document, see log for details");
-			}
+			Document document = Utils.getDocument(expression);
 			String inString = expression.replaceAll("\\n|\\r|\\s|\\t","");
 			String outString = document.toString().replaceAll("\\n|\\r|\\s|\\t","");
 			assertTrue(inString.equals(outString));
 		}
-		
 	}
 
 }

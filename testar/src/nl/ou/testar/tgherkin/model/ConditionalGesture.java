@@ -7,9 +7,7 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.Settings;
 
 /**
  * Tgherkin ConditonalGesture.
@@ -49,29 +47,25 @@ public class ConditionalGesture {
 	
 	/**
 	 * Check whether widget is a candidate for the conditional gesture.
-	 * @param settings given settings
-	 * @param proxy given action widget proxy
-	 * @param state given state
+	 * @param proxy given protocol proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return true if widget is a candidate, otherwise false
 	 */
-	public boolean isCandidate(Settings settings, ActionWidgetProxy proxy, State state, Widget widget, DataTable dataTable) {
-		return getGesture().gesturePossible(widget, proxy, dataTable) && (getWidgetCondition() == null || getWidgetCondition().evaluate(settings, state, widget, dataTable));
+	public boolean isCandidate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
+		return getGesture().gesturePossible(widget, proxy, dataTable) && (getWidgetCondition() == null || getWidgetCondition().evaluate(proxy, widget, dataTable));
 	}
 
 	/**	  
 	 * Evaluate when condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return  set of derived actions 
 	 */
-	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Widget widget, DataTable dataTable) {
+	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();
-		if (isCandidate(settings, proxy, state, widget, dataTable)) {
+		if (isCandidate(proxy, widget, dataTable)) {
 			// widget is target for the gesture: return corresponding action 
 			actions.addAll(getGesture().getActions(widget, proxy, dataTable));	
 		}

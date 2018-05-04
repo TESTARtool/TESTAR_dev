@@ -5,9 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.fruit.Drag;
+import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
+import org.fruit.alayer.Abstractor;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Finder;
 import org.fruit.alayer.Point;
+import org.fruit.alayer.StdAbstractor;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -17,33 +22,39 @@ import org.fruit.alayer.actions.StdActionCompiler;
  * Tgherkin DragGesture.
  *
  */
-public class DragGesture extends Gesture {
+public class DragSliderGesture extends Gesture {
 
     /**
-     * DragGesture constructor.
+     * DragSliderGesture constructor.
      * @param arguments list of arguments
      */
-    public DragGesture(List<Argument> arguments) {
+    public DragSliderGesture(List<Argument> arguments) {
     	super(arguments);
     }
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
     	return super.gesturePossible(widget, proxy, dataTable) && widget.scrollDrags(Gesture.SCROLL_ARROW_SIZE, Gesture.SCROLL_THICKNESS) != null;
     }
     
     @Override
-    public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
     	StdActionCompiler ac = new AnnotatingActionCompiler();
 		Drag[] drags = widget.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICKNESS);
 		if(drags != null){
 			for (Drag drag : drags){
-				actions.add(ac.dragFromTo(
-					new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-					new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
+				Action action = ac.dragFromTo(
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+					);
+				// add action target
+				action.set(Tags.TargetID, widget.get(Tags.ConcreteID));
+				Abstractor abstractor = new StdAbstractor();
+				Finder wf = abstractor.apply(widget);	
+				action.set(Tags.Targets, Util.newArrayList(wf));				
+				actions.add(action);
 			}
 		}
     	return actions;
@@ -52,7 +63,7 @@ public class DragGesture extends Gesture {
     @Override
     public String toString() {
     	StringBuilder result = new StringBuilder();
-   		result.append("drag");
+   		result.append("dragSlider");
    		result.append(argumentsToString());
     	return result.toString();    	
     }

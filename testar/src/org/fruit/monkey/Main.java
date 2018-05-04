@@ -394,6 +394,8 @@ public class Main {
       defaults.add(Pair.from(ReportDerivedGestures, false));
       defaults.add(Pair.from(ReportState, false));
       defaults.add(Pair.from(ConfidenceThreshold, 1.0));
+      defaults.add(Pair.from(TgherkinReportIncludeOCR, false));
+      defaults.add(Pair.from(TgherkinReportIncludeImageRecognition, false));
 
       return Settings.fromFile(defaults, file);
     } catch (IOException ioe) {

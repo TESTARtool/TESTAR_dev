@@ -3,32 +3,33 @@ package nl.ou.testar.tgherkin.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.fruit.alayer.StdState;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
 /**
  * Simplified State representation that only defines an iterator over widgets. 
  *
  */
-public class TestState extends StdState{
+public class StateMock extends StdState{
 
-	/**
-	 * Serial version UID 
-	 */
 	private static final long serialVersionUID = 7755367830576251631L;
-	/**
-	 * List of widgets.
-	 */
 	private List<Widget> widgets = new ArrayList<Widget>();
+	
 	
 	/**
 	 * Constructor.
 	 * @param widgets given list of widgets
 	 */
-	public TestState(List<Widget> widgets) {
+	public StateMock(List<Widget> widgets) {
 		super();
 		this.widgets = widgets;
+		// generate a random identifier
+		Random random = new Random();
+		int randomNumber  = random.nextInt(Integer.MAX_VALUE);
+		set(Tags.ConcreteID, "ConcreteID" + randomNumber);
 	}
 	
 	@Override

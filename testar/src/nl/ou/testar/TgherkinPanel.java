@@ -24,7 +24,6 @@ import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 import javax.swing.JLabel;
 
 import static org.fruit.monkey.ConfigTags.MyClassPath;
-import static org.fruit.monkey.dialog.ToolTipTexts.maxTestTimeTTT;
 
 import org.fruit.UnProc;
 import java.net.URL;
@@ -47,6 +46,8 @@ public class TgherkinPanel extends JPanel {
 	private JCheckBox tgContinueToApplyDefaultCheckBox;
 	private JCheckBox tgRepeatTgherkinScenariosCheckBox;
 	private JCheckBox tgGenerateTgherkinReportCheckBox;
+	private JCheckBox tgTgherkinReportIncludeOCRCheckBox;
+	private JCheckBox tgTgherkinReportIncludeImageRecognitionCheckBox;
 	private JCheckBox tgStoreTgherkinReportCheckBox;
 	private JCheckBox tgReportDerivedGesturesCheckBox;
 	private JCheckBox tgReportStateCheckBox;
@@ -93,12 +94,12 @@ public class TgherkinPanel extends JPanel {
 	
 	private void addTgherkinControls() {
 		tgComboBoxTgherkinDocument = new JComboBox<String>();
-		tgComboBoxTgherkinDocument.setBounds(286, 77, 200, 20);
+		tgComboBoxTgherkinDocument.setBounds(286, 10, 200, 20);
 		tgComboBoxTgherkinDocument.setToolTipText("<html>\nSelect *.tgherkin document: specifications of features and scenarios in Tgherkin grammar.\n</html>");
 		add(tgComboBoxTgherkinDocument);
 		
 		btnEditTgherkinDocument = new javax.swing.JButton("Edit Tgherkin Document");
-		btnEditTgherkinDocument.setBounds(286, 101, 200, 20);
+		btnEditTgherkinDocument.setBounds(286, 34, 200, 20);
 		btnEditTgherkinDocument.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnEditTgherkinDocumentActionPerformed(evt);
@@ -111,12 +112,12 @@ public class TgherkinPanel extends JPanel {
 		add(btnEditTgherkinDocument);
 
 		tgApplyDefaultOnMismatchCheckBox = new JCheckBox("Apply default on step mismatch");
-		tgApplyDefaultOnMismatchCheckBox.setBounds(10, 125, 200, 23);
+		tgApplyDefaultOnMismatchCheckBox.setBounds(10, 58, 200, 23);
 		tgApplyDefaultOnMismatchCheckBox.setToolTipText("<html>\nIncicates whether default should be applied on step mismatches.\n</html>");
 		add(tgApplyDefaultOnMismatchCheckBox);
 		
 		tgContinueToApplyDefaultCheckBox = new JCheckBox("Continue to apply default after a step mismatch");
-		tgContinueToApplyDefaultCheckBox.setBounds(10, 149, 300, 23);
+		tgContinueToApplyDefaultCheckBox.setBounds(30, 82, 300, 23);
 		tgContinueToApplyDefaultCheckBox.setToolTipText("<html>\nIncicates whether default should continue to be applied after a step mismatch occurred.\n</html>");
 		add(tgContinueToApplyDefaultCheckBox);
 
@@ -130,45 +131,73 @@ public class TgherkinPanel extends JPanel {
 		});
 		
 		tgRepeatTgherkinScenariosCheckBox = new JCheckBox("Repeat Tgherkin scenarios");
-		tgRepeatTgherkinScenariosCheckBox.setBounds(10, 173, 300, 23);
+		tgRepeatTgherkinScenariosCheckBox.setBounds(10, 106, 300, 23);
 		tgRepeatTgherkinScenariosCheckBox.setToolTipText("<html>\nIncicates whether Tgherkin scenarios should be repeated until the number of sequences has been reached.\n</html>");
 		add(tgRepeatTgherkinScenariosCheckBox);
 
 		tgGenerateTgherkinReportCheckBox = new JCheckBox("Generate Tgherkin report");
-		tgGenerateTgherkinReportCheckBox.setBounds(10, 197, 300, 23);
+		tgGenerateTgherkinReportCheckBox.setBounds(10, 130, 300, 23);
 		tgGenerateTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be generated.\n</html>");
 		add(tgGenerateTgherkinReportCheckBox);
 
+		tgTgherkinReportIncludeOCRCheckBox = new JCheckBox("Include OCR in Tgherkin report");
+		tgTgherkinReportIncludeOCRCheckBox.setBounds(30, 154, 300, 23);
+		tgTgherkinReportIncludeOCRCheckBox.setToolTipText("<html>\nIndicates whether Optical Character Recognition (OCR) results should be included in the Tgherkin report.\nOCR will significantly slow down processing.\n</html>");
+		add(tgTgherkinReportIncludeOCRCheckBox);
+
+		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeOCRCheckBox.isSelected()){
+					tgTgherkinReportIncludeOCRCheckBox.setSelected(false);
+				}
+				tgTgherkinReportIncludeOCRCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
+			}
+		});
+
+		tgTgherkinReportIncludeImageRecognitionCheckBox = new JCheckBox("Include Image recognition in Tgherkin report");
+		tgTgherkinReportIncludeImageRecognitionCheckBox.setBounds(30, 178, 300, 23);
+		tgTgherkinReportIncludeImageRecognitionCheckBox.setToolTipText("<html>\nIndicates whether image recognition results should be included in the Tgherkin report.\nImage recognition will significantly slow down processing.\n</html>");
+		add(tgTgherkinReportIncludeImageRecognitionCheckBox);
+
+		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()){
+					tgTgherkinReportIncludeImageRecognitionCheckBox.setSelected(false);
+				}
+				tgTgherkinReportIncludeImageRecognitionCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
+			}
+		});
+		
 		tgStoreTgherkinReportCheckBox = new JCheckBox("Store Tgherkin report in GraphDB");
-		tgStoreTgherkinReportCheckBox.setBounds(10, 221, 300, 23);
+		tgStoreTgherkinReportCheckBox.setBounds(10, 202, 300, 23);
 		tgStoreTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be stored in the GraphDB database.\n</html>");
 		add(tgStoreTgherkinReportCheckBox);
 
 		tgReportDerivedGesturesCheckBox = new JCheckBox("Report Tgherkin derived gestures");
-		tgReportDerivedGesturesCheckBox.setBounds(10, 245, 300, 23);
+		tgReportDerivedGesturesCheckBox.setBounds(10, 226, 300, 23);
 		tgReportDerivedGesturesCheckBox.setToolTipText("<html>\nIndicates whether Tgherkin derived gestures should be reported.\n</html>");
 		add(tgReportDerivedGesturesCheckBox);
 
 		tgReportStateCheckBox = new JCheckBox("Report state");
-		tgReportStateCheckBox.setBounds(10, 269, 300, 23);
+		tgReportStateCheckBox.setBounds(10, 250, 300, 23);
 		tgReportStateCheckBox.setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
 		add(tgReportStateCheckBox);
 		
 		tgConfidenceThreshold = new JSpinner();
-		tgConfidenceThreshold.setBounds(280, 293, 100, 31);
+		tgConfidenceThreshold.setBounds(280, 274, 100, 31);
 		tgConfidenceThreshold.setModel(new SpinnerNumberModel(0.0d, 0.0d, 1.0d, 0.01d));
-		tgConfidenceThreshold.setToolTipText(maxTestTimeTTT);
+		tgConfidenceThreshold.setToolTipText("<html>\nNumber between zero and one that represents the confidence threshold\n</html>");
 	    add(tgConfidenceThreshold);
 
 	}
 
 	private void addTgherkinLabels() {
 		JLabel tgTgherkinDocumentLabel = new JLabel("Tgherkin document:");
-		tgTgherkinDocumentLabel.setBounds(10, 77, 120, 23);
+		tgTgherkinDocumentLabel.setBounds(10, 10, 120, 23);
 		add(tgTgherkinDocumentLabel);		
 
 		JLabel tgConfidenceThresholdLabel = new JLabel("Confidence threshold for image recognition:");
-		tgConfidenceThresholdLabel.setBounds(10, 293, 270, 23);
+		tgConfidenceThresholdLabel.setBounds(10, 274, 270, 23);
 		add(tgConfidenceThresholdLabel);		
 
 	}
@@ -183,6 +212,8 @@ public class TgherkinPanel extends JPanel {
 		tgContinueToApplyDefaultCheckBox.setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
 		tgRepeatTgherkinScenariosCheckBox.setSelected(settings.get(ConfigTags.RepeatTgherkinScenarios));
 		tgGenerateTgherkinReportCheckBox.setSelected(settings.get(ConfigTags.GenerateTgherkinReport));
+		tgTgherkinReportIncludeOCRCheckBox.setSelected(settings.get(ConfigTags.TgherkinReportIncludeOCR));
+		tgTgherkinReportIncludeImageRecognitionCheckBox.setSelected(settings.get(ConfigTags.TgherkinReportIncludeImageRecognition));
 		tgStoreTgherkinReportCheckBox.setSelected(settings.get(ConfigTags.StoreTgherkinReport));
 		tgReportDerivedGesturesCheckBox.setSelected(settings.get(ConfigTags.ReportDerivedGestures));
 		tgReportStateCheckBox.setSelected(settings.get(ConfigTags.ReportState));
@@ -210,6 +241,8 @@ public class TgherkinPanel extends JPanel {
 		settings.set(ConfigTags.ContinueToApplyDefault, tgContinueToApplyDefaultCheckBox.isSelected());
 		settings.set(ConfigTags.RepeatTgherkinScenarios, tgRepeatTgherkinScenariosCheckBox.isSelected());
 		settings.set(ConfigTags.GenerateTgherkinReport, tgGenerateTgherkinReportCheckBox.isSelected());	
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, tgTgherkinReportIncludeOCRCheckBox.isSelected());	
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected());	
 		settings.set(ConfigTags.StoreTgherkinReport, tgStoreTgherkinReportCheckBox.isSelected());	
 		settings.set(ConfigTags.ReportDerivedGestures, tgReportDerivedGesturesCheckBox.isSelected());
 		settings.set(ConfigTags.ReportState, tgReportStateCheckBox.isSelected());

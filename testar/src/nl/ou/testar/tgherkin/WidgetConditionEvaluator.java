@@ -5,18 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.linux.AtSpiTags;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.NativeLinker;
+import nl.ou.testar.tgherkin.functions.Image;
+import nl.ou.testar.tgherkin.functions.Matches;
+import nl.ou.testar.tgherkin.functions.OCR;
+import nl.ou.testar.tgherkin.functions.XPath;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParserBaseVisitor;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.tgherkin.model.DataTable;
 
 /**
@@ -28,23 +31,18 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	private static final double TOLERANCE = 5E-16;
 	private static Map<String, Tag<?>> tagMap;
 	
-	private double confidenceThreshold;
-	private State state;
+	private ProtocolProxy proxy;
 	private Widget widget;
 	private DataTable dataTable;
-	private Map<String,List<Widget>> xPathMap = new HashMap<String,List<Widget>>();
-	private Map<String,List<Widget>> imageMap = new HashMap<String,List<Widget>>();
 
 	/**
 	 * Constructor.
-	 * @param settings given settings
-	 * @param state given state
+	 * @param proxy given protocol widget proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 */
-	public WidgetConditionEvaluator(Settings settings, State state, Widget widget, DataTable dataTable) {
-		this.confidenceThreshold = settings.get(ConfigTags.ConfidenceThreshold);
-		this.state = state;
+	public WidgetConditionEvaluator(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
+		this.proxy = proxy;
 		this.widget = widget;
 		this.dataTable = dataTable;
 		if (tagMap == null) {
@@ -62,17 +60,12 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	
 	/**
 	 * Set data attributes.
-	 * @param state given state
+	 * @param proxy given protocol proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 */
-	public void set(State state, Widget widget, DataTable dataTable) {
-		if (this.state != state ) {
-			// reset xpath and image recognition results upon new state
-			xPathMap.clear();
-			imageMap.clear();
-		}
-		this.state = state;
+	public void set(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
+		this.proxy = proxy;
 		this.widget = widget;
 		this.dataTable = dataTable;
 	}
@@ -197,22 +190,19 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Boolean visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx) { 
 		// retrieve value widget variable
-		String str = getTagValue(widget, ctx.STRING_VARIABLE().getText().substring(1)).toString();
+		String str = (String)visit(ctx.string_entity()); 
 		String regex = ctx.STRING().getText();
 		// unquote regex
-		regex = regex.substring(1, regex.length()-1);		
-		return str.matches(regex);
+		regex = regex.substring(1, regex.length()-1);
+		return Matches.getInstance().isMatch(str, regex);
 	}
 
 	@Override 
 	public Boolean visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx) { 
 		String xpathExpr = ctx.STRING().getText();
 		// unquote 
-		xpathExpr = xpathExpr.substring(1, xpathExpr.length()-1);	
-		if (!xPathMap.containsKey(xpathExpr)) {
-			xPathMap.put(xpathExpr, Utils.getXpathResult(state, xpathExpr));
-		}
-		return xPathMap.get(xpathExpr).contains(widget);
+		xpathExpr = xpathExpr.substring(1, xpathExpr.length()-1);
+		return XPath.getInstance().isXpathResult(proxy, widget, xpathExpr);
 	}	
 	
 	@Override 
@@ -220,12 +210,17 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 		String imageFile = ctx.STRING().getText();
 		// unquote 
 		imageFile = imageFile.substring(1, imageFile.length()-1);	
-		if (!imageMap.containsKey(imageFile)) {
-			imageMap.put(imageFile, Utils.getImageRecognitionResult(state, imageFile, confidenceThreshold));
-		}
-		return imageMap.get(imageFile).contains(widget);
+		return Image.getInstance().isRecognized(proxy, widget, imageFile);
 	}
 	
+	@Override 
+	public String visitOcrFunction(WidgetConditionParser.OcrFunctionContext ctx) {
+		String ocrResult = OCR.getInstance().getOCR(proxy, widget);
+		if (ocrResult == null) {
+			return "";
+		}
+		return ocrResult;
+	}
 	
 	@Override 
 	public Boolean visitLogicalConst(WidgetConditionParser.LogicalConstContext ctx) { 

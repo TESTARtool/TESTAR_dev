@@ -12,10 +12,8 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
 
@@ -158,36 +156,33 @@ public class Feature {
 	
 	/**	  
 	 * Evaluate given condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @return true if condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(Settings settings, State state) {
+	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
 		Report.appendReportDetail(Report.StringColumn.FEATURE,getTitle());
 		Report.appendReportDetail(Report.StringColumn.SCENARIO,currentScenarioDefinition().getTitle());
 		if (backgroundRun ) {
 			if (background.moreActions()){
 				Report.appendReportDetail(Report.StringColumn.TYPE,background.getClass().getSimpleName());
-				return background.evaluateGivenCondition(settings, state);
+				return background.evaluateGivenCondition(proxy);
 			}	
 			backgroundRun = false;
 		}
 		Report.appendReportDetail(Report.StringColumn.TYPE,currentScenarioDefinition().getClass().getSimpleName());
-		return currentScenarioDefinition().evaluateGivenCondition(settings, state);
+		return currentScenarioDefinition().evaluateGivenCondition(proxy);
 	}
 	
 	/**	  
 	 * Evaluate when condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy) {
+	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy) {
 		Map<Widget,List<Gesture>> map = new HashMap<Widget, List<Gesture>>();
 		List<Gesture> list;
 		// for gestures only look at top widgets
-		for (Widget widget : proxy.getTopWidgets(state)) {
+		for (Widget widget : proxy.getTopWidgets(proxy.getState())) {
 			// always test whether enabled and not blocked
 			if(widget.get(Enabled, true) && !widget.get(Blocked, false)) {
 				list = new ArrayList<Gesture>();
@@ -195,13 +190,13 @@ public class Feature {
 					// no selection defined: all possible gestures are in scope
 					Gesture gesture = new AnyGesture(new ArrayList<Argument>());
 					ConditionalGesture conditionalGesture = new ConditionalGesture(null, gesture); 
-					if (conditionalGesture.isCandidate(settings, proxy, state, widget, null)) {
+					if (conditionalGesture.isCandidate(proxy, widget, null)) {
 						list.add(gesture);
 						map.put(widget, list);
 					}
 				}else {
 					for(ConditionalGesture conditionalGesture : selection) {
-						if (conditionalGesture.isCandidate(settings, proxy, state, widget, null)) {
+						if (conditionalGesture.isCandidate(proxy, widget, null)) {
 							list.add(conditionalGesture.getGesture());
 						}
 					}
@@ -212,21 +207,20 @@ public class Feature {
 			}
 		}
 		if (backgroundRun ) {
-			return background.evaluateWhenCondition(settings, state, proxy, map);
+			return background.evaluateWhenCondition(proxy, map);
 		}
-		return currentScenarioDefinition().evaluateWhenCondition(settings, state, proxy, map);
+		return currentScenarioDefinition().evaluateWhenCondition(proxy, map);
 	}
 	
 
 	/**	  
 	 * Get verdict.
-	 * @param settings settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(Settings settings, State state) {
+	public Verdict getVerdict(ProtocolProxy proxy) {
 		// feature level
-		if (oracle != null && !oracle.evaluate(settings, state, null)) {
+		if (oracle != null && !oracle.evaluate(proxy, null)) {
 				if (backgroundRun ) {
 					background.setFailed();
 				}else {
@@ -237,9 +231,9 @@ public class Feature {
 		}
 		// scenario level
 		if (backgroundRun ) {
-			return background.getVerdict(settings, state);
+			return background.getVerdict(proxy);
 		}
-		return currentScenarioDefinition().getVerdict(settings, state);
+		return currentScenarioDefinition().getVerdict(proxy);
 	}
 	
 	/**

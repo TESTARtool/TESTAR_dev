@@ -38,10 +38,12 @@ arithmetic_expr:
 string_expr : string_entity; 
  
 booleanFunction: matchesFunction | xpathFunction | imageFunction;
+stringFunction: ocrFunction;
 
-matchesFunction: MATCHES_NAME LPAREN STRING_VARIABLE COMMA STRING RPAREN; 
+matchesFunction: MATCHES_NAME LPAREN string_entity COMMA STRING RPAREN; 
 xpathFunction: XPATH_NAME LPAREN STRING RPAREN;
 imageFunction: IMAGE_NAME LPAREN STRING RPAREN;
+ocrFunction: OCR_NAME LPAREN RPAREN;
  
 bool: TRUE | FALSE;
 				
@@ -60,4 +62,6 @@ numeric_entity :
 string_entity : 
    STRING               #StringConst
  | STRING_VARIABLE      #StringVariable
- | PLACEHOLDER          #StringPlaceholder;		   
+ | PLACEHOLDER          #StringPlaceholder
+ | stringFunction       #StrFunction;
+		   

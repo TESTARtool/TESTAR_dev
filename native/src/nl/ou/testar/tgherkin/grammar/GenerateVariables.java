@@ -1,4 +1,4 @@
-package nl.ou.testar.tgherkin.variables;
+package nl.ou.testar.tgherkin.grammar;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -80,7 +80,6 @@ public class GenerateVariables {
 			BufferedWriter bWriter = new BufferedWriter(fWriter);
 			pWriter = new PrintWriter(bWriter);
 			pWriter.println("lexer grammar Variables;");
-			pWriter.println("@header {package nl.ou.testar.tgherkin.gen;}");
 			writeVariableType(pWriter, tagMap, Boolean.class, "BOOLEAN_VARIABLE_NAME :");
 			writeVariableType(pWriter, tagMap, Double.class, "NUMBER_VARIABLE_NAME :");
 			writeVariableType(pWriter, tagMap, String.class, "STRING_VARIABLE_NAME :");

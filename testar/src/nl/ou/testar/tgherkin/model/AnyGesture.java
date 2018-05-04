@@ -27,8 +27,10 @@ public class AnyGesture extends Gesture {
     	// pass boolean argument unchecked to the click gestures 
 		gestures.add(new ClickGesture(arguments));
 		gestures.add(new DoubleClickGesture(arguments));
-		gestures.add(new DragGesture(new ArrayList<Argument>()));
+		gestures.add(new DragSliderGesture(new ArrayList<Argument>()));
+		gestures.add(new DragDropGesture(new ArrayList<Argument>()));
 		gestures.add(new DropDownAtGesture(new ArrayList<Argument>()));
+		gestures.add(new HitKeyGesture(new ArrayList<Argument>()));
 		gestures.add(new MouseMoveGesture(new ArrayList<Argument>()));
 		gestures.add(new RightClickGesture(new ArrayList<Argument>()));
 		gestures.add(new TripleClickGesture(arguments));
@@ -37,7 +39,7 @@ public class AnyGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
        	// at least one gesture has to be possible
     	for (Gesture gesture: gestures) {
        		if (gesture.gesturePossible(widget, proxy, dataTable)) {
@@ -49,7 +51,7 @@ public class AnyGesture extends Gesture {
     
   
     @Override
-    public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
     	for (Gesture gesture: gestures) {
     		if (gesture.gesturePossible(widget, proxy, dataTable)) {

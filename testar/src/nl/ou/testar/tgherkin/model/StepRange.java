@@ -3,9 +3,6 @@ package nl.ou.testar.tgherkin.model;
 import java.util.List;
 import java.util.Random;
 
-import org.fruit.alayer.State;
-import org.fruit.monkey.Settings;
-
 /**
  * Tgherkin Step.
  *
@@ -50,17 +47,16 @@ public class StepRange extends Step {
 
 	/**	  
 	 * Evaluate given condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return  true if given condition is applicable, otherwise false 
 	 */
 	@Override
-	public boolean evaluateGivenCondition(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
+	public boolean evaluateGivenCondition(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
 		// reset status
 		setStatus(Status.UNDETERMINED);
-		return super.evaluateGivenCondition(settings, state, dataTable, mismatchOccurred);
+		return super.evaluateGivenCondition(proxy, dataTable, mismatchOccurred);
 	}
 	
 	

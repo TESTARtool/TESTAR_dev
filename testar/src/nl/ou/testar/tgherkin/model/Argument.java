@@ -6,4 +6,10 @@ package nl.ou.testar.tgherkin.model;
  */
 public abstract class Argument {
 
+	/**
+	 * Retrieve value.
+	 * @return value
+	 */
+	public abstract Object getValue();
+	
 }

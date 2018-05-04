@@ -1,6 +1,8 @@
 package nl.ou.testar.tgherkin.protocol;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 import org.fruit.Util;
@@ -16,7 +18,7 @@ import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.tgherkin.Utils;
-import nl.ou.testar.tgherkin.model.ActionWidgetProxy;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.utils.report.Reporter;
 
@@ -24,12 +26,13 @@ import nl.ou.testar.utils.report.Reporter;
  * DocumentProtocol for Tgherkin documents.
  *
  */
-public class DocumentProtocol extends ClickFilterLayerProtocol implements ActionWidgetProxy{
+public class DocumentProtocol extends ClickFilterLayerProtocol implements ProtocolProxy{
 	
 	private Document document;
 	private boolean documentActionExecuted;
 	private boolean actionSwitchesOn;
 	private Action lastAction;
+	private String sourceCode;
 	
 	/**
      * Constructor.
@@ -46,8 +49,14 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	 */
 	protected void initialize(Settings settings){
 		super.initialize(settings);
+		//####TEMP weg
+		try {
+			PrintStream out = new PrintStream(new FileOutputStream("A3.txt"));
+			System.setOut(out);
+		}catch(Exception e) {};
 		if (documentExecutionMode()) {
-			document = Utils.getDocumentModel(settings.get(ConfigTags.TgherkinDocument));
+			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
+			document = Utils.getDocument(sourceCode);
 			// report header
 			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);			
 		}
@@ -77,7 +86,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 			if (documentActionExecuted) {
 				if (verdict.severity() < settings().get(ConfigTags.FaultThreshold)) {
 					// no fault yet: determine document verdict
-					verdict = document.getVerdict(settings(), state);
+					verdict = document.getVerdict(this);
 				}
 			}
 			Report.appendReportDetail(Report.StringColumn.VERDICT, verdict.toString());
@@ -98,16 +107,16 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 	 * @throws ActionBuildException 
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		if (settings().get(ConfigTags.ReportState)){
-			Report.reportState(state, getSequenceCount(), getActionCount());	
-		}
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 		Set<Action> actions = super.deriveActions(system,state);
-		if (documentExecutionMode()) {		
+		if (documentExecutionMode()) {
+			if (settings().get(ConfigTags.ReportState)){
+				Report.reportState(this);	
+			}
 			Report.appendReportDetail(Report.IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS,actions.size());
 			// if an action switch is on then do not process document step
 			if (!checkActionSwitches()) {
-				actions.addAll(document.deriveActions(settings(), state, this));
+				actions.addAll(document.deriveActions(this));
 			}
 		}
 		return actions;		
@@ -160,7 +169,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 			Report.appendReportDetail(Report.IntegerColumn.SEQUENCE_NR,sequenceCount());
 			Report.appendReportDetail(Report.IntegerColumn.ACTION_NR,actionCount() - 1);
 			Report.report(state,lastAction, graphDB, settings().get(ConfigTags.GenerateTgherkinReport), settings().get(ConfigTags.StoreTgherkinReport));			
-			return super.moreActions(state) && document.moreActions(settings());
+			return super.moreActions(state) && document.moreActions(this);
 		}
 		lastAction = null;
 		return super.moreActions(state);
@@ -232,6 +241,13 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
 		return super.getTopWidgets(state);
 	}
     
+    @Override
+	// change visibility from protected to public
+	public void storeWidget(String stateID, Widget widget) {
+    	super.storeWidget(stateID, widget);
+	}
+    
+    
 	/**
 	 * Retrieve sequence count.
 	 * @return sequence count
@@ -250,7 +266,32 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Action
     	return super.actionCount();
     }
 	
-    private boolean documentExecutionMode() {
+	/**
+	 * Retrieve configuration settings.
+	 * @return settings
+	 */
+    // change visibility from protected to public    
+    public Settings getSettings(){
+    	return super.settings();
+    }
+
+	/**
+	 * Retrieve state.
+	 * @return state
+	 */
+	public State getState() {
+		return state;
+	}
+
+	/**
+	 * Retrieve Tgherkin source code.
+	 * @return Tgherkin source code
+	 */
+	public String getTgherkinSourceCode() {
+		return sourceCode;
+	}
+
+	private boolean documentExecutionMode() {
 		return mode() == Modes.Generate || mode() == Modes.GenerateDebug;
 	}
 

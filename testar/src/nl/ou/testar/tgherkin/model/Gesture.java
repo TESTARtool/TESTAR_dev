@@ -10,6 +10,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
 
+
 /**
  * Tgherkin Gesture.
  *
@@ -48,22 +49,22 @@ public abstract class Gesture {
 	/**
 	 * Retrieve whether gesture is possible on a given widget.
 	 * @param widget given widget
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
 	 * @return true if gesture is possible on widget, otherwise false
 	 */
-	public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+	public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		return proxy.isUnfiltered(widget);
 	}
     
 	/**
      * Retrieve actions.
      * @param widget given widget
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
      * @return set of actions 
      */
-    public abstract Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable);
+    public abstract Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable);
     
     /**
      * Get string argument.
@@ -74,7 +75,7 @@ public abstract class Gesture {
     protected String getStringArgument(int index, DataTable dataTable) {
     	Argument argument = getArguments().get(index);
     	if (argument instanceof PlaceholderArgument) {
-    		String columnName = ((PlaceholderArgument)argument).getName();
+    		String columnName = ((PlaceholderArgument)argument).getValue();
     		return dataTable.getPlaceholderValue(columnName);
     	}else {
     		if (argument instanceof StringArgument) {
@@ -93,7 +94,7 @@ public abstract class Gesture {
     protected Boolean getBooleanArgument(int index, DataTable dataTable) {
     	Argument argument = getArguments().get(index);
     	if (argument instanceof PlaceholderArgument) {
-    		String columnName = ((PlaceholderArgument)argument).getName();
+    		String columnName = ((PlaceholderArgument)argument).getValue();
     		return Boolean.valueOf(dataTable.getPlaceholderValue(columnName));
     	}else {
     		if (argument instanceof BooleanArgument) {
@@ -112,10 +113,14 @@ public abstract class Gesture {
 		List<String> list = new ArrayList<String>();
 		for (Argument argument : getArguments()) {
 			if (argument instanceof PlaceholderArgument) {
-				String name = ((PlaceholderArgument)argument).getName();
-				// check whether the placeholder is a column name of the data table
-				if (!dataTable.isColumnName(name)) {
-					list.add("Validation error - invalid argument placeholder : " + name + "\n");
+				String name = ((PlaceholderArgument)argument).getValue();
+				if (dataTable == null){
+					list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + name + System.getProperty("line.separator"));
+				}else{	
+					// check whether the placeholder is a column name of the data table
+					if (!dataTable.isColumnName(name)) {
+						list.add(getClass().getSimpleName() + " validation error - invalid argument placeholder : " + name + "\n");
+					}
 				}
 			}
 		}

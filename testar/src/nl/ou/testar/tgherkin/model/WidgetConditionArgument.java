@@ -3,18 +3,18 @@ package nl.ou.testar.tgherkin.model;
 import org.fruit.Assert;
 
 /**
- * Tgherkin StringArgument.
+ * Tgherkin WidgetConditionArgument.
  * 
  */
-public class StringArgument extends Argument {
+public class WidgetConditionArgument extends Argument {
 
-	private final String value;
+	private final WidgetCondition value;
 	
 	/**
-	 * StringArgument Constructor.
+	 * NumberArgument Constructor.
 	 * @param value given value
 	 */
-	public StringArgument(String value){
+	public WidgetConditionArgument(WidgetCondition value){
 		Assert.notNull(value);
 		this.value = value;
 	}
@@ -24,13 +24,13 @@ public class StringArgument extends Argument {
 	 * @return value
 	 */
 	@Override
-	public String getValue() {
+	public WidgetCondition getValue() {
 		return value;
 	}
 	
     @Override
     public String toString() {
-    	return "\"" + getValue() + "\"";    	
+    	return getValue().toString();    	
     }
 	
 }

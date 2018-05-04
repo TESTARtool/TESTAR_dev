@@ -128,7 +128,9 @@ gesture:
  | clickGesture
  | doubleClickGesture
  | tripleClickGesture
- | anyGesture;
+ | anyGesture
+ | hitKeyGesture
+ | dragDropGesture; 
  
 typeGesture: TYPE_NAME LPAREN (STRING | PLACEHOLDER)? RPAREN; 
 
@@ -140,6 +142,12 @@ tripleClickGesture: TRIPLE_CLICK_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPARE
 
 anyGesture: ANY_NAME LPAREN (FALSE | TRUE | PLACEHOLDER)? RPAREN;
 
-gestureName:  DRAG_NAME | RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
+hitKeyGesture: HIT_KEY_NAME LPAREN hitKeyArgument* RPAREN;
+
+hitKeyArgument: KB_KEY_NAME | PLACEHOLDER;
+
+dragDropGesture: DRAG_DROP_NAME LPAREN widget_condition? RPAREN;
+
+gestureName:  DRAG_SLIDER_NAME | RIGHT_CLICK_NAME | MOUSE_MOVE_NAME | DROP_DOWN_AT_NAME;
 
 parameterlessGesture: gestureName LPAREN RPAREN; 

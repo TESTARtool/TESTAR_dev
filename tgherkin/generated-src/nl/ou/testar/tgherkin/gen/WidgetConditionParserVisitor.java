@@ -137,6 +137,12 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBooleanFunction(WidgetConditionParser.BooleanFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#stringFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringFunction(WidgetConditionParser.StringFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#matchesFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -154,6 +160,12 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#ocrFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOcrFunction(WidgetConditionParser.OcrFunctionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#bool}.
 	 * @param ctx the parse tree
@@ -237,4 +249,11 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStringPlaceholder(WidgetConditionParser.StringPlaceholderContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StrFunction}
+	 * labeled alternative in {@link WidgetConditionParser#string_entity}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStrFunction(WidgetConditionParser.StrFunctionContext ctx);
 }

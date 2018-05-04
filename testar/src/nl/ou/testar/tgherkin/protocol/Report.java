@@ -17,9 +17,16 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
 
 import nl.ou.testar.GraphDB;
+import nl.ou.testar.tgherkin.TgherkinImageFileAnalyzer;
+import nl.ou.testar.tgherkin.Utils;
+import nl.ou.testar.tgherkin.functions.Image;
+import nl.ou.testar.tgherkin.functions.OCR;
+import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.model.Gesture;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.utils.report.Reporter;
 
 /**
@@ -30,6 +37,9 @@ import nl.ou.testar.utils.report.Reporter;
 public class Report {
 
 	private static final String DOUBLE_QUOTE = "\"";
+	private static final String OCR_COLUMN_NAME = "OCR";
+	private static final String IMAGE_RECOGNITION_COLUMN_PREFIX = "Image_";
+	private static final String IMAGE_RECOGNITION_CONFIDENCE_COLUMN_SUFFIX = "_Confidence";
 	
 	private Report() {		
 	}
@@ -214,14 +224,15 @@ public class Report {
 
 	/**
 	 * Report derived gestures.
+	 * @param proxy given document protocol proxy
 	 * @param map given widget-gesture list map
-	 * @param sequenceCount current sequence number
-	 * @param actionCount current action number
 	 */
-	public static void reportDerivedGestures(Map<Widget, List<Gesture>> map, int sequenceCount, int actionCount) {
+	public static void reportDerivedGestures(ProtocolProxy proxy, Map<Widget, List<Gesture>> map) {
 		SortedSet<String> header = new TreeSet<String>();
 		List<SortedMap<String,String>> reportLines = new ArrayList<SortedMap<String,String>>();
-		String reportName = "output" + File.separator + "DerivedGestures_" + sequenceCount + "_" + actionCount + "_" + new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + ".csv";
+		String reportName = "output" + File.separator + "DerivedGestures_" + 
+				proxy.getSequenceCount() + "_" + proxy.getActionCount() + "_" + 
+				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + ".csv";
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<Widget,List<Gesture>> entrySet = iterator.next();
@@ -295,15 +306,16 @@ public class Report {
 	
 	/**
 	 * Report state.
-	 * @param state GUI state
-	 * @param sequenceCount current sequence number
-	 * @param actionCount current action number
+	 * @param proxy given document protocol proxy
 	 */
-	public static void reportState(State state, int sequenceCount, int actionCount) {
+	public static void reportState(ProtocolProxy proxy) {
+		List<String> imageFiles = getImageFiles(proxy);
 		SortedSet<String> header = new TreeSet<String>();
 		List<SortedMap<String,String>> reportLines = new ArrayList<SortedMap<String,String>>();
-		String reportName = "output" + File.separator + "State_" + sequenceCount + "_" + actionCount + "_" + new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + ".csv";
-		Iterator<Widget> iterator = state.iterator();
+		String reportName = "output" + File.separator + "State_" + 
+				proxy.getSequenceCount() + "_" + proxy.getActionCount() + "_" + 
+				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + ".csv";
+		Iterator<Widget> iterator = proxy.getState().iterator();
 		while (iterator.hasNext()) {
 			Widget widget = iterator.next();
 			SortedMap<String,String> reportLine = new TreeMap<String,String>();
@@ -316,12 +328,55 @@ public class Report {
 	        		}
 	        		reportLine.put(tag.name(), tagValue);
 	        	}
-	        }        
-			reportLines.add(reportLine);
+	        }
+	        includeOCR(proxy, widget, header, reportLine);
+	        includeImageRecognition(proxy, widget, imageFiles, header, reportLine);
+	        reportLines.add(reportLine);
 		}
 		outputState(header, reportLines, reportName);
 	}
 
+	private static List<String> getImageFiles(ProtocolProxy proxy) {
+		if (proxy.getSettings().get(ConfigTags.TgherkinReportIncludeImageRecognition)) {
+			TgherkinParser parser = Utils.getTgherkinParser(proxy.getTgherkinSourceCode());
+			return new TgherkinImageFileAnalyzer().visitDocument(parser.document());
+		}else {
+			return new ArrayList<String>(); 
+		}
+		
+	}
+
+	private static void includeOCR(ProtocolProxy proxy, Widget widget, SortedSet<String> header, SortedMap<String,String> reportLine) {
+		if (proxy.getSettings().get(ConfigTags.TgherkinReportIncludeOCR)) {
+	        String ocrValue = OCR.getInstance().getOCR(proxy, widget);
+			if (ocrValue != null && !"".equals(ocrValue)) {
+		        if (!header.contains(OCR_COLUMN_NAME)) {
+	    			header.add(OCR_COLUMN_NAME);	        			
+	    		}
+	    		reportLine.put(OCR_COLUMN_NAME, ocrValue);
+			}
+		}
+	}
+	
+	private static void includeImageRecognition(ProtocolProxy proxy, Widget widget, List<String> imageFiles, SortedSet<String> header, SortedMap<String,String> reportLine) {
+		if (proxy.getSettings().get(ConfigTags.TgherkinReportIncludeImageRecognition)) {
+			for (String imageFile : imageFiles) {
+				Boolean recognized = Image.getInstance().isRecognized(proxy, widget, imageFile);
+		        String headerName = IMAGE_RECOGNITION_COLUMN_PREFIX + imageFile;
+				if (!header.contains(headerName)) {
+	    			header.add(headerName);	        			
+	    		}
+	    		reportLine.put(headerName, recognized.toString());
+				Double confidence = Image.getInstance().getRecognitionConfidence(proxy, widget, imageFile);
+		        headerName = IMAGE_RECOGNITION_COLUMN_PREFIX + imageFile + IMAGE_RECOGNITION_CONFIDENCE_COLUMN_SUFFIX;
+				if (!header.contains(headerName)) {
+	    			header.add(headerName);	        			
+	    		}
+	    		reportLine.put(headerName, String.format("%.2f", confidence));
+			}
+		}
+	}
+	
 	private static void outputState(SortedSet<String> header, List<SortedMap<String,String>> reportLines, String reportName){
 		StringBuilder reportContent = new StringBuilder();
 		// header
@@ -365,6 +420,9 @@ public class Report {
 			value = value.replace(DOUBLE_QUOTE, DOUBLE_QUOTE + DOUBLE_QUOTE);
 			value = DOUBLE_QUOTE + value + DOUBLE_QUOTE;
 		}
+		// replace line breaks by space
+		value = value.replaceAll("\\r|\\n", "");
+		value = value.replaceAll("\\r\\n|\\r|\\n", " ");
 		return value;
 		
 	}

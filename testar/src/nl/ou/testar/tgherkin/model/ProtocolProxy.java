@@ -4,12 +4,31 @@ import java.util.List;
 
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.Settings;
 
 /**
- * ActionWidgetProxy interface.
+ * ProtocolProxy interface.
  *
  */
-public interface ActionWidgetProxy {
+public interface ProtocolProxy {
+
+	/**
+	 * Retrieve configuration settings.
+	 * @return settings
+	 */
+	Settings getSettings();
+
+	/**
+	 * Retrieve state.
+	 * @return state
+	 */
+	State getState();
+
+	/**
+	 * Retrieve Tgherkin source code.
+	 * @return Tgherkin source code
+	 */
+	String getTgherkinSourceCode();
 
 	/**
 	 * Check whether widget is not filtered.
@@ -45,6 +64,13 @@ public interface ActionWidgetProxy {
 	 * @return list of top widgets
 	 */
 	List<Widget> getTopWidgets(State state);
+
+	/**
+	 * Store widget.
+	 * @param stateID state identifier
+	 * @param widget to be stored widget 
+	 */
+	void storeWidget(String stateID, Widget widget);
 
 	/**
 	 * Retrieve sequence count.

@@ -203,6 +203,24 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAnyGesture(TgherkinParser.AnyGestureContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#hitKeyGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHitKeyGesture(TgherkinParser.HitKeyGestureContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#hitKeyArgument}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHitKeyArgument(TgherkinParser.HitKeyArgumentContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#dragDropGesture}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDragDropGesture(TgherkinParser.DragDropGestureContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#gestureName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -338,6 +356,12 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBooleanFunction(TgherkinParser.BooleanFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stringFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringFunction(TgherkinParser.StringFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#matchesFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -355,6 +379,12 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitImageFunction(TgherkinParser.ImageFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#ocrFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOcrFunction(TgherkinParser.OcrFunctionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#bool}.
 	 * @param ctx the parse tree
@@ -438,4 +468,11 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStringPlaceholder(TgherkinParser.StringPlaceholderContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code StrFunction}
+	 * labeled alternative in {@link TgherkinParser#string_entity}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStrFunction(TgherkinParser.StrFunctionContext ctx);
 }

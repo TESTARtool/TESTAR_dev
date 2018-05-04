@@ -1,6 +1,6 @@
 lexer grammar TgherkinLexer;
-
-import Variables;
+@header {package nl.ou.testar.tgherkin.gen;}
+import Variables, Constants;
 
 @lexer::members {
 boolean ignoreEOL=false;
@@ -82,17 +82,20 @@ COMMA: ',';
 MATCHES_NAME: 'matches' ;
 XPATH_NAME: 'xpath' ;
 IMAGE_NAME: 'image' ;
+OCR_NAME: 'ocr' ;
 
 // gesture names
 CLICK_NAME: 'click' ;
 TYPE_NAME: 'type' ;
-DRAG_NAME: 'drag' ;
+DRAG_SLIDER_NAME: 'dragSlider' ;
 ANY_NAME: 'anyGesture' ;
 DOUBLE_CLICK_NAME: 'doubleClick';
 TRIPLE_CLICK_NAME: 'tripleClick';
 RIGHT_CLICK_NAME: 'rightClick';
 MOUSE_MOVE_NAME: 'mouseMove';
 DROP_DOWN_AT_NAME: 'dropDownAt';
+HIT_KEY_NAME: 'hitKey' ;
+DRAG_DROP_NAME: 'dragDrop' ;
 
 // standard variables for widget attributes
 BOOLEAN_VARIABLE : VARIABLE_PREFIX BOOLEAN_VARIABLE_NAME;

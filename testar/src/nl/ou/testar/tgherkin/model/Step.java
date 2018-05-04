@@ -11,11 +11,10 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
 
@@ -160,25 +159,24 @@ public class Step {
     
 	/**	  
 	 * Evaluate given condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return  true if given condition is applicable, otherwise false 
 	 */
-	public boolean evaluateGivenCondition(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
+	public boolean evaluateGivenCondition(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
 		// Step
 		Report.appendReportDetail(Report.StringColumn.STEP,getTitle());
 		boolean result = true;
-		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
+		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
 			if (givenCondition != null) {
-				result = givenCondition.evaluate(settings, state, dataTable);
+				result = givenCondition.evaluate(proxy, dataTable);
 				if (result) {
 					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,false);
 				}else {
 					setMismatch(true);
 					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,true);
-					if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
+					if (!proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
 						setStatus(Status.FAILED);
 					}else {
 						result = true;
@@ -192,24 +190,22 @@ public class Step {
     
 	/**	  
 	 * Evaluate when condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param map widget-list of gestures map
 	 * @param table data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, DataTable table, boolean mismatchOccurred) {
+	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable table, boolean mismatchOccurred) {
 		Set<Action> actions = new HashSet<Action>();
-		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
+		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
 			Map<Widget,List<Gesture>> oldMap = copy(map);
-			evaluateWhenCondition(settings, state, proxy, map, whenGestures, table);
+			evaluateWhenCondition(proxy, map, whenGestures, table);
 			if (map.size() == 0) {
 				// current step level execution resulted in mismatch
 				setMismatch(true);
 				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,true);
-				if (settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
+				if (proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
 					// restore map if default should be applied 
 					map = oldMap;
 				}else {
@@ -219,8 +215,8 @@ public class Step {
 				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 			}
 		}
-		if (settings.get(ConfigTags.ReportDerivedGestures)){
-			Report.reportDerivedGestures(map, proxy.getSequenceCount(), proxy.getActionCount());		
+		if (proxy.getSettings().get(ConfigTags.ReportDerivedGestures)){
+			Report.reportDerivedGestures(proxy, map);		
 		}
 		// generate actions
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
@@ -231,6 +227,8 @@ public class Step {
 			for(Gesture gesture : list) {
 				actions.addAll(gesture.getActions(widget, proxy, table));
 			}
+			// store widget 
+			proxy.storeWidget(proxy.getState().get(Tags.ConcreteID), widget);
 		}
 		Report.appendReportDetail(Report.IntegerColumn.WHEN_DERIVED_ACTIONS,actions.size());
 		return actions;
@@ -238,14 +236,12 @@ public class Step {
 	
 	/**
 	 * Evaluate when condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param map widget-list of gestures map
 	 * @param select given list of conditional gestures
 	 * @param table given data table
 	 */
-	protected static void evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map, List<ConditionalGesture> select, DataTable table) {
+	protected static void evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, List<ConditionalGesture> select, DataTable table) {
 		if (select.size() > 0) {
 			Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
@@ -254,7 +250,7 @@ public class Step {
 				List<Gesture> originalList = entrySet.getValue();
 				List<Gesture> newList = new ArrayList<Gesture>();
 				for(ConditionalGesture conditionalGesture : select) {
-					if (conditionalGesture.isCandidate(settings, proxy, state, widget, table)) {
+					if (conditionalGesture.isCandidate(proxy, widget, table)) {
 						newList.addAll(getFilteredGestures(originalList, conditionalGesture.getGesture()));
 					}
 				}
@@ -296,18 +292,17 @@ public class Step {
 
 	/**	  
 	 * Get verdict.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
 	 * @param mismatchOccurred indicator whether a mismatch occurred
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
-	public Verdict getVerdict(Settings settings, State state, DataTable dataTable, boolean mismatchOccurred) {
-		if (!mismatchOccurred || !settings.get(ConfigTags.ContinueToApplyDefault)) {			
-			if (thenCondition != null && !thenCondition.evaluate(settings, state, dataTable)) { 
+	public Verdict getVerdict(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
+		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
+			if (thenCondition != null && !thenCondition.evaluate(proxy, dataTable)) { 
 				setMismatch(true);
 				Report.appendReportDetail(Report.BooleanColumn.THEN_MISMATCH,true);
-				if (!settings.get(ConfigTags.ApplyDefaultOnMismatch)) {
+				if (!proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
 					setStatus(Status.FAILED);
 					Report.appendReportDetail(Report.BooleanColumn.THEN,false);					
 					return new Verdict(TGHERKIN_FAILURE, "Tgherkin step oracle failure!");
@@ -324,7 +319,7 @@ public class Step {
 			if (isMismatch()) {
 				return new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch");
 			}
-			if (mismatchOccurred && settings.get(ConfigTags.ContinueToApplyDefault)) {
+			if (mismatchOccurred && proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {
 				return new Verdict(Verdict.SEVERITY_MIN, "Default applied after a Tgherkin step mismatch");
 			}
 			return Verdict.OK;

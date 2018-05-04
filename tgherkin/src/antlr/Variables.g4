@@ -1,5 +1,4 @@
 lexer grammar Variables;
-@header {package nl.ou.testar.tgherkin.gen;}
 BOOLEAN_VARIABLE_NAME :
    'Rendered'
  | 'UIAIsContentElement'

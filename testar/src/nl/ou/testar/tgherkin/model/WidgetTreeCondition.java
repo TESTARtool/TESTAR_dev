@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.fruit.Assert;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.Settings;
 
 /**
  * Tgherkin WidgetTreeCondition.
@@ -36,12 +34,11 @@ public class WidgetTreeCondition {
     
 	/**
 	 * Evaluate widget tree condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @param dataTable given data table
 	 * @return  true if condition is applicable for the given state, otherwise false 
 	 */
-	public boolean evaluate(Settings settings, State state, DataTable dataTable) {
+	public boolean evaluate(ProtocolProxy proxy, DataTable dataTable) {
 		// true if one or more widgets are found for which the tree condition is applicable
 		// This means individual widget conditions can evaluate to true for different widgets.
 		// Also (and operator) has higher priority then Either (or operator)
@@ -49,13 +46,13 @@ public class WidgetTreeCondition {
 		for (WidgetCondition widgetCondition : widgetConditions) {
 			if (widgetCondition.getType() == null) {
 				// first condition
-				result = evaluateCondition(settings, state, dataTable, widgetCondition);
+				result = evaluateCondition(proxy, dataTable, widgetCondition);
 			}else {
 				switch(widgetCondition.getType()) {
 				case ALSO:
 					if (result) {
 						// only evaluate if intermediary result is still true
-						result = evaluateCondition(settings, state, dataTable, widgetCondition);					
+						result = evaluateCondition(proxy, dataTable, widgetCondition);					
 					}
 					break;
 				case EITHER:
@@ -63,7 +60,7 @@ public class WidgetTreeCondition {
 						// previous intermediary result evaluated to true  
 						return true;					
 					}
-					result = evaluateCondition(settings, state, dataTable, widgetCondition);
+					result = evaluateCondition(proxy, dataTable, widgetCondition);
 				default:
 				}
 			}
@@ -71,10 +68,10 @@ public class WidgetTreeCondition {
 		return result;
 	}
 
-	private boolean evaluateCondition(Settings settings, State state, DataTable dataTable, WidgetCondition widgetCondition) {
+	private boolean evaluateCondition(ProtocolProxy proxy, DataTable dataTable, WidgetCondition widgetCondition) {
 		// true if a widget is found for which the condition is applicable
-		for (Widget widget : state) {
-			if (widgetCondition.evaluate(settings, state, widget, dataTable)) {
+		for (Widget widget : proxy.getState()) {
+			if (widgetCondition.evaluate(proxy, widget, dataTable)) {
 				return true;
 			}
 		}

@@ -28,11 +28,12 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 	private Style defaultStyle;
 	private Style keywordStyle;
 	private Style variableStyle;
-	private Style literalStyle;
+	private Style literalStyle;	
 	private Style gestureStyle;    
 	private Style functionStyle;   
 	private Style placeholderStyle;
 	private Style tableStyle;
+	private Style constantStyle;
 
 	/**
 	 * Constructor.
@@ -60,6 +61,9 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		StyleConstants.setBold(placeholderStyle, true);
 		tableStyle = styleContext.addStyle("ConstantWidth", null);
 		StyleConstants.setForeground(tableStyle, new Color(153, 153, 153));//grey
+		constantStyle = styleContext.addStyle("ConstantWidth", null);
+		StyleConstants.setForeground(constantStyle, new Color(153, 102, 0));//light brown
+		StyleConstants.setBold(constantStyle, true);
 	}
 
 	@Override 
@@ -99,8 +103,10 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.ANY_NAME:
 		case TgherkinLexer.CLICK_NAME:
 		case TgherkinLexer.DOUBLE_CLICK_NAME:
-		case TgherkinLexer.DRAG_NAME:
-		case TgherkinLexer.DROP_DOWN_AT_NAME:				
+		case TgherkinLexer.DRAG_DROP_NAME:
+		case TgherkinLexer.DRAG_SLIDER_NAME:
+		case TgherkinLexer.DROP_DOWN_AT_NAME:
+		case TgherkinLexer.HIT_KEY_NAME:
 		case TgherkinLexer.MOUSE_MOVE_NAME:
 		case TgherkinLexer.RIGHT_CLICK_NAME:
 		case TgherkinLexer.TRIPLE_CLICK_NAME:
@@ -109,6 +115,7 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.MATCHES_NAME:
 		case TgherkinLexer.XPATH_NAME:	
 		case TgherkinLexer.IMAGE_NAME:
+		case TgherkinLexer.OCR_NAME:
 			return functionStyle;
 		case TgherkinLexer.BACKGROUND_KEYWORD:
 		case TgherkinLexer.EXAMPLES_KEYWORD:
@@ -141,6 +148,8 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.INTEGER_NUMBER:
 		case TgherkinLexer.STRING:
 			return literalStyle;
+		case TgherkinLexer.KB_KEY_NAME:
+			return constantStyle;
 		case TgherkinLexer.COMMENT:
 			return defaultStyle;
 		default:

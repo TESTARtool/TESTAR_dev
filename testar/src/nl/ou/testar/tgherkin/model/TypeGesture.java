@@ -9,7 +9,6 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 
-
 /**
  * Tgherkin TypeGesture.
  *
@@ -26,12 +25,12 @@ public class TypeGesture extends Gesture {
 	
     
     @Override
-    public boolean gesturePossible(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
    		return proxy.isTypeable(widget);
     }
     
     @Override
-    public Set<Action> getActions(Widget widget, ActionWidgetProxy proxy, DataTable dataTable) {
+    public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
     	StdActionCompiler ac = new AnnotatingActionCompiler();
 		if (getArguments().size() > 0) {

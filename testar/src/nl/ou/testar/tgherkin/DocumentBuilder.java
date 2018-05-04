@@ -8,8 +8,10 @@ import java.util.Queue;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
+import nl.ou.testar.tgherkin.gen.TgherkinParser.HitKeyArgumentContext;
 import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
 import nl.ou.testar.tgherkin.model.Gesture;
+import nl.ou.testar.tgherkin.model.HitKeyGesture;
 import nl.ou.testar.tgherkin.model.MouseMoveGesture;
 import nl.ou.testar.tgherkin.model.AnyGesture;
 import nl.ou.testar.tgherkin.model.Argument;
@@ -20,7 +22,8 @@ import nl.ou.testar.tgherkin.model.ConditionalGesture;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.tgherkin.model.DoubleClickGesture;
-import nl.ou.testar.tgherkin.model.DragGesture;
+import nl.ou.testar.tgherkin.model.DragDropGesture;
+import nl.ou.testar.tgherkin.model.DragSliderGesture;
 import nl.ou.testar.tgherkin.model.DropDownAtGesture;
 import nl.ou.testar.tgherkin.model.Examples;
 import nl.ou.testar.tgherkin.model.Feature;
@@ -38,6 +41,7 @@ import nl.ou.testar.tgherkin.model.Tag;
 import nl.ou.testar.tgherkin.model.TripleClickGesture;
 import nl.ou.testar.tgherkin.model.TypeGesture;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
+import nl.ou.testar.tgherkin.model.WidgetConditionArgument;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 
 /**
@@ -501,13 +505,39 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 	}
 	
 	@Override 
+	public HitKeyGesture visitHitKeyGesture(TgherkinParser.HitKeyGestureContext ctx) { 
+		List<Argument> arguments = new ArrayList<Argument>();
+		for (HitKeyArgumentContext argumentCtx : ctx.hitKeyArgument()) {
+			if (argumentCtx.KB_KEY_NAME() != null) {
+				arguments.add(new StringArgument(argumentCtx.KB_KEY_NAME().getText()));
+			}
+			if (argumentCtx.PLACEHOLDER() != null) {
+				// use placeholder name without enclosing angular brackets
+				arguments.add(new PlaceholderArgument(argumentCtx.PLACEHOLDER().getText().substring(1, argumentCtx.PLACEHOLDER().getText().length() - 1)));
+			}
+		}
+		return new HitKeyGesture(arguments);
+	}
+	
+	@Override 
+	public DragDropGesture visitDragDropGesture(TgherkinParser.DragDropGestureContext ctx) { 
+		List<Argument> arguments = new ArrayList<Argument>();
+		if (ctx.widget_condition() != null) {
+			arguments.add(new WidgetConditionArgument(new WidgetCondition(ctx.widget_condition().getText())));
+		}
+		return new DragDropGesture(arguments);
+	}
+	
+	
+	
+	@Override 
 	public Gesture visitParameterlessGesture(TgherkinParser.ParameterlessGestureContext ctx) { 
 		if (ctx.gestureName() == null) {
 			return null;
 		}	
 		List<Argument> arguments = new ArrayList<Argument>();
-		if (ctx.gestureName().DRAG_NAME() != null) {
-			return new DragGesture(arguments);
+		if (ctx.gestureName().DRAG_SLIDER_NAME() != null) {
+			return new DragSliderGesture(arguments);
 		}
 		if (ctx.gestureName().RIGHT_CLICK_NAME() != null) {
 			return new RightClickGesture(arguments);

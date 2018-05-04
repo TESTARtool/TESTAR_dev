@@ -23,9 +23,10 @@ import org.junit.Test;
 
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.model.DataTable;
+import nl.ou.testar.tgherkin.model.ProtocolProxyMock;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
-import nl.ou.testar.tgherkin.model.TestState;
+import nl.ou.testar.tgherkin.model.StateMock;
 
 /**
  * Test WidgetConditionEvaluator class.
@@ -73,7 +74,7 @@ public class WidgetConditionEvaluatorTest {
 		widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID1");
 		widgets.add(widget);
 		// Create state
-		state = new TestState(widgets);		
+		state = new StateMock(widgets);		
 		// Create test data table
 		List<TableRow> tableRows = new ArrayList<TableRow>();
 		List<TableCell> tableCells = new ArrayList<TableCell>();
@@ -136,7 +137,7 @@ public class WidgetConditionEvaluatorTest {
 			Boolean expectedResult = entry.getValue();
 			WidgetConditionParser parser = Utils.getWidgetConditionParser(expression);
 			Boolean result = false;
-			result = (Boolean)new WidgetConditionEvaluator(settings, state, widget, dataTable).visit(parser.widget_condition());
+			result = (Boolean)new WidgetConditionEvaluator(new ProtocolProxyMock(settings, state), widget, dataTable).visit(parser.widget_condition());
 			assertEquals(expectedResult, result);
 		}
 		

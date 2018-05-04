@@ -8,10 +8,8 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.protocol.Report;
 
@@ -79,12 +77,11 @@ public class ScenarioOutline extends ScenarioDefinition {
 	
 	/**	  
 	 * Evaluate given condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @return true if given condition is applicable, otherwise false 
 	 */
     @Override
-	public boolean evaluateGivenCondition(Settings settings, State state) {
+	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
 		if (currentStep() != null && currentStep().hasNextAction()) {
 			// current step has more actions
 			currentStep().nextAction();
@@ -98,41 +95,38 @@ public class ScenarioOutline extends ScenarioDefinition {
 				}
 			}
 		}
-		return currentStep().evaluateGivenCondition(settings, state, examples.getDataTable(), mismatchOccurred());
+		return currentStep().evaluateGivenCondition(proxy, examples.getDataTable(), mismatchOccurred());
 	}
 	
 	/**	  
 	 * Evaluate when condition.
-	 * @param settings given settings
-	 * @param state the SUT's current state
-	 * @param proxy given action widget proxy
+	 * @param proxy given protocol proxy
 	 * @param map widget-list of gestures map
 	 * @return set of actions
 	 */
     @Override
-	public Set<Action> evaluateWhenCondition(Settings settings, State state, ActionWidgetProxy proxy, Map<Widget,List<Gesture>> map) {
+	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map) {
 		// apply scenario level selection
-		Step.evaluateWhenCondition(settings, state, proxy, map, getSelection(), examples.getDataTable());
+		Step.evaluateWhenCondition(proxy, map, getSelection(), examples.getDataTable());
 		// apply step level selection
-		return currentStep().evaluateWhenCondition(settings, state, proxy, map, examples.getDataTable(), mismatchOccurred());
+		return currentStep().evaluateWhenCondition(proxy, map, examples.getDataTable(), mismatchOccurred());
 	}
 	
 	/**	  
 	 * Get verdict.
-	 * @param settings given settings
-	 * @param state the SUT's current state
+	 * @param proxy given protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why  
 	 */
     @Override
-	public Verdict getVerdict(Settings settings, State state) {
+	public Verdict getVerdict(ProtocolProxy proxy) {
 		// scenario level
-		if (getOracle() != null && !getOracle().evaluate(settings, state, examples.getDataTable())){
+		if (getOracle() != null && !getOracle().evaluate(proxy, examples.getDataTable())){
 			setFailed();
 			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!");
 		}
 		// step level
-		return currentStep().getVerdict(settings, state, examples.getDataTable(), mismatchOccurred());
+		return currentStep().getVerdict(proxy, examples.getDataTable(), mismatchOccurred());
 	}
 
 	/**

@@ -5,9 +5,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.fruit.Assert;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.WidgetConditionEvaluator;
@@ -79,17 +77,16 @@ public class WidgetCondition {
 	
 	/**
 	 * Evaluate widget condition.
-	 * @param settings given settings
-	 * @param state given state
+	 * @param proxy given protocol proxy
 	 * @param widget given widget
 	 * @param dataTable given data table
 	 * @return  true if condition is applicable for widget, otherwise false 
 	 */
-	public boolean evaluate(Settings settings, State state, Widget widget, DataTable dataTable) {				
+	public boolean evaluate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {				
 		if (evaluator == null) {
-			evaluator = new WidgetConditionEvaluator(settings, state, widget, dataTable);
+			evaluator = new WidgetConditionEvaluator(proxy, widget, dataTable);
 		}else {
-			evaluator.set(state, widget, dataTable);
+			evaluator.set(proxy, widget, dataTable);
 		}
 		WidgetConditionParser parser = Utils.getWidgetConditionParser(getCode());
 		Boolean result = false;
