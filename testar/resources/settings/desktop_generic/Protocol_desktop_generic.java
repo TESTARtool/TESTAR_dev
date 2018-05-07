@@ -34,11 +34,13 @@
  */
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import nl.ou.testar.JavaOutputParser;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Assert;
 import org.fruit.Drag;
@@ -94,6 +96,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
+	private JavaOutputParser output, errout;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -104,6 +107,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	protected void initialize(Settings settings){
 
 		super.initialize(settings);
+
+		// initializing parsing of Java standard output and error:
+		output = new JavaOutputParser("Exception", "output/std_output.txt");
+		System.setOut(new PrintStream(output));
+		errout = new JavaOutputParser("Exception", "output/error_output.txt");
+		System.setErr(new java.io.PrintStream(errout));
 
 	}
 	
@@ -167,6 +176,14 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	protected Verdict getVerdict(State state){
 
 		Verdict verdict = super.getVerdict(state); // by urueda
+
+		//checking if Java output or error had "Exception" mentioned:
+		if(output.isThingToLookFound()){
+			System.out.println("\n\nDEBUG: output had failure!!!");
+		}
+		if(errout.isThingToLookFound()){
+			System.out.println("\n\nDEBUG: error out had failure!!!");
+		}
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 		
 		//-----------------------------------------------------------------------------
