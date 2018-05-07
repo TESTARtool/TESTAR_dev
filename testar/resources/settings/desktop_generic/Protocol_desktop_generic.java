@@ -109,10 +109,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 
 		// initializing parsing of Java standard output and error:
-		output = new JavaOutputParser("Exception", "output/std_output.txt");
-		System.setOut(new PrintStream(output));
-		errout = new JavaOutputParser("Exception", "output/error_output.txt");
-		System.setErr(new java.io.PrintStream(errout));
+		PrintStream origOut = System.out;
+		output = new JavaOutputParser(origOut,"Exception" );
+		System.setOut(output);
+		PrintStream origErr = System.err;
+		errout = new JavaOutputParser(origErr,"Exception");
+		System.setErr(errout);
 
 	}
 
@@ -157,7 +159,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 
 		return super.getState(system);
-
 	}
 
 	/**
@@ -176,9 +177,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		//checking if Java output or error had "Exception" mentioned:
 		if(output.isThingToLookFound()){
 			System.out.println("\n\nDEBUG: output had failure!!!");
+			// reset boolean "found"
+			output.setThingToLookFound(false);
 		}
 		if(errout.isThingToLookFound()){
 			System.out.println("\n\nDEBUG: error out had failure!!!");
+			// reset boolean "found"
+			errout.setThingToLookFound(false);
 		}
 
 		//--------------------------------------------------------

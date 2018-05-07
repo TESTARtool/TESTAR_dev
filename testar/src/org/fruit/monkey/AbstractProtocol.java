@@ -1611,6 +1611,23 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				logger.setLevel(Level.OFF);
 				logger.setUseParentHandlers(false);
 
+				//FIXME GlobalScreen and NativeHook stuff throws FATAR ERROR and crashes TESTAR with Pekka's desktop Win10
+				/**
+				 * Loading external lib ... windows.dll
+				 FATAL ERROR in native method: Failed to locate one or more required classes.
+				 at java.lang.ClassLoader$NativeLibrary.load(Native Method)
+				 at java.lang.ClassLoader.loadLibrary0(ClassLoader.java:1941)
+				 - locked <0x0000000080e828f8> (a java.util.Vector)
+				 - locked <0x0000000080c38350> (a java.util.Vector)
+				 at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1857)
+				 at java.lang.Runtime.loadLibrary0(Runtime.java:870)
+				 - locked <0x0000000080ac4480> (a java.lang.Runtime)
+				 at java.lang.System.loadLibrary(System.java:1122)
+				 at org.jnativehook.GlobalScreen.<clinit>(Unknown Source)
+				 at org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:1631)
+				 at org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:134)
+				 at org.fruit.monkey.Main.main(Main.java:303)
+				 */
 				if (GlobalScreen.isNativeHookRegistered()) {
 					GlobalScreen.unregisterNativeHook();
 				}
