@@ -87,11 +87,9 @@ public final class UIARoles {
 	UIAToolBar = from(Windows.UIA_ToolBarControlTypeId, "UIAToolBar", UIAWidget, Roles.Control),
 	UIAToolTip = from(Windows.UIA_ToolTipControlTypeId, "UIAToolTip", UIAWidget, Roles.Control),
 	UIATree = from(Windows.UIA_TreeControlTypeId, "UIATree", UIAWidget, Roles.Control),
-	UIATreeItem = from(Windows.UIA_TreeItemControlTypeId, "UIATree", UIAWidget, Roles.Control),
+	UIATreeItem = from(Windows.UIA_TreeItemControlTypeId, "UIATreeItem", UIAWidget, Roles.Control),
 	UIAWindow = from(Windows.UIA_WindowControlTypeId, "UIAWindow", UIAWidget, Roles.Control),
-	
-	UIAUnknown = from(-2, "UIAWindow", UIAWidget, Roles.Control)
-	;
+	UIAUnknown = from(-2, "UIAUnknown", UIAWidget, Roles.Control);
 
 	private static Role from(long id, String name, Role...inheritFrom){
 		Role ret = Role.from(name, inheritFrom);
