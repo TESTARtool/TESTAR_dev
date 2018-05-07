@@ -1,35 +1,3 @@
-/***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-
-/**
- *  @author Sebastian Bauersfeld
- */
 
 import java.io.IOException;
 
@@ -72,7 +40,17 @@ public class Calc {
 				fd.open();
 			}
 		});
-		
+
+		ShutDownMenuItem = new MenuItem(FileMenu, SWT.PUSH);
+		ShutDownMenuItem.setText("Shut Down...");
+
+
+		//shut down
+		ShutDownMenuItem.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				Calculator.close();
+			}
+		});
 
 
 		Menu4 = new Menu(Calculator , SWT.DROP_DOWN);
@@ -84,6 +62,18 @@ public class Calc {
 		MenuItem6 = new MenuItem(Menu4 , SWT.PUSH);
 		MenuItem6.setText("Paste");
 
+
+		//hide an easter egg
+		MenuItem5.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				MessageBox mb = new MessageBox(Calculator, SWT.ICON_ERROR);
+				mb.setText("Oh oh oh");
+				mb.setMessage("Found an issue!");
+				mb.open();
+			}
+		});
+
+
 		//simulate critical message box
 		MenuItem6.addSelectionListener(new SelectionAdapter(){
 			public void widgetSelected(SelectionEvent e){
@@ -93,6 +83,7 @@ public class Calc {
 				mb.open();
 			}
 		});
+
 
 		GridData gridData = new GridData();
 		gridData.horizontalAlignment = GridData.FILL;
@@ -112,6 +103,8 @@ public class Calc {
 		MenuItem9.setText("Scientific");
 		MenuItem10 = new MenuItem(Menu7 , SWT.PUSH);
 		MenuItem10.setText("Digital Grouping");
+
+
 		Menu11 = new Menu(Calculator , SWT.DROP_DOWN);
 		MenuItem11 = new MenuItem(menuBar1 , SWT.CASCADE);
 		MenuItem11.setText("Help");
@@ -120,12 +113,76 @@ public class Calc {
 		MenuItem12.setText("Open MS Paint");
 		MenuItem13 = new MenuItem(Menu11 , SWT.PUSH);
 		MenuItem13.setText("About Calculator");
+		MenuItem14 = new MenuItem(Menu11 , SWT.PUSH);
+		MenuItem14.setText("Contact");
+
+
+
+
+		//Division by 0
+		MenuItem9.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				int x;
+				x = 10/0;
+			}
+		});
+
+
+
+
+		//NullpointerException
+		MenuItem10.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				MessageBox mb = null;
+				mb.setText("null");
+				mb.open();
+			}
+		});
+
+
+		// startup external process
+		MenuItem12.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+
+				try {
+					Process p = Runtime.getRuntime().exec(System.getenv("windir") +"/system32/mspaint.exe");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+
+
+
+
+		//About the calculator information
+		MenuItem13.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				MessageBox mb = new MessageBox(Calculator, SWT.ICON_INFORMATION);
+				mb.setText("About");
+				mb.setMessage("This calculator has not been written, and should better not be used, for doing calculation. This buggy calculator has been written for the purpose of illustrating and exercising with TESTAR at practical or DIY hansdon sessions.");
+				mb.open();
+			}
+		});
+
+
+		//hide an TESTAR message
+		MenuItem14.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				MessageBox mb = new MessageBox(Calculator, SWT.ICON_INFORMATION);
+				mb.setText("OH YES!!");
+				mb.setMessage("TESTAR is awesome! Go to www.testar.org");
+				mb.open();
+			}
+		});
+
 		Composite14 = new Composite(Calculator , SWT.FLAT);
 		RowLayout15 = new RowLayout(SWT.VERTICAL);
 		Composite14.setLayout(RowLayout15);
 		Composite16 = new Composite(Composite14 , SWT.FLAT);
 		//Text17 = new Text(Composite16 , SWT.BORDER);
-		Text17 = new Label(Composite16 , SWT.BORDER); // by urueda		
+		Text17 = new Label(Composite16 , SWT.BORDER); // by urueda
 		Text17.setBounds(1 , 2 , 170 , 20);
 		Text17.setText("0");
 		Text17.setOrientation(SWT.LEFT_TO_RIGHT);
@@ -142,7 +199,23 @@ public class Calc {
 		Button22.setText("CE");
 		Button23 = new Button(Composite18 , SWT.PUSH);
 		Button23.setText("C");
-		
+
+
+		Button20.addMouseListener(new MouseAdapter(){
+			public void mouseDown(MouseEvent e){
+				Text17.setText("What are you doing!!?????");
+			}
+		});
+
+
+
+		Button21.addMouseListener(new MouseAdapter(){
+			public void mouseDown(MouseEvent e){
+				Text17.setText("%&$%&$%TFCGBCGHRTE$TRED$%$%$");
+			}
+		});
+
+
 		Button23.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
 				//calc.hitKey(Calculator.Clear);
@@ -150,7 +223,7 @@ public class Calc {
 			}
 		});
 
-		
+
 		JCalcPanel = new Composite(Composite14 , SWT.FLAT);
 		GridLayout25 = new GridLayout();
 		GridLayout25.makeColumnsEqualWidth = true;
@@ -161,7 +234,8 @@ public class Calc {
 		Button26 = new Button(JCalcPanel , SWT.PUSH);
 		Button26.setText("log x");
 		Button26.setLayoutData(gridData);
-		
+
+
 		//simulate a crash
 		Button26.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
@@ -171,7 +245,7 @@ public class Calc {
 			}
 		});
 
-		
+
 		Button27 = new Button(JCalcPanel , SWT.PUSH);
 		Button27.setText("7");
 		Button27.setLayoutData(gridData);
@@ -181,20 +255,7 @@ public class Calc {
 			}
 		});
 
-		
-		// startup external process
-		MenuItem12.addSelectionListener(new SelectionAdapter(){
-			public void widgetSelected(SelectionEvent e){
-				
-				try {
-					Process p = Runtime.getRuntime().exec(System.getenv("windir") +"/system32/mspaint.exe");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				
-			}
-		});
-		
+
 
 
 		Button28 = new Button(JCalcPanel , SWT.PUSH);
@@ -206,7 +267,7 @@ public class Calc {
 			}
 		});
 
-		
+
 		Button29 = new Button(JCalcPanel , SWT.PUSH);
 		Button29.setText("9");
 		Button29.setLayoutData(gridData);
@@ -222,7 +283,7 @@ public class Calc {
 		Button31 = new Button(JCalcPanel , SWT.PUSH);
 		Button31.setText("sqrt");
 		Button31.setLayoutData(gridData);
-		
+
 		Button31.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
 				String txt = Text17.getText();
@@ -239,8 +300,8 @@ public class Calc {
 			}
 		});
 
-		
-		
+
+
 		Button32 = new Button(JCalcPanel , SWT.PUSH);
 		Button32.setText("tan x");
 		Button32.setLayoutData(gridData);
@@ -269,7 +330,7 @@ public class Calc {
 		Button34.setLayoutData(gridData);
 		Button34.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
-				//Text17.setText(Text17.getText() + "5");				
+				//Text17.setText(Text17.getText() + "5");
 				// start by urueda
 				if (new java.util.Random(System.currentTimeMillis()).nextInt() > Integer.MAX_VALUE / 2)
 					Text17.setText(Text17.getText()); // + "NOT_FIVE");
@@ -306,14 +367,14 @@ public class Calc {
 		Button39 = new Button(JCalcPanel , SWT.PUSH);
 		Button39.setText("1");
 		Button39.setLayoutData(gridData);
-		
+
 		Button39.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
 				Text17.setText(Text17.getText() + "1");
 			}
 		});
 
-		
+
 		Button40 = new Button(JCalcPanel , SWT.PUSH);
 		Button40.setText("2");
 		Button40.setLayoutData(gridData);
@@ -323,8 +384,8 @@ public class Calc {
 			}
 		});
 
-		
-		
+
+
 		Button41 = new Button(JCalcPanel , SWT.PUSH);
 		Button41.setText("3");
 		Button41.setLayoutData(gridData);
@@ -342,20 +403,29 @@ public class Calc {
 		Button43 = new Button(JCalcPanel , SWT.PUSH);
 		Button43.setText("1/x");
 		Button43.setLayoutData(gridData);
+
+		Button43.addMouseListener(new MouseAdapter(){
+			public void mouseDown(MouseEvent e){
+
+				Double d = Double.parseDouble(Text17.getText());
+				Text17.setText(Double.toString(1/d));
+			}
+		});
+
 		Button44 = new Button(JCalcPanel , SWT.PUSH);
 		Button44.setText("M+");
 		Button44.setLayoutData(gridData);
 		Button45 = new Button(JCalcPanel , SWT.PUSH);
 		Button45.setText("0");
 		Button45.setLayoutData(gridData);
-		
+
 		Button45.addMouseListener(new MouseAdapter(){
 			public void mouseDown(MouseEvent e){
 				Text17.setText(Text17.getText() + "0");
 			}
 		});
 
-		
+
 		Button46 = new Button(JCalcPanel , SWT.PUSH);
 		Button46.setText("+/-");
 		Button46.setLayoutData(gridData);
@@ -368,6 +438,19 @@ public class Calc {
 		Button49 = new Button(JCalcPanel , SWT.PUSH);
 		Button49.setText("=");
 		Button49.setLayoutData(gridData);
+
+
+		//simulate critical message box
+		Button49.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				MessageBox mb = new MessageBox(Calculator, SWT.ICON_ERROR);
+				mb.setText("Strange error");
+				mb.setMessage("Whatever you are trying to calculate. I cannot do that.");
+				mb.open();
+			}
+		});
+
+
 		Calculator.pack();
 		Calculator.open();
 		while (!Calculator.isDisposed ()) {
@@ -397,8 +480,9 @@ public class Calc {
 	protected MenuItem MenuItem8;
 	protected MenuItem MenuItem11;
 	protected MenuItem MenuItem4;
+	protected MenuItem MenuItem14;
 	protected GridLayout GridLayout25;
-	protected MenuItem MenuItem7, FileMenuItem, OpenMenuItem;
+	protected MenuItem MenuItem7, FileMenuItem, OpenMenuItem, ShutDownMenuItem;
 	protected Menu FileMenu;
 	protected RowLayout RowLayout15;
 	protected MenuItem MenuItem10;
@@ -410,8 +494,7 @@ public class Calc {
 	protected MenuItem MenuItem6;
 	protected Composite Composite18;
 	protected Composite Composite16;
-	//protected Text Text17;
-	protected Label Text17; // by urueda
+	protected Label Text17;
 	protected Menu menuBar1;
 	protected Button Button31;
 	protected Button Button32;

@@ -92,10 +92,12 @@ import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	
-	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
+	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
+
 	static Role webText; // browser dependent
 	static double browser_toolbar_filter;
-		
+
+	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
 	static double scrollThick = 16; // scroll thickness (iexplorer)
 	
@@ -105,10 +107,8 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
-		
 		super.initialize(settings);
 		initBrowser();
-		
 	}
 	
 	// check browser

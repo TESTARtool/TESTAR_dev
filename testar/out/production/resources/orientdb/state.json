@@ -1,0 +1,20 @@
+{
+  "source": { "file": { "path": "state.csv" } },
+  "extractor": { "csv": {} },
+  "transformers": [
+    { "vertex": { "class": "State" } }
+  ],
+  "loader": {
+    "orientdb": {
+      "dbURL": "remote:localhost/databases/testar",
+      "serverUser": "root",
+      "serverPassword": "admin",
+      "dbType": "graph",
+      "classes": [
+        {"name": "State", "extends": "V"}
+      ], "indexes": [
+        {"class":"State", "fields":["id:string"], "type":"UNIQUE" }
+      ]
+    }
+  }
+}
