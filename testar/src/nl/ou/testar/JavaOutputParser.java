@@ -1,69 +1,57 @@
 package nl.ou.testar;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class JavaOutputParser extends PrintStream{
-        //ByteArrayOutputStream {
-    private String thingToLookFor;
-    private boolean thingToLookFound = false;
+    private String stringToLookFor;
+    private boolean stringToLookFound = false;
     private java.io.PrintWriter stdOut;
 
-    public JavaOutputParser(OutputStream out, String thingToLookFor) {
+    /**
+     * Constructor for output parser that intercepts OutputStream out, but does not change it's behavior
+     *
+     * The idea is to intercept StdOut / Error streams to look for Exceptions (or other String you want to look for)
+     *
+     * @param out Existing OutputStream that you want to intercept
+     * @param stringToLookFor String that you want to look for in the OutputStream
+     */
+    public JavaOutputParser(OutputStream out, String stringToLookFor) {
         super(out,true);
-        this.thingToLookFor=thingToLookFor;
-//        try {
-//            stdOut = new java.io.PrintWriter(new java.io.FileWriter(filename));
-//        } catch (Exception e) {
-//            //TODO handle exception
-//        }
+        this.stringToLookFor=stringToLookFor;
     }
 
     @Override
     public void print(String s)
-    {//do what ever you like
+    {
+        // Still writing to the StdOut / Error as implemented in super
         super.print(s);
-        if (s.contains(thingToLookFor)) {
-            setThingToLookFound(true);
+        // checking if the StdOut / Error contains the String we are looking for:
+        if (s.contains(stringToLookFor)) {
+            setStringToLookFound(true);
         }
-    }
-
-    public boolean isThingToLookFound() {
-        return thingToLookFound;
-    }
-
-    public void setThingToLookFound(boolean thingToLookFound) {
-        this.thingToLookFound = thingToLookFound;
     }
 
     /**
-     * Writes the existing contents of the OutputStream to the
-     * logger as a log record.
+     * Getter for stringToLookFound boolean
      *
-     * @throws java.io.IOException in case of error
+     * Allows checking if the String stringToLookFor specified in constructor has been found from StdOut / Error
+     *
+     * If it has been found, you have to reset the boolean by setStringToLookFound(false)
+     *
+     * @return true if the stringToLookFor specified in constructor has been found
+     */
+    public boolean isStringToLookFound() {
+        return stringToLookFound;
+    }
 
-    public void flush() throws IOException {
-        String record;
-        synchronized (this) {
-            super.flush();
-            record = this.toString();
-            super.reset();
-
-            if (record.length() == 0 || record.equals(lineSeparator)) {
-                // avoid empty records
-                return;
-            }
-            stdOut.println(record);
-            stdOut.flush();
-            if (record.contains(thingToLookFor)) {
-                setThingToLookFound(true);
-                stdOut.println("DEBUG: Found "+thingToLookFor+" in the output!");
-                stdOut.flush();
-            }
-//            logger.logp(Level.ALL, "", "", record);
-        }
-    }*/
+    /**
+     * Setter for stringToLookFound boolean
+     *
+     * @param stringToLookFound
+     */
+    public void setStringToLookFound(boolean stringToLookFound) {
+        this.stringToLookFound = stringToLookFound;
+    }
 
 }

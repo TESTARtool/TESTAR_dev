@@ -108,7 +108,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected void initialize(Settings settings){
 		super.initialize(settings);
 
-		// initializing parsing of Java standard output and error:
+		// initializing intercepting and parsing of Java standard output and error:
+		// You can change the String that is being search for, now it is "Exception"
 		PrintStream origOut = System.out;
 		output = new JavaOutputParser(origOut,"Exception" );
 		System.setOut(output);
@@ -175,15 +176,17 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		Verdict verdict = super.getVerdict(state);
 
 		//checking if Java output or error had "Exception" mentioned:
-		if(output.isThingToLookFound()){
+		if(output.isStringToLookFound()){
 			System.out.println("\n\nDEBUG: output had failure!!!");
+			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
-			output.setThingToLookFound(false);
+			output.setStringToLookFound(false);
 		}
-		if(errout.isThingToLookFound()){
+		if(errout.isStringToLookFound()){
 			System.out.println("\n\nDEBUG: error out had failure!!!");
+			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
-			errout.setThingToLookFound(false);
+			errout.setStringToLookFound(false);
 		}
 
 		//--------------------------------------------------------
