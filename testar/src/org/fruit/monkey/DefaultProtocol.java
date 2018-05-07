@@ -34,43 +34,16 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.Title;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.ActionRoles;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -78,12 +51,14 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.PrologUtil;
-import es.upv.staq.testar.serialisation.LogSerialiser;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.fruit.alayer.Tags.IsRunning;
+import static org.fruit.alayer.Tags.Title;
 
 public class DefaultProtocol extends AbstractProtocol{
 
@@ -101,7 +76,12 @@ public class DefaultProtocol extends AbstractProtocol{
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	protected void initialize(Settings settings){
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
+		// The NativeLinker can't detect web-driver usage natively
+		String sutConnector = settings().get(ConfigTags.SUTConnector);
+		if (sutConnector.equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
+			NativeLinker.addWdDriverOS();
+		}
+
 		builder = NativeLinker.getNativeStateBuilder(
 			settings.get(ConfigTags.TimeToFreeze),
 			settings.get(ConfigTags.AccessBridgeEnabled),
