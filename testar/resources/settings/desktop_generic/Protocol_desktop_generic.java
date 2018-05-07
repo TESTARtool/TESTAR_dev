@@ -34,6 +34,7 @@
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashSet;
@@ -111,12 +112,15 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		// initializing intercepting and parsing of Java standard output and error:
 		// You can change the String that is being search for, now it is "Exception"
 		PrintStream origOut = System.out;
-		output = new JavaOutputParser(origOut,"Exception" );
-		System.setOut(output);
 		PrintStream origErr = System.err;
-		errout = new JavaOutputParser(origErr,"Exception");
-		System.setErr(errout);
-
+		try {
+			output = new JavaOutputParser(origOut,"Exception", "output/std_out.txt");
+			System.setOut(output);
+			errout = new JavaOutputParser(origErr,"Exception", "output/std_error.txt");
+			System.setErr(errout);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -177,13 +181,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
 		//checking if Java output or error had "Exception" mentioned:
 		if(output.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: output had failure!!!");
+			System.out.println("\n\nDEBUG: output had failure: "+output.getMatchingOutput());
 			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
 			output.setStringToLookFound(false);
 		}
 		if(errout.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: error out had failure!!!");
+			System.out.println("\n\nDEBUG: error out had failure: "+errout.getMatchingOutput());
 			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
 			errout.setStringToLookFound(false);
@@ -350,6 +354,22 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
+		System.out.println("stopSystem");
+		//checking if Java output or error had "Exception" mentioned:
+		if(output.isStringToLookFound()){
+			System.out.println("\n\nDEBUG: output had failure: "+output.getMatchingOutput());
+			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
+			// reset boolean "found"
+			output.setStringToLookFound(false);
+		}
+		if(errout.isStringToLookFound()){
+			System.out.println("\n\nDEBUG: error out had failure: "+errout.getMatchingOutput());
+			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
+			// reset boolean "found"
+			errout.setStringToLookFound(false);
+		}
+		output.close();
+		errout.close();
 		super.stopSystem(system);
 	}
 
