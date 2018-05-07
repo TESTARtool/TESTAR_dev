@@ -937,7 +937,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			//Util.clear(cv);
 			visualizeState(cv, state, system);
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);;
+			CodingManager.buildIDs(state, actions);
 			visualizeActions(cv, state, actions);
 			//cv.end();
 		}		

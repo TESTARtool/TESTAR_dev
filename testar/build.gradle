@@ -76,6 +76,10 @@ task prepareNativeDLL(type: Copy) {
     into 'target/scripts'
 }
 
+applicationDistribution.from("../webdriver/resources/chrome-extension") {
+    into "chrome-extension"
+}
+
 prepareOracles.dependsOn(oracleClasses)
 
 /**

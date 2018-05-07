@@ -1,0 +1,213 @@
+package org.fruit.alayer.webdriver;
+
+import org.fruit.alayer.Rect;
+import org.openqa.selenium.WebElement;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+public class WdElement implements Serializable {
+  private static final long serialVersionUID = 2695983969893321255L;
+
+  // TODO
+  WebElement webElement;
+
+  // TODO Access
+  List<WdElement> children = new ArrayList<>();
+  WdElement parent;
+  WdRootElement root;
+  WdWidget backRef;
+
+  // TODO These might need to be fetched
+  boolean blocked = false;
+  long culture = 0L;
+  boolean isModal = false; // i.c.w. access key
+
+  public String id, name, tagName, textContent, helpText;
+  public List<String> cssClasses = new ArrayList<>();
+  public String display, type;
+  public String value, href;
+
+  boolean enabled, ignore;
+  public boolean isClickable;
+  boolean isContentElement, isControlElement;
+  boolean hasKeyboardFocus, isKeyboardFocusable;
+  String acceleratorKey, accessKey;
+  String valuePattern;
+
+  double zindex;
+  Rect rect;
+  boolean scrollPattern, hScroll, vScroll;
+  public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
+
+  // Keep these here for fillScrollValues
+  protected String overflow;
+  protected long innerWidth, innerHeight;
+  protected long clientWidth, clientHeight;
+  public long scrollWidth, scrollHeight;
+  public long scrollLeft, scrollTop;
+  
+  @SuppressWarnings("unchecked")
+  public WdElement (Map<String, Object> packedElement,
+                    WdRootElement root, WdElement parent) {
+    this.root = root;
+    this.parent = parent;
+
+    webElement = (WebElement) packedElement.get("element");
+
+    id = (String) packedElement.get("id");
+    name = (String) packedElement.get("name");
+    tagName = (String) packedElement.get("tagName");
+    textContent = ((String) packedElement.get("textContent"))
+        .replaceAll("\\s+", " ").trim();
+    helpText = (String) packedElement.get("title");
+    value = String.valueOf(packedElement.getOrDefault("value", ""));
+    href = (String) packedElement.getOrDefault("href", "");
+    String tmp = (String) packedElement.getOrDefault("cssClasses", "");
+    if (tmp != null) {
+      cssClasses.addAll(Arrays.asList(tmp.split(" ")));
+    }
+    display = (String) packedElement.get("display");
+    type = (String) packedElement.get("type");
+
+    zindex = (double) (long) packedElement.get("zIndex");
+    fillRect(packedElement);
+    fillDimensions(packedElement);
+
+    isClickable = (Boolean) packedElement.get("isClickable");
+    isKeyboardFocusable = isFocusable();
+    // TODO Check if this works
+    hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
+
+    // TODO Also check for clickable / writeable
+    enabled = !WdStateFetcher.hiddenTags.contains(tagName);
+    if (display != null && display.toLowerCase().equals("none")) {
+      enabled = false;
+    }
+
+    List<Map<String, Object>> wrappedChildren =
+        (List<Map<String, Object>>) packedElement.get("wrappedChildren");
+    for (Map<String, Object> wrappedChild : wrappedChildren) {
+      // TODO Check if this even happens
+      if (wrappedChild != null) {
+        WdElement child = new WdElement(wrappedChild, root, this);
+        if (!WdStateFetcher.hiddenTags.contains(child.tagName) &&
+            !WdStateFetcher.ignoredTags.contains(child.tagName)) {
+          children.add(child);
+        }
+      }
+    }
+
+    setName();
+    fillScrollValues();
+  }
+
+  private void writeObject(ObjectOutputStream oos) throws IOException {
+    // TODO
+    Utils.logAndEnd();
+    oos.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream ois)
+      throws IOException, ClassNotFoundException {
+    // TODO
+    Utils.logAndEnd();
+    ois.defaultReadObject();
+  }
+
+  // TODO Check if this is correct
+  private void setName () {
+    Map<String, String> labelmap = WdStateFetcher.getLabelmap();
+
+    if (labelmap.get(name) != null) {
+      name = labelmap.get(name);
+      return;
+    }
+    if (name == null || name.equals("null") || name.isEmpty()) {
+      if (!id.isEmpty()) {
+        name = id;
+      }
+      else {
+        name = textContent;
+      }
+    }
+  }
+
+  public boolean isFocusable() {
+    // TODO It's much more complex than this
+    // https://allyjs.io/data-tables/focusable.html#document-elements
+    // https://allyjs.io/tests/focusable/test.html
+    // https://gist.github.com/jamiewilson/c3043f8c818b6b0ccffd
+    // https://www.w3.org/TR/html5/editing.html#focus
+
+    List<String> focusableTags =
+        Arrays.asList("input", "select", "textarea", "a", "button", "area");
+    return focusableTags.contains(tagName);
+  }
+
+  protected void fillScrollValues() {
+    scrollPattern = false;
+    vScroll = false;
+    hScroll = false;
+    vScrollPercent = 0;
+    hScrollPercent = 0;
+    vScrollViewSize = 100;
+    hScrollViewSize = 100;
+
+    if (overflow.equals("auto") || overflow.equals("scroll")) {
+      vScroll = scrollHeight > clientHeight;
+      hScroll = scrollWidth > clientWidth;
+      scrollPattern = hScroll || vScroll;
+
+      if (vScroll) {
+        vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+        vScrollViewSize = 100.0 * clientHeight / scrollHeight;
+      }
+      if (hScroll) {
+        hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
+        hScrollViewSize = 100.0 * clientWidth / scrollWidth;
+      }
+    }
+  }
+
+  public boolean visibleAt(double x, double y) {
+    int scrollLeft = (root == null) ? 0 : (int) root.scrollLeft;
+    int scrollHeight = (root == null) ? 0 : (int) root.scrollHeight;
+    return rect != null && rect.contains(x - scrollLeft, y - scrollHeight);
+  }
+
+  public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
+    // TODO Do the obscured stuff??
+
+    return visibleAt(x, y);
+  }
+
+  @SuppressWarnings("unchecked")
+  /*
+   * This gets the position relative to the viewport
+   */
+  private void fillRect (Map<String, Object> packedElement) {
+    List<Long> rect = (List<Long>) packedElement.get("rect");
+    this.rect = Rect.from(rect.get(0), rect.get(1), rect.get(2), rect.get(3));
+  }
+
+  @SuppressWarnings("unchecked")
+  private void fillDimensions(Map<String, Object> packedElement) {
+    Map<String, Object> dims = (Map<String, Object>) packedElement.get("dimensions");
+    overflow = (String) dims.get("overflow");
+    innerWidth = (long) dims.get("innerWidth");
+    innerHeight = (long) dims.get("innerHeight");
+    clientWidth = (long) dims.get("clientWidth");
+    clientHeight = (long) dims.get("clientHeight");
+    scrollWidth = (long) dims.get("scrollWidth");
+    scrollHeight = (long) dims.get("scrollHeight");
+    scrollLeft = (long) dims.get("scrollLeft");
+    scrollTop = (long) dims.get("scrollTop");
+  }
+}
