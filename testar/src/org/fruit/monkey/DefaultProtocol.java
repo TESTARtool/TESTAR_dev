@@ -121,7 +121,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	protected void finishSequence(File recordedSequence){
-		System.out.println("Finish sequence");
+		//System.out.println("Finish sequence");
 		this.killTestLaunchedProcesses();
 	}
 	

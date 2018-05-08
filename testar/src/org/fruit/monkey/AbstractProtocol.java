@@ -224,7 +224,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
 		int i = 1;
 		for (SUT sut : runningP){
-			System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
+			//System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
 			pid = sut.get(Tags.PID, Long.MIN_VALUE);
 			if (pid != Long.MIN_VALUE){
 				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
@@ -1139,17 +1139,17 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						actionRepresentation[0]) + "\n",
 						LogSerialiser.LogLevel.Info);
 
-				System.out.print(String.format(
+				/*System.out.print(String.format(
 						"S[%1$" + (1 + (int)Math.log10((double)settings.get(ConfigTags.Sequences))) + "d=%2$" + (1 + (int)Math.log10((double)generatedSequenceNumber)) + "d]-" + // S = test Sequence
 						"A[%3$" + (1 + (int)Math.log10((double)settings().get(ConfigTags.SequenceLength))) + // A = Action
 						"d] <%4$3s@%5$3s KCVG>... SR = %6$8d KB / SC = %7$7s ... ", // KCVG = % CVG of Known UI space @ known UI space scale; SR = SUT_RAM; SC = SUT_CPU
 						sequenceCount, generatedSequenceNumber, actionCount,
 						Grapher.GRAPHS_ACTIVATED ? Grapher.getEnvironment().getExplorationCurveSampleCvg() : -1,
 						Grapher.GRAPHS_ACTIVATED ? Grapher.getEnvironment().convertKCVG(Grapher.getEnvironment().getExplorationCurveSampleScale()) : -1,
-						memUsage, cpuPercent)); debugResources();
-				System.out.print(" ... L/S/T: " + LogSerialiser.queueLength() + "/" + ScreenshotSerialiser.queueLength() + "/" + TestSerialiser.queueLength()); // L/S/T = Log/Scr/Test queues
+						memUsage, cpuPercent)); debugResources();*/
+				//System.out.print(" ... L/S/T: " + LogSerialiser.queueLength() + "/" + ScreenshotSerialiser.queueLength() + "/" + TestSerialiser.queueLength()); // L/S/T = Log/Scr/Test queues
 
-				System.out.print("\n");
+				//System.out.print("\n");
 				//logln(Grapher.getExplorationCurveSample(),LogLevel.Info);
 				//logln(Grapher.getLongestPath() + "\n",LogLevel.Info);
 				if (mode() == Modes.AdhocTest){
@@ -1210,8 +1210,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		double testCPU = (nowStamp - lastStamp)/1000.0;
 		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
 			testCPUpeak = testCPU;
-		System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
-						 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
+		//System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
+		//				 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
 		lastStamp = nowStamp;
 	}
 
@@ -1398,7 +1398,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 								
 				finishSequence(currentSeq);
 	
-				System.out.println("currentseq: " + currentSeq);
+				//System.out.println("currentseq: " + currentSeq);
 				
 				Verdict finalVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
 				
@@ -1583,7 +1583,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					);
 				ps.print(metrics);
 				ps.close();
-				System.out.println(heading + "\n" + metrics);
+				//System.out.println(heading + "\n" + metrics);
 			} catch (NoSuchTagException | FileNotFoundException e) {
 				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
 			//} catch (FileNotFoundException e) {
@@ -1707,7 +1707,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					try{
 						if(tries < 2){
 							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							System.out.println(replayMessage);
+							//System.out.println(replayMessage);
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						 }else{
 							if(tries % 50 == 0)
