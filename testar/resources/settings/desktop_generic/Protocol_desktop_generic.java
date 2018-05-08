@@ -354,22 +354,20 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		System.out.println("stopSystem");
+//		System.out.println("stopSystem");
 		//checking if Java output or error had "Exception" mentioned:
 		if(output.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: output had failure: "+output.getMatchingOutput());
+			System.out.println("\n\nDEBUG stopSystem(): output had failure: "+output.getMatchingOutput());
 			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
 			output.setStringToLookFound(false);
 		}
 		if(errout.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: error out had failure: "+errout.getMatchingOutput());
+			System.out.println("\n\nDEBUG stopSystem(): error out had failure: "+errout.getMatchingOutput());
 			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
 			// reset boolean "found"
 			errout.setStringToLookFound(false);
 		}
-		output.close();
-		errout.close();
 		super.stopSystem(system);
 	}
 
