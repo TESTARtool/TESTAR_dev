@@ -128,7 +128,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	 @Override
 	protected void beginSequence(){
-		super.beginSequence();
+	 	super.beginSequence();
 	}
 
 	/**
@@ -155,9 +155,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
-	 * state is erroneous and if so why.
+	 * own state fetching routine.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
@@ -342,7 +340,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * You could stop the test after:
 	 * - a specified amount of sequences, which is specified through the Sequences setting, or
 	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue test, else stop	 */
+	 * @return  if <code>true</code> continue test, else stop
+	 */
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();
