@@ -435,7 +435,9 @@ public class StateFetcher implements Callable<UIAState>{
 				// el.enabled = true;
 				parent.root.hwndMap.put(el.hwnd, el);
 	
-				if (childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
+				if(!role.equals("menu") && !role.equals("combo box")
+				&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 					if (cc > 0){
 						el.children = new ArrayList<UIAElement>(cc);
