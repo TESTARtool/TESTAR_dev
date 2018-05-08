@@ -198,6 +198,17 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 					// type into text boxes
 					if(isTypeable(w))
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+					
+					//Force actions on some widgets with a wrong accessibility
+					//Optional, comment this changes if your Swing applications doesn't need it
+					if(w.parent().get(Tags.Role).toString().contains("ComboBox") || (w.parent().get(Tags.Role).toString().contains("List"))){
+						actions.add(ac.leftClickAt(w));
+						w.set(Tags.ActionSet, actions);
+					}
+					if(w.get(Tags.Role).toString().contains("Tree")) {
+						widgetTree(w, actions);
+					}
+					//End of Force action
 
 				}
 				
@@ -207,6 +218,16 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 		
 		return actions;
 
+	}
+	
+	//Force actions on Tree widgets with a wrong accessibility
+	public void widgetTree(Widget w, Set<Action> actions) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		actions.add(ac.leftClickAt(w));
+		w.set(Tags.ActionSet, actions);
+		for(int i = 0; i<w.childCount(); i++) {
+			widgetTree(w.child(i), actions);
+		}
 	}
 	
 	/**
