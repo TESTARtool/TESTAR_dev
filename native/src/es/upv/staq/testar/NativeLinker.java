@@ -169,8 +169,10 @@ public class NativeLinker {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return WinProcess.fromExecutable(executableCommand);
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
-				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
+				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
+					System.out.println("WinProcess.fromExecutable with argument " + executableCommand);
 					return WinProcess.fromExecutable(executableCommand);
+				}
 				else
 					return WinProcess.fromExecutableUwp(executableCommand);
 			}

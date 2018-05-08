@@ -142,7 +142,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the methods that is called when you click on one of the big mode buttons in TESTAR dialog
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(AbstractProtocol.Modes mode) {
