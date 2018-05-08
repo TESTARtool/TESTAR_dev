@@ -1605,36 +1605,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				settings.get(ConfigTags.GraphDBPassword));
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests)){
+			if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
 				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-				logger.setLevel(Level.OFF);
-				logger.setUseParentHandlers(false);
-
-				//FIXME GlobalScreen and NativeHook stuff throws FATAR ERROR and crashes TESTAR with Pekka's desktop Win10
-				/**
-				 * Loading external lib ... windows.dll
-				 FATAL ERROR in native method: Failed to locate one or more required classes.
-				 at java.lang.ClassLoader$NativeLibrary.load(Native Method)
-				 at java.lang.ClassLoader.loadLibrary0(ClassLoader.java:1941)
-				 - locked <0x0000000080e828f8> (a java.util.Vector)
-				 - locked <0x0000000080c38350> (a java.util.Vector)
-				 at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1857)
-				 at java.lang.Runtime.loadLibrary0(Runtime.java:870)
-				 - locked <0x0000000080ac4480> (a java.lang.Runtime)
-				 at java.lang.System.loadLibrary(System.java:1122)
-				 at org.jnativehook.GlobalScreen.<clinit>(Unknown Source)
-				 at org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:1631)
-				 at org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:134)
-				 at org.fruit.monkey.Main.main(Main.java:303)
-				 */
-				if (GlobalScreen.isNativeHookRegistered()) {
+				// begin by urueda
+				if (GlobalScreen.isNativeHookRegistered())
 					GlobalScreen.unregisterNativeHook();
-				}
+				Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
+				// end by urueda
 				GlobalScreen.registerNativeHook();
-				GlobalScreen.addNativeKeyListener(eventHandler);
-				GlobalScreen.addNativeMouseListener(eventHandler);
-				GlobalScreen.addNativeMouseMotionListener(eventHandler);
+				//GlobalScreen.getInstance().addNativeKeyListener(this);
+				GlobalScreen.getInstance().addNativeKeyListener(eventHandler); // by urueda (refactored)
+				//GlobalScreen.getInstance().addNativeMouseListener(this);
+				GlobalScreen.getInstance().addNativeMouseListener(eventHandler); // by urueda (refactored)
+				GlobalScreen.getInstance().addNativeMouseMotionListener(eventHandler); // by urueda
 				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
 			}
 
@@ -1652,12 +1635,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
 		}finally{
 			try{
-				if (!settings.get(ConfigTags.UnattendedTests)) {
-					if (GlobalScreen.isNativeHookRegistered()) {
+				if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
+					if (GlobalScreen.isNativeHookRegistered()){
 						LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-						GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-						GlobalScreen.removeNativeMouseListener(eventHandler);
-						GlobalScreen.removeNativeKeyListener(eventHandler);
+						GlobalScreen.getInstance().removeNativeMouseMotionListener(eventHandler);
+						GlobalScreen.getInstance().removeNativeMouseListener(eventHandler);
+						GlobalScreen.getInstance().removeNativeKeyListener(eventHandler);
 						GlobalScreen.unregisterNativeHook();
 					}
 				}
