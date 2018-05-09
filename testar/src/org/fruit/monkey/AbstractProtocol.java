@@ -489,7 +489,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
 	protected final GraphDB graphDB(){ return graphDB; }
-	protected void beginSequence(State state) {}
+	protected void beginSequence(SUT system, State state) {}
 	protected void finishSequence(File recordedSequence) {}
 	protected abstract SUT startSystem() throws SystemStartException;
 	protected abstract void stopSystem(SUT system);
@@ -1325,7 +1325,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
-				beginSequence(state);
+				beginSequence(system, state);
 				LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				state = getState(system);
 				//Store ( initial )state

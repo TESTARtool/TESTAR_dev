@@ -98,8 +98,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	@Override
-	protected void beginSequence(State state) {
-		super.beginSequence(state);
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
 		try {
 			html = new HTMLReporter(
 					settings().get(ConfigTags.OutputDir) + File.separator +

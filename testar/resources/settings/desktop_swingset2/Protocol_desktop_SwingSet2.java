@@ -102,9 +102,9 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
-	protected void beginSequence(State state){
+	protected void beginSequence(SUT system, State state){
 
-		super.beginSequence(state);
+		super.beginSequence(system, state);
 
 	}
 	

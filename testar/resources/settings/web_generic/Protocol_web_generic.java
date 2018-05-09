@@ -85,10 +85,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
-	protected void beginSequence(State state){
+	protected void beginSequence(SUT system, State state){
 		
-		super.beginSequence(state);
-		
+		super.beginSequence(system, state);
+
 	}
 	
 	/**
