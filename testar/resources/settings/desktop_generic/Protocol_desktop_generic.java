@@ -67,8 +67,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(State state){
+		super.beginSequence(state);
 	}
 
 	/**

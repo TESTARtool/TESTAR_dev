@@ -126,9 +126,9 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
-	protected void beginSequence(){
+	protected void beginSequence(State state){
 		
-		super.beginSequence();
+		super.beginSequence(state);
 		
 	}
 	

@@ -114,8 +114,8 @@ public class DefaultProtocol extends AbstractProtocol{
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(State state){
+		super.beginSequence(state);
 		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
