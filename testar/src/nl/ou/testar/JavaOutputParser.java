@@ -40,7 +40,7 @@ public class JavaOutputParser extends PrintStream{
         super(out,true);
         this.stringToLookFor=stringToLookFor;
         fileOut = new PrintWriter(filename);
-        fileOut.println("Writing OutputStream to file started.");
+        fileOut.println("Thread: name="+Thread.currentThread().getName()+",id="+Thread.currentThread().getId()+", writing OutputStream to file "+filename+" started.");
         fileOut.flush();
     }
 
@@ -87,6 +87,7 @@ public class JavaOutputParser extends PrintStream{
      * @param stringToLookFound
      */
     public void setStringToLookFound(boolean stringToLookFound) {
+        System.out.println("DEBUG: set stringToLookFound="+stringToLookFound);
         this.stringToLookFound = stringToLookFound;
     }
 

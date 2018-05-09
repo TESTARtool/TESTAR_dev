@@ -1442,6 +1442,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				sequenceCount++;
 
 			} catch(Exception e){
+				System.out.println("Thread: name="+Thread.currentThread().getName()+",id="+Thread.currentThread().getId()+", SUT throws exception");
+				e.printStackTrace();
 				this.killTestLaunchedProcesses();
 				ScreenshotSerialiser.finish();
 				TestSerialiser.finish();				
