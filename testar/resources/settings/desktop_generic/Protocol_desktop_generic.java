@@ -98,7 +98,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
-	private JavaOutputParser output, errout;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -108,25 +107,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-
-		// initializing intercepting and parsing of Java standard output and error:
-		// You can change the String that is being search for, now it is "Exception"
-		PrintStream origOut = System.out;
-		PrintStream origErr = System.err;
-		try {
-			output = new JavaOutputParser(origOut,"Exception", "output/std_out.txt");
-			System.setOut(output);
-			errout = new JavaOutputParser(origErr,"Exception", "output/std_error.txt");
-			System.setErr(errout);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(){
 	 	super.beginSequence();
 	}
@@ -176,20 +162,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		// non-responsiveness
 		// suspicious titles
 		Verdict verdict = super.getVerdict(state);
-
-		//checking if Java output or error had "Exception" mentioned:
-		if(output.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: output had failure: "+output.getMatchingOutput());
-			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
-			// reset boolean "found"
-			output.setStringToLookFound(false);
-		}
-		if(errout.isStringToLookFound()){
-			System.out.println("\n\nDEBUG: error out had failure: "+errout.getMatchingOutput());
-			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
-			// reset boolean "found"
-			errout.setStringToLookFound(false);
-		}
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
@@ -319,6 +291,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+
 		return super.executeAction(system, state, action);
 	}
 
@@ -331,6 +304,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
+
 		return super.moreActions(state);
 	}
 
@@ -350,23 +324,11 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	/**
 	 * Here you can put graceful shutdown sequence for your SUT
 	 * @param system
+	 *
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-//		System.out.println("stopSystem");
-		//checking if Java output or error had "Exception" mentioned:
-		if(output.isStringToLookFound()){
-			System.out.println("\n\nDEBUG stopSystem(): output had failure: "+output.getMatchingOutput());
-			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
-			// reset boolean "found"
-			output.setStringToLookFound(false);
-		}
-		if(errout.isStringToLookFound()){
-			System.out.println("\n\nDEBUG stopSystem(): error out had failure: "+errout.getMatchingOutput());
-			// Add your "failure found behaviour" here, for example changing the verdict of TESTAR
-			// reset boolean "found"
-			errout.setStringToLookFound(false);
-		}
+
 		super.stopSystem(system);
 	}
 

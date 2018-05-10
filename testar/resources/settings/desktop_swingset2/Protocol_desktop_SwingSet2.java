@@ -82,7 +82,8 @@ import static org.fruit.alayer.Tags.Enabled;
 
 
 
-public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // DefaultProtocol {
+public class
+Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // DefaultProtocol {
 
 
 	/** 

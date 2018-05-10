@@ -106,6 +106,3 @@ StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
-TestGenerator = random
-MaxReward = 9999999
-Discount = .95
