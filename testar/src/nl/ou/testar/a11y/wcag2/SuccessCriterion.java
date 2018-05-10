@@ -84,9 +84,8 @@ public final class SuccessCriterion extends ItemBase {
 	 */
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level, String urlSuffix) {
 		super(nr, name, Assert.notNull(parent));
-		Assert.notNull(level);
 		Assert.hasText(urlSuffix);
-		this.level = level;
+		this.level = Assert.notNull(level);
 		this.urlSuffix = urlSuffix;
 	}
 	

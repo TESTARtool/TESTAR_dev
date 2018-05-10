@@ -53,8 +53,12 @@ import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
-  // by urueda
-  private static void overrideWithUserProperties(Settings settings) { // overrides test.settings
+  // TODO: Understand what this exactly does?
+  /**
+   * Overidde something. Not sure what
+   * @param settings
+   */
+  private static void overrideWithUserProperties(Settings settings) {
     String pS, p;
     // headless mode
     pS = ConfigTags.ShowVisualSettingsDialogOnStartup.name();
@@ -153,16 +157,19 @@ public class Main {
     }
   }
 
-  // begin by urueda
+
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
   public static String SSE_ACTIVATED = null;
-  // end by urueda
 
-  // by urueda
+
+  /**
+   *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
+   */
+  //FIXME: This method throws a NullPointerException when you do not start testar explicitly from the bin directorybecause it cannot find the settings files
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./settings").listFiles()) {
+    for (File f : new File("./settings/").listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -197,7 +204,10 @@ public class Main {
     SSE_ACTIVATED = null;
   }
 
-  // by urueda
+  /**
+   * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
+   * @return A list of file names that have extension SUT_SETTINGS_EXT
+   */
   public static String[] getSSE() {
     return new File("./settings/").list(new FilenameFilter() {
       @Override
@@ -209,11 +219,13 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     Settings settings = null;
-    //by fraalpe2
     Locale.setDefault(Locale.ENGLISH);
 
-    // begin by urueda
+    // TODO: put the code below into seperate method/class
+    // Get the files with SUT_SETTINGS_EXT extension and check whether it is not empty
+    // and that there is exactly one.
     String[] files = getSSE();
+    // If there is more than 1, then delete them all
     if (files != null && files.length > 1) {
       System.out.println("Too many *.sse files - exactly one expected!");
       for (String f : files) {
@@ -221,6 +233,7 @@ public class Main {
       }
       files = null;
     }
+    //If there is none, then start up a selection menu
     if (files == null || files.length == 0) {
       settingsSelection();
       if (SSE_ACTIVATED == null) {
@@ -228,28 +241,33 @@ public class Main {
       }
     }
     else {
+      //Use the only file that was found
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
     String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
-    // end by urueda
+    // TODO: put the above code into a seperate method/class that returns the testSettings String
 
     try {
       settings = loadSettings(args, testSettings);
-      overrideWithUserProperties(settings); // by urueda
+      overrideWithUserProperties(settings);
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+
       if (SST != null) {
         System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
       }
 
+      // Start up the TESTAR Dialog
       if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
         if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
           return;
         }
       }
 
+      // Starting the logs
       try {
+        // TODO: The date format is not consistent everywhere (see DATE-FORMAT comments)
         String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
         File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
         if (logFile.exists()) {
@@ -261,15 +279,11 @@ public class Main {
         t.printStackTrace(System.out);
         System.exit(-1);
       }
-
-      //logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
-      //logln("Hello, I'm the FRUIT Monkey!" + Util.lineSep() + Util.lineSep() + "These are my settings:", Main.LogLevel.Critical);
-      // start by urueda
+      //TODO: DATE-FORMAT not consistent
       LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
-      // end by urueda
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
-      LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
+      LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
       List<String> cp = settings.get(MyClassPath);
       URL[] classPath = new URL[cp.size()];
       for (int i = 0; i < cp.size(); i++) {
@@ -277,18 +291,15 @@ public class Main {
       }
       loader = new URLClassLoader(classPath);
 
-      //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
-      String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
+      String protocolClass = settings.get(ProtocolClass).split("/")[1];
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
-          "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
+          "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
-      //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
-      LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
+      LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
-      //logln("Starting monkey protocol ...", Main.LogLevel.Debug);
-      LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
+      LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
       protocol.run(settings);
     } catch (ConfigException ce) {
       LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
@@ -297,13 +308,7 @@ public class Main {
       t.printStackTrace(System.out);
       t.printStackTrace(LogSerialiser.getLogStream());
     } finally {
-      //logln("Monkey stopped execution.", Main.LogLevel.Critical);
-      //logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
-      //LogSerialiser.log("TESTAR stopped execution at " + Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + "\n", LogSerialiser.LogLevel.Critical); // by urueda
-      //LogSerialiser.finish(); // by urueda
-      //if(settings != null && settings.get(ShowSettingsAfterTest))
-      //Runtime.getRuntime().exec("cmd /c start monkey.bat && exit");
-      // begin by urueda
+
       TestSerialiser.exit();
       ScreenshotSerialiser.exit();
       LogSerialiser.exit();
@@ -315,11 +320,20 @@ public class Main {
           e.printStackTrace();
         }
       }
-      // end by urueda
+
       System.exit(0);
     }
   }
 
+  // TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
+  /**
+   * Load the default settings for all the configurable settings and add/overwrite with those from the file
+   * This is needed because the user might not have set all the possible settings in the test.settings file.
+   * @param argv
+   * @param file
+   * @return An instance of Settings
+   * @throws ConfigException
+   */
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
     Assert.notNull(file); // by urueda
     try {
@@ -385,7 +399,14 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
-      return Settings.fromFile(defaults, file);
+      //Overwrite the default settings with those from the file
+      Settings settings = Settings.fromFile(defaults, file);
+      //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
+      //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
+      //PrologActivated is ALWAYS false.
+      //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
+      settings.set(ConfigTags.PrologActivated, false);
+      return settings;
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);
     }

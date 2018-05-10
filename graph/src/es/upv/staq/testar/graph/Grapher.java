@@ -85,7 +85,7 @@ public class Grapher implements Runnable {
 
 	public static int EXPLORATION_SAMPLE_INTERVAL = 10;
 	public static boolean GRAPHS_ACTIVATED = true;
-	public static boolean PROLOG_ACTIVATED = true;
+	public static boolean PROLOG_ACTIVATED = false;
 	public static boolean GRAPH_RESUMING_ACTIVATED = false;
 	
 	public static final String GRAPH_NODE_ENTRY = "ENTRY";
@@ -126,13 +126,12 @@ public class Grapher implements Runnable {
 	
 	public static String[] getRegisteredAlgorithms(){
 		return new String[]{
-			RANDOM_GENERATOR,
-			RANDOM_RESTARTS_GENERATOR,
-			QLEARNING_GENERATOR,
-			QLEARNING_RESTARTS_GENERATOR,
-			MAXCOVERAGE_GENERATOR,
-			PROLOG_GENERATOR,
-			EVOLUTIONARY_GENERATOR
+			RANDOM_GENERATOR
+			//RANDOM_RESTARTS_GENERATOR,
+			//QLEARNING_GENERATOR,
+			//QLEARNING_RESTARTS_GENERATOR,
+			//MAXCOVERAGE_GENERATOR
+			//EVOLUTIONARY_GENERATOR
 		};
 	}
 	
@@ -172,7 +171,7 @@ public class Grapher implements Runnable {
 		Grapher.QLEARNING_DISCOUNT_PARAM = discount.doubleValue();
 		Grapher.EXPLORATION_SAMPLE_INTERVAL = explorationSampleInterval.intValue();
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
-		Grapher.PROLOG_ACTIVATED = prologActivated;
+		Grapher.PROLOG_ACTIVATED = false;
 		Grapher.GRAPH_RESUMING_ACTIVATED = graphResumingActivated;
 		Grapher.offlineGraphConversion = offlineGraphConversion;
 		Grapher.jipWrapper = jipWrapper;
@@ -218,8 +217,6 @@ public class Grapher implements Runnable {
 				movementsFIFO.notifyAll(); // awake CONSUMER
 			}
 		}
-		if (PROLOG_ACTIVATED)
-			jipWrapper.setFacts(state);
 	}		
 	
 	/**
@@ -343,9 +340,7 @@ public class Grapher implements Runnable {
 	 * @return
 	 */
 	public static Action selectAction(State state, Set<Action> actions){
-		if (PROLOG_ACTIVATED) {
-			jipWrapper.setFacts(state, actions);
-		}
+
 		Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT ?
 			FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
 			: actions;
@@ -434,9 +429,7 @@ public class Grapher implements Runnable {
 			env = new TESTAREnvironment(testSequencePath);
 			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
 		}
-		
-		if (PROLOG_ACTIVATED)
-			walker.setProlog(jipWrapper);
+
 		if (Grapher.GRAPHS_ACTIVATED){
 			walkStopper = new WalkStopper();
 			walker.walk(env, walkStopper);

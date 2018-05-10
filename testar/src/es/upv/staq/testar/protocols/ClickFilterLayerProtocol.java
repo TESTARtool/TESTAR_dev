@@ -52,7 +52,7 @@ import es.upv.staq.testar.managers.FilteringManager;
  *
  */
 
-public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerProtocol {
+public class ClickFilterLayerProtocol extends DefaultProtocol {
 
 
 	//The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
@@ -79,7 +79,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
 		filteringManager.loadFilters();
 		dataManager.loadInputValues();		
 	}
-	
+
+	/**
+	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the filtering of actions by clicking on them
+	 * @param key
+	 */
     @Override
     public void keyDown(KBKeys key) {    	
         super.keyDown(key);        

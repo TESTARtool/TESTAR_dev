@@ -56,11 +56,9 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	// begin by urueda
 	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
 			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
 			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
-	// end by urueda
 	
 	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
@@ -160,7 +158,6 @@ public class Settings extends TaggableBase implements Serializable {
 	public static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException{
 		Assert.notNull(path);
 		Properties props = new Properties();
-		// begin by urueda
 		FileInputStream fis = new FileInputStream(path);
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
@@ -168,7 +165,7 @@ public class Settings extends TaggableBase implements Serializable {
 		in.close();			
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
-		// end by urueda
+
 		return new Settings(defaults, new Properties(props));
 	}
 
@@ -208,6 +205,8 @@ public class Settings extends TaggableBase implements Serializable {
 				set((Tag)defTag, parse(value, defTag));
 			}
 
+
+
 		}
 	}
 
@@ -223,6 +222,9 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Make the default file Structure for the test.settings file
+	 */
 	public String toFileString() throws IOException{
 		StringBuilder sb = new StringBuilder();
 
@@ -327,14 +329,18 @@ public class Settings extends TaggableBase implements Serializable {
 				int ini = sb.indexOf(t.name()+" =");
 				int end = sb.indexOf(System.lineSeparator(), ini);
 
-				if(ini!=-1) { // Overwrite default tags with the new value
+				//Forced the hiding of prolog config option
+				//TODO: Take out entirely after prolog has been eradicated from TESTAR
+				if (!t.name().equals("PrologActivated")) {
+					if (ini != -1) { // Overwrite default tags with the new value
 
-					sb = sb.delete(ini, end);
-					sb.insert(ini, t.name() +" = "+ escapeBackslash(print((Tag<Object>)t, get(t))));
+						sb = sb.delete(ini, end);
+						sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>) t, get(t))));
 
-				}else { // This tag is new a variable
+					} else { // This tag is new a variable
 
-					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
+						sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
+					}
 				}
 			}
 			

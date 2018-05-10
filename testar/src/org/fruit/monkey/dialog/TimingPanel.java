@@ -40,6 +40,9 @@ import static org.fruit.monkey.dialog.ToolTipTexts.maxTestTimeTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.useRecordedTTT;
 
 public class TimingPanel extends JPanel {
+
+  private static final long serialVersionUID = -5878966626046293031L;
+
   private JSpinner spnActionDuration;
   private JSpinner spnActionWaitTime;
   private JSpinner spnSutStartupTime;
