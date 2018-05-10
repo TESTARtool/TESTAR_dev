@@ -183,7 +183,7 @@ public final class WinProcess extends SUTBase {
 
 		}catch(FruitException fe){
 			LogSerialiser.log(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
-			System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
+			//System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
 			throw new SystemStartException(fe);
 		}
 	}
