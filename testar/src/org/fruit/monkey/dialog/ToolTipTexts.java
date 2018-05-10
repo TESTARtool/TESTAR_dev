@@ -51,9 +51,8 @@ public class ToolTipTexts {
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
 
   // TTTs for the general tab
-  public static String sutConnectorTTT = "How does TESTAR engage with the SUT";
-  public static String suthPathTTT = "<html> Path to the SUT: " +
-      "Pick the executable of the SUT or insert a custom command line. </html>";
+  public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
+  public static String suthPathTTT = "Write the argument for selected the SUT connector";
   public static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
   public static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
       "After having executed the given amount of<br>\n" +
@@ -67,6 +66,7 @@ public class ToolTipTexts {
   public static String checkStopOnFaultTTT = "<html> Stop sequence generation on fault: " +
       "If TESTAR detects and error, it will immediately stop sequence generation. </html>";
   public static String lblCompileTTT = "Always compile protocol on action start";
+  public static String btnEditProtocolTTT = "Open the protocol editor to edit, save and compile the Java Protocol";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
