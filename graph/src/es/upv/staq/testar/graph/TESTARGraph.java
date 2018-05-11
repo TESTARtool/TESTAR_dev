@@ -291,11 +291,11 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 	 */
 	public void addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
 		if (!this.containsVertex(from.getConcreteID())){
-			System.out.println("WARNING - Adding missing vertex: " + from.getConcreteID());
+			//System.out.println("WARNING - Adding missing vertex: " + from.getConcreteID());
 			this.addVertex(env, from);
 		}
 		if (!this.containsVertex(to.getConcreteID())){
-			System.out.println("WARNING - Adding missing vertex: " + to.getConcreteID());
+			//System.out.println("WARNING - Adding missing vertex: " + to.getConcreteID());
 			this.addVertex(env, to);
 		}
 		GraphEdge edge = new GraphEdge(e.getConcreteID(),to.getConcreteID());
@@ -308,8 +308,9 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 					e.incCount();
 					edgeAdded(e,edge);
 					e.addTargetStateID(to.getConcreteID());
-				} else
-					System.out.println("WARNING - failed to add multi-target edge to graph: " + edge.toString());
+				} else {
+					//System.out.println("WARNING - failed to add multi-target edge to graph: " + edge.toString());
+				}
 			} else{
 				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
 					edgeAdded(e,edge);
@@ -317,8 +318,9 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 					e.addTargetStateID(to.getConcreteID());
 					this.graphActions.put(e.getConcreteID(),e);
 					updateCluster(e);
-				} else
-					System.out.println("WARNING - failed to add new action edge to graph: " + edge.toString());
+				} else {
+					//System.out.println("WARNING - failed to add new action edge to graph: " + edge.toString());
+				}
 			}
 		}
 	}
@@ -418,7 +420,7 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
     	progress = Math.round(nidx / nlength * 100.0);
     	if (progress - lastProgress > 1){
     		lastProgress = progress;
-    		System.out.println("\t[" + (int)nidx + "] / [" + nlength + "]");
+    		//System.out.println("\t[" + (int)nidx + "] / [" + nlength + "]");
     	}
 	}
 	
@@ -452,7 +454,7 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 				}
 			}
 			if (doc == null)
-				LogSerialiser.log("Exception loading graph filet: " + xmlPath, LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("Exception loading graph file: " + xmlPath, LogSerialiser.LogLevel.Critical);
 			else{
 				
 				Grapher.getWalker().enablePreviousWalk();
@@ -462,7 +464,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 				
 				Node node; Element element;
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_STATE);
-		        lastProgress = 0; System.out.println("Loading graph vertex nodes [" + nList.getLength() + "]:");
+		        lastProgress = 0;
+		        //System.out.println("Loading graph vertex nodes [" + nList.getLength() + "]:");
 		        int nListLength = nList.getLength();
 		        for (int nidx = 0; nidx < nListLength; nidx++){
 		        	printGraphLoadingProgress((float)nidx,(float)nListLength);
@@ -515,7 +518,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		        
 				int graphActionsCount = 0;
 		        nList = doc.getElementsByTagName(XML_TAG_ACTION);
-		        lastProgress = 0; System.out.println("Loading graph edge nodes [" + nList.getLength() + "]:");
+		        lastProgress = 0;
+		        //System.out.println("Loading graph edge nodes [" + nList.getLength() + "]:");
 		        String wid, absid, from, to = null;
 		        nListLength = nList.getLength();
 		        for (int nidx = 0; nidx < nListLength; nidx++){
@@ -541,10 +545,11 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		        }
 		        if (to != null)
 		        	Grapher.notify(graphStates.get(to),null); // ending state
-		        else
-		        	System.out.println("End state missing at XML loading");
+		        else {
+		        	//System.out.println("End state missing at XML loading");
+				}
 
-				System.out.println("\tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
+				//System.out.println("\tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
 			}
 		} else
 			LogSerialiser.log("Graph file does not exist: " + xmlPath, LogSerialiser.LogLevel.Critical);
