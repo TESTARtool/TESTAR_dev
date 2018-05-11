@@ -448,7 +448,7 @@ public class Grapher implements Runnable {
 	public static String[] getReport(int firstSequenceActionNumber){
 		if (!Grapher.GRAPHS_ACTIVATED)
 			return null;
-		System.out.println("TESTAR sequence graph dump on way ...");
+		//System.out.println("TESTAR sequence graph dump on way ...");
 		try {
 			while (walkStopper != null && walkStopper.continueWalking()){
 				synchronized(walkStopper){
@@ -458,7 +458,7 @@ public class Grapher implements Runnable {
 				}
 			}
 			String[] report = env.getReport(firstSequenceActionNumber);
-			System.out.println("... finished TESTAR sequence graph dump");			
+			//System.out.println("... finished TESTAR sequence graph dump");
 			return report;
 		} catch(java.lang.NullPointerException npe){ // premature test end <- env == null
 			System.out.println("Grapher exception caught:");
