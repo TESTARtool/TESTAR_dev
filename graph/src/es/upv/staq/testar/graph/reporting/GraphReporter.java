@@ -537,7 +537,7 @@ public class GraphReporter {
 			   p6S = "dot.exe -Tsvg " + scrshotedAbstractDotPath + " -o " + scrshotedAbstractDotPath + ".svg"; // screenshot abstract
 		String outDirS = OUT_DIR + testSequenceFolder + "/";
 		try {
-			FileWriter w = new FileWriter(outDirS + "offline_graph_conversion.bat");
+			FileWriter w = new FileWriter(outDirS + "offline_graph_conversion_"+ usingGraphTime + ".bat");
 			w.write(p5S + "\n"); // minimal abstract
 			w.write(p6S + "\n"); // screenshot abstract
 			w.write(p2S + "\n"); // screenshot
