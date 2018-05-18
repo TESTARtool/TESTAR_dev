@@ -98,9 +98,12 @@ public final class Type extends TaggableBase implements Action {
 	}
 	
 	private KBKeys getKey(char c){
-		for(KBKeys k : KBKeys.values())
-			if(k.code() == (int) c)
-				return k;
+    for (KBKeys key : KBKeys.values()) {
+      if (key.code() == (int) c) {
+        return key;
+      }
+    }
+
 		throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
 	}
 	
