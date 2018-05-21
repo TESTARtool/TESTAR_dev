@@ -104,6 +104,8 @@ public final class ConfigTags {
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
 
+  @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateProperties = Tag.from("AbstractStateProperties", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractActionProperties = Tag.from("AbstractActionProperties", (Class<List<String>>) (Class<?>) List.class);
 }

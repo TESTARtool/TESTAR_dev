@@ -353,7 +353,7 @@ public class Settings extends TaggableBase implements Serializable {
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
-	protected void verifySettings() {
+	private void verifySettings() {
 		// verify the abstract state and action settings.
 		// the values provided should be allowed by the Coding Manager
 		try {
@@ -376,7 +376,7 @@ public class Settings extends TaggableBase implements Serializable {
 			List<String> abstractActionProperties = get(ConfigTags.AbstractActionProperties);
 			for (String abstractActionProperty : abstractActionProperties) {
 				try {
-					CodingManager.allowedAbstractStateTags.valueOf(abstractActionProperty);
+					CodingManager.allowedAbstractActionTags.valueOf(abstractActionProperty);
 				}
 				catch (IllegalArgumentException ex) {
 					// couldn't find the string in the enum, get it out of here
