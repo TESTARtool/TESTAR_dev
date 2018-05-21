@@ -45,12 +45,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import es.upv.staq.testar.CodingManager;
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -204,10 +206,9 @@ public class Settings extends TaggableBase implements Serializable {
 			}else{
 				set((Tag)defTag, parse(value, defTag));
 			}
-
-
-
 		}
+
+		verifySettings();
 	}
 
 	public String toString(){
@@ -351,4 +352,40 @@ public class Settings extends TaggableBase implements Serializable {
 	
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
+
+	protected void verifySettings() {
+		// verify the abstract state and action settings.
+		// the values provided should be allowed by the Coding Manager
+		try {
+			List<String> abstractStateProperties = get(ConfigTags.AbstractStateProperties);
+			for (String abstractStateProperty : abstractStateProperties) {
+				try {
+					CodingManager.allowedAbstractStateTags.valueOf(abstractStateProperty);
+				}
+				catch (IllegalArgumentException ex) {
+					// couldn't find the string in the enum, get it out of here
+					abstractStateProperties.remove(abstractStateProperty);
+				}
+			}
+		}
+		catch (NoSuchTagException ex) {
+			// no need to do anything, nothing to verify
+		}
+
+		try {
+			List<String> abstractActionProperties = get(ConfigTags.AbstractActionProperties);
+			for (String abstractActionProperty : abstractActionProperties) {
+				try {
+					CodingManager.allowedAbstractStateTags.valueOf(abstractActionProperty);
+				}
+				catch (IllegalArgumentException ex) {
+					// couldn't find the string in the enum, get it out of here
+					abstractActionProperties.remove(abstractActionProperty);
+				}
+			}
+		}
+		catch (NoSuchTagException ex) {
+			// no need to do anything, nothing to verify
+		}
+	}
 }

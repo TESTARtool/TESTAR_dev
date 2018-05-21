@@ -103,4 +103,7 @@ public final class ConfigTags {
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
+
+  public static final Tag<List<String>> AbstractStateProperties = Tag.from("AbstractStateProperties", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<List<String>> AbstractActionProperties = Tag.from("AbstractActionProperties", (Class<List<String>>) (Class<?>) List.class);
 }

@@ -34,6 +34,7 @@
  */
 package org.fruit.monkey;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -399,6 +400,10 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
+      defaults.add(Pair.from(AbstractStateProperties, Arrays.asList(CodingManager.allowedAbstractStateTags.ROLE)));
+      defaults.add(Pair.from(AbstractActionProperties, Arrays.asList(CodingManager.allowedAbstractActionTags.ROLE)));
+
+
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
@@ -406,6 +411,17 @@ public class Main {
       //PrologActivated is ALWAYS false.
       //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
       settings.set(ConfigTags.PrologActivated, false);
+
+      // check that the abstract state properties and the abstract action properties have at least 1 value
+      if (((List<String>)settings.get(AbstractStateProperties)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave it out of the settings file");
+      }
+
+      // check that the abstract state properties and the abstract action properties have at least 1 value
+      if (((List<String>)settings.get(AbstractActionProperties)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid abstract action attribute or leave it out of the settings file");
+      }
+
       return settings;
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);

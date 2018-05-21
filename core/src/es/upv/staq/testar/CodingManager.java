@@ -80,6 +80,14 @@ public class CodingManager {
 		ActionRoles.KeyDown,
 		ActionRoles.KeyUp
 	};
+
+	public enum allowedAbstractStateTags {
+		ROLE, TITLE, PATH, ENABLED
+	}
+
+	public enum allowedAbstractActionTags {
+		ROLE, TITLE, PATH, ENABLED
+	}
 	
 	// ###########################################
 	//  Widgets/States and Actions IDs management
