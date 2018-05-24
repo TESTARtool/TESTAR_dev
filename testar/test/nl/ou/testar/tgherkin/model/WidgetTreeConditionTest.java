@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.fruit.alayer.State;
 import org.fruit.alayer.StdWidget;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.monkey.ConfigTags;
@@ -45,10 +46,15 @@ public class WidgetTreeConditionTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 0.7);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
-		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		List<Widget> testWidgets = new ArrayList<Widget>();
 		// Create test widget
 		Widget widget = new StdWidget();

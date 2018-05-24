@@ -80,7 +80,6 @@ public class OCR {
 	private OCR() {
 		File file = new File(TESSERACT_LANGUAGE_FILE); 
 		if(!file.exists() || file.isDirectory()) {
-			System.out.println("Tesseract OCR data file not found: " + file.getAbsolutePath());
 			// if tesseract data not available then extract tesseract data file from jar
 			try{
 				extractTesseractDataFromJar();
@@ -92,15 +91,15 @@ public class OCR {
 	
 	/**
 	 * Retrieve singleton instance.
-	 * @return OCR singleton instance
+	 * @return singleton instance
 	 */
 	public static OCR getInstance( ) {
 		return ocr;
 	}
 	
 	/**
-	 * Determine the OCR result for all top widgets of the state.
-	 * @param proxy given protocol proxy
+	 * Collect the OCR result for all top widgets of the state.
+	 * @param proxy document protocol proxy
 	 */
 	public void updateAllWidgets(ProtocolProxy proxy) {
 		// process all widgets 
@@ -111,9 +110,9 @@ public class OCR {
 	}
 
 	/**
-	 * Retrieve OCR result of widget image.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
+	 * Retrieve OCR result of a widget image.
+	 * @param proxy document protocol proxy
+	 * @param widget to be analyzed widget
 	 * @return OCR result, null if a problem occurred
 	 */
 	public String getOCR(ProtocolProxy proxy, Widget widget) {
@@ -141,7 +140,7 @@ public class OCR {
 			try {
 				result = getOCR(grayImage);
 			}catch(Throwable t) {
-				LogSerialiser.log(t.getMessage().toString(), LogSerialiser.LogLevel.Info);
+				LogSerialiser.log(t.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
 			}
 		}	
 		if (result !=null) {
@@ -160,7 +159,7 @@ public class OCR {
         try {
             result = instance.doOCR(bi);
         } catch (TesseractException e) {
-        	LogSerialiser.log(e.getMessage().toString(), LogSerialiser.LogLevel.Info);
+        	LogSerialiser.log(e.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
         }	
         return result;
 	}
@@ -176,13 +175,16 @@ public class OCR {
 			JarEntry jarEntry = conn.getJarEntry();
 			in = new BufferedInputStream(jarfile.getInputStream(jarEntry));
 			out = new BufferedOutputStream(new FileOutputStream(TARGET_FILE));
-			byte[] buffer = new byte[2048];
+			final int bufferSize = 2048;
+			byte[] buffer = new byte[bufferSize];
 			for (;;)  {
 				int nBytes = in.read(buffer);
-				if (nBytes <= 0) break;
+				if (nBytes <= 0) { 
+					break;
+				}
 				out.write(buffer, 0, nBytes);
 			}
-			LogSerialiser.log("Tesseract OCR data file has been extracted.", LogSerialiser.LogLevel.Info);
+			LogSerialiser.log("Tesseract OCR data file has been extracted.\n", LogSerialiser.LogLevel.Info);
 		}finally {
 			if (in != null) {
 				in.close();

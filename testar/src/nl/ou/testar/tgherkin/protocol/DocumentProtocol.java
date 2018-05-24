@@ -23,7 +23,7 @@ import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.utils.report.Reporter;
 
 /**
- * DocumentProtocol for Tgherkin documents.
+ * Class responsible for executing a protocol enriched with a Tgherkin Document model.
  *
  */
 public class DocumentProtocol extends ClickFilterLayerProtocol implements ProtocolProxy{
@@ -49,11 +49,6 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 */
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-		//####TEMP weg
-		try {
-			PrintStream out = new PrintStream(new FileOutputStream("A3.txt"));
-			System.setOut(out);
-		}catch(Exception e) {};
 		if (documentExecutionMode()) {
 			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
 			document = Utils.getDocument(sourceCode);
@@ -111,7 +106,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		Set<Action> actions = super.deriveActions(system,state);
 		if (documentExecutionMode()) {
 			if (settings().get(ConfigTags.ReportState)){
-				Report.reportState(this);	
+				Reporter.getInstance().report(new StateReportItem(false, this));
 			}
 			Report.appendReportDetail(Report.IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS,actions.size());
 			// if an action switch is on then do not process document step

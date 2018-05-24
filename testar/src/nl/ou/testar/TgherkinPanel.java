@@ -18,7 +18,9 @@ import javax.swing.SpinnerNumberModel;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import es.upv.staq.testar.graph.Grapher;
 import nl.ou.testar.tgherkin.TgherkinEditor;
+import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 
 import javax.swing.JLabel;
@@ -42,6 +44,7 @@ public class TgherkinPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 9033457654990065279L;
 	private JComboBox<String> tgComboBoxTgherkinDocument;
+	private JComboBox<String> tgComboBoxExecutionMode;
 	private JCheckBox tgApplyDefaultOnMismatchCheckBox;
 	private JCheckBox tgContinueToApplyDefaultCheckBox;
 	private JCheckBox tgRepeatTgherkinScenariosCheckBox;
@@ -52,6 +55,8 @@ public class TgherkinPanel extends JPanel {
 	private JCheckBox tgReportDerivedGesturesCheckBox;
 	private JCheckBox tgReportStateCheckBox;
 	private JSpinner tgConfidenceThreshold;
+	private JSpinner tgMinimumPercentageForImageRecognition;
+	private JSpinner tgNumberOfNOPRetries;
 	private JButton btnEditTgherkinDocument;
 	private String tgherkinDocument;
 	private String protocolClass;
@@ -111,6 +116,14 @@ public class TgherkinPanel extends JPanel {
 		btnEditTgherkinDocument.setPreferredSize(new java.awt.Dimension(160, 35));
 		add(btnEditTgherkinDocument);
 
+		tgComboBoxExecutionMode = new JComboBox<String>();
+	    String[] executionModes = Document.getRegisteredExecutionModes();
+	    tgComboBoxExecutionMode.setModel(new DefaultComboBoxModel<>(executionModes));
+	    tgComboBoxExecutionMode.setSelectedIndex(0);
+		tgComboBoxExecutionMode.setBounds(120, 34, 120, 20);
+		tgComboBoxExecutionMode.setToolTipText("<html>\nSelect execution mode.\n</html>");
+		add(tgComboBoxExecutionMode);
+		
 		tgApplyDefaultOnMismatchCheckBox = new JCheckBox("Apply default on step mismatch");
 		tgApplyDefaultOnMismatchCheckBox.setBounds(10, 58, 200, 23);
 		tgApplyDefaultOnMismatchCheckBox.setToolTipText("<html>\nIncicates whether default should be applied on step mismatches.\n</html>");
@@ -184,11 +197,22 @@ public class TgherkinPanel extends JPanel {
 		add(tgReportStateCheckBox);
 		
 		tgConfidenceThreshold = new JSpinner();
-		tgConfidenceThreshold.setBounds(280, 274, 100, 31);
+		tgConfidenceThreshold.setBounds(280, 274, 100, 25);
 		tgConfidenceThreshold.setModel(new SpinnerNumberModel(0.0d, 0.0d, 1.0d, 0.01d));
-		tgConfidenceThreshold.setToolTipText("<html>\nNumber between zero and one that represents the confidence threshold\n</html>");
+		tgConfidenceThreshold.setToolTipText("<html>\nNumber between zero and one that represents the confidence threshold.\n</html>");
 	    add(tgConfidenceThreshold);
 
+		tgMinimumPercentageForImageRecognition = new JSpinner();
+		tgMinimumPercentageForImageRecognition.setBounds(280, 298, 100, 25);
+		tgMinimumPercentageForImageRecognition.setModel(new SpinnerNumberModel(0.0d, 0.0d, 100.0d, 1.0d));
+		tgMinimumPercentageForImageRecognition.setToolTipText("<html>\nMinimum percentage of entire widget screenshot for the rectangle that contains the recognized image.<br>The percentage has to be a value between 0 and 100.\n</html>");
+	    add(tgMinimumPercentageForImageRecognition);
+
+	    tgNumberOfNOPRetries = new JSpinner();
+		tgNumberOfNOPRetries.setBounds(280, 322, 100, 25);
+		tgNumberOfNOPRetries.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+		tgNumberOfNOPRetries.setToolTipText("<html>\nNumber of NOP (no operation) action retries if a mismatch occurs during the derivation of actions.\n</html>");
+	    add(tgNumberOfNOPRetries);
 	}
 
 	private void addTgherkinLabels() {
@@ -196,10 +220,21 @@ public class TgherkinPanel extends JPanel {
 		tgTgherkinDocumentLabel.setBounds(10, 10, 120, 23);
 		add(tgTgherkinDocumentLabel);		
 
+		JLabel tgExecutionModeLabel = new JLabel("Execution mode:");
+		tgExecutionModeLabel.setBounds(10, 34, 100, 23);
+		add(tgExecutionModeLabel);		
+
 		JLabel tgConfidenceThresholdLabel = new JLabel("Confidence threshold for image recognition:");
 		tgConfidenceThresholdLabel.setBounds(10, 274, 270, 23);
 		add(tgConfidenceThresholdLabel);		
 
+		JLabel tgMinimumPercentageForImageRecognitionLabel = new JLabel("Minimum percentage for image recognition:");
+		tgMinimumPercentageForImageRecognitionLabel.setBounds(10, 298, 270, 23);
+		add(tgMinimumPercentageForImageRecognitionLabel);		
+
+		JLabel tgNumberOfNOPRetriesLabel = new JLabel("Number of NOP (no operation) action retries:");
+		tgNumberOfNOPRetriesLabel.setBounds(10, 322, 270, 23);
+		add(tgNumberOfNOPRetriesLabel);		
 	}
 
 	/**
@@ -207,6 +242,7 @@ public class TgherkinPanel extends JPanel {
 	 * @param settings The settings to load.
 	 */
 	public void populateFrom(final Settings settings) {
+		tgComboBoxExecutionMode.setSelectedItem(settings.get(ConfigTags.TgherkinExecutionMode));
 		tgApplyDefaultOnMismatchCheckBox.setSelected(settings.get(ConfigTags.ApplyDefaultOnMismatch));
 		tgContinueToApplyDefaultCheckBox.setSelected(settings.get(ConfigTags.ContinueToApplyDefault));
 		tgContinueToApplyDefaultCheckBox.setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
@@ -218,6 +254,8 @@ public class TgherkinPanel extends JPanel {
 		tgReportDerivedGesturesCheckBox.setSelected(settings.get(ConfigTags.ReportDerivedGestures));
 		tgReportStateCheckBox.setSelected(settings.get(ConfigTags.ReportState));
 		tgConfidenceThreshold.setValue(settings.get(ConfigTags.ConfidenceThreshold));
+		tgMinimumPercentageForImageRecognition.setValue(settings.get(ConfigTags.MinimumPercentageForImageRecognition));
+		tgNumberOfNOPRetries.setValue(settings.get(ConfigTags.TgherkinNrOfNOPRetries));
 		tgherkinDocument = settings.get(ConfigTags.TgherkinDocument);
 		protocolClass = settings.get(ConfigTags.ProtocolClass); 
 		myClassPath = settings.get(MyClassPath);
@@ -237,6 +275,7 @@ public class TgherkinPanel extends JPanel {
 		}else {
 			settings.set(ConfigTags.TgherkinDocument, "");
 		}
+	    settings.set(ConfigTags.TgherkinExecutionMode, (String) tgComboBoxExecutionMode.getSelectedItem());
 		settings.set(ConfigTags.ApplyDefaultOnMismatch, tgApplyDefaultOnMismatchCheckBox.isSelected());
 		settings.set(ConfigTags.ContinueToApplyDefault, tgContinueToApplyDefaultCheckBox.isSelected());
 		settings.set(ConfigTags.RepeatTgherkinScenarios, tgRepeatTgherkinScenariosCheckBox.isSelected());
@@ -247,6 +286,8 @@ public class TgherkinPanel extends JPanel {
 		settings.set(ConfigTags.ReportDerivedGestures, tgReportDerivedGesturesCheckBox.isSelected());
 		settings.set(ConfigTags.ReportState, tgReportStateCheckBox.isSelected());
 		settings.set(ConfigTags.ConfidenceThreshold, (Double) tgConfidenceThreshold.getValue());
+		settings.set(ConfigTags.MinimumPercentageForImageRecognition, (Double) tgMinimumPercentageForImageRecognition.getValue());
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, (Integer) tgNumberOfNOPRetries.getValue());
 	}
 
 	private void btnEditTgherkinDocumentActionPerformed(java.awt.event.ActionEvent evt) {

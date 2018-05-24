@@ -13,10 +13,10 @@ import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
 import nl.ou.testar.tgherkin.model.Gesture;
 import nl.ou.testar.tgherkin.model.HitKeyGesture;
 import nl.ou.testar.tgherkin.model.MouseMoveGesture;
+import nl.ou.testar.tgherkin.model.ParameterBase;
+import nl.ou.testar.tgherkin.model.Parameters;
 import nl.ou.testar.tgherkin.model.AnyGesture;
-import nl.ou.testar.tgherkin.model.Argument;
 import nl.ou.testar.tgherkin.model.Background;
-import nl.ou.testar.tgherkin.model.BooleanArgument;
 import nl.ou.testar.tgherkin.model.ClickGesture;
 import nl.ou.testar.tgherkin.model.ConditionalGesture;
 import nl.ou.testar.tgherkin.model.DataTable;
@@ -27,21 +27,18 @@ import nl.ou.testar.tgherkin.model.DragSliderGesture;
 import nl.ou.testar.tgherkin.model.DropDownAtGesture;
 import nl.ou.testar.tgherkin.model.Examples;
 import nl.ou.testar.tgherkin.model.Feature;
-import nl.ou.testar.tgherkin.model.PlaceholderArgument;
 import nl.ou.testar.tgherkin.model.RightClickGesture;
 import nl.ou.testar.tgherkin.model.Scenario;
 import nl.ou.testar.tgherkin.model.ScenarioDefinition;
 import nl.ou.testar.tgherkin.model.ScenarioOutline;
 import nl.ou.testar.tgherkin.model.Step;
 import nl.ou.testar.tgherkin.model.StepRange;
-import nl.ou.testar.tgherkin.model.StringArgument;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.tgherkin.model.Tag;
 import nl.ou.testar.tgherkin.model.TripleClickGesture;
 import nl.ou.testar.tgherkin.model.TypeGesture;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
-import nl.ou.testar.tgherkin.model.WidgetConditionArgument;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 
 /**
@@ -420,112 +417,112 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 
 	@Override 
 	public TypeGesture visitTypeGesture(TgherkinParser.TypeGestureContext ctx) { 
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.PLACEHOLDER() != null) {
 			// use placeholder name without enclosing angular brackets
-			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+			parameterBase.setPlaceholder(Parameters.TEXT, ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1));
 		}
 		if (ctx.STRING() != null) {
 			// string without enclosing quotes
-			arguments.add(new StringArgument(ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1))); 
+			parameterBase.setValue(Parameters.TEXT, ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1));
 		}
-		return new TypeGesture(arguments);
+		return new TypeGesture(parameterBase);
 	}
 	
 	@Override
 	public ClickGesture visitClickGesture(TgherkinParser.ClickGestureContext ctx) {
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.PLACEHOLDER() != null) {
 			// use placeholder name without enclosing angular brackets
-			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+			parameterBase.setPlaceholder(Parameters.UNCHECKED, ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1));
 		}else {
 			if (ctx.TRUE() != null) {
-				arguments.add(new BooleanArgument(true)); 
+				parameterBase.setValue(Parameters.UNCHECKED, true);
 			}else {
 				if (ctx.FALSE() != null) {
-					arguments.add(new BooleanArgument(false)); 
+					parameterBase.setValue(Parameters.UNCHECKED, false);
 				}				
 			}
 		}
-		return new ClickGesture(arguments);		
+		return new ClickGesture(parameterBase);		
 	}
 	
 	@Override
 	public DoubleClickGesture visitDoubleClickGesture(TgherkinParser.DoubleClickGestureContext ctx) {
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.PLACEHOLDER() != null) {
 			// use placeholder name without enclosing angular brackets
-			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+			parameterBase.setPlaceholder(Parameters.UNCHECKED, ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1));
 		}else {
 			if (ctx.TRUE() != null) {
-				arguments.add(new BooleanArgument(true)); 
+				parameterBase.setValue(Parameters.UNCHECKED, true);
 			}else {
 				if (ctx.FALSE() != null) {
-					arguments.add(new BooleanArgument(false)); 
+					parameterBase.setValue(Parameters.UNCHECKED, false);
 				}				
 			}
 		}
-		return new DoubleClickGesture(arguments);		
+		return new DoubleClickGesture(parameterBase);		
 	}
 	
 	@Override
 	public TripleClickGesture visitTripleClickGesture(TgherkinParser.TripleClickGestureContext ctx) {
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.PLACEHOLDER() != null) {
 			// use placeholder name without enclosing angular brackets
-			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+			parameterBase.setPlaceholder(Parameters.UNCHECKED, ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1));
 		}else {
 			if (ctx.TRUE() != null) {
-				arguments.add(new BooleanArgument(true)); 
+				parameterBase.setValue(Parameters.UNCHECKED, true);
 			}else {
 				if (ctx.FALSE() != null) {
-					arguments.add(new BooleanArgument(false)); 
+					parameterBase.setValue(Parameters.UNCHECKED, false);
 				}				
 			}
 		}
-		return new TripleClickGesture(arguments);		
+		return new TripleClickGesture(parameterBase);		
 	}
 	
 	@Override
 	public AnyGesture visitAnyGesture(TgherkinParser.AnyGestureContext ctx) {
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.PLACEHOLDER() != null) {
 			// use placeholder name without enclosing angular brackets
-			arguments.add(new PlaceholderArgument(ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1)));
+			parameterBase.setPlaceholder(Parameters.UNCHECKED, ctx.PLACEHOLDER().getText().substring(1, ctx.PLACEHOLDER().getText().length() - 1));
 		}else {
 			if (ctx.TRUE() != null) {
-				arguments.add(new BooleanArgument(true)); 
+				parameterBase.setValue(Parameters.UNCHECKED, true);
 			}else {
 				if (ctx.FALSE() != null) {
-					arguments.add(new BooleanArgument(false)); 
+					parameterBase.setValue(Parameters.UNCHECKED, false);
 				}				
 			}
 		}
-		return new AnyGesture(arguments);		
+		return new AnyGesture(parameterBase);		
 	}
 	
 	@Override 
 	public HitKeyGesture visitHitKeyGesture(TgherkinParser.HitKeyGestureContext ctx) { 
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		for (HitKeyArgumentContext argumentCtx : ctx.hitKeyArgument()) {
 			if (argumentCtx.KB_KEY_NAME() != null) {
-				arguments.add(new StringArgument(argumentCtx.KB_KEY_NAME().getText()));
+				parameterBase.setValue(Parameters.KBKEYS, argumentCtx.KB_KEY_NAME().getText());
 			}
 			if (argumentCtx.PLACEHOLDER() != null) {
 				// use placeholder name without enclosing angular brackets
-				arguments.add(new PlaceholderArgument(argumentCtx.PLACEHOLDER().getText().substring(1, argumentCtx.PLACEHOLDER().getText().length() - 1)));
+				parameterBase.setPlaceholder(Parameters.KBKEYS, argumentCtx.PLACEHOLDER().getText().substring(1, argumentCtx.PLACEHOLDER().getText().length() - 1));
 			}
 		}
-		return new HitKeyGesture(arguments);
+		return new HitKeyGesture(parameterBase);
 	}
 	
 	@Override 
 	public DragDropGesture visitDragDropGesture(TgherkinParser.DragDropGestureContext ctx) { 
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.widget_condition() != null) {
-			arguments.add(new WidgetConditionArgument(new WidgetCondition(ctx.widget_condition().getText())));
+			parameterBase.setValue(Parameters.WIDGET_CONITION, new WidgetCondition(ctx.widget_condition().getText()));
 		}
-		return new DragDropGesture(arguments);
+		return new DragDropGesture(parameterBase);
 	}
 	
 	
@@ -535,18 +532,18 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		if (ctx.gestureName() == null) {
 			return null;
 		}	
-		List<Argument> arguments = new ArrayList<Argument>();
+		ParameterBase parameterBase = new ParameterBase(); 
 		if (ctx.gestureName().DRAG_SLIDER_NAME() != null) {
-			return new DragSliderGesture(arguments);
+			return new DragSliderGesture(parameterBase);
 		}
 		if (ctx.gestureName().RIGHT_CLICK_NAME() != null) {
-			return new RightClickGesture(arguments);
+			return new RightClickGesture(parameterBase);
 		}
 		if (ctx.gestureName().MOUSE_MOVE_NAME() != null) {
-			return new MouseMoveGesture(arguments);
+			return new MouseMoveGesture(parameterBase);
 		}
 		if (ctx.gestureName().DROP_DOWN_AT_NAME() != null) {
-			return new DropDownAtGesture(arguments);
+			return new DropDownAtGesture(parameterBase);
 		}
 		return null;
 	}

@@ -18,21 +18,33 @@ import org.fruit.alayer.windows.UIATags;
 import es.upv.staq.testar.NativeLinker;
 
 /**
- * Generate variables for Tgherkin grammar.
+ * Class responsible for the generation of Tgherkin variables.
  *
  */
 public class GenerateVariables {
 	
-	// target file is created in tgherkin directory
-	public static final String fileName = ".." + File.separator + "tgherkin" + File.separator + "src" + File.separator + "antlr" + File.separator + "Variables.g4";
+	/**
+	 * Name of the file with variables that is created in the tgherkin sub-project. 
+	 */
+	public static final String FILE_NAME = ".." + File.separator + "tgherkin" + File.separator + "src" + File.separator + "antlr" + File.separator + "Variables.g4";
 	private static Map<String, Class<?>> tagMap = new HashMap<String, Class<?>>();;
 	
+	private GenerateVariables(){
+	}
+
 	/**
 	 * Main method.
 	 * @param args given arguments
 	 */
-	public static void main(String args[]){
-		// trigger class initialization, otherwise getNativeTags() returns the empty set
+	public static void main(String[] args){
+		generateGrammarFile();
+	}
+	
+	/**
+	 * Generate grammar file with variables for the Tgherkin language.
+	 */
+	public static void generateGrammarFile() {
+		//trigger class initialization, otherwise getNativeTags() returns the empty set
 		@SuppressWarnings("unused")
 		Object obj = Tags.Abstract_R_ID;
 		obj = UIATags.UIAAcceleratorKey;
@@ -40,7 +52,7 @@ public class GenerateVariables {
 		for(Tag<?> nativeTag : NativeLinker.getNativeTags()) {
 			fillTagMap(nativeTag);
 		}
-		generateGrammar(fileName);
+		generateGrammar(FILE_NAME);
 	}
 	
 	private static void fillTagMap(Tag<?> tag){
@@ -83,14 +95,11 @@ public class GenerateVariables {
 			writeVariableType(pWriter, tagMap, Boolean.class, "BOOLEAN_VARIABLE_NAME :");
 			writeVariableType(pWriter, tagMap, Double.class, "NUMBER_VARIABLE_NAME :");
 			writeVariableType(pWriter, tagMap, String.class, "STRING_VARIABLE_NAME :");
-        }    
-        catch (FileNotFoundException e) {
+        }catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        }catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        }finally {
             if (pWriter != null) {
                 pWriter.close();
             }

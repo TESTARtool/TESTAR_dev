@@ -14,7 +14,7 @@ import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 
 /**
- * Tgherkin WidgetCondition.
+ * Representation of a widget condition that delegates evaluation to WidgetConditionEvaluator.
  * 
  */
 public class WidgetCondition {
@@ -40,7 +40,7 @@ public class WidgetCondition {
 	
 	/**
 	 * WidgetCondition Constructor.
-	 * @param code given Tgherkin source code
+	 * @param code Tgherkin source code
 	 */
 	public WidgetCondition(String code){
 		Assert.notNull(code);		
@@ -50,8 +50,8 @@ public class WidgetCondition {
 
 	/**
 	 * WidgetCondition Constructor.
-	 * @param type given type
-	 * @param code given Tgherkin source code
+	 * @param type operator type
+	 * @param code Tgherkin source code
 	 */
 	public WidgetCondition(Type type, String code){
 		Assert.notNull(code);		
@@ -60,16 +60,16 @@ public class WidgetCondition {
 	}
 	
 	/**
-	 * Retrieve type.
-	 * @return type
+	 * Retrieve operator type.
+	 * @return operator type
 	 */
 	public Type getType() {
 		return type;
 	}
 
 	/**
-	 * Retrieve code.
-	 * @return code
+	 * Retrieve source code.
+	 * @return source code
 	 */
 	public String getCode() {
 		return code;
@@ -77,9 +77,9 @@ public class WidgetCondition {
 	
 	/**
 	 * Evaluate widget condition.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
-	 * @param dataTable given data table
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 * @return  true if condition is applicable for widget, otherwise false 
 	 */
 	public boolean evaluate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {				
@@ -92,14 +92,15 @@ public class WidgetCondition {
 		Boolean result = false;
 		try {
 			result = (Boolean)evaluator.visit(parser.widget_condition());
-		}catch (Exception e) {}
+		}catch (Exception e) {
+		}
 		return result;
 	}
 	
     /**
      * Check widget condition.
-     * @param dataTable given data table
-     * @return list of error descriptions
+     * @param dataTable data table contained in the examples section of a scenario outline
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> check(DataTable dataTable) {
 		ANTLRInputStream inputStream = new ANTLRInputStream(getCode());

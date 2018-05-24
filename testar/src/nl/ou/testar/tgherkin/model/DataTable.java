@@ -6,7 +6,7 @@ import java.util.List;
 import org.fruit.Assert;
 
 /**
- * Tgherkin DataTable.
+ * Representation of a Tgherkin data table.
  * The first row contains column names.
  *
  */
@@ -16,7 +16,7 @@ public class DataTable {
 
     /**
      * DataTable constructor.
-     * @param tableRows given list of table rows
+     * @param tableRows list of table rows
      */
     public DataTable(List<TableRow> tableRows) {
     	Assert.notNull(tableRows);
@@ -50,7 +50,7 @@ public class DataTable {
     
     /**
      * Retrieve placeholder value of current table row.
-     * @param columnName given column name
+     * @param columnName name of the table column involved
      * @return placeholder value
      */
     public String getPlaceholderValue(String columnName) {
@@ -60,8 +60,8 @@ public class DataTable {
     
     /**
      * Check whether a placeholder is a column name.
-     * @param placeholderName given placeholder name
-     * @return boolean true if placeholder is a column name, otherwise false
+     * @param placeholderName to be checked placeholder name
+     * @return true if placeholder name is a column name, otherwise false
      */
     public boolean isColumnName(String placeholderName) {
     	return getColumnIndex(placeholderName) != -1;
@@ -69,7 +69,7 @@ public class DataTable {
 
     /**
 	 * Check whether more sequences exist.
-	 * @return boolean true if more sequences exist, otherwise false
+	 * @return true if more sequences exist, otherwise false
 	 */
 	public boolean moreSequences() {
 		return hasNextTableRow();

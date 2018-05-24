@@ -10,7 +10,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
 /**
- * Tgherkin ConditonalGesture.
+ * Representation of a conditional gesture that defines the conditions under which a certain gesture is derived.
  *
  */
 public class ConditionalGesture {
@@ -20,8 +20,8 @@ public class ConditionalGesture {
 
     /**
      * ConditionalGesture constructor.
-     * @param widgetCondition given widget condition
-     * @param gesture given gesture
+     * @param widgetCondition condition that indicates when a gesture applies to a widget
+     * @param gesture gesture that is applied
      */
     public ConditionalGesture(WidgetCondition widgetCondition, Gesture gesture) {
         Assert.notNull(gesture);
@@ -47,9 +47,9 @@ public class ConditionalGesture {
 	
 	/**
 	 * Check whether widget is a candidate for the conditional gesture.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
-	 * @param dataTable given data table
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget 
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 * @return true if widget is a candidate, otherwise false
 	 */
 	public boolean isCandidate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
@@ -58,10 +58,10 @@ public class ConditionalGesture {
 
 	/**	  
 	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
-	 * @param dataTable given data table
-	 * @return  set of derived actions 
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget
+	 * @param dataTable data table contained in the examples section of a scenario outline
+	 * @return set of derived actions for the widget involved 
 	 */
 	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();
@@ -74,8 +74,8 @@ public class ConditionalGesture {
 	
 	/**
      * Check conditional gesture.
-     * @param dataTable given data table
-     * @return list of error descriptions
+     * @param dataTable data table contained in the examples section of a scenario outline
+     * @return list of error descriptions, empty list of no errors exist
      */
 	public List<String> check(DataTable dataTable) {
 		List<String> list = new ArrayList<String>();

@@ -4,7 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;  
 
 /**
- * Item processor.
+ * Class responsible for processing an Item.
  *
  */
 public class ItemProcessor implements Runnable  {

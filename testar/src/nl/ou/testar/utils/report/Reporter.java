@@ -7,7 +7,7 @@ import nl.ou.testar.utils.consumer.Consumer;
 import nl.ou.testar.utils.consumer.ConsumerImpl;
 
 /**
- * Reporter class. 
+ * Reporter submits ReportItems to a Consumer.
  *
  */
 public class Reporter {
@@ -29,7 +29,7 @@ public class Reporter {
 	}
 	
 	/**
-	 * Get singleton instance.
+	 * Get instance.
 	 * @return instance
 	 */
 	public static Reporter getInstance(){
@@ -46,11 +46,19 @@ public class Reporter {
 
 	/**
 	 * Report.
-	 * @param fileName name of report file
+	 * @param fileName name of the report file
 	 * @param data to be reported data
 	 */
 	public void report(String fileName, String data){
 		consumer.consume(new ReportItem(fileName, data, true));
+	}
+
+	/**
+	 * Report.
+	 * @param item to be consumed report item
+	 */
+	public void report(ReportItem item){
+		consumer.consume(item);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -10,17 +9,17 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 
 /**
- * Tgherkin RightClickGesture.
+ * Class responsible for handling right clicks.
  *
  */
 public class RightClickGesture extends Gesture {
 
     /**
      * RightClickGesture constructor.
-     * @param arguments list of arguments
+     * @param parameterBase container for parameters
      */
-    public RightClickGesture(List<Argument> arguments) {
-    	super(arguments);
+    public RightClickGesture(ParameterBase parameterBase) {
+    	super(parameterBase);    	
     }
 	
     @Override
@@ -35,7 +34,7 @@ public class RightClickGesture extends Gesture {
     public String toString() {
     	StringBuilder result = new StringBuilder();
    		result.append("rightClick");
-   		result.append(argumentsToString());
+   		result.append(getParameterBase().toString());
     	return result.toString();    	
     }
 }

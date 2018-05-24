@@ -8,7 +8,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.Widget;
 
 /**
- * Tgherkin WidgetTreeCondition.
+ * Class that defines and evaluates a widget tree condition.
  *
  */
 public class WidgetTreeCondition {
@@ -34,8 +34,8 @@ public class WidgetTreeCondition {
     
 	/**
 	 * Evaluate widget tree condition.
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 * @return  true if condition is applicable for the given state, otherwise false 
 	 */
 	public boolean evaluate(ProtocolProxy proxy, DataTable dataTable) {
@@ -80,8 +80,8 @@ public class WidgetTreeCondition {
 	
 	/**
      * Check.
-     * @param dataTable given data table
-     * @return list of error descriptions
+     * @param dataTable data table contained in the examples section of a scenario outline
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> check(DataTable dataTable) {
 		List<String> list = new ArrayList<String>();

@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;  
 
 /**
- * Consumer implementation.
+ * Class that provides an implementation of a Consumer.
  */
 public class ConsumerImpl implements Consumer{
 
@@ -19,7 +19,7 @@ public class ConsumerImpl implements Consumer{
 
 	/**
 	 * Constructor.
-	 * @param poolSize given pool size
+	 * @param poolSize the number of processing threads to be created
 	 */
 	public ConsumerImpl(int poolSize){  
 		for(int i = 0; i < poolSize; i++){  
@@ -31,7 +31,7 @@ public class ConsumerImpl implements Consumer{
 
 	/**
 	 * Consume item.
-	 * @param item given item
+	 * @param item to be consumed item
 	 * @return true if item consumed successfully, otherwise false.
 	 */
 	public boolean consume(Item item){  

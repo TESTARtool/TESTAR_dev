@@ -6,7 +6,7 @@ import java.util.List;
 import org.fruit.Assert;
 
 /**
- * Tgherkin Scenario.
+ * Representation of a Tgherkin scenario.
  *
  */
 public class Scenario extends ScenarioDefinition {
@@ -15,12 +15,12 @@ public class Scenario extends ScenarioDefinition {
 
     /**
      * Scenario constructor. 
-     * @param tags given list of tags
-     * @param title given title
-     * @param narrative given narrative
-     * @param selection given list of conditional gestures
-     * @param oracle given widget tree condition
-     * @param steps given list of steps
+     * @param tags list of tags
+     * @param title summary description
+     * @param narrative detailed description
+     * @param selection list of conditional gestures that defines a filter on the set of derivable gestures
+     * @param oracle widget tree condition that serves as an oracle verdict
+     * @param steps list of consecutive steps
      */
     public Scenario(List<Tag> tags, String title, String narrative, List<ConditionalGesture> selection, WidgetTreeCondition oracle,List<Step> steps) {
     	super(title, narrative, selection, oracle, steps);

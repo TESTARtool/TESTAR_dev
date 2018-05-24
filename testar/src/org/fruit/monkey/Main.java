@@ -38,6 +38,8 @@ import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.tgherkin.model.Document;
+
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
@@ -396,6 +398,9 @@ public class Main {
       defaults.add(Pair.from(ConfidenceThreshold, 1.0));
       defaults.add(Pair.from(TgherkinReportIncludeOCR, false));
       defaults.add(Pair.from(TgherkinReportIncludeImageRecognition, false));
+      defaults.add(Pair.from(TgherkinNrOfNOPRetries, 0));
+      defaults.add(Pair.from(TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]));
+      defaults.add(Pair.from(MinimumPercentageForImageRecognition, 95.0));
 
       return Settings.fromFile(defaults, file);
     } catch (IOException ioe) {

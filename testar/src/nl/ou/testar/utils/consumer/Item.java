@@ -1,7 +1,7 @@
 package nl.ou.testar.utils.consumer;
 
 /**
- * Item interface.
+ * Interface that defines an item.
  *
  */
 public interface Item {

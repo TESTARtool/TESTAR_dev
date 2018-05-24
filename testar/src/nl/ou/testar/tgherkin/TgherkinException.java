@@ -1,7 +1,7 @@
 package nl.ou.testar.tgherkin;
 
 /**
- * TgherkinException class.
+ * Class that provides Tgherkin exceptions.
  *
  */
 public class TgherkinException extends RuntimeException {
@@ -10,7 +10,7 @@ public class TgherkinException extends RuntimeException {
 	
 	/**
 	 * Constructor.
-	 * @param message given message
+	 * @param message exception message
 	 */
 	public TgherkinException(String message){ 
 		this(message, null); 
@@ -18,8 +18,8 @@ public class TgherkinException extends RuntimeException {
 	
 	/**
 	 * Constructor.
-	 * @param message given message
-	 * @param cause given cause
+	 * @param message exception message
+	 * @param cause cause of the exception
 	 */
 	public TgherkinException(String message, Throwable cause){ 
 		super(message, cause); 
@@ -27,7 +27,7 @@ public class TgherkinException extends RuntimeException {
 	
 	/**
 	 * Constructor.
-	 * @param cause given cause
+	 * @param cause cause of the exception
 	 */
 	public TgherkinException(Throwable cause){ 
 		super(cause); 

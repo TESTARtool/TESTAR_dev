@@ -3,7 +3,7 @@ package nl.ou.testar.tgherkin.model;
 import org.fruit.Assert;
 
 /**
- * Tgherkin TableCell.
+ * Representation of a Tgherkin data table element.
  *
  */
 public class TableCell{
@@ -12,7 +12,7 @@ public class TableCell{
 
     /**
      * TableCell constructor.
-     * @param value given value
+     * @param value value contained in the table cell
      */
     public TableCell(String value) {
     	Assert.notNull(value);

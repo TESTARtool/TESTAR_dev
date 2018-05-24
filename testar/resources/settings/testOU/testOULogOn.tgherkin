@@ -1,0 +1,13 @@
+Feature: A user logs on to the system. 
+    
+Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+	
+  Scenario: A user successfully logs on to the system.
+    Step: Enter username
+	When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
+    Step: Enter password
+	When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
+    Step: Press log on button
+	When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Check whether user is logged on
+	When $Role="UIAText" and $Title="Adri Weijling" mouseMove()

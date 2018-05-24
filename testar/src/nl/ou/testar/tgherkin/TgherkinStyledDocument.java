@@ -16,7 +16,7 @@ import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 
 /**
- * This class defines styles for a Tgherkin text document.
+ * TgherkinStyledDocument defines styles for a Tgherkin text document.
  * The Tgherkin parser result is visited to identify relevant tokens. 
  * All relevant tokens will be displayed in a particular style.
  */
@@ -112,10 +112,14 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.TRIPLE_CLICK_NAME:
 		case TgherkinLexer.TYPE_NAME:
 			return gestureStyle;
-		case TgherkinLexer.MATCHES_NAME:
-		case TgherkinLexer.XPATH_NAME:	
 		case TgherkinLexer.IMAGE_NAME:
+		case TgherkinLexer.MATCHES_NAME:
 		case TgherkinLexer.OCR_NAME:
+		case TgherkinLexer.XPATH_NAME:	
+		case TgherkinLexer.XPATH_BOOLEAN_NAME:
+		case TgherkinLexer.XPATH_NUMBER_NAME:
+		case TgherkinLexer.XPATH_STRING_NAME:
+		case TgherkinLexer.STATE_NAME:		
 			return functionStyle;
 		case TgherkinLexer.BACKGROUND_KEYWORD:
 		case TgherkinLexer.EXAMPLES_KEYWORD:

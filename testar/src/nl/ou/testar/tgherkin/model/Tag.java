@@ -3,7 +3,7 @@ package nl.ou.testar.tgherkin.model;
 import org.fruit.Assert;
 
 /**
- * Tgherkin Tag.
+ * Representation of a Tgherkin tag.
  *
  */
 public class Tag {
@@ -12,7 +12,7 @@ public class Tag {
 
     /**
      * Tag constructor.
-     * @param name given name
+     * @param name tag name
      */
     public Tag(String name) {
     	Assert.notNull(name);

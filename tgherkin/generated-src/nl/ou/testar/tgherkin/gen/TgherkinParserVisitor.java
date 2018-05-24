@@ -140,27 +140,6 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStepRange(TgherkinParser.StepRangeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code WidgetCondition}
-	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWidgetCondition(TgherkinParser.WidgetConditionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code WidgetTreeConditionEither}
-	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWidgetTreeConditionEither(TgherkinParser.WidgetTreeConditionEitherContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code WidgetTreeConditionAlso}
-	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitWidgetTreeConditionAlso(TgherkinParser.WidgetTreeConditionAlsoContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#conditional_gesture}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -362,6 +341,12 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringFunction(TgherkinParser.StringFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#numericFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumericFunction(TgherkinParser.NumericFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#matchesFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -374,6 +359,24 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitXpathFunction(TgherkinParser.XpathFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#xpathBooleanFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathBooleanFunction(TgherkinParser.XpathBooleanFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#xpathNumberFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathNumberFunction(TgherkinParser.XpathNumberFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#xpathStringFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathStringFunction(TgherkinParser.XpathStringFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#imageFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -385,6 +388,33 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOcrFunction(TgherkinParser.OcrFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stateFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStateFunction(TgherkinParser.StateFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetCondition}
+	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetCondition(TgherkinParser.WidgetConditionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetTreeConditionEither}
+	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetTreeConditionEither(TgherkinParser.WidgetTreeConditionEitherContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetTreeConditionAlso}
+	 * labeled alternative in {@link TgherkinParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetTreeConditionAlso(TgherkinParser.WidgetTreeConditionAlsoContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#bool}.
 	 * @param ctx the parse tree
@@ -447,6 +477,13 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNumericPlaceholder(TgherkinParser.NumericPlaceholderContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NumberFunction}
+	 * labeled alternative in {@link TgherkinParser#numeric_entity}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberFunction(TgherkinParser.NumberFunctionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StringConst}
 	 * labeled alternative in {@link TgherkinParser#string_entity}.

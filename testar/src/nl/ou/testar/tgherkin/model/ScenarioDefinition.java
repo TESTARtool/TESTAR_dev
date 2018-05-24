@@ -14,7 +14,7 @@ import org.fruit.alayer.Widget;
 import nl.ou.testar.tgherkin.protocol.Report;
 
 /**
- * Tgherkin ScenarioDefinition.
+ * Abstract class that defines a scenario.
  *
  */
 public abstract class ScenarioDefinition {
@@ -129,7 +129,7 @@ public abstract class ScenarioDefinition {
     
 	/**	  
 	 * Evaluate given condition.
-	 * @param proxy given protocol proxy
+	 * @param proxy document protocol proxy
 	 * @return true if given condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
@@ -151,8 +151,8 @@ public abstract class ScenarioDefinition {
 
 	/**	  
 	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @param map widget-list of gestures map
+	 * @param proxy document protocol proxy
+	 * @param map map with widget as key and list of gestures as value
 	 * @return set of actions
 	 */
 	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map) {
@@ -165,7 +165,7 @@ public abstract class ScenarioDefinition {
 
 	/**	  
 	 * Get verdict.
-	 * @param proxy given protocol proxy
+	 * @param proxy document protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why  
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy) {
@@ -203,7 +203,7 @@ public abstract class ScenarioDefinition {
 
 	/**
      * Check.
-     * @return list of error descriptions
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> check() {
 		List<String> list = new ArrayList<String>();

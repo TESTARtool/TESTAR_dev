@@ -16,9 +16,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -39,7 +37,7 @@ import nl.ou.testar.tgherkin.model.Document;
 import org.fruit.Util;
 
 /**
- * Editor for the Tgherkin language.
+ * TgherkinEditor is responsible for editing Tgherkin documents.
  * 
  */
 public class TgherkinEditor extends javax.swing.JDialog{	
@@ -72,7 +70,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 		setTitle("Tgherkin editor");      
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		setMinimumSize(new java.awt.Dimension(800, 400));
+		setMinimumSize(new java.awt.Dimension(800, 800));
 		addWindowListener(new java.awt.event.WindowAdapter() {
 			public void windowClosed(java.awt.event.WindowEvent evt) {
 				formWindowClosed(evt);
@@ -186,7 +184,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 		try {
 			Util.saveToFile(codeEditor.getText(), fileName); 
 		} catch (IOException ioe) {
-			System.out.println(ioe);
+			ioe.printStackTrace();
 		}
 	}                                 
 
@@ -210,8 +208,8 @@ public class TgherkinEditor extends javax.swing.JDialog{
 
 	// Copyright rememberjava.com. Licensed under GPL 3. See http://rememberjava.com/license */
 	/**
-	 * Left hand side RowHeaderView for a JEditorPane in a JScrollPane. Highlights
-	 * the currently selected line. Handles line wrapping, frame resizing.
+	 * Left hand side RowHeaderView for a JEditorPane in a JScrollPane. 
+	 * Highlights the currently selected line. Handles line wrapping, frame resizing.
 	 */
 	class LineNumbersView extends JComponent implements DocumentListener, CaretListener, ComponentListener {
 

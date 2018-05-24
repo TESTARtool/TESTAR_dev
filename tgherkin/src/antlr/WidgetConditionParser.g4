@@ -37,14 +37,24 @@ arithmetic_expr:
 
 string_expr : string_entity; 
  
-booleanFunction: matchesFunction | xpathFunction | imageFunction;
-stringFunction: ocrFunction;
+booleanFunction: matchesFunction | xpathFunction | xpathBooleanFunction | imageFunction | stateFunction;
+stringFunction: ocrFunction | xpathStringFunction;
+numericFunction: xpathNumberFunction;
 
 matchesFunction: MATCHES_NAME LPAREN string_entity COMMA STRING RPAREN; 
 xpathFunction: XPATH_NAME LPAREN STRING RPAREN;
+xpathBooleanFunction: XPATH_BOOLEAN_NAME LPAREN STRING RPAREN;
+xpathNumberFunction: XPATH_NUMBER_NAME LPAREN STRING RPAREN;
+xpathStringFunction: XPATH_STRING_NAME LPAREN STRING RPAREN;
 imageFunction: IMAGE_NAME LPAREN STRING RPAREN;
 ocrFunction: OCR_NAME LPAREN RPAREN;
+stateFunction: STATE_NAME LPAREN widget_tree_condition RPAREN;
  
+widget_tree_condition : 
+   widget_condition                                                           #WidgetCondition
+ | left=widget_tree_condition STEP_ALSO_KEYWORD right=widget_tree_condition   #WidgetTreeConditionAlso
+ | left=widget_tree_condition STEP_EITHER_KEYWORD right=widget_tree_condition #WidgetTreeConditionEither; 
+
 bool: TRUE | FALSE;
 				
 logical_entity : 
@@ -57,7 +67,8 @@ numeric_entity :
    INTEGER_NUMBER       #IntegerConst
  | DECIMAL_NUMBER       #DecimalConst
  | NUMBER_VARIABLE      #NumericVariable
- | PLACEHOLDER          #NumericPlaceholder;	
+ | PLACEHOLDER          #NumericPlaceholder
+ | numericFunction      #NumberFunction; 	
  
 string_entity : 
    STRING               #StringConst

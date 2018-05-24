@@ -18,7 +18,7 @@ import org.fruit.alayer.Widget;
 import nl.ou.testar.tgherkin.protocol.Report;
 
 /**
- * Tgherkin Feature.
+ * Representation of a Tgherkin feature.
  *
  */
 public class Feature {
@@ -35,13 +35,13 @@ public class Feature {
 
 	/**
      * Feature constructor.
-     * @param tags given list of tags
-     * @param title given title
-     * @param narrative given narrative
-     * @param selection given list of conditional gestures
-     * @param oracle given widget tree condition
-     * @param background given background
-     * @param scenarioDefinitions given list of scenario definitions 
+     * @param tags list of tags
+     * @param title summary description
+     * @param narrative detailed description
+     * @param selection list of conditional gestures that defines a filter on the set of derivable gestures
+     * @param oracle widget tree condition that serves as an oracle verdict
+     * @param background background that will be executed before execution of each scenario
+     * @param scenarioDefinitions list of scenario definitions 
      */
     public Feature(List<Tag> tags, String title, String narrative, List<ConditionalGesture> selection, WidgetTreeCondition oracle, Background background, List<ScenarioDefinition> scenarioDefinitions) {
     	Assert.notNull(tags);
@@ -118,7 +118,7 @@ public class Feature {
 
     /**
 	 * Check whether more actions exist.
-	 * @return boolean true if more actions exist, otherwise false
+	 * @return true if more actions exist, otherwise false
 	 */
 	public boolean moreActions() {
 		if (backgroundRun && background.moreActions()) {
@@ -129,7 +129,7 @@ public class Feature {
 	
 	/**
 	 * Check whether more sequences exist.
-	 * @return boolean true if more sequences exist, otherwise false
+	 * @return true if more sequences exist, otherwise false
 	 */
 	public boolean moreSequences() {
 		return hasNextScenarioDefinition() || currentScenarioDefinition().moreSequences();
@@ -156,7 +156,7 @@ public class Feature {
 	
 	/**	  
 	 * Evaluate given condition.
-	 * @param proxy given protocol proxy
+	 * @param proxy document protocol proxy
 	 * @return true if condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
@@ -175,8 +175,8 @@ public class Feature {
 	
 	/**	  
 	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @return set of actions
+	 * @param proxy document protocol proxy
+	 * @return set of derived actions, empty set if no actions were derived
 	 */
 	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy) {
 		Map<Widget,List<Gesture>> map = new HashMap<Widget, List<Gesture>>();
@@ -188,7 +188,7 @@ public class Feature {
 				list = new ArrayList<Gesture>();
 				if (selection.size() == 0) {
 					// no selection defined: all possible gestures are in scope
-					Gesture gesture = new AnyGesture(new ArrayList<Argument>());
+					Gesture gesture = new AnyGesture(new ParameterBase());
 					ConditionalGesture conditionalGesture = new ConditionalGesture(null, gesture); 
 					if (conditionalGesture.isCandidate(proxy, widget, null)) {
 						list.add(gesture);
@@ -215,7 +215,7 @@ public class Feature {
 
 	/**	  
 	 * Get verdict.
-	 * @param proxy given protocol proxy
+	 * @param proxy document protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy) {
@@ -238,7 +238,7 @@ public class Feature {
 	
 	/**
      * Retrieve whether current action resulted in a failure.
-     * @return true if current action failed otherwise false 
+     * @return true if current action failed, otherwise false 
      */
 	public boolean hasFailed() {
 		if (backgroundRun ) {
@@ -265,7 +265,7 @@ public class Feature {
 
 	/**
      * Check.
-     * @return list of error descriptions
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> check() {
 		List<String> list = new ArrayList<String>();

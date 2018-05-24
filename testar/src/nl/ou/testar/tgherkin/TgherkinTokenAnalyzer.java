@@ -10,7 +10,7 @@ import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
 import nl.ou.testar.tgherkin.gen.TgherkinParser.HitKeyArgumentContext;
 
 /**
- * The TgherkinTokenAnalyzer analyzes a Tgherkin text for usage within an editor.
+ * TgherkinTokenAnalyzer analyzes a Tgherkin text for usage within an editor.
  * Tgherkin elements like title and narrative are intended for natural language expressions.
  * These elements can therefore contain Lexer tokens, but these tokens have no special 
  * meaning within a title or narrative.

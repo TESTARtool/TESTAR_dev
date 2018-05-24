@@ -1,14 +1,14 @@
 package nl.ou.testar.utils.consumer;
 
 /**
- * Consumer interface.
+ * Interface that defines a consumer of Items.
  *
  */
 public interface Consumer {
 
 	/**
 	 * Consume item.
-	 * @param item given item
+	 * @param item to be consumed item
 	 * @return true if item consumed successfully, otherwise false.
 	 */
 	boolean consume(Item item);  

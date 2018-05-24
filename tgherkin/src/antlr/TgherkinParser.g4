@@ -113,11 +113,6 @@ stepRange:
  from=INTEGER_NUMBER
  to=INTEGER_NUMBER;
 
-widget_tree_condition : 
-   widget_condition                                                           #WidgetCondition
- | left=widget_tree_condition STEP_ALSO_KEYWORD right=widget_tree_condition   #WidgetTreeConditionAlso
- | left=widget_tree_condition STEP_EITHER_KEYWORD right=widget_tree_condition #WidgetTreeConditionEither; 
-
 conditional_gesture:
  widget_condition? 
  gesture; 

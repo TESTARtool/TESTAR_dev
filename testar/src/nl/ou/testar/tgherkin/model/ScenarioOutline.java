@@ -14,7 +14,7 @@ import org.fruit.alayer.Widget;
 import nl.ou.testar.tgherkin.protocol.Report;
 
 /**
- * Tgherkin ScenarioOutline.
+ * Representation of a Tgherkin scenario outline.
  *
  */
 public class ScenarioOutline extends ScenarioDefinition {
@@ -23,13 +23,13 @@ public class ScenarioOutline extends ScenarioDefinition {
 
     /**
      * ScenarioOutline constructor. 
-     * @param tags given list of tags
-     * @param title given title
-     * @param narrative given narrative
-     * @param selection given list of conditional gestures
-     * @param oracle given widget tree condition
-     * @param steps given list of steps
-     * @param examples given examples
+     * @param tags list of tags
+     * @param title summary description
+     * @param narrative detailed description
+     * @param selection list of conditional gestures that defines a filter on the set of derivable gestures
+     * @param oracle widget tree condition that serves as an oracle verdict
+     * @param steps list of consecutive steps
+     * @param examples container for a data table
      */
     public ScenarioOutline(List<Tag> tags, String title, String narrative, List<ConditionalGesture> selection, WidgetTreeCondition oracle,List<Step> steps, Examples examples) {
         super(title, narrative, selection, oracle, steps);
@@ -56,18 +56,11 @@ public class ScenarioOutline extends ScenarioDefinition {
         return examples;
     }
     
-	/**
-	 * Check whether more sequences exist.
-	 * @return true if more sequences exist, otherwise false
-	 */
     @Override
 	public boolean moreSequences() {
 		return getExamples().moreSequences();
 	}
     
-	/**
-	 * Begin sequence.
-	 */
     @Override
 	public void beginSequence() {
 		super.beginSequence();
@@ -75,11 +68,6 @@ public class ScenarioOutline extends ScenarioDefinition {
 		getExamples().beginSequence();
 	}
 	
-	/**	  
-	 * Evaluate given condition.
-	 * @param proxy given protocol proxy
-	 * @return true if given condition is applicable, otherwise false 
-	 */
     @Override
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
 		if (currentStep() != null && currentStep().hasNextAction()) {
@@ -98,12 +86,6 @@ public class ScenarioOutline extends ScenarioDefinition {
 		return currentStep().evaluateGivenCondition(proxy, examples.getDataTable(), mismatchOccurred());
 	}
 	
-	/**	  
-	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @param map widget-list of gestures map
-	 * @return set of actions
-	 */
     @Override
 	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map) {
 		// apply scenario level selection
@@ -112,11 +94,6 @@ public class ScenarioOutline extends ScenarioDefinition {
 		return currentStep().evaluateWhenCondition(proxy, map, examples.getDataTable(), mismatchOccurred());
 	}
 	
-	/**	  
-	 * Get verdict.
-	 * @param proxy given protocol proxy
-	 * @return oracle verdict, which determines whether the state is erroneous and why  
-	 */
     @Override
 	public Verdict getVerdict(ProtocolProxy proxy) {
 		// scenario level
@@ -129,19 +106,12 @@ public class ScenarioOutline extends ScenarioDefinition {
 		return currentStep().getVerdict(proxy, examples.getDataTable(), mismatchOccurred());
 	}
 
-	/**
-     * Reset scenario definition.
-     */
     @Override
 	public void reset() {
 		super.reset();
 		getExamples().reset();
 	}
 	
-	/**
-     * Check.
-     * @return list of error descriptions
-     */
     @Override
 	public List<String> check() {
 		List<String> list = new ArrayList<String>();
@@ -156,8 +126,6 @@ public class ScenarioOutline extends ScenarioDefinition {
 		}
 		return list;
 	}
-	
-	
 
     @Override
     public String toString() {

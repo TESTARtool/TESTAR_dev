@@ -7,7 +7,7 @@ import org.fruit.alayer.Widget;
 import org.fruit.monkey.Settings;
 
 /**
- * ProtocolProxy interface.
+ * This interface defines methods on states, widgets and actions that the document model needs.
  *
  */
 public interface ProtocolProxy {
@@ -32,35 +32,35 @@ public interface ProtocolProxy {
 
 	/**
 	 * Check whether widget is not filtered.
-	 * @param widget given widget
+	 * @param widget widget involved
 	 * @return true if widget is not filtered, otherwise false
 	 */
 	boolean isUnfiltered(Widget widget);
 
 	/**
 	 * Check whether widget is clickable.
-	 * @param widget given widget
+	 * @param widget widget involved
 	 * @return true if widget is clickable, otherwise false
 	 */
 	boolean isClickable(Widget widget);
 	
 	/**
 	 * Check whether widget is typeable.
-	 * @param widget given widget
+	 * @param widget widget involved
 	 * @return true if widget is typeable, otherwise false
 	 */
 	boolean isTypeable(Widget widget);
 	
     /**
      * Retrieve random text.
-     * @param widget given widget
+     * @param widget widget involved
      * @return generated random text
      */
     String getRandomText(Widget widget);
     
 	/**
 	 * Retrieve top widgets.
-	 * @param state given state
+	 * @param state the SUT's current state
 	 * @return list of top widgets
 	 */
 	List<Widget> getTopWidgets(State state);

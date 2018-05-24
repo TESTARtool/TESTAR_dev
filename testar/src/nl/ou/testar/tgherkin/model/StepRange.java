@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Tgherkin Step.
- *
+ * Step that iterates a fixed or random number of times.
  */
 public class StepRange extends Step {
 
@@ -13,15 +12,16 @@ public class StepRange extends Step {
 	private final int toRange;
 	private int targetedActions;
 	private int currentAction;
+	private boolean generalMismatch;
 	
 	/**
      * StepRange constructor.
-     * @param title title
-     * @param fromRange given from range
-     * @param toRange given to range
-     * @param givenCondition given widget tree condition
-     * @param whenGestures list of conditional gestures
-     * @param thenCondition then widget tree condition
+     * @param title summary description
+     * @param fromRange from range that defines the minimum number of iterations
+     * @param toRange to range that defines the maximum number of iterations
+     * @param givenCondition widget tree condition that defines the Given clause
+     * @param whenGestures list of conditional gestures that defines the When clause 
+     * @param thenCondition widget tree condition that defines the Then clause
      */
     public StepRange(String title, int fromRange, int toRange, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
         super(title, givenCondition, whenGestures, thenCondition);
@@ -44,27 +44,37 @@ public class StepRange extends Step {
 	public int getToRange() {
 		return toRange;
 	}
+	
 
-	/**	  
-	 * Evaluate given condition.
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
-	 * @param mismatchOccurred indicator whether a mismatch occurred
-	 * @return  true if given condition is applicable, otherwise false 
-	 */
+	@Override
+	public boolean isMismatch() {
+		return generalMismatch;
+	}
+
+	@Override
+	public void setMismatch(boolean mismatch) {
+		if (mismatch) {
+			generalMismatch = mismatch;
+		}
+		super.setMismatch(mismatch);
+	}
+	
+	@Override
+    public void reset() {
+    	super.reset();
+    	generalMismatch = false;
+	}
+	
+
 	@Override
 	public boolean evaluateGivenCondition(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
 		// reset status
 		setStatus(Status.UNDETERMINED);
+		setMismatch(false);
 		return super.evaluateGivenCondition(proxy, dataTable, mismatchOccurred);
 	}
 	
 	
-	/**
-     * Check.
-     * @param dataTable given data table
-     * @return list of error descriptions
-     */
 	@Override
 	public List<String> check(DataTable dataTable) {
 		List<String> list = super.check(dataTable);
@@ -74,10 +84,6 @@ public class StepRange extends Step {
 		return list;
 	}
 	
-	
-    /**
-	 * Begin step.
-	 */
 	@Override
 	public void beginSequence() {
 		super.beginSequence();
@@ -91,22 +97,18 @@ public class StepRange extends Step {
 		currentAction = 0;
 	}
 	
-    /**
-     * Checks whether the step has a next action.
-     * @return true if step has a next action otherwise false
-     */
 	@Override
     protected boolean hasNextAction() {
-    	return currentAction < targetedActions;
+    	return currentAction < targetedActions || isRetryMode();
     }
 	
-    /**
-     * Proceed to next action.
-     */
 	@Override
     protected void nextAction() {
-    	super.nextAction();
-    	currentAction++;
+		if (!isRetryMode()){
+	    	currentAction++;
+	    	setNrOfRetries(0);
+		}
+		super.nextAction();
     }
     
 

@@ -14,12 +14,15 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
+import org.fruit.alayer.actions.NOP;
 import org.fruit.monkey.ConfigTags;
 
+import nl.ou.testar.tgherkin.protocol.DerivedGesturesReportItem;
 import nl.ou.testar.tgherkin.protocol.Report;
+import nl.ou.testar.utils.report.Reporter;
 
 /**
- * Tgherkin Step.
+ * Representation of a Tgherkin step.
  *
  */
 public class Step {
@@ -55,14 +58,16 @@ public class Step {
     private boolean running;
 	private Status status;
 	private boolean mismatch;
+	private boolean retryMode;
+	private int nrOfRetries; 
     
 
     /**
      * Step constructor.
-     * @param title title
-     * @param givenCondition given widget tree condition
-     * @param whenGestures list of conditional gestures
-     * @param thenCondition then widget tree condition
+     * @param title summary description
+     * @param givenCondition widget tree condition that defines the Given clause
+     * @param whenGestures list of conditional gestures that defines the When clause 
+     * @param thenCondition widget tree condition that defines the Then clause
      */
     public Step(String title, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
     	Assert.notNull(title);
@@ -134,12 +139,45 @@ public class Step {
 
 	/**
 	 * Set mismatch.
-	 * @param mismatch given mismatch
+	 * @param mismatch to be set mismatch value
 	 */
 	public void setMismatch(boolean mismatch) {
 		this.mismatch = mismatch;
 	}
 	
+	/**
+	 * Retrieve retry mode.
+	 * @return true if in retry mode, otherwise false
+	 */
+	public boolean isRetryMode() {
+		return retryMode;
+	}
+
+	/**
+	 * Set retry mode.
+	 * @param retryMode to be set retry mode
+	 */
+	protected void setRetryMode(boolean retryMode) {
+		this.retryMode = retryMode;
+	}
+
+	/**
+	 * Retrieve number of NOP action retries.
+	 * @return number of NOP action retries
+	 */
+	public int getNrOfRetries() {
+		return nrOfRetries;
+	}
+
+
+	/**
+	 * Set number of NOP action retries.
+	 * @param nrOfRetries to be set number of NOP action retries
+	 */
+	protected void setNrOfRetries(int nrOfRetries) {
+		this.nrOfRetries = nrOfRetries;
+	}
+
 	/**
 	 * Begin step.
 	 */
@@ -154,14 +192,16 @@ public class Step {
     	running = false;
     	status = Status.UNDETERMINED;
     	mismatch = false;
+    	nrOfRetries = 0;
+    	retryMode = false;
 	}
     
     
 	/**	  
 	 * Evaluate given condition.
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
-	 * @param mismatchOccurred indicator whether a mismatch occurred
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
+	 * @param mismatchOccurred indicator whether a mismatch occurred during execution of the current scenario
 	 * @return  true if given condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
@@ -171,18 +211,19 @@ public class Step {
 		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
 			if (givenCondition != null) {
 				result = givenCondition.evaluate(proxy, dataTable);
-				if (result) {
-					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,false);
-				}else {
-					setMismatch(true);
-					Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH,true);
-					if (!proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
-						setStatus(Status.FAILED);
+				if (!result ) {
+					if (nrOfRetries >= proxy.getSettings().get(ConfigTags.TgherkinNrOfNOPRetries)) {
+						setMismatch(true);
+						if (!proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
+							setStatus(Status.FAILED);
+							result = false;
+						}
 					}else {
-						result = true;
+						retryMode = true;
 					}
-				}
+				}	
 			}
+			Report.appendReportDetail(Report.BooleanColumn.GIVEN_MISMATCH, isMismatch());
 		}
 		Report.appendReportDetail(Report.BooleanColumn.GIVEN,result);
 		return result;
@@ -190,45 +231,54 @@ public class Step {
     
 	/**	  
 	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @param map widget-list of gestures map
-	 * @param table data table
-	 * @param mismatchOccurred indicator whether a mismatch occurred
-	 * @return set of actions
+	 * @param proxy document protocol proxy
+	 * @param map map with widget as key and list of gestures as value
+	 * @param dataTable data table contained in the examples section of a scenario outline
+	 * @param mismatchOccurred indicator whether a mismatch occurred during execution of the current scenario
+	 * @return derived set of actions
 	 */
-	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable table, boolean mismatchOccurred) {
+	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable dataTable, boolean mismatchOccurred) {
 		Set<Action> actions = new HashSet<Action>();
-		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
+		if (!retryMode && (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault))) {			
 			Map<Widget,List<Gesture>> oldMap = copy(map);
-			evaluateWhenCondition(proxy, map, whenGestures, table);
+			evaluateWhenCondition(proxy, map, whenGestures, dataTable);
 			if (map.size() == 0) {
-				// current step level execution resulted in mismatch
-				setMismatch(true);
-				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,true);
-				if (proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
-					// restore map if default should be applied 
-					map = oldMap;
+				if (nrOfRetries >= proxy.getSettings().get(ConfigTags.TgherkinNrOfNOPRetries)) {
+					// current step level execution resulted in mismatch
+					setMismatch(true);
+					Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,true);
+					if (proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
+						// restore map if default should be applied 
+						map = oldMap;
+					}else {
+						setStatus(Status.FAILED);
+					}
 				}else {
-					setStatus(Status.FAILED);
+					retryMode = true;
+					Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 				}
 			}else {
 				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 			}
 		}
-		if (proxy.getSettings().get(ConfigTags.ReportDerivedGestures)){
-			Report.reportDerivedGestures(proxy, map);		
+		if (!retryMode && proxy.getSettings().get(ConfigTags.ReportDerivedGestures)){
+			Reporter.getInstance().report(new DerivedGesturesReportItem(false, proxy.getSequenceCount(), proxy.getActionCount(), map));
 		}
 		// generate actions
-		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<Widget,List<Gesture>> entrySet = iterator.next();
-			Widget widget = entrySet.getKey();
-			List<Gesture> list = entrySet.getValue();
-			for(Gesture gesture : list) {
-				actions.addAll(gesture.getActions(widget, proxy, table));
+		if (retryMode) {
+			actions.add(new NOP());
+		}else {
+			Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<Widget,List<Gesture>> entrySet = iterator.next();
+				Widget widget = entrySet.getKey();
+				List<Gesture> list = entrySet.getValue();
+				for(Gesture gesture : list) {
+					actions.addAll(gesture.getActions(widget, proxy, dataTable));
+				}
+				// store widget 
+				proxy.storeWidget(proxy.getState().get(Tags.ConcreteID), widget);
 			}
-			// store widget 
-			proxy.storeWidget(proxy.getState().get(Tags.ConcreteID), widget);
 		}
 		Report.appendReportDetail(Report.IntegerColumn.WHEN_DERIVED_ACTIONS,actions.size());
 		return actions;
@@ -236,10 +286,10 @@ public class Step {
 	
 	/**
 	 * Evaluate when condition.
-	 * @param proxy given protocol proxy
-	 * @param map widget-list of gestures map
-	 * @param select given list of conditional gestures
-	 * @param table given data table
+	 * @param proxy document protocol proxy
+	 * @param map map with widget as key and list of gestures as value
+	 * @param select filter defined by a list of conditional gestures
+	 * @param table data table contained in the examples section of a scenario outline
 	 */
 	protected static void evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, List<ConditionalGesture> select, DataTable table) {
 		if (select.size() > 0) {
@@ -275,7 +325,7 @@ public class Step {
 			}
 			return resultList;
 		}
-		if (originalList.contains(new AnyGesture(new ArrayList<Argument>()))) {
+		if (originalList.contains(new AnyGesture(new ParameterBase()))) {
 			resultList.add(gesture);
 		}
 		return resultList;
@@ -292,12 +342,18 @@ public class Step {
 
 	/**	  
 	 * Get verdict.
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
-	 * @param mismatchOccurred indicator whether a mismatch occurred
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
+	 * @param mismatchOccurred indicator whether a mismatch occurred during execution of the current scenario
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
+		if (retryMode) {
+			// NOP action has been executed: do not use step oracle to get verdict. 
+			Report.appendReportDetail(Report.BooleanColumn.THEN,true);
+			Report.appendReportDetail(Report.BooleanColumn.THEN_MISMATCH,false);
+			return new Verdict(Verdict.SEVERITY_MIN, "Tgherkin NOP action in retry mode");
+		}	
 		if (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault)) {			
 			if (thenCondition != null && !thenCondition.evaluate(proxy, dataTable)) { 
 				setMismatch(true);
@@ -328,7 +384,7 @@ public class Step {
 
 	/**
      * Check.
-     * @param dataTable given data table
+     * @param dataTable data table contained in the examples section of a scenario outline
      * @return list of error descriptions
      */
 	public List<String> check(DataTable dataTable) {
@@ -347,10 +403,10 @@ public class Step {
 
     /**
      * Checks whether the step has a next action.
-     * @return true if step has a next action otherwise false
+     * @return true if step has a next action, otherwise false
      */
     protected boolean hasNextAction() {
-    	return !running;
+    	return !running || retryMode;
     }
 	
     /**
@@ -358,6 +414,10 @@ public class Step {
      */
     protected void nextAction() {
     	running = true;
+    	if (retryMode) {
+    		nrOfRetries++;
+    		retryMode = false;
+    	}
     }
     
     @Override

@@ -10,8 +10,8 @@ import org.fruit.alayer.Widget;
 
 
 /**
- * Tgherkin AnyGesture.
- *
+ * Class responsible for handling any gesture.
+ * 
  */
 public class AnyGesture extends Gesture {
 
@@ -20,21 +20,21 @@ public class AnyGesture extends Gesture {
 	
     /**
      * AnyGesture constructor.
-     * @param arguments list of arguments
+     * @parameterBase container for parameters
      */
-    public AnyGesture(List<Argument> arguments) {
-    	super(arguments);
+    public AnyGesture(ParameterBase parameterBase) {
+    	super(parameterBase);    	
     	// pass boolean argument unchecked to the click gestures 
-		gestures.add(new ClickGesture(arguments));
-		gestures.add(new DoubleClickGesture(arguments));
-		gestures.add(new DragSliderGesture(new ArrayList<Argument>()));
-		gestures.add(new DragDropGesture(new ArrayList<Argument>()));
-		gestures.add(new DropDownAtGesture(new ArrayList<Argument>()));
-		gestures.add(new HitKeyGesture(new ArrayList<Argument>()));
-		gestures.add(new MouseMoveGesture(new ArrayList<Argument>()));
-		gestures.add(new RightClickGesture(new ArrayList<Argument>()));
-		gestures.add(new TripleClickGesture(arguments));
-		gestures.add(new TypeGesture(new ArrayList<Argument>()));
+		gestures.add(new ClickGesture(parameterBase));
+		gestures.add(new DoubleClickGesture(parameterBase));
+		gestures.add(new DragSliderGesture(new ParameterBase()));
+		gestures.add(new DragDropGesture(new ParameterBase()));
+		gestures.add(new DropDownAtGesture(new ParameterBase()));
+		gestures.add(new HitKeyGesture(new ParameterBase()));
+		gestures.add(new MouseMoveGesture(new ParameterBase()));
+		gestures.add(new RightClickGesture(new ParameterBase()));
+		gestures.add(new TripleClickGesture(parameterBase));
+		gestures.add(new TypeGesture(new ParameterBase()));
     }
 	
     
@@ -65,7 +65,7 @@ public class AnyGesture extends Gesture {
     public String toString() {
     	StringBuilder result = new StringBuilder();
    		result.append("anyGesture");
-   		result.append(argumentsToString());
+   		result.append(getParameterBase().toString());
     	return result.toString();    	
     }
 }

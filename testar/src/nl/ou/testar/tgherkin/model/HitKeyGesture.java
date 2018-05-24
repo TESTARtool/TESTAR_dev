@@ -16,17 +16,17 @@ import org.fruit.alayer.windows.UIATags;
 
 
 /**
- * Tgherkin HitKeyGesture.
+ * Class responsible for handling key board key presses.
  *
  */
 public class HitKeyGesture extends Gesture {
 
 	/**
 	 * HitKeyGesture constructor.
-	 * @param arguments list of arguments
+     * @param parameterBase container for parameters
 	 */
-	public HitKeyGesture(List<Argument> arguments) {
-		super(arguments);
+	public HitKeyGesture(ParameterBase parameterBase) {
+		super(parameterBase);
 	}
 
 
@@ -39,18 +39,22 @@ public class HitKeyGesture extends Gesture {
 	public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
 		Set<Action> actions = new HashSet<Action>();	
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		switch (getArguments().size()) {
+		List<String> keyList = getParameterBase().getList(Parameters.KBKEYS, dataTable);
+		if (keyList == null) {
+			return actions;
+		}
+		switch (keyList.size()) {
 		case 0:
 			actions.add(ac.hitShortcutKey(getRandomKeys()));
 			break;
 		case 1:
-			actions.add(ac.hitKey(KBKeys.valueOf(getStringArgument(0, dataTable))));
+			actions.add(ac.hitKey(KBKeys.valueOf(keyList.get(0))));
 			break;
 		default:
 			// 2 or more keys
 			List<KBKeys> keys = new ArrayList<KBKeys>();
-			for (int index = 0; index < getArguments().size(); index++) {
-				keys.add(KBKeys.valueOf(getStringArgument(index, dataTable)));
+			for (String key : keyList) {
+				keys.add(KBKeys.valueOf(key));
 			}
 			actions.add(ac.hitShortcutKey(keys));
 		}
@@ -66,7 +70,7 @@ public class HitKeyGesture extends Gesture {
 		while (keys.size() < nrOfKeys) {
 			// pick a random number within the range of KBKeys enum values
 			KBKeys key = KBKeys.values()[random.nextInt(KBKeys.values().length)];
-			// same key cannot be pressed more than once
+			// don't press the same key more than once
 			if (!keys.contains(key)) {
 				keys.add(key);
 			}
@@ -74,20 +78,11 @@ public class HitKeyGesture extends Gesture {
 		return keys;
 	}
 
-	/**
-	 * Check gesture.
-	 * @param dataTable given data table
-	 * @return list of error descriptions
-	 */
 	@Override
 	public List<String> check(DataTable dataTable) {
 		List<String> list = new ArrayList<String>();
 		List<KBKeys> keys = new ArrayList<KBKeys>();
-		boolean placeholdersUsed = false;
-		for (Argument argument : getArguments()) {
-			if (argument instanceof PlaceholderArgument) {
-				placeholdersUsed = true;
-				String name = ((PlaceholderArgument)argument).getValue();
+		for (String name : getParameterBase().getPlaceholders()) {
 				if (dataTable == null){
 					list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + name + System.getProperty("line.separator"));
 				}else{	
@@ -98,31 +93,23 @@ public class HitKeyGesture extends Gesture {
 						// check whether data table cells contain valid entries
 						list.addAll(checkTableContent(dataTable, name));
 					}
-				}
-			}else {
-				// String argument with KBKeys 
-				if (argument instanceof StringArgument) {
-					String value = ((StringArgument)argument).getValue();
-					KBKeys key = null;
-					try {
-						key = KBKeys.valueOf(value);
-					}catch(IllegalArgumentException e) {
-						list.add(getClass().getSimpleName() +  " validation error - key value " + value + " does not exist" + System.getProperty("line.separator"));					
-					}
-					if (key != null) {
-						if (keys.contains(key)) {
-							list.add(getClass().getSimpleName() +  " validation error - key value " + value + " occurs multiple times" + System.getProperty("line.separator"));							
-						}else {
-							keys.add(key);
-						}
-
-					}
-				}
 			}
 		}
-		// only further check for uniqueness if no errors found yet 
-		if (list.isEmpty() && placeholdersUsed) {
-			list.addAll(checkUniqueness(dataTable));
+		for (String value : getParameterBase().getNonPlaceholderValuesToString()) {
+				// String argument with KBKeys 
+				KBKeys key = null;
+				try {
+					key = KBKeys.valueOf(value);
+				}catch(IllegalArgumentException e) {
+					list.add(getClass().getSimpleName() +  " validation error - key value " + value + " does not exist" + System.getProperty("line.separator"));					
+				}
+				if (key != null) {
+					if (keys.contains(key)) {
+						list.add(getClass().getSimpleName() +  " validation error - key value " + value + " occurs multiple times" + System.getProperty("line.separator"));							
+					}else {
+						keys.add(key);
+					}
+				}
 		}
 		return list;
 	}	
@@ -139,10 +126,14 @@ public class HitKeyGesture extends Gesture {
 			String value = null;
 			try {
 				value = dataTable.getPlaceholderValue(columnName);
-				try {
-					KBKeys.valueOf(value);
-				}catch(IllegalArgumentException e) {
-					list.add(getClass().getSimpleName() +  " validation error - key value " + value + " does not exist at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
+				// elements are separated by spaces
+				String[] elements = value.split("\\s+");
+				for (String element : elements) {
+					try {
+						KBKeys.valueOf(element);
+					}catch(IllegalArgumentException e) {
+						list.add(getClass().getSimpleName() +  " validation error - key value element " + element + " does not exist at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
+					}
 				}
 			}catch(Exception e) {
 				list.add(getClass().getSimpleName() +  " validation error - invalid table value at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
@@ -152,56 +143,11 @@ public class HitKeyGesture extends Gesture {
 		return list;
 	}
 
-	//check for uniqueness data table rows and string arguments
-	private List<String> checkUniqueness(DataTable dataTable) {
-		List<String> list = new ArrayList<String>();
-		if (dataTable == null){
-			return list;
-		}
-		List<KBKeys> keys = null;
-		// process for all data table elements
-		int rows = 0;
-		while (dataTable.moreSequences()) {
-			keys = new ArrayList<KBKeys>();
-			dataTable.beginSequence();
-			rows++;
-			for (Argument argument : getArguments()) {
-				String value = null;
-				if (argument instanceof PlaceholderArgument) {
-					String name = ((PlaceholderArgument)argument).getValue();
-					value = dataTable.getPlaceholderValue(name);
-				}else {
-					// String argument with KBKeys 
-					if (argument instanceof StringArgument) {
-						value = ((StringArgument)argument).getValue();
-					}
-				}
-				KBKeys key = null;
-				try {
-					key = KBKeys.valueOf(value);
-				}catch(IllegalArgumentException e) {
-					list.add(getClass().getSimpleName() +  " validation error - key value " + value + " does not exist for data table row" + rows + System.getProperty("line.separator"));					
-				}
-				if (key != null) {
-					if (keys.contains(key)) {
-						list.add(getClass().getSimpleName() +  " validation error - key value " + value + " occurs multiple times  for data table row" + rows + System.getProperty("line.separator"));							
-					}else {
-						keys.add(key);
-					}
-
-				}
-			}	
-		}
-		dataTable.reset();
-		return list;
-	}
-
-
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append("hitKey");
-		result.append(argumentsToString());
+		result.append(getParameterBase().toString());
 		return result.toString();    	
 	}
 }

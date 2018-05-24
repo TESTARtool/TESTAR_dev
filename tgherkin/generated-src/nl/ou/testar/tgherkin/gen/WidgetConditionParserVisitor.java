@@ -143,6 +143,12 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringFunction(WidgetConditionParser.StringFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#numericFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumericFunction(WidgetConditionParser.NumericFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#matchesFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -155,6 +161,24 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#xpathBooleanFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathBooleanFunction(WidgetConditionParser.XpathBooleanFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#xpathNumberFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathNumberFunction(WidgetConditionParser.XpathNumberFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#xpathStringFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXpathStringFunction(WidgetConditionParser.XpathStringFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#imageFunction}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -166,6 +190,33 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOcrFunction(WidgetConditionParser.OcrFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link WidgetConditionParser#stateFunction}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStateFunction(WidgetConditionParser.StateFunctionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetCondition}
+	 * labeled alternative in {@link WidgetConditionParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetCondition(WidgetConditionParser.WidgetConditionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetTreeConditionEither}
+	 * labeled alternative in {@link WidgetConditionParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetTreeConditionEither(WidgetConditionParser.WidgetTreeConditionEitherContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code WidgetTreeConditionAlso}
+	 * labeled alternative in {@link WidgetConditionParser#widget_tree_condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWidgetTreeConditionAlso(WidgetConditionParser.WidgetTreeConditionAlsoContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link WidgetConditionParser#bool}.
 	 * @param ctx the parse tree
@@ -228,6 +279,13 @@ public interface WidgetConditionParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNumericPlaceholder(WidgetConditionParser.NumericPlaceholderContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NumberFunction}
+	 * labeled alternative in {@link WidgetConditionParser#numeric_entity}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberFunction(WidgetConditionParser.NumberFunctionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StringConst}
 	 * labeled alternative in {@link WidgetConditionParser#string_entity}.

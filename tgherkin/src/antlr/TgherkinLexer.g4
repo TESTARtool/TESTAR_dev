@@ -81,8 +81,12 @@ COMMA: ',';
 // function names
 MATCHES_NAME: 'matches' ;
 XPATH_NAME: 'xpath' ;
+XPATH_BOOLEAN_NAME: 'xpathBoolean' ;
+XPATH_NUMBER_NAME: 'xpathNumber' ;
+XPATH_STRING_NAME: 'xpathString' ;
 IMAGE_NAME: 'image' ;
 OCR_NAME: 'ocr' ;
+STATE_NAME: 'state' ;
 
 // gesture names
 CLICK_NAME: 'click' ;

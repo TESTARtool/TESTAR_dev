@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
@@ -11,23 +10,23 @@ import org.fruit.alayer.actions.StdActionCompiler;
 
 
 /**
- * Tgherkin DoubleClickGesture.
+ * Class responsible for handling double clicks.
  *
  */
 public class DoubleClickGesture extends Gesture {
 
     /**
      * DoubleClickGesture constructor.
-     * @param arguments list of arguments
+     * @param parameterBase container for parameters
      */
-    public DoubleClickGesture(List<Argument> arguments) {
-    	super(arguments);
+    public DoubleClickGesture(ParameterBase parameterBase) {
+    	super(parameterBase);
     }
 	
     
     @Override
     public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-    	if (getArguments().size() > 0 && getBooleanArgument(0, dataTable)) {    		 
+    	if (getParameterBase().size() > 0 && getParameterBase().get(Parameters.UNCHECKED, dataTable)) {    		 
     		// unchecked argument contains value true
     		return super.gesturePossible(widget, proxy, dataTable);
     	}    	
@@ -46,7 +45,7 @@ public class DoubleClickGesture extends Gesture {
     public String toString() {
     	StringBuilder result = new StringBuilder();
    		result.append("doubleClick");
-   		result.append(argumentsToString());
+   		result.append(getParameterBase().toString());
     	return result.toString();    	
     }
 }

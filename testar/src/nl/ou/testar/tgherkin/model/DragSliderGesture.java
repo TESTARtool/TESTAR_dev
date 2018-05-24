@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.fruit.Drag;
@@ -19,17 +18,17 @@ import org.fruit.alayer.actions.StdActionCompiler;
 
 
 /**
- * Tgherkin DragGesture.
+ * Class responsible for handling slider drags.
  *
  */
 public class DragSliderGesture extends Gesture {
 
     /**
      * DragSliderGesture constructor.
-     * @param arguments list of arguments
+     * @param parameterBase container for parameters
      */
-    public DragSliderGesture(List<Argument> arguments) {
-    	super(arguments);
+    public DragSliderGesture(ParameterBase parameterBase) {
+    	super(parameterBase);    	
     }
 	
     
@@ -64,7 +63,7 @@ public class DragSliderGesture extends Gesture {
     public String toString() {
     	StringBuilder result = new StringBuilder();
    		result.append("dragSlider");
-   		result.append(argumentsToString());
+   		result.append(getParameterBase().toString());
     	return result.toString();    	
     }
 }

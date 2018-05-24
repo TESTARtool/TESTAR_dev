@@ -1,8 +1,11 @@
 package nl.ou.testar.tgherkin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
@@ -10,7 +13,6 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.linux.AtSpiTags;
 import org.fruit.alayer.windows.UIATags;
-import org.fruit.monkey.ConfigTags;
 
 import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.tgherkin.functions.Image;
@@ -20,10 +22,12 @@ import nl.ou.testar.tgherkin.functions.XPath;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParserBaseVisitor;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
+import nl.ou.testar.tgherkin.model.WidgetCondition;
+import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 import nl.ou.testar.tgherkin.model.DataTable;
 
 /**
- * This visitor class evaluates a widget condition.
+ * Class responsible for the evaluation of a WidgetCondition.
  * The base visitor super class has been auto-generated for the WidgetCondition grammar.
  */
 public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<Object> {
@@ -35,11 +39,14 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	private Widget widget;
 	private DataTable dataTable;
 
+	private List<WidgetCondition> widgetConditions;
+	private Queue<WidgetCondition.Type> operatorQueue = new LinkedList<WidgetCondition.Type>();
+
 	/**
 	 * Constructor.
-	 * @param proxy given protocol widget proxy
-	 * @param widget given widget
-	 * @param dataTable given data table
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 */
 	public WidgetConditionEvaluator(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
 		this.proxy = proxy;
@@ -60,9 +67,9 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	
 	/**
 	 * Set data attributes.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
-	 * @param dataTable given data table
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 */
 	public void set(ProtocolProxy proxy, Widget widget, DataTable dataTable) {
 		this.proxy = proxy;
@@ -191,25 +198,42 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	public Boolean visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx) { 
 		// retrieve value widget variable
 		String str = (String)visit(ctx.string_entity()); 
-		String regex = ctx.STRING().getText();
 		// unquote regex
-		regex = regex.substring(1, regex.length()-1);
+		String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
 		return Matches.getInstance().isMatch(str, regex);
 	}
 
 	@Override 
 	public Boolean visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx) { 
-		String xpathExpr = ctx.STRING().getText();
 		// unquote 
-		xpathExpr = xpathExpr.substring(1, xpathExpr.length()-1);
-		return XPath.getInstance().isXpathResult(proxy, widget, xpathExpr);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		return XPath.getInstance().isInXpathResult(proxy, widget, xpathExpr);
 	}	
 	
 	@Override 
-	public Boolean visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx) {
-		String imageFile = ctx.STRING().getText();
+	public Boolean visitXpathBooleanFunction(WidgetConditionParser.XpathBooleanFunctionContext ctx) { 
 		// unquote 
-		imageFile = imageFile.substring(1, imageFile.length()-1);	
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		return XPath.getInstance().getXPathBooleanResult(proxy, xpathExpr);
+	}
+
+	@Override 
+	public Double visitXpathNumberFunction(WidgetConditionParser.XpathNumberFunctionContext ctx) { 
+		// unquote 
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		return XPath.getInstance().getXPathNumberResult(proxy, xpathExpr);
+	}
+
+	@Override public String visitXpathStringFunction(WidgetConditionParser.XpathStringFunctionContext ctx) { 
+		// unquote 
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		return XPath.getInstance().getXPathStringResult(proxy, xpathExpr);
+	}
+	
+	@Override 
+	public Boolean visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx) {
+		// unquote 
+		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
 		return Image.getInstance().isRecognized(proxy, widget, imageFile);
 	}
 	
@@ -221,6 +245,36 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 		}
 		return ocrResult;
 	}
+	
+	@Override 
+	public Boolean visitStateFunction(WidgetConditionParser.StateFunctionContext ctx) { 
+		widgetConditions = new ArrayList<WidgetCondition>();
+		operatorQueue.add(null);
+		visit(ctx.widget_tree_condition());
+		WidgetTreeCondition widgetTreeCondition = new WidgetTreeCondition(widgetConditions);
+		return widgetTreeCondition.evaluate(proxy, dataTable);
+	}
+
+	@Override public Object visitWidgetCondition(WidgetConditionParser.WidgetConditionContext ctx) { 
+		WidgetCondition.Type  type = operatorQueue.poll();
+		String code = ctx.getText();
+		WidgetCondition widgetCondition = new WidgetCondition(type, code);
+		widgetConditions.add(widgetCondition);
+		return visitChildren(ctx); 
+	}
+
+	@Override 
+	public Object visitWidgetTreeConditionEither(WidgetConditionParser.WidgetTreeConditionEitherContext ctx) { 
+		operatorQueue.add(WidgetCondition.Type.EITHER);
+		return visitChildren(ctx); 
+	}
+
+	@Override 
+	public Object visitWidgetTreeConditionAlso(WidgetConditionParser.WidgetTreeConditionAlsoContext ctx) { 
+		operatorQueue.add(WidgetCondition.Type.ALSO);
+		return visitChildren(ctx); 
+	}
+	
 	
 	@Override 
 	public Boolean visitLogicalConst(WidgetConditionParser.LogicalConstContext ctx) { 

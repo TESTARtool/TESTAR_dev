@@ -340,10 +340,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
+		settings.set(ConfigTags.ConfidenceThreshold, 0.7);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
 		settings.set(ConfigTags.ForceToSequenceLength, false);
-		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -384,10 +389,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"\r\n" + 
@@ -433,10 +443,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -564,10 +579,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -704,10 +724,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -842,10 +867,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -898,10 +928,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"\r\n" + 
@@ -953,10 +988,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1042,10 +1082,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1155,10 +1200,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, true);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Perform calculations with windows calculator \r\n" + 
 				"  Selection: click()\r\n" +
@@ -1285,10 +1335,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1324,10 +1379,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1363,10 +1423,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title3\"\r\n" + 
@@ -1402,10 +1467,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Oracle: $Title=\"Title1\"\r\n" + 
@@ -1443,10 +1513,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Scenario: Scenario 1\r\n" + 
@@ -1479,10 +1554,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Scenario: Scenario 1\r\n" + 
@@ -1518,10 +1598,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 
@@ -1552,10 +1637,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 
@@ -1587,10 +1677,15 @@ public class DocumentTest {
 		settings.set(ConfigTags.ContinueToApplyDefault, false);
 		settings.set(ConfigTags.RepeatTgherkinScenarios, false);
 		settings.set(ConfigTags.GenerateTgherkinReport, false);
+		settings.set(ConfigTags.StoreTgherkinReport, false);
 		settings.set(ConfigTags.ReportDerivedGestures, false);
 		settings.set(ConfigTags.ReportState, false);
-		settings.set(ConfigTags.ForceToSequenceLength, false);
 		settings.set(ConfigTags.ConfidenceThreshold, 1.0);
+		settings.set(ConfigTags.TgherkinReportIncludeOCR, false);
+		settings.set(ConfigTags.TgherkinReportIncludeImageRecognition, false);
+		settings.set(ConfigTags.TgherkinNrOfNOPRetries, 1);
+		settings.set(ConfigTags.TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]);
+		settings.set(ConfigTags.ForceToSequenceLength, false);
 		// expression
 		String expression = "Feature: Feature 1 \r\n" + 
 				"  Selection: click() rightClick()\r\n" + 

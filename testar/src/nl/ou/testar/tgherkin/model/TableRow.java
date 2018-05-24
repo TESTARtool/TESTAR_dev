@@ -8,7 +8,7 @@ import org.fruit.Assert;
 
 
 /**
- * Tgherkin TableRow.
+ * Representation of a Tgherkin data table row.
  *
  */
 public class TableRow {
@@ -16,7 +16,7 @@ public class TableRow {
 
     /**
      * TableRow constructor.
-     * @param tableCells given list of table cells
+     * @param tableCells list of table cells
      */
     public TableRow(List<TableCell> tableCells) {
     	Assert.notNull(tableCells);

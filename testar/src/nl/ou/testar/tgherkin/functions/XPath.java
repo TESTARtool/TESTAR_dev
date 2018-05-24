@@ -1,44 +1,34 @@
 package nl.ou.testar.tgherkin.functions;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.fruit.Util;
-import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import nl.ou.testar.tgherkin.TgherkinException;
+import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
 
 /**
  * Singleton class responsible for the handling of XPath expressions.
- * This class supports the Tgherkin XPath function.
- *
+ * This class supports the Tgherkin xpath, xpathBoolean, xpathNumber and xpathString functions.
+ * No generics or sub-classing have been used, because these constructs do not quite fit with the singleton concept. 
  */
 public class XPath {
-
-	private static final String XML_HEADER = "<?xml version=\"1.0\"?>";
 
 	private static XPath xpath = new XPath();
 
 	private State state;
 
 	private Map<String,List<Widget>> xpathMap = new HashMap<String,List<Widget>>();
+	private Map<String,Boolean> xpathBooleanMap = new HashMap<String,Boolean>();
+	private Map<String,Double> xpathNumberMap = new HashMap<String,Double>();
+	private Map<String,String> xpathStringMap = new HashMap<String,String>();
 	
 	// private Constructor prevents instantiation by other classes.
 	private XPath() {
@@ -46,7 +36,7 @@ public class XPath {
 	
 	/**
 	 * Retrieve singleton instance.
-	 * @return OCR singleton instance
+	 * @return XPath singleton instance
 	 */
 	public static XPath getInstance( ) {
 		return xpath;
@@ -54,33 +44,35 @@ public class XPath {
 	
 	/**
 	 * Determine whether a widget is in the xpath results.
-	 * @param proxy given protocol proxy
-	 * @param widget given widget
-	 * @param xpathExpr xpath expression
-	 * @return true if match, otherwise false
+	 * @param proxy document protocol proxy
+	 * @param widget to be evaluated widget
+	 * @param xpathExpr XPath expression
+	 * @return true if widget is an element in the XPath node set, otherwise false
 	 */
-	public boolean isXpathResult(ProtocolProxy proxy, Widget widget, String xpathExpr) {
+	public boolean isInXpathResult(ProtocolProxy proxy, Widget widget, String xpathExpr) {
 		return getXpathResult(proxy, xpathExpr).contains(widget);
 	}
 	
+
 	/**
 	 * Get result of Xpath expression.
-	 * The result is a list of widgets that were present as widget elements in the Xpath result. 
-	 * @param proxy given protocol proxy
-	 * @param xpathExpr given Xpath expression
-	 * @return list of widgets  
+	 * The result is a list of widgets that were present as widget elements in the XPath result. 
+	 * @param proxy document protocol proxy
+	 * @param xpathExpr Xpath expression
+	 * @return list of widgets, empty list if no widget is in the XPath result.  
 	 */
 	public List<Widget> getXpathResult(ProtocolProxy proxy, String xpathExpr){
 		if (state != proxy.getState()) {
 			state = proxy.getState();
-			xpathMap.clear();
+			clearMaps();
 		}
 		if (xpathMap.containsKey(xpathExpr)){
 			return xpathMap.get(xpathExpr);
-		}		
+		}
+		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
 		List<Widget> widgetList = new ArrayList<Widget>();
 		try {
-			for (String concreteID : getXpathResult(getStateXML(state), xpathExpr)) {
+			for (String concreteID : Utils.getXPathResult(Utils.getStateXML(proxy, state, imageFiles, xpathExpr.contains("ocr()")), xpathExpr)) {
 				for (Widget widget : state){
 					if (widget.get(Tags.ConcreteID).equals(concreteID)){
 						widgetList.add(widget);
@@ -94,150 +86,88 @@ public class XPath {
 		xpathMap.putIfAbsent(xpathExpr, widgetList);
 		return widgetList;
 	}
-	
-	/**
-	 * Get result of Xpath expression. 
-	 * The result is a list of concrete ID's of all the widget elements that were in the Xpath result. 
-	 * @param xmlData given XML data
-	 * @param xpathExpr given Xpath expression
-	 * @return list of concrete ID's
-	 */
-	private static List<String> getXpathResult(String xmlData, String xpathExpr) throws Exception{
-	    List<String> concreteIDList = new ArrayList<String>();
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
-	    InputSource is = new InputSource(new StringReader(xmlData));
-	    org.w3c.dom.Document document = builder.parse(is);
-        // Create XPathFactory object
-        XPathFactory xpathFactory = XPathFactory.newInstance();
-        // Create XPath object
-        javax.xml.xpath.XPath xpath = xpathFactory.newXPath();
-        //create XPathExpression object
-        XPathExpression expr = xpath.compile(xpathExpr);
-        //evaluate expression result on XML document
-        NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
-        for (int i = 0; i < nodes.getLength(); i++) {
-        	// only select widget elements from the Xpath result
-        	// collect concrete ID's of those widget elements
-        	if (nodes.item(i).getNodeName().equals("widget")) {
-        		if (nodes.item(i) instanceof Element) {
-        			Element element = (Element)nodes.item(i);
-        			Element childElement =  (Element) element.getElementsByTagName("ConcreteID").item(0);
-        			concreteIDList.add(childElement.getFirstChild().getTextContent());
-       			}
-        	}
-        }   
-        return concreteIDList; 
-	}
-	
-	
-    /**
-     * Transform state to XML.
-     * @param widget given state
-     * @return XML representation of the state
-     */
-	private static String getStateXML(State state) {
-    	StringBuilder stringBuilder = new StringBuilder();    	
-    	stringBuilder.append(XML_HEADER);
-        stringBuilder.append(getWidgetTreeXML(state));
-        return stringBuilder.toString();
-    }
-
-    /**
-     * Transform widget tree to XML elements.
-     * @param widget given root widget
-     * @return XML representation of the widget tree
-     */
-    private static String getWidgetTreeXML(Widget widget) {
-    	StringBuilder stringBuilder = new StringBuilder(); 
-    	stringBuilder.append("<widget>");
-        // write tags
-        for (Tag<?> tag : widget.tags()) {
-    		if (tag.type() == Shape.class) {
-    			Shape shape = widget.get(Tags.Shape);
-    			stringBuilder.append(toXMLElement(tag.name(), Util.toString(shape)));
-    			// insert at same level, not as children of Shape element
-       			stringBuilder.append(toXMLElement("Shape.x", "" + shape.x()));
-       			stringBuilder.append(toXMLElement("Shape.y", "" + shape.y()));
-       			stringBuilder.append(toXMLElement("Shape.width", "" + shape.width()));
-       			stringBuilder.append(toXMLElement("Shape.height", "" + shape.height()));
-    		}else {
-                stringBuilder.append(toXMLElement(tag.name(), Util.toString(widget.get(tag))));
-    		}
-        }        
-        // write children
-        for (int i = 0; i < widget.childCount(); ++i) {
-            Widget child = widget.child(i);
-            stringBuilder.append(getWidgetTreeXML(child).toString());
-        }
-        stringBuilder.append("</widget>");
-        return stringBuilder.toString();
-    }
-	
-	/**
-	 * Transform name - value pair to an XML element.
-	 * @param name given element name
-	 * @param value given element value
-	 * @return
-	 */
-	private static String toXMLElement(String name, String value){
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("<");
-		stringBuilder.append(getXMLName(name));
-		stringBuilder.append(">");
-		stringBuilder.append(StringEscapeUtils.escapeXml(toXMLValue(value)));
-		stringBuilder.append("</" + getXMLName(name) + ">");
-		return stringBuilder.toString();		
-	}
-    
-	/**
-	  * This method ensures that the output String has only valid XML unicode
-	  * characters as specified by the XML 1.0 standard.
-	  * Invalid characters are removed.
-	  * Special XML control characters like < are escaped.    
-	  * 
-	  * @param in The String we want to correct.
-	  * @return The corrected in String.
-	  */
-	private static String toXMLValue(String in) {
-		return StringEscapeUtils.escapeXml(stripInvalidXMLCharacters(in));
-	}
-	
-	/**
-	  * This method removes unicode characters that do not adhere to the XML 1.0 standard.  
-	  * 
-	  * @param in The String whose non-valid characters we want to remove.
-	  * @return The in String, stripped of non-valid characters.
-	  */
-	private static String stripInvalidXMLCharacters(String in) {
-	     // XML 1.0
-	     // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-	     String xml10pattern = 
-	             "[^" + 
-	             "\u0009\r\n" + 
-	             "\u0020-\uD7FF" + 
-	             "\uE000-\uFFFD" + 
-	             "\ud800\udc00-\udbff\udfff" + 
-	             "]";
-	     return in.replaceAll(xml10pattern, "").trim();
-	}
 
 	/**
-	  * This method removes unicode characters that do not adhere to the XML 1.0 standard for element names.  
-	  * 
-	  * @param in The String whose non-valid characters we want to remove.
-	  * @return The in String, stripped of non-valid characters.
-	  */
-	private static String getXMLName(String in) {
-	     String xml10pattern = 
-	             "[^" + 
-	             "\u0041-\u005A" +  // upper case letters
-	             "\u0061-\u007A" +  // lower case letters 
-	             "\u002D\r\n" +     // hyphen
-	             "\u005F\r\n" +     // underscore
-	             "\u002E\r\n" +     // period
-	             "]";
-	     return in.replaceAll(xml10pattern, "").trim();
+	 * Retrieve results of XPath expression with return type Boolean.
+	 * @param proxy document protocol proxy
+	 * @param xpathExpr XPath expression
+	 * @return results of XPath expression evaluation
+	 */
+	public boolean getXPathBooleanResult(ProtocolProxy proxy, String xpathExpr) {
+		if (state != proxy.getState()) {
+			state = proxy.getState();
+			clearMaps();
+		}
+		if (xpathBooleanMap.containsKey(xpathExpr)){
+			return xpathBooleanMap.get(xpathExpr);
+		}
+		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
+		Boolean result = null;
+		result = Utils.getXPathBooleanResult(Utils.getStateXML(proxy, state, imageFiles, xpathExpr.contains("ocr()")), xpathExpr);
+		xpathBooleanMap.putIfAbsent(xpathExpr, result);
+		return result;
 	}
 	
+	/**
+	 * Retrieve results of XPath expression with return type Number.
+	 * @param proxy document protocol proxy
+	 * @param xpathExpr XPath expression
+	 * @return results of XPath expression evaluation
+	 */
+	public double getXPathNumberResult(ProtocolProxy proxy, String xpathExpr) {
+		if (state != proxy.getState()) {
+			state = proxy.getState();
+			clearMaps();
+		}
+		if (xpathNumberMap.containsKey(xpathExpr)){
+			return xpathNumberMap.get(xpathExpr);
+		}
+		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
+		Double result = null;
+		result = Utils.getXPathNumberResult(Utils.getStateXML(proxy, state, imageFiles, xpathExpr.contains("ocr()")), xpathExpr);
+		xpathNumberMap.putIfAbsent(xpathExpr, result);
+		return result;
+	}
+	
+	/**
+	 * Retrieve results of XPath expression with return type String.
+	 * @param proxy document protocol proxy
+	 * @param xpathExpr XPath expression
+	 * @return results of XPath expression evaluation
+	 */
+	public String getXPathStringResult(ProtocolProxy proxy, String xpathExpr) {
+		if (state != proxy.getState()) {
+			state = proxy.getState();
+			clearMaps();
+		}
+		if (xpathStringMap.containsKey(xpathExpr)){
+			return xpathStringMap.get(xpathExpr);
+		}
+		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
+		String result = null;
+		result = Utils.getXPathStringResult(Utils.getStateXML(proxy, state, imageFiles, xpathExpr.contains("ocr()")), xpathExpr);
+		xpathStringMap.putIfAbsent(xpathExpr, result);
+		return result;
+	}
+
+	private List<String> updateImageRecognitionAndOCR(ProtocolProxy proxy, String xpathExpr) {
+		if (xpathExpr.contains("ocr()")) {
+			// if ocr function is used then collect ocr results 
+			OCR.getInstance().updateAllWidgets(proxy);
+		}
+		List<String> imageFiles = Utils.getImageFilesFromTgherkinXpathExpression(xpathExpr);
+		for (String imageFile : imageFiles) {
+			// if image function used then collect image recognition results
+			Image.getInstance().updateAllWidgets(proxy, imageFile);
+		}		
+		return imageFiles;
+	}
+	
+	private void clearMaps(){
+		xpathMap.clear();
+		xpathBooleanMap.clear();
+		xpathNumberMap.clear();
+		xpathStringMap.clear();
+	}
+	 
 }

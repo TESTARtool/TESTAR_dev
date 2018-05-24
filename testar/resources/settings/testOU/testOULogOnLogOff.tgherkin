@@ -1,0 +1,17 @@
+Feature: A user logs out of the system. 
+    
+Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+	
+  Scenario: A user successfully logs out of the system.
+    Step: Enter username
+	When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
+    Step: Enter password
+	When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
+    Step: Press log on button
+	When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Expand user
+	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+    Step: Signoff user
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
+    Step: Check whether user is logged off
+	When $Role="UIAText" and $Title="U dient alle browservensters te sluiten om volledig uitgelogd te zijn." mouseMove() 	

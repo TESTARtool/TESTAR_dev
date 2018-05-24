@@ -4,7 +4,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
 /**
- * The TgherkinTags class provides tags for reporting the execution results.
+ * TgherkinTags provides tags for reporting the execution results.
  *
  */
 public class TgherkinTags extends TagsBase {

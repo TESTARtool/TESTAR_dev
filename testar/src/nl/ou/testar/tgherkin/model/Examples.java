@@ -3,7 +3,7 @@ package nl.ou.testar.tgherkin.model;
 import org.fruit.Assert;
 
 /**
- * Tgherkin Examples.
+ * Representation of a Tgherkin examples entity that is a container for a data table.
  *
  */
 public class Examples {
@@ -14,9 +14,9 @@ public class Examples {
 
     /**
      * Examples constructor. 
-     * @param title given title
-     * @param narrative given narrative
-     * @param dataTable given data table
+     * @param title summary description
+     * @param narrative detailed description
+     * @param dataTable data table that can be referenced by placeholders 
      */
     public Examples(String title, String narrative, DataTable dataTable) {
     	Assert.notNull(dataTable);
@@ -51,7 +51,7 @@ public class Examples {
     
 	/**
 	 * Check whether more sequences exist.
-	 * @return boolean true if more sequences exist, otherwise false
+	 * @return true if more sequences exist, otherwise false
 	 */
 	public boolean moreSequences() {
 		return getDataTable().moreSequences();

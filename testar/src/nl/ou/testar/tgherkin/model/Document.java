@@ -11,50 +11,54 @@ import org.fruit.alayer.Verdict;
 import org.fruit.monkey.ConfigTags;
 
 /**
- * Tgherkin Document.
+ * Representation of an executable Tgherkin document.
  *
  */
 public class Document {
 
-    private List<Feature> features;
-    private int index;
-    
-    /**
-     * Document constructor.
-     * @param features given list of features
-     */
-    public Document(List<Feature> features) {
-    	Assert.notNull(features);
-    	this.features = Collections.unmodifiableList(features);
-    	index = -1;
-    }
+	/**
+	 * Sequential execution mode.
+	 */
+	public static final String SEQUENTIAL_MODE = "sequential"; 
+	private List<Feature> features;
+	private int index;
 
-    
-    /**
-     * Retrieve features.
-     * @return list of features
-     */
-    public List<Feature> getFeatures() {
-        return features;        
-    }
-    
-    /**
+	/**
+	 * Document constructor.
+	 * @param features list of features
+	 */
+	public Document(List<Feature> features) {
+		Assert.notNull(features);
+		this.features = Collections.unmodifiableList(features);
+		index = -1;
+	}
+
+
+	/**
+	 * Retrieve features.
+	 * @return list of features
+	 */
+	public List<Feature> getFeatures() {
+		return features;        
+	}
+
+	/**
 	 * Check whether more actions exist.
-	 * @param proxy protocol proxy
-	 * @return boolean true if more actions exist, otherwise false
+	 * @param proxy document protocol proxy
+	 * @return true if more actions exist, otherwise false
 	 */
 	public boolean moreActions(ProtocolProxy proxy) {
 		return !(currentFeature().hasFailed() && !proxy.getSettings().get(ConfigTags.ForceToSequenceLength)) && currentFeature().moreActions();
 	}
-    
+
 	/**
 	 * Check whether more sequences exist.
-	 * @return boolean true if more sequences exist, otherwise false
+	 * @return true if more sequences exist, otherwise false
 	 */
 	public boolean moreSequences() {
 		return hasNextFeature() || currentFeature().moreSequences();
 	}
-	
+
 	/**
 	 * Begin sequence.
 	 */
@@ -66,21 +70,21 @@ public class Document {
 			nextFeature().beginSequence();
 		}
 	}
-    
+
 	/**
 	 * Derive actions.
-	 * @param proxy given protocol proxy
-	 * @return set of derived actions, empty set if no action was found 
+	 * @param proxy document protocol proxy
+	 * @return set of derived actions, empty set if no actions were derived 
 	 */
 	public Set<Action> deriveActions(ProtocolProxy proxy) {
 		currentFeature().evaluateGivenCondition(proxy);
 		return currentFeature().evaluateWhenCondition(proxy);
 	}
-	
+
 
 	/**	  
 	 * Get verdict.
-	 * @param proxy given protocol proxy
+	 * @param proxy document protocol proxy
 	 * @return oracle verdict, which determines whether the state is erroneous and why 
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy) {
@@ -88,20 +92,20 @@ public class Document {
 	}
 
 	/**
-     * Retrieve whether current action resulted in a failure.
-     * @return true if current action failed otherwise false 
-     */
+	 * Retrieve whether current action resulted in a failure.
+	 * @return true if current action failed, otherwise false 
+	 */
 	public boolean hasFailed() {
 		if(currentFeature() != null) {
 			return currentFeature().hasFailed();
 		}
 		return false;
 	}
-	
-	
+
+
 	/**
-     * Reset document.
-     */
+	 * Reset document.
+	 */
 	public void reset() {
 		index = -1;
 		for (Feature feature : getFeatures()) {
@@ -110,9 +114,9 @@ public class Document {
 	}
 
 	/**
-     * Check.
-     * @return list of error descriptions
-     */
+	 * Check.
+	 * @return list of error descriptions, empty list if no errors exist
+	 */
 	public List<String> check() {
 		List<String> list = new ArrayList<String>();
 		for (Feature feature : getFeatures()) {
@@ -120,30 +124,41 @@ public class Document {
 		}
 		return list;
 	}
-	
-    @Override
-    public String toString() {
-    	StringBuilder result = new StringBuilder();
-   		for (Feature feature : getFeatures()) {
-    		result.append(feature.toString());
-    	}
-    	return result.toString();    	
-    }
 
-    private boolean hasNextFeature() {
-    	return index + 1 < features.size();
-    }
+	/**
+	 * Get registered execution modes.
+	 * @return registered execution modes.
+	 */
+	public static String[] getRegisteredExecutionModes(){
+		return new String[]{
+				SEQUENTIAL_MODE
+		};
+	}
 
-    private Feature nextFeature() {
-    	index++; 
-        return features.get(index);
-    }
 
-    private Feature currentFeature() {
-    	if (index < 0 || index >= features.size()) {
-    		return null;
-    	}
-        return features.get(index);
-    }
-    
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		for (Feature feature : getFeatures()) {
+			result.append(feature.toString());
+		}
+		return result.toString();    	
+	}
+
+	private boolean hasNextFeature() {
+		return index + 1 < features.size();
+	}
+
+	private Feature nextFeature() {
+		index++; 
+		return features.get(index);
+	}
+
+	private Feature currentFeature() {
+		if (index < 0 || index >= features.size()) {
+			return null;
+		}
+		return features.get(index);
+	}
+
 }

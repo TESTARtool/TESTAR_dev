@@ -3,18 +3,18 @@ package nl.ou.testar.tgherkin.model;
 import java.util.List;
 
 /**
- * Tgherkin Background.
+ * Class that represents a Tgherkin background.
  *
  */
 public class Background extends ScenarioDefinition {
     
     /**
      * Background constructor. 
-     * @param title given title
-     * @param narrative given narrative
-     * @param selection given list of conditional gestures
-     * @param oracle given widget tree condition
-     * @param steps given list of steps
+     * @param title summary description
+     * @param narrative detailed description
+     * @param selection list of conditional gestures that defines a filter on the set of derivable gestures
+     * @param oracle widget tree condition that serves as an oracle verdict
+     * @param steps list of consecutive steps
      */
 	public Background(String title, String narrative, List<ConditionalGesture> selection, WidgetTreeCondition oracle, List<Step> steps) {
         super(title, narrative, selection, oracle, steps);

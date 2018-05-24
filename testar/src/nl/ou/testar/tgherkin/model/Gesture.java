@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +11,7 @@ import org.fruit.alayer.Widget;
 
 
 /**
- * Tgherkin Gesture.
+ * Abstract class that represents a gesture.
  *
  */
 public abstract class Gesture {
@@ -27,30 +26,30 @@ public abstract class Gesture {
 	 */
 	public static final double SCROLL_THICKNESS = 16; 
 	
-	private final List<Argument> arguments;	
+	private final ParameterBase parameterBase;	
 
     /**
      * Gesture constructor.
-     * @param arguments list of arguments
+     * @param parameterBase container for parameters
      */
-    public Gesture(List<Argument> arguments) {
-    	Assert.notNull(arguments);
-    	this.arguments = Collections.unmodifiableList(arguments);
+    public Gesture(ParameterBase parameterBase) {
+    	Assert.notNull(parameterBase);
+    	this.parameterBase = parameterBase;
     }
 
 	/**
-     * Retrieve arguments.
-     * @return list of arguments
+     * Retrieve parameter base.
+     * @return parameter base
      */
-    public List<Argument> getArguments() {
-        return arguments;
+    public ParameterBase getParameterBase() {
+        return parameterBase;
     }
     
 	/**
 	 * Retrieve whether gesture is possible on a given widget.
-	 * @param widget given widget
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
+	 * @param widget to be assessed widget
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
 	 * @return true if gesture is possible on widget, otherwise false
 	 */
 	public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
@@ -59,68 +58,27 @@ public abstract class Gesture {
     
 	/**
      * Retrieve actions.
-     * @param widget given widget
-	 * @param proxy given protocol proxy
-	 * @param dataTable given data table
+     * @param widget widget for which actions should be derived
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
      * @return set of actions 
      */
     public abstract Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable);
     
-    /**
-     * Get string argument.
-     * @param index given index
-     * @param dataTable given data table
-     * @return string argument
-     */
-    protected String getStringArgument(int index, DataTable dataTable) {
-    	Argument argument = getArguments().get(index);
-    	if (argument instanceof PlaceholderArgument) {
-    		String columnName = ((PlaceholderArgument)argument).getValue();
-    		return dataTable.getPlaceholderValue(columnName);
-    	}else {
-    		if (argument instanceof StringArgument) {
-   				return ((StringArgument)argument).getValue();
-        	}    		
-    	}
-    	return null;
-    }
-    
-    /**
-     * Get boolean argument.
-     * @param index given index
-     * @param dataTable given data table
-     * @return boolean argument
-     */
-    protected Boolean getBooleanArgument(int index, DataTable dataTable) {
-    	Argument argument = getArguments().get(index);
-    	if (argument instanceof PlaceholderArgument) {
-    		String columnName = ((PlaceholderArgument)argument).getValue();
-    		return Boolean.valueOf(dataTable.getPlaceholderValue(columnName));
-    	}else {
-    		if (argument instanceof BooleanArgument) {
-   				return ((BooleanArgument)argument).getValue();
-        	}    		
-    	}
-    	return null;
-    }
-    
 	/**
      * Check gesture.
-     * @param dataTable given data table
-     * @return list of error descriptions
+     * @param dataTable data table contained in the examples section of a scenario outline
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> check(DataTable dataTable) {
 		List<String> list = new ArrayList<String>();
-		for (Argument argument : getArguments()) {
-			if (argument instanceof PlaceholderArgument) {
-				String name = ((PlaceholderArgument)argument).getValue();
-				if (dataTable == null){
-					list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + name + System.getProperty("line.separator"));
-				}else{	
-					// check whether the placeholder is a column name of the data table
-					if (!dataTable.isColumnName(name)) {
-						list.add(getClass().getSimpleName() + " validation error - invalid argument placeholder : " + name + "\n");
-					}
+		for (String placeholder : getParameterBase().getPlaceholders()) {
+			if (dataTable == null){
+				list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + placeholder + System.getProperty("line.separator"));
+			}else{	
+				// check whether the placeholder is a column name of the data table
+				if (!dataTable.isColumnName(placeholder)) {
+					list.add(getClass().getSimpleName() + " validation error - invalid parameter placeholder : " + placeholder + "\n");
 				}
 			}
 		}
@@ -154,28 +112,4 @@ public abstract class Gesture {
         return getClass().hashCode();
       }
 
-    
-    
-    /**
-     * Retrieve string representation of arguments.
-     * @return arguments
-     */
-    protected String argumentsToString() {
-    	StringBuilder result = new StringBuilder();
-    	result.append("(");
-    	if (getArguments() != null) {
-    		boolean first = true;
-    		for (Argument argument : getArguments()) {
-	    		if (!first) {
-	    			result.append(",");
-	    		}
-    			result.append(argument.toString());
-    			first = false;
-	    	}
-    	}
-    	result.append(")");
-    	result.append(System.getProperty("line.separator"));
-    	return result.toString();    	
-    }
-    
 }

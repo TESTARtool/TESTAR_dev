@@ -24,8 +24,8 @@ public class TgherkinErrorListener extends BaseErrorListener {
 	}
 
 	/**
-     * Retrieve result.
-     * @return true if Tgherkin document is valid, otherwise false
+     * Retrieve whether the Tgherkin text file is valid.
+     * @return true if Tgherkin text file is valid, otherwise false
      */
 	public boolean isValid() {
 		return errorList.size() == 0;
@@ -33,7 +33,7 @@ public class TgherkinErrorListener extends BaseErrorListener {
 
 	/**
      * Retrieve error list.
-     * @return List of error descriptions
+     * @return list of error descriptions, empty list if no errors exist
      */
 	public List<String> getErrorList() {
 		return errorList;

@@ -115,4 +115,7 @@ public final class ConfigTags {
   public static final Tag<Double> ConfidenceThreshold = Tag.from("ConfidenceThreshold", Double.class);
   public static final Tag<Boolean> TgherkinReportIncludeOCR = Tag.from("TgherkinReportIncludeOCR", Boolean.class);
   public static final Tag<Boolean> TgherkinReportIncludeImageRecognition = Tag.from("TgherkinReportIncludeImageRecognition", Boolean.class);
+  public static final Tag<Integer> TgherkinNrOfNOPRetries = Tag.from("TgherkinNrOfNOPRetries", Integer.class);
+  public static final Tag<String> TgherkinExecutionMode = Tag.from("TgherkinExecutionMode", String.class);
+  public static final Tag<Double> MinimumPercentageForImageRecognition = Tag.from("MinimumPercentageForImageRecognition", Double.class);
 }

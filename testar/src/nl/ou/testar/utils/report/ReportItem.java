@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import nl.ou.testar.utils.consumer.Item;
 
 /**
- * ReportItem class.
+ * ReportItem provides an implementation of an Item that is responsible for writing the report content to a file.
  *
  */
 public class ReportItem implements Item {
@@ -20,7 +20,7 @@ public class ReportItem implements Item {
 	
 	/**
 	 * Constructor.
-	 * @param fileName name of report file
+	 * @param fileName name of the report file
 	 * @param data to be reported data
 	 * @param append indicator whether data should be appended to the file
 	 */
@@ -28,6 +28,14 @@ public class ReportItem implements Item {
 		this.fileName = fileName;
 		this.data = data;
 		this.append = append;
+	}
+
+	/**
+	 * Set data.
+	 * @param data to be reported data
+	 */
+	protected void setData(String data) {
+		this.data = data;
 	}
 
 	@Override

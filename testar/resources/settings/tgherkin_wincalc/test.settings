@@ -42,6 +42,7 @@ StartupTime = 10.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
 ContinueToApplyDefault = true
+ConfidenceThreshold = 0.7
 GraphsActivated = true
 GraphResuming = false
 GraphDBPassword = 

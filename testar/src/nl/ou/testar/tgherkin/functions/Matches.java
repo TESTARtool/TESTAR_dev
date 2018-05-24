@@ -22,7 +22,7 @@ public class Matches {
 	
 	/**
 	 * Retrieve singleton instance.
-	 * @return OCR singleton instance
+	 * @return singleton instance
 	 */
 	public static Matches getInstance( ) {
 		return matches;
@@ -32,7 +32,7 @@ public class Matches {
 	 * Determine whether a string matches the regex pattern.
 	 * @param string to be evaluated string
 	 * @param regex regular expression
-	 * @return true if match, otherwise false
+	 * @return true if a match is found, otherwise false
 	 */
 	public boolean isMatch(String string, String regex) {
 		Pattern pattern;
