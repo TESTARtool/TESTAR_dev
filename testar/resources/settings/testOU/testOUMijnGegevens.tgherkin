@@ -1,4 +1,4 @@
-Feature: Open Universiteit. 
+Feature: Open University - A user changes his account details. 
     
 Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 

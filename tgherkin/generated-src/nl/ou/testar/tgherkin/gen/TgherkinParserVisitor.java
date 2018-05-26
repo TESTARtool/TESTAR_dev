@@ -134,11 +134,29 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitThenClause(TgherkinParser.ThenClauseContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stepIteration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStepIteration(TgherkinParser.StepIterationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#stepRange}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitStepRange(TgherkinParser.StepRangeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stepWhile}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStepWhile(TgherkinParser.StepWhileContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stepRepeatUntil}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStepRepeatUntil(TgherkinParser.StepRepeatUntilContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#conditional_gesture}.
 	 * @param ctx the parse tree

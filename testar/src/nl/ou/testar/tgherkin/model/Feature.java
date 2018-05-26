@@ -118,13 +118,14 @@ public class Feature {
 
     /**
 	 * Check whether more actions exist.
+	 * @param proxy document protocol proxy
 	 * @return true if more actions exist, otherwise false
 	 */
-	public boolean moreActions() {
-		if (backgroundRun && background.moreActions()) {
+	public boolean moreActions(ProtocolProxy proxy) {
+		if (backgroundRun && background.moreActions(proxy)) {
 			return true;
 		}
-		return currentScenarioDefinition().moreActions();
+		return currentScenarioDefinition().moreActions(proxy);
 	}
 	
 	/**
@@ -163,7 +164,7 @@ public class Feature {
 		Report.appendReportDetail(Report.StringColumn.FEATURE,getTitle());
 		Report.appendReportDetail(Report.StringColumn.SCENARIO,currentScenarioDefinition().getTitle());
 		if (backgroundRun ) {
-			if (background.moreActions()){
+			if (background.moreActions(proxy)){
 				Report.appendReportDetail(Report.StringColumn.TYPE,background.getClass().getSimpleName());
 				return background.evaluateGivenCondition(proxy);
 			}	

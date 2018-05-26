@@ -133,6 +133,9 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.STEP_GIVEN_KEYWORD:
 		case TgherkinLexer.STEP_KEYWORD:
 		case TgherkinLexer.STEP_RANGE_KEYWORD:
+		case TgherkinLexer.STEP_WHILE_KEYWORD:
+		case TgherkinLexer.STEP_REPEAT_KEYWORD:
+		case TgherkinLexer.STEP_UNTIL_KEYWORD:			
 		case TgherkinLexer.STEP_THEN_KEYWORD:
 		case TgherkinLexer.STEP_WHEN_KEYWORD:
 			return keywordStyle;

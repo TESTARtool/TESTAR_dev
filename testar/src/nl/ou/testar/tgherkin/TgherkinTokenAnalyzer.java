@@ -139,6 +139,25 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 	}	
 
 	@Override 
+	public Object visitStepWhile(TgherkinParser.StepWhileContext ctx) { 
+		if (ctx.STEP_WHILE_KEYWORD() != null) {
+			tokenList.add(ctx.STEP_WHILE_KEYWORD().getSourceInterval().a);
+		}
+		return visitChildren(ctx);
+	}	
+
+	@Override 
+	public Object visitStepRepeatUntil(TgherkinParser.StepRepeatUntilContext ctx) { 
+		if (ctx.STEP_REPEAT_KEYWORD() != null) {
+			tokenList.add(ctx.STEP_REPEAT_KEYWORD().getSourceInterval().a);
+		}
+		if (ctx.STEP_UNTIL_KEYWORD() != null) {
+			tokenList.add(ctx.STEP_UNTIL_KEYWORD().getSourceInterval().a);
+		}
+		return visitChildren(ctx);
+	}	
+
+	@Override 
 	public Object visitWidgetTreeConditionEither(TgherkinParser.WidgetTreeConditionEitherContext ctx) { 
 		if (ctx.STEP_EITHER_KEYWORD() != null) {
 			tokenList.add(ctx.STEP_EITHER_KEYWORD().getSourceInterval().a);

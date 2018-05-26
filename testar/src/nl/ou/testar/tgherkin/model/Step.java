@@ -403,9 +403,11 @@ public class Step {
 
     /**
      * Checks whether the step has a next action.
+	 * @param proxy document protocol proxy
+	 * @param dataTable data table contained in the examples section of a scenario outline
      * @return true if step has a next action, otherwise false
      */
-    protected boolean hasNextAction() {
+    protected boolean hasNextAction(ProtocolProxy proxy, DataTable dataTable) {
     	return !running || retryMode;
     }
 	

@@ -22,18 +22,19 @@ public class WidgetConditionParser extends Parser {
 		OPTION_KEYWORD_INCLUDE=1, OPTION_KEYWORD_EXCLUDE=2, TAGNAME=3, FEATURE_KEYWORD=4, 
 		BACKGROUND_KEYWORD=5, SCENARIO_KEYWORD=6, SCENARIO_OUTLINE_KEYWORD=7, 
 		EXAMPLES_KEYWORD=8, SELECTION_KEYWORD=9, ORACLE_KEYWORD=10, STEP_KEYWORD=11, 
-		STEP_RANGE_KEYWORD=12, STEP_GIVEN_KEYWORD=13, STEP_WHEN_KEYWORD=14, STEP_THEN_KEYWORD=15, 
-		STEP_ALSO_KEYWORD=16, STEP_EITHER_KEYWORD=17, TABLE_ROW=18, DECIMAL_NUMBER=19, 
-		INTEGER_NUMBER=20, PLACEHOLDER=21, STRING=22, COMMENT=23, AND=24, OR=25, 
-		NOT=26, TRUE=27, FALSE=28, POW=29, MULT=30, DIV=31, MOD=32, PLUS=33, MINUS=34, 
-		GT=35, GE=36, LT=37, LE=38, EQ=39, NE=40, LPAREN=41, RPAREN=42, COMMA=43, 
-		MATCHES_NAME=44, XPATH_NAME=45, XPATH_BOOLEAN_NAME=46, XPATH_NUMBER_NAME=47, 
-		XPATH_STRING_NAME=48, IMAGE_NAME=49, OCR_NAME=50, STATE_NAME=51, CLICK_NAME=52, 
-		TYPE_NAME=53, DRAG_SLIDER_NAME=54, ANY_NAME=55, DOUBLE_CLICK_NAME=56, 
-		TRIPLE_CLICK_NAME=57, RIGHT_CLICK_NAME=58, MOUSE_MOVE_NAME=59, DROP_DOWN_AT_NAME=60, 
-		HIT_KEY_NAME=61, DRAG_DROP_NAME=62, BOOLEAN_VARIABLE=63, NUMBER_VARIABLE=64, 
-		STRING_VARIABLE=65, EOL=66, WS=67, OTHER=68, BOOLEAN_VARIABLE_NAME=69, 
-		NUMBER_VARIABLE_NAME=70, STRING_VARIABLE_NAME=71, KB_KEY_NAME=72;
+		STEP_RANGE_KEYWORD=12, STEP_WHILE_KEYWORD=13, STEP_REPEAT_KEYWORD=14, 
+		STEP_UNTIL_KEYWORD=15, STEP_GIVEN_KEYWORD=16, STEP_WHEN_KEYWORD=17, STEP_THEN_KEYWORD=18, 
+		STEP_ALSO_KEYWORD=19, STEP_EITHER_KEYWORD=20, TABLE_ROW=21, DECIMAL_NUMBER=22, 
+		INTEGER_NUMBER=23, PLACEHOLDER=24, STRING=25, COMMENT=26, AND=27, OR=28, 
+		NOT=29, TRUE=30, FALSE=31, POW=32, MULT=33, DIV=34, MOD=35, PLUS=36, MINUS=37, 
+		GT=38, GE=39, LT=40, LE=41, EQ=42, NE=43, LPAREN=44, RPAREN=45, COMMA=46, 
+		MATCHES_NAME=47, XPATH_NAME=48, XPATH_BOOLEAN_NAME=49, XPATH_NUMBER_NAME=50, 
+		XPATH_STRING_NAME=51, IMAGE_NAME=52, OCR_NAME=53, STATE_NAME=54, CLICK_NAME=55, 
+		TYPE_NAME=56, DRAG_SLIDER_NAME=57, ANY_NAME=58, DOUBLE_CLICK_NAME=59, 
+		TRIPLE_CLICK_NAME=60, RIGHT_CLICK_NAME=61, MOUSE_MOVE_NAME=62, DROP_DOWN_AT_NAME=63, 
+		HIT_KEY_NAME=64, DRAG_DROP_NAME=65, BOOLEAN_VARIABLE=66, NUMBER_VARIABLE=67, 
+		STRING_VARIABLE=68, EOL=69, WS=70, OTHER=71, BOOLEAN_VARIABLE_NAME=72, 
+		NUMBER_VARIABLE_NAME=73, STRING_VARIABLE_NAME=74, KB_KEY_NAME=75;
 	public static final int
 		RULE_widget_condition = 0, RULE_relational_expr = 1, RULE_relational_operator = 2, 
 		RULE_arithmetic_expr = 3, RULE_string_expr = 4, RULE_booleanFunction = 5, 
@@ -53,23 +54,25 @@ public class WidgetConditionParser extends Parser {
 	private static final String[] _LITERAL_NAMES = {
 		null, "'include:'", "'exclude:'", null, "'Feature:'", "'Background:'", 
 		"'Scenario:'", "'Scenario Outline:'", "'Examples:'", "'Selection:'", "'Oracle:'", 
-		"'Step:'", "'Range'", "'Given'", "'When'", "'Then'", "'Also'", "'Either'", 
-		null, null, null, null, null, null, "'and'", "'or'", null, "'true'", "'false'", 
-		"'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", "'>='", "'<'", "'<='", 
-		"'='", null, "'('", "')'", "','", "'matches'", "'xpath'", "'xpathBoolean'", 
-		"'xpathNumber'", "'xpathString'", "'image'", "'ocr'", "'state'", "'click'", 
-		"'type'", "'dragSlider'", "'anyGesture'", "'doubleClick'", "'tripleClick'", 
-		"'rightClick'", "'mouseMove'", "'dropDownAt'", "'hitKey'", "'dragDrop'"
+		"'Step:'", "'Range'", "'While'", "'Repeat'", "'until'", "'Given'", "'When'", 
+		"'Then'", "'Also'", "'Either'", null, null, null, null, null, null, "'and'", 
+		"'or'", null, "'true'", "'false'", "'^'", "'*'", "'/'", "'%'", "'+'", 
+		"'-'", "'>'", "'>='", "'<'", "'<='", "'='", null, "'('", "')'", "','", 
+		"'matches'", "'xpath'", "'xpathBoolean'", "'xpathNumber'", "'xpathString'", 
+		"'image'", "'ocr'", "'state'", "'click'", "'type'", "'dragSlider'", "'anyGesture'", 
+		"'doubleClick'", "'tripleClick'", "'rightClick'", "'mouseMove'", "'dropDownAt'", 
+		"'hitKey'", "'dragDrop'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, "OPTION_KEYWORD_INCLUDE", "OPTION_KEYWORD_EXCLUDE", "TAGNAME", "FEATURE_KEYWORD", 
 		"BACKGROUND_KEYWORD", "SCENARIO_KEYWORD", "SCENARIO_OUTLINE_KEYWORD", 
 		"EXAMPLES_KEYWORD", "SELECTION_KEYWORD", "ORACLE_KEYWORD", "STEP_KEYWORD", 
-		"STEP_RANGE_KEYWORD", "STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", "STEP_THEN_KEYWORD", 
-		"STEP_ALSO_KEYWORD", "STEP_EITHER_KEYWORD", "TABLE_ROW", "DECIMAL_NUMBER", 
-		"INTEGER_NUMBER", "PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", 
-		"TRUE", "FALSE", "POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", 
-		"LT", "LE", "EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "XPATH_NAME", 
+		"STEP_RANGE_KEYWORD", "STEP_WHILE_KEYWORD", "STEP_REPEAT_KEYWORD", "STEP_UNTIL_KEYWORD", 
+		"STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", "STEP_THEN_KEYWORD", "STEP_ALSO_KEYWORD", 
+		"STEP_EITHER_KEYWORD", "TABLE_ROW", "DECIMAL_NUMBER", "INTEGER_NUMBER", 
+		"PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", "TRUE", "FALSE", 
+		"POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", "LT", "LE", 
+		"EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "XPATH_NAME", 
 		"XPATH_BOOLEAN_NAME", "XPATH_NUMBER_NAME", "XPATH_STRING_NAME", "IMAGE_NAME", 
 		"OCR_NAME", "STATE_NAME", "CLICK_NAME", "TYPE_NAME", "DRAG_SLIDER_NAME", 
 		"ANY_NAME", "DOUBLE_CLICK_NAME", "TRIPLE_CLICK_NAME", "RIGHT_CLICK_NAME", 
@@ -1855,7 +1858,7 @@ public class WidgetConditionParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3J\u00c6\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3M\u00c6\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3"+
@@ -1869,48 +1872,48 @@ public class WidgetConditionParser extends Parser {
 		"\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\7\22\u00ac\n\22\f\22\16\22\u00af"+
 		"\13\22\3\23\3\23\3\24\3\24\3\24\3\24\5\24\u00b7\n\24\3\25\3\25\3\25\3"+
 		"\25\3\25\5\25\u00be\n\25\3\26\3\26\3\26\3\26\5\26\u00c4\n\26\3\26\2\5"+
-		"\2\b\"\27\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*\2\6\3\2%*\3\2"+
-		" \"\3\2#$\3\2\35\36\u00cd\2\65\3\2\2\2\4N\3\2\2\2\6P\3\2\2\2\bZ\3\2\2"+
-		"\2\nj\3\2\2\2\fq\3\2\2\2\16u\3\2\2\2\20w\3\2\2\2\22y\3\2\2\2\24\u0080"+
-		"\3\2\2\2\26\u0085\3\2\2\2\30\u008a\3\2\2\2\32\u008f\3\2\2\2\34\u0094\3"+
-		"\2\2\2\36\u0099\3\2\2\2 \u009d\3\2\2\2\"\u00a2\3\2\2\2$\u00b0\3\2\2\2"+
-		"&\u00b6\3\2\2\2(\u00bd\3\2\2\2*\u00c3\3\2\2\2,-\b\2\1\2-.\7\34\2\2.\66"+
-		"\5\2\2\6/\66\5&\24\2\60\61\7+\2\2\61\62\5\2\2\2\62\63\7,\2\2\63\66\3\2"+
-		"\2\2\64\66\5\4\3\2\65,\3\2\2\2\65/\3\2\2\2\65\60\3\2\2\2\65\64\3\2\2\2"+
-		"\66?\3\2\2\2\678\f\4\2\289\7\32\2\29>\5\2\2\5:;\f\3\2\2;<\7\33\2\2<>\5"+
-		"\2\2\4=\67\3\2\2\2=:\3\2\2\2>A\3\2\2\2?=\3\2\2\2?@\3\2\2\2@\3\3\2\2\2"+
-		"A?\3\2\2\2BC\5\b\5\2CD\5\6\4\2DE\5\b\5\2EO\3\2\2\2FG\5\n\6\2GH\5\6\4\2"+
-		"HI\5\n\6\2IO\3\2\2\2JK\7+\2\2KL\5\4\3\2LM\7,\2\2MO\3\2\2\2NB\3\2\2\2N"+
-		"F\3\2\2\2NJ\3\2\2\2O\5\3\2\2\2PQ\t\2\2\2Q\7\3\2\2\2RS\b\5\1\2ST\7$\2\2"+
-		"T[\5\b\5\6U[\5(\25\2VW\7+\2\2WX\5\b\5\2XY\7,\2\2Y[\3\2\2\2ZR\3\2\2\2Z"+
-		"U\3\2\2\2ZV\3\2\2\2[g\3\2\2\2\\]\f\5\2\2]^\7\37\2\2^f\5\b\5\6_`\f\4\2"+
-		"\2`a\t\3\2\2af\5\b\5\5bc\f\3\2\2cd\t\4\2\2df\5\b\5\4e\\\3\2\2\2e_\3\2"+
-		"\2\2eb\3\2\2\2fi\3\2\2\2ge\3\2\2\2gh\3\2\2\2h\t\3\2\2\2ig\3\2\2\2jk\5"+
-		"*\26\2k\13\3\2\2\2lr\5\22\n\2mr\5\24\13\2nr\5\26\f\2or\5\34\17\2pr\5 "+
-		"\21\2ql\3\2\2\2qm\3\2\2\2qn\3\2\2\2qo\3\2\2\2qp\3\2\2\2r\r\3\2\2\2sv\5"+
-		"\36\20\2tv\5\32\16\2us\3\2\2\2ut\3\2\2\2v\17\3\2\2\2wx\5\30\r\2x\21\3"+
-		"\2\2\2yz\7.\2\2z{\7+\2\2{|\5*\26\2|}\7-\2\2}~\7\30\2\2~\177\7,\2\2\177"+
-		"\23\3\2\2\2\u0080\u0081\7/\2\2\u0081\u0082\7+\2\2\u0082\u0083\7\30\2\2"+
-		"\u0083\u0084\7,\2\2\u0084\25\3\2\2\2\u0085\u0086\7\60\2\2\u0086\u0087"+
-		"\7+\2\2\u0087\u0088\7\30\2\2\u0088\u0089\7,\2\2\u0089\27\3\2\2\2\u008a"+
-		"\u008b\7\61\2\2\u008b\u008c\7+\2\2\u008c\u008d\7\30\2\2\u008d\u008e\7"+
-		",\2\2\u008e\31\3\2\2\2\u008f\u0090\7\62\2\2\u0090\u0091\7+\2\2\u0091\u0092"+
-		"\7\30\2\2\u0092\u0093\7,\2\2\u0093\33\3\2\2\2\u0094\u0095\7\63\2\2\u0095"+
-		"\u0096\7+\2\2\u0096\u0097\7\30\2\2\u0097\u0098\7,\2\2\u0098\35\3\2\2\2"+
-		"\u0099\u009a\7\64\2\2\u009a\u009b\7+\2\2\u009b\u009c\7,\2\2\u009c\37\3"+
-		"\2\2\2\u009d\u009e\7\65\2\2\u009e\u009f\7+\2\2\u009f\u00a0\5\"\22\2\u00a0"+
-		"\u00a1\7,\2\2\u00a1!\3\2\2\2\u00a2\u00a3\b\22\1\2\u00a3\u00a4\5\2\2\2"+
-		"\u00a4\u00ad\3\2\2\2\u00a5\u00a6\f\4\2\2\u00a6\u00a7\7\22\2\2\u00a7\u00ac"+
-		"\5\"\22\5\u00a8\u00a9\f\3\2\2\u00a9\u00aa\7\23\2\2\u00aa\u00ac\5\"\22"+
-		"\4\u00ab\u00a5\3\2\2\2\u00ab\u00a8\3\2\2\2\u00ac\u00af\3\2\2\2\u00ad\u00ab"+
+		"\2\b\"\27\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*\2\6\3\2(-\3\2"+
+		"#%\3\2&\'\3\2 !\u00cd\2\65\3\2\2\2\4N\3\2\2\2\6P\3\2\2\2\bZ\3\2\2\2\n"+
+		"j\3\2\2\2\fq\3\2\2\2\16u\3\2\2\2\20w\3\2\2\2\22y\3\2\2\2\24\u0080\3\2"+
+		"\2\2\26\u0085\3\2\2\2\30\u008a\3\2\2\2\32\u008f\3\2\2\2\34\u0094\3\2\2"+
+		"\2\36\u0099\3\2\2\2 \u009d\3\2\2\2\"\u00a2\3\2\2\2$\u00b0\3\2\2\2&\u00b6"+
+		"\3\2\2\2(\u00bd\3\2\2\2*\u00c3\3\2\2\2,-\b\2\1\2-.\7\37\2\2.\66\5\2\2"+
+		"\6/\66\5&\24\2\60\61\7.\2\2\61\62\5\2\2\2\62\63\7/\2\2\63\66\3\2\2\2\64"+
+		"\66\5\4\3\2\65,\3\2\2\2\65/\3\2\2\2\65\60\3\2\2\2\65\64\3\2\2\2\66?\3"+
+		"\2\2\2\678\f\4\2\289\7\35\2\29>\5\2\2\5:;\f\3\2\2;<\7\36\2\2<>\5\2\2\4"+
+		"=\67\3\2\2\2=:\3\2\2\2>A\3\2\2\2?=\3\2\2\2?@\3\2\2\2@\3\3\2\2\2A?\3\2"+
+		"\2\2BC\5\b\5\2CD\5\6\4\2DE\5\b\5\2EO\3\2\2\2FG\5\n\6\2GH\5\6\4\2HI\5\n"+
+		"\6\2IO\3\2\2\2JK\7.\2\2KL\5\4\3\2LM\7/\2\2MO\3\2\2\2NB\3\2\2\2NF\3\2\2"+
+		"\2NJ\3\2\2\2O\5\3\2\2\2PQ\t\2\2\2Q\7\3\2\2\2RS\b\5\1\2ST\7\'\2\2T[\5\b"+
+		"\5\6U[\5(\25\2VW\7.\2\2WX\5\b\5\2XY\7/\2\2Y[\3\2\2\2ZR\3\2\2\2ZU\3\2\2"+
+		"\2ZV\3\2\2\2[g\3\2\2\2\\]\f\5\2\2]^\7\"\2\2^f\5\b\5\6_`\f\4\2\2`a\t\3"+
+		"\2\2af\5\b\5\5bc\f\3\2\2cd\t\4\2\2df\5\b\5\4e\\\3\2\2\2e_\3\2\2\2eb\3"+
+		"\2\2\2fi\3\2\2\2ge\3\2\2\2gh\3\2\2\2h\t\3\2\2\2ig\3\2\2\2jk\5*\26\2k\13"+
+		"\3\2\2\2lr\5\22\n\2mr\5\24\13\2nr\5\26\f\2or\5\34\17\2pr\5 \21\2ql\3\2"+
+		"\2\2qm\3\2\2\2qn\3\2\2\2qo\3\2\2\2qp\3\2\2\2r\r\3\2\2\2sv\5\36\20\2tv"+
+		"\5\32\16\2us\3\2\2\2ut\3\2\2\2v\17\3\2\2\2wx\5\30\r\2x\21\3\2\2\2yz\7"+
+		"\61\2\2z{\7.\2\2{|\5*\26\2|}\7\60\2\2}~\7\33\2\2~\177\7/\2\2\177\23\3"+
+		"\2\2\2\u0080\u0081\7\62\2\2\u0081\u0082\7.\2\2\u0082\u0083\7\33\2\2\u0083"+
+		"\u0084\7/\2\2\u0084\25\3\2\2\2\u0085\u0086\7\63\2\2\u0086\u0087\7.\2\2"+
+		"\u0087\u0088\7\33\2\2\u0088\u0089\7/\2\2\u0089\27\3\2\2\2\u008a\u008b"+
+		"\7\64\2\2\u008b\u008c\7.\2\2\u008c\u008d\7\33\2\2\u008d\u008e\7/\2\2\u008e"+
+		"\31\3\2\2\2\u008f\u0090\7\65\2\2\u0090\u0091\7.\2\2\u0091\u0092\7\33\2"+
+		"\2\u0092\u0093\7/\2\2\u0093\33\3\2\2\2\u0094\u0095\7\66\2\2\u0095\u0096"+
+		"\7.\2\2\u0096\u0097\7\33\2\2\u0097\u0098\7/\2\2\u0098\35\3\2\2\2\u0099"+
+		"\u009a\7\67\2\2\u009a\u009b\7.\2\2\u009b\u009c\7/\2\2\u009c\37\3\2\2\2"+
+		"\u009d\u009e\78\2\2\u009e\u009f\7.\2\2\u009f\u00a0\5\"\22\2\u00a0\u00a1"+
+		"\7/\2\2\u00a1!\3\2\2\2\u00a2\u00a3\b\22\1\2\u00a3\u00a4\5\2\2\2\u00a4"+
+		"\u00ad\3\2\2\2\u00a5\u00a6\f\4\2\2\u00a6\u00a7\7\25\2\2\u00a7\u00ac\5"+
+		"\"\22\5\u00a8\u00a9\f\3\2\2\u00a9\u00aa\7\26\2\2\u00aa\u00ac\5\"\22\4"+
+		"\u00ab\u00a5\3\2\2\2\u00ab\u00a8\3\2\2\2\u00ac\u00af\3\2\2\2\u00ad\u00ab"+
 		"\3\2\2\2\u00ad\u00ae\3\2\2\2\u00ae#\3\2\2\2\u00af\u00ad\3\2\2\2\u00b0"+
-		"\u00b1\t\5\2\2\u00b1%\3\2\2\2\u00b2\u00b7\5$\23\2\u00b3\u00b7\7A\2\2\u00b4"+
-		"\u00b7\7\27\2\2\u00b5\u00b7\5\f\7\2\u00b6\u00b2\3\2\2\2\u00b6\u00b3\3"+
+		"\u00b1\t\5\2\2\u00b1%\3\2\2\2\u00b2\u00b7\5$\23\2\u00b3\u00b7\7D\2\2\u00b4"+
+		"\u00b7\7\32\2\2\u00b5\u00b7\5\f\7\2\u00b6\u00b2\3\2\2\2\u00b6\u00b3\3"+
 		"\2\2\2\u00b6\u00b4\3\2\2\2\u00b6\u00b5\3\2\2\2\u00b7\'\3\2\2\2\u00b8\u00be"+
-		"\7\26\2\2\u00b9\u00be\7\25\2\2\u00ba\u00be\7B\2\2\u00bb\u00be\7\27\2\2"+
+		"\7\31\2\2\u00b9\u00be\7\30\2\2\u00ba\u00be\7E\2\2\u00bb\u00be\7\32\2\2"+
 		"\u00bc\u00be\5\20\t\2\u00bd\u00b8\3\2\2\2\u00bd\u00b9\3\2\2\2\u00bd\u00ba"+
 		"\3\2\2\2\u00bd\u00bb\3\2\2\2\u00bd\u00bc\3\2\2\2\u00be)\3\2\2\2\u00bf"+
-		"\u00c4\7\30\2\2\u00c0\u00c4\7C\2\2\u00c1\u00c4\7\27\2\2\u00c2\u00c4\5"+
+		"\u00c4\7\33\2\2\u00c0\u00c4\7F\2\2\u00c1\u00c4\7\32\2\2\u00c2\u00c4\5"+
 		"\16\b\2\u00c3\u00bf\3\2\2\2\u00c3\u00c0\3\2\2\2\u00c3\u00c1\3\2\2\2\u00c3"+
 		"\u00c2\3\2\2\2\u00c4+\3\2\2\2\20\65=?NZegqu\u00ab\u00ad\u00b6\u00bd\u00c3";
 	public static final ATN _ATN =

@@ -30,6 +30,12 @@ STEP_KEYWORD: 'Step:' {ignoreEOL=false;ignoreWS=false;};
 
 STEP_RANGE_KEYWORD: 'Range' {ignoreEOL=true;ignoreWS=true;};
 
+STEP_WHILE_KEYWORD: 'While' {ignoreEOL=true;ignoreWS=true;};
+
+STEP_REPEAT_KEYWORD: 'Repeat' {ignoreEOL=true;ignoreWS=true;};
+
+STEP_UNTIL_KEYWORD: 'until' {ignoreEOL=true;ignoreWS=true;};
+
 STEP_GIVEN_KEYWORD: 'Given' {ignoreEOL=true;ignoreWS=true;};
 
 STEP_WHEN_KEYWORD: 'When' {ignoreEOL=true;ignoreWS=true;};

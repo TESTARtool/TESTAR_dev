@@ -22,70 +22,74 @@ public class TgherkinParser extends Parser {
 		OPTION_KEYWORD_INCLUDE=1, OPTION_KEYWORD_EXCLUDE=2, TAGNAME=3, FEATURE_KEYWORD=4, 
 		BACKGROUND_KEYWORD=5, SCENARIO_KEYWORD=6, SCENARIO_OUTLINE_KEYWORD=7, 
 		EXAMPLES_KEYWORD=8, SELECTION_KEYWORD=9, ORACLE_KEYWORD=10, STEP_KEYWORD=11, 
-		STEP_RANGE_KEYWORD=12, STEP_GIVEN_KEYWORD=13, STEP_WHEN_KEYWORD=14, STEP_THEN_KEYWORD=15, 
-		STEP_ALSO_KEYWORD=16, STEP_EITHER_KEYWORD=17, TABLE_ROW=18, DECIMAL_NUMBER=19, 
-		INTEGER_NUMBER=20, PLACEHOLDER=21, STRING=22, COMMENT=23, AND=24, OR=25, 
-		NOT=26, TRUE=27, FALSE=28, POW=29, MULT=30, DIV=31, MOD=32, PLUS=33, MINUS=34, 
-		GT=35, GE=36, LT=37, LE=38, EQ=39, NE=40, LPAREN=41, RPAREN=42, COMMA=43, 
-		MATCHES_NAME=44, XPATH_NAME=45, XPATH_BOOLEAN_NAME=46, XPATH_NUMBER_NAME=47, 
-		XPATH_STRING_NAME=48, IMAGE_NAME=49, OCR_NAME=50, STATE_NAME=51, CLICK_NAME=52, 
-		TYPE_NAME=53, DRAG_SLIDER_NAME=54, ANY_NAME=55, DOUBLE_CLICK_NAME=56, 
-		TRIPLE_CLICK_NAME=57, RIGHT_CLICK_NAME=58, MOUSE_MOVE_NAME=59, DROP_DOWN_AT_NAME=60, 
-		HIT_KEY_NAME=61, DRAG_DROP_NAME=62, BOOLEAN_VARIABLE=63, NUMBER_VARIABLE=64, 
-		STRING_VARIABLE=65, EOL=66, WS=67, OTHER=68, BOOLEAN_VARIABLE_NAME=69, 
-		NUMBER_VARIABLE_NAME=70, STRING_VARIABLE_NAME=71, KB_KEY_NAME=72;
+		STEP_RANGE_KEYWORD=12, STEP_WHILE_KEYWORD=13, STEP_REPEAT_KEYWORD=14, 
+		STEP_UNTIL_KEYWORD=15, STEP_GIVEN_KEYWORD=16, STEP_WHEN_KEYWORD=17, STEP_THEN_KEYWORD=18, 
+		STEP_ALSO_KEYWORD=19, STEP_EITHER_KEYWORD=20, TABLE_ROW=21, DECIMAL_NUMBER=22, 
+		INTEGER_NUMBER=23, PLACEHOLDER=24, STRING=25, COMMENT=26, AND=27, OR=28, 
+		NOT=29, TRUE=30, FALSE=31, POW=32, MULT=33, DIV=34, MOD=35, PLUS=36, MINUS=37, 
+		GT=38, GE=39, LT=40, LE=41, EQ=42, NE=43, LPAREN=44, RPAREN=45, COMMA=46, 
+		MATCHES_NAME=47, XPATH_NAME=48, XPATH_BOOLEAN_NAME=49, XPATH_NUMBER_NAME=50, 
+		XPATH_STRING_NAME=51, IMAGE_NAME=52, OCR_NAME=53, STATE_NAME=54, CLICK_NAME=55, 
+		TYPE_NAME=56, DRAG_SLIDER_NAME=57, ANY_NAME=58, DOUBLE_CLICK_NAME=59, 
+		TRIPLE_CLICK_NAME=60, RIGHT_CLICK_NAME=61, MOUSE_MOVE_NAME=62, DROP_DOWN_AT_NAME=63, 
+		HIT_KEY_NAME=64, DRAG_DROP_NAME=65, BOOLEAN_VARIABLE=66, NUMBER_VARIABLE=67, 
+		STRING_VARIABLE=68, EOL=69, WS=70, OTHER=71, BOOLEAN_VARIABLE_NAME=72, 
+		NUMBER_VARIABLE_NAME=73, STRING_VARIABLE_NAME=74, KB_KEY_NAME=75;
 	public static final int
 		RULE_document = 0, RULE_execOptions = 1, RULE_execOptionExclude = 2, RULE_execOptionInclude = 3, 
 		RULE_feature = 4, RULE_background = 5, RULE_scenarioDefiniton = 6, RULE_scenario = 7, 
 		RULE_scenarioOutline = 8, RULE_examples = 9, RULE_table = 10, RULE_title = 11, 
 		RULE_narrativeLine = 12, RULE_tagname = 13, RULE_selection = 14, RULE_oracle = 15, 
 		RULE_step = 16, RULE_givenClause = 17, RULE_whenClause = 18, RULE_thenClause = 19, 
-		RULE_stepRange = 20, RULE_conditional_gesture = 21, RULE_gesture = 22, 
-		RULE_typeGesture = 23, RULE_clickGesture = 24, RULE_doubleClickGesture = 25, 
-		RULE_tripleClickGesture = 26, RULE_anyGesture = 27, RULE_hitKeyGesture = 28, 
-		RULE_hitKeyArgument = 29, RULE_dragDropGesture = 30, RULE_gestureName = 31, 
-		RULE_parameterlessGesture = 32, RULE_widget_condition = 33, RULE_relational_expr = 34, 
-		RULE_relational_operator = 35, RULE_arithmetic_expr = 36, RULE_string_expr = 37, 
-		RULE_booleanFunction = 38, RULE_stringFunction = 39, RULE_numericFunction = 40, 
-		RULE_matchesFunction = 41, RULE_xpathFunction = 42, RULE_xpathBooleanFunction = 43, 
-		RULE_xpathNumberFunction = 44, RULE_xpathStringFunction = 45, RULE_imageFunction = 46, 
-		RULE_ocrFunction = 47, RULE_stateFunction = 48, RULE_widget_tree_condition = 49, 
-		RULE_bool = 50, RULE_logical_entity = 51, RULE_numeric_entity = 52, RULE_string_entity = 53;
+		RULE_stepIteration = 20, RULE_stepRange = 21, RULE_stepWhile = 22, RULE_stepRepeatUntil = 23, 
+		RULE_conditional_gesture = 24, RULE_gesture = 25, RULE_typeGesture = 26, 
+		RULE_clickGesture = 27, RULE_doubleClickGesture = 28, RULE_tripleClickGesture = 29, 
+		RULE_anyGesture = 30, RULE_hitKeyGesture = 31, RULE_hitKeyArgument = 32, 
+		RULE_dragDropGesture = 33, RULE_gestureName = 34, RULE_parameterlessGesture = 35, 
+		RULE_widget_condition = 36, RULE_relational_expr = 37, RULE_relational_operator = 38, 
+		RULE_arithmetic_expr = 39, RULE_string_expr = 40, RULE_booleanFunction = 41, 
+		RULE_stringFunction = 42, RULE_numericFunction = 43, RULE_matchesFunction = 44, 
+		RULE_xpathFunction = 45, RULE_xpathBooleanFunction = 46, RULE_xpathNumberFunction = 47, 
+		RULE_xpathStringFunction = 48, RULE_imageFunction = 49, RULE_ocrFunction = 50, 
+		RULE_stateFunction = 51, RULE_widget_tree_condition = 52, RULE_bool = 53, 
+		RULE_logical_entity = 54, RULE_numeric_entity = 55, RULE_string_entity = 56;
 	public static final String[] ruleNames = {
 		"document", "execOptions", "execOptionExclude", "execOptionInclude", "feature", 
 		"background", "scenarioDefiniton", "scenario", "scenarioOutline", "examples", 
 		"table", "title", "narrativeLine", "tagname", "selection", "oracle", "step", 
-		"givenClause", "whenClause", "thenClause", "stepRange", "conditional_gesture", 
-		"gesture", "typeGesture", "clickGesture", "doubleClickGesture", "tripleClickGesture", 
-		"anyGesture", "hitKeyGesture", "hitKeyArgument", "dragDropGesture", "gestureName", 
-		"parameterlessGesture", "widget_condition", "relational_expr", "relational_operator", 
-		"arithmetic_expr", "string_expr", "booleanFunction", "stringFunction", 
-		"numericFunction", "matchesFunction", "xpathFunction", "xpathBooleanFunction", 
-		"xpathNumberFunction", "xpathStringFunction", "imageFunction", "ocrFunction", 
-		"stateFunction", "widget_tree_condition", "bool", "logical_entity", "numeric_entity", 
-		"string_entity"
+		"givenClause", "whenClause", "thenClause", "stepIteration", "stepRange", 
+		"stepWhile", "stepRepeatUntil", "conditional_gesture", "gesture", "typeGesture", 
+		"clickGesture", "doubleClickGesture", "tripleClickGesture", "anyGesture", 
+		"hitKeyGesture", "hitKeyArgument", "dragDropGesture", "gestureName", "parameterlessGesture", 
+		"widget_condition", "relational_expr", "relational_operator", "arithmetic_expr", 
+		"string_expr", "booleanFunction", "stringFunction", "numericFunction", 
+		"matchesFunction", "xpathFunction", "xpathBooleanFunction", "xpathNumberFunction", 
+		"xpathStringFunction", "imageFunction", "ocrFunction", "stateFunction", 
+		"widget_tree_condition", "bool", "logical_entity", "numeric_entity", "string_entity"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
 		null, "'include:'", "'exclude:'", null, "'Feature:'", "'Background:'", 
 		"'Scenario:'", "'Scenario Outline:'", "'Examples:'", "'Selection:'", "'Oracle:'", 
-		"'Step:'", "'Range'", "'Given'", "'When'", "'Then'", "'Also'", "'Either'", 
-		null, null, null, null, null, null, "'and'", "'or'", null, "'true'", "'false'", 
-		"'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", "'>='", "'<'", "'<='", 
-		"'='", null, "'('", "')'", "','", "'matches'", "'xpath'", "'xpathBoolean'", 
-		"'xpathNumber'", "'xpathString'", "'image'", "'ocr'", "'state'", "'click'", 
-		"'type'", "'dragSlider'", "'anyGesture'", "'doubleClick'", "'tripleClick'", 
-		"'rightClick'", "'mouseMove'", "'dropDownAt'", "'hitKey'", "'dragDrop'"
+		"'Step:'", "'Range'", "'While'", "'Repeat'", "'until'", "'Given'", "'When'", 
+		"'Then'", "'Also'", "'Either'", null, null, null, null, null, null, "'and'", 
+		"'or'", null, "'true'", "'false'", "'^'", "'*'", "'/'", "'%'", "'+'", 
+		"'-'", "'>'", "'>='", "'<'", "'<='", "'='", null, "'('", "')'", "','", 
+		"'matches'", "'xpath'", "'xpathBoolean'", "'xpathNumber'", "'xpathString'", 
+		"'image'", "'ocr'", "'state'", "'click'", "'type'", "'dragSlider'", "'anyGesture'", 
+		"'doubleClick'", "'tripleClick'", "'rightClick'", "'mouseMove'", "'dropDownAt'", 
+		"'hitKey'", "'dragDrop'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, "OPTION_KEYWORD_INCLUDE", "OPTION_KEYWORD_EXCLUDE", "TAGNAME", "FEATURE_KEYWORD", 
 		"BACKGROUND_KEYWORD", "SCENARIO_KEYWORD", "SCENARIO_OUTLINE_KEYWORD", 
 		"EXAMPLES_KEYWORD", "SELECTION_KEYWORD", "ORACLE_KEYWORD", "STEP_KEYWORD", 
-		"STEP_RANGE_KEYWORD", "STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", "STEP_THEN_KEYWORD", 
-		"STEP_ALSO_KEYWORD", "STEP_EITHER_KEYWORD", "TABLE_ROW", "DECIMAL_NUMBER", 
-		"INTEGER_NUMBER", "PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", 
-		"TRUE", "FALSE", "POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", 
-		"LT", "LE", "EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "XPATH_NAME", 
+		"STEP_RANGE_KEYWORD", "STEP_WHILE_KEYWORD", "STEP_REPEAT_KEYWORD", "STEP_UNTIL_KEYWORD", 
+		"STEP_GIVEN_KEYWORD", "STEP_WHEN_KEYWORD", "STEP_THEN_KEYWORD", "STEP_ALSO_KEYWORD", 
+		"STEP_EITHER_KEYWORD", "TABLE_ROW", "DECIMAL_NUMBER", "INTEGER_NUMBER", 
+		"PLACEHOLDER", "STRING", "COMMENT", "AND", "OR", "NOT", "TRUE", "FALSE", 
+		"POW", "MULT", "DIV", "MOD", "PLUS", "MINUS", "GT", "GE", "LT", "LE", 
+		"EQ", "NE", "LPAREN", "RPAREN", "COMMA", "MATCHES_NAME", "XPATH_NAME", 
 		"XPATH_BOOLEAN_NAME", "XPATH_NUMBER_NAME", "XPATH_STRING_NAME", "IMAGE_NAME", 
 		"OCR_NAME", "STATE_NAME", "CLICK_NAME", "TYPE_NAME", "DRAG_SLIDER_NAME", 
 		"ANY_NAME", "DOUBLE_CLICK_NAME", "TRIPLE_CLICK_NAME", "RIGHT_CLICK_NAME", 
@@ -172,30 +176,30 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(109);
+			setState(115);
 			_la = _input.LA(1);
 			if (_la==OPTION_KEYWORD_INCLUDE || _la==OPTION_KEYWORD_EXCLUDE) {
 				{
-				setState(108);
+				setState(114);
 				execOptions();
 				}
 			}
 
-			setState(112); 
+			setState(118); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(111);
+				setState(117);
 				feature();
 				}
 				}
-				setState(114); 
+				setState(120); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==TAGNAME || _la==FEATURE_KEYWORD );
-			setState(116);
+			setState(122);
 			match(EOF);
 			}
 		}
@@ -233,18 +237,18 @@ public class TgherkinParser extends Parser {
 		enterRule(_localctx, 2, RULE_execOptions);
 		int _la;
 		try {
-			setState(126);
+			setState(132);
 			switch (_input.LA(1)) {
 			case OPTION_KEYWORD_EXCLUDE:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(118);
+				setState(124);
 				execOptionExclude();
-				setState(120);
+				setState(126);
 				_la = _input.LA(1);
 				if (_la==OPTION_KEYWORD_INCLUDE) {
 					{
-					setState(119);
+					setState(125);
 					execOptionInclude();
 					}
 				}
@@ -254,13 +258,13 @@ public class TgherkinParser extends Parser {
 			case OPTION_KEYWORD_INCLUDE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(122);
+				setState(128);
 				execOptionInclude();
-				setState(124);
+				setState(130);
 				_la = _input.LA(1);
 				if (_la==OPTION_KEYWORD_EXCLUDE) {
 					{
-					setState(123);
+					setState(129);
 					execOptionExclude();
 					}
 				}
@@ -313,9 +317,9 @@ public class TgherkinParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(128);
+			setState(134);
 			match(OPTION_KEYWORD_EXCLUDE);
-			setState(130); 
+			setState(136); 
 			_errHandler.sync(this);
 			_alt = 1;
 			do {
@@ -323,7 +327,7 @@ public class TgherkinParser extends Parser {
 				case 1:
 					{
 					{
-					setState(129);
+					setState(135);
 					((ExecOptionExcludeContext)_localctx).TAGNAME = match(TAGNAME);
 					((ExecOptionExcludeContext)_localctx).tags.add(((ExecOptionExcludeContext)_localctx).TAGNAME);
 					}
@@ -332,21 +336,21 @@ public class TgherkinParser extends Parser {
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(132); 
+				setState(138); 
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,5,_ctx);
 			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-			setState(137);
+			setState(143);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==EOL) {
 				{
 				{
-				setState(134);
+				setState(140);
 				match(EOL);
 				}
 				}
-				setState(139);
+				setState(145);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -394,9 +398,9 @@ public class TgherkinParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(140);
+			setState(146);
 			match(OPTION_KEYWORD_INCLUDE);
-			setState(142); 
+			setState(148); 
 			_errHandler.sync(this);
 			_alt = 1;
 			do {
@@ -404,7 +408,7 @@ public class TgherkinParser extends Parser {
 				case 1:
 					{
 					{
-					setState(141);
+					setState(147);
 					((ExecOptionIncludeContext)_localctx).TAGNAME = match(TAGNAME);
 					((ExecOptionIncludeContext)_localctx).tags.add(((ExecOptionIncludeContext)_localctx).TAGNAME);
 					}
@@ -413,21 +417,21 @@ public class TgherkinParser extends Parser {
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(144); 
+				setState(150); 
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
-			setState(149);
+			setState(155);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==EOL) {
 				{
 				{
-				setState(146);
+				setState(152);
 				match(EOL);
 				}
 				}
-				setState(151);
+				setState(157);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -503,82 +507,82 @@ public class TgherkinParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(155);
+			setState(161);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==TAGNAME) {
 				{
 				{
-				setState(152);
+				setState(158);
 				((FeatureContext)_localctx).tagname = tagname();
 				((FeatureContext)_localctx).tags.add(((FeatureContext)_localctx).tagname);
 				}
 				}
-				setState(157);
+				setState(163);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(158);
+			setState(164);
 			match(FEATURE_KEYWORD);
-			setState(159);
+			setState(165);
 			title();
-			setState(161); 
+			setState(167); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(160);
+				setState(166);
 				match(EOL);
 				}
 				}
-				setState(163); 
+				setState(169); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(168);
+			setState(174);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(165);
+				setState(171);
 				((FeatureContext)_localctx).narrativeLine = narrativeLine();
 				((FeatureContext)_localctx).narrative.add(((FeatureContext)_localctx).narrativeLine);
 				}
 				}
-				setState(170);
+				setState(176);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(172);
+			setState(178);
 			_la = _input.LA(1);
 			if (_la==SELECTION_KEYWORD) {
 				{
-				setState(171);
+				setState(177);
 				selection();
 				}
 			}
 
-			setState(175);
+			setState(181);
 			_la = _input.LA(1);
 			if (_la==ORACLE_KEYWORD) {
 				{
-				setState(174);
+				setState(180);
 				oracle();
 				}
 			}
 
-			setState(178);
+			setState(184);
 			_la = _input.LA(1);
 			if (_la==BACKGROUND_KEYWORD) {
 				{
-				setState(177);
+				setState(183);
 				background();
 				}
 			}
 
-			setState(181); 
+			setState(187); 
 			_errHandler.sync(this);
 			_alt = 1;
 			do {
@@ -586,7 +590,7 @@ public class TgherkinParser extends Parser {
 				case 1:
 					{
 					{
-					setState(180);
+					setState(186);
 					scenarioDefiniton();
 					}
 					}
@@ -594,7 +598,7 @@ public class TgherkinParser extends Parser {
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(183); 
+				setState(189); 
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,15,_ctx);
 			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
@@ -660,76 +664,76 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(185);
+			setState(191);
 			match(BACKGROUND_KEYWORD);
-			setState(187);
+			setState(193);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
-				setState(186);
+				setState(192);
 				title();
 				}
 			}
 
-			setState(190); 
+			setState(196); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(189);
+				setState(195);
 				match(EOL);
 				}
 				}
-				setState(192); 
+				setState(198); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(197);
+			setState(203);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(194);
+				setState(200);
 				((BackgroundContext)_localctx).narrativeLine = narrativeLine();
 				((BackgroundContext)_localctx).narrative.add(((BackgroundContext)_localctx).narrativeLine);
 				}
 				}
-				setState(199);
+				setState(205);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(201);
+			setState(207);
 			_la = _input.LA(1);
 			if (_la==SELECTION_KEYWORD) {
 				{
-				setState(200);
+				setState(206);
 				selection();
 				}
 			}
 
-			setState(204);
+			setState(210);
 			_la = _input.LA(1);
 			if (_la==ORACLE_KEYWORD) {
 				{
-				setState(203);
+				setState(209);
 				oracle();
 				}
 			}
 
-			setState(207); 
+			setState(213); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(206);
+				setState(212);
 				((BackgroundContext)_localctx).step = step();
 				((BackgroundContext)_localctx).steps.add(((BackgroundContext)_localctx).step);
 				}
 				}
-				setState(209); 
+				setState(215); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==STEP_KEYWORD );
@@ -770,17 +774,17 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(213);
+			setState(219);
 			switch ( getInterpreter().adaptivePredict(_input,22,_ctx) ) {
 			case 1:
 				{
-				setState(211);
+				setState(217);
 				scenario();
 				}
 				break;
 			case 2:
 				{
-				setState(212);
+				setState(218);
 				scenarioOutline();
 				}
 				break;
@@ -855,84 +859,84 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(218);
+			setState(224);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==TAGNAME) {
 				{
 				{
-				setState(215);
+				setState(221);
 				((ScenarioContext)_localctx).tagname = tagname();
 				((ScenarioContext)_localctx).tags.add(((ScenarioContext)_localctx).tagname);
 				}
 				}
-				setState(220);
+				setState(226);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(221);
+			setState(227);
 			match(SCENARIO_KEYWORD);
-			setState(222);
+			setState(228);
 			title();
-			setState(224); 
+			setState(230); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(223);
+				setState(229);
 				match(EOL);
 				}
 				}
-				setState(226); 
+				setState(232); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(231);
+			setState(237);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(228);
+				setState(234);
 				((ScenarioContext)_localctx).narrativeLine = narrativeLine();
 				((ScenarioContext)_localctx).narrative.add(((ScenarioContext)_localctx).narrativeLine);
 				}
 				}
-				setState(233);
+				setState(239);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(235);
+			setState(241);
 			_la = _input.LA(1);
 			if (_la==SELECTION_KEYWORD) {
 				{
-				setState(234);
+				setState(240);
 				selection();
 				}
 			}
 
-			setState(238);
+			setState(244);
 			_la = _input.LA(1);
 			if (_la==ORACLE_KEYWORD) {
 				{
-				setState(237);
+				setState(243);
 				oracle();
 				}
 			}
 
-			setState(241); 
+			setState(247); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(240);
+				setState(246);
 				((ScenarioContext)_localctx).step = step();
 				((ScenarioContext)_localctx).steps.add(((ScenarioContext)_localctx).step);
 				}
 				}
-				setState(243); 
+				setState(249); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==STEP_KEYWORD );
@@ -1009,88 +1013,88 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(248);
+			setState(254);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==TAGNAME) {
 				{
 				{
-				setState(245);
+				setState(251);
 				((ScenarioOutlineContext)_localctx).tagname = tagname();
 				((ScenarioOutlineContext)_localctx).tags.add(((ScenarioOutlineContext)_localctx).tagname);
 				}
 				}
-				setState(250);
+				setState(256);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(251);
+			setState(257);
 			match(SCENARIO_OUTLINE_KEYWORD);
-			setState(252);
+			setState(258);
 			title();
-			setState(254); 
+			setState(260); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(253);
+				setState(259);
 				match(EOL);
 				}
 				}
-				setState(256); 
+				setState(262); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(261);
+			setState(267);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(258);
+				setState(264);
 				((ScenarioOutlineContext)_localctx).narrativeLine = narrativeLine();
 				((ScenarioOutlineContext)_localctx).narrative.add(((ScenarioOutlineContext)_localctx).narrativeLine);
 				}
 				}
-				setState(263);
+				setState(269);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(265);
+			setState(271);
 			_la = _input.LA(1);
 			if (_la==SELECTION_KEYWORD) {
 				{
-				setState(264);
+				setState(270);
 				selection();
 				}
 			}
 
-			setState(268);
+			setState(274);
 			_la = _input.LA(1);
 			if (_la==ORACLE_KEYWORD) {
 				{
-				setState(267);
+				setState(273);
 				oracle();
 				}
 			}
 
-			setState(271); 
+			setState(277); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(270);
+				setState(276);
 				((ScenarioOutlineContext)_localctx).step = step();
 				((ScenarioOutlineContext)_localctx).steps.add(((ScenarioOutlineContext)_localctx).step);
 				}
 				}
-				setState(273); 
+				setState(279); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==STEP_KEYWORD );
-			setState(275);
+			setState(281);
 			examples();
 			}
 		}
@@ -1143,47 +1147,47 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(277);
+			setState(283);
 			match(EXAMPLES_KEYWORD);
-			setState(279);
+			setState(285);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
-				setState(278);
+				setState(284);
 				title();
 				}
 			}
 
-			setState(282); 
+			setState(288); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(281);
+				setState(287);
 				match(EOL);
 				}
 				}
-				setState(284); 
+				setState(290); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(289);
+			setState(295);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(286);
+				setState(292);
 				((ExamplesContext)_localctx).narrativeLine = narrativeLine();
 				((ExamplesContext)_localctx).narrative.add(((ExamplesContext)_localctx).narrativeLine);
 				}
 				}
-				setState(291);
+				setState(297);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(292);
+			setState(298);
 			table();
 			}
 		}
@@ -1227,32 +1231,32 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(295); 
+			setState(301); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(294);
+				setState(300);
 				((TableContext)_localctx).TABLE_ROW = match(TABLE_ROW);
 				((TableContext)_localctx).rows.add(((TableContext)_localctx).TABLE_ROW);
 				}
 				}
-				setState(297); 
+				setState(303); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==TABLE_ROW );
-			setState(302);
+			setState(308);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==EOL) {
 				{
 				{
-				setState(299);
+				setState(305);
 				match(EOL);
 				}
 				}
-				setState(304);
+				setState(310);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1297,29 +1301,29 @@ public class TgherkinParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(308);
+			setState(314);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,40,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
-					setState(305);
+					setState(311);
 					match(WS);
 					}
 					} 
 				}
-				setState(310);
+				setState(316);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,40,_ctx);
 			}
-			setState(312); 
+			setState(318); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(311);
+				setState(317);
 				_la = _input.LA(1);
 				if ( _la <= 0 || (_la==EOL) ) {
 				_errHandler.recoverInline(this);
@@ -1328,10 +1332,10 @@ public class TgherkinParser extends Parser {
 				}
 				}
 				}
-				setState(314); 
+				setState(320); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1384,20 +1388,20 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(316);
+			setState(322);
 			_la = _input.LA(1);
-			if ( _la <= 0 || (((((_la - 3)) & ~0x3f) == 0 && ((1L << (_la - 3)) & ((1L << (TAGNAME - 3)) | (1L << (FEATURE_KEYWORD - 3)) | (1L << (BACKGROUND_KEYWORD - 3)) | (1L << (SCENARIO_KEYWORD - 3)) | (1L << (SCENARIO_OUTLINE_KEYWORD - 3)) | (1L << (EXAMPLES_KEYWORD - 3)) | (1L << (SELECTION_KEYWORD - 3)) | (1L << (ORACLE_KEYWORD - 3)) | (1L << (STEP_KEYWORD - 3)) | (1L << (STEP_RANGE_KEYWORD - 3)) | (1L << (STEP_GIVEN_KEYWORD - 3)) | (1L << (STEP_WHEN_KEYWORD - 3)) | (1L << (STEP_THEN_KEYWORD - 3)) | (1L << (STEP_ALSO_KEYWORD - 3)) | (1L << (STEP_EITHER_KEYWORD - 3)) | (1L << (TABLE_ROW - 3)) | (1L << (EOL - 3)))) != 0)) ) {
+			if ( _la <= 0 || ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW))) != 0) || _la==EOL) ) {
 			_errHandler.recoverInline(this);
 			} else {
 				consume();
 			}
-			setState(320);
+			setState(326);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME) | (1L << HIT_KEY_NAME) | (1L << DRAG_DROP_NAME) | (1L << BOOLEAN_VARIABLE))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << OPTION_KEYWORD_INCLUDE) | (1L << OPTION_KEYWORD_EXCLUDE) | (1L << TAGNAME) | (1L << FEATURE_KEYWORD) | (1L << BACKGROUND_KEYWORD) | (1L << SCENARIO_KEYWORD) | (1L << SCENARIO_OUTLINE_KEYWORD) | (1L << EXAMPLES_KEYWORD) | (1L << SELECTION_KEYWORD) | (1L << ORACLE_KEYWORD) | (1L << STEP_KEYWORD) | (1L << STEP_RANGE_KEYWORD) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD) | (1L << STEP_UNTIL_KEYWORD) | (1L << STEP_GIVEN_KEYWORD) | (1L << STEP_WHEN_KEYWORD) | (1L << STEP_THEN_KEYWORD) | (1L << STEP_ALSO_KEYWORD) | (1L << STEP_EITHER_KEYWORD) | (1L << TABLE_ROW) | (1L << DECIMAL_NUMBER) | (1L << INTEGER_NUMBER) | (1L << PLACEHOLDER) | (1L << STRING) | (1L << COMMENT) | (1L << AND) | (1L << OR) | (1L << NOT) | (1L << TRUE) | (1L << FALSE) | (1L << POW) | (1L << MULT) | (1L << DIV) | (1L << MOD) | (1L << PLUS) | (1L << MINUS) | (1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE) | (1L << LPAREN) | (1L << RPAREN) | (1L << COMMA) | (1L << MATCHES_NAME) | (1L << XPATH_NAME) | (1L << XPATH_BOOLEAN_NAME) | (1L << XPATH_NUMBER_NAME) | (1L << XPATH_STRING_NAME) | (1L << IMAGE_NAME) | (1L << OCR_NAME) | (1L << STATE_NAME) | (1L << CLICK_NAME) | (1L << TYPE_NAME) | (1L << DRAG_SLIDER_NAME) | (1L << ANY_NAME) | (1L << DOUBLE_CLICK_NAME) | (1L << TRIPLE_CLICK_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (HIT_KEY_NAME - 64)) | (1L << (DRAG_DROP_NAME - 64)) | (1L << (BOOLEAN_VARIABLE - 64)) | (1L << (NUMBER_VARIABLE - 64)) | (1L << (STRING_VARIABLE - 64)) | (1L << (WS - 64)) | (1L << (OTHER - 64)) | (1L << (BOOLEAN_VARIABLE_NAME - 64)) | (1L << (NUMBER_VARIABLE_NAME - 64)) | (1L << (STRING_VARIABLE_NAME - 64)) | (1L << (KB_KEY_NAME - 64)))) != 0)) {
 				{
 				{
-				setState(317);
+				setState(323);
 				_la = _input.LA(1);
 				if ( _la <= 0 || (_la==EOL) ) {
 				_errHandler.recoverInline(this);
@@ -1406,21 +1410,21 @@ public class TgherkinParser extends Parser {
 				}
 				}
 				}
-				setState(322);
+				setState(328);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(324); 
+			setState(330); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(323);
+				setState(329);
 				match(EOL);
 				}
 				}
-				setState(326); 
+				setState(332); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
@@ -1461,19 +1465,19 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(328);
+			setState(334);
 			match(TAGNAME);
-			setState(332);
+			setState(338);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==EOL) {
 				{
 				{
-				setState(329);
+				setState(335);
 				match(EOL);
 				}
 				}
-				setState(334);
+				setState(340);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1518,23 +1522,23 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(335);
+			setState(341);
 			match(SELECTION_KEYWORD);
-			setState(337); 
+			setState(343); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(336);
+				setState(342);
 				((SelectionContext)_localctx).conditional_gesture = conditional_gesture();
 				((SelectionContext)_localctx).conditional_gestures.add(((SelectionContext)_localctx).conditional_gesture);
 				}
 				}
-				setState(339); 
+				setState(345); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( ((((_la - 19)) & ~0x3f) == 0 && ((1L << (_la - 19)) & ((1L << (DECIMAL_NUMBER - 19)) | (1L << (INTEGER_NUMBER - 19)) | (1L << (PLACEHOLDER - 19)) | (1L << (STRING - 19)) | (1L << (NOT - 19)) | (1L << (TRUE - 19)) | (1L << (FALSE - 19)) | (1L << (MINUS - 19)) | (1L << (LPAREN - 19)) | (1L << (MATCHES_NAME - 19)) | (1L << (XPATH_NAME - 19)) | (1L << (XPATH_BOOLEAN_NAME - 19)) | (1L << (XPATH_NUMBER_NAME - 19)) | (1L << (XPATH_STRING_NAME - 19)) | (1L << (IMAGE_NAME - 19)) | (1L << (OCR_NAME - 19)) | (1L << (STATE_NAME - 19)) | (1L << (CLICK_NAME - 19)) | (1L << (TYPE_NAME - 19)) | (1L << (DRAG_SLIDER_NAME - 19)) | (1L << (ANY_NAME - 19)) | (1L << (DOUBLE_CLICK_NAME - 19)) | (1L << (TRIPLE_CLICK_NAME - 19)) | (1L << (RIGHT_CLICK_NAME - 19)) | (1L << (MOUSE_MOVE_NAME - 19)) | (1L << (DROP_DOWN_AT_NAME - 19)) | (1L << (HIT_KEY_NAME - 19)) | (1L << (DRAG_DROP_NAME - 19)) | (1L << (BOOLEAN_VARIABLE - 19)) | (1L << (NUMBER_VARIABLE - 19)) | (1L << (STRING_VARIABLE - 19)))) != 0) );
+			} while ( ((((_la - 22)) & ~0x3f) == 0 && ((1L << (_la - 22)) & ((1L << (DECIMAL_NUMBER - 22)) | (1L << (INTEGER_NUMBER - 22)) | (1L << (PLACEHOLDER - 22)) | (1L << (STRING - 22)) | (1L << (NOT - 22)) | (1L << (TRUE - 22)) | (1L << (FALSE - 22)) | (1L << (MINUS - 22)) | (1L << (LPAREN - 22)) | (1L << (MATCHES_NAME - 22)) | (1L << (XPATH_NAME - 22)) | (1L << (XPATH_BOOLEAN_NAME - 22)) | (1L << (XPATH_NUMBER_NAME - 22)) | (1L << (XPATH_STRING_NAME - 22)) | (1L << (IMAGE_NAME - 22)) | (1L << (OCR_NAME - 22)) | (1L << (STATE_NAME - 22)) | (1L << (CLICK_NAME - 22)) | (1L << (TYPE_NAME - 22)) | (1L << (DRAG_SLIDER_NAME - 22)) | (1L << (ANY_NAME - 22)) | (1L << (DOUBLE_CLICK_NAME - 22)) | (1L << (TRIPLE_CLICK_NAME - 22)) | (1L << (RIGHT_CLICK_NAME - 22)) | (1L << (MOUSE_MOVE_NAME - 22)) | (1L << (DROP_DOWN_AT_NAME - 22)) | (1L << (HIT_KEY_NAME - 22)) | (1L << (DRAG_DROP_NAME - 22)) | (1L << (BOOLEAN_VARIABLE - 22)) | (1L << (NUMBER_VARIABLE - 22)) | (1L << (STRING_VARIABLE - 22)))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1570,9 +1574,9 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(341);
+			setState(347);
 			match(ORACLE_KEYWORD);
-			setState(342);
+			setState(348);
 			widget_tree_condition(0);
 			}
 		}
@@ -1599,8 +1603,8 @@ public class TgherkinParser extends Parser {
 		public TerminalNode EOL(int i) {
 			return getToken(TgherkinParser.EOL, i);
 		}
-		public StepRangeContext stepRange() {
-			return getRuleContext(StepRangeContext.class,0);
+		public StepIterationContext stepIteration() {
+			return getRuleContext(StepIterationContext.class,0);
 		}
 		public GivenClauseContext givenClause() {
 			return getRuleContext(GivenClauseContext.class,0);
@@ -1626,49 +1630,49 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(344);
+			setState(350);
 			match(STEP_KEYWORD);
-			setState(345);
+			setState(351);
 			title();
-			setState(347); 
+			setState(353); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(346);
+				setState(352);
 				match(EOL);
 				}
 				}
-				setState(349); 
+				setState(355); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==EOL );
-			setState(352);
+			setState(358);
 			_la = _input.LA(1);
-			if (_la==STEP_RANGE_KEYWORD) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << STEP_RANGE_KEYWORD) | (1L << STEP_WHILE_KEYWORD) | (1L << STEP_REPEAT_KEYWORD))) != 0)) {
 				{
-				setState(351);
-				stepRange();
+				setState(357);
+				stepIteration();
 				}
 			}
 
-			setState(355);
+			setState(361);
 			_la = _input.LA(1);
 			if (_la==STEP_GIVEN_KEYWORD) {
 				{
-				setState(354);
+				setState(360);
 				givenClause();
 				}
 			}
 
-			setState(357);
+			setState(363);
 			whenClause();
-			setState(359);
+			setState(365);
 			_la = _input.LA(1);
 			if (_la==STEP_THEN_KEYWORD) {
 				{
-				setState(358);
+				setState(364);
 				thenClause();
 				}
 			}
@@ -1708,9 +1712,9 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(361);
+			setState(367);
 			match(STEP_GIVEN_KEYWORD);
-			setState(362);
+			setState(368);
 			widget_tree_condition(0);
 			}
 		}
@@ -1753,23 +1757,23 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(364);
+			setState(370);
 			match(STEP_WHEN_KEYWORD);
-			setState(366); 
+			setState(372); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(365);
+				setState(371);
 				((WhenClauseContext)_localctx).conditional_gesture = conditional_gesture();
 				((WhenClauseContext)_localctx).conditional_gestures.add(((WhenClauseContext)_localctx).conditional_gesture);
 				}
 				}
-				setState(368); 
+				setState(374); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( ((((_la - 19)) & ~0x3f) == 0 && ((1L << (_la - 19)) & ((1L << (DECIMAL_NUMBER - 19)) | (1L << (INTEGER_NUMBER - 19)) | (1L << (PLACEHOLDER - 19)) | (1L << (STRING - 19)) | (1L << (NOT - 19)) | (1L << (TRUE - 19)) | (1L << (FALSE - 19)) | (1L << (MINUS - 19)) | (1L << (LPAREN - 19)) | (1L << (MATCHES_NAME - 19)) | (1L << (XPATH_NAME - 19)) | (1L << (XPATH_BOOLEAN_NAME - 19)) | (1L << (XPATH_NUMBER_NAME - 19)) | (1L << (XPATH_STRING_NAME - 19)) | (1L << (IMAGE_NAME - 19)) | (1L << (OCR_NAME - 19)) | (1L << (STATE_NAME - 19)) | (1L << (CLICK_NAME - 19)) | (1L << (TYPE_NAME - 19)) | (1L << (DRAG_SLIDER_NAME - 19)) | (1L << (ANY_NAME - 19)) | (1L << (DOUBLE_CLICK_NAME - 19)) | (1L << (TRIPLE_CLICK_NAME - 19)) | (1L << (RIGHT_CLICK_NAME - 19)) | (1L << (MOUSE_MOVE_NAME - 19)) | (1L << (DROP_DOWN_AT_NAME - 19)) | (1L << (HIT_KEY_NAME - 19)) | (1L << (DRAG_DROP_NAME - 19)) | (1L << (BOOLEAN_VARIABLE - 19)) | (1L << (NUMBER_VARIABLE - 19)) | (1L << (STRING_VARIABLE - 19)))) != 0) );
+			} while ( ((((_la - 22)) & ~0x3f) == 0 && ((1L << (_la - 22)) & ((1L << (DECIMAL_NUMBER - 22)) | (1L << (INTEGER_NUMBER - 22)) | (1L << (PLACEHOLDER - 22)) | (1L << (STRING - 22)) | (1L << (NOT - 22)) | (1L << (TRUE - 22)) | (1L << (FALSE - 22)) | (1L << (MINUS - 22)) | (1L << (LPAREN - 22)) | (1L << (MATCHES_NAME - 22)) | (1L << (XPATH_NAME - 22)) | (1L << (XPATH_BOOLEAN_NAME - 22)) | (1L << (XPATH_NUMBER_NAME - 22)) | (1L << (XPATH_STRING_NAME - 22)) | (1L << (IMAGE_NAME - 22)) | (1L << (OCR_NAME - 22)) | (1L << (STATE_NAME - 22)) | (1L << (CLICK_NAME - 22)) | (1L << (TYPE_NAME - 22)) | (1L << (DRAG_SLIDER_NAME - 22)) | (1L << (ANY_NAME - 22)) | (1L << (DOUBLE_CLICK_NAME - 22)) | (1L << (TRIPLE_CLICK_NAME - 22)) | (1L << (RIGHT_CLICK_NAME - 22)) | (1L << (MOUSE_MOVE_NAME - 22)) | (1L << (DROP_DOWN_AT_NAME - 22)) | (1L << (HIT_KEY_NAME - 22)) | (1L << (DRAG_DROP_NAME - 22)) | (1L << (BOOLEAN_VARIABLE - 22)) | (1L << (NUMBER_VARIABLE - 22)) | (1L << (STRING_VARIABLE - 22)))) != 0) );
 			}
 		}
 		catch (RecognitionException re) {
@@ -1805,10 +1809,73 @@ public class TgherkinParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(370);
+			setState(376);
 			match(STEP_THEN_KEYWORD);
-			setState(371);
+			setState(377);
 			widget_tree_condition(0);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class StepIterationContext extends ParserRuleContext {
+		public StepRangeContext stepRange() {
+			return getRuleContext(StepRangeContext.class,0);
+		}
+		public StepWhileContext stepWhile() {
+			return getRuleContext(StepWhileContext.class,0);
+		}
+		public StepRepeatUntilContext stepRepeatUntil() {
+			return getRuleContext(StepRepeatUntilContext.class,0);
+		}
+		public StepIterationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_stepIteration; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof TgherkinParserVisitor ) return ((TgherkinParserVisitor<? extends T>)visitor).visitStepIteration(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final StepIterationContext stepIteration() throws RecognitionException {
+		StepIterationContext _localctx = new StepIterationContext(_ctx, getState());
+		enterRule(_localctx, 40, RULE_stepIteration);
+		try {
+			setState(382);
+			switch (_input.LA(1)) {
+			case STEP_RANGE_KEYWORD:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(379);
+				stepRange();
+				}
+				break;
+			case STEP_WHILE_KEYWORD:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(380);
+				stepWhile();
+				}
+				break;
+			case STEP_REPEAT_KEYWORD:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(381);
+				stepRepeatUntil();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1843,16 +1910,97 @@ public class TgherkinParser extends Parser {
 
 	public final StepRangeContext stepRange() throws RecognitionException {
 		StepRangeContext _localctx = new StepRangeContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_stepRange);
+		enterRule(_localctx, 42, RULE_stepRange);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(373);
+			setState(384);
 			match(STEP_RANGE_KEYWORD);
-			setState(374);
+			setState(385);
 			((StepRangeContext)_localctx).from = match(INTEGER_NUMBER);
-			setState(375);
+			setState(386);
 			((StepRangeContext)_localctx).to = match(INTEGER_NUMBER);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class StepWhileContext extends ParserRuleContext {
+		public TerminalNode STEP_WHILE_KEYWORD() { return getToken(TgherkinParser.STEP_WHILE_KEYWORD, 0); }
+		public Widget_tree_conditionContext widget_tree_condition() {
+			return getRuleContext(Widget_tree_conditionContext.class,0);
+		}
+		public StepWhileContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_stepWhile; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof TgherkinParserVisitor ) return ((TgherkinParserVisitor<? extends T>)visitor).visitStepWhile(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final StepWhileContext stepWhile() throws RecognitionException {
+		StepWhileContext _localctx = new StepWhileContext(_ctx, getState());
+		enterRule(_localctx, 44, RULE_stepWhile);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(388);
+			match(STEP_WHILE_KEYWORD);
+			setState(389);
+			widget_tree_condition(0);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class StepRepeatUntilContext extends ParserRuleContext {
+		public TerminalNode STEP_REPEAT_KEYWORD() { return getToken(TgherkinParser.STEP_REPEAT_KEYWORD, 0); }
+		public TerminalNode STEP_UNTIL_KEYWORD() { return getToken(TgherkinParser.STEP_UNTIL_KEYWORD, 0); }
+		public Widget_tree_conditionContext widget_tree_condition() {
+			return getRuleContext(Widget_tree_conditionContext.class,0);
+		}
+		public StepRepeatUntilContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_stepRepeatUntil; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof TgherkinParserVisitor ) return ((TgherkinParserVisitor<? extends T>)visitor).visitStepRepeatUntil(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final StepRepeatUntilContext stepRepeatUntil() throws RecognitionException {
+		StepRepeatUntilContext _localctx = new StepRepeatUntilContext(_ctx, getState());
+		enterRule(_localctx, 46, RULE_stepRepeatUntil);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(391);
+			match(STEP_REPEAT_KEYWORD);
+			setState(392);
+			match(STEP_UNTIL_KEYWORD);
+			setState(393);
+			widget_tree_condition(0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1886,21 +2034,21 @@ public class TgherkinParser extends Parser {
 
 	public final Conditional_gestureContext conditional_gesture() throws RecognitionException {
 		Conditional_gestureContext _localctx = new Conditional_gestureContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_conditional_gesture);
+		enterRule(_localctx, 48, RULE_conditional_gesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(378);
+			setState(396);
 			_la = _input.LA(1);
-			if (((((_la - 19)) & ~0x3f) == 0 && ((1L << (_la - 19)) & ((1L << (DECIMAL_NUMBER - 19)) | (1L << (INTEGER_NUMBER - 19)) | (1L << (PLACEHOLDER - 19)) | (1L << (STRING - 19)) | (1L << (NOT - 19)) | (1L << (TRUE - 19)) | (1L << (FALSE - 19)) | (1L << (MINUS - 19)) | (1L << (LPAREN - 19)) | (1L << (MATCHES_NAME - 19)) | (1L << (XPATH_NAME - 19)) | (1L << (XPATH_BOOLEAN_NAME - 19)) | (1L << (XPATH_NUMBER_NAME - 19)) | (1L << (XPATH_STRING_NAME - 19)) | (1L << (IMAGE_NAME - 19)) | (1L << (OCR_NAME - 19)) | (1L << (STATE_NAME - 19)) | (1L << (BOOLEAN_VARIABLE - 19)) | (1L << (NUMBER_VARIABLE - 19)) | (1L << (STRING_VARIABLE - 19)))) != 0)) {
+			if (((((_la - 22)) & ~0x3f) == 0 && ((1L << (_la - 22)) & ((1L << (DECIMAL_NUMBER - 22)) | (1L << (INTEGER_NUMBER - 22)) | (1L << (PLACEHOLDER - 22)) | (1L << (STRING - 22)) | (1L << (NOT - 22)) | (1L << (TRUE - 22)) | (1L << (FALSE - 22)) | (1L << (MINUS - 22)) | (1L << (LPAREN - 22)) | (1L << (MATCHES_NAME - 22)) | (1L << (XPATH_NAME - 22)) | (1L << (XPATH_BOOLEAN_NAME - 22)) | (1L << (XPATH_NUMBER_NAME - 22)) | (1L << (XPATH_STRING_NAME - 22)) | (1L << (IMAGE_NAME - 22)) | (1L << (OCR_NAME - 22)) | (1L << (STATE_NAME - 22)) | (1L << (BOOLEAN_VARIABLE - 22)) | (1L << (NUMBER_VARIABLE - 22)) | (1L << (STRING_VARIABLE - 22)))) != 0)) {
 				{
-				setState(377);
+				setState(395);
 				widget_condition(0);
 				}
 			}
 
-			setState(380);
+			setState(398);
 			gesture();
 			}
 		}
@@ -1953,9 +2101,9 @@ public class TgherkinParser extends Parser {
 
 	public final GestureContext gesture() throws RecognitionException {
 		GestureContext _localctx = new GestureContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_gesture);
+		enterRule(_localctx, 50, RULE_gesture);
 		try {
-			setState(390);
+			setState(408);
 			switch (_input.LA(1)) {
 			case DRAG_SLIDER_NAME:
 			case RIGHT_CLICK_NAME:
@@ -1963,56 +2111,56 @@ public class TgherkinParser extends Parser {
 			case DROP_DOWN_AT_NAME:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(382);
+				setState(400);
 				parameterlessGesture();
 				}
 				break;
 			case TYPE_NAME:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(383);
+				setState(401);
 				typeGesture();
 				}
 				break;
 			case CLICK_NAME:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(384);
+				setState(402);
 				clickGesture();
 				}
 				break;
 			case DOUBLE_CLICK_NAME:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(385);
+				setState(403);
 				doubleClickGesture();
 				}
 				break;
 			case TRIPLE_CLICK_NAME:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(386);
+				setState(404);
 				tripleClickGesture();
 				}
 				break;
 			case ANY_NAME:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(387);
+				setState(405);
 				anyGesture();
 				}
 				break;
 			case HIT_KEY_NAME:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(388);
+				setState(406);
 				hitKeyGesture();
 				}
 				break;
 			case DRAG_DROP_NAME:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(389);
+				setState(407);
 				dragDropGesture();
 				}
 				break;
@@ -2050,20 +2198,20 @@ public class TgherkinParser extends Parser {
 
 	public final TypeGestureContext typeGesture() throws RecognitionException {
 		TypeGestureContext _localctx = new TypeGestureContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_typeGesture);
+		enterRule(_localctx, 52, RULE_typeGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(392);
+			setState(410);
 			match(TYPE_NAME);
-			setState(393);
+			setState(411);
 			match(LPAREN);
-			setState(395);
+			setState(413);
 			_la = _input.LA(1);
 			if (_la==PLACEHOLDER || _la==STRING) {
 				{
-				setState(394);
+				setState(412);
 				_la = _input.LA(1);
 				if ( !(_la==PLACEHOLDER || _la==STRING) ) {
 				_errHandler.recoverInline(this);
@@ -2073,7 +2221,7 @@ public class TgherkinParser extends Parser {
 				}
 			}
 
-			setState(397);
+			setState(415);
 			match(RPAREN);
 			}
 		}
@@ -2108,20 +2256,20 @@ public class TgherkinParser extends Parser {
 
 	public final ClickGestureContext clickGesture() throws RecognitionException {
 		ClickGestureContext _localctx = new ClickGestureContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_clickGesture);
+		enterRule(_localctx, 54, RULE_clickGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(399);
+			setState(417);
 			match(CLICK_NAME);
-			setState(400);
+			setState(418);
 			match(LPAREN);
-			setState(402);
+			setState(420);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) {
 				{
-				setState(401);
+				setState(419);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -2131,7 +2279,7 @@ public class TgherkinParser extends Parser {
 				}
 			}
 
-			setState(404);
+			setState(422);
 			match(RPAREN);
 			}
 		}
@@ -2166,20 +2314,20 @@ public class TgherkinParser extends Parser {
 
 	public final DoubleClickGestureContext doubleClickGesture() throws RecognitionException {
 		DoubleClickGestureContext _localctx = new DoubleClickGestureContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_doubleClickGesture);
+		enterRule(_localctx, 56, RULE_doubleClickGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(406);
+			setState(424);
 			match(DOUBLE_CLICK_NAME);
-			setState(407);
+			setState(425);
 			match(LPAREN);
-			setState(409);
+			setState(427);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) {
 				{
-				setState(408);
+				setState(426);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -2189,7 +2337,7 @@ public class TgherkinParser extends Parser {
 				}
 			}
 
-			setState(411);
+			setState(429);
 			match(RPAREN);
 			}
 		}
@@ -2224,20 +2372,20 @@ public class TgherkinParser extends Parser {
 
 	public final TripleClickGestureContext tripleClickGesture() throws RecognitionException {
 		TripleClickGestureContext _localctx = new TripleClickGestureContext(_ctx, getState());
-		enterRule(_localctx, 52, RULE_tripleClickGesture);
+		enterRule(_localctx, 58, RULE_tripleClickGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(413);
+			setState(431);
 			match(TRIPLE_CLICK_NAME);
-			setState(414);
+			setState(432);
 			match(LPAREN);
-			setState(416);
+			setState(434);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) {
 				{
-				setState(415);
+				setState(433);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -2247,7 +2395,7 @@ public class TgherkinParser extends Parser {
 				}
 			}
 
-			setState(418);
+			setState(436);
 			match(RPAREN);
 			}
 		}
@@ -2282,20 +2430,20 @@ public class TgherkinParser extends Parser {
 
 	public final AnyGestureContext anyGesture() throws RecognitionException {
 		AnyGestureContext _localctx = new AnyGestureContext(_ctx, getState());
-		enterRule(_localctx, 54, RULE_anyGesture);
+		enterRule(_localctx, 60, RULE_anyGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(420);
+			setState(438);
 			match(ANY_NAME);
-			setState(421);
+			setState(439);
 			match(LPAREN);
-			setState(423);
+			setState(441);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) {
 				{
-				setState(422);
+				setState(440);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << PLACEHOLDER) | (1L << TRUE) | (1L << FALSE))) != 0)) ) {
 				_errHandler.recoverInline(this);
@@ -2305,7 +2453,7 @@ public class TgherkinParser extends Parser {
 				}
 			}
 
-			setState(425);
+			setState(443);
 			match(RPAREN);
 			}
 		}
@@ -2343,30 +2491,30 @@ public class TgherkinParser extends Parser {
 
 	public final HitKeyGestureContext hitKeyGesture() throws RecognitionException {
 		HitKeyGestureContext _localctx = new HitKeyGestureContext(_ctx, getState());
-		enterRule(_localctx, 56, RULE_hitKeyGesture);
+		enterRule(_localctx, 62, RULE_hitKeyGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(427);
+			setState(445);
 			match(HIT_KEY_NAME);
-			setState(428);
+			setState(446);
 			match(LPAREN);
-			setState(432);
+			setState(450);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==PLACEHOLDER || _la==KB_KEY_NAME) {
 				{
 				{
-				setState(429);
+				setState(447);
 				hitKeyArgument();
 				}
 				}
-				setState(434);
+				setState(452);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(435);
+			setState(453);
 			match(RPAREN);
 			}
 		}
@@ -2397,12 +2545,12 @@ public class TgherkinParser extends Parser {
 
 	public final HitKeyArgumentContext hitKeyArgument() throws RecognitionException {
 		HitKeyArgumentContext _localctx = new HitKeyArgumentContext(_ctx, getState());
-		enterRule(_localctx, 58, RULE_hitKeyArgument);
+		enterRule(_localctx, 64, RULE_hitKeyArgument);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(437);
+			setState(455);
 			_la = _input.LA(1);
 			if ( !(_la==PLACEHOLDER || _la==KB_KEY_NAME) ) {
 			_errHandler.recoverInline(this);
@@ -2442,25 +2590,25 @@ public class TgherkinParser extends Parser {
 
 	public final DragDropGestureContext dragDropGesture() throws RecognitionException {
 		DragDropGestureContext _localctx = new DragDropGestureContext(_ctx, getState());
-		enterRule(_localctx, 60, RULE_dragDropGesture);
+		enterRule(_localctx, 66, RULE_dragDropGesture);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(439);
+			setState(457);
 			match(DRAG_DROP_NAME);
-			setState(440);
+			setState(458);
 			match(LPAREN);
-			setState(442);
+			setState(460);
 			_la = _input.LA(1);
-			if (((((_la - 19)) & ~0x3f) == 0 && ((1L << (_la - 19)) & ((1L << (DECIMAL_NUMBER - 19)) | (1L << (INTEGER_NUMBER - 19)) | (1L << (PLACEHOLDER - 19)) | (1L << (STRING - 19)) | (1L << (NOT - 19)) | (1L << (TRUE - 19)) | (1L << (FALSE - 19)) | (1L << (MINUS - 19)) | (1L << (LPAREN - 19)) | (1L << (MATCHES_NAME - 19)) | (1L << (XPATH_NAME - 19)) | (1L << (XPATH_BOOLEAN_NAME - 19)) | (1L << (XPATH_NUMBER_NAME - 19)) | (1L << (XPATH_STRING_NAME - 19)) | (1L << (IMAGE_NAME - 19)) | (1L << (OCR_NAME - 19)) | (1L << (STATE_NAME - 19)) | (1L << (BOOLEAN_VARIABLE - 19)) | (1L << (NUMBER_VARIABLE - 19)) | (1L << (STRING_VARIABLE - 19)))) != 0)) {
+			if (((((_la - 22)) & ~0x3f) == 0 && ((1L << (_la - 22)) & ((1L << (DECIMAL_NUMBER - 22)) | (1L << (INTEGER_NUMBER - 22)) | (1L << (PLACEHOLDER - 22)) | (1L << (STRING - 22)) | (1L << (NOT - 22)) | (1L << (TRUE - 22)) | (1L << (FALSE - 22)) | (1L << (MINUS - 22)) | (1L << (LPAREN - 22)) | (1L << (MATCHES_NAME - 22)) | (1L << (XPATH_NAME - 22)) | (1L << (XPATH_BOOLEAN_NAME - 22)) | (1L << (XPATH_NUMBER_NAME - 22)) | (1L << (XPATH_STRING_NAME - 22)) | (1L << (IMAGE_NAME - 22)) | (1L << (OCR_NAME - 22)) | (1L << (STATE_NAME - 22)) | (1L << (BOOLEAN_VARIABLE - 22)) | (1L << (NUMBER_VARIABLE - 22)) | (1L << (STRING_VARIABLE - 22)))) != 0)) {
 				{
-				setState(441);
+				setState(459);
 				widget_condition(0);
 				}
 			}
 
-			setState(444);
+			setState(462);
 			match(RPAREN);
 			}
 		}
@@ -2493,12 +2641,12 @@ public class TgherkinParser extends Parser {
 
 	public final GestureNameContext gestureName() throws RecognitionException {
 		GestureNameContext _localctx = new GestureNameContext(_ctx, getState());
-		enterRule(_localctx, 62, RULE_gestureName);
+		enterRule(_localctx, 68, RULE_gestureName);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(446);
+			setState(464);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DRAG_SLIDER_NAME) | (1L << RIGHT_CLICK_NAME) | (1L << MOUSE_MOVE_NAME) | (1L << DROP_DOWN_AT_NAME))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -2537,15 +2685,15 @@ public class TgherkinParser extends Parser {
 
 	public final ParameterlessGestureContext parameterlessGesture() throws RecognitionException {
 		ParameterlessGestureContext _localctx = new ParameterlessGestureContext(_ctx, getState());
-		enterRule(_localctx, 64, RULE_parameterlessGesture);
+		enterRule(_localctx, 70, RULE_parameterlessGesture);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(448);
+			setState(466);
 			gestureName();
-			setState(449);
+			setState(467);
 			match(LPAREN);
-			setState(450);
+			setState(468);
 			match(RPAREN);
 			}
 		}
@@ -2662,23 +2810,23 @@ public class TgherkinParser extends Parser {
 		int _parentState = getState();
 		Widget_conditionContext _localctx = new Widget_conditionContext(_ctx, _parentState);
 		Widget_conditionContext _prevctx = _localctx;
-		int _startState = 66;
-		enterRecursionRule(_localctx, 66, RULE_widget_condition, _p);
+		int _startState = 72;
+		enterRecursionRule(_localctx, 72, RULE_widget_condition, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(461);
-			switch ( getInterpreter().adaptivePredict(_input,60,_ctx) ) {
+			setState(479);
+			switch ( getInterpreter().adaptivePredict(_input,61,_ctx) ) {
 			case 1:
 				{
 				_localctx = new NegationWidgetConditionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(453);
+				setState(471);
 				match(NOT);
-				setState(454);
+				setState(472);
 				widget_condition(4);
 				}
 				break;
@@ -2687,7 +2835,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new LogicalEntityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(455);
+				setState(473);
 				logical_entity();
 				}
 				break;
@@ -2696,11 +2844,11 @@ public class TgherkinParser extends Parser {
 				_localctx = new WidgetConditionInParenContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(456);
+				setState(474);
 				match(LPAREN);
-				setState(457);
+				setState(475);
 				widget_condition(0);
-				setState(458);
+				setState(476);
 				match(RPAREN);
 				}
 				break;
@@ -2709,32 +2857,32 @@ public class TgherkinParser extends Parser {
 				_localctx = new RelationalExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(460);
+				setState(478);
 				relational_expr();
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(471);
+			setState(489);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,62,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,63,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(469);
-					switch ( getInterpreter().adaptivePredict(_input,61,_ctx) ) {
+					setState(487);
+					switch ( getInterpreter().adaptivePredict(_input,62,_ctx) ) {
 					case 1:
 						{
 						_localctx = new WidgetConditionAndContext(new Widget_conditionContext(_parentctx, _parentState));
 						((WidgetConditionAndContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_condition);
-						setState(463);
+						setState(481);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(464);
+						setState(482);
 						match(AND);
-						setState(465);
+						setState(483);
 						((WidgetConditionAndContext)_localctx).right = widget_condition(3);
 						}
 						break;
@@ -2743,20 +2891,20 @@ public class TgherkinParser extends Parser {
 						_localctx = new WidgetConditionOrContext(new Widget_conditionContext(_parentctx, _parentState));
 						((WidgetConditionOrContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_condition);
-						setState(466);
+						setState(484);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(467);
+						setState(485);
 						match(OR);
-						setState(468);
+						setState(486);
 						((WidgetConditionOrContext)_localctx).right = widget_condition(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(473);
+				setState(491);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,62,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,63,_ctx);
 			}
 			}
 		}
@@ -2836,19 +2984,19 @@ public class TgherkinParser extends Parser {
 
 	public final Relational_exprContext relational_expr() throws RecognitionException {
 		Relational_exprContext _localctx = new Relational_exprContext(_ctx, getState());
-		enterRule(_localctx, 68, RULE_relational_expr);
+		enterRule(_localctx, 74, RULE_relational_expr);
 		try {
-			setState(486);
-			switch ( getInterpreter().adaptivePredict(_input,63,_ctx) ) {
+			setState(504);
+			switch ( getInterpreter().adaptivePredict(_input,64,_ctx) ) {
 			case 1:
 				_localctx = new RelationalNumericExpressionWithOperatorContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(474);
+				setState(492);
 				((RelationalNumericExpressionWithOperatorContext)_localctx).left = arithmetic_expr(0);
-				setState(475);
+				setState(493);
 				relational_operator();
-				setState(476);
+				setState(494);
 				((RelationalNumericExpressionWithOperatorContext)_localctx).right = arithmetic_expr(0);
 				}
 				break;
@@ -2856,11 +3004,11 @@ public class TgherkinParser extends Parser {
 				_localctx = new RelationalStringExpressionWithOperatorContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(478);
+				setState(496);
 				((RelationalStringExpressionWithOperatorContext)_localctx).left = string_expr();
-				setState(479);
+				setState(497);
 				relational_operator();
-				setState(480);
+				setState(498);
 				((RelationalStringExpressionWithOperatorContext)_localctx).right = string_expr();
 				}
 				break;
@@ -2868,11 +3016,11 @@ public class TgherkinParser extends Parser {
 				_localctx = new RelationalExpressionParensContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(482);
+				setState(500);
 				match(LPAREN);
-				setState(483);
+				setState(501);
 				relational_expr();
-				setState(484);
+				setState(502);
 				match(RPAREN);
 				}
 				break;
@@ -2909,12 +3057,12 @@ public class TgherkinParser extends Parser {
 
 	public final Relational_operatorContext relational_operator() throws RecognitionException {
 		Relational_operatorContext _localctx = new Relational_operatorContext(_ctx, getState());
-		enterRule(_localctx, 70, RULE_relational_operator);
+		enterRule(_localctx, 76, RULE_relational_operator);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(488);
+			setState(506);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -3045,14 +3193,14 @@ public class TgherkinParser extends Parser {
 		int _parentState = getState();
 		Arithmetic_exprContext _localctx = new Arithmetic_exprContext(_ctx, _parentState);
 		Arithmetic_exprContext _prevctx = _localctx;
-		int _startState = 72;
-		enterRecursionRule(_localctx, 72, RULE_arithmetic_expr, _p);
+		int _startState = 78;
+		enterRecursionRule(_localctx, 78, RULE_arithmetic_expr, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(498);
+			setState(516);
 			switch (_input.LA(1)) {
 			case MINUS:
 				{
@@ -3060,9 +3208,9 @@ public class TgherkinParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(491);
+				setState(509);
 				match(MINUS);
-				setState(492);
+				setState(510);
 				arithmetic_expr(4);
 				}
 				break;
@@ -3075,7 +3223,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new ArithmeticExpressionNumericEntityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(493);
+				setState(511);
 				numeric_entity();
 				}
 				break;
@@ -3084,11 +3232,11 @@ public class TgherkinParser extends Parser {
 				_localctx = new ArithmeticExpressionParensContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(494);
+				setState(512);
 				match(LPAREN);
-				setState(495);
+				setState(513);
 				arithmetic_expr(0);
-				setState(496);
+				setState(514);
 				match(RPAREN);
 				}
 				break;
@@ -3096,26 +3244,26 @@ public class TgherkinParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(511);
+			setState(529);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,66,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,67,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(509);
-					switch ( getInterpreter().adaptivePredict(_input,65,_ctx) ) {
+					setState(527);
+					switch ( getInterpreter().adaptivePredict(_input,66,_ctx) ) {
 					case 1:
 						{
 						_localctx = new ArithmeticExpressionPowContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionPowContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(500);
+						setState(518);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(501);
+						setState(519);
 						match(POW);
-						setState(502);
+						setState(520);
 						((ArithmeticExpressionPowContext)_localctx).right = arithmetic_expr(4);
 						}
 						break;
@@ -3124,16 +3272,16 @@ public class TgherkinParser extends Parser {
 						_localctx = new ArithmeticExpressionMultDivModContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionMultDivModContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(503);
+						setState(521);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(504);
+						setState(522);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << MULT) | (1L << DIV) | (1L << MOD))) != 0)) ) {
 						_errHandler.recoverInline(this);
 						} else {
 							consume();
 						}
-						setState(505);
+						setState(523);
 						((ArithmeticExpressionMultDivModContext)_localctx).right = arithmetic_expr(3);
 						}
 						break;
@@ -3142,25 +3290,25 @@ public class TgherkinParser extends Parser {
 						_localctx = new ArithmeticExpressionPlusMinusContext(new Arithmetic_exprContext(_parentctx, _parentState));
 						((ArithmeticExpressionPlusMinusContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_arithmetic_expr);
-						setState(506);
+						setState(524);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(507);
+						setState(525);
 						_la = _input.LA(1);
 						if ( !(_la==PLUS || _la==MINUS) ) {
 						_errHandler.recoverInline(this);
 						} else {
 							consume();
 						}
-						setState(508);
+						setState(526);
 						((ArithmeticExpressionPlusMinusContext)_localctx).right = arithmetic_expr(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(513);
+				setState(531);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,66,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,67,_ctx);
 			}
 			}
 		}
@@ -3192,11 +3340,11 @@ public class TgherkinParser extends Parser {
 
 	public final String_exprContext string_expr() throws RecognitionException {
 		String_exprContext _localctx = new String_exprContext(_ctx, getState());
-		enterRule(_localctx, 74, RULE_string_expr);
+		enterRule(_localctx, 80, RULE_string_expr);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(514);
+			setState(532);
 			string_entity();
 			}
 		}
@@ -3240,42 +3388,42 @@ public class TgherkinParser extends Parser {
 
 	public final BooleanFunctionContext booleanFunction() throws RecognitionException {
 		BooleanFunctionContext _localctx = new BooleanFunctionContext(_ctx, getState());
-		enterRule(_localctx, 76, RULE_booleanFunction);
+		enterRule(_localctx, 82, RULE_booleanFunction);
 		try {
-			setState(521);
+			setState(539);
 			switch (_input.LA(1)) {
 			case MATCHES_NAME:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(516);
+				setState(534);
 				matchesFunction();
 				}
 				break;
 			case XPATH_NAME:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(517);
+				setState(535);
 				xpathFunction();
 				}
 				break;
 			case XPATH_BOOLEAN_NAME:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(518);
+				setState(536);
 				xpathBooleanFunction();
 				}
 				break;
 			case IMAGE_NAME:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(519);
+				setState(537);
 				imageFunction();
 				}
 				break;
 			case STATE_NAME:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(520);
+				setState(538);
 				stateFunction();
 				}
 				break;
@@ -3314,21 +3462,21 @@ public class TgherkinParser extends Parser {
 
 	public final StringFunctionContext stringFunction() throws RecognitionException {
 		StringFunctionContext _localctx = new StringFunctionContext(_ctx, getState());
-		enterRule(_localctx, 78, RULE_stringFunction);
+		enterRule(_localctx, 84, RULE_stringFunction);
 		try {
-			setState(525);
+			setState(543);
 			switch (_input.LA(1)) {
 			case OCR_NAME:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(523);
+				setState(541);
 				ocrFunction();
 				}
 				break;
 			case XPATH_STRING_NAME:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(524);
+				setState(542);
 				xpathStringFunction();
 				}
 				break;
@@ -3364,11 +3512,11 @@ public class TgherkinParser extends Parser {
 
 	public final NumericFunctionContext numericFunction() throws RecognitionException {
 		NumericFunctionContext _localctx = new NumericFunctionContext(_ctx, getState());
-		enterRule(_localctx, 80, RULE_numericFunction);
+		enterRule(_localctx, 86, RULE_numericFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(527);
+			setState(545);
 			xpathNumberFunction();
 			}
 		}
@@ -3405,21 +3553,21 @@ public class TgherkinParser extends Parser {
 
 	public final MatchesFunctionContext matchesFunction() throws RecognitionException {
 		MatchesFunctionContext _localctx = new MatchesFunctionContext(_ctx, getState());
-		enterRule(_localctx, 82, RULE_matchesFunction);
+		enterRule(_localctx, 88, RULE_matchesFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(529);
+			setState(547);
 			match(MATCHES_NAME);
-			setState(530);
+			setState(548);
 			match(LPAREN);
-			setState(531);
+			setState(549);
 			string_entity();
-			setState(532);
+			setState(550);
 			match(COMMA);
-			setState(533);
+			setState(551);
 			match(STRING);
-			setState(534);
+			setState(552);
 			match(RPAREN);
 			}
 		}
@@ -3452,17 +3600,17 @@ public class TgherkinParser extends Parser {
 
 	public final XpathFunctionContext xpathFunction() throws RecognitionException {
 		XpathFunctionContext _localctx = new XpathFunctionContext(_ctx, getState());
-		enterRule(_localctx, 84, RULE_xpathFunction);
+		enterRule(_localctx, 90, RULE_xpathFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(536);
+			setState(554);
 			match(XPATH_NAME);
-			setState(537);
+			setState(555);
 			match(LPAREN);
-			setState(538);
+			setState(556);
 			match(STRING);
-			setState(539);
+			setState(557);
 			match(RPAREN);
 			}
 		}
@@ -3495,17 +3643,17 @@ public class TgherkinParser extends Parser {
 
 	public final XpathBooleanFunctionContext xpathBooleanFunction() throws RecognitionException {
 		XpathBooleanFunctionContext _localctx = new XpathBooleanFunctionContext(_ctx, getState());
-		enterRule(_localctx, 86, RULE_xpathBooleanFunction);
+		enterRule(_localctx, 92, RULE_xpathBooleanFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(541);
+			setState(559);
 			match(XPATH_BOOLEAN_NAME);
-			setState(542);
+			setState(560);
 			match(LPAREN);
-			setState(543);
+			setState(561);
 			match(STRING);
-			setState(544);
+			setState(562);
 			match(RPAREN);
 			}
 		}
@@ -3538,17 +3686,17 @@ public class TgherkinParser extends Parser {
 
 	public final XpathNumberFunctionContext xpathNumberFunction() throws RecognitionException {
 		XpathNumberFunctionContext _localctx = new XpathNumberFunctionContext(_ctx, getState());
-		enterRule(_localctx, 88, RULE_xpathNumberFunction);
+		enterRule(_localctx, 94, RULE_xpathNumberFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(546);
+			setState(564);
 			match(XPATH_NUMBER_NAME);
-			setState(547);
+			setState(565);
 			match(LPAREN);
-			setState(548);
+			setState(566);
 			match(STRING);
-			setState(549);
+			setState(567);
 			match(RPAREN);
 			}
 		}
@@ -3581,17 +3729,17 @@ public class TgherkinParser extends Parser {
 
 	public final XpathStringFunctionContext xpathStringFunction() throws RecognitionException {
 		XpathStringFunctionContext _localctx = new XpathStringFunctionContext(_ctx, getState());
-		enterRule(_localctx, 90, RULE_xpathStringFunction);
+		enterRule(_localctx, 96, RULE_xpathStringFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(551);
+			setState(569);
 			match(XPATH_STRING_NAME);
-			setState(552);
+			setState(570);
 			match(LPAREN);
-			setState(553);
+			setState(571);
 			match(STRING);
-			setState(554);
+			setState(572);
 			match(RPAREN);
 			}
 		}
@@ -3624,17 +3772,17 @@ public class TgherkinParser extends Parser {
 
 	public final ImageFunctionContext imageFunction() throws RecognitionException {
 		ImageFunctionContext _localctx = new ImageFunctionContext(_ctx, getState());
-		enterRule(_localctx, 92, RULE_imageFunction);
+		enterRule(_localctx, 98, RULE_imageFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(556);
+			setState(574);
 			match(IMAGE_NAME);
-			setState(557);
+			setState(575);
 			match(LPAREN);
-			setState(558);
+			setState(576);
 			match(STRING);
-			setState(559);
+			setState(577);
 			match(RPAREN);
 			}
 		}
@@ -3666,15 +3814,15 @@ public class TgherkinParser extends Parser {
 
 	public final OcrFunctionContext ocrFunction() throws RecognitionException {
 		OcrFunctionContext _localctx = new OcrFunctionContext(_ctx, getState());
-		enterRule(_localctx, 94, RULE_ocrFunction);
+		enterRule(_localctx, 100, RULE_ocrFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(561);
+			setState(579);
 			match(OCR_NAME);
-			setState(562);
+			setState(580);
 			match(LPAREN);
-			setState(563);
+			setState(581);
 			match(RPAREN);
 			}
 		}
@@ -3709,17 +3857,17 @@ public class TgherkinParser extends Parser {
 
 	public final StateFunctionContext stateFunction() throws RecognitionException {
 		StateFunctionContext _localctx = new StateFunctionContext(_ctx, getState());
-		enterRule(_localctx, 96, RULE_stateFunction);
+		enterRule(_localctx, 102, RULE_stateFunction);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(565);
+			setState(583);
 			match(STATE_NAME);
-			setState(566);
+			setState(584);
 			match(LPAREN);
-			setState(567);
+			setState(585);
 			widget_tree_condition(0);
-			setState(568);
+			setState(586);
 			match(RPAREN);
 			}
 		}
@@ -3800,8 +3948,8 @@ public class TgherkinParser extends Parser {
 		int _parentState = getState();
 		Widget_tree_conditionContext _localctx = new Widget_tree_conditionContext(_ctx, _parentState);
 		Widget_tree_conditionContext _prevctx = _localctx;
-		int _startState = 98;
-		enterRecursionRule(_localctx, 98, RULE_widget_tree_condition, _p);
+		int _startState = 104;
+		enterRecursionRule(_localctx, 104, RULE_widget_tree_condition, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
@@ -3811,30 +3959,30 @@ public class TgherkinParser extends Parser {
 			_ctx = _localctx;
 			_prevctx = _localctx;
 
-			setState(571);
+			setState(589);
 			widget_condition(0);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(581);
+			setState(599);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,70,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,71,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(579);
-					switch ( getInterpreter().adaptivePredict(_input,69,_ctx) ) {
+					setState(597);
+					switch ( getInterpreter().adaptivePredict(_input,70,_ctx) ) {
 					case 1:
 						{
 						_localctx = new WidgetTreeConditionAlsoContext(new Widget_tree_conditionContext(_parentctx, _parentState));
 						((WidgetTreeConditionAlsoContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_tree_condition);
-						setState(573);
+						setState(591);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(574);
+						setState(592);
 						match(STEP_ALSO_KEYWORD);
-						setState(575);
+						setState(593);
 						((WidgetTreeConditionAlsoContext)_localctx).right = widget_tree_condition(3);
 						}
 						break;
@@ -3843,20 +3991,20 @@ public class TgherkinParser extends Parser {
 						_localctx = new WidgetTreeConditionEitherContext(new Widget_tree_conditionContext(_parentctx, _parentState));
 						((WidgetTreeConditionEitherContext)_localctx).left = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_widget_tree_condition);
-						setState(576);
+						setState(594);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(577);
+						setState(595);
 						match(STEP_EITHER_KEYWORD);
-						setState(578);
+						setState(596);
 						((WidgetTreeConditionEitherContext)_localctx).right = widget_tree_condition(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(583);
+				setState(601);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,70,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,71,_ctx);
 			}
 			}
 		}
@@ -3887,12 +4035,12 @@ public class TgherkinParser extends Parser {
 
 	public final BoolContext bool() throws RecognitionException {
 		BoolContext _localctx = new BoolContext(_ctx, getState());
-		enterRule(_localctx, 100, RULE_bool);
+		enterRule(_localctx, 106, RULE_bool);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(584);
+			setState(602);
 			_la = _input.LA(1);
 			if ( !(_la==TRUE || _la==FALSE) ) {
 			_errHandler.recoverInline(this);
@@ -3966,16 +4114,16 @@ public class TgherkinParser extends Parser {
 
 	public final Logical_entityContext logical_entity() throws RecognitionException {
 		Logical_entityContext _localctx = new Logical_entityContext(_ctx, getState());
-		enterRule(_localctx, 102, RULE_logical_entity);
+		enterRule(_localctx, 108, RULE_logical_entity);
 		try {
-			setState(590);
+			setState(608);
 			switch (_input.LA(1)) {
 			case TRUE:
 			case FALSE:
 				_localctx = new LogicalConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(586);
+				setState(604);
 				bool();
 				}
 				break;
@@ -3983,7 +4131,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new LogicalVariableContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(587);
+				setState(605);
 				match(BOOLEAN_VARIABLE);
 				}
 				break;
@@ -3991,7 +4139,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new LogicalPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(588);
+				setState(606);
 				match(PLACEHOLDER);
 				}
 				break;
@@ -4003,7 +4151,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new LogicalFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(589);
+				setState(607);
 				booleanFunction();
 				}
 				break;
@@ -4083,15 +4231,15 @@ public class TgherkinParser extends Parser {
 
 	public final Numeric_entityContext numeric_entity() throws RecognitionException {
 		Numeric_entityContext _localctx = new Numeric_entityContext(_ctx, getState());
-		enterRule(_localctx, 104, RULE_numeric_entity);
+		enterRule(_localctx, 110, RULE_numeric_entity);
 		try {
-			setState(597);
+			setState(615);
 			switch (_input.LA(1)) {
 			case INTEGER_NUMBER:
 				_localctx = new IntegerConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(592);
+				setState(610);
 				match(INTEGER_NUMBER);
 				}
 				break;
@@ -4099,7 +4247,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new DecimalConstContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(593);
+				setState(611);
 				match(DECIMAL_NUMBER);
 				}
 				break;
@@ -4107,7 +4255,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new NumericVariableContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(594);
+				setState(612);
 				match(NUMBER_VARIABLE);
 				}
 				break;
@@ -4115,7 +4263,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new NumericPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(595);
+				setState(613);
 				match(PLACEHOLDER);
 				}
 				break;
@@ -4123,7 +4271,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new NumberFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(596);
+				setState(614);
 				numericFunction();
 				}
 				break;
@@ -4194,15 +4342,15 @@ public class TgherkinParser extends Parser {
 
 	public final String_entityContext string_entity() throws RecognitionException {
 		String_entityContext _localctx = new String_entityContext(_ctx, getState());
-		enterRule(_localctx, 106, RULE_string_entity);
+		enterRule(_localctx, 112, RULE_string_entity);
 		try {
-			setState(603);
+			setState(621);
 			switch (_input.LA(1)) {
 			case STRING:
 				_localctx = new StringConstContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(599);
+				setState(617);
 				match(STRING);
 				}
 				break;
@@ -4210,7 +4358,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new StringVariableContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(600);
+				setState(618);
 				match(STRING_VARIABLE);
 				}
 				break;
@@ -4218,7 +4366,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new StringPlaceholderContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(601);
+				setState(619);
 				match(PLACEHOLDER);
 				}
 				break;
@@ -4227,7 +4375,7 @@ public class TgherkinParser extends Parser {
 				_localctx = new StrFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(602);
+				setState(620);
 				stringFunction();
 				}
 				break;
@@ -4248,11 +4396,11 @@ public class TgherkinParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 33:
-			return widget_condition_sempred((Widget_conditionContext)_localctx, predIndex);
 		case 36:
+			return widget_condition_sempred((Widget_conditionContext)_localctx, predIndex);
+		case 39:
 			return arithmetic_expr_sempred((Arithmetic_exprContext)_localctx, predIndex);
-		case 49:
+		case 52:
 			return widget_tree_condition_sempred((Widget_tree_conditionContext)_localctx, predIndex);
 		}
 		return true;
@@ -4288,235 +4436,240 @@ public class TgherkinParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3J\u0260\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3M\u0272\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
 		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\4\'\t\'\4(\t(\4)\t)\4*\t*\4+\t+\4"+
 		",\t,\4-\t-\4.\t.\4/\t/\4\60\t\60\4\61\t\61\4\62\t\62\4\63\t\63\4\64\t"+
-		"\64\4\65\t\65\4\66\t\66\4\67\t\67\3\2\5\2p\n\2\3\2\6\2s\n\2\r\2\16\2t"+
-		"\3\2\3\2\3\3\3\3\5\3{\n\3\3\3\3\3\5\3\177\n\3\5\3\u0081\n\3\3\4\3\4\6"+
-		"\4\u0085\n\4\r\4\16\4\u0086\3\4\7\4\u008a\n\4\f\4\16\4\u008d\13\4\3\5"+
-		"\3\5\6\5\u0091\n\5\r\5\16\5\u0092\3\5\7\5\u0096\n\5\f\5\16\5\u0099\13"+
-		"\5\3\6\7\6\u009c\n\6\f\6\16\6\u009f\13\6\3\6\3\6\3\6\6\6\u00a4\n\6\r\6"+
-		"\16\6\u00a5\3\6\7\6\u00a9\n\6\f\6\16\6\u00ac\13\6\3\6\5\6\u00af\n\6\3"+
-		"\6\5\6\u00b2\n\6\3\6\5\6\u00b5\n\6\3\6\6\6\u00b8\n\6\r\6\16\6\u00b9\3"+
-		"\7\3\7\5\7\u00be\n\7\3\7\6\7\u00c1\n\7\r\7\16\7\u00c2\3\7\7\7\u00c6\n"+
-		"\7\f\7\16\7\u00c9\13\7\3\7\5\7\u00cc\n\7\3\7\5\7\u00cf\n\7\3\7\6\7\u00d2"+
-		"\n\7\r\7\16\7\u00d3\3\b\3\b\5\b\u00d8\n\b\3\t\7\t\u00db\n\t\f\t\16\t\u00de"+
-		"\13\t\3\t\3\t\3\t\6\t\u00e3\n\t\r\t\16\t\u00e4\3\t\7\t\u00e8\n\t\f\t\16"+
-		"\t\u00eb\13\t\3\t\5\t\u00ee\n\t\3\t\5\t\u00f1\n\t\3\t\6\t\u00f4\n\t\r"+
-		"\t\16\t\u00f5\3\n\7\n\u00f9\n\n\f\n\16\n\u00fc\13\n\3\n\3\n\3\n\6\n\u0101"+
-		"\n\n\r\n\16\n\u0102\3\n\7\n\u0106\n\n\f\n\16\n\u0109\13\n\3\n\5\n\u010c"+
-		"\n\n\3\n\5\n\u010f\n\n\3\n\6\n\u0112\n\n\r\n\16\n\u0113\3\n\3\n\3\13\3"+
-		"\13\5\13\u011a\n\13\3\13\6\13\u011d\n\13\r\13\16\13\u011e\3\13\7\13\u0122"+
-		"\n\13\f\13\16\13\u0125\13\13\3\13\3\13\3\f\6\f\u012a\n\f\r\f\16\f\u012b"+
-		"\3\f\7\f\u012f\n\f\f\f\16\f\u0132\13\f\3\r\7\r\u0135\n\r\f\r\16\r\u0138"+
-		"\13\r\3\r\6\r\u013b\n\r\r\r\16\r\u013c\3\16\3\16\7\16\u0141\n\16\f\16"+
-		"\16\16\u0144\13\16\3\16\6\16\u0147\n\16\r\16\16\16\u0148\3\17\3\17\7\17"+
-		"\u014d\n\17\f\17\16\17\u0150\13\17\3\20\3\20\6\20\u0154\n\20\r\20\16\20"+
-		"\u0155\3\21\3\21\3\21\3\22\3\22\3\22\6\22\u015e\n\22\r\22\16\22\u015f"+
-		"\3\22\5\22\u0163\n\22\3\22\5\22\u0166\n\22\3\22\3\22\5\22\u016a\n\22\3"+
-		"\23\3\23\3\23\3\24\3\24\6\24\u0171\n\24\r\24\16\24\u0172\3\25\3\25\3\25"+
-		"\3\26\3\26\3\26\3\26\3\27\5\27\u017d\n\27\3\27\3\27\3\30\3\30\3\30\3\30"+
-		"\3\30\3\30\3\30\3\30\5\30\u0189\n\30\3\31\3\31\3\31\5\31\u018e\n\31\3"+
-		"\31\3\31\3\32\3\32\3\32\5\32\u0195\n\32\3\32\3\32\3\33\3\33\3\33\5\33"+
-		"\u019c\n\33\3\33\3\33\3\34\3\34\3\34\5\34\u01a3\n\34\3\34\3\34\3\35\3"+
-		"\35\3\35\5\35\u01aa\n\35\3\35\3\35\3\36\3\36\3\36\7\36\u01b1\n\36\f\36"+
-		"\16\36\u01b4\13\36\3\36\3\36\3\37\3\37\3 \3 \3 \5 \u01bd\n \3 \3 \3!\3"+
-		"!\3\"\3\"\3\"\3\"\3#\3#\3#\3#\3#\3#\3#\3#\3#\5#\u01d0\n#\3#\3#\3#\3#\3"+
-		"#\3#\7#\u01d8\n#\f#\16#\u01db\13#\3$\3$\3$\3$\3$\3$\3$\3$\3$\3$\3$\3$"+
-		"\5$\u01e9\n$\3%\3%\3&\3&\3&\3&\3&\3&\3&\3&\5&\u01f5\n&\3&\3&\3&\3&\3&"+
-		"\3&\3&\3&\3&\7&\u0200\n&\f&\16&\u0203\13&\3\'\3\'\3(\3(\3(\3(\3(\5(\u020c"+
-		"\n(\3)\3)\5)\u0210\n)\3*\3*\3+\3+\3+\3+\3+\3+\3+\3,\3,\3,\3,\3,\3-\3-"+
-		"\3-\3-\3-\3.\3.\3.\3.\3.\3/\3/\3/\3/\3/\3\60\3\60\3\60\3\60\3\60\3\61"+
-		"\3\61\3\61\3\61\3\62\3\62\3\62\3\62\3\62\3\63\3\63\3\63\3\63\3\63\3\63"+
-		"\3\63\3\63\3\63\7\63\u0246\n\63\f\63\16\63\u0249\13\63\3\64\3\64\3\65"+
-		"\3\65\3\65\3\65\5\65\u0251\n\65\3\66\3\66\3\66\3\66\3\66\5\66\u0258\n"+
-		"\66\3\67\3\67\3\67\3\67\5\67\u025e\n\67\3\67\2\5DJd8\2\4\6\b\n\f\16\20"+
-		"\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhj"+
-		"l\2\f\3\2DD\4\2\5\24DD\3\2\27\30\4\2\27\27\35\36\4\2\27\27JJ\4\288<>\3"+
-		"\2%*\3\2 \"\3\2#$\3\2\35\36\u0288\2o\3\2\2\2\4\u0080\3\2\2\2\6\u0082\3"+
-		"\2\2\2\b\u008e\3\2\2\2\n\u009d\3\2\2\2\f\u00bb\3\2\2\2\16\u00d7\3\2\2"+
-		"\2\20\u00dc\3\2\2\2\22\u00fa\3\2\2\2\24\u0117\3\2\2\2\26\u0129\3\2\2\2"+
-		"\30\u0136\3\2\2\2\32\u013e\3\2\2\2\34\u014a\3\2\2\2\36\u0151\3\2\2\2 "+
-		"\u0157\3\2\2\2\"\u015a\3\2\2\2$\u016b\3\2\2\2&\u016e\3\2\2\2(\u0174\3"+
-		"\2\2\2*\u0177\3\2\2\2,\u017c\3\2\2\2.\u0188\3\2\2\2\60\u018a\3\2\2\2\62"+
-		"\u0191\3\2\2\2\64\u0198\3\2\2\2\66\u019f\3\2\2\28\u01a6\3\2\2\2:\u01ad"+
-		"\3\2\2\2<\u01b7\3\2\2\2>\u01b9\3\2\2\2@\u01c0\3\2\2\2B\u01c2\3\2\2\2D"+
-		"\u01cf\3\2\2\2F\u01e8\3\2\2\2H\u01ea\3\2\2\2J\u01f4\3\2\2\2L\u0204\3\2"+
-		"\2\2N\u020b\3\2\2\2P\u020f\3\2\2\2R\u0211\3\2\2\2T\u0213\3\2\2\2V\u021a"+
-		"\3\2\2\2X\u021f\3\2\2\2Z\u0224\3\2\2\2\\\u0229\3\2\2\2^\u022e\3\2\2\2"+
-		"`\u0233\3\2\2\2b\u0237\3\2\2\2d\u023c\3\2\2\2f\u024a\3\2\2\2h\u0250\3"+
-		"\2\2\2j\u0257\3\2\2\2l\u025d\3\2\2\2np\5\4\3\2on\3\2\2\2op\3\2\2\2pr\3"+
-		"\2\2\2qs\5\n\6\2rq\3\2\2\2st\3\2\2\2tr\3\2\2\2tu\3\2\2\2uv\3\2\2\2vw\7"+
-		"\2\2\3w\3\3\2\2\2xz\5\6\4\2y{\5\b\5\2zy\3\2\2\2z{\3\2\2\2{\u0081\3\2\2"+
-		"\2|~\5\b\5\2}\177\5\6\4\2~}\3\2\2\2~\177\3\2\2\2\177\u0081\3\2\2\2\u0080"+
-		"x\3\2\2\2\u0080|\3\2\2\2\u0081\5\3\2\2\2\u0082\u0084\7\4\2\2\u0083\u0085"+
-		"\7\5\2\2\u0084\u0083\3\2\2\2\u0085\u0086\3\2\2\2\u0086\u0084\3\2\2\2\u0086"+
-		"\u0087\3\2\2\2\u0087\u008b\3\2\2\2\u0088\u008a\7D\2\2\u0089\u0088\3\2"+
-		"\2\2\u008a\u008d\3\2\2\2\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c"+
-		"\7\3\2\2\2\u008d\u008b\3\2\2\2\u008e\u0090\7\3\2\2\u008f\u0091\7\5\2\2"+
-		"\u0090\u008f\3\2\2\2\u0091\u0092\3\2\2\2\u0092\u0090\3\2\2\2\u0092\u0093"+
-		"\3\2\2\2\u0093\u0097\3\2\2\2\u0094\u0096\7D\2\2\u0095\u0094\3\2\2\2\u0096"+
-		"\u0099\3\2\2\2\u0097\u0095\3\2\2\2\u0097\u0098\3\2\2\2\u0098\t\3\2\2\2"+
-		"\u0099\u0097\3\2\2\2\u009a\u009c\5\34\17\2\u009b\u009a\3\2\2\2\u009c\u009f"+
-		"\3\2\2\2\u009d\u009b\3\2\2\2\u009d\u009e\3\2\2\2\u009e\u00a0\3\2\2\2\u009f"+
-		"\u009d\3\2\2\2\u00a0\u00a1\7\6\2\2\u00a1\u00a3\5\30\r\2\u00a2\u00a4\7"+
-		"D\2\2\u00a3\u00a2\3\2\2\2\u00a4\u00a5\3\2\2\2\u00a5\u00a3\3\2\2\2\u00a5"+
-		"\u00a6\3\2\2\2\u00a6\u00aa\3\2\2\2\u00a7\u00a9\5\32\16\2\u00a8\u00a7\3"+
-		"\2\2\2\u00a9\u00ac\3\2\2\2\u00aa\u00a8\3\2\2\2\u00aa\u00ab\3\2\2\2\u00ab"+
-		"\u00ae\3\2\2\2\u00ac\u00aa\3\2\2\2\u00ad\u00af\5\36\20\2\u00ae\u00ad\3"+
-		"\2\2\2\u00ae\u00af\3\2\2\2\u00af\u00b1\3\2\2\2\u00b0\u00b2\5 \21\2\u00b1"+
-		"\u00b0\3\2\2\2\u00b1\u00b2\3\2\2\2\u00b2\u00b4\3\2\2\2\u00b3\u00b5\5\f"+
-		"\7\2\u00b4\u00b3\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5\u00b7\3\2\2\2\u00b6"+
-		"\u00b8\5\16\b\2\u00b7\u00b6\3\2\2\2\u00b8\u00b9\3\2\2\2\u00b9\u00b7\3"+
-		"\2\2\2\u00b9\u00ba\3\2\2\2\u00ba\13\3\2\2\2\u00bb\u00bd\7\7\2\2\u00bc"+
-		"\u00be\5\30\r\2\u00bd\u00bc\3\2\2\2\u00bd\u00be\3\2\2\2\u00be\u00c0\3"+
-		"\2\2\2\u00bf\u00c1\7D\2\2\u00c0\u00bf\3\2\2\2\u00c1\u00c2\3\2\2\2\u00c2"+
-		"\u00c0\3\2\2\2\u00c2\u00c3\3\2\2\2\u00c3\u00c7\3\2\2\2\u00c4\u00c6\5\32"+
-		"\16\2\u00c5\u00c4\3\2\2\2\u00c6\u00c9\3\2\2\2\u00c7\u00c5\3\2\2\2\u00c7"+
-		"\u00c8\3\2\2\2\u00c8\u00cb\3\2\2\2\u00c9\u00c7\3\2\2\2\u00ca\u00cc\5\36"+
-		"\20\2\u00cb\u00ca\3\2\2\2\u00cb\u00cc\3\2\2\2\u00cc\u00ce\3\2\2\2\u00cd"+
-		"\u00cf\5 \21\2\u00ce\u00cd\3\2\2\2\u00ce\u00cf\3\2\2\2\u00cf\u00d1\3\2"+
-		"\2\2\u00d0\u00d2\5\"\22\2\u00d1\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3"+
-		"\u00d1\3\2\2\2\u00d3\u00d4\3\2\2\2\u00d4\r\3\2\2\2\u00d5\u00d8\5\20\t"+
-		"\2\u00d6\u00d8\5\22\n\2\u00d7\u00d5\3\2\2\2\u00d7\u00d6\3\2\2\2\u00d8"+
-		"\17\3\2\2\2\u00d9\u00db\5\34\17\2\u00da\u00d9\3\2\2\2\u00db\u00de\3\2"+
-		"\2\2\u00dc\u00da\3\2\2\2\u00dc\u00dd\3\2\2\2\u00dd\u00df\3\2\2\2\u00de"+
-		"\u00dc\3\2\2\2\u00df\u00e0\7\b\2\2\u00e0\u00e2\5\30\r\2\u00e1\u00e3\7"+
-		"D\2\2\u00e2\u00e1\3\2\2\2\u00e3\u00e4\3\2\2\2\u00e4\u00e2\3\2\2\2\u00e4"+
-		"\u00e5\3\2\2\2\u00e5\u00e9\3\2\2\2\u00e6\u00e8\5\32\16\2\u00e7\u00e6\3"+
-		"\2\2\2\u00e8\u00eb\3\2\2\2\u00e9\u00e7\3\2\2\2\u00e9\u00ea\3\2\2\2\u00ea"+
-		"\u00ed\3\2\2\2\u00eb\u00e9\3\2\2\2\u00ec\u00ee\5\36\20\2\u00ed\u00ec\3"+
-		"\2\2\2\u00ed\u00ee\3\2\2\2\u00ee\u00f0\3\2\2\2\u00ef\u00f1\5 \21\2\u00f0"+
-		"\u00ef\3\2\2\2\u00f0\u00f1\3\2\2\2\u00f1\u00f3\3\2\2\2\u00f2\u00f4\5\""+
-		"\22\2\u00f3\u00f2\3\2\2\2\u00f4\u00f5\3\2\2\2\u00f5\u00f3\3\2\2\2\u00f5"+
-		"\u00f6\3\2\2\2\u00f6\21\3\2\2\2\u00f7\u00f9\5\34\17\2\u00f8\u00f7\3\2"+
-		"\2\2\u00f9\u00fc\3\2\2\2\u00fa\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb"+
-		"\u00fd\3\2\2\2\u00fc\u00fa\3\2\2\2\u00fd\u00fe\7\t\2\2\u00fe\u0100\5\30"+
-		"\r\2\u00ff\u0101\7D\2\2\u0100\u00ff\3\2\2\2\u0101\u0102\3\2\2\2\u0102"+
-		"\u0100\3\2\2\2\u0102\u0103\3\2\2\2\u0103\u0107\3\2\2\2\u0104\u0106\5\32"+
-		"\16\2\u0105\u0104\3\2\2\2\u0106\u0109\3\2\2\2\u0107\u0105\3\2\2\2\u0107"+
-		"\u0108\3\2\2\2\u0108\u010b\3\2\2\2\u0109\u0107\3\2\2\2\u010a\u010c\5\36"+
-		"\20\2\u010b\u010a\3\2\2\2\u010b\u010c\3\2\2\2\u010c\u010e\3\2\2\2\u010d"+
-		"\u010f\5 \21\2\u010e\u010d\3\2\2\2\u010e\u010f\3\2\2\2\u010f\u0111\3\2"+
-		"\2\2\u0110\u0112\5\"\22\2\u0111\u0110\3\2\2\2\u0112\u0113\3\2\2\2\u0113"+
-		"\u0111\3\2\2\2\u0113\u0114\3\2\2\2\u0114\u0115\3\2\2\2\u0115\u0116\5\24"+
-		"\13\2\u0116\23\3\2\2\2\u0117\u0119\7\n\2\2\u0118\u011a\5\30\r\2\u0119"+
-		"\u0118\3\2\2\2\u0119\u011a\3\2\2\2\u011a\u011c\3\2\2\2\u011b\u011d\7D"+
-		"\2\2\u011c\u011b\3\2\2\2\u011d\u011e\3\2\2\2\u011e\u011c\3\2\2\2\u011e"+
-		"\u011f\3\2\2\2\u011f\u0123\3\2\2\2\u0120\u0122\5\32\16\2\u0121\u0120\3"+
-		"\2\2\2\u0122\u0125\3\2\2\2\u0123\u0121\3\2\2\2\u0123\u0124\3\2\2\2\u0124"+
-		"\u0126\3\2\2\2\u0125\u0123\3\2\2\2\u0126\u0127\5\26\f\2\u0127\25\3\2\2"+
-		"\2\u0128\u012a\7\24\2\2\u0129\u0128\3\2\2\2\u012a\u012b\3\2\2\2\u012b"+
-		"\u0129\3\2\2\2\u012b\u012c\3\2\2\2\u012c\u0130\3\2\2\2\u012d\u012f\7D"+
-		"\2\2\u012e\u012d\3\2\2\2\u012f\u0132\3\2\2\2\u0130\u012e\3\2\2\2\u0130"+
-		"\u0131\3\2\2\2\u0131\27\3\2\2\2\u0132\u0130\3\2\2\2\u0133\u0135\7E\2\2"+
-		"\u0134\u0133\3\2\2\2\u0135\u0138\3\2\2\2\u0136\u0134\3\2\2\2\u0136\u0137"+
-		"\3\2\2\2\u0137\u013a\3\2\2\2\u0138\u0136\3\2\2\2\u0139\u013b\n\2\2\2\u013a"+
-		"\u0139\3\2\2\2\u013b\u013c\3\2\2\2\u013c\u013a\3\2\2\2\u013c\u013d\3\2"+
-		"\2\2\u013d\31\3\2\2\2\u013e\u0142\n\3\2\2\u013f\u0141\n\2\2\2\u0140\u013f"+
-		"\3\2\2\2\u0141\u0144\3\2\2\2\u0142\u0140\3\2\2\2\u0142\u0143\3\2\2\2\u0143"+
-		"\u0146\3\2\2\2\u0144\u0142\3\2\2\2\u0145\u0147\7D\2\2\u0146\u0145\3\2"+
-		"\2\2\u0147\u0148\3\2\2\2\u0148\u0146\3\2\2\2\u0148\u0149\3\2\2\2\u0149"+
-		"\33\3\2\2\2\u014a\u014e\7\5\2\2\u014b\u014d\7D\2\2\u014c\u014b\3\2\2\2"+
-		"\u014d\u0150\3\2\2\2\u014e\u014c\3\2\2\2\u014e\u014f\3\2\2\2\u014f\35"+
-		"\3\2\2\2\u0150\u014e\3\2\2\2\u0151\u0153\7\13\2\2\u0152\u0154\5,\27\2"+
-		"\u0153\u0152\3\2\2\2\u0154\u0155\3\2\2\2\u0155\u0153\3\2\2\2\u0155\u0156"+
-		"\3\2\2\2\u0156\37\3\2\2\2\u0157\u0158\7\f\2\2\u0158\u0159\5d\63\2\u0159"+
-		"!\3\2\2\2\u015a\u015b\7\r\2\2\u015b\u015d\5\30\r\2\u015c\u015e\7D\2\2"+
-		"\u015d\u015c\3\2\2\2\u015e\u015f\3\2\2\2\u015f\u015d\3\2\2\2\u015f\u0160"+
-		"\3\2\2\2\u0160\u0162\3\2\2\2\u0161\u0163\5*\26\2\u0162\u0161\3\2\2\2\u0162"+
-		"\u0163\3\2\2\2\u0163\u0165\3\2\2\2\u0164\u0166\5$\23\2\u0165\u0164\3\2"+
-		"\2\2\u0165\u0166\3\2\2\2\u0166\u0167\3\2\2\2\u0167\u0169\5&\24\2\u0168"+
-		"\u016a\5(\25\2\u0169\u0168\3\2\2\2\u0169\u016a\3\2\2\2\u016a#\3\2\2\2"+
-		"\u016b\u016c\7\17\2\2\u016c\u016d\5d\63\2\u016d%\3\2\2\2\u016e\u0170\7"+
-		"\20\2\2\u016f\u0171\5,\27\2\u0170\u016f\3\2\2\2\u0171\u0172\3\2\2\2\u0172"+
-		"\u0170\3\2\2\2\u0172\u0173\3\2\2\2\u0173\'\3\2\2\2\u0174\u0175\7\21\2"+
-		"\2\u0175\u0176\5d\63\2\u0176)\3\2\2\2\u0177\u0178\7\16\2\2\u0178\u0179"+
-		"\7\26\2\2\u0179\u017a\7\26\2\2\u017a+\3\2\2\2\u017b\u017d\5D#\2\u017c"+
-		"\u017b\3\2\2\2\u017c\u017d\3\2\2\2\u017d\u017e\3\2\2\2\u017e\u017f\5."+
-		"\30\2\u017f-\3\2\2\2\u0180\u0189\5B\"\2\u0181\u0189\5\60\31\2\u0182\u0189"+
-		"\5\62\32\2\u0183\u0189\5\64\33\2\u0184\u0189\5\66\34\2\u0185\u0189\58"+
-		"\35\2\u0186\u0189\5:\36\2\u0187\u0189\5> \2\u0188\u0180\3\2\2\2\u0188"+
-		"\u0181\3\2\2\2\u0188\u0182\3\2\2\2\u0188\u0183\3\2\2\2\u0188\u0184\3\2"+
-		"\2\2\u0188\u0185\3\2\2\2\u0188\u0186\3\2\2\2\u0188\u0187\3\2\2\2\u0189"+
-		"/\3\2\2\2\u018a\u018b\7\67\2\2\u018b\u018d\7+\2\2\u018c\u018e\t\4\2\2"+
-		"\u018d\u018c\3\2\2\2\u018d\u018e\3\2\2\2\u018e\u018f\3\2\2\2\u018f\u0190"+
-		"\7,\2\2\u0190\61\3\2\2\2\u0191\u0192\7\66\2\2\u0192\u0194\7+\2\2\u0193"+
-		"\u0195\t\5\2\2\u0194\u0193\3\2\2\2\u0194\u0195\3\2\2\2\u0195\u0196\3\2"+
-		"\2\2\u0196\u0197\7,\2\2\u0197\63\3\2\2\2\u0198\u0199\7:\2\2\u0199\u019b"+
-		"\7+\2\2\u019a\u019c\t\5\2\2\u019b\u019a\3\2\2\2\u019b\u019c\3\2\2\2\u019c"+
-		"\u019d\3\2\2\2\u019d\u019e\7,\2\2\u019e\65\3\2\2\2\u019f\u01a0\7;\2\2"+
-		"\u01a0\u01a2\7+\2\2\u01a1\u01a3\t\5\2\2\u01a2\u01a1\3\2\2\2\u01a2\u01a3"+
-		"\3\2\2\2\u01a3\u01a4\3\2\2\2\u01a4\u01a5\7,\2\2\u01a5\67\3\2\2\2\u01a6"+
-		"\u01a7\79\2\2\u01a7\u01a9\7+\2\2\u01a8\u01aa\t\5\2\2\u01a9\u01a8\3\2\2"+
-		"\2\u01a9\u01aa\3\2\2\2\u01aa\u01ab\3\2\2\2\u01ab\u01ac\7,\2\2\u01ac9\3"+
-		"\2\2\2\u01ad\u01ae\7?\2\2\u01ae\u01b2\7+\2\2\u01af\u01b1\5<\37\2\u01b0"+
-		"\u01af\3\2\2\2\u01b1\u01b4\3\2\2\2\u01b2\u01b0\3\2\2\2\u01b2\u01b3\3\2"+
-		"\2\2\u01b3\u01b5\3\2\2\2\u01b4\u01b2\3\2\2\2\u01b5\u01b6\7,\2\2\u01b6"+
-		";\3\2\2\2\u01b7\u01b8\t\6\2\2\u01b8=\3\2\2\2\u01b9\u01ba\7@\2\2\u01ba"+
-		"\u01bc\7+\2\2\u01bb\u01bd\5D#\2\u01bc\u01bb\3\2\2\2\u01bc\u01bd\3\2\2"+
-		"\2\u01bd\u01be\3\2\2\2\u01be\u01bf\7,\2\2\u01bf?\3\2\2\2\u01c0\u01c1\t"+
-		"\7\2\2\u01c1A\3\2\2\2\u01c2\u01c3\5@!\2\u01c3\u01c4\7+\2\2\u01c4\u01c5"+
-		"\7,\2\2\u01c5C\3\2\2\2\u01c6\u01c7\b#\1\2\u01c7\u01c8\7\34\2\2\u01c8\u01d0"+
-		"\5D#\6\u01c9\u01d0\5h\65\2\u01ca\u01cb\7+\2\2\u01cb\u01cc\5D#\2\u01cc"+
-		"\u01cd\7,\2\2\u01cd\u01d0\3\2\2\2\u01ce\u01d0\5F$\2\u01cf\u01c6\3\2\2"+
-		"\2\u01cf\u01c9\3\2\2\2\u01cf\u01ca\3\2\2\2\u01cf\u01ce\3\2\2\2\u01d0\u01d9"+
-		"\3\2\2\2\u01d1\u01d2\f\4\2\2\u01d2\u01d3\7\32\2\2\u01d3\u01d8\5D#\5\u01d4"+
-		"\u01d5\f\3\2\2\u01d5\u01d6\7\33\2\2\u01d6\u01d8\5D#\4\u01d7\u01d1\3\2"+
-		"\2\2\u01d7\u01d4\3\2\2\2\u01d8\u01db\3\2\2\2\u01d9\u01d7\3\2\2\2\u01d9"+
-		"\u01da\3\2\2\2\u01daE\3\2\2\2\u01db\u01d9\3\2\2\2\u01dc\u01dd\5J&\2\u01dd"+
-		"\u01de\5H%\2\u01de\u01df\5J&\2\u01df\u01e9\3\2\2\2\u01e0\u01e1\5L\'\2"+
-		"\u01e1\u01e2\5H%\2\u01e2\u01e3\5L\'\2\u01e3\u01e9\3\2\2\2\u01e4\u01e5"+
-		"\7+\2\2\u01e5\u01e6\5F$\2\u01e6\u01e7\7,\2\2\u01e7\u01e9\3\2\2\2\u01e8"+
-		"\u01dc\3\2\2\2\u01e8\u01e0\3\2\2\2\u01e8\u01e4\3\2\2\2\u01e9G\3\2\2\2"+
-		"\u01ea\u01eb\t\b\2\2\u01ebI\3\2\2\2\u01ec\u01ed\b&\1\2\u01ed\u01ee\7$"+
-		"\2\2\u01ee\u01f5\5J&\6\u01ef\u01f5\5j\66\2\u01f0\u01f1\7+\2\2\u01f1\u01f2"+
-		"\5J&\2\u01f2\u01f3\7,\2\2\u01f3\u01f5\3\2\2\2\u01f4\u01ec\3\2\2\2\u01f4"+
-		"\u01ef\3\2\2\2\u01f4\u01f0\3\2\2\2\u01f5\u0201\3\2\2\2\u01f6\u01f7\f\5"+
-		"\2\2\u01f7\u01f8\7\37\2\2\u01f8\u0200\5J&\6\u01f9\u01fa\f\4\2\2\u01fa"+
-		"\u01fb\t\t\2\2\u01fb\u0200\5J&\5\u01fc\u01fd\f\3\2\2\u01fd\u01fe\t\n\2"+
-		"\2\u01fe\u0200\5J&\4\u01ff\u01f6\3\2\2\2\u01ff\u01f9\3\2\2\2\u01ff\u01fc"+
-		"\3\2\2\2\u0200\u0203\3\2\2\2\u0201\u01ff\3\2\2\2\u0201\u0202\3\2\2\2\u0202"+
-		"K\3\2\2\2\u0203\u0201\3\2\2\2\u0204\u0205\5l\67\2\u0205M\3\2\2\2\u0206"+
-		"\u020c\5T+\2\u0207\u020c\5V,\2\u0208\u020c\5X-\2\u0209\u020c\5^\60\2\u020a"+
-		"\u020c\5b\62\2\u020b\u0206\3\2\2\2\u020b\u0207\3\2\2\2\u020b\u0208\3\2"+
-		"\2\2\u020b\u0209\3\2\2\2\u020b\u020a\3\2\2\2\u020cO\3\2\2\2\u020d\u0210"+
-		"\5`\61\2\u020e\u0210\5\\/\2\u020f\u020d\3\2\2\2\u020f\u020e\3\2\2\2\u0210"+
-		"Q\3\2\2\2\u0211\u0212\5Z.\2\u0212S\3\2\2\2\u0213\u0214\7.\2\2\u0214\u0215"+
-		"\7+\2\2\u0215\u0216\5l\67\2\u0216\u0217\7-\2\2\u0217\u0218\7\30\2\2\u0218"+
-		"\u0219\7,\2\2\u0219U\3\2\2\2\u021a\u021b\7/\2\2\u021b\u021c\7+\2\2\u021c"+
-		"\u021d\7\30\2\2\u021d\u021e\7,\2\2\u021eW\3\2\2\2\u021f\u0220\7\60\2\2"+
-		"\u0220\u0221\7+\2\2\u0221\u0222\7\30\2\2\u0222\u0223\7,\2\2\u0223Y\3\2"+
-		"\2\2\u0224\u0225\7\61\2\2\u0225\u0226\7+\2\2\u0226\u0227\7\30\2\2\u0227"+
-		"\u0228\7,\2\2\u0228[\3\2\2\2\u0229\u022a\7\62\2\2\u022a\u022b\7+\2\2\u022b"+
-		"\u022c\7\30\2\2\u022c\u022d\7,\2\2\u022d]\3\2\2\2\u022e\u022f\7\63\2\2"+
-		"\u022f\u0230\7+\2\2\u0230\u0231\7\30\2\2\u0231\u0232\7,\2\2\u0232_\3\2"+
-		"\2\2\u0233\u0234\7\64\2\2\u0234\u0235\7+\2\2\u0235\u0236\7,\2\2\u0236"+
-		"a\3\2\2\2\u0237\u0238\7\65\2\2\u0238\u0239\7+\2\2\u0239\u023a\5d\63\2"+
-		"\u023a\u023b\7,\2\2\u023bc\3\2\2\2\u023c\u023d\b\63\1\2\u023d\u023e\5"+
-		"D#\2\u023e\u0247\3\2\2\2\u023f\u0240\f\4\2\2\u0240\u0241\7\22\2\2\u0241"+
-		"\u0246\5d\63\5\u0242\u0243\f\3\2\2\u0243\u0244\7\23\2\2\u0244\u0246\5"+
-		"d\63\4\u0245\u023f\3\2\2\2\u0245\u0242\3\2\2\2\u0246\u0249\3\2\2\2\u0247"+
-		"\u0245\3\2\2\2\u0247\u0248\3\2\2\2\u0248e\3\2\2\2\u0249\u0247\3\2\2\2"+
-		"\u024a\u024b\t\13\2\2\u024bg\3\2\2\2\u024c\u0251\5f\64\2\u024d\u0251\7"+
-		"A\2\2\u024e\u0251\7\27\2\2\u024f\u0251\5N(\2\u0250\u024c\3\2\2\2\u0250"+
-		"\u024d\3\2\2\2\u0250\u024e\3\2\2\2\u0250\u024f\3\2\2\2\u0251i\3\2\2\2"+
-		"\u0252\u0258\7\26\2\2\u0253\u0258\7\25\2\2\u0254\u0258\7B\2\2\u0255\u0258"+
-		"\7\27\2\2\u0256\u0258\5R*\2\u0257\u0252\3\2\2\2\u0257\u0253\3\2\2\2\u0257"+
-		"\u0254\3\2\2\2\u0257\u0255\3\2\2\2\u0257\u0256\3\2\2\2\u0258k\3\2\2\2"+
-		"\u0259\u025e\7\30\2\2\u025a\u025e\7C\2\2\u025b\u025e\7\27\2\2\u025c\u025e"+
-		"\5P)\2\u025d\u0259\3\2\2\2\u025d\u025a\3\2\2\2\u025d\u025b\3\2\2\2\u025d"+
-		"\u025c\3\2\2\2\u025em\3\2\2\2Lotz~\u0080\u0086\u008b\u0092\u0097\u009d"+
-		"\u00a5\u00aa\u00ae\u00b1\u00b4\u00b9\u00bd\u00c2\u00c7\u00cb\u00ce\u00d3"+
-		"\u00d7\u00dc\u00e4\u00e9\u00ed\u00f0\u00f5\u00fa\u0102\u0107\u010b\u010e"+
-		"\u0113\u0119\u011e\u0123\u012b\u0130\u0136\u013c\u0142\u0148\u014e\u0155"+
-		"\u015f\u0162\u0165\u0169\u0172\u017c\u0188\u018d\u0194\u019b\u01a2\u01a9"+
-		"\u01b2\u01bc\u01cf\u01d7\u01d9\u01e8\u01f4\u01ff\u0201\u020b\u020f\u0245"+
-		"\u0247\u0250\u0257\u025d";
+		"\64\4\65\t\65\4\66\t\66\4\67\t\67\48\t8\49\t9\4:\t:\3\2\5\2v\n\2\3\2\6"+
+		"\2y\n\2\r\2\16\2z\3\2\3\2\3\3\3\3\5\3\u0081\n\3\3\3\3\3\5\3\u0085\n\3"+
+		"\5\3\u0087\n\3\3\4\3\4\6\4\u008b\n\4\r\4\16\4\u008c\3\4\7\4\u0090\n\4"+
+		"\f\4\16\4\u0093\13\4\3\5\3\5\6\5\u0097\n\5\r\5\16\5\u0098\3\5\7\5\u009c"+
+		"\n\5\f\5\16\5\u009f\13\5\3\6\7\6\u00a2\n\6\f\6\16\6\u00a5\13\6\3\6\3\6"+
+		"\3\6\6\6\u00aa\n\6\r\6\16\6\u00ab\3\6\7\6\u00af\n\6\f\6\16\6\u00b2\13"+
+		"\6\3\6\5\6\u00b5\n\6\3\6\5\6\u00b8\n\6\3\6\5\6\u00bb\n\6\3\6\6\6\u00be"+
+		"\n\6\r\6\16\6\u00bf\3\7\3\7\5\7\u00c4\n\7\3\7\6\7\u00c7\n\7\r\7\16\7\u00c8"+
+		"\3\7\7\7\u00cc\n\7\f\7\16\7\u00cf\13\7\3\7\5\7\u00d2\n\7\3\7\5\7\u00d5"+
+		"\n\7\3\7\6\7\u00d8\n\7\r\7\16\7\u00d9\3\b\3\b\5\b\u00de\n\b\3\t\7\t\u00e1"+
+		"\n\t\f\t\16\t\u00e4\13\t\3\t\3\t\3\t\6\t\u00e9\n\t\r\t\16\t\u00ea\3\t"+
+		"\7\t\u00ee\n\t\f\t\16\t\u00f1\13\t\3\t\5\t\u00f4\n\t\3\t\5\t\u00f7\n\t"+
+		"\3\t\6\t\u00fa\n\t\r\t\16\t\u00fb\3\n\7\n\u00ff\n\n\f\n\16\n\u0102\13"+
+		"\n\3\n\3\n\3\n\6\n\u0107\n\n\r\n\16\n\u0108\3\n\7\n\u010c\n\n\f\n\16\n"+
+		"\u010f\13\n\3\n\5\n\u0112\n\n\3\n\5\n\u0115\n\n\3\n\6\n\u0118\n\n\r\n"+
+		"\16\n\u0119\3\n\3\n\3\13\3\13\5\13\u0120\n\13\3\13\6\13\u0123\n\13\r\13"+
+		"\16\13\u0124\3\13\7\13\u0128\n\13\f\13\16\13\u012b\13\13\3\13\3\13\3\f"+
+		"\6\f\u0130\n\f\r\f\16\f\u0131\3\f\7\f\u0135\n\f\f\f\16\f\u0138\13\f\3"+
+		"\r\7\r\u013b\n\r\f\r\16\r\u013e\13\r\3\r\6\r\u0141\n\r\r\r\16\r\u0142"+
+		"\3\16\3\16\7\16\u0147\n\16\f\16\16\16\u014a\13\16\3\16\6\16\u014d\n\16"+
+		"\r\16\16\16\u014e\3\17\3\17\7\17\u0153\n\17\f\17\16\17\u0156\13\17\3\20"+
+		"\3\20\6\20\u015a\n\20\r\20\16\20\u015b\3\21\3\21\3\21\3\22\3\22\3\22\6"+
+		"\22\u0164\n\22\r\22\16\22\u0165\3\22\5\22\u0169\n\22\3\22\5\22\u016c\n"+
+		"\22\3\22\3\22\5\22\u0170\n\22\3\23\3\23\3\23\3\24\3\24\6\24\u0177\n\24"+
+		"\r\24\16\24\u0178\3\25\3\25\3\25\3\26\3\26\3\26\5\26\u0181\n\26\3\27\3"+
+		"\27\3\27\3\27\3\30\3\30\3\30\3\31\3\31\3\31\3\31\3\32\5\32\u018f\n\32"+
+		"\3\32\3\32\3\33\3\33\3\33\3\33\3\33\3\33\3\33\3\33\5\33\u019b\n\33\3\34"+
+		"\3\34\3\34\5\34\u01a0\n\34\3\34\3\34\3\35\3\35\3\35\5\35\u01a7\n\35\3"+
+		"\35\3\35\3\36\3\36\3\36\5\36\u01ae\n\36\3\36\3\36\3\37\3\37\3\37\5\37"+
+		"\u01b5\n\37\3\37\3\37\3 \3 \3 \5 \u01bc\n \3 \3 \3!\3!\3!\7!\u01c3\n!"+
+		"\f!\16!\u01c6\13!\3!\3!\3\"\3\"\3#\3#\3#\5#\u01cf\n#\3#\3#\3$\3$\3%\3"+
+		"%\3%\3%\3&\3&\3&\3&\3&\3&\3&\3&\3&\5&\u01e2\n&\3&\3&\3&\3&\3&\3&\7&\u01ea"+
+		"\n&\f&\16&\u01ed\13&\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\5"+
+		"\'\u01fb\n\'\3(\3(\3)\3)\3)\3)\3)\3)\3)\3)\5)\u0207\n)\3)\3)\3)\3)\3)"+
+		"\3)\3)\3)\3)\7)\u0212\n)\f)\16)\u0215\13)\3*\3*\3+\3+\3+\3+\3+\5+\u021e"+
+		"\n+\3,\3,\5,\u0222\n,\3-\3-\3.\3.\3.\3.\3.\3.\3.\3/\3/\3/\3/\3/\3\60\3"+
+		"\60\3\60\3\60\3\60\3\61\3\61\3\61\3\61\3\61\3\62\3\62\3\62\3\62\3\62\3"+
+		"\63\3\63\3\63\3\63\3\63\3\64\3\64\3\64\3\64\3\65\3\65\3\65\3\65\3\65\3"+
+		"\66\3\66\3\66\3\66\3\66\3\66\3\66\3\66\3\66\7\66\u0258\n\66\f\66\16\66"+
+		"\u025b\13\66\3\67\3\67\38\38\38\38\58\u0263\n8\39\39\39\39\39\59\u026a"+
+		"\n9\3:\3:\3:\3:\5:\u0270\n:\3:\2\5JPj;\2\4\6\b\n\f\16\20\22\24\26\30\32"+
+		"\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjlnpr\2\f\3\2GG\5"+
+		"\2\5\16\22\27GG\3\2\32\33\4\2\32\32 !\4\2\32\32MM\4\2;;?A\3\2(-\3\2#%"+
+		"\3\2&\'\3\2 !\u0299\2u\3\2\2\2\4\u0086\3\2\2\2\6\u0088\3\2\2\2\b\u0094"+
+		"\3\2\2\2\n\u00a3\3\2\2\2\f\u00c1\3\2\2\2\16\u00dd\3\2\2\2\20\u00e2\3\2"+
+		"\2\2\22\u0100\3\2\2\2\24\u011d\3\2\2\2\26\u012f\3\2\2\2\30\u013c\3\2\2"+
+		"\2\32\u0144\3\2\2\2\34\u0150\3\2\2\2\36\u0157\3\2\2\2 \u015d\3\2\2\2\""+
+		"\u0160\3\2\2\2$\u0171\3\2\2\2&\u0174\3\2\2\2(\u017a\3\2\2\2*\u0180\3\2"+
+		"\2\2,\u0182\3\2\2\2.\u0186\3\2\2\2\60\u0189\3\2\2\2\62\u018e\3\2\2\2\64"+
+		"\u019a\3\2\2\2\66\u019c\3\2\2\28\u01a3\3\2\2\2:\u01aa\3\2\2\2<\u01b1\3"+
+		"\2\2\2>\u01b8\3\2\2\2@\u01bf\3\2\2\2B\u01c9\3\2\2\2D\u01cb\3\2\2\2F\u01d2"+
+		"\3\2\2\2H\u01d4\3\2\2\2J\u01e1\3\2\2\2L\u01fa\3\2\2\2N\u01fc\3\2\2\2P"+
+		"\u0206\3\2\2\2R\u0216\3\2\2\2T\u021d\3\2\2\2V\u0221\3\2\2\2X\u0223\3\2"+
+		"\2\2Z\u0225\3\2\2\2\\\u022c\3\2\2\2^\u0231\3\2\2\2`\u0236\3\2\2\2b\u023b"+
+		"\3\2\2\2d\u0240\3\2\2\2f\u0245\3\2\2\2h\u0249\3\2\2\2j\u024e\3\2\2\2l"+
+		"\u025c\3\2\2\2n\u0262\3\2\2\2p\u0269\3\2\2\2r\u026f\3\2\2\2tv\5\4\3\2"+
+		"ut\3\2\2\2uv\3\2\2\2vx\3\2\2\2wy\5\n\6\2xw\3\2\2\2yz\3\2\2\2zx\3\2\2\2"+
+		"z{\3\2\2\2{|\3\2\2\2|}\7\2\2\3}\3\3\2\2\2~\u0080\5\6\4\2\177\u0081\5\b"+
+		"\5\2\u0080\177\3\2\2\2\u0080\u0081\3\2\2\2\u0081\u0087\3\2\2\2\u0082\u0084"+
+		"\5\b\5\2\u0083\u0085\5\6\4\2\u0084\u0083\3\2\2\2\u0084\u0085\3\2\2\2\u0085"+
+		"\u0087\3\2\2\2\u0086~\3\2\2\2\u0086\u0082\3\2\2\2\u0087\5\3\2\2\2\u0088"+
+		"\u008a\7\4\2\2\u0089\u008b\7\5\2\2\u008a\u0089\3\2\2\2\u008b\u008c\3\2"+
+		"\2\2\u008c\u008a\3\2\2\2\u008c\u008d\3\2\2\2\u008d\u0091\3\2\2\2\u008e"+
+		"\u0090\7G\2\2\u008f\u008e\3\2\2\2\u0090\u0093\3\2\2\2\u0091\u008f\3\2"+
+		"\2\2\u0091\u0092\3\2\2\2\u0092\7\3\2\2\2\u0093\u0091\3\2\2\2\u0094\u0096"+
+		"\7\3\2\2\u0095\u0097\7\5\2\2\u0096\u0095\3\2\2\2\u0097\u0098\3\2\2\2\u0098"+
+		"\u0096\3\2\2\2\u0098\u0099\3\2\2\2\u0099\u009d\3\2\2\2\u009a\u009c\7G"+
+		"\2\2\u009b\u009a\3\2\2\2\u009c\u009f\3\2\2\2\u009d\u009b\3\2\2\2\u009d"+
+		"\u009e\3\2\2\2\u009e\t\3\2\2\2\u009f\u009d\3\2\2\2\u00a0\u00a2\5\34\17"+
+		"\2\u00a1\u00a0\3\2\2\2\u00a2\u00a5\3\2\2\2\u00a3\u00a1\3\2\2\2\u00a3\u00a4"+
+		"\3\2\2\2\u00a4\u00a6\3\2\2\2\u00a5\u00a3\3\2\2\2\u00a6\u00a7\7\6\2\2\u00a7"+
+		"\u00a9\5\30\r\2\u00a8\u00aa\7G\2\2\u00a9\u00a8\3\2\2\2\u00aa\u00ab\3\2"+
+		"\2\2\u00ab\u00a9\3\2\2\2\u00ab\u00ac\3\2\2\2\u00ac\u00b0\3\2\2\2\u00ad"+
+		"\u00af\5\32\16\2\u00ae\u00ad\3\2\2\2\u00af\u00b2\3\2\2\2\u00b0\u00ae\3"+
+		"\2\2\2\u00b0\u00b1\3\2\2\2\u00b1\u00b4\3\2\2\2\u00b2\u00b0\3\2\2\2\u00b3"+
+		"\u00b5\5\36\20\2\u00b4\u00b3\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5\u00b7\3"+
+		"\2\2\2\u00b6\u00b8\5 \21\2\u00b7\u00b6\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8"+
+		"\u00ba\3\2\2\2\u00b9\u00bb\5\f\7\2\u00ba\u00b9\3\2\2\2\u00ba\u00bb\3\2"+
+		"\2\2\u00bb\u00bd\3\2\2\2\u00bc\u00be\5\16\b\2\u00bd\u00bc\3\2\2\2\u00be"+
+		"\u00bf\3\2\2\2\u00bf\u00bd\3\2\2\2\u00bf\u00c0\3\2\2\2\u00c0\13\3\2\2"+
+		"\2\u00c1\u00c3\7\7\2\2\u00c2\u00c4\5\30\r\2\u00c3\u00c2\3\2\2\2\u00c3"+
+		"\u00c4\3\2\2\2\u00c4\u00c6\3\2\2\2\u00c5\u00c7\7G\2\2\u00c6\u00c5\3\2"+
+		"\2\2\u00c7\u00c8\3\2\2\2\u00c8\u00c6\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9"+
+		"\u00cd\3\2\2\2\u00ca\u00cc\5\32\16\2\u00cb\u00ca\3\2\2\2\u00cc\u00cf\3"+
+		"\2\2\2\u00cd\u00cb\3\2\2\2\u00cd\u00ce\3\2\2\2\u00ce\u00d1\3\2\2\2\u00cf"+
+		"\u00cd\3\2\2\2\u00d0\u00d2\5\36\20\2\u00d1\u00d0\3\2\2\2\u00d1\u00d2\3"+
+		"\2\2\2\u00d2\u00d4\3\2\2\2\u00d3\u00d5\5 \21\2\u00d4\u00d3\3\2\2\2\u00d4"+
+		"\u00d5\3\2\2\2\u00d5\u00d7\3\2\2\2\u00d6\u00d8\5\"\22\2\u00d7\u00d6\3"+
+		"\2\2\2\u00d8\u00d9\3\2\2\2\u00d9\u00d7\3\2\2\2\u00d9\u00da\3\2\2\2\u00da"+
+		"\r\3\2\2\2\u00db\u00de\5\20\t\2\u00dc\u00de\5\22\n\2\u00dd\u00db\3\2\2"+
+		"\2\u00dd\u00dc\3\2\2\2\u00de\17\3\2\2\2\u00df\u00e1\5\34\17\2\u00e0\u00df"+
+		"\3\2\2\2\u00e1\u00e4\3\2\2\2\u00e2\u00e0\3\2\2\2\u00e2\u00e3\3\2\2\2\u00e3"+
+		"\u00e5\3\2\2\2\u00e4\u00e2\3\2\2\2\u00e5\u00e6\7\b\2\2\u00e6\u00e8\5\30"+
+		"\r\2\u00e7\u00e9\7G\2\2\u00e8\u00e7\3\2\2\2\u00e9\u00ea\3\2\2\2\u00ea"+
+		"\u00e8\3\2\2\2\u00ea\u00eb\3\2\2\2\u00eb\u00ef\3\2\2\2\u00ec\u00ee\5\32"+
+		"\16\2\u00ed\u00ec\3\2\2\2\u00ee\u00f1\3\2\2\2\u00ef\u00ed\3\2\2\2\u00ef"+
+		"\u00f0\3\2\2\2\u00f0\u00f3\3\2\2\2\u00f1\u00ef\3\2\2\2\u00f2\u00f4\5\36"+
+		"\20\2\u00f3\u00f2\3\2\2\2\u00f3\u00f4\3\2\2\2\u00f4\u00f6\3\2\2\2\u00f5"+
+		"\u00f7\5 \21\2\u00f6\u00f5\3\2\2\2\u00f6\u00f7\3\2\2\2\u00f7\u00f9\3\2"+
+		"\2\2\u00f8\u00fa\5\"\22\2\u00f9\u00f8\3\2\2\2\u00fa\u00fb\3\2\2\2\u00fb"+
+		"\u00f9\3\2\2\2\u00fb\u00fc\3\2\2\2\u00fc\21\3\2\2\2\u00fd\u00ff\5\34\17"+
+		"\2\u00fe\u00fd\3\2\2\2\u00ff\u0102\3\2\2\2\u0100\u00fe\3\2\2\2\u0100\u0101"+
+		"\3\2\2\2\u0101\u0103\3\2\2\2\u0102\u0100\3\2\2\2\u0103\u0104\7\t\2\2\u0104"+
+		"\u0106\5\30\r\2\u0105\u0107\7G\2\2\u0106\u0105\3\2\2\2\u0107\u0108\3\2"+
+		"\2\2\u0108\u0106\3\2\2\2\u0108\u0109\3\2\2\2\u0109\u010d\3\2\2\2\u010a"+
+		"\u010c\5\32\16\2\u010b\u010a\3\2\2\2\u010c\u010f\3\2\2\2\u010d\u010b\3"+
+		"\2\2\2\u010d\u010e\3\2\2\2\u010e\u0111\3\2\2\2\u010f\u010d\3\2\2\2\u0110"+
+		"\u0112\5\36\20\2\u0111\u0110\3\2\2\2\u0111\u0112\3\2\2\2\u0112\u0114\3"+
+		"\2\2\2\u0113\u0115\5 \21\2\u0114\u0113\3\2\2\2\u0114\u0115\3\2\2\2\u0115"+
+		"\u0117\3\2\2\2\u0116\u0118\5\"\22\2\u0117\u0116\3\2\2\2\u0118\u0119\3"+
+		"\2\2\2\u0119\u0117\3\2\2\2\u0119\u011a\3\2\2\2\u011a\u011b\3\2\2\2\u011b"+
+		"\u011c\5\24\13\2\u011c\23\3\2\2\2\u011d\u011f\7\n\2\2\u011e\u0120\5\30"+
+		"\r\2\u011f\u011e\3\2\2\2\u011f\u0120\3\2\2\2\u0120\u0122\3\2\2\2\u0121"+
+		"\u0123\7G\2\2\u0122\u0121\3\2\2\2\u0123\u0124\3\2\2\2\u0124\u0122\3\2"+
+		"\2\2\u0124\u0125\3\2\2\2\u0125\u0129\3\2\2\2\u0126\u0128\5\32\16\2\u0127"+
+		"\u0126\3\2\2\2\u0128\u012b\3\2\2\2\u0129\u0127\3\2\2\2\u0129\u012a\3\2"+
+		"\2\2\u012a\u012c\3\2\2\2\u012b\u0129\3\2\2\2\u012c\u012d\5\26\f\2\u012d"+
+		"\25\3\2\2\2\u012e\u0130\7\27\2\2\u012f\u012e\3\2\2\2\u0130\u0131\3\2\2"+
+		"\2\u0131\u012f\3\2\2\2\u0131\u0132\3\2\2\2\u0132\u0136\3\2\2\2\u0133\u0135"+
+		"\7G\2\2\u0134\u0133\3\2\2\2\u0135\u0138\3\2\2\2\u0136\u0134\3\2\2\2\u0136"+
+		"\u0137\3\2\2\2\u0137\27\3\2\2\2\u0138\u0136\3\2\2\2\u0139\u013b\7H\2\2"+
+		"\u013a\u0139\3\2\2\2\u013b\u013e\3\2\2\2\u013c\u013a\3\2\2\2\u013c\u013d"+
+		"\3\2\2\2\u013d\u0140\3\2\2\2\u013e\u013c\3\2\2\2\u013f\u0141\n\2\2\2\u0140"+
+		"\u013f\3\2\2\2\u0141\u0142\3\2\2\2\u0142\u0140\3\2\2\2\u0142\u0143\3\2"+
+		"\2\2\u0143\31\3\2\2\2\u0144\u0148\n\3\2\2\u0145\u0147\n\2\2\2\u0146\u0145"+
+		"\3\2\2\2\u0147\u014a\3\2\2\2\u0148\u0146\3\2\2\2\u0148\u0149\3\2\2\2\u0149"+
+		"\u014c\3\2\2\2\u014a\u0148\3\2\2\2\u014b\u014d\7G\2\2\u014c\u014b\3\2"+
+		"\2\2\u014d\u014e\3\2\2\2\u014e\u014c\3\2\2\2\u014e\u014f\3\2\2\2\u014f"+
+		"\33\3\2\2\2\u0150\u0154\7\5\2\2\u0151\u0153\7G\2\2\u0152\u0151\3\2\2\2"+
+		"\u0153\u0156\3\2\2\2\u0154\u0152\3\2\2\2\u0154\u0155\3\2\2\2\u0155\35"+
+		"\3\2\2\2\u0156\u0154\3\2\2\2\u0157\u0159\7\13\2\2\u0158\u015a\5\62\32"+
+		"\2\u0159\u0158\3\2\2\2\u015a\u015b\3\2\2\2\u015b\u0159\3\2\2\2\u015b\u015c"+
+		"\3\2\2\2\u015c\37\3\2\2\2\u015d\u015e\7\f\2\2\u015e\u015f\5j\66\2\u015f"+
+		"!\3\2\2\2\u0160\u0161\7\r\2\2\u0161\u0163\5\30\r\2\u0162\u0164\7G\2\2"+
+		"\u0163\u0162\3\2\2\2\u0164\u0165\3\2\2\2\u0165\u0163\3\2\2\2\u0165\u0166"+
+		"\3\2\2\2\u0166\u0168\3\2\2\2\u0167\u0169\5*\26\2\u0168\u0167\3\2\2\2\u0168"+
+		"\u0169\3\2\2\2\u0169\u016b\3\2\2\2\u016a\u016c\5$\23\2\u016b\u016a\3\2"+
+		"\2\2\u016b\u016c\3\2\2\2\u016c\u016d\3\2\2\2\u016d\u016f\5&\24\2\u016e"+
+		"\u0170\5(\25\2\u016f\u016e\3\2\2\2\u016f\u0170\3\2\2\2\u0170#\3\2\2\2"+
+		"\u0171\u0172\7\22\2\2\u0172\u0173\5j\66\2\u0173%\3\2\2\2\u0174\u0176\7"+
+		"\23\2\2\u0175\u0177\5\62\32\2\u0176\u0175\3\2\2\2\u0177\u0178\3\2\2\2"+
+		"\u0178\u0176\3\2\2\2\u0178\u0179\3\2\2\2\u0179\'\3\2\2\2\u017a\u017b\7"+
+		"\24\2\2\u017b\u017c\5j\66\2\u017c)\3\2\2\2\u017d\u0181\5,\27\2\u017e\u0181"+
+		"\5.\30\2\u017f\u0181\5\60\31\2\u0180\u017d\3\2\2\2\u0180\u017e\3\2\2\2"+
+		"\u0180\u017f\3\2\2\2\u0181+\3\2\2\2\u0182\u0183\7\16\2\2\u0183\u0184\7"+
+		"\31\2\2\u0184\u0185\7\31\2\2\u0185-\3\2\2\2\u0186\u0187\7\17\2\2\u0187"+
+		"\u0188\5j\66\2\u0188/\3\2\2\2\u0189\u018a\7\20\2\2\u018a\u018b\7\21\2"+
+		"\2\u018b\u018c\5j\66\2\u018c\61\3\2\2\2\u018d\u018f\5J&\2\u018e\u018d"+
+		"\3\2\2\2\u018e\u018f\3\2\2\2\u018f\u0190\3\2\2\2\u0190\u0191\5\64\33\2"+
+		"\u0191\63\3\2\2\2\u0192\u019b\5H%\2\u0193\u019b\5\66\34\2\u0194\u019b"+
+		"\58\35\2\u0195\u019b\5:\36\2\u0196\u019b\5<\37\2\u0197\u019b\5> \2\u0198"+
+		"\u019b\5@!\2\u0199\u019b\5D#\2\u019a\u0192\3\2\2\2\u019a\u0193\3\2\2\2"+
+		"\u019a\u0194\3\2\2\2\u019a\u0195\3\2\2\2\u019a\u0196\3\2\2\2\u019a\u0197"+
+		"\3\2\2\2\u019a\u0198\3\2\2\2\u019a\u0199\3\2\2\2\u019b\65\3\2\2\2\u019c"+
+		"\u019d\7:\2\2\u019d\u019f\7.\2\2\u019e\u01a0\t\4\2\2\u019f\u019e\3\2\2"+
+		"\2\u019f\u01a0\3\2\2\2\u01a0\u01a1\3\2\2\2\u01a1\u01a2\7/\2\2\u01a2\67"+
+		"\3\2\2\2\u01a3\u01a4\79\2\2\u01a4\u01a6\7.\2\2\u01a5\u01a7\t\5\2\2\u01a6"+
+		"\u01a5\3\2\2\2\u01a6\u01a7\3\2\2\2\u01a7\u01a8\3\2\2\2\u01a8\u01a9\7/"+
+		"\2\2\u01a99\3\2\2\2\u01aa\u01ab\7=\2\2\u01ab\u01ad\7.\2\2\u01ac\u01ae"+
+		"\t\5\2\2\u01ad\u01ac\3\2\2\2\u01ad\u01ae\3\2\2\2\u01ae\u01af\3\2\2\2\u01af"+
+		"\u01b0\7/\2\2\u01b0;\3\2\2\2\u01b1\u01b2\7>\2\2\u01b2\u01b4\7.\2\2\u01b3"+
+		"\u01b5\t\5\2\2\u01b4\u01b3\3\2\2\2\u01b4\u01b5\3\2\2\2\u01b5\u01b6\3\2"+
+		"\2\2\u01b6\u01b7\7/\2\2\u01b7=\3\2\2\2\u01b8\u01b9\7<\2\2\u01b9\u01bb"+
+		"\7.\2\2\u01ba\u01bc\t\5\2\2\u01bb\u01ba\3\2\2\2\u01bb\u01bc\3\2\2\2\u01bc"+
+		"\u01bd\3\2\2\2\u01bd\u01be\7/\2\2\u01be?\3\2\2\2\u01bf\u01c0\7B\2\2\u01c0"+
+		"\u01c4\7.\2\2\u01c1\u01c3\5B\"\2\u01c2\u01c1\3\2\2\2\u01c3\u01c6\3\2\2"+
+		"\2\u01c4\u01c2\3\2\2\2\u01c4\u01c5\3\2\2\2\u01c5\u01c7\3\2\2\2\u01c6\u01c4"+
+		"\3\2\2\2\u01c7\u01c8\7/\2\2\u01c8A\3\2\2\2\u01c9\u01ca\t\6\2\2\u01caC"+
+		"\3\2\2\2\u01cb\u01cc\7C\2\2\u01cc\u01ce\7.\2\2\u01cd\u01cf\5J&\2\u01ce"+
+		"\u01cd\3\2\2\2\u01ce\u01cf\3\2\2\2\u01cf\u01d0\3\2\2\2\u01d0\u01d1\7/"+
+		"\2\2\u01d1E\3\2\2\2\u01d2\u01d3\t\7\2\2\u01d3G\3\2\2\2\u01d4\u01d5\5F"+
+		"$\2\u01d5\u01d6\7.\2\2\u01d6\u01d7\7/\2\2\u01d7I\3\2\2\2\u01d8\u01d9\b"+
+		"&\1\2\u01d9\u01da\7\37\2\2\u01da\u01e2\5J&\6\u01db\u01e2\5n8\2\u01dc\u01dd"+
+		"\7.\2\2\u01dd\u01de\5J&\2\u01de\u01df\7/\2\2\u01df\u01e2\3\2\2\2\u01e0"+
+		"\u01e2\5L\'\2\u01e1\u01d8\3\2\2\2\u01e1\u01db\3\2\2\2\u01e1\u01dc\3\2"+
+		"\2\2\u01e1\u01e0\3\2\2\2\u01e2\u01eb\3\2\2\2\u01e3\u01e4\f\4\2\2\u01e4"+
+		"\u01e5\7\35\2\2\u01e5\u01ea\5J&\5\u01e6\u01e7\f\3\2\2\u01e7\u01e8\7\36"+
+		"\2\2\u01e8\u01ea\5J&\4\u01e9\u01e3\3\2\2\2\u01e9\u01e6\3\2\2\2\u01ea\u01ed"+
+		"\3\2\2\2\u01eb\u01e9\3\2\2\2\u01eb\u01ec\3\2\2\2\u01ecK\3\2\2\2\u01ed"+
+		"\u01eb\3\2\2\2\u01ee\u01ef\5P)\2\u01ef\u01f0\5N(\2\u01f0\u01f1\5P)\2\u01f1"+
+		"\u01fb\3\2\2\2\u01f2\u01f3\5R*\2\u01f3\u01f4\5N(\2\u01f4\u01f5\5R*\2\u01f5"+
+		"\u01fb\3\2\2\2\u01f6\u01f7\7.\2\2\u01f7\u01f8\5L\'\2\u01f8\u01f9\7/\2"+
+		"\2\u01f9\u01fb\3\2\2\2\u01fa\u01ee\3\2\2\2\u01fa\u01f2\3\2\2\2\u01fa\u01f6"+
+		"\3\2\2\2\u01fbM\3\2\2\2\u01fc\u01fd\t\b\2\2\u01fdO\3\2\2\2\u01fe\u01ff"+
+		"\b)\1\2\u01ff\u0200\7\'\2\2\u0200\u0207\5P)\6\u0201\u0207\5p9\2\u0202"+
+		"\u0203\7.\2\2\u0203\u0204\5P)\2\u0204\u0205\7/\2\2\u0205\u0207\3\2\2\2"+
+		"\u0206\u01fe\3\2\2\2\u0206\u0201\3\2\2\2\u0206\u0202\3\2\2\2\u0207\u0213"+
+		"\3\2\2\2\u0208\u0209\f\5\2\2\u0209\u020a\7\"\2\2\u020a\u0212\5P)\6\u020b"+
+		"\u020c\f\4\2\2\u020c\u020d\t\t\2\2\u020d\u0212\5P)\5\u020e\u020f\f\3\2"+
+		"\2\u020f\u0210\t\n\2\2\u0210\u0212\5P)\4\u0211\u0208\3\2\2\2\u0211\u020b"+
+		"\3\2\2\2\u0211\u020e\3\2\2\2\u0212\u0215\3\2\2\2\u0213\u0211\3\2\2\2\u0213"+
+		"\u0214\3\2\2\2\u0214Q\3\2\2\2\u0215\u0213\3\2\2\2\u0216\u0217\5r:\2\u0217"+
+		"S\3\2\2\2\u0218\u021e\5Z.\2\u0219\u021e\5\\/\2\u021a\u021e\5^\60\2\u021b"+
+		"\u021e\5d\63\2\u021c\u021e\5h\65\2\u021d\u0218\3\2\2\2\u021d\u0219\3\2"+
+		"\2\2\u021d\u021a\3\2\2\2\u021d\u021b\3\2\2\2\u021d\u021c\3\2\2\2\u021e"+
+		"U\3\2\2\2\u021f\u0222\5f\64\2\u0220\u0222\5b\62\2\u0221\u021f\3\2\2\2"+
+		"\u0221\u0220\3\2\2\2\u0222W\3\2\2\2\u0223\u0224\5`\61\2\u0224Y\3\2\2\2"+
+		"\u0225\u0226\7\61\2\2\u0226\u0227\7.\2\2\u0227\u0228\5r:\2\u0228\u0229"+
+		"\7\60\2\2\u0229\u022a\7\33\2\2\u022a\u022b\7/\2\2\u022b[\3\2\2\2\u022c"+
+		"\u022d\7\62\2\2\u022d\u022e\7.\2\2\u022e\u022f\7\33\2\2\u022f\u0230\7"+
+		"/\2\2\u0230]\3\2\2\2\u0231\u0232\7\63\2\2\u0232\u0233\7.\2\2\u0233\u0234"+
+		"\7\33\2\2\u0234\u0235\7/\2\2\u0235_\3\2\2\2\u0236\u0237\7\64\2\2\u0237"+
+		"\u0238\7.\2\2\u0238\u0239\7\33\2\2\u0239\u023a\7/\2\2\u023aa\3\2\2\2\u023b"+
+		"\u023c\7\65\2\2\u023c\u023d\7.\2\2\u023d\u023e\7\33\2\2\u023e\u023f\7"+
+		"/\2\2\u023fc\3\2\2\2\u0240\u0241\7\66\2\2\u0241\u0242\7.\2\2\u0242\u0243"+
+		"\7\33\2\2\u0243\u0244\7/\2\2\u0244e\3\2\2\2\u0245\u0246\7\67\2\2\u0246"+
+		"\u0247\7.\2\2\u0247\u0248\7/\2\2\u0248g\3\2\2\2\u0249\u024a\78\2\2\u024a"+
+		"\u024b\7.\2\2\u024b\u024c\5j\66\2\u024c\u024d\7/\2\2\u024di\3\2\2\2\u024e"+
+		"\u024f\b\66\1\2\u024f\u0250\5J&\2\u0250\u0259\3\2\2\2\u0251\u0252\f\4"+
+		"\2\2\u0252\u0253\7\25\2\2\u0253\u0258\5j\66\5\u0254\u0255\f\3\2\2\u0255"+
+		"\u0256\7\26\2\2\u0256\u0258\5j\66\4\u0257\u0251\3\2\2\2\u0257\u0254\3"+
+		"\2\2\2\u0258\u025b\3\2\2\2\u0259\u0257\3\2\2\2\u0259\u025a\3\2\2\2\u025a"+
+		"k\3\2\2\2\u025b\u0259\3\2\2\2\u025c\u025d\t\13\2\2\u025dm\3\2\2\2\u025e"+
+		"\u0263\5l\67\2\u025f\u0263\7D\2\2\u0260\u0263\7\32\2\2\u0261\u0263\5T"+
+		"+\2\u0262\u025e\3\2\2\2\u0262\u025f\3\2\2\2\u0262\u0260\3\2\2\2\u0262"+
+		"\u0261\3\2\2\2\u0263o\3\2\2\2\u0264\u026a\7\31\2\2\u0265\u026a\7\30\2"+
+		"\2\u0266\u026a\7E\2\2\u0267\u026a\7\32\2\2\u0268\u026a\5X-\2\u0269\u0264"+
+		"\3\2\2\2\u0269\u0265\3\2\2\2\u0269\u0266\3\2\2\2\u0269\u0267\3\2\2\2\u0269"+
+		"\u0268\3\2\2\2\u026aq\3\2\2\2\u026b\u0270\7\33\2\2\u026c\u0270\7F\2\2"+
+		"\u026d\u0270\7\32\2\2\u026e\u0270\5V,\2\u026f\u026b\3\2\2\2\u026f\u026c"+
+		"\3\2\2\2\u026f\u026d\3\2\2\2\u026f\u026e\3\2\2\2\u0270s\3\2\2\2Muz\u0080"+
+		"\u0084\u0086\u008c\u0091\u0098\u009d\u00a3\u00ab\u00b0\u00b4\u00b7\u00ba"+
+		"\u00bf\u00c3\u00c8\u00cd\u00d1\u00d4\u00d9\u00dd\u00e2\u00ea\u00ef\u00f3"+
+		"\u00f6\u00fb\u0100\u0108\u010d\u0111\u0114\u0119\u011f\u0124\u0129\u0131"+
+		"\u0136\u013c\u0142\u0148\u014e\u0154\u015b\u0165\u0168\u016b\u016f\u0178"+
+		"\u0180\u018e\u019a\u019f\u01a6\u01ad\u01b4\u01bb\u01c4\u01ce\u01e1\u01e9"+
+		"\u01eb\u01fa\u0206\u0211\u0213\u021d\u0221\u0257\u0259\u0262\u0269\u026f";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

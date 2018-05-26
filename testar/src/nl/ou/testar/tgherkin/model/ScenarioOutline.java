@@ -57,6 +57,25 @@ public class ScenarioOutline extends ScenarioDefinition {
     }
     
     @Override
+	public boolean moreActions(ProtocolProxy proxy) {
+		if (currentStep() != null && currentStep().hasNextAction(proxy, examples.getDataTable())) {
+			return true;
+		}else {
+			// search for next step with actions
+			int savedIndex = getIndex();
+			while (hasNextStep()) {
+				nextStep();
+				if (currentStep().hasNextAction(proxy, examples.getDataTable())) {
+					setIndex(savedIndex);
+					return true;
+				}
+			}
+			setIndex(savedIndex);
+			return false;			
+		}
+	}
+    
+    @Override
 	public boolean moreSequences() {
 		return getExamples().moreSequences();
 	}
@@ -70,14 +89,14 @@ public class ScenarioOutline extends ScenarioDefinition {
 	
     @Override
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
-		if (currentStep() != null && currentStep().hasNextAction()) {
+		if (currentStep() != null && currentStep().hasNextAction(proxy,examples.getDataTable())) {
 			// current step has more actions
 			currentStep().nextAction();
 		}else {
 			// search for next step with actions
 			while (hasNextStep()) {
 				nextStep();
-				if (currentStep().hasNextAction()) {
+				if (currentStep().hasNextAction(proxy,examples.getDataTable())) {
 					currentStep().nextAction();
 					break;
 				}

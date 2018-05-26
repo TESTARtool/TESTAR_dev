@@ -1,4 +1,4 @@
-Feature: A user logs out of the system. 
+Feature: Open University - A user logs out of the system. 
     
 Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 	

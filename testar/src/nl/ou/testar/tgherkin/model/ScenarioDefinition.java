@@ -26,7 +26,7 @@ public abstract class ScenarioDefinition {
     private final List<Step> steps;
     private int index;
     
-    /**
+	/**
      * ScenarioDefinition constructor. 
      * @param title given title
      * @param narrative given narrative
@@ -85,20 +85,36 @@ public abstract class ScenarioDefinition {
         return steps;
     }
     
+    /**
+     * Retrieve step index.
+     * @return step index
+     */
+    protected int getIndex() {
+		return index;
+	}
+
+	/**
+	 * Set step index.
+	 * @param index step index
+	 */
+	protected void setIndex(int index) {
+		this.index = index;
+	}
    
     /**
 	 * Check whether more actions exist and proceed to next action if more actions exist.
+	 * @param proxy document protocol proxy
 	 * @return true if more actions exist, otherwise false
 	 */
-	public boolean moreActions() {
-		if (currentStep() != null && currentStep().hasNextAction()) {
+	public boolean moreActions(ProtocolProxy proxy) {
+		if (currentStep() != null && currentStep().hasNextAction(proxy, null)) {
 			return true;
 		}else {
 			// search for next step with actions
 			int savedIndex = index;
 			while (hasNextStep()) {
 				nextStep();
-				if (currentStep().hasNextAction()) {
+				if (currentStep().hasNextAction(proxy, null)) {
 					index = savedIndex;
 					return true;
 				}
@@ -133,14 +149,14 @@ public abstract class ScenarioDefinition {
 	 * @return true if given condition is applicable, otherwise false 
 	 */
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
-		if (currentStep() != null && currentStep().hasNextAction()) {
+		if (currentStep() != null && currentStep().hasNextAction(proxy, null)) {
 			// current step has more actions
 			currentStep().nextAction();
 		}else {
 			// search for next step with actions
 			while (hasNextStep()) {
 				nextStep();
-				if (currentStep().hasNextAction()) {
+				if (currentStep().hasNextAction(proxy, null)) {
 					currentStep().nextAction();
 					break;
 				}

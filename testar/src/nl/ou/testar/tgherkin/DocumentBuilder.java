@@ -15,6 +15,7 @@ import nl.ou.testar.tgherkin.model.HitKeyGesture;
 import nl.ou.testar.tgherkin.model.MouseMoveGesture;
 import nl.ou.testar.tgherkin.model.ParameterBase;
 import nl.ou.testar.tgherkin.model.Parameters;
+import nl.ou.testar.tgherkin.model.ConditionalRepeatingStep;
 import nl.ou.testar.tgherkin.model.AnyGesture;
 import nl.ou.testar.tgherkin.model.Background;
 import nl.ou.testar.tgherkin.model.ClickGesture;
@@ -32,7 +33,7 @@ import nl.ou.testar.tgherkin.model.Scenario;
 import nl.ou.testar.tgherkin.model.ScenarioDefinition;
 import nl.ou.testar.tgherkin.model.ScenarioOutline;
 import nl.ou.testar.tgherkin.model.Step;
-import nl.ou.testar.tgherkin.model.StepRange;
+import nl.ou.testar.tgherkin.model.NumerOfTimesRepeatingStep;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.tgherkin.model.Tag;
@@ -347,10 +348,28 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		if (ctx.thenClause() != null) {
 			thenCondition = visitThenClause(ctx.thenClause());
 		}
-		if (ctx.stepRange() != null) {
-			int fromRange = Integer.valueOf(ctx.stepRange().from.getText());
-			int toRange = Integer.valueOf(ctx.stepRange().to.getText());
-			return new StepRange(title, fromRange, toRange, givenCondition, whenGestures, thenCondition);
+		if (ctx.stepIteration() != null) {
+			if (ctx.stepIteration().stepRange()!=null) {
+				int fromRange = Integer.valueOf(ctx.stepIteration().stepRange().from.getText());
+				int toRange = Integer.valueOf(ctx.stepIteration().stepRange().to.getText());
+				return new NumerOfTimesRepeatingStep(title, fromRange, toRange, givenCondition, whenGestures, thenCondition);
+			}
+			if (ctx.stepIteration().stepWhile()!=null) {
+				widgetConditions = new ArrayList<WidgetCondition>();
+				operatorQueue.add(null);
+				if (ctx.stepIteration().stepWhile().widget_tree_condition() != null) {
+					visit(ctx.stepIteration().stepWhile().widget_tree_condition());
+				}
+				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.WHILE_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenGestures, thenCondition);
+			}
+			if (ctx.stepIteration().stepRepeatUntil()!=null) {
+				widgetConditions = new ArrayList<WidgetCondition>();
+				operatorQueue.add(null);
+				if (ctx.stepIteration().stepRepeatUntil().widget_tree_condition() != null) {
+					visit(ctx.stepIteration().stepRepeatUntil().widget_tree_condition());
+				}
+				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.REPEAT_UNTIL_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenGestures, thenCondition);
+			}
 		}		
 		return new Step(title, givenCondition, whenGestures, thenCondition); 
 	}
@@ -374,7 +393,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		}
 		return new WidgetTreeCondition(widgetConditions); 
 	}
-
+	
 	@Override 
 	public Object visitWidgetCondition(TgherkinParser.WidgetConditionContext ctx) {
 		WidgetCondition.Type  type = operatorQueue.poll();

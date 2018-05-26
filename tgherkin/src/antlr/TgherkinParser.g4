@@ -97,7 +97,7 @@ oracle:
 step : 
  STEP_KEYWORD
  title EOL+
- stepRange?
+ stepIteration?
  givenClause?
  whenClause
  thenClause?;
@@ -108,10 +108,16 @@ whenClause : STEP_WHEN_KEYWORD conditional_gestures+=conditional_gesture+;
 
 thenClause : STEP_THEN_KEYWORD widget_tree_condition;
 
+stepIteration: stepRange | stepWhile | stepRepeatUntil;
+
 stepRange:
  STEP_RANGE_KEYWORD
  from=INTEGER_NUMBER
  to=INTEGER_NUMBER;
+
+stepWhile: STEP_WHILE_KEYWORD widget_tree_condition;
+
+stepRepeatUntil: STEP_REPEAT_KEYWORD STEP_UNTIL_KEYWORD widget_tree_condition;
 
 conditional_gesture:
  widget_condition? 
