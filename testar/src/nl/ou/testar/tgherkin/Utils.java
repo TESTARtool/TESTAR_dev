@@ -3,8 +3,6 @@ package nl.ou.testar.tgherkin;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -164,7 +162,6 @@ public class Utils {
 	 */
 	public static String getXMLXpathExpression(String xpathExpr) {
 		// replace Tgherkin functions 
-		//String workString = xpathExpr.replace("ocr()", "OCR");
 		String result = xpathExpr.replace("ocr()", "OCR");
 		Matcher matcher = imageFilesPattern.matcher(result);
 		while (matcher.find()) {

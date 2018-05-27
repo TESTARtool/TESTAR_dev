@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.fruit.alayer.State;
 import org.fruit.alayer.StdWidget;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.monkey.ConfigTags;
