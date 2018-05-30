@@ -40,10 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import es.upv.staq.testar.CodingManager;
 import org.fruit.Assert;
@@ -137,7 +134,9 @@ public class Settings extends TaggableBase implements Serializable {
 		}else if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<String>();
-			return (T)Arrays.asList(stringValue.split(";"));
+			String stringSeparator = tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
+                    ? "," : ";";
+			return (T)Arrays.asList(stringValue.split(stringSeparator));
 		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<Pair<String, String>>();
@@ -354,38 +353,39 @@ public class Settings extends TaggableBase implements Serializable {
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
 	private void verifySettings() {
-		// verify the abstract state and action settings.
+		// verify the concrete and abstract state settings
 		// the values provided should be allowed by the Coding Manager
+        Set<String> stateSet = new HashSet<>();
+        Set<String> allowedStateAttributes = CodingManager.allowedStateTags.keySet();
+
+        // first the concrete states
 		try {
-			List<String> abstractStateProperties = get(ConfigTags.AbstractStateProperties);
-			for (String abstractStateProperty : abstractStateProperties) {
-				try {
-					CodingManager.allowedAbstractStateTags.valueOf(abstractStateProperty);
-				}
-				catch (IllegalArgumentException ex) {
-					// couldn't find the string in the enum, get it out of here
-					abstractStateProperties.remove(abstractStateProperty);
-				}
+			List<String> concreteStateAttributes = get(ConfigTags.ConcreteStateAttributes);
+			for (String concreteStateAttribute : concreteStateAttributes) {
+                if (allowedStateAttributes.contains(concreteStateAttribute)) {
+                    stateSet.add(concreteStateAttribute);
+                }
 			}
+			set(ConfigTags.ConcreteStateAttributes, new ArrayList<>(stateSet));
 		}
 		catch (NoSuchTagException ex) {
 			// no need to do anything, nothing to verify
 		}
 
-		try {
-			List<String> abstractActionProperties = get(ConfigTags.AbstractActionProperties);
-			for (String abstractActionProperty : abstractActionProperties) {
-				try {
-					CodingManager.allowedAbstractActionTags.valueOf(abstractActionProperty);
-				}
-				catch (IllegalArgumentException ex) {
-					// couldn't find the string in the enum, get it out of here
-					abstractActionProperties.remove(abstractActionProperty);
-				}
-			}
-		}
-		catch (NoSuchTagException ex) {
-			// no need to do anything, nothing to verify
-		}
+        stateSet.clear();
+
+		// then the abstract states
+        try {
+            List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
+            for (String abstractStateAttribute : abstractStateAttributes) {
+                if (allowedStateAttributes.contains(abstractStateAttribute)) {
+                    stateSet.add(abstractStateAttribute);
+                }
+            }
+            set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
+        }
+        catch (NoSuchTagException ex) {
+            // no need to do anything, nothing to verify
+        }
 	}
 }

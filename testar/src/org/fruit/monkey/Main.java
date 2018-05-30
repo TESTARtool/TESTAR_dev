@@ -43,6 +43,7 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
@@ -218,6 +219,37 @@ public class Main {
     });
   }
 
+  private static void initCodingManager(Settings settings) {
+    // we look if there are user-provided custom state tags in the settings
+    // if so, we provide these to the coding manager
+    int i;
+
+    // first the attributes for the concrete state id
+    if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+      i = 0;
+
+      Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+      for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+        concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+      }
+
+      CodingManager.setCustomTagsForConcreteId(concreteTags);
+    }
+
+    // then the attributes for the abstract state id
+    if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+      i = 0;
+
+      Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+      for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+        abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+      }
+
+      CodingManager.setCustomTagsForAbstractId(abstractTags);
+    }
+
+  }
+
   public static void main(String[] args) throws IOException {
     Settings settings = null;
     Locale.setDefault(Locale.ENGLISH);
@@ -253,6 +285,7 @@ public class Main {
     try {
       settings = loadSettings(args, testSettings);
       overrideWithUserProperties(settings);
+      initCodingManager(settings);
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 
       if (SST != null) {
@@ -400,8 +433,8 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
-      defaults.add(Pair.from(AbstractStateProperties, Arrays.asList(CodingManager.allowedAbstractStateTags.ROLE)));
-      defaults.add(Pair.from(AbstractActionProperties, Arrays.asList(CodingManager.allowedAbstractActionTags.ROLE)));
+      defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
+      defaults.add(Pair.from(AbstractStateAttributes, Arrays.asList("ROLE")));
 
 
       //Overwrite the default settings with those from the file
@@ -413,13 +446,13 @@ public class Main {
       settings.set(ConfigTags.PrologActivated, false);
 
       // check that the abstract state properties and the abstract action properties have at least 1 value
-      if (((List<String>)settings.get(AbstractStateProperties)).isEmpty()) {
-        throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave it out of the settings file");
+      if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
       }
 
       // check that the abstract state properties and the abstract action properties have at least 1 value
-      if (((List<String>)settings.get(AbstractActionProperties)).isEmpty()) {
-        throw new ConfigException("Please provide at least 1 valid abstract action attribute or leave it out of the settings file");
+      if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
       }
 
       return settings;

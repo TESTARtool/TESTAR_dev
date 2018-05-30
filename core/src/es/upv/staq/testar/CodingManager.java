@@ -30,6 +30,7 @@
 
 package es.upv.staq.testar;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.zip.CRC32;
 
@@ -81,13 +82,26 @@ public class CodingManager {
 		ActionRoles.KeyUp
 	};
 
-	public enum allowedAbstractStateTags {
-		ROLE, TITLE, PATH, ENABLED
+	private static Tag<?>[] CUSTOM_TAGS_FOR_CONCRETE_ID = new Tag<?>[]{};
+	private static Tag<?>[] CUSTOM_TAGS_FOR_ABSTRACT_ID = new Tag<?>[]{};
+
+
+	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tag) {
+		CUSTOM_TAGS_FOR_CONCRETE_ID = tag;
 	}
 
-	public enum allowedAbstractActionTags {
-		ROLE, TITLE, PATH, ENABLED
+	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tag) {
+		CUSTOM_TAGS_FOR_ABSTRACT_ID = tag;
 	}
+
+	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
+		{
+			put("ROLE", Tags.Role);
+			put("TITLE", Tags.Title);
+			put("PATH", Tags.Path);
+			put("ENABLED", Tags.Enabled);
+		}
+	};
 	
 	// ###########################################
 	//  Widgets/States and Actions IDs management
@@ -111,7 +125,7 @@ public class CodingManager {
 	 */
 	public static synchronized void buildIDs(Widget widget){
 		if (widget.parent() != null){
-			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
+			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CUSTOM_TAGS_FOR_CONCRETE_ID.length == 0 ? CodingManager.TAGS_CONCRETE_ID : CUSTOM_TAGS_FOR_CONCRETE_ID));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
