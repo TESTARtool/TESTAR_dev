@@ -1,6 +1,8 @@
 package nl.ou.testar.tgherkin.protocol;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
 import org.fruit.Util;

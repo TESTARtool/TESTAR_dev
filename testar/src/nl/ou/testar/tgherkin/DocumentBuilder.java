@@ -84,10 +84,11 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		for (TgherkinParser.FeatureContext featureContext : ctx.feature()){
 			Feature feature = visitFeature(featureContext);
 			if (feature != null) {
-				features.add(visitFeature(featureContext));
+				features.add(feature);
 			}
 		}
 		Document document = new Document(features);
+		System.out.println("*** End visitDocument");
 		return document;
 	}
 	
@@ -400,7 +401,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		String code = ctx.getText();
 		WidgetCondition widgetCondition = new WidgetCondition(type, code);
 		widgetConditions.add(widgetCondition);
-		return visitChildren(ctx);
+		return null;
 	}
 
 	@Override 

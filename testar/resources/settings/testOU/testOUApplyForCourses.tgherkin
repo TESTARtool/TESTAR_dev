@@ -1,4 +1,4 @@
-Feature: Open University - A user applies for a master program. 
+Feature: Open University - A user applies for courses. 
     
 Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 
@@ -10,16 +10,22 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
     Step: Press log on button
 	When  $Title="Inloggen" and $Role="UIAButton" click()
 
-  Scenario Outline: A user successfully applies for a master program.
+  Scenario Outline: A user successfully applies for courses.
     Step: Select Studieaanbod
 	When  $Role="UIAText" and $Title="Studieaanbod" click(true)
-    Step: Select master mark
+    Step: Select area
 	When $Role="UIACustomControl" and 
-	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.y") and 
-	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.x") - 1 and
-	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.width")
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.width")
 	click(true)
-    Step: Search for  a selectable master program
+    Step: Select course mark
+	When $Role="UIACustomControl" and 
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.width")
+	click(true)
+    Step: Search for  a selectable course
 	While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
 	When 	!state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)	
 		!state($UIAHasKeyboardFocus) and 
@@ -28,7 +34,7 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 		$Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
 		click(true)
 		$Role="UIAText" and $Title="TOON ALLES" click(true)
-    Step: Select a master program
+    Step: Select a course
 	When $Role="UIAButton" and $Title="KIEZEN" click()
     Step: Select Register (Aanmelden)
 	When $Role="UIAButton" and $Title="AANMELDEN" click()
@@ -113,16 +119,24 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When $Role="UIAEdit" and image("settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
-    # EXEMPTION AND ADMISSION	
-    Step: Enter prior education 
-	When  $Role="UIAEdit" type(<Vooropleiding>)
-    Step: Reset to enable page down
-	When  $Title="Vrijstelling" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls 
-	When hitKey(VK_PAGE_DOWN)	
-    Step: Press No radio buttons
-	Range 3 3 
-	When  $Title="Nee" and $Role="UIARadioButton" and image("settings\testOU\EmptyRadioButton.png") click()
+    # PERSONAL CIRCUMSTANCES
+    Step: Visualize personal circumstances list
+	When  $Role="UIAComboBox" click(true)
+    Step: Select personal circumstance 
+	When hitKey(<Peroonlijke_omstandigheden>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
+    Step: Select continue button
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # PAYMENT METHOD
+    Step: Visualize paymwent method list
+	When  $Role="UIAComboBox" click(true)
+    Step: Select payment method 
+	When hitKey(VK_A)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
+    Step: Enter IBAN
+	When  $Title="Bankrekeningnummer (IBAN)" and $Role="UIAEdit" type(<IBAN>)
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # CONFIRMATION	
@@ -130,11 +144,11 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
     Step: Give Page down to display additional controls 
 	When hitKey(VK_PAGE_DOWN)	
-    Step: Click truthfully filled in mark
+    Step: Click agree with terms and truthfully filled in marks
+	Range 2 2
 	When  $Role="UIACustomControl" and image("settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
 	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
-
     Step: Give Page up to display user controls at the top
 	Range 2 2
 	When hitKey(VK_PAGE_UP)	
@@ -142,6 +156,6 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
-  Examples: Apply for master program data
-|Geboortenaam|Voorvoegsel_geboortenaam|Voornamen|Geboortedatum|Geboorteplaats|Geboorteland|Geslacht|Nationaliteit|Nationaliteit2|Geboortenaam_partner|Voorvoegsel_geboortenaam_partner|Straatnaam|Huisnummer|Huisletter|Huisnummer_toevoeging|Extra_adresregel|Postcode|Plaatsnaam|Land|Netnummer|Abonneenummer|Vooropleiding|
-|User|van|TEST|01-12-1990|Amsterdam|VK_Z|VK_M VK_A VK_N|VK_Z|VK_M VK_A VK_A|Partner|M|Straat|1|A|h|Adresregel|6543XP|Plaats|VK_Z|020|1234567|Geen|
+  Examples: Apply for bachelor program data
+|Geboortenaam|Voorvoegsel_geboortenaam|Voornamen|Geboortedatum|Geboorteplaats|Geboorteland|Geslacht|Nationaliteit|Nationaliteit2|Geboortenaam_partner|Voorvoegsel_geboortenaam_partner|Straatnaam|Huisnummer|Huisletter|Huisnummer_toevoeging|Extra_adresregel|Postcode|Plaatsnaam|Land|Netnummer|Abonneenummer|Peroonlijke_omstandigheden|IBAN|
+|User|van|TEST|01-12-1990|Amsterdam|VK_Z|VK_M VK_A VK_N|VK_Z|VK_M VK_A VK_A|Partner|M|Straat|1|A|h|Adresregel|6543XP|Plaats|VK_Z|020|1234567|VK_G|NL48ABNA0434431559|
