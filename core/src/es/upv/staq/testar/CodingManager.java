@@ -96,10 +96,10 @@ public class CodingManager {
 
 	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
 		{
-			put("ROLE", Tags.Role);
-			put("TITLE", Tags.Title);
-			put("PATH", Tags.Path);
-			put("ENABLED", Tags.Enabled);
+			put("Role", Tags.Role);
+			put("Title", Tags.Title);
+			put("Path", Tags.Path);
+			put("Enabled", Tags.Enabled);
 		}
 	};
 	

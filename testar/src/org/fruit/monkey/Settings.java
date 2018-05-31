@@ -136,7 +136,7 @@ public class Settings extends TaggableBase implements Serializable {
 				return (T) new ArrayList<String>();
 			String stringSeparator = tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
                     ? "," : ";";
-			return (T)Arrays.asList(stringValue.split(stringSeparator));
+			return (T)(Arrays.asList(stringValue.split(stringSeparator)).stream().map(String::trim));
 		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<Pair<String, String>>();
