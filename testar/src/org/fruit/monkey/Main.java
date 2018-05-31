@@ -305,7 +305,8 @@ public class Main {
       LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
     } catch (Throwable t) {
       LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
-      t.printStackTrace(System.out);
+      System.out.println("Main: Exception caught");
+      t.printStackTrace();
       t.printStackTrace(LogSerialiser.getLogStream());
     } finally {
 

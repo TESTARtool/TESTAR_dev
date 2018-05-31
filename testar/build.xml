@@ -10,6 +10,7 @@
 	<property name="coreJarFile"   		location="../core/target/core.jar"/>
 	<property name="nativeJarFile" 		location="../native/target/native.jar"/> <!-- by urueda -->
 	<property name="graphJarFile"  		location="../graph/target/graph.jar"/>
+	<property name="jnativehookJarFile" location="${lib}/JNativeHook.jar"/>
     <property name="jarfile" 	   		value="testar.jar"/>
 
 	<!-- begin by wcoux -->
@@ -91,6 +92,7 @@
 		<copy file="resources/scripts/lux_run.sh" todir="${target}"/>
     	
     	<!-- start by urueda -->
+    	<!--<copy file="resources/windows/x86_64/JNativeHook.dll" todir="${target}"/>-->
     	<copy todir="${target}/lib">
     		<fileset dir="../native/target/resources/" />
     	</copy>
