@@ -27,75 +27,38 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
- 
-/**
- *  @author (base) Sebastian Bauersfeld
- *  Web protocol (generic) authors: urueda, fraalpe2, mimarmu1
- *  @author Urko Rueda Molina (protocol refactor, cleanup and update to last TESTAR version)
- */
+
 import java.io.File;
-
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.Random;
-
-import org.fruit.Assert;
-import org.fruit.Drag; // by urueda
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 import es.upv.staq.testar.NativeLinker;
-
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	
-	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
+	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
+
 	static Role webText; // browser dependent
 	static double browser_toolbar_filter;
-		
+
+	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
 	static double scrollThick = 16; // scroll thickness (iexplorer)
 	
@@ -105,10 +68,8 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
-		
 		super.initialize(settings);
 		initBrowser();
-		
 	}
 	
 	// check browser
@@ -124,10 +85,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
-	protected void beginSequence(){
+	protected void beginSequence(SUT system, State state){
 		
-		super.beginSequence();
-		
+		super.beginSequence(system, state);
+
 	}
 	
 	/**
@@ -178,7 +139,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 */
 	protected Verdict getVerdict(State state){
 		
-		Verdict verdict = super.getVerdict(state); // by urueda
+		Verdict verdict = super.getVerdict(state);
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 		
 		//-----------------------------------------------------------------------------
@@ -203,7 +164,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
+		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -241,7 +202,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		
 	}
 
-	// by urueda
 	@Override
 	protected boolean isClickable(Widget w){
 		if (isAtBrowserCanvas(w))
@@ -250,7 +210,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 			return false;		
 	} 
 
-	// by urueda
 	@Override
 	protected boolean isTypeable(Widget w){
 		if (!isAtBrowserCanvas(w))
@@ -262,8 +221,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		
 		return false;
 	}
-	
-	// by urueda
+
 	private boolean isAtBrowserCanvas(Widget w){
 		Shape shape = w.get(Tags.Shape,null);
 		if (shape != null && shape.y() > browser_toolbar_filter)

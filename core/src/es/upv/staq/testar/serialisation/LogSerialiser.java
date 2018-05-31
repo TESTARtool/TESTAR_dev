@@ -103,7 +103,7 @@ public class LogSerialiser extends Thread {
 		log.flush();
 		log.close();
 		synchronized(log){
-			System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
+			//System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
 			singletonLogSerialiser = null;
 			log.notifyAll();
 		}

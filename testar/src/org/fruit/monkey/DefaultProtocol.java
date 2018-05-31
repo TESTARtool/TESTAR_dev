@@ -114,14 +114,14 @@ public class DefaultProtocol extends AbstractProtocol{
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
 
 	protected void finishSequence(File recordedSequence){
-		System.out.println("Finish sequence");
+		//System.out.println("Finish sequence");
 		this.killTestLaunchedProcesses();
 	}
 	

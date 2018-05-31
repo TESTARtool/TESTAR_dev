@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<TESTAR_inputvalues version="1.0.20170322">
+	<data_types> <!-- note: negative data types are reserved -->
+		<!-- <data type="1" desc="data_type_description" example="example_value"/> -->
+	</data_types>
+	<input_values> <!-- provide a value or list of values for each declared data type -->
+		<!-- <input type="1" value="foo_value"/>
+		<input type="1" value="boo_value"/> -->
+	</input_values>
+</TESTAR_inputvalues>

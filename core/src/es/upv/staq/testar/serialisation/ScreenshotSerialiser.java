@@ -105,7 +105,7 @@ public class ScreenshotSerialiser extends Thread {
 			}
 		}
 		synchronized(testSequenceFolder){
-			System.out.println("ScreenshotSerialiser finished");
+			//System.out.println("ScreenshotSerialiser finished");
 			singletonScreenshotSerialiser = null;
 			testSequenceFolder.notifyAll();
 		}

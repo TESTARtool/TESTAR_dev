@@ -28,67 +28,24 @@
 *******************************************************************************************************/
 
 
-/**
- * A generic desktop protocol
- * @author Urko Rueda Molina
- */
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Assert;
 import org.fruit.Drag;
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.KeyUp;
-import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.DefaultProtocol;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
-import es.upv.staq.testar.CodingManager;
-
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
-import es.upv.staq.testar.NativeLinker;
 
 public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
@@ -110,8 +67,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 	}
 
 	/**
@@ -147,7 +104,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 
 		return super.getState(system);
-
 	}
 
 	/**
@@ -157,7 +113,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Verdict getVerdict(State state){
-
 		// The super methods implements the implicit online state oracles for:
 		// system crashes
 		// non-responsiveness

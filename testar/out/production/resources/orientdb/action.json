@@ -1,0 +1,39 @@
+{
+  "source": { "file": { "path": "action.csv" } },
+  "extractor": { "csv": {} },
+  "transformers": [
+    { "vertex": { "class": "Action","skipDuplicates": true } },
+    { "edge": {
+      "class": "CanExecute",
+      "joinFieldName": "from",
+      "lookup": "State.id",
+      "direction": "out",
+      "skipDuplicates":true,
+      "unresolvedLinkAction": "CREATE"
+    }},
+    {"edge":{
+      "class": "Executes",
+      "joinFieldName": "to",
+      "lookup": "State.id",
+      "direction": "in",
+      "skipDuplicates":true,
+      "unresolvedLinkAction": "CREATE"
+    }}
+  ],
+  "loader": {
+    "orientdb": {
+      "dbURL": "remote:localhost/databases/testar",
+      "serverUser": "root",
+      "serverPassword": "admin",
+      "dbType": "graph",
+      "classes": [
+        {"name": "Action", "extends": "V"},
+        {"name": "CanExecute", "extends": "E"},
+        {"name": "Executes", "extends": "E"}
+      ], "indexes": [
+        {"class":"State", "fields":["id:string"], "type":"UNIQUE" },
+        {"class":"Action", "fields":["id:string"], "type":"UNIQUE" }
+      ]
+    }
+  }
+}

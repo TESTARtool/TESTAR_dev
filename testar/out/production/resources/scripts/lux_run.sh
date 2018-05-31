@@ -1,0 +1,1 @@
+java -ea -server -Xmx2g $* -jar testar.jar | tee console_out.txt
