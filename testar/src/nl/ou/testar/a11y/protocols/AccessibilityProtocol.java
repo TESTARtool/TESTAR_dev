@@ -116,7 +116,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeListItem("Report time: " + Util.dateString("yyyy-MM-dd HH:mm:ss"))
 		.writeListItem("Report type: " +
 				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "On-the-fly"))
-		.writeListItem("Guidelines version: " + evaluator.getImplementationVersion())
+		.writeListItem("Accessibility standard implementation: " + evaluator.getImplementationVersion())
 		.writeListItem("Sequence number: " + sequenceCount())
 		.writeUListEnd();
 	}

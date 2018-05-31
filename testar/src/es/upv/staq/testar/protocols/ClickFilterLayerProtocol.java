@@ -54,6 +54,10 @@ import es.upv.staq.testar.managers.FilteringManager;
 
 public class ClickFilterLayerProtocol extends DefaultProtocol {
 
+
+	//The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
+	//pressing CAPS-LOCK + SHIFT and clicking on the widget
+
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
     private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu

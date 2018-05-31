@@ -87,7 +87,7 @@ public class GeneralPanel extends JPanel {
 
     txtSutPath = new JTextArea();
     txtSutPath.setLineWrap(true);
-    txtSutPath.setToolTipText(suthPathTTT);
+    txtSutPath.setToolTipText(sutPathTTT);
 
     spnNumSequences = new JSpinner();
     spnNumSequences.setBounds(160, 161, 81, 30);
@@ -160,7 +160,7 @@ public class GeneralPanel extends JPanel {
     JButton btnEditProtocol = new JButton("Edit Protocol");
     btnEditProtocol.setBounds(286, 298, 194, 35);
     btnEditProtocol.addActionListener(this::btnEditProtocolActionPerformed);
-    btnEditProtocol.setToolTipText("Edit the protocol");
+    btnEditProtocol.setToolTipText(btnEditProtocolTTT);
     btnEditProtocol.setMaximumSize(new Dimension(160, 35));
     btnEditProtocol.setMinimumSize(new Dimension(160, 35));
     btnEditProtocol.setPreferredSize(new Dimension(160, 35));
