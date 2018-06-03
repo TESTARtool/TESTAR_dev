@@ -374,7 +374,7 @@ public class Grapher implements Runnable {
 			});
 			if (list != null && list.length == 1){
 				String path = prevSeq + "/" + list[0];
-				System.out.println("Resuming previous graph: " + path);
+				//System.out.println("Resuming previous graph: " + path);
 				new Thread(){
 					public void run() {
 						Grapher.GRAPH_LOADING_MOVEMENTS = env.loadFromXML("output/graphs/" + path);
@@ -414,10 +414,10 @@ public class Grapher implements Runnable {
 			System.out.println("<Evolutionary> test generator enabled"); // by urueda
 		} else if (testGenerator.equals(RANDOM_RESTARTS_GENERATOR)){
 			walker = new RandomRestartsWalker(new Random (graphTime), Grapher.testSequenceLength);
-			System.out.println("<Random +> test generator enabled");			
+			System.out.println("<Random +> test generator enabled");
 		} else{ // default: RANDOM_GENERATOR
 			walker = new RandomWalker(new Random(graphTime));
-			System.out.println("<Random> test generator enabled");			
+			//System.out.println("<Random> test generator enabled");
 		}
 
 		if (Grapher.GRAPHS_ACTIVATED){
@@ -448,7 +448,7 @@ public class Grapher implements Runnable {
 	public static String[] getReport(int firstSequenceActionNumber){
 		if (!Grapher.GRAPHS_ACTIVATED)
 			return null;
-		System.out.println("TESTAR sequence graph dump on way ...");
+		//System.out.println("TESTAR sequence graph dump on way ...");
 		try {
 			while (walkStopper != null && walkStopper.continueWalking()){
 				synchronized(walkStopper){
@@ -458,7 +458,7 @@ public class Grapher implements Runnable {
 				}
 			}
 			String[] report = env.getReport(firstSequenceActionNumber);
-			System.out.println("... finished TESTAR sequence graph dump");			
+			//System.out.println("... finished TESTAR sequence graph dump");
 			return report;
 		} catch(java.lang.NullPointerException npe){ // premature test end <- env == null
 			System.out.println("Grapher exception caught:");
@@ -513,7 +513,7 @@ public class Grapher implements Runnable {
 	}
 	
 	private static void resetGrapherFields(){
-		System.out.println("TESTAR grapher reset");
+		//System.out.println("TESTAR grapher reset");
 		movementsFIFO.clear();
 		movementsSync.clear();
 		env = null;

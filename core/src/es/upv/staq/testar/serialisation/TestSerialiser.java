@@ -110,7 +110,7 @@ public class TestSerialiser extends Thread {
 			}
 		}
 		synchronized(test){
-			System.out.println("TestSerialiser finished");
+			//System.out.println("TestSerialiser finished");
 			singletonTestSerialiser = null;
 			test.notifyAll();
 		}
