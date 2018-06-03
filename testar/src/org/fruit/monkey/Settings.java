@@ -51,6 +51,8 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
+import static java.util.stream.Collectors.toList;
+
 public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
@@ -69,12 +71,13 @@ public class Settings extends TaggableBase implements Serializable {
 	public static <T> String print(Tag<T> tag, T value){
 		if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			StringBuilder sb = new StringBuilder();
+			String stringSeparator = getStringSeparator(tag);
 			List<?> l = (List<?>) value;
 			
 			int i = 0;
 			for(Object o : l){
 				if(i > 0)
-					sb.append(';');
+					sb.append(stringSeparator);
 				sb.append(Util.toString(o));
 				i++;
 			}
@@ -134,9 +137,7 @@ public class Settings extends TaggableBase implements Serializable {
 		}else if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<String>();
-			String stringSeparator = tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
-                    ? "," : ";";
-			return (T)(Arrays.asList(stringValue.split(stringSeparator)).stream().map(String::trim));
+			return (T)(Arrays.asList(stringValue.split(getStringSeparator(tag))).stream().map(String::trim).collect(toList()));
 		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<Pair<String, String>>();
@@ -320,6 +321,16 @@ public class Settings extends TaggableBase implements Serializable {
 					+"GraphDBPassword =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# State identifier attributes\n"
+					+"#\n"
+					+"# Specify the widget attributes that you wish to use in constructing\n"
+					+"# the widget and state hash strings. Use a comma separated list.\n"
+					+"# Allowed value are: Role,Path,Title,Enabled\n"
+                    +"#################################################################\n"
+			        +"ConcreteStateAttributes =" + Util.lineSep()
+			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Other more advanced settings\n"
 					+"#################################################################\n");
 
@@ -387,5 +398,10 @@ public class Settings extends TaggableBase implements Serializable {
         catch (NoSuchTagException ex) {
             // no need to do anything, nothing to verify
         }
+	}
+
+	private static String getStringSeparator(Tag<?> tag) {
+		return tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
+				? "," : ";";
 	}
 }

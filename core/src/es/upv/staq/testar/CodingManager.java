@@ -86,12 +86,12 @@ public class CodingManager {
 	private static Tag<?>[] CUSTOM_TAGS_FOR_ABSTRACT_ID = new Tag<?>[]{};
 
 
-	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tag) {
-		CUSTOM_TAGS_FOR_CONCRETE_ID = tag;
+	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
+		CUSTOM_TAGS_FOR_CONCRETE_ID = tags;
 	}
 
-	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tag) {
-		CUSTOM_TAGS_FOR_ABSTRACT_ID = tag;
+	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
+		CUSTOM_TAGS_FOR_ABSTRACT_ID = tags;
 	}
 
 	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {

@@ -434,8 +434,11 @@ public class Main {
       defaults.add(Pair.from(AlwaysCompile, true));
 
       defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
-      defaults.add(Pair.from(AbstractStateAttributes, Arrays.asList("Role")));
-
+      defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+        {
+          add("Role");
+        }
+      }));
 
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
