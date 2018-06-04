@@ -158,6 +158,12 @@ public interface TgherkinParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStepRepeatUntil(TgherkinParser.StepRepeatUntilContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link TgherkinParser#stepNOP}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStepNOP(TgherkinParser.StepNOPContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link TgherkinParser#conditional_gesture}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

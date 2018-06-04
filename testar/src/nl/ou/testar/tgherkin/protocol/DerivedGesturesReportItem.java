@@ -26,7 +26,7 @@ public class DerivedGesturesReportItem extends ReportItem {
 	private static final String REPORT_NAME_PREFIX = "output" + File.separator + "DerivedGestures_";
 	private static final String REPORT_NAME_SUFFIX = ".csv";
 	private Map<Widget, List<Gesture>> gesturesMap;
-	
+	private boolean nopAction;	
 	
 	/**
 	 * Constructor.
@@ -34,8 +34,9 @@ public class DerivedGesturesReportItem extends ReportItem {
 	 * @param sequenceCount sequence number
 	 * @param actionCount action number
 	 * @param gesturesMap map with widget as key and list of gestures as value
+	 * @param nopAction indicates whether a NOP (no operation) action is derived
 	 */
-	public DerivedGesturesReportItem(boolean append, int sequenceCount, int actionCount, Map<Widget, List<Gesture>> gesturesMap) {
+	public DerivedGesturesReportItem(boolean append, int sequenceCount, int actionCount, Map<Widget, List<Gesture>> gesturesMap, boolean nopAction) {
 		super(REPORT_NAME_PREFIX + 
 				sequenceCount + "_" + actionCount + "_" + 
 				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
@@ -44,15 +45,16 @@ public class DerivedGesturesReportItem extends ReportItem {
 				append);
 		// postpone filling of data attribute: fill data from map in the process method that executed in a separate thread.
 		this.gesturesMap = gesturesMap;
+		this.nopAction = nopAction;
 	}
 	
 	@Override
 	public void process() {
-		setData(reportDerivedGestures(gesturesMap));
+		setData(reportDerivedGestures(gesturesMap, nopAction));
 		super.process();
 	}
 	
-	private static String reportDerivedGestures(Map<Widget, List<Gesture>> map) {
+	private static String reportDerivedGestures(Map<Widget, List<Gesture>> map, boolean nopAction) {
 		SortedSet<String> header = new TreeSet<String>();
 		List<SortedMap<String,String>> reportLines = new ArrayList<SortedMap<String,String>>();
 		Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
@@ -78,6 +80,15 @@ public class DerivedGesturesReportItem extends ReportItem {
         		}
         		reportLine.put(gestureName, "Yes");
 			}
+			reportLines.add(reportLine);
+		}
+		if (nopAction) {
+			String columnName = "#NOP"; 
+    		if (!header.contains(columnName)) {
+    			header.add(columnName);
+    		}
+			SortedMap<String,String> reportLine = new TreeMap<String,String>();
+			reportLine.put(columnName, "Yes");
 			reportLines.add(reportLine);
 		}
 		return outputDerivedGestures(header, reportLines);

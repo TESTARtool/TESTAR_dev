@@ -48,6 +48,12 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 * @param settings the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
+		//####TEMP Begin
+		try {
+			PrintStream out = new PrintStream(new FileOutputStream("A3.txt"));
+			System.setOut(out);
+		}catch(Exception e) {};
+		//####TEMP End
 		super.initialize(settings);
 		if (documentExecutionMode()) {
 			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));

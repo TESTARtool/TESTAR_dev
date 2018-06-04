@@ -1,7 +1,5 @@
 package nl.ou.testar.tgherkin.model;
 
-import java.util.List;
-
 /**
  * Step that repeats itself.
  */
@@ -14,11 +12,11 @@ public abstract class RepeatingStep extends Step {
      * RepeatingStep Constructor.
      * @param title summary description
      * @param givenCondition widget tree condition that defines the Given clause
-     * @param whenGestures list of conditional gestures that defines the When clause 
+     * @param whenClause definition of the When clause
      * @param thenCondition widget tree condition that defines the Then clause
      */
-    public RepeatingStep(String title, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
-        super(title, givenCondition, whenGestures, thenCondition);
+    public RepeatingStep(String title, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
+        super(title, givenCondition, whenClause, thenCondition);
     }
 
 	/**

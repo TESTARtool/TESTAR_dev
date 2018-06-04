@@ -156,6 +156,14 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
 		}
 		return visitChildren(ctx);
 	}	
+	
+	@Override 
+	public Object visitStepNOP(TgherkinParser.StepNOPContext ctx) { 
+		if (ctx.STEP_NOP_KEYWORD() != null) {
+			tokenList.add(ctx.STEP_NOP_KEYWORD().getSourceInterval().a);
+		}	
+		return visitChildren(ctx); 
+	}
 
 	@Override 
 	public Object visitWidgetTreeConditionEither(TgherkinParser.WidgetTreeConditionEitherContext ctx) { 

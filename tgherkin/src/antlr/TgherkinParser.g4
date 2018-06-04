@@ -104,7 +104,7 @@ step :
 
 givenClause : STEP_GIVEN_KEYWORD widget_tree_condition;
  
-whenClause : STEP_WHEN_KEYWORD conditional_gestures+=conditional_gesture+;
+whenClause : STEP_WHEN_KEYWORD conditional_gesture+ stepNOP?|STEP_WHEN_KEYWORD stepNOP;
 
 thenClause : STEP_THEN_KEYWORD widget_tree_condition;
 
@@ -118,6 +118,8 @@ stepRange:
 stepWhile: STEP_WHILE_KEYWORD widget_tree_condition;
 
 stepRepeatUntil: STEP_REPEAT_KEYWORD STEP_UNTIL_KEYWORD widget_tree_condition;
+
+stepNOP: STEP_NOP_KEYWORD widget_tree_condition?;
 
 conditional_gesture:
  widget_condition? 

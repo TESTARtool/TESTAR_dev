@@ -138,6 +138,7 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		case TgherkinLexer.STEP_UNTIL_KEYWORD:			
 		case TgherkinLexer.STEP_THEN_KEYWORD:
 		case TgherkinLexer.STEP_WHEN_KEYWORD:
+		case TgherkinLexer.STEP_NOP_KEYWORD:
 			return keywordStyle;
 		case TgherkinLexer.BOOLEAN_VARIABLE:
 		case TgherkinLexer.NUMBER_VARIABLE:

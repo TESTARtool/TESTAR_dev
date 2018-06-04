@@ -39,6 +39,7 @@ import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.tgherkin.model.Tag;
 import nl.ou.testar.tgherkin.model.TripleClickGesture;
 import nl.ou.testar.tgherkin.model.TypeGesture;
+import nl.ou.testar.tgherkin.model.WhenClause;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 
@@ -88,7 +89,6 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			}
 		}
 		Document document = new Document(features);
-		System.out.println("*** End visitDocument");
 		return document;
 	}
 	
@@ -339,11 +339,9 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		if (ctx.givenClause() != null) {
 			givenCondition = visitGivenClause(ctx.givenClause());
 		}
-		List<ConditionalGesture> whenGestures = new ArrayList<ConditionalGesture>();
+		WhenClause whenClause = null;
 		if (ctx.whenClause() != null) {
-			for (TgherkinParser.Conditional_gestureContext  conditionalGestureContext : ctx.whenClause().conditional_gestures) {
-				whenGestures.add(visitConditional_gesture(conditionalGestureContext));
-			}		
+			whenClause = visitWhenClause(ctx.whenClause());
 		}
 		WidgetTreeCondition thenCondition = null;
 		if (ctx.thenClause() != null) {
@@ -353,7 +351,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			if (ctx.stepIteration().stepRange()!=null) {
 				int fromRange = Integer.valueOf(ctx.stepIteration().stepRange().from.getText());
 				int toRange = Integer.valueOf(ctx.stepIteration().stepRange().to.getText());
-				return new NumerOfTimesRepeatingStep(title, fromRange, toRange, givenCondition, whenGestures, thenCondition);
+				return new NumerOfTimesRepeatingStep(title, fromRange, toRange, givenCondition, whenClause, thenCondition);
 			}
 			if (ctx.stepIteration().stepWhile()!=null) {
 				widgetConditions = new ArrayList<WidgetCondition>();
@@ -361,7 +359,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 				if (ctx.stepIteration().stepWhile().widget_tree_condition() != null) {
 					visit(ctx.stepIteration().stepWhile().widget_tree_condition());
 				}
-				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.WHILE_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenGestures, thenCondition);
+				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.WHILE_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenClause, thenCondition);
 			}
 			if (ctx.stepIteration().stepRepeatUntil()!=null) {
 				widgetConditions = new ArrayList<WidgetCondition>();
@@ -369,12 +367,25 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 				if (ctx.stepIteration().stepRepeatUntil().widget_tree_condition() != null) {
 					visit(ctx.stepIteration().stepRepeatUntil().widget_tree_condition());
 				}
-				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.REPEAT_UNTIL_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenGestures, thenCondition);
+				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.REPEAT_UNTIL_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenClause, thenCondition);
 			}
 		}		
-		return new Step(title, givenCondition, whenGestures, thenCondition); 
+		return new Step(title, givenCondition, whenClause, thenCondition); 
 	}
 
+	@Override 
+	public WidgetTreeCondition visitStepNOP(TgherkinParser.StepNOPContext ctx) { 
+		widgetConditions = new ArrayList<WidgetCondition>();
+		operatorQueue.add(null);
+		if (ctx.widget_tree_condition() != null) {
+			visit(ctx.widget_tree_condition());
+		}else {
+			// no condition defined: always true
+			widgetConditions.add(new WidgetCondition("true"));
+		}
+		return new WidgetTreeCondition(widgetConditions); 
+	}
+	
 	@Override 
 	public WidgetTreeCondition visitGivenClause(TgherkinParser.GivenClauseContext ctx) { 
 		widgetConditions = new ArrayList<WidgetCondition>();
@@ -383,6 +394,21 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			visit(ctx.widget_tree_condition());
 		}
 		return new WidgetTreeCondition(widgetConditions); 
+	}
+
+	@Override 
+	public WhenClause visitWhenClause(TgherkinParser.WhenClauseContext ctx) {
+		List<ConditionalGesture> conditionalGestures = new ArrayList<ConditionalGesture>();
+		if (ctx.conditional_gesture() != null) {
+			for (TgherkinParser.Conditional_gestureContext  conditionalGestureContext : ctx.conditional_gesture()) {
+				conditionalGestures.add(visitConditional_gesture(conditionalGestureContext));
+			}		
+		}
+		WidgetTreeCondition nopCondition = null;
+		if (ctx.stepNOP() != null) {
+			nopCondition = visitStepNOP(ctx.stepNOP());
+		}		
+		return new WhenClause(conditionalGestures, nopCondition); 
 	}
 
 	@Override 

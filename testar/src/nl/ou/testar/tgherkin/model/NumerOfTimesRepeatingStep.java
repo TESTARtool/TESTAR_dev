@@ -18,11 +18,11 @@ public class NumerOfTimesRepeatingStep extends RepeatingStep {
      * @param fromRange from range that defines the minimum number of iterations
      * @param toRange to range that defines the maximum number of iterations
      * @param givenCondition widget tree condition that defines the Given clause
-     * @param whenGestures list of conditional gestures that defines the When clause 
+     * @param whenClause definition of the When clause
      * @param thenCondition widget tree condition that defines the Then clause
      */
-    public NumerOfTimesRepeatingStep(String title, int fromRange, int toRange, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
-        super(title, givenCondition, whenGestures, thenCondition);
+    public NumerOfTimesRepeatingStep(String title, int fromRange, int toRange, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
+        super(title, givenCondition, whenClause, thenCondition);
     	this.fromRange = fromRange;
     	this.toRange = toRange;
     }
@@ -84,12 +84,7 @@ public class NumerOfTimesRepeatingStep extends RepeatingStep {
     		result.append("Given ");	
     		result.append(getGivenCondition().toString());
     	}
-    	if (getWhenGestures().size() > 0) {
-    		result.append("When ");
-    	}
-   		for (ConditionalGesture conditionalGesture : getWhenGestures()) {
-   			result.append(conditionalGesture.toString());
-   		}
+    	result.append(getWhenClause().toString());
     	if (getThenCondition() != null) {
     		result.append("Then ");
     		result.append(getThenCondition().toString());

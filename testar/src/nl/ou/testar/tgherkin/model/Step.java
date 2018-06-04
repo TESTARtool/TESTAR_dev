@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,7 +52,7 @@ public class Step {
 
     private final String title;
     private final WidgetTreeCondition givenCondition;
-    private final List<ConditionalGesture> whenGestures;
+    private final WhenClause whenClause;
     private final WidgetTreeCondition thenCondition;
     private boolean running;
 	private Status status;
@@ -66,15 +65,15 @@ public class Step {
      * Step constructor.
      * @param title summary description
      * @param givenCondition widget tree condition that defines the Given clause
-     * @param whenGestures list of conditional gestures that defines the When clause 
+     * @param whenClause definition of the When clause 
      * @param thenCondition widget tree condition that defines the Then clause
      */
-    public Step(String title, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
+    public Step(String title, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
     	Assert.notNull(title);
-    	Assert.notNull(whenGestures);
+    	Assert.notNull(whenClause);
     	this.title = title;
     	this.givenCondition = givenCondition;
-    	this.whenGestures = Collections.unmodifiableList(whenGestures);
+    	this.whenClause = whenClause;
     	this.thenCondition = thenCondition;
     }
 
@@ -86,7 +85,7 @@ public class Step {
         return title;
     }
 
-    /**
+	/**
 	 * Retrieve given condition. 
 	 * @return given condition
 	 */
@@ -96,11 +95,11 @@ public class Step {
 
 
 	/**
-	 * Retrieve when gestures. 
-	 * @return list of when gestures
+	 * Retrieve when clause. 
+	 * @return when clause
 	 */
-	public List<ConditionalGesture> getWhenGestures() {
-		return whenGestures;
+	public WhenClause getWhenClause() {
+		return whenClause;
 	}
 
 
@@ -238,11 +237,19 @@ public class Step {
 	 * @return derived set of actions
 	 */
 	public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable dataTable, boolean mismatchOccurred) {
-		Set<Action> actions = new HashSet<Action>();
+		boolean nopAction = false;
 		if (!retryMode && (!mismatchOccurred || !proxy.getSettings().get(ConfigTags.ContinueToApplyDefault))) {			
 			Map<Widget,List<Gesture>> oldMap = copy(map);
-			evaluateWhenCondition(proxy, map, whenGestures, dataTable);
-			if (map.size() == 0) {
+			if (whenClause.getConditionalGestures().size() > 0) {
+				evaluateWhenCondition(proxy, map, whenClause.getConditionalGestures(), dataTable);
+			}else {
+				// no list of conditional gestures in when clause: only NOP action must have been specified
+				map = new HashMap<Widget, List<Gesture>>();
+			}
+			if (whenClause.getNOPCondition() != null) {
+				nopAction = whenClause.getNOPCondition().evaluate(proxy, dataTable);
+			}
+			if (map.size() == 0 && !nopAction) {
 				if (nrOfRetries >= proxy.getSettings().get(ConfigTags.TgherkinNrOfNOPRetries)) {
 					// current step level execution resulted in mismatch
 					setMismatch(true);
@@ -262,9 +269,14 @@ public class Step {
 			}
 		}
 		if (!retryMode && proxy.getSettings().get(ConfigTags.ReportDerivedGestures)){
-			Reporter.getInstance().report(new DerivedGesturesReportItem(false, proxy.getSequenceCount(), proxy.getActionCount(), map));
+			Reporter.getInstance().report(new DerivedGesturesReportItem(false, proxy.getSequenceCount(), proxy.getActionCount(), map, nopAction));
 		}
 		// generate actions
+		return generateActions(proxy, map, dataTable, nopAction);
+	}
+	
+	private Set<Action> generateActions(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable dataTable, boolean nopAction){
+		Set<Action> actions = new HashSet<Action>();
 		if (retryMode) {
 			actions.add(new NOP());
 		}else {
@@ -279,6 +291,9 @@ public class Step {
 				// store widget 
 				proxy.storeWidget(proxy.getState().get(Tags.ConcreteID), widget);
 			}
+			if (nopAction) {
+				actions.add(new NOP());
+			}			
 		}
 		Report.appendReportDetail(Report.IntegerColumn.WHEN_DERIVED_ACTIONS,actions.size());
 		return actions;
@@ -392,9 +407,7 @@ public class Step {
 		if (getGivenCondition() != null) {
 			list.addAll(getGivenCondition().check(dataTable));
 		}
-   		for (ConditionalGesture conditionalGesture : getWhenGestures()) {
-			list.addAll(conditionalGesture.check(dataTable));
-   		}
+		list.addAll(whenClause.check(dataTable));
 		if (getThenCondition() != null) {
 			list.addAll(getThenCondition().check(dataTable));
 		}
@@ -436,12 +449,7 @@ public class Step {
     		result.append("Given ");	
     		result.append(getGivenCondition().toString());
     	}
-    	if (getWhenGestures().size() > 0) {
-    		result.append("When ");
-    	}
-   		for (ConditionalGesture conditionalGesture : getWhenGestures()) {
-   			result.append(conditionalGesture.toString());
-   		}
+    	result.append(whenClause.toString());
     	if (getThenCondition() != null) {
     		result.append("Then ");
     		result.append(getThenCondition().toString());

@@ -36,6 +36,8 @@ STEP_REPEAT_KEYWORD: 'Repeat' {ignoreEOL=true;ignoreWS=true;};
 
 STEP_UNTIL_KEYWORD: 'until' {ignoreEOL=true;ignoreWS=true;};
 
+STEP_NOP_KEYWORD: 'NOP' ;
+
 STEP_GIVEN_KEYWORD: 'Given' {ignoreEOL=true;ignoreWS=true;};
 
 STEP_WHEN_KEYWORD: 'When' {ignoreEOL=true;ignoreWS=true;};

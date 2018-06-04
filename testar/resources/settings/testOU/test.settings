@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 100
+Sequences = 500
+SequenceLength = 500
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,7 +51,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xception.*
+SuspiciousTitles = 
 
 #################################################################
 # Actionfilter
@@ -93,9 +93,9 @@ GraphDBPassword = testar
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = true
 Reportstate = true
-TgherkinDocument = ./settings/testOU/testOUApplyForCourses.tgherkin
+TgherkinDocument = ./settings/testOU/OU_ATI.tgherkin
 Discount = 0.95
-TgherkinNrOfNOPRetries = 25
+TgherkinNrOfNOPRetries = 100
 TempDir = ./output/temp
 MaxTime = 3.1536E7
 StopGenerationOnFault = true
@@ -124,7 +124,7 @@ ForceToSequenceLength = false
 OutputDir = ./output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 10.0
+StartupTime = 1.0
 ActionDuration = 0.2
 NonReactingUIThreshold = 100
 ContinueToApplyDefault = false
@@ -139,10 +139,10 @@ TgherkinExecutionMode = sequential
 TimeToWaitAfterAction = 0.2
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = ./output/temp
+PathToReplaySequence = D:\\testar\\bin\\output\\sequences\\sequence1
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
-RepeatTgherkinScenarios = false
+RepeatTgherkinScenarios = true
 MinimumPercentageForImageRecognition = 95.0
 OfflineGraphConversion = false

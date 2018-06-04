@@ -31,11 +31,11 @@ public class ConditionalRepeatingStep extends RepeatingStep {
      * @param type type of loop
      * @param loopCondition condition that defines repetition of the step
      * @param givenCondition widget tree condition that defines the Given clause
-     * @param whenGestures list of conditional gestures that defines the When clause 
+     * result.append(getGivenCondition().toString());
      * @param thenCondition widget tree condition that defines the Then clause
      */
-    public ConditionalRepeatingStep(String title, Type type, WidgetTreeCondition loopCondition, WidgetTreeCondition givenCondition, List<ConditionalGesture> whenGestures, WidgetTreeCondition thenCondition) {
-        super(title, givenCondition, whenGestures, thenCondition);
+    public ConditionalRepeatingStep(String title, Type type, WidgetTreeCondition loopCondition, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
+        super(title, givenCondition, whenClause, thenCondition);
         this.type = type;
         this.loopCondition = loopCondition;
     }
@@ -96,12 +96,7 @@ public class ConditionalRepeatingStep extends RepeatingStep {
     		result.append("Given ");	
     		result.append(getGivenCondition().toString());
     	}
-    	if (getWhenGestures().size() > 0) {
-    		result.append("When ");
-    	}
-   		for (ConditionalGesture conditionalGesture : getWhenGestures()) {
-   			result.append(conditionalGesture.toString());
-   		}
+    	result.append(getWhenClause().toString());
     	if (getThenCondition() != null) {
     		result.append("Then ");
     		result.append(getThenCondition().toString());
