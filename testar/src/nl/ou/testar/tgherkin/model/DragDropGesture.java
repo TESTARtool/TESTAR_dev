@@ -82,7 +82,6 @@ public class DragDropGesture extends Gesture {
 			Random random = new Random();
     		int targetNumber  = random.nextInt(targetWidgets.size());
 			Widget targetWidget = targetWidgets.get(targetNumber);
-			widget.get(Tags.Desc,"Desc unknown");
 			actions.add(getAction(widget, targetWidget));
 		}else {
 			for (Widget targetWidget : targetWidgets) {
