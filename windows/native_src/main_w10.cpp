@@ -1540,7 +1540,7 @@ HRESULT GetValuePatternFromElement(IUIAutomationElement *pElement, PATTERNID pat
         hr = pUIAValuePattern->get_CurrentValue(&bstr);
         if (SUCCEEDED(hr) && bstr != NULL) {
             *pValuePattern = bstr;
-            SysFreeString(bstr);
+            //SysFreeString(bstr);
         }
         pUIAValuePattern->Release();
         pUIAValuePattern = NULL;
