@@ -41,18 +41,12 @@ import org.fruit.alayer.Widget;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class WdStateFetcher implements Callable<WdState> {
-
-  public static List<String> ignoredTags =
-      Arrays.asList("script", "noscript", "head", "meta", "style");
-  public static  List<String> hiddenTags = Arrays.asList("canvas");
-
   private static Map<String, String> labelmap;
 
   private final RemoteWebDriver driver;
@@ -65,10 +59,8 @@ public class WdStateFetcher implements Callable<WdState> {
 
   @SuppressWarnings("unchecked")
   public static WdRootElement buildRoot(SUT system) {
-    RemoteWebDriver driver = ((WdDriver) system).getRemoteWebDriver();
-
-    Map<String, Object> packedBody = (Map<String, Object>) driver.executeScript(
-        "return getStateTreeTestar(arguments[0])", ignoredTags);
+    Map<String, Object> packedBody = (Map<String, Object>) WdDriver.executeScript(
+        "return getStateTreeTestar(arguments[0])", Constants.ignoredTags);
 
     WdRootElement wdRoot = new WdRootElement(packedBody);
     wdRoot.isRunning = system.isRunning();
@@ -76,7 +68,7 @@ public class WdStateFetcher implements Callable<WdState> {
     wdRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
     wdRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;
     wdRoot.pid = system.get(Tags.PID);
-    wdRoot.windowHandles = driver.getWindowHandles();
+    wdRoot.windowHandles = WdDriver.getWindowHandles();
 
     return wdRoot;
   }
@@ -103,7 +95,10 @@ public class WdStateFetcher implements Callable<WdState> {
     labelmap = new HashMap<>();
     findAllLabels(labelmap);
 
-    return buildRoot(system);
+    WdRootElement rootElement = buildRoot(system);
+    system.set(Tags.Desc, rootElement.documentTitle);
+
+    return rootElement;
   }
 
   private void findAllLabels(Map<String, String> labelmap) {
@@ -144,7 +139,8 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   private void createWidgetTree(WdWidget parent, WdElement element) {
-    if (!element.enabled || element.blocked) {
+    // TODO Needed?
+    if (!element.enabled) {
       return;
     }
 

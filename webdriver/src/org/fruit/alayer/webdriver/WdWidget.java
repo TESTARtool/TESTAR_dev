@@ -1,6 +1,7 @@
 package org.fruit.alayer.webdriver;
 
 import org.fruit.Drag;
+import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 
@@ -29,6 +30,14 @@ public class WdWidget implements Widget, Serializable {
     if (parent != null) {
       root.connect(parent, this);
     }
+  }
+
+  // TODO Comment
+  public Pair<Double, Double> getClickPosition() {
+    Shape shape = get(Tags.Shape, null);
+    double x = shape.x() + shape.width() / 2 + CanvasDimensions.getCanvasX();
+    double y = shape.y() + shape.height() / 2 + CanvasDimensions.getCanvasY();
+    return Pair.from(x, y);
   }
 
   final public void moveTo(Widget p, int idx) {
@@ -100,37 +109,42 @@ public class WdWidget implements Widget, Serializable {
                           double scrollArrowSize, double scrollThick) {
     // system dependent
     double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - scrollArrowSize * 2;
-    double fixedH;
-    double fixedV;
+    double fromX;
+    double fromY;
+
     // horizontal
     if (scrollOrientation) {
-      fixedH = shape.x() + scrollArrowSize +
+      fromX = shape.x() + scrollArrowSize +
                scrollableSize * scrollPercent / 100.0 +
                (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
-      fixedV = shape.y() + shape.height() - scrollThick / 2;
+      fromY = shape.y() + shape.height() - scrollThick / 2;
     }
     // vertical
     else {
-      fixedH = shape.x() + shape.width() - scrollThick / 2;
-      fixedV = shape.y() + scrollArrowSize +
+      fromX = shape.x() + shape.width() - scrollThick / 2;
+      fromY = shape.y() + scrollArrowSize +
                scrollableSize * scrollPercent / 100.0 +
                (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
     }
+
     int dragC = (int) Math.ceil(100.0 / viewSize) - 1;
     if (dragC < 1) {
       return null;
     }
     double[] emptyDragPoints = calculateScrollDragPoints(dragC,
-        scrollOrientation ? fixedH - shape.x() : fixedV - shape.y(),
+        scrollOrientation ? fromX - shape.x() : fromY - shape.y(),
         scrollableSize / (double) dragC);
+
+    int offsetX = CanvasDimensions.getCanvasX();
+    int offsetY = CanvasDimensions.getCanvasY();
+
     Drag[] drags = new Drag[dragC];
     for (int i = 0; i < dragC; i++) {
-      drags[i] = new Drag(
-          fixedH,
-          fixedV,
-          scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fixedH,
-          scrollOrientation ? fixedV : shape.y() + scrollArrowSize + emptyDragPoints[i]
-      );
+      double toX = scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fromX;
+      double toY = scrollOrientation ? fromY : shape.y() + scrollArrowSize + emptyDragPoints[i];
+
+      drags[i] = new Drag(fromX + offsetX, fromY + offsetY,
+          toX + offsetX, toY + offsetY);
     }
     return drags;
   }
@@ -142,7 +156,7 @@ public class WdWidget implements Widget, Serializable {
       return null;
     }
 
-    Drag[] hDrags = null, vDrags = null;
+    Drag[] hDrags = null;
     boolean hScroll = get(WebHorizontallyScrollable, Boolean.FALSE);
     if (hScroll) {
       double hViewSize = get(WebScrollHorizontalViewSize, Double.MIN_VALUE);
@@ -154,6 +168,8 @@ public class WdWidget implements Widget, Serializable {
         }
       }
     }
+
+    Drag[] vDrags = null;
     boolean vScroll = get(WebVerticallyScrollable, Boolean.FALSE);
     if (vScroll) {
       double vViewSize = get(WebScrollVerticalViewSize, Double.MIN_VALUE);

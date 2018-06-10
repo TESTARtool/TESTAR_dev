@@ -1,12 +1,8 @@
 package org.fruit.alayer.webdriver;
 
 import org.fruit.alayer.Rect;
-import org.openqa.selenium.WebElement;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +11,6 @@ import java.util.Map;
 public class WdElement implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
 
-  // TODO
-  WebElement webElement;
-
   // TODO Access
   List<WdElement> children = new ArrayList<>();
   WdElement parent;
@@ -25,14 +18,13 @@ public class WdElement implements Serializable {
   WdWidget backRef;
 
   // TODO These might need to be fetched
-  boolean blocked = false;
+  public boolean blocked;
   long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
   public String id, name, tagName, textContent, helpText;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
-  public String value, href;
 
   boolean enabled, ignore;
   public boolean isClickable;
@@ -47,7 +39,8 @@ public class WdElement implements Serializable {
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
 
   // Keep these here for fillScrollValues
-  protected String overflow;
+  // TODO Check overflow with Firefox
+  protected String overflowX, overflowY;
   protected long innerWidth, innerHeight;
   protected long clientWidth, clientHeight;
   public long scrollWidth, scrollHeight;
@@ -59,16 +52,17 @@ public class WdElement implements Serializable {
     this.root = root;
     this.parent = parent;
 
-    webElement = (WebElement) packedElement.get("element");
-
     id = (String) packedElement.get("id");
     name = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent"))
         .replaceAll("\\s+", " ").trim();
     helpText = (String) packedElement.get("title");
-    value = String.valueOf(packedElement.getOrDefault("value", ""));
-    href = (String) packedElement.getOrDefault("href", "");
+    valuePattern = (String) packedElement.getOrDefault("href", "");
+    if (valuePattern.equals("")) {
+      valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
+    }
+
     String tmp = (String) packedElement.getOrDefault("cssClasses", "");
     if (tmp != null) {
       cssClasses.addAll(Arrays.asList(tmp.split(" ")));
@@ -80,13 +74,14 @@ public class WdElement implements Serializable {
     fillRect(packedElement);
     fillDimensions(packedElement);
 
+    blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");
-    isKeyboardFocusable = isFocusable();
+    isKeyboardFocusable = getIsFocusable();
     // TODO Check if this works
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
     // TODO Also check for clickable / writeable
-    enabled = !WdStateFetcher.hiddenTags.contains(tagName);
+    enabled = !Constants.hiddenTags.contains(tagName);
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
     }
@@ -97,8 +92,8 @@ public class WdElement implements Serializable {
       // TODO Check if this even happens
       if (wrappedChild != null) {
         WdElement child = new WdElement(wrappedChild, root, this);
-        if (!WdStateFetcher.hiddenTags.contains(child.tagName) &&
-            !WdStateFetcher.ignoredTags.contains(child.tagName)) {
+        if (!Constants.hiddenTags.contains(child.tagName) &&
+            !Constants.ignoredTags.contains(child.tagName)) {
           children.add(child);
         }
       }
@@ -109,15 +104,11 @@ public class WdElement implements Serializable {
   }
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
-    // TODO
-    Utils.logAndEnd();
     oos.defaultWriteObject();
   }
 
   private void readObject(ObjectInputStream ois)
       throws IOException, ClassNotFoundException {
-    // TODO
-    Utils.logAndEnd();
     ois.defaultReadObject();
   }
 
@@ -139,7 +130,7 @@ public class WdElement implements Serializable {
     }
   }
 
-  public boolean isFocusable() {
+  public boolean getIsFocusable() {
     // TODO It's much more complex than this
     // https://allyjs.io/data-tables/focusable.html#document-elements
     // https://allyjs.io/tests/focusable/test.html
@@ -152,28 +143,29 @@ public class WdElement implements Serializable {
   }
 
   protected void fillScrollValues() {
-    scrollPattern = false;
-    vScroll = false;
     hScroll = false;
-    vScrollPercent = 0;
     hScrollPercent = 0;
-    vScrollViewSize = 100;
     hScrollViewSize = 100;
-
-    if (overflow.equals("auto") || overflow.equals("scroll")) {
-      vScroll = scrollHeight > clientHeight;
+    if (overflowX.equals("auto") || overflowX.equals("scroll")) {
       hScroll = scrollWidth > clientWidth;
-      scrollPattern = hScroll || vScroll;
-
-      if (vScroll) {
-        vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
-        vScrollViewSize = 100.0 * clientHeight / scrollHeight;
-      }
       if (hScroll) {
         hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
         hScrollViewSize = 100.0 * clientWidth / scrollWidth;
       }
     }
+
+    vScroll = false;
+    vScrollPercent = 0;
+    vScrollViewSize = 100;
+    if (overflowY.equals("auto") || overflowY.equals("scroll")) {
+      vScroll = scrollHeight > clientHeight;
+      if (vScroll) {
+        vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+        vScrollViewSize = 100.0 * clientHeight / scrollHeight;
+      }
+      }
+
+    scrollPattern = hScroll || vScroll;
   }
 
   public boolean visibleAt(double x, double y) {
@@ -183,8 +175,6 @@ public class WdElement implements Serializable {
   }
 
   public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
-    // TODO Do the obscured stuff??
-
     return visibleAt(x, y);
   }
 
@@ -200,7 +190,9 @@ public class WdElement implements Serializable {
   @SuppressWarnings("unchecked")
   private void fillDimensions(Map<String, Object> packedElement) {
     Map<String, Object> dims = (Map<String, Object>) packedElement.get("dimensions");
-    overflow = (String) dims.get("overflow");
+    overflowX = (String) dims.get("overflowX");
+    overflowY = (String) dims.get("overflowY");
+    // TODO Not used?
     innerWidth = (long) dims.get("innerWidth");
     innerHeight = (long) dims.get("innerHeight");
     clientWidth = (long) dims.get("clientWidth");

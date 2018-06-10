@@ -1,4 +1,4 @@
-function addCanvasTestar(canvasId) {
+function addCanvasTestar() {
     // Only add when needed
     if (typeof testar_canvas !== 'undefined') {
         return;
@@ -6,7 +6,7 @@ function addCanvasTestar(canvasId) {
 
     // Create canvas, get reference to context
     testar_canvas = document.createElement('canvas');
-    testar_canvas.id = canvasId;
+    testar_canvas.id = 'testar_canvas';
     document.body.appendChild(testar_canvas);
     testarCtx = testar_canvas.getContext('2d');
 
@@ -22,14 +22,19 @@ function canvasDimensionsTestar() {
     return [window.screenX,
             window.screenY + window.outerHeight - window.innerHeight,
             document.documentElement.clientWidth,
-            document.documentElement.clientHeight];
+        document.documentElement.clientHeight,
+        window.innerWidth,
+        window.innerHeight
+    ];
 }
 
 function resizeCanvasTestar() {
     testar_canvas.width = document.documentElement.clientWidth;
     testar_canvas.height = document.documentElement.clientHeight;
-    testar_canvas.style.left = document.body.scrollLeft + "px";
-    testar_canvas.style.top = document.body.scrollTop + "px";
+    var scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
+    testar_canvas.style.left = scrollLeft + "px";
+    var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+    testar_canvas.style.top = scrollTop + "px";
 }
 
 function clearCanvasTestar(args) {

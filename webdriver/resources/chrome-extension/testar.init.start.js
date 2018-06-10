@@ -54,14 +54,16 @@ var actualCode = '(' + function () {
         if (this.eventListenerList[a].length === 0)
             delete this.eventListenerList[a];
     };
+
+    // Disallow browser dialogs
+    window.alert = function () {};
+    window.print = function () {};
 } + ')();';
 
 var script = document.createElement('script');
 script.textContent = actualCode;
 (document.head || document.documentElement).appendChild(script);
 script.remove();
-
-window.alert = function() {};
 
 // https://stackoverflow.com/questions/9515704/
 // https://stackoverflow.com/questions/446892/

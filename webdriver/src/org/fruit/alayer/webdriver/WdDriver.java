@@ -6,31 +6,29 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
+import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static org.fruit.Util.pause;
 
 
 public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
 
-  public static RemoteWebDriver getInstance() {
-    return webDriver;
-  }
-
-  // TODO Test on Windows
   private final Keyboard kbd = AWTKeyboard.build();
-  // We need this to be static, see comments in WdMouse
-  private static final Mouse mouse = WdMouse.build();
-
-  public static Mouse getWdMouse() {
-    return mouse;
-  }
+  private final Mouse mouse = WdMouse.build();
 
   private WdDriver(String sutConnector) {
     String[] parts = sutConnector.split(" ");
@@ -42,16 +40,14 @@ public class WdDriver extends SUTBase {
         .usingAnyFreePort()
         .build();
     ChromeOptions options = new ChromeOptions();
-
     String path = System.getProperty("user.dir");
     path = path.substring(0, path.length() - 3) + "chrome-extension";
     options.addArguments("load-extension=" + path);
     options.addArguments("disable-infobars");
-
     webDriver = new ChromeDriver(service, options);
     webDriver.get(url);
 
-    CanvasPosition.startThread(webDriver);
+    CanvasDimensions.startThread();
   }
 
   @Override
@@ -61,7 +57,7 @@ public class WdDriver extends SUTBase {
       webDriver = null;
     }
 
-    CanvasPosition.stopThread();
+    CanvasDimensions.stopThread();
   }
 
   @Override
@@ -76,13 +72,11 @@ public class WdDriver extends SUTBase {
 
   @Override
   public AutomationCache getNativeAutomationCache() {
-    // TODO
     return null;
   }
 
   @Override
   public void setNativeAutomationCache() {
-    Utils.logAndEnd();
   }
 
   public static List<SUT> fromAll() {
@@ -125,12 +119,46 @@ public class WdDriver extends SUTBase {
       // return (T) runningProcesses().iterator();
     }
     else if (tag.equals(Tags.SystemActivator)) {
-      return null;
+      return (T) new WdProcessActivator();
     }
     return null;
   }
 
   public RemoteWebDriver getRemoteWebDriver() {
     return webDriver;
+  }
+
+  /*
+   * Make sure the last tab has focus
+   */
+  public static void activate() {
+    // TODO Remember window handles for each element / widget?
+
+    for (String handle : webDriver.getWindowHandles()) {
+      webDriver.switchTo().window(handle);
+    }
+  }
+
+  public static String getCurrentUrl () {
+    return webDriver.getCurrentUrl();
+  }
+
+  public static Set<String> getWindowHandles() {
+    return webDriver.getWindowHandles();
+  }
+
+  public static Object executeScript(String script, Object... args) {
+    if (webDriver == null) {
+      return null;
+    }
+
+      try {
+        return webDriver.executeScript(script, args);
+      }
+    catch (NoSuchWindowException nswe) {
+      // Make sure we have the last tab
+      activate();
+      return webDriver.executeScript(script, args);
+    }
   }
 }
