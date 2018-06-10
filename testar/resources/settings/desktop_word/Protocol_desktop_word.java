@@ -101,8 +101,8 @@ public class Protocol_desktop_word extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 	}
 	
 	/**

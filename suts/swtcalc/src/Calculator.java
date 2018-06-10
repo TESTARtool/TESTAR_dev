@@ -76,7 +76,7 @@ public class Calculator{
             opReg = -1;
             display = Double.toString(numReg);
         } else if(opReg == Keys.Divide.ordinal()){
-            if(numReg == 0) throw new ArithmeticException("Division by thero!");
+            if(numReg == 0) throw new ArithmeticException("Division by zero!");
             numReg = operandReg / numReg;
             operandReg = 0;
             opReg = -1;
