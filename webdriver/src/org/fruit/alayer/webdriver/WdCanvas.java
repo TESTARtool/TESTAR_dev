@@ -2,21 +2,17 @@ package org.fruit.alayer.webdriver;
 
 import org.fruit.Assert;
 import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.*;
-import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static org.fruit.Util.pause;
 
 
 /**
  * Represents a canvas for a webdriver on which can be painted.
  */
 public class WdCanvas implements Canvas {
-  public static final String canvasId = "testar_canvas";
-
   private static final int textOffsetX = 5;
   private static final int textOffsetY = 15;
-
-  private RemoteWebDriver webDriver = null;
 
   private Pen defaultPen;
   private double fontSize, strokeWidth;
@@ -32,12 +28,12 @@ public class WdCanvas implements Canvas {
 
   @Override
   public double width() {
-    return CanvasPosition.getCanvasWidth();
+    return CanvasDimensions.getCanvasWidth();
   }
 
   @Override
   public double height() {
-    return CanvasPosition.getCanvasHeight();
+    return CanvasDimensions.getCanvasHeight();
   }
 
   @Override
@@ -58,12 +54,11 @@ public class WdCanvas implements Canvas {
   @Override
   public void end() {
     // TODO What ??
-    Util.pause(1);
+    pause(1);
   }
 
   @Override
   public void release() {
-    Utils.logAndEnd();
   }
 
   @Override
@@ -71,7 +66,7 @@ public class WdCanvas implements Canvas {
     check();
 
     Object[] args = new Object[]{x, y, width, height};
-    webDriver.executeScript("clearCanvasTestar(arguments)", args);
+    WdDriver.executeScript("clearCanvasTestar(arguments)", args);
   }
 
   @Override
@@ -81,7 +76,7 @@ public class WdCanvas implements Canvas {
 
     Object[] args = new Object[]{cssColor(), Math.round(fontSize), font, text,
         x + textOffsetX, y + textOffsetY};
-    webDriver.executeScript("drawTextTestar(arguments)", args);
+    WdDriver.executeScript("drawTextTestar(arguments)", args);
   }
 
   @Override
@@ -98,7 +93,7 @@ public class WdCanvas implements Canvas {
     adjustPen(pen);
 
     Object[] args = new Object[]{cssColor(), strokeWidth, x1, y1, x2, y2};
-    webDriver.executeScript("drawLineTestar(arguments)", args);
+    WdDriver.executeScript("drawLineTestar(arguments)", args);
   }
 
   @Override
@@ -109,7 +104,7 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x1, y1, x2, y2, x3, y3};
-    webDriver.executeScript("drawTriangleTestar(arguments)", args);
+    WdDriver.executeScript("drawTriangleTestar(arguments)", args);
   }
 
   @Override
@@ -124,10 +119,13 @@ public class WdCanvas implements Canvas {
     check();
     adjustPen(pen);
 
+    x -= CanvasDimensions.getCanvasX();
+    y -= CanvasDimensions.getCanvasY();
+
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x + width / 2, y + height / 2, width / 2, height / 2};
-    webDriver.executeScript("drawEllipseTestar(arguments)", args);
+    WdDriver.executeScript("drawEllipseTestar(arguments)", args);
   }
 
   @Override
@@ -138,7 +136,7 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fillRect" : "strokeRect";
     Object[] args = new Object[]{
         cssColor(), strokeWidth, fillStroke, x, y, width, height};
-    webDriver.executeScript("drawRectTestar(arguments)", args);
+    WdDriver.executeScript("drawRectTestar(arguments)", args);
   }
 
   @Override
@@ -173,11 +171,16 @@ public class WdCanvas implements Canvas {
 
   // Add the canvas if the page doesn't have one
   private void check() {
-    if (webDriver == null) {
-      webDriver = WdDriver.getInstance();
+    try {
+      WdDriver.executeScript("addCanvasTestar()");
     }
+    catch (Exception e) {
+      // TODO
+      System.out.println();
+      e.printStackTrace();
 
-    // Add canvas if needed
-    webDriver.executeScript("addCanvasTestar(arguments[0])", canvasId);
+      pause(1);
+      check();
+    }
   }
 }

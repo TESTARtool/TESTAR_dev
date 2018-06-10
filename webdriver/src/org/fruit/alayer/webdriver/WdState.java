@@ -204,22 +204,6 @@ public final class WdState extends WdWidget implements State {
     else if (t.equals(WdTags.WebIsKeyboardFocusable)) {
       ret = w.element.isKeyboardFocusable;
     }
-    else if (t.equals(WdTags.WebProviderDescription)) {
-      // TODO
-      // ret = w.element.providerDesc;
-    }
-    else if (t.equals(WdTags.WebWindowInteractionState)) {
-      // TODO
-      //ret = w.element.wndInteractionState;
-    }
-    else if (t.equals(WdTags.WebWindowVisualState)) {
-      // TODO
-      // ret = w.element.wndVisualState;
-    }
-    else if (t.equals(WdTags.WebAutomationId)) {
-      // TODO
-      // ret = w.element.automationId;
-    }
     else if (t.equals(WdTags.WebAcceleratorKey)) {
       ret = w.element.acceleratorKey;
     }

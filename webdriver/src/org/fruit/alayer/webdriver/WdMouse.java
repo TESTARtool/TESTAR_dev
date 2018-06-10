@@ -8,7 +8,7 @@ import java.awt.*;
 
 /*
  * This is a clone of the AWTMouse class for the WebDriver layer.
- * AWTMouse is final, so not possible to extend.
+ * AWTMouse is final, so it's not possible to extend.
  *
  * AbstractProtocol creates its own Mouse object, separate from the native layer.
  * The end Protocol should replace this with the static WdMouse from WdDriver.
@@ -55,7 +55,12 @@ public class WdMouse implements Mouse {
   }
 
   public void setCursor(double x, double y) {
-    robot.mouseMove((int) x, (int) y);
+    int canvasX = (int) Math.max(CanvasDimensions.getCanvasX(), x);
+    canvasX = Math.min(canvasX, CanvasDimensions.getCanvasX() + CanvasDimensions.getInnerWidth());
+    int canvasY = (int) Math.max(CanvasDimensions.getCanvasY(), y);
+    canvasY = Math.min(canvasY, CanvasDimensions.getCanvasY() + CanvasDimensions.getInnerHeight());
+
+    robot.mouseMove(canvasX, canvasY);
   }
 
   public org.fruit.alayer.Point cursor() {
@@ -65,8 +70,8 @@ public class WdMouse implements Mouse {
     }
     java.awt.Point p = info.getLocation();
 
-    int viewportX = p.x - CanvasPosition.getCanvasX();
-    int viewportY = p.y - CanvasPosition.getCanvasY();
+    int viewportX = p.x - CanvasDimensions.getCanvasX();
+    int viewportY = p.y - CanvasDimensions.getCanvasY();
     return org.fruit.alayer.Point.from(viewportX, viewportY);
   }
 }

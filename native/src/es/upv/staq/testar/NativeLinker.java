@@ -31,6 +31,11 @@
 package es.upv.staq.testar;
 
 import org.fruit.alayer.*;
+import org.fruit.alayer.actions.CompoundAction;
+import org.fruit.alayer.actions.KeyDown;
+import org.fruit.alayer.actions.KeyUp;
+import org.fruit.alayer.actions.Wait;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.linux.*;
@@ -459,6 +464,36 @@ public class NativeLinker {
     else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return w.get(AtSpiTags.AtSpiIsFocusable);
     }
+    throw new UnsupportedPlatformException();
+  }
+
+  public static CompoundAction getWdBackAction() {
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS) ||
+        PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+      return new CompoundAction.Builder()
+          .add(new KeyDown(KBKeys.VK_ALT), 1)
+          .add(new KeyDown(KBKeys.VK_LEFT), 1)
+          .add(new KeyUp(KBKeys.VK_LEFT), 1)
+          .add(new KeyUp(KBKeys.VK_ALT), 1)
+          .add(new Wait(3), 1)
+          .build();
+    }
+
+    throw new UnsupportedPlatformException();
+  }
+
+  public static CompoundAction getWdCloseTabAction() {
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS) ||
+        PLATFORM_OS.contains(OperatingSystems.UNIX)) {
+      return new CompoundAction.Builder()
+          .add(new KeyDown(KBKeys.VK_CONTROL), 1)
+          .add(new KeyDown(KBKeys.VK_W), 1)
+          .add(new KeyUp(KBKeys.VK_W), 1)
+          .add(new KeyUp(KBKeys.VK_CONTROL), 1)
+          .add(new Wait(3), 1)
+          .build();
+    }
+
     throw new UnsupportedPlatformException();
   }
 }

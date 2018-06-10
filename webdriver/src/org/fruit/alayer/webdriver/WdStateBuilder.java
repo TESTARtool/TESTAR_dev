@@ -23,29 +23,24 @@ public class WdStateBuilder implements StateBuilder {
   }
 
   @Override
-  public State apply(SUT system) throws StateBuildException {
+  public WdState apply(SUT system) throws StateBuildException {
     try {
       Future<WdState> future = executor.submit(new WdStateFetcher(system));
       return future.get((long) (timeOut), TimeUnit.SECONDS);
     }
-    catch (InterruptedException e) {
-      throw new StateBuildException(e);
-    }
-    catch (ExecutionException e) {
+    catch (InterruptedException | ExecutionException e) {
       e.printStackTrace();
       throw new StateBuildException(e);
     }
     catch (TimeoutException e) {
-      // TODO
       System.out.println();
       e.printStackTrace();
       System.out.println();
-      Utils.logAndEnd();
 
-      WdState ret = new WdState(WdStateFetcher.buildRoot(system));
-      ret.set(Tags.Role, Roles.Process);
-      ret.set(Tags.NotResponding, true);
-      return ret;
+      WdState wdState = new WdState(WdStateFetcher.buildRoot(system));
+      wdState.set(Tags.Role, Roles.Process);
+      wdState.set(Tags.NotResponding, true);
+      return wdState;
     }
   }
 }

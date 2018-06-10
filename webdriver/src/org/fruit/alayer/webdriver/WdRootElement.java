@@ -16,55 +16,27 @@ public class WdRootElement extends WdElement {
   public boolean hasStandardMouse;
   public boolean hasStandardKeyboard;
   public Set<String> windowHandles;
-  public ElementMap tlc;
+  public String documentTitle;
 
   public WdRootElement(Map<String, Object> packedbody) {
     super(packedbody, null, null);
     root = this;
     parent = this;
     windowHandles = new HashSet<>();
-    tlc = ElementMap.newBuilder().build();
-    isForeground = false;
+    isForeground = (Boolean) packedbody.get("documentHasFocus");
+    documentTitle = (String) packedbody.get("documentTitle");
+    blocked = false;
   }
 
   public WdElement at(double x, double y) {
     throw new UnsupportedOperationException();
   }
 
-  public boolean visibleAt(WdElement el, double x, double y) {
-    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
-      return false;
-    }
-
-    WdElement topLevelContainer = tlc.at(x, y);
-    return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
-  }
-
-  public boolean visibleAt(WdElement el, double x, double y, boolean obscuredByChildFeature) {
-    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
-      return false;
-    }
-
-    WdElement topLevelContainer = tlc.at(x, y);
-    return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
-            !obscuredByChildFeature || !obscuredByChildren(el, x, y));
-  }
-
-  private boolean obscuredByChildren(WdElement el, double x, double y) {
-    for (int i = 0; i < el.children.size(); i++) {
-      WdElement child = el.children.get(i);
-      if (child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   protected void fillScrollValues () {
-    hScroll = innerWidth > clientWidth;
-    vScroll = innerHeight > clientHeight;
+    hScroll = scrollWidth > clientWidth;
+    vScroll = scrollHeight > clientHeight;
     scrollPattern = vScroll || hScroll;
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
