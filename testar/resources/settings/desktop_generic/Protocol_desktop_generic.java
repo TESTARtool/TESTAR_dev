@@ -28,95 +28,48 @@
 *******************************************************************************************************/
 
 
-/**
- * A generic desktop protocol
- * @author Urko Rueda Molina
- */
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.fruit.Assert;
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.KeyUp;
-import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.DefaultProtocol;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
-import es.upv.staq.testar.CodingManager;
-
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
-import es.upv.staq.testar.NativeLinker;
 
-public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // DefaultProtocol {
+public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
+	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
 
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
-	 * @param   settings   the current TESTAR settings as specified by the user.
+	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
-
 		super.initialize(settings);
-
 	}
-	
 
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
-	protected void beginSequence(){
-
-		super.beginSequence();
-
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 	}
-	
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -127,6 +80,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	 *      the SUT's configuratio files etc.)
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
+	 *   4) bypassing a login screen by filling the username and password
      * @return  a started SUT, ready to be tested.
 	 */
 	@Override
@@ -137,8 +91,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 		return sut;
 
 	}
-
-
 
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
@@ -152,32 +104,28 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	protected State getState(SUT system) throws StateBuildException{
 
 		return super.getState(system);
-
 	}
 
-
-
 	/**
-	 * This is a helper method used by the default implementation of <code>buildState()</code>
-	 * It examines the SUT's current state and returns an oracle verdict.
+	 * The getVerdict methods implements the online state oracles that
+	 * examine the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
 	protected Verdict getVerdict(State state){
+		// The super methods implements the implicit online state oracles for:
+		// system crashes
+		// non-responsiveness
+		// suspicious titles
+		Verdict verdict = super.getVerdict(state);
 
-		Verdict verdict = super.getVerdict(state); // by urueda
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
-		
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-        //-----------------------------------------------------------------------------
+		//--------------------------------------------------------
+		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
+        //--------------------------------------------------------
 
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-		
 		return verdict;
-		
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -190,59 +138,104 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		Set<Action> actions = super.deriveActions(system,state);
+
+		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
-		//----------------------
-		// BUILD CUSTOM ACTIONS
-		//----------------------
-		
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
-			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						//storeWidget(state.get(Tags.ConcreteID), w);
-						// left clicks
-						if(whiteListed(w) || isClickable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.leftClickAt(w));
-						}
 
-						// type into text boxes
-						if(whiteListed(w) || isTypeable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-						}
-						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+		for(Widget w : state){
+			//optional: iterate through top level widgets based on Z-index:
+			//for(Widget w : getTopWidgets(state)){
 
+			// Only consider enabled and non-blocked widgets
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+				// Do not build actions for widgets on the blacklist
+				// The blackListed widgets are those that have been filtered during the SPY mode with the
+				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+				if (!blackListed(w)){
+
+					//For widgets that are:
+					// - clickable
+					// and
+					// - unFiltered by any of the regular expressions in the Filter-tab, or
+					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					// We want to create actions that consist of left clicking on them
+					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						//Store the widget in the Graphdatabase
+						storeWidget(state.get(Tags.ConcreteID), w);
+						//Create a left click action with the Action Compiler, and add it to the set of derived actions
+						actions.add(ac.leftClickAt(w));
 					}
-				}
-			}			
-			
-		}
-		
-		return actions;
 
+					//For widgets that are:
+					// - typeable
+					// and
+					// - unFiltered by any of the regular expressions in the Filter-tab, or
+					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					// We want to create actions that consist of typing into them
+					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						//Store the widget in the Graphdatabase
+						storeWidget(state.get(Tags.ConcreteID), w);
+						//Create a type action with the Action Compiler, and add it to the set of derived actions
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+					}
+					//Add sliding actions (like scroll, drag and drop) to the derived actions
+					//method defined below.
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+				}
+			}
+		}
+		//return the set of derived actions
+		return actions;
 	}
 
 	/**
-	 * Select one of the possible actions (e.g. at random)
+	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+	 * @param actions
+	 * @param ac
+	 * @param scrollArrowSize
+	 * @param scrollThick
+	 * @param w
+	 */
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
+		Drag[] drags = null;
+		//If there are scroll (drags/drops) actions possible
+		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+			//For each possible drag, create an action and add it to the derived actions
+			for (Drag drag : drags){
+				//Store the widget in the Graphdatabase
+				storeWidget(state.get(Tags.ConcreteID), w);
+				//Create a slide action with the Action Compiler, and add it to the set of derived actions
+				actions.add(ac.slideFromTo(
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+				));
+
+			}
+		}
+	}
+
+	/**
+	 * Select one of the available actions (e.g. at random)
 	 * @param state the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
-
-		return super.selectAction(state, actions);
-
+	protected Action selectAction(State state, Set<Action> actions){
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action a = preSelectAction(state, actions);
+		if (a!= null) {
+			return a;
+		} else
+			//if no preSelected actions are needed, then implement your own strategy
+			return RandomActionSelector.selectAction(actions);
 	}
 
 	/**
@@ -254,44 +247,40 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // Defa
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		
 		return super.executeAction(system, state, action);
-		
 	}
 
 	/**
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
+	 * current sequence. You can stop deriving more actions after:
+	 * - a specified amount of executed actions, which is specified through the SequenceLength setting, or
+	 * - after a specific time, that is set in the MaxTime setting
 	 * @return  if <code>true</code> continue generation, else stop
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-
 		return super.moreActions(state);
-
 	}
 
-	/** 
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	@Override
-	protected void finishSequence(File recordedSequence){
-		
-		super.finishSequence(recordedSequence);
-		
-	}
 
 	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
+	 * TESTAR uses this method to determine when to stop the entire test sequence
+	 * You could stop the test after:
+	 * - a specified amount of sequences, which is specified through the Sequences setting, or
+	 * - after a specific time, that is set in the MaxTime setting
 	 * @return  if <code>true</code> continue test, else stop	 */
 	@Override
 	protected boolean moreSequences() {
-
 		return super.moreSequences();
-
 	}
-	
+
+	/**
+	 * Here you can put graceful shutdown sequence for your SUT
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
+		super.stopSystem(system);
+	}
+
 }
