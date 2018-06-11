@@ -194,7 +194,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
-    
+
+	//TODO is this process handling Windows specific? move to Windows specific protocol
 	protected class ProcessInfo{
 		public SUT sut;
 		public long pid;
@@ -212,6 +213,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	protected List<ProcessInfo> contextRunningProcesses = null;
 
+	//TODO is this process handling Windows specific? move to Windows specific protocol
 	/**
 	 * Retrieve a list of Running processes
 	 * @param debugTag Tag used in debug output
@@ -236,7 +238,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	
 	final static long MAX_KILL_WINDOW = 10000; // 10 seconds
-	
+
+	//TODO is this process handling Windows specific? move to Windows specific protocol
 	protected void killTestLaunchedProcesses(){
 		boolean kill;
 		for (ProcessInfo pi1 : getRunningProcesses("END")){
@@ -252,6 +255,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO is this process handling Windows specific? move to Windows specific protocol
 	/**
 	 * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
 	 * @param sut
@@ -274,6 +278,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return allKilled;
 	}
 
+	//TODO is this process handling Windows specific? move to Windows specific protocol
 	/**
 	 * Kill process with info pi
 	 * @param pi
@@ -302,6 +307,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 
+
+	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
+	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
+	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
+	// event is not recorded as a user event).
 	/**
 	 * Override the default keylistener to implement the TESTAR shortcuts
 	 * SHIFT + SPACE
@@ -313,11 +323,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * SHIFT + ALT
 	 * @param key
 	 */
-	//TODO: Should this method be in the AbstractProtocol? or move somewhere else?
-
-	//TODO: Investigate better shortcut combinations to control TESTAR that does not intefere with
-	// SUT (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
-	// event is not recorded as a user event).
 	@Override
 	public void keyDown(KBKeys key){
 		pressed.add(key);
@@ -372,7 +377,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
 			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 
-		// TODO: Find out if this commented code is anything usefull
+		// TODO: Find out if this commented code is anything useful
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
 			protocolUtil.startAdhocServer();
 			mode = Modes.AdhocTest;
@@ -393,11 +398,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			markParentWidget = !markParentWidget;
 	}
 
+	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
 	@Override
 	public void keyUp(KBKeys key){
 		pressed.remove(key);
 	}
 
+	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
 	/**
 	 * TESTAR does not listen to mouse down clicks in any mode
 	 * @param btn
@@ -407,6 +414,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	@Override
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
+	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
 	/**
 	 * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
 	 * @param btn
@@ -486,6 +494,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
 	}
 
+	//abstract methods for TESTAR flow:
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
 	protected final GraphDB graphDB(){ return graphDB; }
@@ -651,7 +660,16 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-
+	//TODO move away from abstract to SUT visualization
+	/**
+	 * Getting the Z index of a widget targeted by the given action
+	 *
+	 * used only by visualizeActions()
+	 *
+	 * @param state
+	 * @param a
+	 * @return
+	 */
 	private int getTargetZindex(State state, Action a){
 		try{
 			String targetID = a.get(Tags.TargetID);
@@ -664,7 +682,15 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		} catch(NoSuchTagException ex){}
 		return 1; // default
 	}
-	
+
+	//TODO move away from abstract to SUT visualization
+	/**
+	 * Visualizing available actions with colored dots on a canvas on top of SUT
+	 *
+	 * @param canvas
+	 * @param state
+	 * @param actions
+	 */
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		if((mode() == Modes.Spy ||
 			mode() == Modes.GenerateManual ||
@@ -705,6 +731,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO move away from abstract to SUT visualization
+	/**
+	 * Visualizing the selected action with red colored dot
+	 *
+	 * @param canvas
+	 * @param state
+	 * @param action
+	 */
 	private void visualizeSelectedAction(Canvas canvas, State state, Action action){
 		if(mode() == Modes.GenerateDebug || mode() == Modes.ReplayDebug){
 			Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
@@ -727,10 +761,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	// End of all the visualization methods that need to be moved out of the Abstract protocol.
-	// END TODO
 
-
+	//TODO is this process handling Windows specific? move away from abstract
 	/**
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
 	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
@@ -778,6 +810,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			return null;
 	}
 
+	//TODO move to default protocol
 	/**
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
@@ -799,6 +832,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
 
+
+	//TODO move to default protocol
 	protected boolean executeAction(SUT system, State state, Action action){
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		 try{
@@ -820,7 +855,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-
+	//TODO move away from abstract, to Modeling protocol etc
 	/**
 	 * Creates a file out of the given state.
 	 * could be more interesting as XML instead of Java Serialisation
@@ -845,6 +880,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO move away from abstract, to Modeling protocol etc
 	private Action mapUserEvent(State state){
 		Assert.notNull(userEvent);		
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
