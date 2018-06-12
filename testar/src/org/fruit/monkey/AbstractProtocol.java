@@ -132,6 +132,7 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
+//TODO move eventListener out of abstract
 												  IEventListener {
 	
 	public static enum Modes{
@@ -213,7 +214,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	protected List<ProcessInfo> contextRunningProcesses = null;
 
-	//TODO is this process handling Windows specific? move to Windows specific protocol
+	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
 	/**
 	 * Retrieve a list of Running processes
 	 * @param debugTag Tag used in debug output
@@ -239,7 +240,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 	final static long MAX_KILL_WINDOW = 10000; // 10 seconds
 
-	//TODO is this process handling Windows specific? move to Windows specific protocol
+	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
 	protected void killTestLaunchedProcesses(){
 		boolean kill;
 		for (ProcessInfo pi1 : getRunningProcesses("END")){
@@ -255,7 +256,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	//TODO is this process handling Windows specific? move to Windows specific protocol
+	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
 	/**
 	 * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
 	 * @param sut
@@ -278,7 +279,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return allKilled;
 	}
 
-	//TODO is this process handling Windows specific? move to Windows specific protocol
+	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
 	/**
 	 * Kill process with info pi
 	 * @param pi
@@ -309,6 +310,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
+	//TODO move to TestarControlKeyCommands
 	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
 	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
 	// event is not recorded as a user event).
@@ -398,13 +400,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			markParentWidget = !markParentWidget;
 	}
 
-	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	@Override
 	public void keyUp(KBKeys key){
 		pressed.remove(key);
 	}
 
-	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	/**
 	 * TESTAR does not listen to mouse down clicks in any mode
 	 * @param btn
@@ -414,7 +416,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	@Override
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
-	//TODO: jnativehook is platform independent, but move to Default Platform Independent protocol
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	/**
 	 * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
 	 * @param btn
@@ -440,6 +442,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 */
 	public synchronized Modes mode(){ return mode; }
 
+	//TODO think how the modes should be implemented
 	/**
 	 * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
 	 * Show the flashfeedback in the upperleft corner of the screen
@@ -494,6 +497,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
 	}
 
+	//TODO think about creating pre- and post- methods, for example preSelectAction(), postSelectAction()
 	//abstract methods for TESTAR flow:
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
@@ -516,6 +520,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	private String lastPrintParentsOf = "null-id";
 
+	//TODO move to SUTvisualization class
 	/**
 	 *
 	 * @param canvas
@@ -660,7 +665,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	//TODO move away from abstract to SUT visualization
+	//TODO move to SUTvisualization class
 	/**
 	 * Getting the Z index of a widget targeted by the given action
 	 *
@@ -683,7 +688,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return 1; // default
 	}
 
-	//TODO move away from abstract to SUT visualization
+	//TODO move to SUTvisualization class
 	/**
 	 * Visualizing available actions with colored dots on a canvas on top of SUT
 	 *
@@ -731,7 +736,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	//TODO move away from abstract to SUT visualization
+	//TODO move to SUTvisualization class
 	/**
 	 * Visualizing the selected action with red colored dot
 	 *
@@ -762,7 +767,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 
-	//TODO is this process handling Windows specific? move away from abstract
+	//TODO is this process handling Windows specific? move to SystemProcessHandling and call from Default protocol
 	/**
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
 	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
@@ -810,7 +815,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			return null;
 	}
 
-	//TODO move to default protocol
+	//TODO move to default protocol (platform independent?)
 	/**
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
@@ -831,9 +836,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
-
-
-	//TODO move to default protocol
+	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
+	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		 try{
@@ -855,7 +859,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	//TODO move away from abstract, to Modeling protocol etc
+	//TODO move away from abstract, to helper class, call from Default protocol with a setting to turn on/off
 	/**
 	 * Creates a file out of the given state.
 	 * could be more interesting as XML instead of Java Serialisation
@@ -880,7 +884,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-	//TODO move away from abstract, to Modeling protocol etc
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
+	/**
+	 * Records user action (for example for Generate-Manual)
+	 *
+	 * @param state
+	 * @return
+	 */
 	private Action mapUserEvent(State state){
 		Assert.notNull(userEvent);		
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
@@ -919,13 +929,17 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	//TODO: Is this method needed??
 	/**
+	 * This is used for synchronizing the loops of TESTAR between automated and manual (and between two automated loops)
+	 *
 	 * Action execution listeners override.
+	 *
 	 * @param system
 	 * @param state
 	 * @param action
 	 */
 	protected abstract void actionExecuted(SUT system, State state, Action action);
 
+	//TODO move to KeyControl or user action recording
 	private boolean isESC(Action action){
 		Role r = action.get(Tags.Role, null);
 		if (r != null && r.isA(ActionRoles.HitKey)){
@@ -936,6 +950,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return false;
 	}
 
+	//TODO move to KeyControl or user action recording
 	private boolean isNOP(Action action){
 		String as = action.toString();
 		if (as != null && as.equals(NOP.NOP_ID))
@@ -953,6 +968,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private static final long NOP_WAIT_WINDOW = 100; // ms
 	private double sutRAMbase, sutRAMpeak, sutCPUpeak, testRAMpeak, testCPUpeak;
 
+
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
 	/**
 	 * Waits for an user UI action.
 	 * Requirement: Mode must be GenerateManual.
@@ -978,7 +995,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			//cv.end();
 		}		
 	}
-	
+
+
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
 	/**
 	 * Waits for an event (UI action) from adhoc-test.
 	 * @param state
@@ -1032,7 +1051,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		CodingManager.buildIDs(state, actionStatus.getAction());
 		return false;
 	}
-	
+
+	//TODO part of generate loop, move to Default protocol
 	/**
 	 * Waits for an automatically selected UI action.
 	 * @param system
@@ -1080,8 +1100,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return false;
 	}
 	
-	// (refactor run() method)
-	 // return: problems?
+	// TODO move to default protocol
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
 		LOGGER.info("[RA} start runAction");
@@ -1238,6 +1257,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return actionStatus.isProblems();
 	}
 
+	//TODO move to profiler helper
 	private void debugResources(){
 		long nowStamp = System.currentTimeMillis();
 		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;		
@@ -1251,7 +1271,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		lastStamp = nowStamp;
 	}
 
-	// (refactor run() method)
+	// TODO move to default protocol
 	private void runTest(){
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
@@ -1513,6 +1533,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			this.forceToSequenceLengthAfterFail = false;
 	}
 
+	//TODO move to reporting helper etc
+	/**
+	 * Making a log file of a sequence
+	 *
+	 * @param generatedSequence
+	 * @param fileSuffix
+	 * @param page
+	 */
 	private void saveReportPage(String generatedSequence, String fileSuffix, String page){
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
@@ -1527,6 +1555,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 	}
 
+	//TODO move to reporting helper etc
 	private void saveReport(String[] reportPages, String generatedSequence){
 		this.saveReportPage(generatedSequence, "clusters", reportPages[0]);
 		this.saveReportPage(generatedSequence, "testable", reportPages[1]);
@@ -1534,6 +1563,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		this.saveReportPage(generatedSequence, "stats", reportPages[3]);
 	}
 
+	//TODO move to reporting helper etc
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
 		final double sev = verdict.severity();
@@ -1565,6 +1595,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);		
 	}
 
+
+	//TODO move to reporting helper etc
 	private void saveSequenceMetrics(String testSequenceName, boolean problems){
 		if (Grapher.GRAPHS_ACTIVATED){
 			try {
@@ -1631,7 +1663,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			}
 		}
 	}
-	
+
+	/**
+	 * Initializing the TESTAR loop
+	 *
+	 * @param settings
+	 */
 	public final void run(final Settings settings) {		
 		startTime = Util.time();
 		this.settings = settings;
@@ -1691,6 +1728,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO move to default protocol
 	private void replay(){
 		boolean graphsActivated = Grapher.GRAPHS_ACTIVATED;
 		Grapher.GRAPHS_ACTIVATED = false;
