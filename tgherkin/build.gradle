@@ -28,13 +28,8 @@ dependencies {
 }
 
 generateGrammarSource {
-	dependsOn clean	
 	exclude ('**/*Variables.g4')
 	exclude ('**/*Constants.g4')
 	arguments += ['-visitor', '-no-listener', '-long-messages']	
-	outputDirectory = new File('generated-src/nl/ou/testar/tgherkin/gen')
-}
-
-clean{
-  delete "generated-src/nl/ou/testar/tgherkin/gen"
+	outputDirectory = new File(projectDir,'/generated-src/nl/ou/testar/tgherkin/gen')
 }

@@ -92,12 +92,14 @@ public class Protocol_testOU extends DocumentProtocol { // DefaultProtocol {
 	
 
 	/**
+	 * Begin sequence.
+	 * @param system the SUT
+	 * @param state the SUT's current state
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
-	protected void beginSequence(){
-		super.beginSequence();
-
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 	}
 	
 

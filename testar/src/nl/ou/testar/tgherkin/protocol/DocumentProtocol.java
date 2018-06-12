@@ -65,10 +65,12 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	
 	/**
 	 * Begin sequence.
+	 * @param system the SUT
+	 * @param state the SUT's current state
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 		if (documentExecutionMode()) {
 			document.beginSequence();
 		}

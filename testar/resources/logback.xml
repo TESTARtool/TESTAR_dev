@@ -12,16 +12,6 @@
       </Pattern>
     </encoder>
 
-    <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-      <!--<fileNamePattern>archived/debug.%d{yyyy-MM-dd}.%i.log-->
-      <!--</fileNamePattern>-->
-      <!--<timeBasedFileNamingAndTriggeringPolicy-->
-              <!--class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
-        <!--<maxFileSize>10MB</maxFileSize>-->
-      <!--</timeBasedFileNamingAndTriggeringPolicy>-->
-    <!--</rollingPolicy>-->
-
-      <!-- NEW SizeAndTimeBasedRollingPolicy -->
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <fileNamePattern>archived/debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
         <maxFileSize>10MB</maxFileSize>    
