@@ -68,7 +68,6 @@ public class WdStateFetcher implements Callable<WdState> {
     wdRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
     wdRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;
     wdRoot.pid = system.get(Tags.PID);
-    wdRoot.windowHandles = WdDriver.getWindowHandles();
 
     return wdRoot;
   }

@@ -34,6 +34,20 @@ public class WdDriver extends SUTBase {
     String[] parts = sutConnector.split(" ");
     String driverPath = parts[0].replace("\"", "");
     String url = parts[parts.length - 1].replace("\"", "");
+    Dimension screenDimensions = null;
+    Point screenPosition = null;
+    if (parts.length == 3) {
+      String tmp = parts[1].replace("\"", "").toLowerCase();
+      String[] dims = tmp.split("\\+")[0].split("x");
+      screenDimensions =
+          new Dimension(Integer.valueOf(dims[0]), Integer.valueOf(dims[1]));
+      try {
+        screenPosition = new Point(Integer.valueOf(tmp.split("\\+")[1]),
+            Integer.valueOf(tmp.split("\\+")[2]));
+      } catch (ArrayIndexOutOfBoundsException aioobe) {
+
+      }
+    }
 
     ChromeDriverService service = new ChromeDriverService.Builder()
         .usingDriverExecutable(new File(driverPath))
@@ -45,6 +59,14 @@ public class WdDriver extends SUTBase {
     options.addArguments("load-extension=" + path);
     options.addArguments("disable-infobars");
     webDriver = new ChromeDriver(service, options);
+
+    if (screenDimensions != null) {
+      webDriver.manage().window().setSize(screenDimensions);
+    }
+    if (screenPosition != null) {
+      webDriver.manage().window().setPosition(screenPosition);
+    }
+
     webDriver.get(url);
 
     CanvasDimensions.startThread();
@@ -139,7 +161,7 @@ public class WdDriver extends SUTBase {
     }
   }
 
-  public static String getCurrentUrl () {
+  public static String getCurrentUrl() {
     return webDriver.getCurrentUrl();
   }
 
@@ -152,10 +174,9 @@ public class WdDriver extends SUTBase {
       return null;
     }
 
-      try {
-        return webDriver.executeScript(script, args);
-      }
-    catch (NoSuchWindowException nswe) {
+    try {
+      return webDriver.executeScript(script, args);
+    } catch (NoSuchWindowException nswe) {
       // Make sure we have the last tab
       activate();
       return webDriver.executeScript(script, args);

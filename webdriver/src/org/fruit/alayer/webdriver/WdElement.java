@@ -45,10 +45,10 @@ public class WdElement implements Serializable {
   protected long clientWidth, clientHeight;
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
-  
+
   @SuppressWarnings("unchecked")
-  public WdElement (Map<String, Object> packedElement,
-                    WdRootElement root, WdElement parent) {
+  public WdElement(Map<String, Object> packedElement,
+                   WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
@@ -59,7 +59,7 @@ public class WdElement implements Serializable {
         .replaceAll("\\s+", " ").trim();
     helpText = (String) packedElement.get("title");
     valuePattern = (String) packedElement.getOrDefault("href", "");
-    if (valuePattern.equals("")) {
+    if (valuePattern == null || valuePattern.equals("")) {
       valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
     }
 
@@ -113,7 +113,7 @@ public class WdElement implements Serializable {
   }
 
   // TODO Check if this is correct
-  private void setName () {
+  private void setName() {
     Map<String, String> labelmap = WdStateFetcher.getLabelmap();
 
     if (labelmap.get(name) != null) {
@@ -143,27 +143,18 @@ public class WdElement implements Serializable {
   }
 
   protected void fillScrollValues() {
-    hScroll = false;
-    hScrollPercent = 0;
-    hScrollViewSize = 100;
-    if (overflowX.equals("auto") || overflowX.equals("scroll")) {
-      hScroll = scrollWidth > clientWidth;
-      if (hScroll) {
-        hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
-        hScrollViewSize = 100.0 * clientWidth / scrollWidth;
-      }
+    List<String> scrollOn = Arrays.asList("auto", "scroll", "visible");
+    hScroll = scrollOn.contains(overflowX) && scrollWidth > clientWidth;
+    if (scrollWidth != clientWidth) {
+      hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
     }
+    hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
-    vScroll = false;
-    vScrollPercent = 0;
-    vScrollViewSize = 100;
-    if (overflowY.equals("auto") || overflowY.equals("scroll")) {
-      vScroll = scrollHeight > clientHeight;
-      if (vScroll) {
-        vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
-        vScrollViewSize = 100.0 * clientHeight / scrollHeight;
-      }
-      }
+    vScroll = scrollOn.contains(overflowY) && scrollHeight > clientHeight;
+    if (scrollHeight != clientHeight) {
+      vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+    }
+    vScrollViewSize = 100.0 * clientHeight / scrollHeight;
 
     scrollPattern = hScroll || vScroll;
   }
@@ -182,7 +173,7 @@ public class WdElement implements Serializable {
   /*
    * This gets the position relative to the viewport
    */
-  private void fillRect (Map<String, Object> packedElement) {
+  private void fillRect(Map<String, Object> packedElement) {
     List<Long> rect = (List<Long>) packedElement.get("rect");
     this.rect = Rect.from(rect.get(0), rect.get(1), rect.get(2), rect.get(3));
   }

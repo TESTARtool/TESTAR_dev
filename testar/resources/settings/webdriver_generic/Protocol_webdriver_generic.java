@@ -56,7 +56,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
    *
-   * @param   settings   the current TESTAR settings as specified by the user.
+   * @param settings the current TESTAR settings as specified by the user.
    */
   protected void initialize(Settings settings) {
     super.initialize(settings);
@@ -65,7 +65,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence
    */
-  protected void beginSequence(SUT system, State state){
+  protected void beginSequence(SUT system, State state) {
     super.beginSequence(system, state);
   }
 
@@ -133,7 +133,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * will stop generation of the current action and continue with the next one.
    *
    * @param system the SUT
-   * @param state the SUT's current state
+   * @param state  the SUT's current state
    * @return a set of actions
    */
   protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
@@ -160,34 +160,36 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
         continue;
       }
 
-      Pair<Double, Double> pos = ((WdWidget) w).getClickPosition();
+      // left clicks
+      if (isAtBrowserCanvas(w) && (whiteListed(w) || isClickable(w))) {
+        actions.add(ac.leftClickAt(w));
+      }
 
-          // left clicks
-      if (isAtBrowserCanvas(pos) && (whiteListed(w) || isClickable(w))) {
-        actions.add(ac.leftClickAt(pos.left(), pos.right()));
-          }
+      // type into text boxes
+      if (isAtBrowserCanvas(w) && (whiteListed(w) || isTypeable(w))) {
+        actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+      }
 
-          // type into text boxes
-      if (isAtBrowserCanvas(pos) && (whiteListed(w) || isTypeable(w))) {
-        Position position = new AbsolutePosition(pos.left(), pos.right());
-        actions.add(ac.clickTypeInto(position, this.getRandomText(w)));
-          }
-
-          // slides
-          addSlidingActions(actions, ac, scrollArrowSize, scrollThick, w);
-        }
+      // slides
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, w);
+    }
 
     return actions;
   }
 
   /*
-   * We need to check if the screen position is within the canvas
+   * We need to check if click position is within the canvas
    */
-  private boolean isAtBrowserCanvas(Pair<Double, Double> pos) {
-    return pos.left() >= CanvasDimensions.getCanvasX() &&
-           pos.left() <= CanvasDimensions.getCanvasX() + CanvasDimensions.getCanvasWidth() &&
-           pos.right() >= CanvasDimensions.getCanvasY() &&
-           pos.right() <= CanvasDimensions.getCanvasY() + CanvasDimensions.getInnerWidth();
+  private boolean isAtBrowserCanvas(Widget widget) {
+    Shape shape = widget.get(Tags.Shape, null);
+    if (shape == null) {
+      return false;
+    }
+
+    double x = shape.x() + shape.width() / 2;
+    double y = shape.y() + shape.height() / 2;
+    return x > 0 && x < CanvasDimensions.getCanvasWidth() &&
+        y > 0 && y < CanvasDimensions.getInnerWidth();
   }
 
   protected boolean isClickable(Widget w) {
@@ -198,7 +200,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
         String type = ((WdWidget) w).element.type;
         if (WdRoles.clickableInputTypes().contains(type)) {
           return true;
-      }
+        }
       }
       return true;
     }
@@ -230,7 +232,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /**
    * Select one of the possible actions (e.g. at random)
    *
-   * @param state the SUT's current state
+   * @param state   the SUT's current state
    * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
    * @return the selected action (non-null!)
    */
@@ -243,7 +245,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Execute the selected action.
    *
    * @param system the SUT
-   * @param state the SUT's current state
+   * @param state  the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */

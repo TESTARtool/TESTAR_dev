@@ -119,9 +119,6 @@ public class WdCanvas implements Canvas {
     check();
     adjustPen(pen);
 
-    x -= CanvasDimensions.getCanvasX();
-    y -= CanvasDimensions.getCanvasY();
-
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x + width / 2, y + height / 2, width / 2, height / 2};
@@ -173,8 +170,7 @@ public class WdCanvas implements Canvas {
   private void check() {
     try {
       WdDriver.executeScript("addCanvasTestar()");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       // TODO
       System.out.println();
       e.printStackTrace();

@@ -75,14 +75,6 @@ applicationDistribution.from("../webdriver/resources/chrome-extension") {
     into "chrome-extension"
 }
 
-applicationDistribution.from("../webdriver/resources/chrome-extension") {
-    into "chrome-extension"
-}
-
-applicationDistribution.from("../webdriver/resources/chrome-extension") {
-    into "chrome-extension"
-}
-
 prepareOracles.dependsOn(oracleClasses)
 
 /**
