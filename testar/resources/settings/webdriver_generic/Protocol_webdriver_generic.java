@@ -31,10 +31,10 @@ import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.CanvasDimensions;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.alayer.webdriver.enums.WdRoles;
-import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -49,8 +49,16 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   // Classes that are deemed clickable by the web framework
-  private static List<String> clickableClasses =
-      Arrays.asList("list__item__title");
+  private static List<String> clickableClasses = Arrays.asList(
+      "list__item__title");
+
+  // Go back once we encounter certain files
+  private static List<String> deniedExtensions = Arrays.asList(
+      "pdf");
+
+  // If set to NULL, only the sut connector domain will be used
+  private static List<String> domainsAllowed = Arrays.asList(
+      "www.ou.nl");
 
   /**
    * Called once during the life time of TESTAR
@@ -60,6 +68,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    */
   protected void initialize(Settings settings) {
     super.initialize(settings);
+    ensureDomainsAllowed();
   }
 
   /**
@@ -149,33 +158,210 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return actions;
     }
 
+    // Check if forced actions are needed to stay within allowed domains
+    Set<Action> forcedActions = detectForcedActions();
+    if (forcedActions != null && forcedActions.size() > 0) {
+      return forcedActions;
+    }
     // create an action compiler, which helps us create actions
     // such as clicks, drag&drop, typing ...
     StdActionCompiler ac = new AnnotatingActionCompiler();
 
     // iterate through all widgets
-    for (Widget w : state) {
+    for (Widget widget : state) {
       // only consider enabled, non-blocked widgets and non-tabu widgets
-      if (!w.get(Enabled, true) || w.get(Blocked, false) || blackListed(w)) {
+      if (!widget.get(Enabled, true) || widget.get(Blocked, false) || blackListed(widget)) {
         continue;
       }
 
-      // left clicks
-      if (isAtBrowserCanvas(w) && (whiteListed(w) || isClickable(w))) {
-        actions.add(ac.leftClickAt(w));
+      // left clicks, but ignore links outside domain
+      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isClickable(widget))) {
+        if (!isLinkDenied(widget)) {
+          actions.add(ac.leftClickAt(widget));
+        }
       }
 
       // type into text boxes
-      if (isAtBrowserCanvas(w) && (whiteListed(w) || isTypeable(w))) {
-        actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
+        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
       }
 
       // slides
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, w);
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
     }
 
     return actions;
   }
+
+  /*
+   * Check the state if we need to force an action
+   */
+  private Set<Action> detectForcedActions() {
+    String currentURL = WdDriver.getCurrentUrl();
+
+    Set<Action> actions = new HashSet<>();
+
+    // Don't get caught in a PDFs etc. and non-whitelisted domains
+    if (isUrlDenied(currentURL) || isExtensionDenied(currentURL)) {
+      // If opened in new tab, close it, else go back
+      if (WdDriver.getWindowHandles().size() > 1) {
+        actions.add(NativeLinker.getWdCloseTabAction());
+      }
+      else {
+        actions.add(NativeLinker.getWdBackAction());
+      }
+    }
+
+    return actions;
+  }
+
+  /*
+   * Check if the current address has a denied extension (PDF etc.)
+   */
+  private boolean isExtensionDenied(String currentURL) {
+    // If the current page doesn't have an extension, always allow
+    if (!currentURL.contains(".")) {
+      return false;
+    }
+
+    // Deny if the extension is in the list
+    String ext = currentURL.substring(currentURL.lastIndexOf(".") + 1);
+    ext = ext.replace("/", "");
+    return deniedExtensions.contains(ext);
+  }
+
+  /*
+   * Check if the URL is denied
+   */
+  private boolean isUrlDenied(String currentUrl) {
+    if (currentUrl.startsWith("mailto:")) {
+      return true;
+    }
+
+    // Always allow local file
+    if (currentUrl.startsWith("file:///")) {
+      return false;
+    }
+
+    // Only allow pre-approved domains
+    String domain = getDomain(currentUrl);
+    return !domainsAllowed.contains(domain);
+  }
+
+  /*
+   * Check if the widget has a denied URL as hyperlink
+   */
+  private boolean isLinkDenied(Widget widget) {
+    String linkUrl = widget.get(Tags.ValuePattern, "");
+
+    // Not a link or local file
+    if (linkUrl == null || linkUrl.startsWith("file:///")) {
+      return false;
+    }
+
+    // Mail link, deny
+    if (linkUrl.startsWith("mailto:")) {
+      return true;
+    }
+
+    // Not a web link, allow
+    if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("https://"))) {
+      return false;
+    }
+
+    // Only allow pre-approved domains
+    String domain = getDomain(linkUrl);
+    return !domainsAllowed.contains(domain);
+  }
+
+  /*
+   * Get the domain from a full URL
+   */
+  private String getDomain(String url) {
+    if (url == null) {
+      return null;
+    }
+
+    // When serving from file, 'domain' is filesystem
+    if (url.startsWith("file://")) {
+      return "file://";
+    }
+
+    url = url.replace("https://", "").replace("http://", "").replace("file://", "");
+    return (url.split("/")[0]).split("\\?")[0];
+  }
+
+  /*
+   * If domainsAllowed not set, allow the domain from the SUT Connector
+   */
+  private void ensureDomainsAllowed() {
+    // Already defined
+    if (domainsAllowed != null && domainsAllowed.size() > 0) {
+      return;
+    }
+
+    String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
+    String url = parts[parts.length - 1].replace("\"", "");
+    domainsAllowed = Arrays.asList(getDomain(url));
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // TODO
+  private static int counter = 0;
+
+  private void showWidgetOrg(Widget w) {
+    String role = w.get(Tags.Role, Roles.Widget).name();
+    String title = w.get(Tags.Title, "_") + " :: " + w.get(Tags.Text, "_");
+    title = title.replace("\n", " ");
+    title = title.substring(0, Math.min(100, title.length()));
+    boolean yes = w.get(Enabled, true) && !w.get(Blocked, false) && !blackListed(w);
+    yes &= (whiteListed(w) || (isClickable(w) || isTypeable(w)));
+
+    Shape shape = w.get(Tags.Shape);
+    int x = (int) shape.x();
+    int y = (int) shape.y();
+    int width = (int) shape.width();
+    int height = (int) shape.height();
+    WdElement element = ((WdWidget) w).element;
+
+    System.out.format("%-5s %-5s | %-5s | %-5s %-5s | %-5s %-5s | %-50s | %-30s %s\n",
+        isClickable(w), isTypeable(w), yes, x, y, width, height, element.display, role, title);
+  }
+
+  private void showWidget(Widget w) {
+    String role = w.get(Tags.Role, Roles.Widget).name();
+    if (!role.equals("WdA")) {
+      return;
+    }
+
+    String title = w.get(Tags.Title, "_") + " :: " + w.get(Tags.Text, "_");
+    title = title.replace("\n", " ");
+    title = title.substring(0, Math.min(100, title.length()));
+    boolean yes = w.get(Enabled, true) && !w.get(Blocked, false) && !blackListed(w);
+    yes &= (whiteListed(w) || (isClickable(w) || isTypeable(w)));
+
+    Shape shape = w.get(Tags.Shape);
+    int x = (int) shape.x();
+    int y = (int) shape.y();
+    int width = (int) shape.width();
+    int height = (int) shape.height();
+    int clickX = x + width / 2;
+    int clickY = y + height / 2;
+    WdElement element = ((WdWidget) w).element;
+
+    System.out.format("%-5s %-5s | %-5d %-5d | %d | %s\n",
+        w.get(Blocked, false), isAtBrowserCanvas(w),
+        clickX, clickY, CanvasDimensions.getCanvasHeight(), title);
+  }
+
+  /*
+   * We need to check if the screen position is within the canvas
+   */
+  private boolean isAtBrowserCanvas(Pair<Double, Double> pos) {
+    return pos.left() >= 0 && pos.left() <= CanvasDimensions.getCanvasWidth() &&
+           pos.right() >= 0 && pos.right() <= CanvasDimensions.getInnerWidth();
+  }
+  //////////////////////////////////////////////////////////////////////////////
 
   /*
    * We need to check if click position is within the canvas
