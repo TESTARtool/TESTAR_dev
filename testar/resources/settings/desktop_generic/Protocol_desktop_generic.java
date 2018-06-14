@@ -71,7 +71,20 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		super.beginSequence(system, state);
 	}
 
-	/**
+	 /**
+	  * This method is invoked each time TESTAR starts through COMMAND_LINE.
+	  * It examines the SUT's process to work with oracles at the process level.
+	  * By default it works with the settings oracles, but you can also add specific oracles.
+	  */
+	 protected void processListeners(SUT system, String specificSuspiciousTitle) {
+
+		 specificSuspiciousTitle=".*Exception.*|failed|.*null.*";
+
+		 super.processListeners(system, specificSuspiciousTitle);
+
+	 }
+
+	 /**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of 
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
