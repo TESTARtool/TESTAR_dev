@@ -60,9 +60,6 @@ dependencies {
     compile group: 'net.sourceforge.tess4j', name: 'tess4j', version: '4.0.0'
 	// ####ADD for Tesseract build End    
 	// ####ADD for SikuliX build Begin    
-    //compile files('./lib/sikulixapi.jar')
-    // SikuliX
-    //compile group: 'com.github.vidstige', name: 'jadb', version: '-v1.0-g94ebf38-23'
     compile ('com.github.vidstige:jadb:94ebf38')
     compile ( group: 'com.sikulix', name: 'sikulixapi', version: '1.1.2') {
         exclude group: 'com.sikulix', module: '${sikulix.libs}'
