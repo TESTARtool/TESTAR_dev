@@ -21,9 +21,13 @@ Mode = Spy
 #
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = WEB_DRIVER: SUTConnectorValue property consists of webdriver path and web url
+# Format : <path of webdriver> [optional size/position] <url of web application>
+# Example format for the dimensions and position : 1920x1000+1680+0
 #################################################################
 SUTConnector = WEB_DRIVER
-SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "https://www.ou.nl"
+SUTConnectorValue = "C:\\Windows\\chromedriver.exe" "1920x1000+0+0" "https://www.ou.nl"
 
 #################################################################
 # Sequences

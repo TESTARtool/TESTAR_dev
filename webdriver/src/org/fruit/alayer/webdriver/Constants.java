@@ -5,9 +5,8 @@ import java.util.List;
 
 public class Constants {
   public static List<String> ignoredTags = Arrays.asList(
-      "script", "noscript", "head", "meta", "style", "link", "svg");
-  public static  List<String> hiddenTags = Arrays.asList(
-      "canvas");
+      "script", "noscript", "head", "meta", "style", "link", "svg", "canvas");
+  public static List<String> hiddenTags = Arrays.asList("canvas");
 
   // TODO System and CSS dependent
   // element.offsetWidth - element.clientWidth

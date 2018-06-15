@@ -1,7 +1,6 @@
 package org.fruit.alayer.webdriver;
 
 import org.fruit.Drag;
-import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 
@@ -30,14 +29,6 @@ public class WdWidget implements Widget, Serializable {
     if (parent != null) {
       root.connect(parent, this);
     }
-  }
-
-  // TODO Comment
-  public Pair<Double, Double> getClickPosition() {
-    Shape shape = get(Tags.Shape, null);
-    double x = shape.x() + shape.width() / 2 + CanvasDimensions.getCanvasX();
-    double y = shape.y() + shape.height() / 2 + CanvasDimensions.getCanvasY();
-    return Pair.from(x, y);
   }
 
   final public void moveTo(Widget p, int idx) {
@@ -115,16 +106,16 @@ public class WdWidget implements Widget, Serializable {
     // horizontal
     if (scrollOrientation) {
       fromX = shape.x() + scrollArrowSize +
-               scrollableSize * scrollPercent / 100.0 +
-               (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
+          scrollableSize * scrollPercent / 100.0 +
+          (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
       fromY = shape.y() + shape.height() - scrollThick / 2;
     }
     // vertical
     else {
       fromX = shape.x() + shape.width() - scrollThick / 2;
       fromY = shape.y() + scrollArrowSize +
-               scrollableSize * scrollPercent / 100.0 +
-               (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
+          scrollableSize * scrollPercent / 100.0 +
+          (scrollPercent < 50.0 ? scrollThick / 2 : -3 * scrollThick / 2);
     }
 
     int dragC = (int) Math.ceil(100.0 / viewSize) - 1;
@@ -135,16 +126,12 @@ public class WdWidget implements Widget, Serializable {
         scrollOrientation ? fromX - shape.x() : fromY - shape.y(),
         scrollableSize / (double) dragC);
 
-    int offsetX = CanvasDimensions.getCanvasX();
-    int offsetY = CanvasDimensions.getCanvasY();
-
     Drag[] drags = new Drag[dragC];
     for (int i = 0; i < dragC; i++) {
       double toX = scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fromX;
       double toY = scrollOrientation ? fromY : shape.y() + scrollArrowSize + emptyDragPoints[i];
 
-      drags[i] = new Drag(fromX + offsetX, fromY + offsetY,
-          toX + offsetX, toY + offsetY);
+      drags[i] = new Drag(fromX, fromY, toX, toY);
     }
     return drags;
   }
@@ -219,10 +206,10 @@ public class WdWidget implements Widget, Serializable {
    */
   public String getRepresentation(String tab) {
     return tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +
-           this.get(Tags.Abstract_R_ID) + ", " +
-           this.get(Tags.Abstract_R_T_ID) + ", " +
-           this.get(Tags.Abstract_R_T_P_ID) + "\n" +
-           getPropertiesRepresentation(tab);
+        this.get(Tags.Abstract_R_ID) + ", " +
+        this.get(Tags.Abstract_R_T_ID) + ", " +
+        this.get(Tags.Abstract_R_T_P_ID) + "\n" +
+        getPropertiesRepresentation(tab);
   }
 
   @Override

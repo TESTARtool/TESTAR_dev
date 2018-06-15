@@ -20,8 +20,8 @@ public class WdMouse implements Mouse {
       "WD Mouse cannot poll the mouse's state!";
   private static String INFO_MESSAGE =
       "MouseInfo.getPointerInfo() returned null! " + System.lineSeparator() +
-      "This seeems to be undocumented Java library behavior... " + System.lineSeparator() +
-      "Consider using a platform specific Mouse Implementation instead of WdMouse!";
+          "This seeems to be undocumented Java library behavior... " + System.lineSeparator() +
+          "Consider using a platform specific Mouse Implementation instead of WdMouse!";
 
   private final Robot robot;
 
@@ -32,8 +32,7 @@ public class WdMouse implements Mouse {
   private WdMouse() throws FruitException {
     try {
       robot = new Robot();
-    }
-    catch (AWTException awte) {
+    } catch (AWTException awte) {
       throw new FruitException(awte);
     }
   }
@@ -55,10 +54,11 @@ public class WdMouse implements Mouse {
   }
 
   public void setCursor(double x, double y) {
-    int canvasX = (int) Math.max(CanvasDimensions.getCanvasX(), x);
-    canvasX = Math.min(canvasX, CanvasDimensions.getCanvasX() + CanvasDimensions.getInnerWidth());
-    int canvasY = (int) Math.max(CanvasDimensions.getCanvasY(), y);
-    canvasY = Math.min(canvasY, CanvasDimensions.getCanvasY() + CanvasDimensions.getInnerHeight());
+    int canvasX = (int) Math.min(Math.max(0, x), CanvasDimensions.getInnerWidth());
+    int canvasY = (int) Math.min(Math.max(0, y), CanvasDimensions.getInnerHeight());
+
+    canvasX += CanvasDimensions.getCanvasX();
+    canvasY += CanvasDimensions.getCanvasY();
 
     robot.mouseMove(canvasX, canvasY);
   }
