@@ -136,7 +136,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		
 		//Only if we executed SUT with command_line
 		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
-			final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 			
 			Pattern defaultOracles= Pattern.compile(settings().get(ConfigTags.SuspiciousTitles)+"|"+specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
 			
@@ -158,12 +158,12 @@ public class DefaultProtocol extends AbstractProtocol{
 							m= defaultOracles.matcher(ch);
 							if(defaultOracles!=null & m.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdErr: " +ch);
+								System.out.println("SUT StdErr:	" +ch);
 								
 								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
 								if(lastExecutedAction()!=null)
 									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerError.println(DateString+"   on Action: "+actionId+"  SUT StdErr:  " +ch);
+								writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 								writerError.flush();
 								writerError.close();
 							}
@@ -191,12 +191,12 @@ public class DefaultProtocol extends AbstractProtocol{
 							m = defaultOracles.matcher(ch);
 							if(defaultOracles!=null & m.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdOut: " +ch);
+								System.out.println("SUT StdOut:	" +ch);
 								
 								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
 								if(lastExecutedAction()!=null)
 									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerOut.println(DateString+"   on Action: "+ actionId+"  SUT StdOut:  " +ch);
+								writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 								writerOut.flush();
 								writerOut.close();
 							}

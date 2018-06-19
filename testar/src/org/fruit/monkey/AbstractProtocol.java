@@ -154,7 +154,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	double startTime;
 
 	// TODO: DATE-FORMAT
-	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	// Verdict severities
 	// PASS

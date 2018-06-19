@@ -78,6 +78,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	  */
 	 protected void processListeners(SUT system, String specificSuspiciousTitle) {
 
+		 //Use .*.* if u want to read all possible output errors
 		 specificSuspiciousTitle=".*Exception.*|failed|.*null.*";
 
 		 super.processListeners(system, specificSuspiciousTitle);

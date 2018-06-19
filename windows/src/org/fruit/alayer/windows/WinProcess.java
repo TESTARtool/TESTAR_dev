@@ -136,10 +136,14 @@ public final class WinProcess extends SUTBase {
 			Field f = p.getClass().getDeclaredField("handle");
 			f.setAccessible(true);
 			
-			//Wait to SUT process
-			Util.pause(5);
-			
 			long procHandle = f.getLong(p);
+			
+			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
+			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
+			if(path.contains("java -jar"))
+				Util.pause(5);
+			else
+				Windows.WaitForInputIdle(procHandle);
 			
 			long pid = Windows.GetProcessId(procHandle);
 			
@@ -151,7 +155,7 @@ public final class WinProcess extends SUTBase {
 		    
 		    Windows.CloseHandle(procHandle);
 			
-			ret.set(Tags.Desc, path);
+			ret.set(Tags.Path, path);
 			return ret;
 		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
