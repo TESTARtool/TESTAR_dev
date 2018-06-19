@@ -30,6 +30,7 @@
 
 import java.util.Set;
 
+import nl.ou.testar.GuiStateGraphWithVisitedActions;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
@@ -55,6 +56,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
 	private HtmlSequenceReport htmlReport;
+	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -65,6 +67,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected void initialize(Settings settings){
 		//initializing the HTML sequence report:
 		htmlReport = new HtmlSequenceReport();
+		// initializing simple GUI state graph:
+		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
 
@@ -233,7 +237,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 		//adding state to the HTML sequence report:
-		htmlReport.addState(state,actions);
+		try {
+			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+		}catch(Exception e){
+			// catching null for the first state or any new state, when unvisited actions is still null
+			htmlReport.addState(state, actions);
+		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action a = preSelectAction(state, actions);
@@ -241,7 +250,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 			// returning pre-selected action
 		} else{
 			//if no preSelected actions are needed, then implement your own action selection strategy
-			a = RandomActionSelector.selectAction(actions);
+
+			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
+			a = stateGraphWithVisitedActions.selectAction(state,actions);
+			//a = RandomActionSelector.selectAction(actions);
 		}
 		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
 		return a;
