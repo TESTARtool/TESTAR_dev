@@ -11,5 +11,5 @@ public class Constants {
   // TODO System and CSS dependent
   // element.offsetWidth - element.clientWidth
   public static double scrollArrowSize = 36;
-  public static double scrollThick = 16;
+  public static double scrollThick = 15;
 }

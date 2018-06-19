@@ -23,23 +23,27 @@
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import org.fruit.Pair;
 import org.fruit.alayer.*;
+import org.fruit.alayer.Shape;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.webdriver.CanvasDimensions;
-import org.fruit.alayer.webdriver.WdDriver;
-import org.fruit.alayer.webdriver.WdElement;
-import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.awt.*;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -95,6 +99,9 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
     // See remarks in WdMouse
     mouse = sut.get(Tags.StandardMouse);
+    // Override ProtocolUtil to allow WebDriver screenshots
+    protocolUtil = new WdProtocolUtil();
+    ((WdProtocolUtil) protocolUtil).webDriver = ((WdDriver) sut).getRemoteWebDriver();
 
     return sut;
   }
@@ -372,10 +379,9 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return false;
     }
 
-    double x = shape.x() + shape.width() / 2;
-    double y = shape.y() + shape.height() / 2;
-    return x > 0 && x < CanvasDimensions.getCanvasWidth() &&
-        y > 0 && y < CanvasDimensions.getInnerWidth();
+    // Widget must be completely visible on viewport for screenshots
+    return shape.x() > 0 && shape.x() + shape.width() < CanvasDimensions.getCanvasWidth() &&
+           shape.y() > 0 && shape.y() + shape.height() < CanvasDimensions.getInnerHeight();
   }
 
   protected boolean isClickable(Widget w) {
@@ -450,14 +456,12 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     return super.moreActions(state);
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   protected void finishSequence(File recordedSequence) {
     super.finishSequence(recordedSequence);
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.
@@ -469,4 +473,52 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   protected boolean moreSequences() {
     return super.moreSequences();
   }
+
+  public class WdProtocolUtil extends ProtocolUtil {
+    private RemoteWebDriver webDriver;
+
+    @Override
+    public String getStateshot(State state) {
+      double width = CanvasDimensions.getCanvasWidth() + (
+          state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+      double height = CanvasDimensions.getCanvasHeight() + (
+          state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+      Rect rect = Rect.from(0, 0, width, height);
+      AWTCanvas screenshot = WdScreenshot.fromScreenshot(webDriver, rect);
+      return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), screenshot);
+    }
+
+    @Override
+    public String getActionshot(State state, Action action) {
+      List<Finder> targets = action.get(Tags.Targets, null);
+      if (targets == null) {
+        return null;
+      }
+
+      Rectangle actionArea = new Rectangle(
+          Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+      for (Finder f : targets) {
+        Widget widget = f.apply(state);
+        Shape shape = widget.get(Tags.Shape);
+        Rectangle r = new Rectangle((int) shape.x(), (int) shape.y(), (int) shape.width(), (int) shape.height());
+        actionArea = actionArea.union(r);
+      }
+      if (actionArea.isEmpty()) {
+        return null;
+      }
+
+      // Actionarea is outside viewport
+      if (actionArea.x < 0 || actionArea.y < 0 ||
+          actionArea.x + actionArea.width > CanvasDimensions.getCanvasWidth() ||
+          actionArea.y + actionArea.height > CanvasDimensions.getCanvasHeight()) {
+        return null;
+      }
+
+      Rect rect = Rect.from(
+          actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
+      AWTCanvas scrshot = WdScreenshot.fromScreenshot(webDriver, rect);
+      return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID), action.get(Tags.ConcreteID), scrshot);
+    }
+  }
 }
+
