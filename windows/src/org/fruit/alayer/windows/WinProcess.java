@@ -122,13 +122,19 @@ public final class WinProcess extends SUTBase {
 	public static WinProcess fromExecutable(String path) throws SystemStartException{
 		try{
 			Assert.notNull(path);
-			/*long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
-			long hProcess = handles[0];
-			long hThread = handles[1];
-			Windows.CloseHandle(hThread);
+			
+			//TODO: With the new way of invoking the SUT, Chrome runs but remains "not responding" until TESTAR is closed,
+			//then loads (probably by the inclusion of --force-renderer-accessibility --incognito)
+			if(path.contains("chrome.exe")) {
+				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
+				long hProcess = handles[0];
+				long hThread = handles[1];
+				Windows.CloseHandle(hThread);
 
-			WinProcess ret = new WinProcess(hProcess, true);
-			ret.set(Tags.Desc, path);*/
+				WinProcess ret = new WinProcess(hProcess, true);
+				ret.set(Tags.Desc, path);
+				return ret;
+			}
 			
 			//Associate Output / Error from SUT
 
