@@ -29,6 +29,8 @@
 
 
 import java.util.Set;
+
+import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.alayer.AbsolutePosition;
@@ -52,6 +54,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
+	private HtmlSequenceReport htmlReport;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -60,6 +63,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
 		super.initialize(settings);
 	}
 
@@ -138,7 +143,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		Set<Action> actions = super.deriveActions(system,state);
@@ -228,14 +232,19 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state,actions);
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action a = preSelectAction(state, actions);
 		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+			// returning pre-selected action
+		} else{
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			a = RandomActionSelector.selectAction(actions);
+		}
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
+		return a;
 	}
 
 	/**
