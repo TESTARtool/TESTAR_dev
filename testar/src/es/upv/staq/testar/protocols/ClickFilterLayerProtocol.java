@@ -34,6 +34,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.Set;
 
+import nl.ou.testar.SutVisualization;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.State;
@@ -127,10 +128,10 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 		mouseX = x;
 		mouseY = y;
 	}
-	    
+
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		super.visualizeActions(canvas, state, actions);
+		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
     	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
     		filteringManager.visualizeActions(canvas,state);
 	}

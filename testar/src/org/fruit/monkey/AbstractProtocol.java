@@ -48,6 +48,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.GraphDB;
+import nl.ou.testar.SutVisualization;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -154,8 +155,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected int lastSequenceActionNumber;
 	double startTime;
 
-	// TODO: DATE-FORMAT
-	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	// 2018-06-18: changed the date format into more standard ISO format:
+	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	// Verdict severities
 	// PASS
@@ -520,253 +521,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	private String lastPrintParentsOf = "null-id";
 
-	//TODO move to SUTvisualization class
-	/**
-	 *
-	 * @param canvas
-	 * @param state
-	 * @param system
-	 */
-	private synchronized void visualizeState(Canvas canvas, State state, SUT system){
-		if((mode() == Modes.Spy
-			|| mode() == Modes.GenerateManual
-			|| mode() == Modes.ReplayDebug) && settings().get(ConfigTags.DrawWidgetUnderCursor)){
-			Point cursor = mouse.cursor();
-			Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-
-			if(cursorWidget != null){
-				Widget rootW = cursorWidget;
-				while (rootW.parent() != null && rootW.parent() != rootW)
-					rootW = rootW.parent();
-				Shape cwShape = cursorWidget.get(Tags.Shape, null);
-
-				if(cwShape != null){
-					cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
-					cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
-					if (!settings().get(ConfigTags.DrawWidgetInfo) && !settings().get(ConfigTags.DrawWidgetTree) && !markParentWidget){
-						String rootText = "State: " + rootW.get(Tags.ConcreteID),
-							   widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
-							   roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-							   idxText = "Path: " + cursorWidget.get(Tags.Path);
-
-						double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
-						double miniwidgetInfoH = 80; // 20 * 4
-						Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
-													  cwShape.y() + cwShape.height()/2 + 32,
-													  miniwidgetInfoW, miniwidgetInfoH); 
-						Shape repositionShape = protocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
-						if (repositionShape != minicwShape){
-							double x = repositionShape.x() - repositionShape.width() - 32,
-								   y = repositionShape.y() - repositionShape.height() - 32;
-							if (x < 0) x = 0; if (y < 0) y = 0;
-							minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
-						}
-						canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-						canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-						canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, idxText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, roleText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
-					}
-
-					if (markParentWidget){
-						String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
-						boolean print = !cursorWidgetID.equals(lastPrintParentsOf); 
-						if (print){
-							lastPrintParentsOf = cursorWidgetID;
-							System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
-						}
-						int lvls = protocolUtil.markParents(canvas,cursorWidget,protocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
-						if (lvls > 0){
-							Shape legendShape = protocolUtil.repositionShape(canvas,Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
-							canvas.rect(Pen.PEN_WHITE_ALPHA, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-							canvas.rect(Pen.PEN_BLACK, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-							int shadow = 2;
-							String l;
-							Iterator<String> it = protocolUtil.ancestorsMarkingColors.keySet().iterator();
-							for (int i=0; i<lvls; i++){
-								l = it.next();
-								Pen lpen = Pen.newPen().setColor(protocolUtil.ancestorsMarkingColors.get(l)).build();
-								canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i*25, 0, l);
-								canvas.text(Pen.PEN_BLACK, legendShape.x()         , legendShape.y() + i*25         , 0, l);								
-							}
-						}
-					}
-					int MAX_ANCESTORS_PERLINE = 6;
-					double widgetInfoW = canvas.width()/2; //550;
-					double widgetInfoH = (1 + Util.size(cursorWidget.tags()) +
-										  Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
-										 * 20;
-					cwShape = protocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
-					
-					if(settings().get(ConfigTags.DrawWidgetInfo)){
-						//canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-						//canvas.rect(apen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-						canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
-						canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
-						
-						//canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
-						//canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
-						int pos = -20;
-						StringBuilder sb = new StringBuilder();
-						sb.append("Ancestors: ");
-
-						//for(Widget p : Util.ancestors(cursorWidget))
-						//	sb.append("::").append(p.get(Role, Roles.Widget));							
-						//canvas.text(apen, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-						// (fix too many ancestors)
-						int i=0;
-						for(Widget p : Util.ancestors(cursorWidget)){
-							sb.append("::").append(p.get(Role, Roles.Widget));
-							i++;
-							if (i >= MAX_ANCESTORS_PERLINE){
-								canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-								i=0;
-								sb = new StringBuilder();
-								sb.append("\t");
-							}
-						}
-						if (i > 0)
-							canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-
-						for(Tag<?> t : cursorWidget.tags()){
-							canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
-										 cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-							// (multi-line display without abbreviation)
-							/*final int MAX_TEXT = 50;
-							String text = Util.abbreviate(Util.toString(cursorWidget.get(t)), Integer.MAX_VALUE, "NO_SENSE");
-							int fragment = 0, limit;
-							while (fragment < text.length()){
-								limit = fragment + MAX_TEXT > text.length() ? text.length() : fragment + MAX_TEXT;
-								canvas.text((t.equals(Tags.Title) || t.equals(Tags.Role)) ? rpen : apen, cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " +
-									text.substring(fragment,limit));
-								fragment = limit;
-							}*/
-						}
-					}
-
-					if (settings().get(ConfigTags.DrawWidgetTree)){
-						canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-						protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);						
-					}
-					if (settings().get(ConfigTags.GraphsActivated) && this.delay != Double.MIN_VALUE){ // slow motion?
-						canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-						IEnvironment env = Grapher.getEnvironment();
-						IGraphState gs = env.get(state);
-						String wid = cursorWidget.get(Tags.ConcreteID);
-						String graphDebug = "Widget <" + wid + "> count = " + gs.getStateWidgetsExecCount().get(wid);
-						canvas.text(Pen.PEN_WHITE_TEXT_12px, 10, 10, 0, graphDebug);
-					}
-				}
-			}
-		}
-	}
-
-	//TODO move to SUTvisualization class
-	/**
-	 * Getting the Z index of a widget targeted by the given action
-	 *
-	 * used only by visualizeActions()
-	 *
-	 * @param state
-	 * @param a
-	 * @return
-	 */
-	private int getTargetZindex(State state, Action a){
-		try{
-			String targetID = a.get(Tags.TargetID);
-			Widget w;
-			if (targetID != null){
-				w = getWidget(state,targetID);
-				if (w != null)
-					return (int)w.get(Tags.ZIndex).doubleValue();
-			}
-		} catch(NoSuchTagException ex){}
-		return 1; // default
-	}
-
-	//TODO move to SUTvisualization class
-	/**
-	 * Visualizing available actions with colored dots on a canvas on top of SUT
-	 *
-	 * @param canvas
-	 * @param state
-	 * @param actions
-	 */
-	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		if((mode() == Modes.Spy ||
-			mode() == Modes.GenerateManual ||
-			mode() == Modes.GenerateDebug) && settings().get(ConfigTags.VisualizeActions)){
-			IEnvironment env = Grapher.getEnvironment();
-			int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
-			Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
-			for(Action a : actions){
-				//a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
-				zindex = getTargetZindex(state,a);
-				zindexes.put(a, new Integer(zindex));
-				if (zindex < minz)
-					minz = zindex;
-				if (zindex > maxz)
-					maxz = zindex;
-			}
-			int alfa;
-			for(Action a : actions){
-				zindex = 1; // default
-				Pen vp = Pen.PEN_IGNORE;
-				if (env != null){ // graphs enabled
-					Integer widgetExeCount = env.get(state).getStateWidgetsExecCount().get(env.get(a).getTargetWidgetID());
-					if (widgetExeCount != null && widgetExeCount.intValue() > 0)
-						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,0,255,255),1.0/(1 + (widgetExeCount.intValue()/10)))).build(); // mark executed widgets with a different color
-					else{
-						zindex = zindexes.get(a).intValue();
-						if (minz == maxz || zindex == maxz)
-							alfa = 255;							
-						else if (zindex == minz)
-							alfa = 64;
-						else
-							alfa = 128;
-						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,255,0,alfa),1.0)).build(); // color depends on widgets zindex
-					}
-				}
-				a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
-			}
-		}
-	}
-
-	//TODO move to SUTvisualization class
-	/**
-	 * Visualizing the selected action with red colored dot
-	 *
-	 * @param canvas
-	 * @param state
-	 * @param action
-	 */
-	private void visualizeSelectedAction(Canvas canvas, State state, Action action){
-		if(mode() == Modes.GenerateDebug || mode() == Modes.ReplayDebug){
-			Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-			Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
-			//final int BLINK_COUNT = 3;
-			//final double BLINK_DELAY = 0.5;
-			double actionDuration = settings.get(ConfigTags.ActionDuration);
-			final int BLINK_COUNT = 3;
-			final double BLINK_DELAY = actionDuration / BLINK_COUNT;
-			for(int i = 0; i < BLINK_COUNT; i++){
-				Util.pause(BLINK_DELAY);
-				canvas.begin();
-				visualizer.run(state, canvas, Pen.PEN_IGNORE);
-				canvas.end();
-				Util.pause(BLINK_DELAY);
-				canvas.begin();
-				visualizer.run(state, canvas, redPen);
-				canvas.end();
-			}
-		}
-	}
-
-
 	//TODO is this process handling Windows specific? move to SystemProcessHandling and call from Default protocol
 	/**
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
@@ -986,16 +740,16 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					this.wait(10);
 				} catch (InterruptedException e) {}
 			}
-			//cv.begin();
-			//Util.clear(cv);
-			visualizeState(cv, state, system);
+			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);;
+			CodingManager.buildIDs(state, actions);
 			visualizeActions(cv, state, actions);
-			//cv.end();
 		}		
 	}
 
+	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+	}
 
 	//TODO move away from abstract, to Default protocol or ManualRecording helper class
 	/**
@@ -1108,8 +862,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		waitUserActionLoop(cv,system,state,actionStatus);
 
 		cv.begin(); Util.clear(cv);
-		//visualizeState(cv, state);
-		visualizeState(cv, state,system);
+		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 		LogSerialiser.log("Building action set...\n", LogSerialiser.LogLevel.Debug);
 
 		if (actionStatus.isUserEventAction()){ // user action
@@ -1145,7 +898,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
 
-		visualizeSelectedAction(cv, state, actionStatus.getAction());
+		SutVisualization.visualizeSelectedAction(mode, settings, cv, state, actionStatus.getAction());
 
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		
@@ -1770,13 +1523,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				while(!success && (Util.time() - start < rrt)){
 					tries++;
 					cv.begin(); Util.clear(cv);
-					//visualizeState(cv, state);
-					visualizeState(cv, state, system);
+					SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
 					Action action = fragment.get(ExecutedAction, new NOP());
-					visualizeSelectedAction(cv, state, action);
+					SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
 					if(mode() == Modes.Quit) break;
 
 					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
@@ -1855,13 +1607,5 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		graphDB.addWidget(stateID, widget);
 	}
 
-	protected Widget getWidget(State state, String concreteID){
-		for (Widget w : state){
-			if (w.get(Tags.ConcreteID).equals(concreteID)){
-				return w;
-			}
-		}
-		return null;
-	}
 	
 }

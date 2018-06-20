@@ -1,8 +1,8 @@
-package nl.ou.testar;
+package nl.ou.testar.SimpleGuiStateGraph;
 
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.ArrayList;

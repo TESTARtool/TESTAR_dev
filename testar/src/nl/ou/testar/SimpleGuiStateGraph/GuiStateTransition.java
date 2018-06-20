@@ -1,4 +1,4 @@
-package nl.ou.testar;
+package nl.ou.testar.SimpleGuiStateGraph;
 
 public class GuiStateTransition {
     private String sourceStateConcreteId;
