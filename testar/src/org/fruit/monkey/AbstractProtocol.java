@@ -48,7 +48,9 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.GraphDB;
+import nl.ou.testar.ProcessInfo;
 import nl.ou.testar.SutVisualization;
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -154,6 +156,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		firstSequenceActionNumber;
 	protected int lastSequenceActionNumber;
 	double startTime;
+	protected List<ProcessInfo> contextRunningProcesses = null;
 
 	// TODO: DATE-FORMAT
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -196,119 +199,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
-
-	//TODO is this process handling Windows specific? move to Windows specific protocol
-	protected class ProcessInfo{
-		public SUT sut;
-		public long pid;
-		public long handle;
-		public String Desc;
-		public ProcessInfo(SUT sut, long pid, long handle, String desc){
-			this.sut = sut;
-			this.pid = pid;
-			this.handle = handle;
-			this.Desc = desc;
-		}
-		public String toString(){
-			return "PID <" + this.pid + "> HANDLE <" + this.handle + "> DESC <" + this.Desc + ">";
-		}
-	}
-	protected List<ProcessInfo> contextRunningProcesses = null;
-
-	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
-	/**
-	 * Retrieve a list of Running processes
-	 * @param debugTag Tag used in debug output
-	 * @return a list of running processes
-	 */
-	protected List<ProcessInfo> getRunningProcesses(String debugTag){
-		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
-		long pid, handle; String desc;
-		List<SUT> runningP = NativeLinker.getNativeProcesses();
-		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
-		int i = 1;
-		for (SUT sut : runningP){
-			//System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
-			pid = sut.get(Tags.PID, Long.MIN_VALUE);
-			if (pid != Long.MIN_VALUE){
-				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
-				desc = sut.get(Tags.Desc, null);
-				runningProcesses.add(new ProcessInfo(sut,pid,handle,desc));
-			}
-		}
-		return runningProcesses;
-	}
-	
-	final static long MAX_KILL_WINDOW = 10000; // 10 seconds
-
-	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
-	protected void killTestLaunchedProcesses(){
-		boolean kill;
-		for (ProcessInfo pi1 : getRunningProcesses("END")){
-			kill = true;
-			for (ProcessInfo pi2 : this.contextRunningProcesses){
-				if (pi1.pid == pi2.pid){
-					kill = false;
-					break;
-				}
-			}
-			if (kill)
-				killProcess(pi1,MAX_KILL_WINDOW);
-		}
-	}
-
-	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
-	/**
-	 * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
-	 * @param sut
-	 * @param KILL_WINDOW
-	 * @return
-	 */
-	protected boolean killRunningProcesses(SUT sut, long KILL_WINDOW){
-		boolean allKilled = true;
-		for(ProcessHandle ph : Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))){
-			if (ph.name() != null && sut.get(Tags.Desc, "").contains(ph.name())){
-				try{
-					System.out.println("\tWill kill <" + ph.name() +"> with PID <" + ph.pid() + ">");
-					ph.kill();
-				} catch (SystemStopException e){
-					System.out.println("Exception killing SUT running processes: " + e.getMessage());
-					allKilled = false;
-				}
-			}
-		}
-		return allKilled;
-	}
-
-	//TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
-	/**
-	 * Kill process with info pi
-	 * @param pi
-	 * @param KILL_WINDOW indicates a time frame
-	 * @return
-	 */
-	private boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
-		if (pi.sut.isRunning()){
-			System.out.println("Will kill process: " + pi.toString());
-			long now = System.currentTimeMillis(),
-				 elapsed;
-			do{
-				elapsed = System.currentTimeMillis() - now;
-				try {
-					NativeLinker.getNativeProcessHandle(pi.pid).kill();
-				} catch (Exception e){
-					System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
-					Util.pauseMs(500);
-				}
-			} while (pi.sut.isRunning() && elapsed < KILL_WINDOW);
-			return pi.sut.isRunning();
-		} else{
-			System.out.println("Did not kill process as it is not running: " + pi.toString());
-			return true;
-		}
-	}
-
-
 
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
 	//TODO move to TestarControlKeyCommands
@@ -538,6 +428,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		//Then here we will select the action to do that killing
 
 		if (this.forceKillProcess != null){
+			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 			Action a = KillProcess.byName(this.forceKillProcess, 0);
 			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
@@ -560,6 +451,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		//TODO: This seems not to be used yet...
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
 		else if (this.forceNextActionESC){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			CodingManager.buildIDs(state, a);
@@ -1255,7 +1147,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			} catch(Exception e){
 				System.out.println("Thread: name="+Thread.currentThread().getName()+",id="+Thread.currentThread().getId()+", SUT throws exception");
 				e.printStackTrace();
-				this.killTestLaunchedProcesses();
+				SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 				ScreenshotSerialiser.finish();
 				TestSerialiser.finish();				
 				Grapher.walkFinished(false, null, null);

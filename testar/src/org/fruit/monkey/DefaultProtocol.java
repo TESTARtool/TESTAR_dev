@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -122,7 +123,7 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	protected void finishSequence(File recordedSequence){
 		//System.out.println("Finish sequence");
-		this.killTestLaunchedProcesses();
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 	
 	// refactored
@@ -142,7 +143,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		
 
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
-		this.contextRunningProcesses = getRunningProcesses("START");
+		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
 		try{// refactored from "protected SUT startSystem() throws SystemStartException"
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
@@ -194,7 +195,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
 		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
-		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
+		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
 			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
@@ -278,7 +279,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			if(verdict.severity()==SEVERITY_NOT_RESPONDING){
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
-				killRunningProcesses(system, 100);
+				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
 		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
 			passSeverity = verdict.severity();
