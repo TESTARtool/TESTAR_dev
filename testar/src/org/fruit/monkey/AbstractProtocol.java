@@ -155,7 +155,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected int lastSequenceActionNumber;
 	double startTime;
 
-	// 2018-06-18: changed the date format into more standard ISO format:
+	// TODO: DATE-FORMAT
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	// Verdict severities
