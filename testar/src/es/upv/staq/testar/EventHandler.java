@@ -58,18 +58,22 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 	// ##############################################
 
 	@Override
-	public final void nativeKeyPressed(NativeKeyEvent e) {
-		for(KBKeys key : KBKeys.values())
-			if(key.code() == e.getKeyCode())
-				eventListener.keyDown(key);
-	}
+	public final void nativeKeyPressed (NativeKeyEvent e) {
+        for (KBKeys key : KBKeys.values()) {
+            if (key.scanCode() == e.getKeyCode()) {
+                eventListener.keyDown(key);
+            }
+        }
+    }
 
 	@Override
-	public final void nativeKeyReleased(NativeKeyEvent e) {
-		for(KBKeys key : KBKeys.values())
-			if(key.code() == e.getKeyCode())
-				eventListener.keyUp(key);
-	}
+	public final void nativeKeyReleased (NativeKeyEvent e) {
+        for (KBKeys key : KBKeys.values()) {
+            if (key.scanCode() == e.getKeyCode()) {
+                eventListener.keyUp(key);
+            }
+        }
+    }
 
 	@Override
 	public final void nativeMouseClicked(NativeMouseEvent arg0) {}

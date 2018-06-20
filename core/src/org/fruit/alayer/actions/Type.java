@@ -97,12 +97,15 @@ public final class Type extends TaggableBase implements Action {
 	    	throw new IllegalArgumentException("This string is not an ascii string!");
 	}
 	
-	private KBKeys getKey(char c){
-		for(KBKeys k : KBKeys.values())
-			if(k.code() == (int) c)
-				return k;
-		throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
-	}
+	private KBKeys getKey(char c) {
+        for (KBKeys key : KBKeys.values()) {
+            if (key.code() == (int) c) {
+                return key;
+            }
+        }
+
+        throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
+    }
 	
 	public String toString(){ return "Type text '" + text + "'"; }
 	
