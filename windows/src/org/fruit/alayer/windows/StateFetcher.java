@@ -434,8 +434,11 @@ public class StateFetcher implements Callable<UIAState>{
 				el.helpText = description;
 				// el.enabled = true;
 				parent.root.hwndMap.put(el.hwnd, el);
-	
-				if (childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+				
+				
+				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
+				if(!role.equals("menu") && !role.equals("combo box")
+					&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 					if (cc > 0){
 						el.children = new ArrayList<UIAElement>(cc);
@@ -443,14 +446,16 @@ public class StateFetcher implements Callable<UIAState>{
 						for (int i=0; i<children.length; i++)
 							abDescend(hwnd,el,vmidAC[0],children[i]);
 					}*/
-					long childAC;
-					int c = new Integer(childrenCount).intValue();
-					el.children = new ArrayList<UIAElement>(c);
-					for (int i=0; i<c; i++){
-						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-						abDescend(hwnd,el,vmidAC[0],childAC);
-					}
+					
+						long childAC;
+						int c = new Integer(childrenCount).intValue();
+						el.children = new ArrayList<UIAElement>(c);
+						for (int i=0; i<c; i++){
+							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+							abDescend(hwnd,el,vmidAC[0],childAC);
+						}
 				}
+
 			}
 		}
 				
