@@ -42,7 +42,7 @@ import org.fruit.alayer.Widget;
  *
  */
 public class EvaluationResult implements Serializable {
-	
+
 	private static final long serialVersionUID = -51527046346987231L;
 
 	public enum Type {
@@ -63,11 +63,11 @@ public class EvaluationResult implements Serializable {
 		 */
 		ERROR;
 	}
-	
+
 	private final Type type;
 	private final String message;
 	private final Widget widget;
-	
+
 	/**
 	 * Constructs a new evaluation result that does not apply to a single widget.
 	 * @param type The problem type.
@@ -76,7 +76,7 @@ public class EvaluationResult implements Serializable {
 	public EvaluationResult(Type type, String message) {
 		this(type, message, null);
 	}
-	
+
 	/**
 	 * Constructs a new evaluation result that applies to a single widget.
 	 * @param type The problem type.
@@ -88,7 +88,7 @@ public class EvaluationResult implements Serializable {
 		this.message = message;
 		this.widget = widget;
 	}
-	
+
 	/**
 	 * Gets the problem type.
 	 * @return The problem type.
@@ -104,7 +104,7 @@ public class EvaluationResult implements Serializable {
 	public String getMessage() {
 		return message;
 	}
-	
+
 	/**
 	 * Gets the widget that this evaluation result applies to.
 	 * @return The widget.
@@ -120,7 +120,7 @@ public class EvaluationResult implements Serializable {
 	public double getVerdictSeverity() {
 		return type.equals(Type.OK) ? Verdict.SEVERITY_OK : Verdict.SEVERITY_FAIL;
 	}
-	
+
 	@Override
 	public String toString() {
 		String ret = type.name() + ": " + message;
@@ -129,5 +129,4 @@ public class EvaluationResult implements Serializable {
 		}
 		return ret;
 	}
-
 }

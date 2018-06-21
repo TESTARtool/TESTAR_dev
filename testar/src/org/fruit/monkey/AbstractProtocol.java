@@ -113,6 +113,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -338,13 +341,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		// toggle widget mark visualization
 		else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT)) {
-			    settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
+				settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
 			}	
 
 		// toggle widget info visualization
 		else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT)) {
-			    settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));	
-		     }
+				settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));	
+			 }
 		
 		// begin by urueda (method structure changed from if* to <if, elseif*, else>)
 		

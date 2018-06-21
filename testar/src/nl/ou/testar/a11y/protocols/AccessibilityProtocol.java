@@ -61,23 +61,23 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  *
  */
 public class AccessibilityProtocol extends DefaultProtocol {
-	
+
 	public static final String HTML_FILENAME_PREFIX = "accessibility_report_",
 			HTML_EXTENSION = ".html";
-	
+
 	private static final String SCREENSHOT_PATH_PREFIX = "../";
-	
+
 	/**
 	 * The accessibility evaluator.
 	 */
 	protected final Evaluator evaluator;
-	
+
 	/**
 	 * The relevant widgets.
 	 * This needs to be updated after every state change.
 	 */
 	protected List<Widget> relevantWidgets;
-	
+
 	/**
 	 * The HTML reporter to store the evaluation results.
 	 */
@@ -90,12 +90,12 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		super();
 		this.evaluator = evaluator;
 	}
-	
+
 	@Override
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 	}
-	
+
 	@Override
 	protected void beginSequence() {
 		super.beginSequence();
@@ -157,7 +157,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		for (Widget w : relevantWidgets) {
 			storeWidget(concreteID, w);
 		}
-		
+
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {
 			// no upstream actions, so evaluate accessibility
@@ -165,7 +165,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		return actions;
 	}
-	
+
 	@Override
 	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
@@ -175,7 +175,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		html.writeFooter().close();
 	}
-	
+
 	/**
 	 * Perform offline evaluation, e.g. with a graph database.
 	 */
@@ -183,7 +183,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		EvaluationResults results = evaluator.query(graphDB());
 		writeOfflineEvaluationResults(results);
 	}
-	
+
 	/**
 	 * Write implementation-specific on-the-fly evaluation result details to the HTML report.
 	 * @param results The evaluation results.
@@ -203,7 +203,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		html.writeUListEnd();
 	}
-	
+
 	/**
 	 * Write implementation-specific evaluation result details from a graph database to the HTML report.
 	 * @param stateProps The map of state properties, indexed by tag name.
@@ -214,7 +214,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 * Write implementation-specific offline evaluation result details to the HTML report.
 	 */
 	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {}
-	
+
 	/**
 	 * Gets the title of the widget with the given concrete ID from a graph database.
 	 * @param concreteID The concrete ID of the widget.
@@ -230,7 +230,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		return (String)widgets.get(0);
 	}
-	
+
 	private List<Widget> getRelevantWidgets(State state) {
 		List<Widget> widgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
@@ -244,7 +244,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		}
 		return widgets;
 	}
-	
+
 	private void writeOnTheFlyEvaluationResults(EvaluationResults results) {
 		html.writeHeading(2, "State: " + state.get(Tags.ConcreteID))
 		.writeTableStart()
@@ -256,7 +256,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeTableEnd();
 		writeOnTheFlyEvaluationResultsDetails(results);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void writeGraphDBResults() {
 		// This will retrieve all properties,
@@ -273,7 +273,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 			writeGraphDBResultsDetails(stateProps);
 		}
 	}
-	
+
 	private void writeGeneralGraphDBResults(Map<String, Object> stateProps) {
 		html.writeHeading(3,
 				"State: " + stateProps.get(Tags.ConcreteID.name()))
@@ -292,13 +292,13 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeLink("Open screenshot in a new window",
 				SCREENSHOT_PATH_PREFIX + stateProps.get(Tags.ScreenshotPath.name()), true);
 	}
-	
+
 	private void writeOfflineEvaluationResults(EvaluationResults results) {
 		html.writeHeading(2, "Offline evaluation");
 		writeGeneralOfflineEvaluationResults(results);
 		writeOfflineEvaluationResultsDetails(results);
 	}
-	
+
 	private void writeGeneralOfflineEvaluationResults(EvaluationResults results) {
 		html.writeHeading(3, "General information")
 		.writeTableStart()
@@ -309,5 +309,5 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeTableRow("Total", results.getResultCount())
 		.writeTableEnd();
 	}
-	
+
 }

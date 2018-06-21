@@ -286,7 +286,7 @@ public class FilteringManager {
         	}
         	break;
         default:
-        	if (winfo != null && winfo.filterCode.intValue() == widgetFilter) {
+        	if (winfo != null && winfo.filterCode.intValue() == widgetFilter){
         		widgetsFilterList.remove(widgetID);
         	}
         	else {
@@ -365,15 +365,15 @@ public class FilteringManager {
     
     public String getRandomText(Widget w){
     	String wid = w.get(Tags.Abstract_R_T_P_ID);
-    	if (!widgetsFilterList.containsKey(wid)) {
-        	wid = w.get(Tags.Abstract_R_T_ID);    
+    	if (!widgetsFilterList.containsKey(wid)){
+        	wid = w.get(Tags.Abstract_R_T_ID);
     	}
     	if (widgetsFilterList.containsKey(wid)){
         	int widgetFilter = widgetsFilterList.get(wid).filterCode;
-        	if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_NUMBER) {
+        	if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_NUMBER){
         		return DataManager.getRandomPrimitiveDataTypeNumber();
         	}
-        	else if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_TEXT) {
+        	else if (widgetFilter == DataManager.PRIMITIVE_DATA_TYPE_TEXT){
         		return DataManager.getRandomPrimitiveDataTypeText();
         	}
         	Set<String> dataSamples = DataManager.INPUT_VALUES.get(widgetFilter);

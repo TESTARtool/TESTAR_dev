@@ -1,3 +1,7 @@
+// ####ADD for SikuliX build Begin 
+import org.gradle.internal.os.OperatingSystem; 
+// ####ADD for SikuliX build End
+
 apply plugin: 'application'
 
 sourceSets {
@@ -18,11 +22,32 @@ sourceSets {
     }
 }
 
+// ####ADD for SikuliX build Begin
+repositories {
+    mavenCentral()
+    maven{url "http://oss.sonatype.org/content/groups/public"}
+    maven {url "https://jitpack.io"}
+}
+// ####ADD for SikuliX build End
+
+/**
+ * Task to run TESTAR using gradle
+ * This task set the working directory to the install folder and runs testar.bat
+ * Note this version only works on Windows.
+ */
+task runTestar(type: Exec) {
+    group = 'custom_testar'
+    description ='runTESTAR'
+    workingDir 'target/install/testar/bin'
+    commandLine 'cmd', '/c', 'testar.bat'
+}
+
 dependencies {
     compile project(':core')
     compile project(':native')
     compile project(':graph')
     compile project(':graphdb')
+    compile project(':tgherkin')
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/JNativeHook.jar')
     runtime project(':windows')
@@ -31,6 +56,30 @@ dependencies {
     runtime files('../graph/lib/com.alexmerz.graphviz.jar')
     runtime files('../graph/lib/json-simple-1.1.1.jar')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
+	// ####ADD for Tesseract build Begin    
+    compile group: 'net.sourceforge.tess4j', name: 'tess4j', version: '4.0.0'
+	// ####ADD for Tesseract build End    
+	// ####ADD for SikuliX build Begin    
+    //compile files('./lib/sikulixapi.jar')
+    // SikuliX
+    //compile group: 'com.github.vidstige', name: 'jadb', version: '-v1.0-g94ebf38-23'
+    compile ('com.github.vidstige:jadb:94ebf38')
+    compile ( group: 'com.sikulix', name: 'sikulixapi', version: '1.1.2') {
+        exclude group: 'com.sikulix', module: '${sikulix.libs}'
+    }
+    if (OperatingSystem.current().isWindows()) {
+        println 'Setting sikuli libs to Windows'
+        compile ( group: 'com.sikulix', name: 'sikulixlibswin', version: '1.1.1')
+    } else if ( OperatingSystem.current().isLinux() ) {
+        println 'Setting sikuli libs to Linux'
+        compile ( group: 'com.sikulix', name: 'sikulixlibslux', version: '1.1.1')
+    } else if ( OperatingSystem.current().isMacOsX() ) {
+        println 'Setting sikuli libs to Mac'
+        compile ( group: 'com.sikulix', name: 'sikulixlibsmac', version: '1.1.1')
+    } else {
+        throw new Exception('Unknown OS')
+    }    
+    // ####ADD for SikuliX build End 
 }
 evaluationDependsOn(':windows')
 
@@ -64,13 +113,35 @@ task prepareNativeDLL(type: Copy) {
     into 'target/scripts'
 }
 
-
 prepareOracles.dependsOn(oracleClasses)
 
-applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+/**
+ * Set the arguments of the jvm in the start scripts.
+ * To debug build TESTAR with the -DDEBUG=true.
+ */
+startScripts {
+    if(System.getProperty('DEBUG', 'false') ) {
+        applicationDefaultJvmArgs = 
+            ["-Dlogback.configurationFile=logback.xml",
+            '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+    } else {
+        applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+    }
+}
 
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
 }
 
+//running testar requires the distribution to be installed.
+runTestar.dependsOn(installDist)
+
 mainClassName='org.fruit.monkey.Main'
+
+// ####ADD for SikuliX build Begin
+buildscript {
+    configurations {
+    	compile.exclude module: 'slf4j-nop'
+ 	}
+}
+// ####ADD for SikuliX build End

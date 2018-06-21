@@ -38,7 +38,7 @@ import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-
+import nl.ou.testar.tgherkin.model.Document;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
@@ -48,8 +48,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import static org.fruit.monkey.ConfigTags.*;
 
@@ -241,16 +240,17 @@ public class Main {
       settings = loadSettings(args, testSettings);
       overrideWithUserProperties(settings); // by urueda
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
+      
       if (SST != null) {
         System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
       }
 
       if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-        if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
-          return;
+          if ((settings = new SettingsDialog().run(settings, testSettings)) == null) {
+            return;
+          }
         }
-      }
-
+     
       try {
         String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
         File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
@@ -280,8 +280,7 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
-      // String protocolClass = settings.get(ProtocolClass).split("/")[1]; // by urueda
-      String protocolClass = settings.get(ProtocolClass).replace("/",".");
+      String protocolClass = settings.get(ProtocolClass).replace("/","."); // by urueda
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
@@ -391,6 +390,20 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
+      defaults.add(Pair.from(TgherkinDocument, ""));
+      defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
+      defaults.add(Pair.from(ContinueToApplyDefault, true));
+      defaults.add(Pair.from(RepeatTgherkinScenarios, true));
+      defaults.add(Pair.from(GenerateTgherkinReport, false));		
+      defaults.add(Pair.from(StoreTgherkinReport, false));
+      defaults.add(Pair.from(ReportDerivedGestures, false));
+      defaults.add(Pair.from(ReportState, false));
+      defaults.add(Pair.from(ConfidenceThreshold, 1.0));
+      defaults.add(Pair.from(TgherkinReportIncludeOCR, false));
+      defaults.add(Pair.from(TgherkinReportIncludeImageRecognition, false));
+      defaults.add(Pair.from(TgherkinNrOfNOPRetries, 0));
+      defaults.add(Pair.from(TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]));
+      defaults.add(Pair.from(MinimumPercentageForImageRecognition, 95.0));
       return Settings.fromFile(defaults, file);
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);

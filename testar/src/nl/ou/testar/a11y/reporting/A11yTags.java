@@ -48,5 +48,4 @@ public final class A11yTags extends TagsBase {
 	public static final Tag<Integer> A11yWarningCount = from("A11yWarningCount", Integer.class);
 	public static final Tag<Integer> A11yErrorCount = from("A11yErrorCount", Integer.class);
 	public static final Tag<Boolean> A11yHasViolations = from("A11yHasViolations", Boolean.class);
-
 }

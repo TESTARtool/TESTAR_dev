@@ -53,7 +53,7 @@ public final class EvaluationResults implements Serializable {
 	public static final double SEVERITY_WARNING =
 			Verdict.SEVERITY_MIN + ((Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / 10.0);
 	// The severity of an error is computed, see getOverallVerdict().
-	
+
 	private final List<EvaluationResult> results = new ArrayList<>();
 	
 	private int passCount = 0, warningCount = 0, errorCount = 0;
@@ -83,7 +83,7 @@ public final class EvaluationResults implements Serializable {
 				return;
 		}
 	}
-	
+
 	/**
 	 * Get a list of all evaluation results.
 	 * @return The list of results.
@@ -91,7 +91,7 @@ public final class EvaluationResults implements Serializable {
 	public List<EvaluationResult> getResults() {
 		return Collections.unmodifiableList(results);
 	}
-	
+
 	/**
 	 * Get the total number of evaluation results.
 	 * @return The result count.
@@ -99,7 +99,7 @@ public final class EvaluationResults implements Serializable {
 	public int getResultCount() {
 		return results.size();
 	}
-	
+
 	/**
 	 * Get the total number of evaluation results that are passes.
 	 * @return The pass count.
@@ -107,7 +107,7 @@ public final class EvaluationResults implements Serializable {
 	public int getPassCount() {
 		return passCount;
 	}
-	
+
 	/**
 	 * Get the total number of evaluation results that are warnings.
 	 * @return The warning count.
@@ -115,7 +115,7 @@ public final class EvaluationResults implements Serializable {
 	public int getWarningCount() {
 		return warningCount;
 	}
-	
+
 	/**
 	 * Get the total number of evaluation results that are errors.
 	 * @return The error count.
@@ -131,7 +131,7 @@ public final class EvaluationResults implements Serializable {
 	public boolean hasViolations() {
 		return getResultCount() - passCount > 0;
 	}
-	
+
 	/**
 	 * Computes an overall Verdict from all evaluation results.
 	 * The severity will match that of the highest-level problem that was found.
@@ -154,12 +154,11 @@ public final class EvaluationResults implements Serializable {
 		}
 		return new Verdict(severity, "Accessibility evaluation");
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Warnings: " + getWarningCount() +
 				", Errors: " + getErrorCount() +
 				", Total: " + getResultCount();
 	}
-	
 }

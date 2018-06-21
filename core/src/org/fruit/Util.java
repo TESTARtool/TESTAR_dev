@@ -516,11 +516,11 @@ public final class Util {
   }
 
   public static List<File> getAllFiles(List<File> dirs, String extension) {
-    List<File> files = Util.newArrayList();
-    for (File f : dirs) {
-      files.addAll(getAllFiles(f, extension));
-    }
-    return files;
+	    List<File> files = Util.newArrayList();
+	    for (File f : dirs) {
+	        files.addAll(getAllFiles(f, extension));
+	    }
+	    return files;
   }
 
   public static List<File> getAllFiles(File dir, String extension) {
@@ -529,16 +529,16 @@ public final class Util {
     return fileList;
   }
 
-  public static void getAllFiles(File dir, String extension, List<File> fileList) {
-    for (File f : dir.listFiles()) {
-      if (f.getName().endsWith(extension)) {
-        fileList.add(f);
-      }
-      if (f.isDirectory()) {
-        getAllFiles(f, extension, fileList);
-      }
-    }
-  }
+	public static void getAllFiles(File dir, String extension, List<File> fileList) {
+		for (File f : dir.listFiles()) {
+			if (f.getName().endsWith(extension)) {
+				fileList.add(f);
+			}
+			if (f.isDirectory()) {
+				getAllFiles(f, extension, fileList);
+			}
+		}
+	}
 
   public static String readFile(File path) {
     try {
@@ -768,7 +768,6 @@ public final class Util {
     File compileDir = new File("./resources/settings/" +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
-
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       if (compiler == null) {
@@ -780,7 +779,6 @@ public final class Util {
       try {
         Iterable<? extends JavaFileObject> compilationUnits =
             fileManager.getJavaFileObjectsFromFiles(getAllFiles(dir, ".java"));
-
         ArrayList<String> options = new ArrayList<>();
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
@@ -793,7 +791,7 @@ public final class Util {
             options,
             null,
             compilationUnits);
-        if (!task.call()) {
+         if (!task.call()) {
           for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
             System.err.format("[Util] Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
