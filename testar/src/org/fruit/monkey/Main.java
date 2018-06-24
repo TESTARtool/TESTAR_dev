@@ -219,6 +219,11 @@ public class Main {
     });
   }
 
+  /**
+   * This method initializes the coding manager with custom tags to use for constructing
+   * concrete and abstract state id's, if provided of course.
+   * @param settings
+   */
   private static void initCodingManager(Settings settings) {
     // we look if there are user-provided custom state tags in the settings
     // if so, we provide these to the coding manager

@@ -53,8 +53,10 @@ public class CodingManager {
 	public static final int ID_LENTGH = 24; // 2 (prefixes) + 7 (MAX_RADIX) + 5 (max expected text length) + 10 (CRC32)
 	
 	public static final String CONCRETE_ID = "ConcreteID";
+	public static final String CONCRETE_ID_CUSTOM = "ConcreteIDCustom";
 	// actions abstraction
 	public static final String ABSTRACT_ID = "AbstractID";
+	public static final String ABSTRACT_ID_CUSTOM = "AbstractIDCustom";
 	// widgets abstraction
 	public static final String ABSTRACT_R_ID = "Abs(R)ID"; // ROLE
 	public static final String ABSTRACT_R_T_ID = "Abs(R,T)ID"; // ROLE, TITLE
@@ -83,8 +85,8 @@ public class CodingManager {
 	};
 
 	// two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
-	private static Tag<?>[] CUSTOM_TAGS_FOR_CONCRETE_ID = new Tag<?>[]{};
-	private static Tag<?>[] CUSTOM_TAGS_FOR_ABSTRACT_ID = new Tag<?>[]{};
+	private static Tag<?>[] customTagsForConcreteId = new Tag<?>[]{};
+	private static Tag<?>[] customTagsForAbstractId = new Tag<?>[]{};
 
     /**
      * Set the array of tags that should be used in constructing the concrete state id's.
@@ -92,7 +94,7 @@ public class CodingManager {
      * @param tags array
      */
 	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
-		CUSTOM_TAGS_FOR_CONCRETE_ID = tags;
+		customTagsForConcreteId = tags;
 	}
 
     /**
@@ -101,7 +103,7 @@ public class CodingManager {
      * @param tags
      */
 	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
-		CUSTOM_TAGS_FOR_ABSTRACT_ID = tags;
+		customTagsForAbstractId = tags;
 	}
 
 	// this map holds the state tags that should be provided to the coding manager
@@ -137,12 +139,15 @@ public class CodingManager {
 	 */
 	public static synchronized void buildIDs(Widget widget){
 		if (widget.parent() != null){
-			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CUSTOM_TAGS_FOR_CONCRETE_ID.length == 0 ? CodingManager.TAGS_CONCRETE_ID : CUSTOM_TAGS_FOR_CONCRETE_ID));
+			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
+			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, customTagsForConcreteId));
+			widget.set(Tags.AbstractIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT + CodingManager.codify(widget, false, customTagsForAbstractId));
 		} else if (widget instanceof State) { // UI root
-			String cid = "", a_R_id = "", a_R_T_id = "", a_R_T_P_id = "";
+			String cid, a_R_id, a_R_T_id, a_R_T_P_id, concreteIdCustom, abstractIdCustom;
+			cid = a_R_id = a_R_T_id = a_R_T_P_id = concreteIdCustom = abstractIdCustom = "";
 			for (Widget w : (State) widget){
 				if (w != widget){
 					buildIDs(w);
@@ -150,12 +155,16 @@ public class CodingManager {
 					a_R_id += w.get(Tags.Abstract_R_ID);
 					a_R_T_id += w.get(Tags.Abstract_R_T_ID);
 					a_R_T_P_id += w.get(Tags.Abstract_R_T_P_ID);
+					concreteIdCustom += w.get(Tags.ConcreteIDCustom);
+					abstractIdCustom += w.get(Tags.AbstractIDCustom);
 				}
 			}
 			widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(cid));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.toID(a_R_id));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.toID(a_R_T_id));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.toID(a_R_T_P_id));
+			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(concreteIdCustom));
+			widget.set(Tags.AbstractIDCustom, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT + CodingManager.toID(abstractIdCustom));
 		}	
 	}
 	
