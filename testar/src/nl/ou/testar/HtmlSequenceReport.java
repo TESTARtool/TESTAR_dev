@@ -30,6 +30,7 @@ public class HtmlSequenceReport {
 
     public HtmlSequenceReport() {
         try{
+            //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
             String filename = "TESTAR_sequence.txt"; // will be replaced
             int i = 1;
@@ -56,6 +57,10 @@ public class HtmlSequenceReport {
     public void addState(State state, Set<Action> actions){
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
+        try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
+        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
+        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
+        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
         write("<p><img src=\""+state.get(Tags.ScreenshotPath)+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
         sequenceCounter++;
 
@@ -74,8 +79,13 @@ public class HtmlSequenceReport {
             write("<li>");
 //            try{if(action.get(Tags.Role)!=null) write("--Role="+action.get(Tags.Role));}catch(Exception e){}
 //            try{if(action.get(Tags.Targets)!=null) write("--Targets="+action.get(Tags.Targets));}catch(Exception e){}
-            try{if(action.get(Tags.Desc)!=null) write("<b>"+action.get(Tags.Desc)+"</b>");}catch(Exception e){}
-            write(" || "+action.toString());
+            try{if(action.get(Tags.Desc)!=null) write("<b>"+action.get(Tags.Desc)+"</b>  || ");}catch(Exception e){}
+            write(action.toString());
+            write(" || ConcreteId="+action.get(Tags.ConcreteID));
+            try{if(action.get(Tags.AbstractID)!=null) write(" || AbstractId="+action.get(Tags.AbstractID));}catch(Exception e){}
+            try{if(action.get(Tags.Abstract_R_ID)!=null) write(" || Abstract_R_ID="+action.get(Tags.Abstract_R_ID));}catch(Exception e){}
+            try{if(action.get(Tags.Abstract_R_T_ID)!=null) write(" || Abstract_R_T_ID="+action.get(Tags.Abstract_R_T_ID));}catch(Exception e){}
+            try{if(action.get(Tags.Abstract_R_T_P_ID)!=null) write(" || Abstract_R_T_P_ID="+action.get(Tags.Abstract_R_T_P_ID));}catch(Exception e){}
             write("</li>");
         }
         write("</ul>");
