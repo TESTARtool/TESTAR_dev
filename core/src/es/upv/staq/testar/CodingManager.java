@@ -82,18 +82,30 @@ public class CodingManager {
 		ActionRoles.KeyUp
 	};
 
+	// two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
 	private static Tag<?>[] CUSTOM_TAGS_FOR_CONCRETE_ID = new Tag<?>[]{};
 	private static Tag<?>[] CUSTOM_TAGS_FOR_ABSTRACT_ID = new Tag<?>[]{};
 
-
+    /**
+     * Set the array of tags that should be used in constructing the concrete state id's.
+     *
+     * @param tags array
+     */
 	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
 		CUSTOM_TAGS_FOR_CONCRETE_ID = tags;
 	}
 
+    /**
+     * Set the array of tags that should be used in constructing the abstract state id's.
+     *
+     * @param tags
+     */
 	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
 		CUSTOM_TAGS_FOR_ABSTRACT_ID = tags;
 	}
 
+	// this map holds the state tags that should be provided to the coding manager
+    // for use in constructing concrete and abstract state id's
 	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
 		{
 			put("Role", Tags.Role);

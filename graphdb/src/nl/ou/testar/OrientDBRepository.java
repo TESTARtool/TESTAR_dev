@@ -139,15 +139,14 @@ class OrientDBRepository implements GraphDBRepository {
       long tStart = System.currentTimeMillis();
       OrientGraph graph = graphFactory.getTx();
       try {
-         Vertex state = getStateVertex(stateID, graph);
-         if (state == null) {
+         if (getStateVertex(stateID, graph) == null) {
             throw new GraphDBException("state not found in database");
          }
-         Vertex widget = getWidgetVertex(w.get(Tags.ConcreteID), graph);
-         if (widget == null) {
-            Vertex wv = createWidgetVertex(stateID, w, graph);
+         Vertex widgetVertex = getWidgetVertex(w.get(Tags.ConcreteID), graph);
+         if (widgetVertex == null) {
+            widgetVertex = createWidgetVertex(stateID, w, graph);
 
-            bindToAbstractRole(wv, w, graph);
+            bindToAbstractRole(widgetVertex, w, graph);
          }
          graph.commit();
       } finally {
@@ -246,15 +245,15 @@ class OrientDBRepository implements GraphDBRepository {
       Edge isA = graph.addEdge(null,vertex,abstractState,"isA");
    }
 
-   private Vertex createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
-      Vertex vertex = graph.addVertex("class:Widget");
+   private Vertex createWidgetVertex(final String stateId, final Widget w, final OrientGraph graph) {
+      Vertex widgetVertex = graph.addVertex("class:Widget");
       for (Tag<?> t : w.tags())
-         setProperty(t, w.get(t), vertex);
-      Vertex state = getStateVertex(widgetId, graph);
-      Edge edge = graph.addEdge(null, state, vertex, "has");
+         setProperty(t, w.get(t), widgetVertex);
+      Vertex stateVertex = getStateVertex(stateId, graph);
+      Edge edge = graph.addEdge(null, stateVertex, widgetVertex, "has");
       graph.commit();
-      LOGGER.debug("Widget {} Vertex created and connected to state via Edge {} ", vertex.getId(), edge.getId());
-      return vertex;
+      LOGGER.debug("Widget {} Vertex created and connected to state via Edge {} ", widgetVertex.getId(), edge.getId());
+      return widgetVertex;
    }
 
    /**
@@ -407,12 +406,12 @@ class OrientDBRepository implements GraphDBRepository {
     * @return Vertext for the abstract Role/Title/Path combination.
     */
    private Vertex getAbstractRoleWidget(Graph g, Widget widget) {
-      String absID = widget.get(Tags.Abstract_R_ID, "");
+      String abstractId = widget.get(Tags.Abstract_R_ID, "");
       Vertex abstractRole = createVertex("AbsRole",
          "Abstract_R_ID",
          widget.get(Tags.Abstract_R_ID),g);
 
-      abstractRole.setProperty("absid", absID);
+      abstractRole.setProperty("absid", abstractId);
       abstractRole.setProperty("Role", widget.get(Tags.Role, Role.from("UNKNOWN")).toString());
       return abstractRole;
    }
