@@ -33,6 +33,8 @@
  */
 package org.fruit.alayer.windows;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -120,15 +122,48 @@ public final class WinProcess extends SUTBase {
 	public static WinProcess fromExecutable(String path) throws SystemStartException{
 		try{
 			Assert.notNull(path);
-			long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
-			long hProcess = handles[0];
-			long hThread = handles[1];
-			Windows.CloseHandle(hThread);
+			
+			//TODO: With the new way of invoking the SUT, Chrome runs but remains "not responding" until TESTAR is closed,
+			//then loads (probably by the inclusion of --force-renderer-accessibility --incognito)
+			if(path.contains("chrome.exe")) {
+				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
+				long hProcess = handles[0];
+				long hThread = handles[1];
+				Windows.CloseHandle(hThread);
 
-			WinProcess ret = new WinProcess(hProcess, true);
-			ret.set(Tags.Desc, path);
+				WinProcess ret = new WinProcess(hProcess, true);
+				ret.set(Tags.Desc, path);
+				return ret;
+			}
+			
+			//Associate Output / Error from SUT
+
+			final Process p = Runtime.getRuntime().exec(path);
+			Field f = p.getClass().getDeclaredField("handle");
+			f.setAccessible(true);
+			
+			long procHandle = f.getLong(p);
+			
+			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
+			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
+			if(path.contains("java -jar"))
+				Util.pause(5);
+			else
+				Windows.WaitForInputIdle(procHandle);
+			
+			long pid = Windows.GetProcessId(procHandle);
+			
+			WinProcess ret = fromPID(pid);
+			
+			ret.set(Tags.StdErr,p.getErrorStream());
+			ret.set(Tags.StdOut, p.getInputStream());
+			ret.set(Tags.StdIn, p.getOutputStream());
+		    
+		    Windows.CloseHandle(procHandle);
+			
+			ret.set(Tags.Path, path);
 			return ret;
-		}catch(FruitException fe){
+		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
 		}
 	}

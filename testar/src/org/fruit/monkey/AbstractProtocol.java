@@ -154,7 +154,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	double startTime;
 
 	// TODO: DATE-FORMAT
-	private static final String DATE_FORMAT = "dd.MMMMM.yyyy HH:mm:ss";
+	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	// Verdict severities
 	// PASS
@@ -502,6 +502,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected final int actionCount(){ return actionCount; }
 	protected final int sequenceCount(){ return sequenceCount; }
 	protected void initialize(Settings settings){}
+	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
+	protected final Action lastExecutedAction() {return lastExecutedAction;}
+	protected void processListeners(SUT system, String specificSuspiciousTitle) {}
 
 	// TODO: The methods below are all about visualization of the state, widgets and actions. They need to be moved out of the Abstract Protocol
 
@@ -1315,6 +1318,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			try{
 
 				system = startSystem();
+				processListeners(system, "");
 
 				lastCPU = NativeLinker.getCPUsage(system);
 				
@@ -1609,21 +1613,21 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				settings.get(ConfigTags.GraphDBPassword));
 
 		try {
-			if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
-				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				// begin by urueda
-				if (GlobalScreen.isNativeHookRegistered())
-					GlobalScreen.unregisterNativeHook();
-				Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.FINEST); //Level.SEVERE
-				// end by urueda
-				GlobalScreen.registerNativeHook();
-				//GlobalScreen.getInstance().addNativeKeyListener(this);
-				GlobalScreen.getInstance().addNativeKeyListener(eventHandler); // by urueda (refactored)
-				//GlobalScreen.getInstance().addNativeMouseListener(this);
-				GlobalScreen.getInstance().addNativeMouseListener(eventHandler); // by urueda (refactored)
-				GlobalScreen.getInstance().addNativeMouseMotionListener(eventHandler); // by urueda
-				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
-			}
+            if (!settings.get(ConfigTags.UnattendedTests)) {
+                LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+                Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+                logger.setLevel(Level.OFF);
+                logger.setUseParentHandlers(false);
+
+                if (GlobalScreen.isNativeHookRegistered()) {
+                    GlobalScreen.unregisterNativeHook();
+                }
+                GlobalScreen.registerNativeHook();
+                GlobalScreen.addNativeKeyListener(eventHandler);
+                GlobalScreen.addNativeMouseListener(eventHandler);
+                GlobalScreen.addNativeMouseMotionListener(eventHandler);
+                LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
+            }
 
 			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
 
@@ -1638,18 +1642,18 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
 		}finally{
-			try{
-				if (!settings.get(ConfigTags.UnattendedTests).booleanValue()){ // by urueda
-					if (GlobalScreen.isNativeHookRegistered()){
-						LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-						GlobalScreen.getInstance().removeNativeMouseMotionListener(eventHandler);
-						GlobalScreen.getInstance().removeNativeMouseListener(eventHandler);
-						GlobalScreen.getInstance().removeNativeKeyListener(eventHandler);
-						GlobalScreen.unregisterNativeHook();
-					}
-				}
-				protocolUtil.stopAdhocServer();
-			}catch(Exception e){
+            try {
+                if (!settings.get(ConfigTags.UnattendedTests)) {
+                    if (GlobalScreen.isNativeHookRegistered()) {
+                        LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+                        GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+                        GlobalScreen.removeNativeMouseListener(eventHandler);
+                        GlobalScreen.removeNativeKeyListener(eventHandler);
+                        GlobalScreen.unregisterNativeHook();
+                    }
+                }
+                protocolUtil.stopAdhocServer();
+            } catch(Exception e) {
 				e.printStackTrace();
 			}
 		}
