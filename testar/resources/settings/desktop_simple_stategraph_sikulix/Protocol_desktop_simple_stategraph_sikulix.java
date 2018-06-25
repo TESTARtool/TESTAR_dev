@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -278,14 +279,14 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
 			//System.out.println("DEBUG: action: "+action.toString());
-			System.out.println("DEBUG: action short: "+action.toShortString());
+			//System.out.println("DEBUG: action short: "+action.toShortString());
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
 				try {
-					System.out.println("DEBUG: sikuli clicking ");
+					//System.out.println("DEBUG: sikuli clicking ");
 					while(!new File(widgetScreenshotPath).exists()){
-						System.out.println("Waiting for image file to exist");
+						//System.out.println("Waiting for image file to exist");
 						Util.pause(halfWait);
 					}
 					Util.pause(1);
@@ -296,14 +297,14 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 				}
 			}else if(action.toShortString().contains("ClickTypeInto(")){
 				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
-				System.out.println("parsed text:"+textToType);
+				//System.out.println("parsed text:"+textToType);
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Util.pause(halfWait);
 				Screen sikuliScreen = new Screen();
 				try {
-					System.out.println("DEBUG: sikuli typing ");
+					//System.out.println("DEBUG: sikuli typing ");
 					while(!new File(widgetScreenshotPath).exists()){
-						System.out.println("Waiting for image file to exist");
+						//System.out.println("Waiting for image file to exist");
 						Util.pause(halfWait);
 					}
 					Util.pause(1);
@@ -313,7 +314,8 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 					return false;
 				}
 			}
-			else { 				 System.out.println("DEBUG: TESTAR action");
+			else {
+				//System.out.println("DEBUG: TESTAR action");
 				//System.out.println("DEBUG: action desc: "+action.get(Tags.Desc));
 				action.run(system, state, settings().get(ConfigTags.ActionDuration));
 			}return true;
