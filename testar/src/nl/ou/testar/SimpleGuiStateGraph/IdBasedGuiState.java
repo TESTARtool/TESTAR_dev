@@ -1,4 +1,4 @@
-package nl.ou.testar;
+package nl.ou.testar.SimpleGuiStateGraph;
 
 import java.util.HashSet;
 import java.util.Set;
