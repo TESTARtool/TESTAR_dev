@@ -123,6 +123,7 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	protected void finishSequence(File recordedSequence){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+
 	}
 	
 	// refactored
