@@ -406,6 +406,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected final int actionCount(){ return actionCount; }
 	protected final int sequenceCount(){ return sequenceCount; }
 	protected void initialize(Settings settings){}
+	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
+	protected final Action lastExecutedAction() {return lastExecutedAction;}
+	protected void processListeners(SUT system, String specificSuspiciousTitle) {}
 
 	// TODO: The methods below are all about visualization of the state, widgets and actions. They need to be moved out of the Abstract Protocol
 
@@ -1016,6 +1019,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			try{
 
 				system = startSystem();
+				processListeners(system, "");
 
 				lastCPU = NativeLinker.getCPUsage(system);
 				

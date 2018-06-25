@@ -768,6 +768,7 @@ public final class Windows{
 
 	public static native long OpenProcess(long dwDesiredAccess, boolean bInheritHandle, long dwProcessId) throws WinApiException;
 	public static native long WaitForSingleObject(long hHandle, long dwMilliseconds) throws WinApiException;
+	public static native long WaitForInputIdle(long hProcess) throws WinApiException;
 	public static native long GetExitCodeProcess(long hProcess) throws WinApiException;
 
 	/* COM */

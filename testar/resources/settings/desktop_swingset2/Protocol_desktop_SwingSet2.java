@@ -108,6 +108,19 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
 	}
 	
+	/**
+	 * This method is invoked each time TESTAR starts through COMMAND_LINE.
+	 * It examines the SUT's process to work with oracles at the process level.
+	 * By default it works with the settings oracles, but you can also add specific oracles.
+	 */
+	protected void processListeners(SUT system, String specificSuspiciousTitle) {
+		
+		//Use .*.* if u want to read all possible output errors
+		specificSuspiciousTitle=".*Exception.*|failed|.*null.*";
+		
+		super.processListeners(system, specificSuspiciousTitle);
+		
+	}
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -201,11 +214,10 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 					
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it
-					if(w.parent().get(Tags.Role).toString().contains("ComboBox") || (w.parent().get(Tags.Role).toString().contains("List"))){
-						actions.add(ac.leftClickAt(w));
-						w.set(Tags.ActionSet, actions);
-					}
-					if(w.get(Tags.Role).toString().contains("Tree")) {
+
+					if(w.get(Tags.Role).toString().contains("Tree") ||
+						w.get(Tags.Role).toString().contains("ComboBox") ||
+						w.get(Tags.Role).toString().contains("List")) {
 						widgetTree(w, actions);
 					}
 					//End of Force action
