@@ -32,7 +32,7 @@
 import java.io.File;
 import java.util.Set;
 
-import nl.ou.testar.GuiStateGraphWithVisitedActions;
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
