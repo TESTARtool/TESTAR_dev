@@ -1,6 +1,6 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -137,7 +137,9 @@ public class DefaultProtocol extends AbstractProtocol{
 		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 			
-			Pattern defaultOracles= Pattern.compile(settings().get(ConfigTags.SuspiciousTitles)+"|"+specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+			//Online Oracles
+			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			Pattern offlineOracles= Pattern.compile(specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
 			
 			int seqn = generatedSequenceCount();
 			File dir = new File("output/StdOutErr");
@@ -151,11 +153,39 @@ public class DefaultProtocol extends AbstractProtocol{
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 						String actionId = "";
 						String ch;
-						Matcher m;
+						Matcher mOffline, mOnline;
 						while ((ch = input.readLine()) != null)
 						{	
-							m= defaultOracles.matcher(ch);
-							if(defaultOracles!=null & m.matches()) {
+							mOffline= offlineOracles.matcher(ch);
+							mOnline = onlineOracles.matcher(ch);
+							
+							if(onlineOracles!=null && mOnline.matches()) {		
+
+								try {
+									semaphore.acquire();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								//Prepare report
+								State state = getState(system);
+								actionId=lastExecutedAction().get(Tags.ConcreteID);
+								Visualizer visualizer = Util.NullVisualizer;
+								// visualize the problematic state
+								if(state.get(Tags.Shape, null) != null)
+									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
+								
+								setProcessVerdict(verdict);
+								
+								faultySequence = true;
+								
+								semaphore.release();
+								
+							}
+							if(offlineOracles!=null && mOffline.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
 								System.out.println("SUT StdErr:	" +ch);
 								
@@ -184,11 +214,38 @@ public class DefaultProtocol extends AbstractProtocol{
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 						String actionId = "";
 						String ch;
-						Matcher m;
+						Matcher mOffline, mOnline;
 						while ((ch = input.readLine()) != null)
 						{	
-							m = defaultOracles.matcher(ch);
-							if(defaultOracles!=null & m.matches()) {
+							mOffline = offlineOracles.matcher(ch);
+							mOnline = onlineOracles.matcher(ch);
+							if(onlineOracles!=null && mOnline.matches()) {	
+
+								try {
+									semaphore.acquire();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+								//Prepare report
+								State state = getState(system);
+								actionId=lastExecutedAction().get(Tags.ConcreteID);
+								Visualizer visualizer = Util.NullVisualizer;
+								// visualize the problematic state
+								if(state.get(Tags.Shape, null) != null)
+									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
+
+								setProcessVerdict(verdict);
+								
+								faultySequence = true;
+
+								semaphore.release();
+
+							}
+							if(offlineOracles!=null && mOffline.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
 								System.out.println("SUT StdOut:	" +ch);
 								
