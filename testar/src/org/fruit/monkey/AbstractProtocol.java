@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -920,17 +920,22 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 	// TODO move to default protocol
-	private void runTest(){
+	/**
+	 * Method to run TESTAR on Generate mode
+	 * @param system
+	 */
+	private void runGenerate(SUT system){
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
 		lastStamp = System.currentTimeMillis();
 		escAttempts = 0; nopAttempts = 0;
 		boolean problems;
+
+		//New sequence starts
 		while(mode() != Modes.Quit && moreSequences()){
 			long tStart = System.currentTimeMillis();
-			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount);
+			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
 
-			//
 			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
 			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
 
@@ -938,8 +943,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 			try {
 				LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-					settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log")))),
-					settings.get(LogLevel));
+						settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
+						settings.get(LogLevel));
 			} catch (NoSuchTagException e3) {
 				// TODO Auto-generated catch block
 				e3.printStackTrace();
@@ -947,31 +952,30 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				// TODO Auto-generated catch block
 				e3.printStackTrace();
 			}
-			
-			if (mode() == Modes.GenerateManual)
-				setMode(Modes.Spy);
+
+			//Create a new Grapher for a new sequence
 			jipWrapper = new JIPrologWrapper();
 			Grapher.grapher(generatedSequence,
-							settings.get(ConfigTags.SequenceLength),
-							settings.get(ConfigTags.AlgorithmFormsFilling),
-							settings.get(ConfigTags.TypingTextsForExecutedAction).intValue(),
-							settings.get(ConfigTags.TestGenerator),
-							settings.get(ConfigTags.MaxReward),
-							settings.get(ConfigTags.Discount),
-							settings.get(ConfigTags.ExplorationSampleInterval),
-							settings.get(ConfigTags.GraphsActivated),
-							settings.get(ConfigTags.PrologActivated),
-							settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-									true :
-									settings.get(ConfigTags.GraphResuming),
-							settings.get(ConfigTags.OfflineGraphConversion),
-							jipWrapper);
+					settings.get(ConfigTags.SequenceLength),
+					settings.get(ConfigTags.AlgorithmFormsFilling),
+					settings.get(ConfigTags.TypingTextsForExecutedAction).intValue(),
+					settings.get(ConfigTags.TestGenerator),
+					settings.get(ConfigTags.MaxReward),
+					settings.get(ConfigTags.Discount),
+					settings.get(ConfigTags.ExplorationSampleInterval),
+					settings.get(ConfigTags.GraphsActivated),
+					settings.get(ConfigTags.PrologActivated),
+					settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
+							true :
+								settings.get(ConfigTags.GraphResuming),
+								settings.get(ConfigTags.OfflineGraphConversion),
+								jipWrapper);
+
 			Grapher.waitEnvironment();
 			ScreenshotSerialiser.start(generatedSequence);
-			
+
 			problems = false;
 			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;
-			//actionCount = 0;
 			if (this.forceToSequenceLengthAfterFail){
 				this.forceToSequenceLengthAfterFail = false;
 				this.testFailTimes++;
@@ -993,80 +997,63 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			} catch (IOException e2) {
 				LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 			}
-			//oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq), 50000000));
-			//raf = new RandomAccessFile(currentSeq, "rw");
-			//oos = new ObjectOutputStream(new FileOutputStream(raf.getFD()));
 			try {
-				//TestSerialiser.start(new RandomAccessFile(currentSeq, "rw"));
-				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq))));
+				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
 				LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 			} catch (IOException e) {
 				LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
 			}
-			//} catch (FileNotFoundException e1) {
-			//	LogSerialiser.log("File not found exception creating random test file\n", LogSerialiser.LogLevel.Critical);
-			//}
-
 			LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
-			//Canvas cv = buildCanvas();
+
 			this.cv = buildCanvas();
-			//logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " Starting system...", LogLevel.Info);
+
 			String startDateString = Util.dateString(DATE_FORMAT);
 			LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
-
-			SUT system = null;
 			
 			try{
-
-				system = startSystem();
-				processListeners(system, "");
+				//If system it's null means that we have started TESTAR from the Generate mode
+				if(system == null || !system.isRunning()) {
+					system = null;
+					system = startSystem();
+					processListeners(system, "");
+				}
 
 				lastCPU = NativeLinker.getCPUsage(system);
-				
-				//SUT system = WinProcess.fromProcName("firefox.exe");
-				//logln("System is running!", LogLevel.Debug);
+
 				LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
-				//logln("Starting sequence " + sequenceCount, LogLevel.Info);
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				State state = getState(system);
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
 				beginSequence(system, state);
 				LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				state = getState(system);
-				//Store ( initial )state
 				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
-	
+
 				Taggable fragment = new TaggableBase();
 				fragment.set(SystemState, state);
-							
+
 				Verdict verdict = state.get(OracleVerdict, Verdict.OK);
 				if (faultySequence) problems = true;
 				fragment.set(OracleVerdict, verdict);
-				int waitCycleIdx = 0;
-				long[] waitCycles = new long[]{1, 10, 25, 50}; // ms
-				long spyCycle = -1;
-				String stateID, lastStateID = state.get(Tags.ConcreteID);
+				
+				long spyTime;
+				//We begin to make the number of actions indicated in our sequence
 				while(mode() != Modes.Quit && moreActions(state)){
+					
+					//User wants to move to Spy mode, after that we will continue the actions
+					if(mode() == Modes.Spy) {
+						spyTime = System.currentTimeMillis();
+						runSpy(system);
+						LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
+					}
+					
 					if (problems)
 						faultySequence = true;
 					else{
 						problems = runAction(cv,system,state,fragment);
-						if (mode() == Modes.Spy){
-							stateID = state.get(Tags.ConcreteID);
-							if (stateID.equals(lastStateID)){
-								if (System.currentTimeMillis() - spyCycle > waitCycles[waitCycleIdx]){
-									spyCycle = System.currentTimeMillis();
-									if (waitCycleIdx < waitCycles.length - 1)
-										waitCycleIdx++;
-								} else
-									continue;
-							} else{
-								lastStateID = stateID;
-								waitCycleIdx = 0;
-							}
-						}
+						
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 						state = getState(system);
 						graphDB.addState(state);
@@ -1081,37 +1068,34 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						}
 					}
 				}
-	
+
 				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
 				stopSystem(system);
 				//If stopSystem did not really stop the system, we will do it for you ;-)
 				if (system != null && system.isRunning())
 					system.stop();
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
-				
+
 				ScreenshotSerialiser.finish();
 				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 				TestSerialiser.write(fragment);
 				TestSerialiser.finish();
 				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-				
+
 				Grapher.walkFinished(!problems,
-						 			 mode() == Modes.Spy ? null : state,
-						 			 protocolUtil.getStateshot(state));
-				
+						mode() == Modes.Spy ? null : state,
+								protocolUtil.getStateshot(state));
+
 				LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
 				if(problems)
 					LogSerialiser.log("Sequence contained problems!\n", LogSerialiser.LogLevel.Critical);
-								
+
 				finishSequence(currentSeq);
-	
-				//System.out.println("currentseq: " + currentSeq);
-				
+
 				Verdict finalVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
-				
+
 				if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
-					finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
-					//String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
+						finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 					LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
 					try {
 						Util.copyToDirectory(currentSeq.getAbsolutePath(),
@@ -1128,18 +1112,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				}
 				if(!problems)
 					this.forceToSequenceLengthAfterFail = false;
-	
+
 				LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
 				cv.release();
-				
+
 				saveSequenceMetrics(generatedSequence,problems);
-				
-				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
+
+				ScreenshotSerialiser.exit();
+				final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
 				if (reportPages == null)
 					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
 				TestSerialiser.exit();
 				String stopDateString =  Util.dateString(DATE_FORMAT),
-					   durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
+						durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
 				LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
@@ -1161,7 +1146,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
 				int i=1; StringBuffer trace = new StringBuffer();
 				for(StackTraceElement t : e.getStackTrace())
-				   trace.append("\n\t[" + i++ + "] " + t.toString());
+					trace.append("\n\t[" + i++ + "] " + t.toString());
 				System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
 				stopSystem(system);
 				if (system != null && system.isRunning())
@@ -1171,13 +1156,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
-			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount,System.currentTimeMillis()-tStart);
+			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount(),System.currentTimeMillis()-tStart);
 		}
 		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
-				this.actionCount <= settings().get(ConfigTags.SequenceLength) && mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
+				this.actionCount <= settings().get(ConfigTags.SequenceLength) && 
+				mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
 			this.forceToSequenceLengthAfterFail = true;
 			System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
- 			runTest(); // continue testing
+			runGenerate(system); // continue testing
 		} else
 			this.forceToSequenceLengthAfterFail = false;
 	}
@@ -1353,9 +1339,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				new SequenceViewer(settings).run();
 			}else if(mode() == Modes.Replay || mode() == Modes.ReplayDebug){
 				replay();
-			}else if(mode() == Modes.Generate || mode() == Modes.Spy || mode() == Modes.GenerateDebug){
-				runTest();
+			}else {
+				SUT system = null;
+				detectLoopMode(system);
 			}
+			
 		} catch (NativeHookException e) {
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
@@ -1375,6 +1363,65 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	//Method to change between the different loops that represent the principal modes of execution on TESTAR
+	private void detectLoopMode(SUT system) {
+		if(mode() == Modes.Spy ){
+			runSpy(system);
+		}else if(mode() == Modes.Generate || mode() == Modes.GenerateDebug || mode() == Modes.GenerateManual){
+			runGenerate(system);
+		}else if(mode() == Modes.Quit) {
+			quitSUT(system);
+		}
+	}
+
+	//close SUT because we're on Quit mode
+	private void quitSUT(SUT system) {
+
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+		stopSystem(system);
+		//If stopSystem did not really stop the system, we will do it for you ;-)
+		if (system != null)
+			system.stop();
+	}
+	
+	/**
+	 * Method to run TESTAR on Spy Mode.
+	 * @param system
+	 */
+	private void runSpy(SUT system) {
+		boolean startedSpy = false;
+
+		//If system it's null means that we have started TESTAR from the Spy mode
+		//We need to invoke the SUT & the canvas representation
+		if(system == null) {
+			system = startSystem();
+			processListeners(system, "");
+			startedSpy = true;
+			Grapher.GRAPHS_ACTIVATED = false;
+			this.cv = buildCanvas();
+		}
+		//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
+		
+		State state = getState(system);
+
+		while(mode() == Modes.Spy && system.isRunning()) {
+			cv.begin(); Util.clear(cv);
+			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+			Set<Action> actions = deriveActions(system,state);
+			CodingManager.buildIDs(state, actions);
+			visualizeActions(cv, state, actions);
+			cv.end();
+			state = getState(system);
+		}
+		
+		if(startedSpy){
+			cv.release();
+			detectLoopMode(system);
+		}
+
 	}
 
 	//TODO move to default protocol
