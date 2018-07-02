@@ -1,31 +1,31 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 
@@ -34,16 +34,47 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.serialisation.LogSerialiser;
+import static org.fruit.alayer.Tags.IsRunning;
+import static org.fruit.alayer.Tags.Title;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.*;
+import org.fruit.alayer.AbsolutePosition;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.AutomationCache;
+import org.fruit.alayer.Canvas;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Pen;
+import org.fruit.alayer.Point;
+import org.fruit.alayer.Role;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.State;
+import org.fruit.alayer.StateBuilder;
+import org.fruit.alayer.StrokePattern;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Visualizer;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -51,28 +82,25 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.Title;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol{
 
-	
+
 	protected State state = null,
-			        lastState = null;
+			lastState = null;
 	protected int nonReactingActionNumber;
 
-	
+
 	private StateBuilder builder;
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-							   BluePen = Pen.newPen().setColor(Color.Blue).
+			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	protected void initialize(Settings settings){
@@ -83,12 +111,12 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 
 		builder = NativeLinker.getNativeStateBuilder(
-			settings.get(ConfigTags.TimeToFreeze),
-			settings.get(ConfigTags.AccessBridgeEnabled),
-			settings.get(ConfigTags.SUTProcesses)
-			);
+				settings.get(ConfigTags.TimeToFreeze),
+				settings.get(ConfigTags.AccessBridgeEnabled),
+				settings.get(ConfigTags.SUTProcesses)
+				);
 	}
-	
+
 	protected Canvas buildCanvas() {
 		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
@@ -101,15 +129,103 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	protected void finishSequence(File recordedSequence){
-		//System.out.println("Finish sequence");
-		this.killTestLaunchedProcesses();
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 	
+	/**
+	 * If SUT process is invoked through COMMAND_LINE,
+	 * this method create threads to work with oracles at the process level.
+	 */
+	protected void processListeners(SUT system, String specificSuspiciousTitle) {
+		
+		//Only if we executed SUT with command_line
+		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+			
+			Pattern defaultOracles= Pattern.compile(settings().get(ConfigTags.SuspiciousTitles)+"|"+specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+			
+			int seqn = generatedSequenceCount();
+			File dir = new File("output/StdOutErr");
+			if(!dir.exists())
+				dir.mkdirs();
+			
+			Runnable readErrors = new Runnable() {
+				public void run() {
+					try {
+						PrintWriter writerError;
+						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
+						String actionId = "";
+						String ch;
+						Matcher m;
+						while ((ch = input.readLine()) != null)
+						{	
+							m= defaultOracles.matcher(ch);
+							if(defaultOracles!=null & m.matches()) {
+								String DateString = Util.dateString(DATE_FORMAT);
+								System.out.println("SUT StdErr:	" +ch);
+								
+								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
+								if(lastExecutedAction()!=null)
+									actionId=lastExecutedAction().get(Tags.ConcreteID);
+								writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
+								writerError.flush();
+								writerError.close();
+							}
+						}
+						if(!system.isRunning()) {
+							input.close();
+							Thread.currentThread().interrupt();
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+			Runnable readOutput = new Runnable() {
+				public void run() {
+					try {
+						PrintWriter writerOut;
+						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
+						String actionId = "";
+						String ch;
+						Matcher m;
+						while ((ch = input.readLine()) != null)
+						{	
+							m = defaultOracles.matcher(ch);
+							if(defaultOracles!=null & m.matches()) {
+								String DateString = Util.dateString(DATE_FORMAT);
+								System.out.println("SUT StdOut:	" +ch);
+								
+								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
+								if(lastExecutedAction()!=null)
+									actionId=lastExecutedAction().get(Tags.ConcreteID);
+								writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
+								writerOut.flush();
+								writerOut.close();
+							}
+						}
+						if(!system.isRunning()) {
+						input.close();
+						Thread.currentThread().interrupt();
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			};
+
+			new Thread(readErrors).start();
+			new Thread(readOutput).start();
+		}
+	}
+
 	// refactored
 	protected SUT startSystem() throws SystemStartException{
 		return startSystem(null);
 	}
-		
+
 	/**
 	 *
 	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
@@ -119,10 +235,10 @@ public class DefaultProtocol extends AbstractProtocol{
 	protected SUT startSystem(String mustContain) throws SystemStartException{
 		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 	}
-		
+
 
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
-		this.contextRunningProcesses = getRunningProcesses("START");
+		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
 		try{// refactored from "protected SUT startSystem() throws SystemStartException"
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
@@ -146,35 +262,35 @@ public class DefaultProtocol extends AbstractProtocol{
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
-					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
-			State state;
-			do{
-				if (sut.isRunning()){
-					System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
-					state = builder.apply(sut);
-					if (state != null && state.childCount() > 0){
-						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-						System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
-						return sut;
-					}
-				}
-				Util.pauseMs(500);				
-			} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-			if (sut.isRunning())
-				sut.stop();
-			// issue starting the SUT
-			if (tryToKillIfRunning){
-				System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
-				return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-			} else
-				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
+					State state;
+					do{
+						if (sut.isRunning()){
+							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
+							state = builder.apply(sut);
+							if (state != null && state.childCount() > 0){
+								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
+								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+								return sut;
+							}
+						}
+						Util.pauseMs(500);				
+					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
+					if (sut.isRunning())
+						sut.stop();
+					// issue starting the SUT
+					if (tryToKillIfRunning){
+						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
+						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
+					} else
+						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
 		}
 	}
 
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
 		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
-		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
+		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
 			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
@@ -239,7 +355,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		Assert.notNull(system);
 		//State state = builder.apply(system);
 		state = builder.apply(system);
-		
+
 		CodingManager.buildIDs(state);
 
 		Shape viewPort = state.get(Tags.Shape, null);
@@ -258,7 +374,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			if(verdict.severity()==SEVERITY_NOT_RESPONDING){
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
-				killRunningProcesses(system, 100);
+				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
 		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
 			passSeverity = verdict.severity();
@@ -311,12 +427,12 @@ public class DefaultProtocol extends AbstractProtocol{
 				}
 			}
 		}
-		
+
 		if (this.nonSuitableAction){
 			this.nonSuitableAction = false;
 			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
 		}
-		
+
 		// if everything was OK ...
 		return Verdict.OK;
 	}
@@ -346,7 +462,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			state.set(Tags.RunningProcesses, system.getRunningProcesses());
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
-				   process.right() != null && process.right().matches(processRE)){ // pid x name
+						process.right() != null && process.right().matches(processRE)){ // pid x name
 					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
@@ -367,7 +483,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		//Note this list is always empty in this deriveActions.
 		return actions;
 	}
-	
+
 
 	protected String getRandomText(Widget w){
 		return DataManager.getRandomData();
@@ -421,7 +537,7 @@ public class DefaultProtocol extends AbstractProtocol{
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-					));
+						));
 				storeWidget(state.get(Tags.ConcreteID), w);
 			}
 		}
@@ -541,5 +657,5 @@ public class DefaultProtocol extends AbstractProtocol{
 				ac.releaseCachedAutomationElements();
 		}
 	}
-		
+
 }

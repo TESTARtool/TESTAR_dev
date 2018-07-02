@@ -1328,6 +1328,14 @@ JNI_SIG(jlong, WINAPI_NS(WaitForSingleObject)) (JNIEnv * env, jclass,
 	return (jlong) ret;
 }
 
+/* WaitForInputIdle */
+JNI_SIG(jlong, WINAPI_NS(WaitForInputIdle)) (JNIEnv * env, jclass, jlong hProcess){
+	DWORD ret = WaitForInputIdle((HANDLE)hProcess, INFINITE); //If dwMilliseconds is INFINITE, the function does not return until the process is idle.
+
+	if(ret == WAIT_FAILED)
+		throwWinApiException(env, errString("WaitForInputIdle", ret));
+	return (jlong) ret;
+}
 
 /* GetExitCodeProcess */
 JNI_SIG(jlong, WINAPI_NS(GetExitCodeProcess)) (JNIEnv * env, jclass, jlong hProcess){
@@ -1540,7 +1548,7 @@ HRESULT GetValuePatternFromElement(IUIAutomationElement *pElement, PATTERNID pat
         hr = pUIAValuePattern->get_CurrentValue(&bstr);
         if (SUCCEEDED(hr) && bstr != NULL) {
             *pValuePattern = bstr;
-            SysFreeString(bstr);
+            //SysFreeString(bstr);
         }
         pUIAValuePattern->Release();
         pUIAValuePattern = NULL;
