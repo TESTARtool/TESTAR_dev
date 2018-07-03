@@ -88,13 +88,9 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol {
 
-	// begin by urueda
-	
 	protected State state = null;
 	protected State lastState = null;
 	protected int nonReactingActionNumber;
-	
-	// end by urueda
 	
 	private StateBuilder builder;
 
@@ -104,31 +100,28 @@ public class DefaultProtocol extends AbstractProtocol {
 			.setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 	protected void initialize(Settings settings) {
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 			settings.get(ConfigTags.TimeToFreeze),
 			settings.get(ConfigTags.AccessBridgeEnabled),
 			settings.get(ConfigTags.SUTProcesses)
-			); // by urueda
+			);
 	}
 	
 	protected Canvas buildCanvas() {
-		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
-		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT); // by urueda
+		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
 		faultySequence = false;
-		nonReactingActionNumber = 0; // by urueda
+		nonReactingActionNumber = 0;
 	}
 
 	protected void finishSequence(File recordedSequence) {
 		System.out.println("[" + getClass().getSimpleName() + "] Finish sequence");
-		this.killTestLaunchedProcesses(); // by urueda
+		this.killTestLaunchedProcesses();
 	}
 	
-	// refactored
 	protected SUT startSystem() throws SystemStartException {
 		return startSystem(null);
 	}
@@ -143,19 +136,18 @@ public class DefaultProtocol extends AbstractProtocol {
 		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 	}
 		
-	// by urueda
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException {
 		this.contextRunningProcesses = getRunningProcesses("START");
-		try {// refactored from "protected SUT startSystem() throws SystemStartException"
-			for(String d : settings().get(ConfigTags.Delete)) {
+		try {
+			for (String d : settings().get(ConfigTags.Delete)) {
 				Util.delete(d);
 			}
-			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo)) {
+			for (Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo)) {
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 			}
-		} catch(IOException ioe) {
+		} catch (IOException ioe) {
 			throw new SystemStartException(ioe);
-		} // end refactoring
+		} 
 		String sutConnector = settings().get(ConfigTags.SUTConnector);
 		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length() + 1));
@@ -169,11 +161,10 @@ public class DefaultProtocol extends AbstractProtocol {
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		}
-		else { // Settings.SUT_CONNECTOR_CMDLINE
+		else { 
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
 			
-			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
 					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
@@ -202,7 +193,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 	}
 	
-	// by urueda
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException {
 		// kill running SUT processes
 		System.out.println("[" + getClass().getSimpleName() + "] Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
@@ -215,7 +205,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 	}
 
-	// by urueda
 	private SUT getSUTByProcessName(String processName) throws SystemStartException {
 		Assert.hasText(processName);
 		List<SUT> suts = null;
@@ -238,7 +227,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
 	}
 
-	// by urueda
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException {
 		Assert.hasText(windowTitle);
 		List<SUT> suts = null;
@@ -273,37 +261,33 @@ public class DefaultProtocol extends AbstractProtocol {
 
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
-		Assert.notNull(system); // by urueda
-		//State state = builder.apply(system);
-		state = builder.apply(system); // by urueda
+		Assert.notNull(system); 
+		state = builder.apply(system); 
 		
-		CodingManager.buildIDs(state); // by urueda
+		CodingManager.buildIDs(state); 
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if (viewPort != null) {
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
 			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state)); // by urueda
 		}
 		
-		// begin by urueda
 		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
-		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity) { // begin by urueda
+		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity) {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
 
-		Grapher.notify(state, state.get(Tags.ScreenshotPath, null)); // by urueda				
-		// end by urueda
+		Grapher.notify(state, state.get(Tags.ScreenshotPath, null));		
 
 		return state;
 	}
 
-	@Override // by urueda
+	@Override 
 	protected Verdict getVerdict(State state) {
 		Assert.notNull(state);
 		//-------------------
@@ -324,24 +308,20 @@ public class DefaultProtocol extends AbstractProtocol {
 		// ORACLES ALMOST FOR FREE
 		//------------------------
 		
-		// begin by urueda
 		if (this.suspiciousTitlesPattern == null) {
 			this.suspiciousTitlesPattern = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-		//System.out.println("[" + getClass().getSimpleName() + "]  " +  this.suspiciousTitlesMatchers.size() + " suspiciousTitles matchers");
 		}
 		Matcher m;
-		// end by urueda
 		// search all widgets for suspicious titles
 		for(Widget w : state) {
 			String title = w.get(Title, "");
 			if (title != null && !title.isEmpty()) {
-				// begin by urueda
 				m = this.suspiciousTitlesMatchers.get(title);
 				if (m == null) {
 					m = this.suspiciousTitlesPattern.matcher(title);
 					this.suspiciousTitlesMatchers.put(title, m);
 				}
-				if (m.matches()) { // end by urueda
+				if (m.matches()) { 
 					Visualizer visualizer = Util.NullVisualizer;
 					// visualize the problematic widget, by marking it with a red box
 					if (w.get(Tags.Shape, null) != null) {
@@ -352,7 +332,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			}
 		}
 		
-		if (this.nonSuitableAction) { // by urueda
+		if (this.nonSuitableAction) {
 			this.nonSuitableAction = false;
 			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
 		}
@@ -370,13 +350,12 @@ public class DefaultProtocol extends AbstractProtocol {
 
 		// if there is an unwanted process running, kill it
 		String processRE = settings().get(ConfigTags.ProcessesToKillDuringTest);
-		if (processRE != null && !processRE.isEmpty()) { // by urueda
+		if (processRE != null && !processRE.isEmpty()) {
 			state.set(Tags.RunningProcesses, system.getRunningProcesses()); // by urueda
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())) {
 				if (process.left().longValue() != system.get(Tags.PID).longValue() && // by urueda
 				   process.right() != null && process.right().matches(processRE)) { // pid x name
-					//actions.add(ac.killProcessByName(process.right(), 2));
-					this.forceKillProcess = process.right(); // by urueda
+					this.forceKillProcess = process.right(); 
 					System.out.println("[" + getClass().getSimpleName() + "] will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
 				}
@@ -385,17 +364,14 @@ public class DefaultProtocol extends AbstractProtocol {
 
 		// if the system is in the background force it into the foreground!
 		if (!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null) {
-			//actions.add(ac.activateSystem());
 			this.forceToForeground = true; // by urueda
 			return actions;
 		}
 		
-		// begin by urueda
 		if (settings().get(ConfigTags.PrologActivated)) {			
 			List<List<String>> solutions = jipWrapper.setQuery(
 				"action(A,'" + state.get(Tags.ConcreteID) + "',W," + ActionRoles.LeftClick + ",0)."
 			);
-			//PrologUtil.printSolutions(solutions);
 			Widget w;
 			for (String wid : PrologUtil.getSolutions("W", solutions)) {
 				w = getWidget(state,wid);
@@ -403,18 +379,14 @@ public class DefaultProtocol extends AbstractProtocol {
 					actions.add(ac.leftClickAt(w));
 				}
 			}
-		}
-		// end by urueda
-		
+		}		
 		return actions;
 	}
 	
-	// by urueda (random inputs)	
 	protected String getRandomText(Widget w) {
 		return DataManager.getRandomData();
 	}
 	
-	// by urueda (refactored)
 	protected void calculateZIndices(State state) {
 		double minZIndex = Double.MAX_VALUE,
 				maxZIndex = Double.MIN_VALUE,
@@ -432,7 +404,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		state.set(Tags.MaxZIndex, maxZIndex);
 	}
 	
-	// by urueda
 	protected List<Widget> getTopWidgets(State state) {
 		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
@@ -444,7 +415,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		return topWidgets;
 	}
 	
-	// by urueda
 	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double SCROLLARROWSIZE, double SCROLLTHICK, Widget w) {
 		Drag[] drags = null;
 		if ((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null) {
@@ -458,14 +428,12 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 	}
 	
-	// by urueda
 	protected boolean isUnfiltered(Widget w) {
 		if (!Util.hitTest(w, 0.5, 0.5)) {
 			return false;
 		}
 		if (this.clickFilterPattern == null) {
 			this.clickFilterPattern = Pattern.compile(settings().get(ConfigTags.ClickFilter), Pattern.UNICODE_CHARACTER_CLASS);
-		// System.out.println("[" + getClass().getSimpleName() + "]  " +  this.clickFilterMatchers.size() + " clickFilter matchers");
 		}
 		String title = w.get(Title, "");
 		if (title == null || title.isEmpty()) {
@@ -479,7 +447,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		return !m.matches();
 	}
 	
-	// by urueda
 	protected boolean isClickable(Widget w) {
 		Role role = w.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -488,7 +455,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		return false;
 	}
 	
-	// by urueda
 	protected boolean isTypeable(Widget w) {
 		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
@@ -496,18 +462,15 @@ public class DefaultProtocol extends AbstractProtocol {
 	protected boolean moreActions(State state) {
 		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) 
 				&& state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) 
-				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
-				&& actionCount() <= lastSequenceActionNumber && // by urueda
+				&& actionCount() <= lastSequenceActionNumber && 
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
 	protected boolean moreSequences() {	
-		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
-		return sequenceCount() <= settings().get(ConfigTags.Sequences) && // by urueda		
+		return sequenceCount() <= settings().get(ConfigTags.Sequences) && 		
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
-	// by urueda
 	@Override
 	protected void actionExecuted(SUT system, State state, Action action) {
 		if (this.lastState == null && state == null) {
@@ -525,11 +488,9 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 	}
 
-	// by urueda
 	@Override
 	public void mouseMoved(double x, double y) {}
 
-	// by urueda
 	@Override
 	protected void stopSystem(SUT system) {
 		if (system != null) {
@@ -538,6 +499,5 @@ public class DefaultProtocol extends AbstractProtocol {
 				ac.releaseCachedAutomationElements();
 			}
 		}
-	}
-		
+	}	
 }

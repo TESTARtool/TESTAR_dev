@@ -793,7 +793,7 @@ public final class Util {
             options,
             null,
             compilationUnits);
-         if (task.call()) {
+         if (!task.call()) {
           for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
             System.err.format("[Util] Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
