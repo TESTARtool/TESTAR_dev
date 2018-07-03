@@ -5,8 +5,9 @@ import org.openqa.selenium.WebDriverException;
 
 import java.util.List;
 
+
 /*
- * Periodically poll position of the browser window (viewport ackchyually)
+ * Periodically poll position of the browser window (viewport)
  * Browsers don't have event listeners for window movement
  */
 public class CanvasDimensions extends Thread {
@@ -53,13 +54,12 @@ public class CanvasDimensions extends Thread {
       if (screen == null) {
         return;
       }
-
-        canvasX = (int) (long) screen.get(0);
-        canvasY = (int) (long) screen.get(1);
-        canvasWidth = (int) (long) screen.get(2);
-        canvasHeight = (int) (long) screen.get(3);
-        innerWidth = (int) (long) screen.get(4);
-        innerHeight = (int) (long) screen.get(5);
+      canvasX = Math.toIntExact(screen.get(0));
+      canvasY = Math.toIntExact(screen.get(1));
+      canvasWidth = Math.toIntExact(screen.get(2));
+      canvasHeight = Math.toIntExact(screen.get(3));
+      innerWidth = Math.toIntExact(screen.get(4));
+      innerHeight = Math.toIntExact(screen.get(5));
       }
       catch (WebDriverException ignored) {
 

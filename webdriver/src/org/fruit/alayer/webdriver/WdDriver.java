@@ -6,26 +6,25 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
-import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.fruit.Util.pause;
-
 
 public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
+  private static List<String> windowHandles = new ArrayList<>();
+  // TODO Make settable via settings or protocol
+  public static boolean followLinks = true;
 
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
@@ -44,7 +43,8 @@ public class WdDriver extends SUTBase {
       try {
         screenPosition = new Point(Integer.valueOf(tmp.split("\\+")[1]),
             Integer.valueOf(tmp.split("\\+")[2]));
-      } catch (ArrayIndexOutOfBoundsException aioobe) {
+      }
+      catch (ArrayIndexOutOfBoundsException aioobe) {
 
       }
     }
@@ -150,23 +150,50 @@ public class WdDriver extends SUTBase {
     return webDriver;
   }
 
+
+  /*
+   * Update the list of handles with added handles (new tabs) 
+   * Remove handles from closed tabs
+   */
+  private static void updateHandlesList ()
+  {
+    Set<String> currentHandles = webDriver.getWindowHandles();
+
+    // Remove handles not present anymore (closed tabs)
+    for (String handle : new ArrayList<>(windowHandles)) {
+      if (!currentHandles.contains(handle)) {
+        windowHandles.remove(handle);
+      }
+    }
+    // Add new handles (new tabs), shouldn't be more than one
+    for (String handle : currentHandles) {
+      if (!windowHandles.contains(handle)) {
+        windowHandles.add(handle);
+      }
+    }
+  }
+
   /*
    * Make sure the last tab has focus
    */
   public static void activate() {
-    // TODO Remember window handles for each element / widget?
+    // Nothing to activate
+    if (windowHandles.size() < 1) {
+      return;
+    }
 
-    for (String handle : webDriver.getWindowHandles()) {
+    String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
+    if (!webDriver.getWindowHandle().equals(handle)) {
       webDriver.switchTo().window(handle);
     }
   }
 
-  public static String getCurrentUrl() {
-    return webDriver.getCurrentUrl();
-  }
-
   public static Set<String> getWindowHandles() {
     return webDriver.getWindowHandles();
+  }
+
+  public static String getCurrentUrl() {
+    return webDriver.getCurrentUrl();
   }
 
   public static Object executeScript(String script, Object... args) {
@@ -174,12 +201,16 @@ public class WdDriver extends SUTBase {
       return null;
     }
 
+    // Update the list with window handles
+    updateHandlesList();
+    // Choose first or last tab, depending on user prefs
+    activate();
+
     try {
       return webDriver.executeScript(script, args);
-    } catch (NoSuchWindowException nswe) {
-      // Make sure we have the last tab
-      activate();
-      return webDriver.executeScript(script, args);
+    }
+    catch (NoSuchWindowException nswe) {
+      return null;
     }
   }
 }

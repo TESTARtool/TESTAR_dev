@@ -56,13 +56,19 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private static List<String> clickableClasses = Arrays.asList(
       "list__item__title");
 
-  // Go back once we encounter certain files
+  // Disallow links and pages with these extensions
   private static List<String> deniedExtensions = Arrays.asList(
-      "pdf");
+      "pdf", "jpg", "png");
 
-  // If set to NULL, only the sut connector domain will be used
+  // Define a whitelist of allowed domains for links and pages
+  // An empty list will be filled with the domain from the sut connector
+  // To ignore this feature, set to null.
   private static List<String> domainsAllowed = Arrays.asList(
       "www.ou.nl");
+
+  // If true, follow links opened in new tabs
+  // If false, stay with the original (ignore links opened in new tabs)
+  private static boolean followLinks = true;
 
   /**
    * Called once during the life time of TESTAR
@@ -102,6 +108,8 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     // Override ProtocolUtil to allow WebDriver screenshots
     protocolUtil = new WdProtocolUtil();
     ((WdProtocolUtil) protocolUtil).webDriver = ((WdDriver) sut).getRemoteWebDriver();
+    // Propagate followLinks setting
+    WdDriver.followLinks = followLinks;
 
     return sut;
   }
@@ -175,7 +183,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     StdActionCompiler ac = new AnnotatingActionCompiler();
 
     // iterate through all widgets
-    for (Widget widget : state) {
+    for (Widget widget: state) {
       // only consider enabled, non-blocked widgets and non-tabu widgets
       if (!widget.get(Enabled, true) || widget.get(Blocked, false) || blackListed(widget)) {
         continue;
@@ -206,9 +214,8 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private Set<Action> detectForcedActions() {
     String currentURL = WdDriver.getCurrentUrl();
 
-    Set<Action> actions = new HashSet<>();
-
     // Don't get caught in a PDFs etc. and non-whitelisted domains
+    Set<Action> actions = new HashSet<>();
     if (isUrlDenied(currentURL) || isExtensionDenied(currentURL)) {
       // If opened in new tab, close it, else go back
       if (WdDriver.getWindowHandles().size() > 1) {
@@ -233,7 +240,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
     // Deny if the extension is in the list
     String ext = currentURL.substring(currentURL.lastIndexOf(".") + 1);
-    ext = ext.replace("/", "");
+    ext = ext.replace("/", "").toLowerCase();
     return deniedExtensions.contains(ext);
   }
 
@@ -250,6 +257,11 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return false;
     }
 
+    // User wants to allow all
+    if (domainsAllowed == null) {
+      return false;
+    }
+
     // Only allow pre-approved domains
     String domain = getDomain(currentUrl);
     return !domainsAllowed.contains(domain);
@@ -261,7 +273,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private boolean isLinkDenied(Widget widget) {
     String linkUrl = widget.get(Tags.ValuePattern, "");
 
-    // Not a link or local file
+    // Not a link or local file, allow
     if (linkUrl == null || linkUrl.startsWith("file:///")) {
       return false;
     }
@@ -271,12 +283,17 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return true;
     }
 
-    // Not a web link, allow
+    // Not a web link (or link to the same domain), allow
     if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("https://"))) {
       return false;
     }
 
-    // Only allow pre-approved domains
+    // User wants to allow all
+    if (domainsAllowed == null) {
+      return false;
+    }
+
+    // Only allow pre-approved domains if
     String domain = getDomain(linkUrl);
     return !domainsAllowed.contains(domain);
   }
@@ -302,8 +319,8 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * If domainsAllowed not set, allow the domain from the SUT Connector
    */
   private void ensureDomainsAllowed() {
-    // Already defined
-    if (domainsAllowed != null && domainsAllowed.size() > 0) {
+    // Not required or already defined
+    if (domainsAllowed == null || domainsAllowed.size() > 0) {
       return;
     }
 
@@ -311,64 +328,6 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     String url = parts[parts.length - 1].replace("\"", "");
     domainsAllowed = Arrays.asList(getDomain(url));
   }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // TODO
-  private static int counter = 0;
-
-  private void showWidgetOrg(Widget w) {
-    String role = w.get(Tags.Role, Roles.Widget).name();
-    String title = w.get(Tags.Title, "_") + " :: " + w.get(Tags.Text, "_");
-    title = title.replace("\n", " ");
-    title = title.substring(0, Math.min(100, title.length()));
-    boolean yes = w.get(Enabled, true) && !w.get(Blocked, false) && !blackListed(w);
-    yes &= (whiteListed(w) || (isClickable(w) || isTypeable(w)));
-
-    Shape shape = w.get(Tags.Shape);
-    int x = (int) shape.x();
-    int y = (int) shape.y();
-    int width = (int) shape.width();
-    int height = (int) shape.height();
-    WdElement element = ((WdWidget) w).element;
-
-    System.out.format("%-5s %-5s | %-5s | %-5s %-5s | %-5s %-5s | %-50s | %-30s %s\n",
-        isClickable(w), isTypeable(w), yes, x, y, width, height, element.display, role, title);
-  }
-
-  private void showWidget(Widget w) {
-    String role = w.get(Tags.Role, Roles.Widget).name();
-    if (!role.equals("WdA")) {
-      return;
-    }
-
-    String title = w.get(Tags.Title, "_") + " :: " + w.get(Tags.Text, "_");
-    title = title.replace("\n", " ");
-    title = title.substring(0, Math.min(100, title.length()));
-    boolean yes = w.get(Enabled, true) && !w.get(Blocked, false) && !blackListed(w);
-    yes &= (whiteListed(w) || (isClickable(w) || isTypeable(w)));
-
-    Shape shape = w.get(Tags.Shape);
-    int x = (int) shape.x();
-    int y = (int) shape.y();
-    int width = (int) shape.width();
-    int height = (int) shape.height();
-    int clickX = x + width / 2;
-    int clickY = y + height / 2;
-    WdElement element = ((WdWidget) w).element;
-
-    System.out.format("%-5s %-5s | %-5d %-5d | %d | %s\n",
-        w.get(Blocked, false), isAtBrowserCanvas(w),
-        clickX, clickY, CanvasDimensions.getCanvasHeight(), title);
-  }
-
-  /*
-   * We need to check if the screen position is within the canvas
-   */
-  private boolean isAtBrowserCanvas(Pair<Double, Double> pos) {
-    return pos.left() >= 0 && pos.left() <= CanvasDimensions.getCanvasWidth() &&
-           pos.right() >= 0 && pos.right() <= CanvasDimensions.getInnerWidth();
-  }
-  //////////////////////////////////////////////////////////////////////////////
 
   /*
    * We need to check if click position is within the canvas
@@ -497,7 +456,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
       Rectangle actionArea = new Rectangle(
           Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-      for (Finder f : targets) {
+      for (Finder f: targets) {
         Widget widget = f.apply(state);
         Shape shape = widget.get(Tags.Shape);
         Rectangle r = new Rectangle((int) shape.x(), (int) shape.y(), (int) shape.width(), (int) shape.height());
@@ -521,4 +480,3 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     }
   }
 }
-
