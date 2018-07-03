@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Shape;
@@ -44,7 +43,7 @@ public class Image {
 	 * Retrieve singleton instance.
 	 * @return singleton instance
 	 */
-	public static Image getInstance( ) {
+	public static Image getInstance() {
 		return image;
 	}
 	
@@ -55,7 +54,7 @@ public class Image {
 	 * @param proxy document protocol proxy 
 	 * @param imageFile name of the file with the reference image
 	 */
-	public void updateAllWidgets(ProtocolProxy proxy, String imageFile){
+	public void updateAllWidgets(ProtocolProxy proxy, String imageFile) {
 		for (Widget widget : proxy.getTopWidgets(state)) {
 			isRecognized(proxy, widget, imageFile);
 		}
@@ -69,7 +68,7 @@ public class Image {
 	 * @param imageFile name of the file with the reference image
 	 * @return true if recognized, otherwise false
 	 */
-	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile){
+	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile) {
 		return (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
 	}
 
@@ -80,21 +79,21 @@ public class Image {
 	 * @param imageFile name of the file with the reference image
 	 * @return confidence value between 0 and 1 that indicates the level of confidence (1 is highest level)
 	 */
-	public Double getRecognitionConfidence(ProtocolProxy proxy, Widget widget, String imageFile){
+	public Double getRecognitionConfidence(ProtocolProxy proxy, Widget widget, String imageFile) {
 		return imageRecognition(proxy, widget, imageFile);
 	}
 
-	private Double imageRecognition(ProtocolProxy proxy, Widget widget, String imageFile){
+	private Double imageRecognition(ProtocolProxy proxy, Widget widget, String imageFile) {
 		if (state != proxy.getState()) {
 			state = proxy.getState();
 			imagesMap.clear();
 		}
 		double confidence = 0;
-		if (imagesMap.containsKey(imageFile)){
+		if (imagesMap.containsKey(imageFile)) {
 			if (imagesMap.get(imageFile).containsKey(widget)) {
 				return imagesMap.get(imageFile).get(widget);
 			}
-		}else {
+		} else {
 			imagesMap.put(imageFile, new HashMap<Widget, Double>());
 		}
 		try {
@@ -115,7 +114,7 @@ public class Image {
 					confidence = widgetShot.compareImage(refShot);
 				}
 			}	
-		}catch(Exception e) {
+		} catch(Exception e) {
 			throw new TgherkinException("Image recognition error");
 		}
 		imagesMap.get(imageFile).putIfAbsent(widget, confidence);
@@ -123,7 +122,7 @@ public class Image {
 	}
 
 	// SikuliX image recognition
-	private Double imageRecognition(ProtocolProxy proxy, BufferedImage refShot, BufferedImage widgetShot){
+	private Double imageRecognition(ProtocolProxy proxy, BufferedImage refShot, BufferedImage widgetShot) {
 		double confidence = 0;
 		if (!invalidSikuliXInstallation) {
 			try {
@@ -135,7 +134,7 @@ public class Image {
 				while (finder.hasNext()) {
 					Match match = finder.next();
 					// check if found rectangle covers minimum percentage of entire screen shot
-					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * 100) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)){
+					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * 100) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)) {
 						if (confidence < match.getScore()) {
 							confidence = match.getScore(); 
 						}
@@ -145,14 +144,14 @@ public class Image {
 					LogSerialiser.log("Image recognition is based on SikuliX\n", LogSerialiser.LogLevel.Info);					
 					firstTime = false;	
 				}				
-			}catch(Throwable t) {
+			} catch(Throwable t) {
 				if (firstTime) {
 					// dirty workaround: SikuliX installation might be invalid, in that case the SikuliX setup has to be executed manually
 					// image recognition will continue with the standard Testar compareImage
 					firstTime = false;
 					invalidSikuliXInstallation = true;
 					LogSerialiser.log("Invalid SikuliX installation, switching to AWTCanvas.compareImage()\n", LogSerialiser.LogLevel.Info);
-				}else{
+				} else {
 					throw(t); 
 				}
 			}

@@ -40,7 +40,9 @@ import java.util.Comparator;
 public class AtSpiElementComparer implements Comparator<AtSpiElement> {
 
 
-    private static final int WORSE = 1, BETTER = -1, EVEN = 0;
+    private static final int WORSE = 1;
+    private static final int BETTER = -1;
+    private static final int EVEN = 0;
 
 
     /**
@@ -51,20 +53,20 @@ public class AtSpiElementComparer implements Comparator<AtSpiElement> {
      */
     @Override
     public int compare(AtSpiElement o1, AtSpiElement o2) {
-        if(o1.zIndex < o2.zIndex){
+        if (o1.zIndex < o2.zIndex) {
             return WORSE;
-        }else if (o1.zIndex > o2.zIndex){
+        } else if (o1.zIndex > o2.zIndex) {
             return BETTER;
-        }else{
-            if(o1.boundingBoxOnScreen != null){
-                if(o2.boundingBoxOnScreen != null){
+        } else {
+            if (o1.boundingBoxOnScreen != null) {
+                if (o2.boundingBoxOnScreen != null) {
                     double area1 = Rect.area(o1.boundingBoxOnScreen);
                     double area2 = Rect.area(o2.boundingBoxOnScreen);
                     return area1 < area2 ? BETTER : (area1 > area2 ? WORSE : EVEN);
-                }else{
+                } else {
                     return BETTER;
                 }
-            }else{
+            } else {
                 return WORSE;
             }
         }

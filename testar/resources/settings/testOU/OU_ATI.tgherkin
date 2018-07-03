@@ -10,22 +10,22 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
     Step: Press log on button
 	When  $Title="Inloggen" and $Role="UIAButton" click()
     Step: Check whether user is logged on
-	Given $Role="UIAText" and image("settings\testOU\Expand.png") 
+	Given $Role="UIAText" and image("resources\settings\testOU\Expand.png") 
 	When NOP
     Step: Enter non-empty shopping cart
 	While $Role="UIAText" and $Title="1"
-	Given $Role="UIAText" and image("settings\testOU\Expand.png")
-	When $Role="UIACustomControl" and image("settings\testOU\ShoppingCart.png") click(true)
+	Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
+	When $Role="UIACustomControl" and image("resources\settings\testOU\ShoppingCart.png") click(true)
     Step: Remove products from shopping cart (if applicable)
-	While $Role="UIAText" and image("settings\testOU\GarbageCan.png")
-	When $Role="UIAText" and image("settings\testOU\GarbageCan.png") click(true)
+	While $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png")
+	When $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png") click(true)
     Step: Click close shopping cart button (if applicable)
-	While $Role="UIAText" and image("settings\testOU\CloseShoppingCart.png")
-	When $Role="UIAText" and image("settings\testOU\CloseShoppingCart.png") click(true)
+	While $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png")
+	When $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png") click(true)
 
   Scenario: A user successfully logs out of the system.
     Step: Expand user
-	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
     Step: Check whether user is logged off
@@ -75,13 +75,13 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When  $Role="UIAButton" and $Title="OPSLAAN" click()
     Step: Expand user
 	Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen."
-	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Account data
 |Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
-|AREM||Weijling|Adri|||VK_A|02-07-1963|Druten|VK_M|VK_N|
-|TEST|van|User|Test||Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|
+|AREM || Weijling|Adri || |VK_A|02-07-1963|Druten|VK_M|VK_N|
+|TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|
 	
 	Scenario Outline: A user successfully applies for a master program.
     Step: Select Studieaanbod
@@ -183,9 +183,9 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # AVAILABILITY DATA	
     Step: Enter net number
-	When $Role="UIAEdit" and image("settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-	When $Role="UIAEdit" and image("settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # EXEMPTION AND ADMISSION	
@@ -197,7 +197,7 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When hitKey(VK_PAGE_DOWN)	
     Step: Press No radio buttons
 	Range 3 3 
-	When  $Title="Nee" and $Role="UIARadioButton" and image("settings\testOU\EmptyRadioButton.png") click()
+	When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # CONFIRMATION	
@@ -206,7 +206,7 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
     Step: Give Page down to display additional controls 
 	When hitKey(VK_PAGE_DOWN)	
     Step: Click truthfully filled in mark
-	When  $Role="UIACustomControl" and image("settings\testOU\Mark.png") click(true)
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
 	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
 
@@ -214,7 +214,7 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	Range 2 2
 	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for master program data
@@ -321,14 +321,14 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # AVAILABILITY DATA	
     Step: Enter net number
-	When $Role="UIAEdit" and image("settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-	When $Role="UIAEdit" and image("settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # EXEMPTION	
     Step: Press No radio button
-	When  $Title="Nee" and $Role="UIARadioButton" and image("settings\testOU\EmptyRadioButton.png") click()
+	When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # CONFIRMATION	
@@ -337,14 +337,14 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
     Step: Give Page down to display additional controls 
 	When hitKey(VK_PAGE_DOWN)	
     Step: Click truthfully filled in mark
-	When  $Role="UIACustomControl" and image("settings\testOU\Mark.png") click(true)
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
 	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
     Step: Give Page up to display user controls at the top
 	Range 2 2
 	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for bachelor program data
@@ -457,9 +457,9 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # AVAILABILITY DATA	
     Step: Enter net number
-	When $Role="UIAEdit" and image("settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-	When $Role="UIAEdit" and image("settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
 	When  $Title="VERDER" and $Role="UIAButton" click()
     # PERSONAL CIRCUMSTANCES
@@ -489,14 +489,14 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
 	When hitKey(VK_PAGE_DOWN)	
     Step: Click agree with terms and truthfully filled in marks
 	Range 2 2
-	When  $Role="UIACustomControl" and image("settings\testOU\Mark.png") click(true)
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
 	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
     Step: Give Page up to display user controls at the top
 	Range 2 2
 	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-	When $Role="UIAText" and image("settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
 	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for bachelor program data

@@ -56,7 +56,9 @@ public final class EvaluationResults implements Serializable {
 
 	private final List<EvaluationResult> results = new ArrayList<>();
 	
-	private int passCount = 0, warningCount = 0, errorCount = 0;
+	private int passCount = 0; 
+	private int warningCount = 0; 
+	private int errorCount = 0;
 	
 	/**
 	 * Constructs a new container for evaluation results.
@@ -157,8 +159,8 @@ public final class EvaluationResults implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Warnings: " + getWarningCount() +
-				", Errors: " + getErrorCount() +
-				", Total: " + getResultCount();
+		return "Warnings: " + getWarningCount()
+		 		+ ", Errors: " + getErrorCount()
+		 		+ ", Total: " + getResultCount();
 	}
 }

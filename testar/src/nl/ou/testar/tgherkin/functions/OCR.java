@@ -79,11 +79,11 @@ public class OCR {
 	// private Constructor prevents instantiation by other classes.
 	private OCR() {
 		File file = new File(TESSERACT_LANGUAGE_FILE); 
-		if(!file.exists() || file.isDirectory()) {
+		if (!file.exists() || file.isDirectory()) {
 			// if tesseract data not available then extract tesseract data file from jar
-			try{
+			try {
 				extractTesseractDataFromJar();
-			}catch(Exception e) {
+			} catch(Exception e) {
 				throw new TgherkinException("Extraction of Tesseract data failed with exception: " + e.getMessage().toString());
 			}
 		}
@@ -93,7 +93,7 @@ public class OCR {
 	 * Retrieve singleton instance.
 	 * @return singleton instance
 	 */
-	public static OCR getInstance( ) {
+	public static OCR getInstance() {
 		return ocr;
 	}
 	
@@ -139,11 +139,11 @@ public class OCR {
 			op.filter(widgetShot.image(),grayImage);
 			try {
 				result = getOCR(grayImage);
-			}catch(Throwable t) {
+			} catch(Throwable t) {
 				LogSerialiser.log(t.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
 			}
 		}	
-		if (result !=null) {
+		if (result != null) {
 			result = result.trim();
 		}
 		ocrMap.putIfAbsent(widget, result);
@@ -185,7 +185,7 @@ public class OCR {
 				out.write(buffer, 0, nBytes);
 			}
 			LogSerialiser.log("Tesseract OCR data file has been extracted.\n", LogSerialiser.LogLevel.Info);
-		}finally {
+		} finally {
 			if (in != null) {
 				in.close();
 			}

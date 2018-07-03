@@ -59,6 +59,7 @@ public class DrawableImage extends DrawableObject {
 
 
     private byte[] _bytes;
+    
     /**
      * The bytes of the image that will be drawn.
      * @return The bytes of the image that will be drawn.

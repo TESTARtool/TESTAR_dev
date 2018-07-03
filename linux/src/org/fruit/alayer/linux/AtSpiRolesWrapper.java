@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux;
 
-
 import org.fruit.Util;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
@@ -210,7 +209,7 @@ public final class AtSpiRolesWrapper {
      * @param inheritFrom The parent(s) of the role.
      * @return The wrapper for the native role.
      */
-    private static Role from(long id, String name, Role... inheritFrom){
+    private static Role from(long id, String name, Role... inheritFrom) {
         Role ret = Role.from(name, inheritFrom);
         typeIdToRole.put(id, ret);
         return ret;
@@ -222,7 +221,7 @@ public final class AtSpiRolesWrapper {
      * @param typeId The type id of an AtSpiRole.
      * @return The Role wrapping an AtSpiRole.
      */
-    public static Role fromTypeId(long typeId){
+    public static Role fromTypeId(long typeId) {
         Role ret = typeIdToRole.get(typeId);
         return (ret == null) ? AtSpiUnknown : ret;
     }

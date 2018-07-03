@@ -24,7 +24,7 @@ public class Reporter {
 	/**
 	 * Constructor.
 	 */
-	private Reporter(){ 
+	private Reporter() { 
 		consumer = new ConsumerImpl(1);
 	}
 	
@@ -32,7 +32,7 @@ public class Reporter {
 	 * Get instance.
 	 * @return instance
 	 */
-	public static Reporter getInstance(){
+	public static Reporter getInstance() {
 		return INSTANCE;
 	}	
 	
@@ -40,7 +40,7 @@ public class Reporter {
 	 * Report.
 	 * @param data to be reported data
 	 */
-	public void report(String data){
+	public void report(String data) {
 		report(STANDARD_FILE_NAME, data);
 	}
 
@@ -49,7 +49,7 @@ public class Reporter {
 	 * @param fileName name of the report file
 	 * @param data to be reported data
 	 */
-	public void report(String fileName, String data){
+	public void report(String fileName, String data) {
 		consumer.consume(new ReportItem(fileName, data, true));
 	}
 
@@ -57,14 +57,14 @@ public class Reporter {
 	 * Report.
 	 * @param item to be consumed report item
 	 */
-	public void report(ReportItem item){
+	public void report(ReportItem item) {
 		consumer.consume(item);
 	}
 
 	/**
 	 * Finish report.
 	 */
-	public void finish(){
+	public void finish() {
 		consumer.finishConsumption();
 	}	
 	

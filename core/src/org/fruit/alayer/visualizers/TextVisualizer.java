@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.visualizers; // refactored by urueda
 
 import org.fruit.Assert;
@@ -46,11 +47,11 @@ import org.fruit.alayer.exceptions.PositionException;
 public final class TextVisualizer implements Visualizer {
 	
 	private static final long serialVersionUID = 9156304220974950751L;
-	final Position pos;
-	final String text;
-	final Pen pen;
+	private final Position pos;
+	private final String text;
+	private final Pen pen;
 	
-	public TextVisualizer(Position pos, String text, Pen pen){
+	public TextVisualizer(Position pos, String text, Pen pen) {
 		Assert.notNull(pos, text, pen);
 		this.pos = pos;
 		this.text = text;
@@ -64,6 +65,7 @@ public final class TextVisualizer implements Visualizer {
 			Point p = pos.apply(state);			
 			Pair<Double, Double> m = cv.textMetrics(pen, text);
 			cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
-		} catch (PositionException pe) {}			
+		} catch (PositionException pe) {
+		}			
 	}
 }

@@ -85,7 +85,7 @@ public class GeneralPanel extends JPanel {
 
     txtSutPath = new JTextArea();
     txtSutPath.setLineWrap(true);
-    txtSutPath.setToolTipText(suthPathTTT);
+    txtSutPath.setToolTipText(sutPathTTT);
 
     spnNumSequences = new JSpinner();
     spnNumSequences.setBounds(160, 161, 81, 30);

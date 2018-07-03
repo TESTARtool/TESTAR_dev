@@ -31,13 +31,23 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.exceptions; // refactored by urueda
 
 import org.fruit.FruitException;
 
 public class TimeOutException extends FruitException {
 	private static final long serialVersionUID = 2546011154169797944L;
-	public TimeOutException(String message){ this(message, null); }
-	public TimeOutException(String message, Throwable cause){ super(message, cause); }
-	public TimeOutException(Throwable cause){ super(cause); }
+	
+	public TimeOutException(String message) { 
+		this(message, null); 
+	}
+	
+	public TimeOutException(String message, Throwable cause) { 
+		super(message, cause); 
+	}
+	
+	public TimeOutException(Throwable cause) { 
+		super(cause); 
+	}
 }

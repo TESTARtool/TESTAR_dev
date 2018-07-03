@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -62,8 +63,8 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public class AccessibilityProtocol extends DefaultProtocol {
 
-	public static final String HTML_FILENAME_PREFIX = "accessibility_report_",
-			HTML_EXTENSION = ".html";
+	public static final String HTML_FILENAME_PREFIX = "accessibility_report_";
+	public static final String HTML_EXTENSION = ".html";
 
 	private static final String SCREENSHOT_PATH_PREFIX = "../";
 
@@ -76,7 +77,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 * The relevant widgets.
 	 * This needs to be updated after every state change.
 	 */
-	protected List<Widget> relevantWidgets;
+	protected List<Widget> relevantWidgets = new ArrayList<>();
 
 	/**
 	 * The HTML reporter to store the evaluation results.
@@ -84,7 +85,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected HTMLReporter html = null;
 
 	/**
-	 * Constructs a new WCAG2ICT test protocol.
+	 * Constructs a new accessibility test protocol.
 	 */
 	public AccessibilityProtocol(Evaluator evaluator) {
 		super();
@@ -97,22 +98,27 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 
 	@Override
-	protected void beginSequence() {
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
 		try {
 			html = new HTMLReporter(
-					settings().get(ConfigTags.OutputDir) + File.separator +
-					HTML_FILENAME_PREFIX + sequenceCount() + HTML_EXTENSION);
+				settings().get(ConfigTags.OutputDir) + File.separator
+				+ HTML_FILENAME_PREFIX + sequenceCount() + HTML_EXTENSION);
 		} catch (Exception e) {
 			LogSerialiser.log("Failed to open the HTML report: " + e.getMessage(),
-					LogSerialiser.LogLevel.Critical);
+				LogSerialiser.LogLevel.Critical);
+			System.exit(-1);
 		}
 		html.writeHeader()
-		.writeHeading(2, "General information")
-		.writeParagraph("Report type: " +
-				(settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "On-the-fly"))
-		.writeParagraph("Guidelines version: " + evaluator.getImplementationVersion())
-		.writeParagraph("Sequence number: " + sequenceCount());
+		.writeHeading(2, "General Information")
+		.writeUListStart()
+		.writeListItem("Report time: " + Util.dateString("yyyy-MM-dd HH:mm:ss"))
+		.writeListItem("Report type: "
+			+ (settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB" : "On-the-fly"))
+		.writeListItem("Accessibility standard implementation: "
+			+ evaluator.getImplementationVersion())
+		.writeListItem("Sequence number: " + sequenceCount())
+		.writeUListEnd();
 	}
 
 	/**
@@ -221,8 +227,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	 * @return The widget title, or null if the widget is not in the graph database.
 	 */
 	protected String getWidgetTitleFromGraphDB(String concreteID) {
-		String gremlinWidget = "_().has('@class','Widget').has('" +
-				Tags.ConcreteID.name() + "','" + concreteID + "').Title";
+		String gremlinWidget = "_().has('@class','Widget').has('"
+			+ Tags.ConcreteID.name() + "','" + concreteID + "').Title";
 		List<Object> widgets = graphDB().getObjectsFromGremlinPipe(gremlinWidget,
 				GremlinStart.VERTICES);
 		if (widgets.size() != 1) { // no matches or too many matches
@@ -261,12 +267,12 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	private void writeGraphDBResults() {
 		// This will retrieve all properties,
 		// which may be inefficient when storing many properties to the GraphDB.
-		String gremlinStateProperties = "_().has('@class','State').has('" +
-				A11yTags.A11yHasViolations.name() + "',true).map";
+		String gremlinStateProperties = "_().has('@class','State').has('"
+			+ A11yTags.A11yHasViolations.name() + "',true).map";
 		List<Object> stateMaps = graphDB().getObjectsFromGremlinPipe(gremlinStateProperties,
 				GremlinStart.VERTICES);
-		html.writeParagraph("Unique states: " + stateMaps.size())
-		.writeHeading(2, "States with violations");
+		html.writeHeading(2, "States with Violations")
+		.writeParagraph("Unique states with violations: " + stateMaps.size());
 		for (Object stateMap : stateMaps) {
 			Map<String, Object> stateProps = (Map<String, Object>)stateMap;
 			writeGeneralGraphDBResults(stateProps);
@@ -294,13 +300,13 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 
 	private void writeOfflineEvaluationResults(EvaluationResults results) {
-		html.writeHeading(2, "Offline evaluation");
+		html.writeHeading(2, "Offline Evaluation");
 		writeGeneralOfflineEvaluationResults(results);
 		writeOfflineEvaluationResultsDetails(results);
 	}
 
 	private void writeGeneralOfflineEvaluationResults(EvaluationResults results) {
-		html.writeHeading(3, "General information")
+		html.writeHeading(3, "General Information")
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
 		.writeTableRow("Error", results.getErrorCount())
@@ -309,5 +315,4 @@ public class AccessibilityProtocol extends DefaultProtocol {
 		.writeTableRow("Total", results.getResultCount())
 		.writeTableEnd();
 	}
-
 }

@@ -46,11 +46,11 @@ public class ReportItem implements Item {
 			BufferedWriter bWriter = new BufferedWriter(fWriter);
 			pWriter = new PrintWriter(bWriter);
             pWriter.write(data);
-        }catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             if (pWriter != null) {
                 pWriter.close();
             }

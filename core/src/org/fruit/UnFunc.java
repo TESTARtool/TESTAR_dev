@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit;
 
 public interface UnFunc<A, T> {

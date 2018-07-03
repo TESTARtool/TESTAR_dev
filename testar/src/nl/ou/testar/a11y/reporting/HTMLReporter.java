@@ -125,7 +125,7 @@ public final class HTMLReporter {
 	 */
 	public HTMLReporter writeHeadingStart(int level) {
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(start(HEADING[level-1]));
+		write(start(HEADING[level - 1]));
 		return this;
 	}
 
@@ -136,7 +136,7 @@ public final class HTMLReporter {
 	 */
 	public HTMLReporter writeHeadingEnd(int level) {
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(end(HEADING[level-1]));
+		write(end(HEADING[level - 1]));
 		return this;
 	}
 

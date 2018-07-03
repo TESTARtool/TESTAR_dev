@@ -30,18 +30,22 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.util.List;
 
 import org.fruit.Util;
 
-public final class Spline{
+public final class Spline {
 
 	private static final class Polynom {
-		private final double a, b, c, d;
+		private final double a;
+		private final double b; 
+		private final double c; 
+		private final double d;
 
-		public Polynom(double a, double b, double c, double d){
+		public Polynom(double a, double b, double c, double d) {
 			this.a = a;
 			this.b = b;
 			this.c = c;
@@ -60,37 +64,39 @@ public final class Spline{
 		int i;
 
 		gamma[0] = 1.0 / 2.0;
-		for(i = 1; i < n; i++)
+		for(i = 1; i < n; i++) {
 			gamma[i] = 1 / (4 - gamma[i - 1]);
+		}
 
 		gamma[n] = 1 / (2 - gamma[n - 1]);
 
 		delta[0] = 3 * (x[1] - x[0]) * gamma[0];
-		for(i = 1; i < n; i++)
+		for(i = 1; i < n; i++) {
 			delta[i] = (3 * (x[i + 1] - x[i - 1]) - delta[i - 1]) * gamma[i];
-
+		}
+		
 		delta[n] = (3 * (x[n] - x[n - 1]) - delta[n - 1]) * gamma[n];
 
 		D[n] = delta[n];
-		for(i = n - 1; i >= 0; i--){
+		for(i = n - 1; i >= 0; i--) {
 			D[i] = delta[i] - gamma[i] * D[i + 1];
 		}
 
 		Polynom[] ret = new Polynom[n];
-		for(i = 0; i < n; i++){
+		for(i = 0; i < n; i++) {
 			ret[i] = new Polynom((double)x[i], D[i], 3 * (x[i + 1] - x[i]) - 2 * D[i] - D[i + 1],
 					2 * (x[i] - x[i + 1]) + D[i] + D[i + 1]);
 		}
 		return ret;
 	}
 
-	public static List<Point> evaluate(Point[] points, int granularity){
+	public static List<Point> evaluate(Point[] points, int granularity) {
 
 		List<Point> ret = Util.newArrayList();
 
 		double[] xs = new double[points.length];
 		double[] ys = new double[points.length];
-		for(int i = 0; i < points.length; i++){
+		for(int i = 0; i < points.length; i++) {
 			xs[i] = points[i].x();
 			ys[i] = points[i].y();
 		}

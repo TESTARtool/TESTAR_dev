@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.visualizers; // refactored by urueda
 
 import org.fruit.Assert;
@@ -44,10 +45,11 @@ public final class ShapeVisualizer implements Visualizer {
 	private static final long serialVersionUID = -1411595441118761574L;
 	private final Shape shape;
 	private final String label;
-	private final double labelX, labelY;
+	private final double labelX;
+	private final double labelY;
 	private final Pen pen;
 	
-	public ShapeVisualizer(Pen pen, Shape shape, String label, double labelX, double labelY){
+	public ShapeVisualizer(Pen pen, Shape shape, String label, double labelX, double labelY) {
 		Assert.notNull(shape, pen);
 		this.shape = shape;
 		this.pen = pen;
@@ -60,7 +62,8 @@ public final class ShapeVisualizer implements Visualizer {
 		Assert.notNull(state, c, pen);
 		pen = Pen.merge(pen, this.pen);
 		shape.paint(c, pen);
-		if(label != null)
+		if (label != null) {
 			c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
+		}
 	}
 }

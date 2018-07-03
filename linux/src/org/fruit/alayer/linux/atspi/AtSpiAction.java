@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.atspi;
 
-
 import org.fruit.alayer.linux.util.BridJHelper;
 
 import java.util.ArrayList;
@@ -59,7 +58,9 @@ public class AtSpiAction {
 
 
     private List<AtSpiActionInfo> _actions;
-    public List<AtSpiActionInfo> actions() { return _actions; }
+    public List<AtSpiActionInfo> actions() { 
+    	return _actions; 
+    }
 
 
     //endregion

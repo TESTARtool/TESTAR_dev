@@ -32,6 +32,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
 import static org.fruit.alayer.Tags.IsRunning;
@@ -85,24 +86,24 @@ import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.prolog.PrologUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
-public class DefaultProtocol extends AbstractProtocol{
+public class DefaultProtocol extends AbstractProtocol {
 
 	// begin by urueda
 	
-	protected State state = null,
-			        lastState = null;
+	protected State state = null;
+	protected State lastState = null;
 	protected int nonReactingActionNumber;
 	
 	// end by urueda
 	
 	private StateBuilder builder;
 
-	protected static final Pen RedPen = Pen.newPen().setColor(Color.Red).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-							   BluePen = Pen.newPen().setColor(Color.Blue).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+	protected static final Pen RedPen = Pen.newPen().setColor(Color.Red)
+			.setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+	protected static final Pen BluePen = Pen.newPen().setColor(Color.Blue)
+			.setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
 		builder = NativeLinker.getNativeStateBuilder(
 			settings.get(ConfigTags.TimeToFreeze),
@@ -116,19 +117,19 @@ public class DefaultProtocol extends AbstractProtocol{
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT); // by urueda
 	}
 
-	protected void beginSequence(){
-		super.beginSequence(); // by urueda
+	protected void beginSequence(SUT system, State state){
+		super.beginSequence(system, state);
 		faultySequence = false;
 		nonReactingActionNumber = 0; // by urueda
 	}
 
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		System.out.println("[" + getClass().getSimpleName() + "] Finish sequence");
 		this.killTestLaunchedProcesses(); // by urueda
 	}
 	
 	// refactored
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		return startSystem(null);
 	}
 		
@@ -138,29 +139,29 @@ public class DefaultProtocol extends AbstractProtocol{
 	 * @return running SUT
 	 * @throws SystemStartException
 	 */
-	protected SUT startSystem(String mustContain) throws SystemStartException{
+	protected SUT startSystem(String mustContain) throws SystemStartException {
 		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
 	}
 		
 	// by urueda
-	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
+	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException {
 		this.contextRunningProcesses = getRunningProcesses("START");
-		try{// refactored from "protected SUT startSystem() throws SystemStartException"
+		try {// refactored from "protected SUT startSystem() throws SystemStartException"
 			for(String d : settings().get(ConfigTags.Delete)) {
 				Util.delete(d);
 			}
 			for(Pair<String, String> fromTo : settings().get(ConfigTags.CopyFromTo)) {
 				Util.copyToDirectory(fromTo.left(), fromTo.right());
 			}
-		}catch(IOException ioe){
+		} catch(IOException ioe) {
 			throw new SystemStartException(ioe);
 		} // end refactoring
 		String sutConnector = settings().get(ConfigTags.SUTConnector);
 		if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
-			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length()+1));
+			return getSUTByWindowTitle(mustContain.substring(Settings.SUT_CONNECTOR_WINDOW_TITLE.length() + 1));
 		}
 		else if (mustContain != null && mustContain.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
-			return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length()+1));
+			return getSUTByProcessName(mustContain.substring(Settings.SUT_CONNECTOR_PROCESS_NAME.length() + 1));
 			}
 		else if (sutConnector.equals(Settings.SUT_CONNECTOR_WINDOW_TITLE)) {
 			return getSUTByWindowTitle(settings().get(ConfigTags.SUTConnectorValue)); 
@@ -168,7 +169,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		}
-		else{ // Settings.SUT_CONNECTOR_CMDLINE
+		else { // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
 			
@@ -177,11 +178,11 @@ public class DefaultProtocol extends AbstractProtocol{
 			final long now = System.currentTimeMillis(),
 					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 			State state;
-			do{
-				if (sut.isRunning()){
+			do {
+				if (sut.isRunning()) {
 					System.out.println("[" + getClass().getSimpleName() + "] SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 					state = builder.apply(sut);
-					if (state != null && state.childCount() > 0){
+					if (state != null && state.childCount() > 0) {
 						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 						System.out.println("[" + getClass().getSimpleName() + "] SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 						return sut;
@@ -202,10 +203,10 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
+	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException {
 		// kill running SUT processes
 		System.out.println("[" + getClass().getSimpleName() + "] Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
-		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
+		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))) { // All killed?
 			// retry start system
 			System.out.println("[" + getClass().getSimpleName() + "] Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
@@ -215,19 +216,19 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	// by urueda
-	private SUT getSUTByProcessName(String processName) throws SystemStartException{
+	private SUT getSUTByProcessName(String processName) throws SystemStartException {
 		Assert.hasText(processName);
 		List<SUT> suts = null;
 		long now = System.currentTimeMillis();
 		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
-		do{
+		do {
 			Util.pauseMs(100);
 			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
+			if (suts != null) {
 				String desc;
-				for (SUT theSUT : suts){
+				for (SUT theSUT : suts) {
 					desc = theSUT.get(Tags.Desc, null);
-					if (desc != null && desc.contains(processName)){
+					if (desc != null && desc.contains(processName)) {
 						System.out.println("[" + getClass().getSimpleName() + "] SUT with Process Name -" + processName + "- DETECTED!");
 						return theSUT;
 					}
@@ -238,24 +239,26 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	// by urueda
-	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
+	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException {
 		Assert.hasText(windowTitle);
 		List<SUT> suts = null;
-		State state; Role role; String title;
+		State state; 
+		Role role; 
+		String title;
 		long now = System.currentTimeMillis();
 		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
-		do{
+		do {
 			Util.pauseMs(100);
 			suts = NativeLinker.getNativeProcesses();
-			if (suts != null){
-				for (SUT theSUT : suts){
+			if (suts != null) {
+				for (SUT theSUT : suts) {
 					state = getState(theSUT);
-					if (state.get(Tags.Foreground)){
-						for (Widget w : state){
+					if (state.get(Tags.Foreground)) {
+						for (Widget w : state) {
 							role = w.get(Tags.Role, null);
-							if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())){
+							if (role != null && Role.isOneOf(role, NativeLinker.getNativeRole_Window())) {
 								title = w.get(Tags.Title, null);
-								if (title != null && title.contains(windowTitle)){
+								if (title != null && title.contains(windowTitle)) {
 									System.out.println("[" + getClass().getSimpleName() + "] SUT with Window Title -" + windowTitle + "- DETECTED!");
 									return theSUT;
 								}
@@ -269,7 +272,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		Assert.notNull(system); // by urueda
 		//State state = builder.apply(system);
 		state = builder.apply(system); // by urueda
@@ -277,7 +280,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		CodingManager.buildIDs(state); // by urueda
 
 		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
+		if (viewPort != null) {
 			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
 			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state)); // by urueda
 		}
@@ -286,10 +289,10 @@ public class DefaultProtocol extends AbstractProtocol{
 		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
-		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
+		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
-		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){ // begin by urueda
+		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity) { // begin by urueda
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
@@ -301,19 +304,19 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	@Override // by urueda
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 		Assert.notNull(state);
 		//-------------------
 		// ORACLES FOR FREE
 		//-------------------		
 
 		// if the SUT is not running, we assume it crashed
-		if(!state.get(IsRunning, false)) {
+		if (!state.get(IsRunning, false)) {
 			return new Verdict(SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
 		}
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
-		if(state.get(Tags.NotResponding, false)) {
+		if (state.get(Tags.NotResponding, false)) {
 			return new Verdict(SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
 
@@ -329,19 +332,19 @@ public class DefaultProtocol extends AbstractProtocol{
 		Matcher m;
 		// end by urueda
 		// search all widgets for suspicious titles
-		for(Widget w : state){
+		for(Widget w : state) {
 			String title = w.get(Title, "");
-			if (title != null && !title.isEmpty()){
+			if (title != null && !title.isEmpty()) {
 				// begin by urueda
 				m = this.suspiciousTitlesMatchers.get(title);
-				if (m == null){
+				if (m == null) {
 					m = this.suspiciousTitlesPattern.matcher(title);
 					this.suspiciousTitlesMatchers.put(title, m);
 				}
-				if (m.matches()){ // end by urueda
+				if (m.matches()) { // end by urueda
 					Visualizer visualizer = Util.NullVisualizer;
 					// visualize the problematic widget, by marking it with a red box
-					if(w.get(Tags.Shape, null) != null) {
+					if (w.get(Tags.Shape, null) != null) {
 						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
 					}
 					return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
@@ -349,7 +352,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			}
 		}
 		
-		if (this.nonSuitableAction){ // by urueda
+		if (this.nonSuitableAction) { // by urueda
 			this.nonSuitableAction = false;
 			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
 		}
@@ -358,7 +361,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		return Verdict.OK;
 	}
 
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		Assert.notNull(state);
 		Set<Action> actions = new HashSet<Action>();	
 
@@ -367,11 +370,11 @@ public class DefaultProtocol extends AbstractProtocol{
 
 		// if there is an unwanted process running, kill it
 		String processRE = settings().get(ConfigTags.ProcessesToKillDuringTest);
-		if (processRE != null && !processRE.isEmpty()){ // by urueda
+		if (processRE != null && !processRE.isEmpty()) { // by urueda
 			state.set(Tags.RunningProcesses, system.getRunningProcesses()); // by urueda
-			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
-				if(process.left().longValue() != system.get(Tags.PID).longValue() && // by urueda
-				   process.right() != null && process.right().matches(processRE)){ // pid x name
+			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())) {
+				if (process.left().longValue() != system.get(Tags.PID).longValue() && // by urueda
+				   process.right() != null && process.right().matches(processRE)) { // pid x name
 					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right(); // by urueda
 					System.out.println("[" + getClass().getSimpleName() + "] will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
@@ -381,20 +384,20 @@ public class DefaultProtocol extends AbstractProtocol{
 		}
 
 		// if the system is in the background force it into the foreground!
-		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+		if (!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null) {
 			//actions.add(ac.activateSystem());
 			this.forceToForeground = true; // by urueda
 			return actions;
 		}
 		
 		// begin by urueda
-		if(settings().get(ConfigTags.PrologActivated)){			
+		if (settings().get(ConfigTags.PrologActivated)) {			
 			List<List<String>> solutions = jipWrapper.setQuery(
 				"action(A,'" + state.get(Tags.ConcreteID) + "',W," + ActionRoles.LeftClick + ",0)."
 			);
 			//PrologUtil.printSolutions(solutions);
 			Widget w;
-			for (String wid : PrologUtil.getSolutions("W", solutions)){
+			for (String wid : PrologUtil.getSolutions("W", solutions)) {
 				w = getWidget(state,wid);
 				if (w != null) {
 					actions.add(ac.leftClickAt(w));
@@ -407,7 +410,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda (random inputs)	
-	protected String getRandomText(Widget w){
+	protected String getRandomText(Widget w) {
 		return DataManager.getRandomData();
 	}
 	
@@ -416,7 +419,7 @@ public class DefaultProtocol extends AbstractProtocol{
 		double minZIndex = Double.MAX_VALUE,
 				maxZIndex = Double.MIN_VALUE,
 				zindex;
-		for (Widget w : state){
+		for (Widget w : state) {
 			zindex = w.get(Tags.ZIndex).doubleValue();
 			if (zindex < minZIndex) {
 				minZIndex = zindex;
@@ -430,7 +433,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	protected List<Widget> getTopWidgets(State state){
+	protected List<Widget> getTopWidgets(State state) {
 		List<Widget> topWidgets = new ArrayList<>();
 		double maxZIndex = state.get(Tags.MaxZIndex);
 		for (Widget w : state) {
@@ -442,10 +445,10 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double SCROLLARROWSIZE, double SCROLLTHICK, Widget w){
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double SCROLLARROWSIZE, double SCROLLTHICK, Widget w) {
 		Drag[] drags = null;
-		if((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null){
-			for (Drag drag : drags){
+		if ((drags = w.scrollDrags(SCROLLARROWSIZE,SCROLLTHICK)) != null) {
+			for (Drag drag : drags) {
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
@@ -456,8 +459,8 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	protected boolean isUnfiltered(Widget w){
-		if(!Util.hitTest(w, 0.5, 0.5)) {
+	protected boolean isUnfiltered(Widget w) {
+		if (!Util.hitTest(w, 0.5, 0.5)) {
 			return false;
 		}
 		if (this.clickFilterPattern == null) {
@@ -469,7 +472,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			return true;
 		}
 		Matcher m = this.clickFilterMatchers.get(title);
-		if (m == null){
+		if (m == null) {
 			m = this.clickFilterPattern.matcher(title);
 			this.clickFilterMatchers.put(title, m);
 		}
@@ -477,24 +480,24 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 	
 	// by urueda
-	protected boolean isClickable(Widget w){
+	protected boolean isClickable(Widget w) {
 		Role role = w.get(Tags.Role, Roles.Widget);
-		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
+		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
 			return isUnfiltered(w);
 		}
 		return false;
 	}
 	
 	// by urueda
-	protected boolean isTypeable(Widget w){
+	protected boolean isTypeable(Widget w) {
 		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
 	}	
 
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
-				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
+		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) 
+				&& state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) 
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
-				actionCount() <= lastSequenceActionNumber && // by urueda
+				&& actionCount() <= lastSequenceActionNumber && // by urueda
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
@@ -506,16 +509,16 @@ public class DefaultProtocol extends AbstractProtocol{
 
 	// by urueda
 	@Override
-	protected void actionExecuted(SUT system, State state, Action action){
+	protected void actionExecuted(SUT system, State state, Action action) {
 		if (this.lastState == null && state == null) {
 			this.nonReactingActionNumber++;
 		}
-		else if (this.lastState != null && state != null &&
-				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID))) {
+		else if (this.lastState != null && state != null
+				&& this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID))) {
 			this.nonReactingActionNumber++;	
 		}
 		this.lastState = state;
-		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
+		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()) {
 			this.nonReactingActionNumber = 0;
 			this.forceNextActionESC = true;
 			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);			
@@ -529,7 +532,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	// by urueda
 	@Override
 	protected void stopSystem(SUT system) {
-		if (system != null){
+		if (system != null) {
 			AutomationCache ac = system.getNativeAutomationCache();
 			if (ac != null) {
 				ac.releaseCachedAutomationElements();

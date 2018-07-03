@@ -61,12 +61,12 @@ public class DrawableRect extends DrawableObject {
 
         Double sw = _pen.strokeWidth();
 
-        if (sw == null)
+        if (sw == null) {
             sw = _defaultPen.strokeWidth();
-
-        if (sw != null)
+        }
+        if (sw != null) {
             g2d.setStroke(new BasicStroke(sw.floatValue()));
-
+        }
 
         FillPattern fp = _pen.fillPattern();
 
@@ -90,6 +90,7 @@ public class DrawableRect extends DrawableObject {
 
 
     private Rectangle _rect;
+    
     /**
      * The rectangle that will be drawn.
      * @return The rectangle that will be drawn.

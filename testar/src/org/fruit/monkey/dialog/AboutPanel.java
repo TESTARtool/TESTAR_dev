@@ -46,7 +46,7 @@ public class AboutPanel extends JPanel {
   private JLabel prosLogo = getLogo("/icons/logos/pros.png");
   private JLabel ouLogo = getLogo("/icons/logos/ou.jpg");
 
-  public AboutPanel () throws IOException {
+  public AboutPanel() throws IOException {
     setBackground(Color.WHITE);
 
     GroupLayout aboutPanelLayout = new GroupLayout(this);
@@ -81,7 +81,7 @@ public class AboutPanel extends JPanel {
 
   }
 
-  private JLabel getLogo (String iconPath) throws IOException{
+  private JLabel getLogo(String iconPath) throws IOException {
     return new JLabel(new ImageIcon(SettingsDialog.loadIcon(iconPath)));
   }
 }

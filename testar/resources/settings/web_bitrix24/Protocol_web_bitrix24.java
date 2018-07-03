@@ -36,6 +36,10 @@ package web_bitrix24;
  *  @author (Bitrix24 adaptation, protocol refactor & cleanup) Urko Rueda (alias: urueda)
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Title;
+import static org.fruit.alayer.Tags.Enabled;
+
 import java.io.File;
 import java.util.Set;
 import org.fruit.alayer.Action;
@@ -58,28 +62,26 @@ import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 
 import es.upv.staq.testar.NativeLinker;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	
 	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-	static final int BROWSER_IEXPLORER = 1;
-	static final int BROWSER_FIREFOX = 2;
+	private static final int BROWSER_IEXPLORER = 1;
+	private static final int BROWSER_FIREFOX = 2;
 	private static int browser; // BROWSER_*
-	static Role webController, webText; // browser dependent
-	static double browser_toolbar_filter;	
+	private static Role webController; // browser dependent
+	private static Role webText; // browser dependent
+	private static double browser_toolbar_filter;	
 
-	static final double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
-	static final double SCROLLTHICK = 16; //scroll thickness (iexplorer)
+	private static final double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
+	private static final double SCROLLTHICK = 16; //scroll thickness (iexplorer)
 	
 	/** 
 	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		
 		super.initialize(settings);
 		initBrowser();
@@ -87,16 +89,16 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	}
 	
 	// check browser
-	private void initBrowser(){
+	private void initBrowser() {
 		browser = 0;
 		webController = NativeLinker.getNativeRole("UIADataItem"); // just init with some value
 		webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
 		String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-		if (sutPath.contains("iexplore.exe")){
+		if (sutPath.contains("iexplore.exe")) {
 			browser = BROWSER_IEXPLORER;
 			webController = NativeLinker.getNativeRole("UIACustomControl");
 			webText = NativeLinker.getNativeRole("UIAEdit");
-		} else if (sutPath.contains("firefox")){
+		} else if (sutPath.contains("firefox")) {
 			browser = BROWSER_FIREFOX;
 			webController = NativeLinker.getNativeRole("UIADataItem");
 			webText = NativeLinker.getNativeRole("UIAText");
@@ -106,9 +108,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
-	protected void beginSequence(){
+	protected void beginSequence(SUT sut, State state) {
 		
-		super.beginSequence();
+		super.beginSequence(sut, state);
 		
 	}
 	
@@ -123,7 +125,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
 	 */
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
         
 		SUT sut = super.startSystem();
 
@@ -139,13 +141,13 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		
 		State state = super.getState(system);
 
-        for(Widget w : state){
+        for(Widget w : state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
             	browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
             }
         }
@@ -159,7 +161,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 		
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
@@ -173,7 +175,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		Shape shape;
 		
 		// search all widgets for suspicious titles
-		for(Widget w : state){
+		for(Widget w : state) {
 
 			role = w.get(Tags.Role, null);
 			title = w.get(Title, "");
@@ -194,7 +196,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 	}
 	
-	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title){
+	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title) {
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty()) {
 			return new Verdict(SEVERITY_WARNING, "Not all images have an alternate textual description",
 							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
@@ -203,7 +205,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		}
 	}
 
-	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape){
+	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape) {
 		final int MINIMUM_FONT_SIZE = 8; // px
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE) {
 			return new Verdict(SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
@@ -213,10 +215,10 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		}
 	}
 	
-	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
+	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape) {
 		final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
 		try {
-			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
+			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")) {
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE) {
 					return new Verdict(SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
 									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));	
@@ -242,7 +244,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		
 		Set<Action> actions = super.deriveActions(system,state); // by urueda
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -255,20 +257,20 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		//----------------------		
 
 		// iterate through all widgets
-		for(Widget w : state){
+		for(Widget w : state) {
 			
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+			if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
 
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)) {  // do not build actions for tabu widgets  
 								
 					// create left clicks
-					if(whiteListed(w) || isClickable(w)) {
+					if (whiteListed(w) || isClickable(w)) {
 						actions.add(ac.leftClickAt(w));
 					}
 	
 					// create double left click
-					if(whiteListed(w) || isDoubleClickable(w)){
-						if(browser == BROWSER_FIREFOX) {
+					if (whiteListed(w) || isDoubleClickable(w)) {
+						if (browser == BROWSER_FIREFOX) {
 							actions.add(ac.leftDoubleClickAt(w));
 						}
 						else if (browser == BROWSER_IEXPLORER) {
@@ -277,7 +279,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 					}
 
 					// type into text boxes
-					if(isTypeable(w)) {
+					if (isTypeable(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));					
 					}
 					
@@ -296,7 +298,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
 
 	@Override
-	protected boolean isClickable(Widget w){		
+	protected boolean isClickable(Widget w) {		
 		if (!isAtBrowserCanvas(w)) {
 			return false;	
 		}
@@ -310,14 +312,14 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		}
 	} 	
 
-	private boolean isDoubleClickable(Widget w){
+	private boolean isDoubleClickable(Widget w) {
 		if (!isAtBrowserCanvas(w)) {
 			return false;	
 		}
 		
-		if (isClickable(w)){
+		if (isClickable(w)) {
 			Widget wParent = w.parent();
-			if (wParent != null){
+			if (wParent != null) {
 				Role roleP = wParent.get(Tags.Role, null);
 				if (roleP != null && Role.isOneOf(roleP,webController)) {
 					return isUnfiltered(w);
@@ -329,7 +331,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	}	
 
 	@Override
-	protected boolean isTypeable(Widget w){
+	protected boolean isTypeable(Widget w) {
 		if (!isAtBrowserCanvas(w)) {
 			return false;	
 		}
@@ -343,7 +345,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	}
 	
 	// by urueda
-	private boolean isAtBrowserCanvas(Widget w){
+	private boolean isAtBrowserCanvas(Widget w) {
 		Shape shape = w.get(Tags.Shape,null);
 		if (shape != null && shape.y() > browser_toolbar_filter) {
 			return true;
@@ -358,7 +360,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
 	 * @return  the selected action (non-null!)
 	 */
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(State state, Set<Action> actions) {
 		
 		return super.selectAction(state, actions);
 		
@@ -371,7 +373,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @param action the action to execute
 	 * @return whether or not the execution succeeded
 	 */
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		
 		return super.executeAction(system, state, action);
 		
@@ -393,7 +395,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		
 		super.finishSequence(recordedSequence);
 		

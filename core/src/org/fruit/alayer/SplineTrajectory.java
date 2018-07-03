@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -43,30 +44,45 @@ import org.fruit.UnFunc;
 public final class SplineTrajectory implements UnFunc<State, Iterable<Point>>, Serializable {
 
 	private static final long serialVersionUID = -7833747078043023184L;
-	final Position[] positions;
-	final int smoothness;
+	private final Position[] positions;
+	private final int smoothness;
 	
-	private final class PointIterable implements Iterable<Point>{
-		final Point[] points;
-		public PointIterable(Point[] points){ this.points = points; }
-		public Iterator<Point> iterator() { return new Iter(points); }		
+	private final class PointIterable implements Iterable<Point> {
+		private final Point[] points;
+		
+		public PointIterable(Point[] points) { 
+			this.points = points; 
+		}
+		
+		public Iterator<Point> iterator() { 
+			return new Iter(points); 
+		}		
 	}
 	
-	private final class Iter implements Iterator<Point>{
-		List<Point> intermediatePoints;
-		Iterator<Point> iter;
+	private final class Iter implements Iterator<Point> {
+		private List<Point> intermediatePoints;
+		private Iterator<Point> iter;
 		
-		public Iter(Point[] points){
-			intermediatePoints = Spline.evaluate(points, smoothness + 1); //TODO: only create points on demand!!
+		Iter(Point[] points) {
+			intermediatePoints = Spline.evaluate(points, smoothness + 1); 
+			//TODO: only create points on demand!!
 			iter = intermediatePoints.iterator();
 		}
 		
-		public boolean hasNext() { return iter.hasNext(); }
-		public Point next() { return iter.next(); }
-		public void remove() { throw new UnsupportedOperationException(); }
+		public boolean hasNext() { 
+			return iter.hasNext(); 
+		}
+		
+		public Point next() { 
+			return iter.next(); 
+		}
+		
+		public void remove() { 
+			throw new UnsupportedOperationException(); 
+		}
 	}
 	
-	public SplineTrajectory(int smoothness, Position... positions){
+	public SplineTrajectory(int smoothness, Position... positions) {
 		Assert.notNull(positions);
 		Assert.isTrue(smoothness >= 0 && positions.length > 1);
 		this.positions = positions;
@@ -76,8 +92,9 @@ public final class SplineTrajectory implements UnFunc<State, Iterable<Point>>, S
 	public Iterable<Point> apply(State s) {
 		Assert.notNull(s);
 		Point[] points = new Point[positions.length];
-		for(int i = 0; i < positions.length; i++)
+		for(int i = 0; i < positions.length; i++) {
 			points[i] = positions[i].apply(s);
+		}
 		return new PointIterable(points);
 	}
 }

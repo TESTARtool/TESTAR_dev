@@ -49,7 +49,7 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 
 	private IEventListener eventListener;
 	
-	public EventHandler(IEventListener eventListener){
+	public EventHandler(IEventListener eventListener) {
 		this.eventListener = eventListener;
 	}
 	
@@ -60,7 +60,7 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 	@Override
 	public final void nativeKeyPressed(NativeKeyEvent e) {
 		for(KBKeys key : KBKeys.values()) {
-			if(key.code() == e.getKeyCode()) {
+			if (key.code() == e.getKeyCode()) {
 				eventListener.keyDown(key);
 			}
 		}
@@ -69,7 +69,7 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 	@Override
 	public final void nativeKeyReleased(NativeKeyEvent e) {
 		for(KBKeys key : KBKeys.values()) {
-			if(key.code() == e.getKeyCode()) {
+			if (key.code() == e.getKeyCode()) {
 				eventListener.keyUp(key);
 			}
 		}
@@ -80,26 +80,26 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 
 	@Override
 	public final void nativeMousePressed(NativeMouseEvent arg0) {
-		if(arg0.getButton() == 1) {
+		if (arg0.getButton() == 1) {
 			eventListener.mouseDown(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
 		}
-		else if(arg0.getButton() == 2) {
+		else if (arg0.getButton() == 2) {
 			eventListener.mouseDown(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
 			}
-		else if(arg0.getButton() == 3) {
+		else if (arg0.getButton() == 3) {
 			eventListener.mouseDown(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
 			}
 	}
 
 	@Override
 	public final void nativeMouseReleased(NativeMouseEvent arg0) {
-		if(arg0.getButton() == 1) {
+		if (arg0.getButton() == 1) {
 			eventListener.mouseUp(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
 		}
-		else if(arg0.getButton() == 2) {
+		else if (arg0.getButton() == 2) {
 			eventListener.mouseUp(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
 		}
-		else if(arg0.getButton() == 3) {
+		else if (arg0.getButton() == 3) {
 			eventListener.mouseUp(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
 		}
 	}

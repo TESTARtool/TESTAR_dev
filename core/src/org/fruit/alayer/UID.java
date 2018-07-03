@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -43,7 +44,8 @@ import java.io.Serializable;
  * @author Sebastian Bauersfeld
  *
  */
-public interface UID extends Serializable{
+public interface UID extends Serializable {
 	int hashCode();
+	
 	boolean equals(Object o);
 }

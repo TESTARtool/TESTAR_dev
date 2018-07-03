@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -52,19 +53,20 @@ public class ActivateSystem extends TaggableBase implements Action {
 		Assert.notNull(system);
 		Assert.isTrue(duration >= 0);
 		
-		try{
+		try {
 			double start = Util.time();
 			Proc activator = system.get(Tags.SystemActivator);
 			activator.run();
 			Util.pause(duration - (Util.time() - start));
-		}catch(NoSuchTagException nste){
+		} catch(NoSuchTagException nste) {
 			throw new ActionFailedException(nste);
 		}
 	}
 	
-	public String toString(){ return "Bring the system to the foreground."; }
+	public String toString() { 
+		return "Bring the system to the foreground."; 
+	}
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
@@ -74,16 +76,15 @@ public class ActivateSystem extends TaggableBase implements Action {
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null)
+		if (r != null) {
 			return r.toString();
-		else
+		} else {
 			return toString();
+		}
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "";
 	}
-
 }

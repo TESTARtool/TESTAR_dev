@@ -58,17 +58,17 @@ public class RestartsWalkerUtil {
 	
 	private static boolean forcingStateRestart = false;
 	
-	public static void setTestSequenceLength(int testSequenceLength){
+	public static void setTestSequenceLength(int testSequenceLength) {
 		TEST_SEQUENCE_LENGTH = testSequenceLength;
 		sequenceIdx = 0;
 	}
 	
-	public static int getTestSquenceIdx(){
+	public static int getTestSquenceIdx() {
 		return sequenceIdx;
 	}
 	
-	private static void setRestartConfig(IEnvironment env){
-		if (TEST_SEQUENCE_LENGTH == 0){ // not initialized?
+	private static void setRestartConfig(IEnvironment env) {
+		if (TEST_SEQUENCE_LENGTH == 0) { // not initialized?
 			RESTART_INTERVAL = Integer.MAX_VALUE;
 			RESTART_WINDOW_SCALE = 1;
 			System.out.println("[RestartWalkerUtil] DEBUG> TEST_SEQUENCE_LENGTH is 0");
@@ -78,15 +78,15 @@ public class RestartsWalkerUtil {
 		final int THRESHOLD = 100; // #actions
 
 		int pendingLength = TEST_SEQUENCE_LENGTH - sequenceIdx;
-		if (pendingLength < THRESHOLD / 2){
+		if (pendingLength < THRESHOLD / 2) {
 			RESTART_INTERVAL = Integer.MAX_VALUE; // prevent restarts
 			RESTART_WINDOW_SCALE = 1;
-			System.out.println("[RestartWalkerUtil] DEBUG> pendingLength <" + pendingLength + "> less than half threshold <" + (THRESHOLD/2) + ">");
+			System.out.println("[RestartWalkerUtil] DEBUG> pendingLength <" + pendingLength + "> less than half threshold <" + (THRESHOLD / 2) + ">");
 			return;
 		}
 		
 		int graphSize = env.getGraphStates().size() * env.getGraphActions().size();
-		if (graphSize == 0){
+		if (graphSize == 0) {
 			RESTART_INTERVAL = THRESHOLD / 4;
 			RESTART_WINDOW_SCALE = 2;
 			System.out.println("[RestartWalkerUtil] DEBUG> graphSize is 0");
@@ -94,24 +94,26 @@ public class RestartsWalkerUtil {
 		}
 				
 		int longestPath = env.getLongestPathLength();
-		if (pendingLength < longestPath * 2){
+		if (pendingLength < longestPath * 2) {
 			RESTART_INTERVAL = Integer.MAX_VALUE; // prevent restarts
 			RESTART_WINDOW_SCALE = 1;
 			System.out.println("[RestartWalkerUtil] DEBUG> pendingLength <" + pendingLength + "> less than double longest path <" + (longestPath * 2) + ">");
 			return;
 		}
 		
-		if (sequenceIdx == 0){
-			RESTART_INTERVAL = 1; restartCounter = RESTART_INTERVAL; // force restart
+		if (sequenceIdx == 0) {
+			RESTART_INTERVAL = 1; 
+			restartCounter = RESTART_INTERVAL; // force restart
 			RESTART_WINDOW_SCALE = (int) Math.log((double)longestPath + 1.0d);
 			System.out.println("[RestartWalkerUtil] DEBUG> sequenceIdx is 0");
 			return;
 		}
 
 		RESTART_INTERVAL = pendingLength / (pendingLength / (longestPath * 2));
-		if (RESTART_INTERVAL < THRESHOLD * 2)
+		if (RESTART_INTERVAL < THRESHOLD * 2) {
 			RESTART_INTERVAL = THRESHOLD * 2;
-		RESTART_WINDOW_SCALE = (int) Math.log((double)longestPath + 1.0d);;
+		}
+		RESTART_WINDOW_SCALE = (int) Math.log((double)longestPath + 1.0d);
 		
 		System.out.println("[RestartWalkerUtil] DEBUG> RESTART_INTERVAL <" + RESTART_INTERVAL + "> and RESTART_WINDOW_SCALE <" + RESTART_WINDOW_SCALE + ">");
 
@@ -124,17 +126,19 @@ public class RestartsWalkerUtil {
 	 * @param state
 	 * @return 'true' if a restart is feasible, 'false' otherwise
 	 */
-	public static boolean forceStateRestart(IWalker walker, IEnvironment env, State state){
-		if (forcingStateRestart)
+	public static boolean forceStateRestart(IWalker walker, IEnvironment env, State state) {
+		if (forcingStateRestart) {
 			return true;
+		}
 		restartCounter = 1;
 		pathTargetState = WalkerUtil.getPathToLessExploredState(walker,env,state);
-		if (pathTargetState != null && !pathTargetState.isEmpty()){
+		if (pathTargetState != null && !pathTargetState.isEmpty()) {
 			forcingStateRestart = true;
 			restartWindowCounter = 1;
 			debug(0);
-		} else
+		} else {
 			restartWindowCounter = -1;
+		}
 		return (restartWindowCounter != -1);		
 	}
 	
@@ -146,31 +150,34 @@ public class RestartsWalkerUtil {
 	 */
 	public static boolean notifyActionSelection(IWalker walker, IEnvironment env, State state) {
 		setRestartConfig(env);
-		if (restartWindowCounter == -1){ // no restart
-			if (restartCounter >= RESTART_INTERVAL)
+		if (restartWindowCounter == -1) { // no restart
+			if (restartCounter >= RESTART_INTERVAL) {
 				forceStateRestart(walker, env,state);
-			else
+			} else {
 				restartCounter++;
-		} else{ // restart
-			if (restartWindowCounter >= (pathTargetState.size() * RESTART_WINDOW_SCALE)){
+			}
+		} else { // restart
+			if (restartWindowCounter >= (pathTargetState.size() * RESTART_WINDOW_SCALE)) {
 				restartWindowCounter = -1;
 				forcingStateRestart = false;
-				if (pathTargetState != null)
+				if (pathTargetState != null) {
 					pathTargetState.clear();
+				}
 				pathTargetState = null;
-			} else
+			} else {
 				restartWindowCounter++;
+			}
 		}
 		sequenceIdx++;
 		return (restartWindowCounter != -1);
 	}
 
 	public static void notifyRewardCalculation(IEnvironment env, IGraphAction action) {
-		if (pathTargetState != null){
+		if (pathTargetState != null) {
 						
 			IGraphState[] targetStates = env.getTargetStates(action);
-			if (targetStates != null &&
-			    Arrays.stream(targetStates).anyMatch(pathTargetState.get(pathTargetState.size() - 1)::equals)){ // path target state
+			if (targetStates != null 
+				&& Arrays.stream(targetStates).anyMatch(pathTargetState.get(pathTargetState.size() - 1)::equals)) { // path target state
 			
 				pathTargetState.clear(); // target state reached!
 				pathTargetState = null;
@@ -181,8 +188,8 @@ public class RestartsWalkerUtil {
 		}
 	}
 
-	public static double getTargetReward(IEnvironment env, IGraphState targetState){
-		if (pathTargetState != null && !pathTargetState.isEmpty() && pathTargetState.contains(targetState)){
+	public static double getTargetReward(IEnvironment env, IGraphState targetState) {
+		if (pathTargetState != null && !pathTargetState.isEmpty() && pathTargetState.contains(targetState)) {
 			int idx = pathTargetState.indexOf(targetState);
 			debug(idx);
 			return Double.MAX_VALUE / Math.pow(2, pathTargetState.size() - 1 - idx);
@@ -190,12 +197,12 @@ public class RestartsWalkerUtil {
 		return Double.MIN_VALUE; // should use the algorithm getTargetReward
 	}
 	
-	private static void debug(int idx){
-		System.out.print("[RestartsWalkerUtil] RESTART PATH TO TARGET STATE (" + idx + "/" + pathTargetState.size() + "): [F|" +
-						 pathTargetState.get(0).getConcreteID() + "] "); // from state
-		for (int i=1; i<pathTargetState.size() - 1; i++)
+	private static void debug(int idx) {
+		System.out.print("[RestartsWalkerUtil] RESTART PATH TO TARGET STATE (" + idx + "/" + pathTargetState.size() + "): [F|" 
+				+ pathTargetState.get(0).getConcreteID() + "] "); // from state
+		for (int i = 1; i < pathTargetState.size() - 1; i++) {
 			System.out.print(pathTargetState.get(i).getConcreteID() + " ");
+		}
 		System.out.print(" [T|" + pathTargetState.get(pathTargetState.size() - 1).getConcreteID() + "]\n"); // target state
-	}
-	
+	}	
 }

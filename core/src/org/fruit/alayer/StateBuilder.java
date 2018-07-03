@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 /**
  * A StateBuilder fetches an <code>SUT</code>'s current state.
  */
-public interface StateBuilder extends Serializable{
+public interface StateBuilder extends Serializable {
 
 	State apply(SUT system) throws StateBuildException;
     	

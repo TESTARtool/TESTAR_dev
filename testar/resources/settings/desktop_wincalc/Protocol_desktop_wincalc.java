@@ -35,6 +35,9 @@ package desktop_wincalc;
  * @author Urko Rueda Molina
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
 import java.io.File;
 import java.util.Set;
 
@@ -57,8 +60,6 @@ import org.fruit.monkey.ConfigTags;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 
 import org.fruit.monkey.Settings;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // DefaultProtocol {
 
@@ -68,7 +69,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 
 		super.initialize(settings);
 
@@ -79,9 +80,9 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * This method is invoked each time the TESTAR starts to generate a new sequence.
 	 */
 	 @Override
-	protected void beginSequence(){
+	protected void beginSequence(SUT sut, State state) {
 
-		super.beginSequence();
+		super.beginSequence(sut, state);
 
 	}
 	
@@ -98,12 +99,12 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
      * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		
 		SUT sut = super.startSystem();
 
 		// begin by urueda
-		if (mode() != Modes.Spy){
+		if (mode() != Modes.Spy) {
 			// bring the calculator to an initial state
 	        new CompoundAction.Builder()				
 	            .add(new KeyDown(KBKeys.VK_ALT),0.2)
@@ -137,7 +138,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 
 		return super.getState(system);
 
@@ -151,7 +152,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
@@ -177,7 +178,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		
 		Set<Action> actions = super.deriveActions(system,state); // by urueda
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -189,20 +190,20 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 		
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
+		if (!settings().get(ConfigTags.PrologActivated)) { // is prolog deactivated?
 			
 			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
+			for(Widget w : getTopWidgets(state)) {
+				if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
+					if (!blackListed(w)) {  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w)) {
+						if (whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
 						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w)) {
+						if (whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 					
@@ -223,7 +224,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
+	protected Action selectAction(State state, Set<Action> actions) { 
 
 		return super.selectAction(state, actions);
 
@@ -238,7 +239,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * @return whether or not the execution succeeded
 	 */
 	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		
 		return super.executeAction(system, state, action);
 		
@@ -263,7 +264,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		
 		super.finishSequence(recordedSequence);
 		

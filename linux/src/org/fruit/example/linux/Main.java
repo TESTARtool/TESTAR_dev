@@ -29,7 +29,6 @@
 
 package org.fruit.example.linux;
 
-
 import org.fruit.alayer.linux.atspi.LibAtSpi;
 import org.fruit.alayer.linux.LinuxProcess;
 
@@ -59,7 +58,7 @@ public class Main {
     /**
      * Tests launching a Linux application.
      */
-    private static void launchApplication(){
+    private static void launchApplication() {
 
 
         LinuxProcess lp = LinuxProcess.fromExecutable(ApplicationPath_GEdit);

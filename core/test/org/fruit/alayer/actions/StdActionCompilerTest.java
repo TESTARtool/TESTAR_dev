@@ -55,7 +55,7 @@ public class StdActionCompilerTest {
 		keys.add(KBKeys.VK_SHIFT);
 		keys.add(KBKeys.VK_F);
 		Action action = compiler.hitShortcutKey(keys);
-		// TODO: instead of looking at a string, inspect the compound action's component actions
+		//TODO: instead of looking at a string, inspect the compound action's component actions
 		String exp =
 				"(VK_CONTROL)(VK_SHIFT)(VK_F)" // press
 				+ "(VK_F)(VK_SHIFT)(VK_CONTROL)"; // release

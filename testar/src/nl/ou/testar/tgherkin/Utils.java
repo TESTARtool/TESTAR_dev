@@ -49,7 +49,7 @@ public class Utils {
 	public static final String XML_HEADER = "<?xml version=\"1.0\"?>";
 	 
 	/**
-	 * Pattern for finding iamge files in a Tgherkin XPath expression
+	 * Pattern for finding iamge files in a Tgherkin XPath expression.
 	 * group 1: image function
 	 * group 2: image file name 
 	 */
@@ -67,7 +67,7 @@ public class Utils {
 		ANTLRInputStream inputStream;
 		try {
 			inputStream = new ANTLRInputStream(new FileInputStream(fileName));
-		}catch (IOException e) {
+		} catch (IOException e) {
 			throw new TgherkinException("Unable to open character stream for Tgherkin file: " + fileName);
 		}        
 		TgherkinLexer lexer = new TgherkinLexer(inputStream);
@@ -147,9 +147,9 @@ public class Utils {
 	 */
 	public static String readTgherkinSourceFile(String fileName) {
 		String sourceCode = null;
-	    try{
+	    try {
 	        sourceCode = new String (Files.readAllBytes(Paths.get(fileName)));
-	    }catch (IOException e){
+	    } catch (IOException e) {
 			throw new TgherkinException("Unable to read Tgherkin file: " + fileName);
 	    }
 	    return sourceCode;
@@ -194,7 +194,7 @@ public class Utils {
 	 * @param xpathExpr XPath expression
 	 * @return list of concrete ID's, empty list if no widget elements were returned
 	 */
-	public static List<String> getXPathResult(String xmlData, String xpathExpr){
+	public static List<String> getXPathResult(String xmlData, String xpathExpr) {
         NodeList nodes = (NodeList) evaluateXPathExpresion(xmlData, xpathExpr,XPathConstants.NODESET);
 		List<String> concreteIDList = new ArrayList<String>();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -217,7 +217,7 @@ public class Utils {
 	 * @param xpathExpr XPath expression
 	 * @return XPath expression result
 	 */
-	public static Boolean getXPathBooleanResult(String xmlData, String xpathExpr){
+	public static Boolean getXPathBooleanResult(String xmlData, String xpathExpr) {
 		return (Boolean) evaluateXPathExpresion(xmlData, xpathExpr,XPathConstants.BOOLEAN);
 	}
 	
@@ -227,7 +227,7 @@ public class Utils {
 	 * @param xpathExpr XPath expression
 	 * @return XPath expression result
 	 */
-	public static Double getXPathNumberResult(String xmlData, String xpathExpr){
+	public static Double getXPathNumberResult(String xmlData, String xpathExpr) {
 		return (Double) evaluateXPathExpresion(xmlData, xpathExpr,XPathConstants.NUMBER);
 	}
 
@@ -237,7 +237,7 @@ public class Utils {
 	 * @param xpathExpr XPath expression
 	 * @return XPath expression result
 	 */
-	public static String getXPathStringResult(String xmlData, String xpathExpr){
+	public static String getXPathStringResult(String xmlData, String xpathExpr) {
 		return (String) evaluateXPathExpresion(xmlData, xpathExpr,XPathConstants.STRING);
 	}
 
@@ -264,7 +264,7 @@ public class Utils {
 	        XPathExpression expr = xpath.compile(xpathExprXML);
 	        //evaluate expression result on XML document
 			result = expr.evaluate(document, resultType);
-		}catch(Exception e) {
+		} catch(Exception e) {
 			throw new TgherkinException("XPath expression " + xpathExpr + " is invalid: " + e.getMessage());
 		}
         return result;
@@ -298,13 +298,13 @@ public class Utils {
        			stringBuilder.append(toXMLElement("Shape.y", "" + shape.y()));
        			stringBuilder.append(toXMLElement("Shape.width", "" + shape.width()));
        			stringBuilder.append(toXMLElement("Shape.height", "" + shape.height()));
-    		}else {
+    		} else {
                 stringBuilder.append(toXMLElement(tag.name(), Util.toString(widget.get(tag))));
     		}
     		if (ocr) {
     			// add OCR element
     			String ocrResult = OCR.getInstance().getOCR(proxy, widget);
-    			if (ocrResult == null){
+    			if (ocrResult == null) {
         			ocrResult = "";
     			}
     			stringBuilder.append(toXMLElement("OCR", Util.toString(ocrResult)));
@@ -314,7 +314,7 @@ public class Utils {
     			String recognitionResult;
     			if (Image.getInstance().isRecognized(proxy, widget, imageFile)) {
     				recognitionResult = "true";
-    			}else {
+    			} else {
     				recognitionResult = "false";
     			}
    				stringBuilder.append(toXMLElement("Image_" + imageFile, recognitionResult));
@@ -335,7 +335,7 @@ public class Utils {
 	 * @param value element value
 	 * @return XML element code
 	 */
-	public static String toXMLElement(String name, String value){
+	public static String toXMLElement(String name, String value) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("<");
 		stringBuilder.append(getXMLName(name));
@@ -352,25 +352,23 @@ public class Utils {
 	private static String stripInvalidXMLCharacters(String in) {
 	     // XML 1.0
 	     // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-	     String xml10pattern = 
-	             "[^" + 
-	             "\u0009\r\n" + 
-	             "\u0020-\uD7FF" + 
-	             "\uE000-\uFFFD" + 
-	             "\ud800\udc00-\udbff\udfff" + 
-	             "]";
+	     String xml10pattern = "[^"
+	             + "\u0009\r\n"
+	             + "\u0020-\uD7FF"
+	             + "\uE000-\uFFFD"
+	             + "\ud800\udc00-\udbff\udfff"
+	             + "]";
 	     return in.replaceAll(xml10pattern, "").trim();
 	}
 
 	private static String getXMLName(String in) {
-	     String xml10pattern = 
-	             "[^" + 
-	             "\u0041-\u005A" +  // upper case letters
-	             "\u0061-\u007A" +  // lower case letters 
-	             "\u002D\r\n" +     // hyphen
-	             "\u005F\r\n" +     // underscore
-	             "\u002E\r\n" +     // period
-	             "]";
+	     String xml10pattern = "[^" 
+	             + "\u0041-\u005A"   // upper case letters
+	             + "\u0061-\u007A"   // lower case letters 
+	             + "\u002D\r\n"      // hyphen
+	             + "\u005F\r\n"      // underscore
+	             + "\u002E\r\n"      // period
+	             + "]";
 	     return in.replaceAll(xml10pattern, "").trim();
 	}
 	 

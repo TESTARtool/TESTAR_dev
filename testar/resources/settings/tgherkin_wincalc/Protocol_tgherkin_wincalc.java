@@ -17,22 +17,22 @@ import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 public class Protocol_tgherkin_wincalc extends DocumentProtocol { 
 
 	/** 
-	 * Called once during the life time of TESTAR
+	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	@Override
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		super.initialize(settings);
 	}
 	
 
 	/**
-	 * This method is invoked each time the TESTAR starts to generate a new sequence
+	 * This method is invoked each time the TESTAR starts to generate a new sequence.
 	 */
 	 @Override
-	protected void beginSequence(){
-		super.beginSequence();
+	protected void beginSequence(SUT sut, State state) {
+		super.beginSequence(sut, state);
 
 	}
 	
@@ -49,7 +49,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
      * @return  a started SUT, ready to be tested.
 	 */
 	@Override
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
         return super.startSystem();
 	}
 
@@ -64,7 +64,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		return super.getState(system);
 	}
 
@@ -76,7 +76,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	@Override
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 		return super.getVerdict(state);
 	}
 	
@@ -91,7 +91,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * @return  a set of actions
 	 */
 	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		return super.deriveActions(system,state);
 	}
 
@@ -102,7 +102,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){ 
+	protected Action selectAction(State state, Set<Action> actions) { 
 		return super.selectAction(state, actions);
 	}
 
@@ -115,7 +115,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * @return whether or not the execution succeeded
 	 */
 	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		return super.executeAction(system, state, action);
 	}
 	
@@ -136,7 +136,7 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
 	}
 

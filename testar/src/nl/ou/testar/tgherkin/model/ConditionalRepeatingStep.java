@@ -88,7 +88,7 @@ public class ConditionalRepeatingStep extends RepeatingStep {
     	result.append(System.getProperty("line.separator"));
     	if (getType() == Type.WHILE_STEP) {
     		result.append("While " + getLoopCondition().toString());	
-    	}else{
+    	} else {
     		result.append("Repeat until " + getLoopCondition().toString());
     	}
     	result.append(System.getProperty("line.separator"));

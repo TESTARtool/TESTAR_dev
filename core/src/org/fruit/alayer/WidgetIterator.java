@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.util.Iterator;
@@ -43,11 +44,11 @@ public final class WidgetIterator implements Iterator<Widget> {
 	private final LinkedList<Widget> buffer;
 	private final Navigator navi;
 	
-	public WidgetIterator(Widget start){
+	public WidgetIterator(Widget start) {
 		this(start, new BFNavigator());
 	}
 
-	public WidgetIterator(Widget start, Navigator navi){
+	public WidgetIterator(Widget start, Navigator navi) {
 		Assert.notNull(start, navi);
 		this.buffer = new LinkedList<Widget>();
 		this.navi = navi;
@@ -55,14 +56,19 @@ public final class WidgetIterator implements Iterator<Widget> {
 		this.navi.run(this.buffer);
 	}
 
-	public boolean hasNext() { return !buffer.isEmpty(); }
+	public boolean hasNext() { 
+		return !buffer.isEmpty(); 
+	}
 
 	public Widget next() {
 		Widget ret = buffer.remove();
-		if(!buffer.isEmpty())
+		if (!buffer.isEmpty()) {
 			navi.run(buffer);
+		}
 		return ret;
 	}
 
-	public void remove() { throw new UnsupportedOperationException(); }
+	public void remove() { 
+		throw new UnsupportedOperationException(); 
+	}
 }

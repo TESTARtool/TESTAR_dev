@@ -147,8 +147,8 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	@Override
-	protected void beginSequence() {
-		super.beginSequence();
+	protected void beginSequence(SUT sut, State state) {
+		super.beginSequence(sut, state);
 	}
 
 	/**
@@ -232,15 +232,19 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		return blacklisted;
 	}
 
-	private boolean preventByMock(State state, Action action, String preventByMockActionTtitle) {
+	private boolean preventByMock(State state, Action action, String preventByMockActionTitle) {
 		if (action != null) {
 			List<Widget> targets = Util.targets(state, action);
 			if (targets != null) {
 				for (Widget widget: targets) {
 					if (widget != null) {
-						String title = widget.get(Tags.Title, null);
+						//String title = widget.get(Tags.Desc, null);
+						String title = widget.get(Tags.Desc, null);
+						
+						System.out.println("[prot temp 4] " + title + "==" + preventByMockActionTitle);
+						System.out.println(widget.getRepresentation(""));
 						if (title != null) {
-							if (title.equalsIgnoreCase(preventByMockActionTtitle)) {
+							if (title.equalsIgnoreCase(preventByMockActionTitle)) {
 								return true;
 							}
 						}
@@ -303,9 +307,9 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		for (Widget widget : getTopWidgets(state)) {
 			String title = widget.get(Tags.Title,null);
 			// only consider enabled and non-blocked widgets
-			if (widget.get(Enabled, true) && !widget.get(Blocked, false) && 
-				((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && mockPassed )|| 
-				 (PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) && !mockPassed))){
+			if (widget.get(Enabled, true) && !widget.get(Blocked, false) 
+				&& ((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && mockPassed) 
+				|| (PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) && !mockPassed))) {
 			// do not build actions for tabu widget
 			if (blackListed(widget)) {
 				continue;
@@ -377,15 +381,17 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action action = super.selectAction(state, actions);
-
+        System.out.println("[prot temp 1] " + mockPassed);
 		// optional mock actions
 		if ( !mockPassed) {
+			System.out.println("[prot temp 2] " + mockPassed);
 			if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE)) {
 				System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
 				action = rerouteByUrl(state, MOCK_URL);
 				}
 			return action;
 		} else {
+			System.out.println("[prot temp 3] " + mockPassed);
 			if (preventByMock(state, action, MOCK_ACTION_TITLE)) {
 				System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
 				action = rerouteByUrl(state, RETURN_URL);

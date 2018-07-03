@@ -40,12 +40,13 @@ import java.util.Set;
  */
 public class GraphUtil {
 
-	public static int getActionClusterCount(IEnvironment env, IGraphAction graphAction){
+	public static int getActionClusterCount(IEnvironment env, IGraphAction graphAction) {
 		int cc = 1;
 		String absID = graphAction.getAbstractID();
 		Set<String> acluster = env.getGraphActionClusters().get(absID);
-		if (acluster != null)
+		if (acluster != null) {
 			return acluster.size();
+		}
 		return cc;
 	}	
 	

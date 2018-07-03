@@ -27,6 +27,7 @@
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
+
 package org.fruit;
 
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class PairTest {
     public void from()  {
         Pair<Integer,Integer> result = Pair.from(leftElement,rightElement);
         assertEquals("The leftelement:", 10, result.left().intValue());
-        assertEquals( "The rightelement:", 20,result.right().intValue());
+        assertEquals("The rightelement:", 20,result.right().intValue());
     }
 
     @Test

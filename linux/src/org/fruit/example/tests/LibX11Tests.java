@@ -29,7 +29,6 @@
 
 package org.fruit.example.tests;
 
-
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.util.BridJHelper;
 import org.fruit.alayer.linux.xlib.LibX11;
@@ -91,11 +90,6 @@ public class LibX11Tests {
         // Now get the RootWindow.
         // TODO: get/create a Window object or check if the returned pointer can be used somehow.
         long rootWindow = LibX11.XRootWindow(displayPointer, defaultScreenNumber);
-
-
-        if (rootWindow == 0) {
-
-        }
 
 
         // Find the Atom specifying the PID.

@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -51,9 +52,11 @@ public final class Wait extends TaggableBase implements Action {
 	private final double waitTime;
 	private final boolean oveheadDuration;
 	
-	public Wait(double waitTime){ this(waitTime, false); }
+	public Wait(double waitTime) { 
+		this(waitTime, false); 
+	}
 	
-	public Wait(double waitTime, boolean overheadDuration){
+	public Wait(double waitTime, boolean overheadDuration) {
 		Assert.isTrue(waitTime >= 0);
 		this.oveheadDuration = overheadDuration;
 		this.waitTime = waitTime;
@@ -62,34 +65,33 @@ public final class Wait extends TaggableBase implements Action {
 	public void run(SUT system, State state, double duration) {
 		Assert.isTrue(duration >= 0);
 		Util.pause(waitTime);
-		if(!oveheadDuration)
-			Util.pause(Math.max(0, waitTime - duration));  // sleep the rest of the time
+		if (!oveheadDuration) {
+			// sleep the rest of the time
+			Util.pause(Math.max(0, waitTime - duration));  
+		}
 	}
 	
-	public String toString(){
+	public String toString() {
 		return "Wait for " + (oveheadDuration ? "exactly " : "") + waitTime + " seconds";
 	}	
 	
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
 	}
 	
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null)
+		if (r != null) {
 			return r.toString();
-		else
+		} else {
 			return toString();
+		}
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "(" + waitTime + ")";
-	}
-	
+	}	
 }

@@ -12,7 +12,7 @@ public class TgherkinException extends RuntimeException {
 	 * Constructor.
 	 * @param message exception message
 	 */
-	public TgherkinException(String message){ 
+	public TgherkinException(String message) { 
 		this(message, null); 
 	}
 	
@@ -21,7 +21,7 @@ public class TgherkinException extends RuntimeException {
 	 * @param message exception message
 	 * @param cause cause of the exception
 	 */
-	public TgherkinException(String message, Throwable cause){ 
+	public TgherkinException(String message, Throwable cause) { 
 		super(message, cause); 
 	}
 	
@@ -29,7 +29,7 @@ public class TgherkinException extends RuntimeException {
 	 * Constructor.
 	 * @param cause cause of the exception
 	 */
-	public TgherkinException(Throwable cause){ 
+	public TgherkinException(Throwable cause) { 
 		super(cause); 
 	}
 	

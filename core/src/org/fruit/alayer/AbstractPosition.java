@@ -39,10 +39,10 @@ public abstract class AbstractPosition implements Position {
 
 	private static final long serialVersionUID = -4924203436239979302L;
 
-	boolean obscuredByChildEnabled = true;
+	protected boolean obscuredByChildEnabled = true;
 
 	@Override
-	public void obscuredByChildFeature(boolean enable){
+	public void obscuredByChildFeature(boolean enable) {
 		this.obscuredByChildEnabled = enable;
 	}
 	

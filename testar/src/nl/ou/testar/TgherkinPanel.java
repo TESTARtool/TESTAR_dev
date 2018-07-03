@@ -135,7 +135,7 @@ public class TgherkinPanel extends JPanel {
 
 		tgApplyDefaultOnMismatchCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!tgApplyDefaultOnMismatchCheckBox.isSelected() && tgContinueToApplyDefaultCheckBox.isSelected()){
+				if (!tgApplyDefaultOnMismatchCheckBox.isSelected() && tgContinueToApplyDefaultCheckBox.isSelected()) {
 					tgContinueToApplyDefaultCheckBox.setSelected(false);
 				}
 				tgContinueToApplyDefaultCheckBox.setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
@@ -159,7 +159,7 @@ public class TgherkinPanel extends JPanel {
 
 		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeOCRCheckBox.isSelected()){
+				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeOCRCheckBox.isSelected()) {
 					tgTgherkinReportIncludeOCRCheckBox.setSelected(false);
 				}
 				tgTgherkinReportIncludeOCRCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
@@ -173,7 +173,7 @@ public class TgherkinPanel extends JPanel {
 
 		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()){
+				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()) {
 					tgTgherkinReportIncludeImageRecognitionCheckBox.setSelected(false);
 				}
 				tgTgherkinReportIncludeImageRecognitionCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
@@ -299,7 +299,7 @@ public class TgherkinPanel extends JPanel {
 		}
 	}
 	
-	private void checkDocumentProtocol(){
+	private void checkDocumentProtocol() {
 		documentProtocol = false;
 		URLClassLoader loader = null;
 		try {
@@ -310,20 +310,22 @@ public class TgherkinPanel extends JPanel {
 			loader = new URLClassLoader(classPath);
 			@SuppressWarnings("unchecked")
 			UnProc<Settings> protocol = (UnProc<Settings>)loader.loadClass(protocolClass.replace("/",".")).getConstructor().newInstance();
-			if (DocumentProtocol.class.isAssignableFrom(protocol.getClass())){
+			if (DocumentProtocol.class.isAssignableFrom(protocol.getClass())) {
 				documentProtocol = true;
 			}
-		}catch(Exception e) {
-		}finally {
+		} catch(Exception e) {
+		} finally {
 			if (loader != null) {
 				try { 
 					loader.close(); 
-				}catch (IOException e) {}
+				} catch (IOException e) {
+				}
 			}	
 		}
 	}	
 	
-	private void populateTgherkinDocuments(){
+	private void populateTgherkinDocuments() {
+		
 		String[] tgherkinDocuments = 
 			new File("./resources/settings/" + protocolClass.split("/")[0] + "/").list(new FilenameFilter() {
 			@Override
@@ -344,15 +346,15 @@ public class TgherkinPanel extends JPanel {
 			if (parts.length > 0) {
 				String tgherkinDocumentName = parts[parts.length - 1];
 				tgComboBoxTgherkinDocument.setSelectedItem(tgherkinDocumentName);
-			}				
+			}	
 		}
+		
 		// tgherkin documents available for selection?
 		if (tgherkinDocuments.length > 0) {
 			btnEditTgherkinDocument.setEnabled(true);	
-		}else {
+		} else {
 			btnEditTgherkinDocument.setEnabled(false);
 		}
-		
 	}
 	
 }

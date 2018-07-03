@@ -87,9 +87,9 @@ public final class NavigableGuideline extends AbstractGuideline {
 	public EvaluationResults query(GraphDB graphDB) {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Page Titled");
-		String gremlinTitleCount = "_().has('@class','Widget')" +
-				".has('" + WCAG2Tags.WCAG2IsWindow.name() +"',true)" +
-				".groupCount{it." + Tags.Title.name() + "}.cap";
+		String gremlinTitleCount = "_().has('@class','Widget')"
+			+ ".has('" + WCAG2Tags.WCAG2IsWindow.name() +"',true)"
+			+ ".groupCount{it." + Tags.Title.name() + "}.cap";
 		List<Object> titleCounts = graphDB.getObjectsFromGremlinPipe(gremlinTitleCount,
 				GremlinStart.VERTICES);
 		// the list contains one map with title counts
@@ -99,8 +99,8 @@ public final class NavigableGuideline extends AbstractGuideline {
 			if (entry.getValue() > SAME_TITLE_THRESHOLD) {
 				hasViolations = true;
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
-						"Possible ambiguous title \"" + entry.getKey() +
-						"\" appeared " + entry.getValue() + " times"));
+						"Possible ambiguous title \"" + entry.getKey()
+						+ "\" appeared " + entry.getValue() + " times"));
 			}
 		}
 		if (!hasViolations) {

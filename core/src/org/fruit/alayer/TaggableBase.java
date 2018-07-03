@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -46,12 +47,13 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 public class TaggableBase implements Taggable, Serializable {
 	private static final long serialVersionUID = 3941511707954247582L;
 	private Map<Tag<?>, Object> tagValues = Util.newHashMap();
-	boolean allFetched;
+	private boolean allFetched;
 	
 	public final <T> T get(Tag<T> tag) throws NoSuchTagException {
 		T ret = get(tag, null);
-		if(ret == null)
+		if (ret == null) {
 			throw new NoSuchTagException(tag);
+		}
 		return ret;
 	}
 
@@ -59,7 +61,7 @@ public class TaggableBase implements Taggable, Serializable {
 	public final <T> T get(Tag<T> tag, T defaultValue) {
 		Assert.notNull(tag);
 		T ret = (T) tagValues.get(tag);
-		if(ret == null && !allFetched && !tagValues.containsKey(tag)){
+		if (ret == null && !allFetched && !tagValues.containsKey(tag)) {
 			ret = fetch(tag);
 			tagValues.put(tag, ret);
 		}
@@ -69,21 +71,28 @@ public class TaggableBase implements Taggable, Serializable {
 	public final Iterable<Tag<?>> tags() {
 		Set<Tag<?>> ret =new HashSet<Tag<?>>();
 		
-		if(!allFetched){
-			for(Tag<?> t : tagDomain())
+		if (!allFetched) {
+			for(Tag<?> t : tagDomain()) {
 				get(t, null);
+			}
 			allFetched = true;
 		}
 		
-		for(Tag<?> t : tagValues.keySet()){
-			if(tagValues.get(t) != null)
+		for(Tag<?> t : tagValues.keySet()) {
+			if (tagValues.get(t) != null) {
 				ret.add(t);
+			}
 		}
 		return ret;
 	}
 
-	protected <T> T fetch(Tag<T> tag){ return null; }
-	protected Set<Tag<?>> tagDomain(){ return Collections.emptySet(); }
+	protected <T> T fetch(Tag<T> tag) { 
+		return null; 
+	}
+	
+	protected Set<Tag<?>> tagDomain() { 
+		return Collections.emptySet(); 
+	}
 
 	public <T> void set(Tag<T> tag, T value) {
 		Assert.notNull(tag, value);
@@ -91,5 +100,7 @@ public class TaggableBase implements Taggable, Serializable {
 		tagValues.put(tag, value);
 	}
 
-	public void remove(Tag<?> tag) { tagValues.put(Assert.notNull(tag), null); }
+	public void remove(Tag<?> tag) { 
+		tagValues.put(Assert.notNull(tag), null); 
+	}
 }

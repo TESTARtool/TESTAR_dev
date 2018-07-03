@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux;
 
-
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.linux.atspi.*;
@@ -65,7 +64,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * Creates a new instance of an object that retrieves the state of a supplied SUT.
      * @param system The SUT to fetch the current state for.
      */
-    AtSpiStateFetcher(SUT system){
+    AtSpiStateFetcher(SUT system) {
         this._system = system;
     }
 
@@ -101,9 +100,9 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Give each widget in the tree a tag describing the path to find it.
-        for (Widget w : widgetTree)
+        for (Widget w : widgetTree) {
             w.set(Tags.Path, Util.indexString(w));
-
+        }
 
         return widgetTree;
 
@@ -358,7 +357,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         //      - window (and it's children) is blocked or not - do a different block check.
         AtSpiStateSet nodeStates = node.states();
 
-        if(nodeStates != null) {
+        if (nodeStates != null) {
 
             nElement.isEnabled = nodeStates.isEnabled();
             nElement.hasFocus = nodeStates.isFocused();
@@ -440,9 +439,9 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Infer from Role if the element is a toplevel container.
-        if (nElement.role == AtSpiRoles.Frame || nElement.role == AtSpiRoles.Menu || nElement.role == AtSpiRoles.MenuBar ||
-                nElement.role == AtSpiRoles.Window || nElement.role == AtSpiRoles.Application ||
-                nElement.role == AtSpiRoles.DocumentFrame) {
+        if (nElement.role == AtSpiRoles.Frame || nElement.role == AtSpiRoles.Menu || nElement.role == AtSpiRoles.MenuBar
+        	|| nElement.role == AtSpiRoles.Window || nElement.role == AtSpiRoles.Application 
+            || nElement.role == AtSpiRoles.DocumentFrame) {
             nElement.isTopLevelContainer = true;
         }
 
@@ -611,7 +610,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * @param root The AtSpiRootElement to start the linking from.
      * @return A State (widget tree) object.
      */
-    private AtSpiState createWidgetTree(AtSpiRootElement root){
+    private AtSpiState createWidgetTree(AtSpiRootElement root) {
 
 
         // Create a new AtSpiState (root of widget tree) and link it to the supplied AtSpiRootElement.
@@ -621,7 +620,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Process each child of the AtSpiRootElement in the AT-SPI tree.
-        for(AtSpiElement childElement : root.children){
+        for(AtSpiElement childElement : root.children) {
             if (!childElement.ignore) {
                 createWidgetTree(state, childElement);
             } else {
@@ -653,7 +652,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * @param parent The parent widget.
      * @param element The AtSpiElement that will be the child of the AtSpiWidget parent.
      */
-    private void createWidgetTree(AtSpiWidget parent, AtSpiElement element){
+    private void createWidgetTree(AtSpiWidget parent, AtSpiElement element) {
 
 
         // Add the new AtSpiElement to the widget tree - it creates a new AtSpiWidget that links to the

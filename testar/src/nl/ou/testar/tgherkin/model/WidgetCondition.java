@@ -42,7 +42,7 @@ public class WidgetCondition {
 	 * WidgetCondition Constructor.
 	 * @param code Tgherkin source code
 	 */
-	public WidgetCondition(String code){
+	public WidgetCondition(String code) {
 		Assert.notNull(code);		
 		this.type = null;
 		this.code = code;
@@ -53,7 +53,7 @@ public class WidgetCondition {
 	 * @param type operator type
 	 * @param code Tgherkin source code
 	 */
-	public WidgetCondition(Type type, String code){
+	public WidgetCondition(Type type, String code) {
 		Assert.notNull(code);		
 		this.type = type;
 		this.code = code;
@@ -85,14 +85,14 @@ public class WidgetCondition {
 	public boolean evaluate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {				
 		if (evaluator == null) {
 			evaluator = new WidgetConditionEvaluator(proxy, widget, dataTable);
-		}else {
+		} else {
 			evaluator.set(proxy, widget, dataTable);
 		}
 		WidgetConditionParser parser = Utils.getWidgetConditionParser(getCode());
 		Boolean result = false;
 		try {
 			result = (Boolean)evaluator.visit(parser.widget_condition());
-		}catch (Exception e) {
+		} catch (Exception e) {
 		}
 		return result;
 	}
@@ -117,7 +117,7 @@ public class WidgetCondition {
     	StringBuilder result = new StringBuilder();
     	if (getType() == Type.ALSO) {
     		result.append("Also ");
-    	}else {
+    	} else {
         	if (getType() == Type.EITHER) {
         		result.append("Either ");
         	}    		

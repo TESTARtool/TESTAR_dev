@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.util;
 
-
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.linux.gtk3.LibGtk3;
 

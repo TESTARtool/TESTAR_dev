@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.gtk3;
 
-
 import org.bridj.BridJ;
 import org.bridj.Pointer;
 import org.bridj.ann.Library;
@@ -45,7 +44,7 @@ import java.io.IOException;
 public class LibGtk3 {
 
 
-    static{
+    static {
         try {
             BridJ.getNativeLibrary("libgtk-3");
         } catch (IOException e) {

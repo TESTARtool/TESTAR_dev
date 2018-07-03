@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import java.io.Serializable;
@@ -40,6 +41,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.ActionBuildException;
 
-public interface ActionBuilder extends Serializable{
+public interface ActionBuilder extends Serializable {
     Set<Action> apply(State state) throws ActionBuildException;
 }

@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux;
 
-
 import org.fruit.Proc;
 import org.fruit.alayer.exceptions.ActionFailedException;
 

@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.util;
 
-
 import org.bridj.Pointer;
 
 

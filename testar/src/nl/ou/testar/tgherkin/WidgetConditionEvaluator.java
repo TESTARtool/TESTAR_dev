@@ -199,41 +199,41 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 		// retrieve value widget variable
 		String str = (String)visit(ctx.string_entity()); 
 		// unquote regex
-		String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return Matches.getInstance().isMatch(str, regex);
 	}
 
 	@Override 
 	public Boolean visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return XPath.getInstance().isInXpathResult(proxy, widget, xpathExpr);
 	}	
 	
 	@Override 
 	public Boolean visitXpathBooleanFunction(WidgetConditionParser.XpathBooleanFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return XPath.getInstance().getXPathBooleanResult(proxy, xpathExpr);
 	}
 
 	@Override 
 	public Double visitXpathNumberFunction(WidgetConditionParser.XpathNumberFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return XPath.getInstance().getXPathNumberResult(proxy, xpathExpr);
 	}
 
 	@Override public String visitXpathStringFunction(WidgetConditionParser.XpathStringFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return XPath.getInstance().getXPathStringResult(proxy, xpathExpr);
 	}
 	
 	@Override 
 	public Boolean visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx) {
 		// unquote 
-		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		return Image.getInstance().isRecognized(proxy, widget, imageFile);
 	}
 	
@@ -367,19 +367,19 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
 	}	
 	
 	private Object getTagValue(Widget widget, String tagName) {
-		if ("Shape.x".equals(tagName)){
+		if ("Shape.x".equals(tagName)) {
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.x();
 		}
-		if ("Shape.y".equals(tagName)){
+		if ("Shape.y".equals(tagName)) {
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.y();
 		}
-		if ("Shape.width".equals(tagName)){
+		if ("Shape.width".equals(tagName)) {
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.width();
 		}
-		if ("Shape.height".equals(tagName)){
+		if ("Shape.height".equals(tagName)) {
 			Shape shape = widget.get(Tags.Shape, null);
 			return shape.height();
 		}

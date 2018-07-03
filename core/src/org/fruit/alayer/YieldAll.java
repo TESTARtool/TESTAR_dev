@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.util.HashSet;
@@ -45,5 +46,8 @@ public final class YieldAll implements UnFunc<Widget, SearchFlag> {
 		widgets.add(widget);
 		return SearchFlag.OK;
 	}
-	public Set<Widget> result(){ return widgets; }
+	
+	public Set<Widget> result() { 
+		return widgets; 
+	}
 }

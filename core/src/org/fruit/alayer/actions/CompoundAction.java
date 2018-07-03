@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import java.util.Arrays;
@@ -56,12 +57,12 @@ public final class CompoundAction extends TaggableBase implements Action {
 	private final List<Action> actions;
 	private final List<Double> relativeDurations;
 	
-	public static final class Builder{
+	public static final class Builder {
 		private List<Double> relativeDurations = Util.newArrayList();
 		private List<Action> actions = Util.newArrayList();
-		double durationSum = 0.0;
+		private double durationSum = 0.0;
 		
-		public Builder add(Action a, double relativeDuration){
+		public Builder add(Action a, double relativeDuration) {
 			Assert.notNull(a);
 			Assert.isTrue(relativeDuration >= 0);
 			relativeDurations.add(relativeDuration);
@@ -70,28 +71,30 @@ public final class CompoundAction extends TaggableBase implements Action {
 			return this;
 		}
 				
-		public CompoundAction build(){
+		public CompoundAction build() {
 			Assert.isTrue(durationSum > 0.0, "Sum of durations needs to be larger than 0!");
 
 			// normalize
-			for(int i = 0; i < relativeDurations.size(); i++)
+			for (int i = 0; i < relativeDurations.size(); i++) {
 				relativeDurations.set(i, relativeDurations.get(i) / durationSum);
+			}
 			return new CompoundAction(this);
 		}
 	}
 	
-	private CompoundAction(Builder b){
+	private CompoundAction(Builder b) {
 		this.actions = b.actions;
 		this.relativeDurations = b.relativeDurations;
 	}
 	
-	public CompoundAction(Action... actions){
+	public CompoundAction(Action... actions) {
 		Assert.notNull((Object)actions);
 		this.actions = Arrays.asList(actions);
 		this.relativeDurations = Util.newArrayList();
 		
-		for(int i = 0; i < actions.length; i++)
+		for (int i = 0; i < actions.length; i++) {
 			relativeDurations.add(1.0 / actions.length);
+		}
 	}
 	
 	public List<Action> getActions() {
@@ -99,15 +102,17 @@ public final class CompoundAction extends TaggableBase implements Action {
 	}
 			
 	public void run(SUT system, State state, double duration) {		
-		for(int i = 0; i < actions.size(); i++)
+		for (int i = 0; i < actions.size(); i++) {
 			actions.get(i).run(system, state, relativeDurations.get(i) * duration);
+		}
 	}
 		
-	public String toString(){
+	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Compound Action =");
-		for (Action a : actions)
+		for (Action a : actions) {
 			sb.append(Util.lineSep()).append(a.toString());
+		}
 		return sb.toString();
 	}
 	
@@ -116,25 +121,28 @@ public final class CompoundAction extends TaggableBase implements Action {
 	public String toString(Role... discardParameters) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Compound Action =");
-		for (Action a : actions)
+		for (Action a : actions) {
 			sb.append(Util.lineSep()).append(a.toString(discardParameters));
+		}
 		return sb.toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		StringBuilder sb = new StringBuilder();
 		Role r = get(Tags.Role, null);
-		if (r != null)
+		if (r != null) {
 			sb.append(r.toString());
-		else
+		} else {
 			sb.append("UNDEF");
+		}
 		HashSet<String> parameters = new HashSet<String>();
-		for (Action a : actions)
+		for (Action a : actions) {
 			parameters.add(a.toParametersString());
-		for (String p : parameters)
+		}
+		for (String p : parameters) {
 			sb.append(p);
+		}
 		return sb.toString();
 	}
 
@@ -142,8 +150,9 @@ public final class CompoundAction extends TaggableBase implements Action {
 	@Override
 	public String toParametersString() {
 		String params = "";
-		for (Action a : actions)
+		for (Action a : actions) {
 			params += a.toParametersString();
+		}
 		return params;
 	}
 }

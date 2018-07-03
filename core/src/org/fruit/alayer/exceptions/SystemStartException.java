@@ -31,13 +31,23 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.exceptions; // refactored by urueda
 
 import org.fruit.FruitException;
 
 public class SystemStartException extends FruitException {
 	private static final long serialVersionUID = 1554849408074075595L;
-	public SystemStartException(String message){ this(message, null); }
-	public SystemStartException(String message, Throwable cause){ super(message, cause); }
-	public SystemStartException(Throwable cause){ super(cause); }
+	
+	public SystemStartException(String message) { 
+		this(message, null); 
+	}
+	
+	public SystemStartException(String message, Throwable cause) { 
+		super(message, cause); 
+	}
+	
+	public SystemStartException(Throwable cause) { 
+		super(cause); 
+	}
 }

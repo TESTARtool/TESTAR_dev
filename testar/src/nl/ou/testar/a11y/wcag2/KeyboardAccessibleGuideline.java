@@ -100,7 +100,7 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 			String key1 = AccessibilityUtil.getAccessKey(w),
 					key2 = AccessibilityUtil.getAcceleratorKey(w);
 			if ((key1 != null && !key1.isEmpty())
-					|| (key2 != null && !key2.isEmpty())) {
+					 || (key2 != null && !key2.isEmpty())) {
 				shortcutKeyCount++;
 			}
 		}

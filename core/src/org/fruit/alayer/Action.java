@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -53,7 +54,7 @@ import es.upv.staq.testar.CodingManager;
  * If it fails to do any of these tasks, it raises an exception.
  * Like states and systems, actions can have properties attached to them.
  * 
- * An action should be serializable, so that it can be stored and replayed.
+ * <p>An action should be serializable, so that it can be stored and replayed.
  * 
  * @see SUT
  * @see State
@@ -82,7 +83,7 @@ public interface Action extends Taggable, Serializable {
 	 *   [1] = Compact representation
 	 * @author urueda
 	 */
-	public static String[] getActionRepresentation(Action action, String tab){
+	public static String[] getActionRepresentation(Action action, String tab) {
 		return getActionRepresentation(null,action,tab);
 	}
 		
@@ -95,25 +96,25 @@ public interface Action extends Taggable, Serializable {
 	 *   [1] = Compact representation
 	 * @author urueda
 	 */
-	public static String[] getActionRepresentation(State state, Action action, String tab){
+	public static String[] getActionRepresentation(State state, Action action, String tab) {
 		String[] returnS = new String[]{"",""};
 
 		Role actionRole = action.get(Tags.Role, null);
-		if (actionRole != null){
+		if (actionRole != null) {
 			returnS[0] += tab + "ROLE = " + actionRole.toString() + "\n";
 			returnS[1] = String.format("%1$2s ",
 				actionRole == null ? "??" : BriefActionRolesMap.map.get(actionRole.toString()));
 		}
 
-		if (state != null){
+		if (state != null) {
 			List<Finder> targets = action.get(Tags.Targets, null);
-			if (targets != null){
+			if (targets != null) {
 				String title;
 				Role widgetRole;
 				Widget w;
-				for (Finder f : targets){
+				for (Finder f : targets) {
 					w = f.apply(state);
-					if (w != null){
+					if (w != null) {
 						returnS[0] += tab + "TARGET =\n" + w.getRepresentation("\t\t");		
 						widgetRole = w.get(Tags.Role, null);
 						title = w.get(Tags.Title, null);
@@ -127,8 +128,9 @@ public interface Action extends Taggable, Serializable {
 		}
 			
 		String desc = action.get(Tags.Desc, null);
-		if (desc != null)
+		if (desc != null) {
 			returnS[0] += tab + "DESCRIPTION = " + desc + "\n";
+		}
 		returnS[0] += tab + "TEXT = " + action.toString().replaceAll("\\r\\n|\\n", "\n\t\t") + "\n";
 		String params = action.toParametersString()
 				.replaceAll("\\)\\(",",")
@@ -137,7 +139,7 @@ public interface Action extends Taggable, Serializable {
 				.replaceAll("BUTTON[1,3]","")
 				.replaceAll(",,","")
 				.replaceAll(", ",",");
-		returnS[1] += " [ " + (params.equals(",") ? "" : params + " ]");
+		returnS[1] += " [ " + (",".equals(params) ? "" : params + " ]");
 		return returnS;
 	}
 	
@@ -155,7 +157,5 @@ public interface Action extends Taggable, Serializable {
 	 */
 	String toParametersString();
 	
-	// by urueda
 	public abstract String toString(Role... discardParameters);
-	
 }

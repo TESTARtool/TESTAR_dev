@@ -31,6 +31,7 @@
 /**
  * @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
 import org.fruit.Pair;

@@ -25,7 +25,7 @@ sourceSets {
 // ####ADD for SikuliX build Begin
 repositories {
     mavenCentral()
-    maven{url "http://oss.sonatype.org/content/groups/public"}
+    maven {url "http://oss.sonatype.org/content/groups/public"}
     maven {url "https://jitpack.io"}
 }
 // ####ADD for SikuliX build End
@@ -49,7 +49,7 @@ dependencies {
     compile project(':graphdb')
     compile project(':tgherkin')
     compile files('./lib/jsyntaxpane-1.1.5.jar')
-    compile files('./lib/JNativeHook.jar')
+    compile files('./lib/JNativeHook-2.1.0.jar')
     runtime project(':windows')
     runtime files('../graph/lib/jiprolog-4.1.3.1.jar')
     runtime files('../graph/lib/jgrapht-ext-1.0.1-uber.jar')
@@ -120,7 +120,7 @@ prepareOracles.dependsOn(oracleClasses)
  * To debug build TESTAR with the -DDEBUG=true.
  */
 startScripts {
-    if(System.getProperty('DEBUG', 'false') ) {
+    if (System.getProperty('DEBUG', 'false') ) {
         applicationDefaultJvmArgs = 
             ["-Dlogback.configurationFile=logback.xml",
             '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']

@@ -19,9 +19,9 @@ import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 
 public class UrlActionCompiler extends StdActionCompiler {
-	Abstractor abstractor;
+	private Abstractor abstractor;
 	
-	public UrlActionCompiler(){	
+	public UrlActionCompiler() {	
 		this(new StdAbstractor()); 
 		}
 
@@ -36,7 +36,7 @@ public class UrlActionCompiler extends StdActionCompiler {
 			.add(leftClickAt(position), 1)
 			.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
 		// Delete the current text
-		for ( int i=0; i< currentUrlLength+10; i++) {
+		for ( int i = 0; i < currentUrlLength + 10; i++) {
 			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
 		}
 		builder.add(new Type(text), 1);
@@ -44,11 +44,11 @@ public class UrlActionCompiler extends StdActionCompiler {
 		return builder.build();
 	}
 
-	public Action clickTypeUrl(Widget widget, String text){
+	public Action clickTypeUrl(Widget widget, String text) {
 		return clickTypeUrl(widget, 0.5, 0.5, text);
 	}
 	
-	public Action clickTypeUrl(Widget widget, double relX, double relY, String text){
+	public Action clickTypeUrl(Widget widget, double relX, double relY, String text) {
 		String value = widget.get(Tags.ValuePattern);
 		int currentUrlLength = value.length();
 		Finder wf = abstractor.apply(widget);

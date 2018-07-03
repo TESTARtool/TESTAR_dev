@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.SpyMode;
 
-
 import org.fruit.alayer.Pen;
 
 import java.awt.*;
@@ -45,6 +44,7 @@ public abstract class DrawableObject {
 
 
     protected Point _location;
+    
     /**
      * The location where this object will be drawn.
      * @return The location where this object will be drawn.
@@ -55,6 +55,7 @@ public abstract class DrawableObject {
 
 
     protected Pen _defaultPen;
+    
     /**
      * The DefaultPen with which this object will be drawn as backup.
      * @return The DefaultPen with which this object will be drawn as backup.
@@ -65,6 +66,7 @@ public abstract class DrawableObject {
 
 
     protected Pen _pen;
+    
     /**
      * The Pen with which this object will be drawn.
      * @return The Pen with which this object will be drawn.

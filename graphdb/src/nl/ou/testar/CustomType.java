@@ -36,7 +36,7 @@ import org.fruit.alayer.TaggableBase;
  * The type is used to define the proper class in the graph database. The id is used to
  * uniquely identify the instance of the type in the database.
  *
- * The class extends TagableBase to manage the properties of the type in the same way as done
+ * <p>The class extends TagableBase to manage the properties of the type in the same way as done
  * for other objects.
  */
 public class CustomType extends TaggableBase {

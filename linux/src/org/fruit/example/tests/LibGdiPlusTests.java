@@ -61,10 +61,6 @@ public class LibGdiPlusTests {
         System.out.println("[" + getClass().getSimpleName() + "] Output: " + output.getLong());
         assertTrue(pmHnd == 0);
 
-        if (pmHnd == 0) {
-
-        }
-
 
 
 

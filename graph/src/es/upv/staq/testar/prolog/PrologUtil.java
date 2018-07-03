@@ -42,41 +42,33 @@ import java.util.Set;
  *
  */
 public class PrologUtil {
-
-    /*public static String normaliseQuotedAtoms(String atom){
-		if (atom.startsWith("[")){ // atoms with quotes are returned as an array: [int, ..., int]
-			StringTokenizer st = new StringTokenizer(atom.substring(1, atom.length()-1),",");
-			StringBuilder sb = new StringBuilder();
-			while (st.hasMoreTokens())
-				sb.append((char) new Integer(st.nextToken()).intValue());
-			return sb.toString();
-		}
-		else return atom;
-	}*/
 	
 	@SafeVarargs
-	public static String setToString(Set<String>... sets){
+	public static String setToString(Set<String>... sets) {
 		StringBuilder sb = new StringBuilder();
-		for (Set<String> set : sets){
-			if (set != null){
-				for (String s : set)
+		for (Set<String> set : sets) {
+			if (set != null) {
+				for (String s : set) {
 					sb.append(s + "\n");
+				}
 			}
 		}
 		return sb.toString();
 	}
 	
-	public static List<String> getSolutions(String var, List<List<String>> solutions){
+	public static List<String> getSolutions(String var, List<List<String>> solutions) {
 		List<String> varSolutions = new ArrayList<String>();
-		boolean b, varSol;
-		for (List<String> solution : solutions){
+		boolean b;
+		boolean varSol;
+		for (List<String> solution : solutions) {
 			b = true; // is variable?
 			varSol = false;
-			for (String s : solution){
-				if (b){
-					if (s.equals(var))
+			for (String s : solution) {
+				if (b) {
+					if (s.equals(var)) {
 						varSol = true;
-				} else if (varSol){
+					}
+				} else if (varSol) {
 					varSolutions.add(s);
 					varSol = false;
 				}
@@ -86,29 +78,31 @@ public class PrologUtil {
 		return varSolutions;
 	}
 	
-	public static void printSolutions(List<List<String>> solutions){
-		if (solutions == null || solutions.isEmpty()){
+	public static void printSolutions(List<List<String>> solutions) {
+		if (solutions == null || solutions.isEmpty()) {
 			System.out.println("[PrologUtil] >>> Prolog: no solutions <<<\n");
 			return;
 		}
 		Set<String> solSet = new HashSet<String>(); // fix equal solutions duplication
 		StringBuilder sol;
 		boolean b; // is variable?
-		for (List<String> solution : solutions){
+		for (List<String> solution : solutions) {
 			sol = new StringBuilder();
 			b = true;
-			for (String s : solution){
-				if (b)
+			for (String s : solution) {
+				if (b) {
 					sol.append("\t" + s + " = ");
-				else
+				} else {
 					sol.append(s + "\n");
+				}
 				b = !b;
 			}
 			solSet.add(sol.toString());
 		}
 		int idx = 1;
-		for (String s : solSet)
+		for (String s : solSet) {
 			System.out.println("[PrologUtil] Prolog-Solution (" + (idx++) + "):\n" + s);
+		}
 		System.out.println("[PrologUtil]  ");
 	}
 

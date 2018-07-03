@@ -53,29 +53,33 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 final class UIAState extends UIAWidget implements State {
 	private static final long serialVersionUID = 7823095941981151363L;
 
-	public UIAState(UIAElement root){
+	public UIAState(UIAElement root) {
 		super(null, null, root);
 		this.root = this;
 	}
 
-	public Iterator<Widget> iterator() { return new WidgetIterator(this); }
+	public Iterator<Widget> iterator() { 
+		return new WidgetIterator(this); 
+	}
 
-	void remove(UIAWidget w){
+	void remove(UIAWidget w) {
 		Assert.isTrue(this != w, "You cannot remove the root!");
 		assert(w.parent != null);
 		w.parent.children.remove(w);
 		invalidate(w);
 	}
 
-	void invalidate(UIAWidget w){
-		if(w.element != null)
+	void invalidate(UIAWidget w) {
+		if (w.element != null) {
 			w.element.backRef = null;
+		}
 		w.root = null;
-		for(UIAWidget c : w.children)
+		for (UIAWidget c : w.children) {
 			invalidate(c);
+		}
 	}
 
-	void setParent(UIAWidget w, Widget parent, int idx){
+	void setParent(UIAWidget w, Widget parent, int idx) {
 		Assert.notNull(parent);
 		Assert.isTrue(parent instanceof UIAWidget);
 		Assert.isTrue(w != this, "You cannot set the root's parent!");
@@ -90,19 +94,20 @@ final class UIAState extends UIAWidget implements State {
 		w.parent = uiaParent;
 	}
 
-	UIAWidget addChild(UIAWidget parent, UIAElement element){
+	UIAWidget addChild(UIAWidget parent, UIAElement element) {
 		UIAWidget ret = new UIAWidget(this, parent, element);
 		return ret;
 	}
 
-	void connect(UIAWidget parent, UIAWidget child){
+	void connect(UIAWidget parent, UIAWidget child) {
 		parent.children.add(child);
 	}
 
-	<T> T get(UIAWidget w, Tag<T> t){
+	<T> T get(UIAWidget w, Tag<T> t) {
 		T ret = get(w, t, null);
-		if(ret == null)
+		if (ret == null) {
 			throw new NoSuchTagException(t);
+		}
 		return ret;
 	}
 
@@ -110,103 +115,95 @@ final class UIAState extends UIAWidget implements State {
 	<T> T get(UIAWidget w, Tag<T> t, T defaultValue) {
 		Object ret = w.tags.get(t);
 
-		if(ret != null){
+		if (ret != null) {
 			return (T)ret;
-		}else if(w.element == null || w.tags.containsKey(t)){
+		} else if (w.element == null || w.tags.containsKey(t)) {
 			return defaultValue;
 		}
 		
-		if(t.equals(Tags.Desc)){
+		if (t.equals(Tags.Desc)) {
 			ret = w.element.name;
-		}else if(t.equals(Tags.Role)){
+		} else if (t.equals(Tags.Role)) {
 			ret = UIARoles.fromTypeId(w.element.ctrlId);
-		}else if(t.equals(Tags.HitTester)){
+		} else if (t.equals(Tags.HitTester)) {
 			ret = new UIAHitTester(w.element);
-		}else if(t.equals(Tags.Shape)){	
+		} else if (t.equals(Tags.Shape)) {	
 			ret = w.element.rect;
-		}else if(t.equals(Tags.Blocked)){
+		} else if (t.equals(Tags.Blocked)) {
 			ret = w.element.blocked;
-		}else if(t.equals(Tags.Enabled)){
+		} else if (t.equals(Tags.Enabled)) {
 			ret = w.element.enabled;
-		}else if(t.equals(Tags.Title)){
+		} else if (t.equals(Tags.Title)) {
 			ret = w.element.name;
-		}else if (t.equals(Tags.ValuePattern)) {
+		} else if (t.equals(Tags.ValuePattern)) {
 			ret = w.element.valuePattern;
-		}else if(t.equals(Tags.ToolTipText)){
+		} else if (t.equals(Tags.ToolTipText)) {
 			ret = w.element.helpText;
-		}else if(t.equals(Tags.PID)){
+		} else if (t.equals(Tags.PID)) {
 			ret = w == this ? ((UIARootElement)element).pid : null;
-		}else if(t.equals(Tags.IsRunning)){
+		} else if (t.equals(Tags.IsRunning)) {
 			ret = w == this ? ((UIARootElement)element).isRunning : null;
-		}else if(t.equals(Tags.TimeStamp)){
+		} else if (t.equals(Tags.TimeStamp)) {
 			ret = w == this ? ((UIARootElement)element).timeStamp : null;
-		}else if(t.equals(Tags.Foreground)){
+		} else if (t.equals(Tags.Foreground)) {
 			ret = w == this ? ((UIARootElement)element).isForeground : null;
-		}else if(t.equals(Tags.HasStandardKeyboard)){
+		} else if (t.equals(Tags.HasStandardKeyboard)) {
 			ret = w == this ? ((UIARootElement)element).hasStandardKeyboard : null;	
-		}else if(t.equals(Tags.HasStandardMouse)){
+		} else if (t.equals(Tags.HasStandardMouse)) {
 			ret = w == this ? ((UIARootElement)element).hasStandardMouse : null;				
-		}else if(t.equals(UIATags.UIAName)){ 
+		} else if (t.equals(UIATags.UIAName)) { 
 			ret = w.element.name;
-		}else if(t.equals(UIATags.UIAOrientation)){
+		} else if (t.equals(UIATags.UIAOrientation)) {
 			ret = w.element.orientation;
-		// begin by urueda
-		}else if(t.equals(Tags.ZIndex)){
+		} else if (t.equals(Tags.ZIndex)) {
 			ret = w.element.zindex;
-		}else if(t.equals(UIATags.UIAIsWindowModal)){
+		} else if (t.equals(UIATags.UIAIsWindowModal)) {
 			ret = w.element.isModal;
-		}else if(t.equals(UIATags.UIAIsTopmostWindow)){
+		} else if (t.equals(UIATags.UIAIsTopmostWindow)) {
 			ret = w.element.isTopmostWnd;
-		}else if(t.equals(UIATags.UIAIsContentElement)){
+		} else if (t.equals(UIATags.UIAIsContentElement)) {
 			ret = w.element.isContentElement;
-		}else if(t.equals(UIATags.UIAIsControlElement)){
+		} else if (t.equals(UIATags.UIAIsControlElement)) {
 			ret = w.element.isControlElement;
-		}else if(t.equals(UIATags.UIAScrollPattern)){
+		} else if (t.equals(UIATags.UIAScrollPattern)) {
 			ret = w.element.scrollPattern;
-		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
-		//	ret = w.element.scrollbarInfo;
-		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
-		//	ret = w.element.scrollbarInfoH;
-		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
-		//	ret = w.element.scrollbarInfoV;
-		}else if(t.equals(UIATags.UIAHorizontallyScrollable)){
+		} else if (t.equals(UIATags.UIAHorizontallyScrollable)) {
 			ret = w.element.hScroll;
-		}else if(t.equals(UIATags.UIAVerticallyScrollable)){
+		} else if (t.equals(UIATags.UIAVerticallyScrollable)) {
 			ret = w.element.vScroll;
-		}else if(t.equals(UIATags.UIAScrollHorizontalViewSize)){
+		} else if (t.equals(UIATags.UIAScrollHorizontalViewSize)) {
 			ret = w.element.hScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollVerticalViewSize)){
+		} else if (t.equals(UIATags.UIAScrollVerticalViewSize)) {
 			ret = w.element.vScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollHorizontalPercent)){
+		} else if (t.equals(UIATags.UIAScrollHorizontalPercent)) {
 			ret = w.element.hScrollPercent;
-		}else if(t.equals(UIATags.UIAScrollVerticalPercent)){
+		} else if (t.equals(UIATags.UIAScrollVerticalPercent)) {
 			ret = w.element.vScrollPercent;
-		// end by urueda
-		}else if(t.equals(UIATags.UIAHelpText)){
+		} else if (t.equals(UIATags.UIAHelpText)) {
 			ret = w.element.helpText;
-		}else if(t.equals(UIATags.UIAClassName)){
+		} else if (t.equals(UIATags.UIAClassName)) {
 			ret = w.element.className;
-		}else if(t.equals(UIATags.UIAControlType)){
+		} else if (t.equals(UIATags.UIAControlType)) {
 			ret = w.element.ctrlId;
-		}else if(t.equals(UIATags.UIACulture)){
+		} else if (t.equals(UIATags.UIACulture)) {
 			ret = w.element.culture;
-		}else if(t.equals(UIATags.UIAFrameworkId)){
+		} else if (t.equals(UIATags.UIAFrameworkId)) {
 			ret = w.element.frameworkId;
-		}else if(t.equals(UIATags.UIAHasKeyboardFocus)){
+		} else if (t.equals(UIATags.UIAHasKeyboardFocus)) {
 			ret = w.element.hasKeyboardFocus;
-		}else if(t.equals(UIATags.UIAIsKeyboardFocusable)){
+		} else if (t.equals(UIATags.UIAIsKeyboardFocusable)) {
 			ret = w.element.isKeyboardFocusable;
-		}else if(t.equals(UIATags.UIAProviderDescription)){
+		} else if (t.equals(UIATags.UIAProviderDescription)) {
 			ret = w.element.providerDesc;
-		}else if(t.equals(UIATags.UIAWindowInteractionState)){
+		} else if (t.equals(UIATags.UIAWindowInteractionState)) {
 			ret = w.element.wndInteractionState;
-		}else if(t.equals(UIATags.UIAWindowVisualState)){
+		} else if (t.equals(UIATags.UIAWindowVisualState)) {
 			ret = w.element.wndVisualState;
-		}else if(t.equals(UIATags.UIAAutomationId)){
+		} else if (t.equals(UIATags.UIAAutomationId)) {
 			ret = w.element.automationId;
-		}else if(t.equals(UIATags.UIAAcceleratorKey)){
+		} else if (t.equals(UIATags.UIAAcceleratorKey)) {
 			ret = w.element.acceleratorKey;
-		}else if(t.equals(UIATags.UIAAccessKey)){
+		} else if (t.equals(UIATags.UIAAccessKey)) {
 			ret = w.element.accessKey;
 		}
 		
@@ -216,27 +213,35 @@ final class UIAState extends UIAWidget implements State {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T> T cacheTag(UIAWidget w, Tag<T> t, Object value){
+	<T> T cacheTag(UIAWidget w, Tag<T> t, Object value) {
 		w.tags.put(t, value);
 		return (T)value;
 	}
 
-	<T> void setTag(UIAWidget w, Tag<T> t, T value){
+	<T> void setTag(UIAWidget w, Tag<T> t, T value) {
 		Assert.notNull(value);
 		w.tags.put(t, value);
 	}
 
-	<T> void remove(UIAWidget w, Tag<T> t){
+	<T> void remove(UIAWidget w, Tag<T> t) {
 		Assert.notNull(w, t);
 		w.tags.put(t, null);
 	}
 
-	UIAWidget getChild(UIAWidget w, int idx){ return w.children.get(idx); }
-	int childCount(UIAWidget w){ return w.children.size(); }
-	UIAWidget getParent(UIAWidget w){ return w.parent; }
+	UIAWidget getChild(UIAWidget w, int idx) { 
+		return w.children.get(idx); 
+	}
+	
+	int childCount(UIAWidget w) { 
+		return w.children.size(); 
+	}
+	
+	UIAWidget getParent(UIAWidget w) { 
+		return w.parent; 
+	}
 
 
-	Iterable<Tag<?>> tags(final UIAWidget w){
+	Iterable<Tag<?>> tags(final UIAWidget w) {
 		Assert.notNull(w);
 
 		// compile a query set
@@ -245,19 +250,20 @@ final class UIAState extends UIAWidget implements State {
 		queryTags.addAll(Tags.tagSet());
 		queryTags.addAll(UIATags.tagSet());
 
-		Iterable<Tag<?>> ret = new Iterable<Tag<?>>(){
+		Iterable<Tag<?>> ret = new Iterable<Tag<?>>() {
 			public Iterator<Tag<?>> iterator() {
-				return new Iterator<Tag<?>>(){
+				return new Iterator<Tag<?>>() {
 					Iterator<Tag<?>> i = queryTags.iterator();
 					UIAWidget target = w;
 					Tag<?> next;
 
-					private Tag<?> fetchNext(){
-						if(next == null){
-							while(i.hasNext()){
+					private Tag<?> fetchNext() {
+						if (next == null) {
+							while (i.hasNext()) {
 								next = i.next();
-								if(target.get(next, null) != null)
+								if (target.get(next, null) != null) {
 									return next;
+								}
 							}
 							next = null;
 						}
@@ -270,13 +276,16 @@ final class UIAState extends UIAWidget implements State {
 
 					public Tag<?> next() {
 						Tag<?> ret = fetchNext();
-						if(ret == null)
+						if (ret == null) {
 							throw new NoSuchElementException();
+						}
 						next = null;
 						return ret;
 					}
 
-					public void remove() { throw new UnsupportedOperationException(); }
+					public void remove() { 
+						throw new UnsupportedOperationException(); 
+					}
 
 				};
 			}
@@ -285,14 +294,15 @@ final class UIAState extends UIAWidget implements State {
 		return ret;
 	}
 
-	//public String toString(){ return Util.treeDesc(this, 2, Tags.Desc); }
-	public String toString(){ return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }// by urueda
+	public String toString() { 
+		return Util.treeDesc(this, 2, Tags.Role, Tags.Title); 
+	}
 
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		ois.defaultReadObject();
 	}
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
+	private void writeObject(ObjectOutputStream oos) throws IOException {
 		oos.defaultWriteObject();
 	}
 }

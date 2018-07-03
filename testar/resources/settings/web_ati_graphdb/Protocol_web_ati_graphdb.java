@@ -132,8 +132,8 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
 	@Override
-	protected void beginSequence() {
-		super.beginSequence();
+	protected void beginSequence(SUT sut, State state) {
+		super.beginSequence(sut, state);
 	}
 
 	/**
@@ -409,7 +409,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
 			// If not in the header, we only need to look for the loginWidget
 			if (shape == null || shape.y() > browserToolbarFilter) {
-				if (title.contains(loginTitle) && role.equals("UIAButton")) {
+				if (title.contains(loginTitle) && "UIAButton".equals(role)) {
 					loginWidget = widget;
 				}
 				continue;

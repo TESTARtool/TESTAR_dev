@@ -68,19 +68,19 @@ public final class PredictableGuideline extends AbstractGuideline {
 		String tagConcreteID = Tags.ConcreteID.name();
 		String gremlinStateChange =
 				// find actions ...
-				"_().has('@class','Action')" +
+				"_().has('@class','Action')"
 				// ... that navigate within the same window ...
-				".has('" + WCAG2Tags.WCAG2IsInWindowNavigation.name() + "',true)" +
+				+ ".has('" + WCAG2Tags.WCAG2IsInWindowNavigation.name() + "',true)"
 				// ... where the ID of the new state is different from the ID of the old state
-				".filter{it.inE('targetedBy').outV." +	tagConcreteID + "!=" + 
-				"it.outE('resultsIn').outV." + tagConcreteID + "}" +
+				+ ".filter {it.inE('targetedBy').outV." +	tagConcreteID + " != " 
+				+ "it.outE('resultsIn').outV." + tagConcreteID + "}"
 				// go to the resulting state,
 				// then through the 'has' edge to the widgets of the state ...
-				".outE('resultsIn').outV.outE('has').inV" +
+				+ ".outE('resultsIn').outV.outE('has').inV"
 				// ... where the widget is a main window ...
-				".has('" + WCAG2Tags.WCAG2IsWindow.name() + "',true)" +
+				+ ".has('" + WCAG2Tags.WCAG2IsWindow.name() + "',true)"
 				// ... and return the title
-				"." + Tags.Title.name();
+				+ "." + Tags.Title.name();
 		List<Object> stateChanges = graphDB.getObjectsFromGremlinPipe(gremlinStateChange,
 				GremlinStart.VERTICES);
 		// the list contains the titles of the new states

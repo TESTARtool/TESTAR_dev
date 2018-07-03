@@ -30,6 +30,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.util.LinkedList;
@@ -37,7 +38,8 @@ import java.util.LinkedList;
 public class BFNavigator implements Navigator {
 	public void run(LinkedList<Widget> buffer) {
 		Widget w = buffer.getFirst();
-		for(int i = 0; i < w.childCount(); i++)
+		for(int i = 0; i < w.childCount(); i++) {
 			buffer.add(w.child(i));
+		}
 	}
 }

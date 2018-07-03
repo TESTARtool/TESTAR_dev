@@ -305,10 +305,10 @@ public class MiscPanel extends JPanel {
       String right = (String) tblCopyFromTo.getValueAt(i, 1);
 
       if (left != null || right != null) {
-        if ((left != null && right == null) ||
-            (left == null && right != null) ||
-            left.trim().equals("") ||
-            right.trim().equals("")) {
+        if ((left != null && right == null) 
+        	|| (left == null && right != null) 
+            || left.trim().equals("") 
+            || right.trim().equals("")) {
           throw new IllegalStateException(
               "CopyFromTo Table has unfinished entries!");
         }

@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.devices;
 
 import java.awt.event.KeyEvent;
@@ -64,10 +65,14 @@ public enum KBKeys {
 	VK_WINDOWS(KeyEvent.VK_WINDOWS), VK_CONTEXT_MENU(KeyEvent.VK_CONTEXT_MENU);
 
 	private final int code;
-	private KBKeys(int code){ this.code = code; }
-	public int code(){ return code; }
+	private KBKeys(int code) { 
+		this.code = code; 
+	}
 	
-	// by urueda
+	public int code() { 
+		return code; 
+	}
+	
 	public static boolean contains(String s) {
 		try {
 			KBKeys.valueOf(s);
@@ -75,6 +80,5 @@ public enum KBKeys {
 		} catch (IllegalArgumentException e) {
 			return false;
 		}
-	}
-	
+	}	
 }

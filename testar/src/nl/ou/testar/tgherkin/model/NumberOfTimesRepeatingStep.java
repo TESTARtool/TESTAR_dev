@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * Step that repeats itself a fixed or random number of times.
  */
-public class NumerOfTimesRepeatingStep extends RepeatingStep {
+public class NumberOfTimesRepeatingStep extends RepeatingStep {
 
 	private final int fromRange;
 	private final int toRange;
@@ -21,7 +21,7 @@ public class NumerOfTimesRepeatingStep extends RepeatingStep {
      * @param whenClause definition of the When clause
      * @param thenCondition widget tree condition that defines the Then clause
      */
-    public NumerOfTimesRepeatingStep(String title, int fromRange, int toRange, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
+    public NumberOfTimesRepeatingStep(String title, int fromRange, int toRange, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
         super(title, givenCondition, whenClause, thenCondition);
     	this.fromRange = fromRange;
     	this.toRange = toRange;
@@ -57,7 +57,7 @@ public class NumerOfTimesRepeatingStep extends RepeatingStep {
 		super.beginSequence();
 		if (fromRange == toRange) {
 			targetedActions = fromRange;
-		}else {
+		} else {
 			// pick a random number within the range
 			Random random = new Random();
 			targetedActions = toRange - random.nextInt(toRange - fromRange + 1);

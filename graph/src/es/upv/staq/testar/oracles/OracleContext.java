@@ -53,36 +53,38 @@ public class OracleContext {
 
 	private JIPrologWrapper jipWrapper;
 		
-	public OracleContext(State state){
+	public OracleContext(State state) {
 		jipWrapper = new JIPrologWrapper();
-		if (state != null)
+		if (state != null) {
 			notifyState(state);
+		}
 	}
 	
-	public void notifyState(State state){
+	public void notifyState(State state) {
 		jipWrapper.addFacts(state);
 	}
 	
-	public void notifyAction(State state, Action action){
+	public void notifyAction(State state, Action action) {
 		jipWrapper.addFacts(state, action);
 	}
         
-	public void setVerificationPoint(State state, Widget w){
+	public void setVerificationPoint(State state, Widget w) {
 		jipWrapper.addFactsNrules("verify('" + state.get(Tags.ConcreteID) + "','" + w.get(Tags.ConcreteID) + "')."); // verify(S,W).
 	}
 	
 	/**
 	 * Infer oracles for executed actions and target verification points.
+	 * @return list of oracles
 	 */
-	public List<Oracle> infer(){
+	public List<Oracle> infer() {
 		IPredicate predicate;
 		List<Oracle> oracles = new ArrayList<Oracle>();
 		// we try to identify dependencies between the executed actions and their impact on the verification point
 		predicate = TitleUpdatePredicate.infer(jipWrapper);
-		if (predicate != null)
+		if (predicate != null) {
 			oracles.add(new Oracle(predicate));
+		}
 		jipWrapper = null;
 		return oracles;
 	}
-	
 }

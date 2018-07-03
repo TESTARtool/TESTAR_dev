@@ -59,6 +59,7 @@ public class DrawableLine extends DrawableObject {
 
 
     private Point _target;
+    
     /**
      * The target point of the line that will be drawn.
      * @return The target point of the line that will be drawn.

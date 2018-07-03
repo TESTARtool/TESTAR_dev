@@ -30,6 +30,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -73,7 +74,7 @@ public class StdWidget extends TaggableBase implements Widget, Serializable {
 	
 	// by urueda
 	@Override
-	public String getRepresentation(String tab){
+	public String getRepresentation(String tab) {
 		return tab + "???";
 	}
 

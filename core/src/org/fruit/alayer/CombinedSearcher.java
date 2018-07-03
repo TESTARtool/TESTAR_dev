@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import org.fruit.Assert;
@@ -38,26 +39,28 @@ import org.fruit.UnFunc;
 
 public final class CombinedSearcher implements Searcher {
 
-	private static final class MyVisitor implements UnFunc<Widget, SearchFlag>{
-		Searcher nextSearcher;
-		UnFunc<Widget, SearchFlag> nextVisitor;
+	private static final class MyVisitor implements UnFunc<Widget, SearchFlag> {
+		private Searcher nextSearcher;
+		private UnFunc<Widget, SearchFlag> nextVisitor;
+		
 		public SearchFlag apply(Widget widget) {
 			return nextSearcher.apply(widget, nextVisitor);
 		}
 	}
 	
 	private static final long serialVersionUID = -7319307314114534139L;
-	final Searcher searcher1, searcher2;
-	transient MyVisitor myVisitor;
+	private final Searcher searcher1;
+	private final Searcher searcher2;
+	private transient MyVisitor myVisitor;
 	
-	public CombinedSearcher(Searcher searcher1, Searcher searcher2){
+	public CombinedSearcher(Searcher searcher1, Searcher searcher2) {
 		Assert.notNull(searcher1, searcher2);
 		this.searcher1 = searcher1;
 		this.searcher2 = searcher2;
 	}
 	
 	public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-		if(myVisitor == null){
+		if (myVisitor == null) {
 			myVisitor = new MyVisitor();
 			myVisitor.nextSearcher = searcher2;
 		}

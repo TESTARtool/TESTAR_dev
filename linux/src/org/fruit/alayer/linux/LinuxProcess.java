@@ -147,7 +147,7 @@ public class LinuxProcess extends SUTBase {
      */
     public static LinuxProcess fromExecutable(String path) throws SystemStartException {
 
-        try{
+        try {
 
             Assert.notNull(path);
 
@@ -165,7 +165,7 @@ public class LinuxProcess extends SUTBase {
                 throw new SystemStartException(new FruitException(e.getMessage()));
             }
 
-        }catch(FruitException fe){
+        } catch(FruitException fe) {
             throw new SystemStartException(fe);
         }
 
@@ -195,7 +195,7 @@ public class LinuxProcess extends SUTBase {
 
             LinuxProcess lp = parseProcess(pi);
 
-            if (lp != null){
+            if (lp != null) {
                 suts.add(lp);
             }
 
@@ -359,10 +359,10 @@ public class LinuxProcess extends SUTBase {
      * @param lp The Linux process to retrieve the memory usage for.
      * @return The memory the Linux process uses; 0 otherwise.
      */
-    public static long getMemUsage(LinuxProcess lp){
+    public static long getMemUsage(LinuxProcess lp) {
 
 
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("[LinuxProcess] SUT is not running - cannot retrieve RAM usage!");
             return 0;
         }
@@ -382,7 +382,7 @@ public class LinuxProcess extends SUTBase {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the memory usage.
                 if (JavaHelper.tryParseInt(pi[SizeIndex])) {
@@ -409,10 +409,10 @@ public class LinuxProcess extends SUTBase {
      * @param lp The Linux process to retrieve the cpu usage for.
      * @return The cpu the Linux process uses; 0 otherwise.
      */
-    public static double getCpuUsage(LinuxProcess lp){
+    public static double getCpuUsage(LinuxProcess lp) {
 
 
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("[LinuxProcess] SUT is not running - cannot retrieve CPU usage!");
             return 0;
         }
@@ -432,7 +432,7 @@ public class LinuxProcess extends SUTBase {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the cpu usage.
                 if (JavaHelper.tryParseDouble(pi[CpuIndex])) {
@@ -497,13 +497,13 @@ public class LinuxProcess extends SUTBase {
 
 
     /**
-     * Retrieve the PID on unix/linux systems
-     * @param p the process to retrive the PID from.
+     * Retrieve the PID on unix/linux systems.
+     * @param p the process to retrive the PID from
      */
     private void retrievePid(Process p) {
 
 
-        if(p.getClass().getName().equals("java.lang.UNIXProcess")) {
+        if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
 
             try {
                 Field f = p.getClass().getDeclaredField("pid");
@@ -607,7 +607,7 @@ public class LinuxProcess extends SUTBase {
      * Creates a list of running Linux processes in a different kind of representation.
      * @return A list of Linux process representations of type LinuxProcessHandle.
      */
-    private static List<LinuxProcessHandle> runningProcesses(){
+    private static List<LinuxProcessHandle> runningProcesses() {
 
 
         // Retrieve a list of LinuxProcesses.
@@ -781,7 +781,7 @@ public class LinuxProcess extends SUTBase {
 
                 LinuxProcess lp = parseProcess(pi);
 
-                if (lp != null && lp.get_pid() == _pid){
+                if (lp != null && lp.get_pid() == _pid) {
                     return true;
                 }
 
@@ -823,17 +823,18 @@ public class LinuxProcess extends SUTBase {
      * @return The value of the tag to retrieve.
      */
     @SuppressWarnings("unchecked")
-    protected <T> T fetch(Tag<T> tag){
-        if(tag.equals(Tags.StandardKeyboard))
+    protected <T> T fetch(Tag<T> tag) {
+        if (tag.equals(Tags.StandardKeyboard)) {
             return (T)_kbd;
-        else if(tag.equals(Tags.StandardMouse))
-            return (T)_mouse;
-        else if(tag.equals(Tags.PID))
+        } else if (tag.equals(Tags.StandardMouse)) {
+            return (T)_mouse; 
+        } else if (tag.equals(Tags.PID)) {
             return (T)(Long)_pid;
-        else if(tag.equals(Tags.ProcessHandles))
+        } else if (tag.equals(Tags.ProcessHandles)) {
             return (T)runningProcesses().iterator();
-        else if(tag.equals(Tags.SystemActivator))
+        } else if (tag.equals(Tags.SystemActivator)) {
             return (T) new LinuxProcessActivator(_pid);
+        }
         return null;
     }
 
@@ -843,7 +844,7 @@ public class LinuxProcess extends SUTBase {
      * @return A new set of tags to be added to instances of this class.
      */
     @SuppressWarnings("Duplicates")
-    protected Set<Tag<?>> tagDomain(){
+    protected Set<Tag<?>> tagDomain() {
         Set<Tag<?>> ret = Util.newHashSet();
         ret.add(Tags.StandardKeyboard);
         ret.add(Tags.StandardMouse);

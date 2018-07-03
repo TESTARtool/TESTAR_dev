@@ -43,10 +43,11 @@ public class StateReportItem extends ReportItem {
 	 * @param proxy document protocol proxy
 	 */
 	public StateReportItem(boolean append, ProtocolProxy proxy) {
-		super(REPORT_NAME_PREFIX + 
-				proxy.getSequenceCount() + "_" + proxy.getActionCount() + "_" + 
-				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
-				REPORT_NAME_SUFFIX,
+		super(REPORT_NAME_PREFIX
+				+ proxy.getSequenceCount() + "_" 
+				+ proxy.getActionCount() + "_"
+				+  new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis())			
+				+ REPORT_NAME_SUFFIX,
 				null, 
 				append);
 		setData(reportState(proxy));
@@ -92,7 +93,7 @@ public class StateReportItem extends ReportItem {
 		return outputState(header, reportLines);
 	}
 
-	private static String outputState(SortedSet<String> header, List<SortedMap<String,String>> reportLines){
+	private static String outputState(SortedSet<String> header, List<SortedMap<String,String>> reportLines) {
 		StringBuilder reportContent = new StringBuilder();
 		// header
 		boolean notFirst = false;
@@ -101,13 +102,13 @@ public class StateReportItem extends ReportItem {
 			String columnName = headerIterator.next();
 			if (notFirst) {
 				reportContent.append(Report.REPORT_SEPARATOR);
-			}else {
+			} else {
 				notFirst = true;
 			}
 			if (columnName.startsWith("#") || columnName.startsWith("$")) {
 				// skip hash and dollar(used to get Parent and ChildCount in front of the widget tag columns)
 				reportContent.append(Report.transformReportValue(columnName.substring(1)));
-			}else {
+			} else {
 				reportContent.append(Report.transformReportValue(columnName));
 			}
 		}
@@ -120,7 +121,7 @@ public class StateReportItem extends ReportItem {
 				String columnName = headerIterator.next();
 				if (notFirst) {
 					reportContent.append(Report.REPORT_SEPARATOR);
-				}else {
+				} else {
 					notFirst = true;
 				}
 				String value = reportLine.get(columnName);
@@ -138,7 +139,7 @@ public class StateReportItem extends ReportItem {
 		if (proxy.getSettings().get(ConfigTags.TgherkinReportIncludeImageRecognition)) {
 			TgherkinParser parser = Utils.getTgherkinParser(proxy.getTgherkinSourceCode());
 			return new TgherkinImageFileAnalyzer().visitDocument(parser.document());
-		}else {
+		} else {
 			return new ArrayList<String>(); 
 		}
 		

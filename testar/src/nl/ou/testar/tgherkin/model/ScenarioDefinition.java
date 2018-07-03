@@ -109,7 +109,7 @@ public abstract class ScenarioDefinition {
 	public boolean moreActions(ProtocolProxy proxy) {
 		if (currentStep() != null && currentStep().hasNextAction(proxy, null)) {
 			return true;
-		}else {
+		} else {
 			// search for next step with actions
 			int savedIndex = index;
 			while (hasNextStep()) {
@@ -152,7 +152,7 @@ public abstract class ScenarioDefinition {
 		if (currentStep() != null && currentStep().hasNextAction(proxy, null)) {
 			// current step has more actions
 			currentStep().nextAction();
-		}else {
+		} else {
 			// search for next step with actions
 			while (hasNextStep()) {
 				nextStep();
@@ -186,7 +186,7 @@ public abstract class ScenarioDefinition {
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy) {
 		// scenario level
-		if (oracle != null && !oracle.evaluate(proxy, null)){
+		if (oracle != null && !oracle.evaluate(proxy, null)) {
 			setFailed();
 			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!");
@@ -200,7 +200,7 @@ public abstract class ScenarioDefinition {
      * @return true if current action failed otherwise false 
      */
 	public boolean hasFailed() {
-		if(currentStep() != null) {
+		if (currentStep() != null) {
 			return currentStep().getStatus() == Step.Status.FAILED;
 		}
 		return false;
@@ -241,7 +241,7 @@ public abstract class ScenarioDefinition {
      */
 	public boolean mismatchOccurred() {
 		// search steps until current index 
-		for (int idx = 0 ; idx <= index; idx++) {
+		for (int idx = 0; idx <= index; idx++) {
 			if (steps.get(idx).isMismatch()) {
 				return true;
 			}

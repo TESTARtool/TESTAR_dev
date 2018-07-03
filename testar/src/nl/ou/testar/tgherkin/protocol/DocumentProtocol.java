@@ -26,8 +26,8 @@ import nl.ou.testar.utils.report.Reporter;
  * Class responsible for executing a protocol enriched with a Tgherkin Document model.
  *
  */
-public class DocumentProtocol extends ClickFilterLayerProtocol implements ProtocolProxy{
-	
+public class DocumentProtocol extends ClickFilterLayerProtocol implements ProtocolProxy {
+
 	private Document document;
 	private boolean documentActionExecuted;
 	private boolean actionSwitchesOn;
@@ -35,45 +35,48 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	private String sourceCode;
 	
 	/**
-     * Constructor.
-     */
-	public DocumentProtocol(){
+	 * Constructor.
+	 */
+	public DocumentProtocol() {
 		super();
 	}
-	
+
 	/** 
 	 * Initialize document protocol.
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param settings the current TESTAR settings as specified by the user.
 	 */
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		//####TEMP Begin
 		try {
 			PrintStream out = new PrintStream(new FileOutputStream("A3.txt"));
 			System.setOut(out);
-		}catch(Exception e) {};
+		} catch(Exception e) {
+		}
 		//####TEMP End
 		super.initialize(settings);
 		if (documentExecutionMode()) {
 			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
 			document = Utils.getDocument(sourceCode);
 			// report header
-			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);			
+			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
 		}
 	}
-	
+
 	/**
 	 * Begin sequence.
+	 * @param system the SUT
+	 * @param state the SUT's current state
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
-	protected void beginSequence(SUT system, State state){
-		super.beginSequence();
+	protected void beginSequence(SUT system, State state) {
+		super.beginSequence(system, state);
 		if (documentExecutionMode()) {
 			document.beginSequence();
 		}
 	}
-	
+
 	/**
 	 * Get verdict.
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -81,7 +84,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 * @param state the SUT's current state
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 		Verdict verdict = super.getVerdict(state);
 		if (documentExecutionMode()) {
 			if (documentActionExecuted) {
@@ -92,7 +95,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 			}
 			Report.appendReportDetail(Report.StringColumn.VERDICT, verdict.toString());
 		}
-		return verdict;				
+		return verdict;
 	}
 
 	/**
@@ -107,11 +110,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 * @return a set of actions
 	 * @throws ActionBuildException 
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 		Set<Action> actions = super.deriveActions(system,state);
 		if (documentExecutionMode()) {
-			if (settings().get(ConfigTags.ReportState)){
+			if (settings().get(ConfigTags.ReportState)) {
 				Reporter.getInstance().report(new StateReportItem(false, this));
 			}
 			Report.appendReportDetail(Report.IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS,actions.size());
@@ -120,7 +123,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 				actions.addAll(document.deriveActions(this));
 			}
 		}
-		return actions;		
+		return actions;
 	}
 
 	/**
@@ -129,11 +132,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 * @param actions the set of available actions
 	 * @return the selected action (non-null!)
 	 */
-	protected Action selectAction(State state, Set<Action> actions){ 
+	protected Action selectAction(State state, Set<Action> actions) { 
 		Action action = super.selectAction(state, actions);
-		if (documentExecutionMode() && action != null) {		
+		if (documentExecutionMode() && action != null) {
 			String data = Util.toString((Object)action.get(Tags.Desc, null));
-			Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION,data);			
+			Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION,data);
 			data = action.toString();
 			data = data.replaceAll("(\\r|\\n|\\t)", "");
 			Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION_DETAILS,data);
@@ -148,14 +151,14 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 * @param action the action to execute
 	 * @return whether or not the execution succeeded
 	 */
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		if (documentExecutionMode() && !actionSwitchesOn) {
 			documentActionExecuted = true;
 		}
 		lastAction = action;
 		return super.executeAction(system, state, action);
 	}
-	
+
 	/**
 	 * Determine whether more actions should be executed.
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -176,15 +179,14 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return super.moreActions(state);
 	}
 
-
 	/** 
 	 * Finish sequence.
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 * @param recordedSequence the recorded sequence
 	 */
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		super.finishSequence(recordedSequence);
-		if (documentExecutionMode()) {				
+		if (documentExecutionMode()) {
 			// reset document if scenarios should be repeated until number of sequences has been reached
 			if (settings().get(ConfigTags.RepeatTgherkinScenarios) && super.moreSequences() && !document.moreSequences()) {
 				document.reset();
@@ -192,20 +194,19 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		}
 	}
 
-
 	/**
 	 * Determine whether more sequences should be executed.
 	 * TESTAR uses this method to determine when to stop the entire test.
 	 * You could stop the test after a given amount of generated sequences or
 	 * after a specific time etc.
-	 * @return  if <code>true</code> continue test, else stop	 
+	 * @return  if <code>true</code> continue test, else stop
 	 */
 	protected boolean moreSequences() {
 		if (documentExecutionMode()) {
 			boolean result = super.moreSequences() && document.moreSequences();
 			if (!result && settings().get(ConfigTags.GenerateTgherkinReport)) {
 				// finish consumption 
-				Reporter.getInstance().finish();			
+				Reporter.getInstance().finish();
 			}
 			return result;
 		}
@@ -213,68 +214,58 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	}
 	
 	@Override
-	// change visibility from protected to public
-	public boolean isUnfiltered(Widget w){
+	public boolean isUnfiltered(Widget w) {
 		return super.isUnfiltered(w);
 	}
 
 	@Override
-	// change visibility from protected to public
-	public boolean isClickable(Widget w){
+	public boolean isClickable(Widget w) {
 		return super.isClickable(w);
 	}
 	
 	@Override
-	// change visibility from protected to public
-	public boolean isTypeable(Widget w){
+	public boolean isTypeable(Widget w) {
 		return super.isTypeable(w);
 	}
 	
-    @Override
-	// change visibility from protected to public
-    public String getRandomText(Widget w){
-    	return super.getRandomText(w);
-    }
-    
-    @Override
-	// change visibility from protected to public
-	public List<Widget> getTopWidgets(State state){
+	@Override
+	public String getRandomText(Widget w){
+		return super.getRandomText(w);
+	}
+	
+	@Override
+	public List<Widget> getTopWidgets(State state) {
 		return super.getTopWidgets(state);
 	}
-    
-    @Override
-	// change visibility from protected to public
+
+	@Override
 	public void storeWidget(String stateID, Widget widget) {
-    	super.storeWidget(stateID, widget);
+		super.storeWidget(stateID, widget);
 	}
-    
-    
+	
 	/**
 	 * Retrieve sequence count.
 	 * @return sequence count
 	 */
-    // change visibility from protected to public    
-    public int getSequenceCount(){
-    	return super.sequenceCount();
-    }
+	public int getSequenceCount() {
+		return super.sequenceCount();
+	}
 
 	/**
 	 * Retrieve action count.
 	 * @return action count
 	 */
-    // change visibility from protected to public    
-    public int getActionCount(){
-    	return super.actionCount();
-    }
+	public int getActionCount(){
+		return super.actionCount();
+	}
 	
 	/**
 	 * Retrieve configuration settings.
 	 * @return settings
 	 */
-    // change visibility from protected to public    
-    public Settings getSettings(){
-    	return super.settings();
-    }
+	public Settings getSettings() {
+		return super.settings();
+	}
 
 	/**
 	 * Retrieve state.
@@ -299,10 +290,9 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
     private boolean checkActionSwitches() {
     	if (forceKillProcess != null || forceToForeground || forceNextActionESC) {
     		actionSwitchesOn = true;
-    	}else {
+    	} else {
     		actionSwitchesOn = false;
     	}
-    	return actionSwitchesOn;		
+    	return actionSwitchesOn;
 	}
-
 }

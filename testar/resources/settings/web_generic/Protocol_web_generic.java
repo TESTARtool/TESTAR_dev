@@ -66,18 +66,18 @@ import static org.fruit.alayer.Tags.Enabled;
 public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	
 	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-	static Role webText; // browser dependent
-	static double browser_toolbar_filter;
+	private static Role webText; // browser dependent
+	private static double browser_toolbar_filter;
 		
-	static double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
-	static double SCROLLTHICK = 16; // scroll thickness (iexplorer)
+	private static double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
+	private static double SCROLLTHICK = 16; // scroll thickness (iexplorer)
 	
 	/** 
 	 * Called once during the life time of TESTAR.
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		
 		super.initialize(settings);
 		initBrowser();
@@ -85,7 +85,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	}
 	
 	// check browser
-	private void initBrowser(){
+	private void initBrowser() {
 		webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
 		String sutPath = settings().get(ConfigTags.SUTConnectorValue);
 		if (sutPath.contains("iexplore.exe")) {
@@ -99,9 +99,9 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
-	protected void beginSequence(){
+	protected void beginSequence(SUT sut, State state) {
 		
-		super.beginSequence();
+		super.beginSequence(sut, state);
 		
 	}
 	
@@ -116,7 +116,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
 	 */
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		
         SUT sut = super.startSystem();
 
@@ -132,13 +132,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 		
 		State state = super.getState(system);
 
-        for(Widget w : state){
+        for(Widget w : state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
             	browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
             }
         }
@@ -152,7 +152,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 		
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
@@ -177,7 +177,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		
 		Set<Action> actions = super.deriveActions(system,state); // by urueda
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -189,20 +189,20 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
+		if (!settings().get(ConfigTags.PrologActivated)) { // is prolog deactivated?
 			
 			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
+			for(Widget w : getTopWidgets(state)) {
+				if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
+					if (!blackListed(w)) {  // do not build actions for tabu widgets  
 						
 						// left clicks
-						if(whiteListed(w) || isClickable(w)) {
+						if (whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
 						}
 		
 						// type into text boxes
-						if(whiteListed(w) || isTypeable(w)) {
+						if (whiteListed(w) || isTypeable(w)) {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 
@@ -221,7 +221,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 	// by urueda
 	@Override
-	protected boolean isClickable(Widget w){
+	protected boolean isClickable(Widget w) {
 		if (isAtBrowserCanvas(w)) {
 			return super.isClickable(w);
 		} else {
@@ -231,7 +231,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 	// by urueda
 	@Override
-	protected boolean isTypeable(Widget w){
+	protected boolean isTypeable(Widget w) {
 		if (!isAtBrowserCanvas(w)) {
 			return false;	
 		}
@@ -245,7 +245,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	}
 	
 	// by urueda
-	private boolean isAtBrowserCanvas(Widget w){
+	private boolean isAtBrowserCanvas(Widget w) {
 		Shape shape = w.get(Tags.Shape,null);
 		if (shape != null && shape.y() > browser_toolbar_filter) {
 			return true;
@@ -260,7 +260,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
 	 * @return  the selected action (non-null!)
 	 */
-	protected Action selectAction(State state, Set<Action> actions){
+	protected Action selectAction(State state, Set<Action> actions) {
 		
 		return super.selectAction(state, actions);
 		
@@ -273,7 +273,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param action the action to execute
 	 * @return whether or not the execution succeeded
 	 */
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		
 		return super.executeAction(system, state, action);
 		
@@ -295,7 +295,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		
 		super.finishSequence(recordedSequence);
 		

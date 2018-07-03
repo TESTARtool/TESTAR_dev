@@ -45,15 +45,15 @@ public class TypeGesture extends Gesture {
     	StdActionCompiler ac = new AnnotatingActionCompiler();
 		if (getParameterBase().size() > 0) {
 			String text = getParameterBase().get(Parameters.TEXT, dataTable);
-			if ("".equals(text)){
+			if ("".equals(text)) {
 				// type action does not allow typing of an empty string
 				// use hitkey to clear the existing text on the screen
 				actions.add(clearScreenText(widget));
-			}else{
+			} else {
 				actions.add(ac.clickTypeInto(widget, getParameterBase().get(Parameters.TEXT, dataTable)));				
 			}
 
-		}else {
+		} else {
 			// no arguments: generate random text
 			actions.add(ac.clickTypeInto(widget, proxy.getRandomText(widget)));
 		}

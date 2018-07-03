@@ -1839,6 +1839,14 @@ JNIEXPORT jlong JNICALL Java_org_fruit_alayer_windows_Windows_WaitForSingleObjec
 
 /*
  * Class:     org_fruit_alayer_windows_Windows
+ * Method:    WaitForInputIdle
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_fruit_alayer_windows_Windows_WaitForInputIdle
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_fruit_alayer_windows_Windows
  * Method:    GetExitCodeProcess
  * Signature: (J)J
  */

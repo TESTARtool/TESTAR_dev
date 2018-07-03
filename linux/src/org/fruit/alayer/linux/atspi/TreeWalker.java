@@ -477,7 +477,7 @@ public class TreeWalker {
      * @param name
      * @param roles
      * @param states
-     * @return
+     * @return list of nodes
      */
     public static List<AtSpiAccessible> findNodes(String name, AtSpiRoles[] roles, AtSpiStateTypes[] states) {
 

@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import org.fruit.alayer.Role;
@@ -41,36 +42,34 @@ import org.fruit.alayer.devices.KBKeys;
 /**
  * An action which releases a given Key on the Keyboard.
  */
-public final class KeyUp extends //TaggableBase
-		KeyAction { // by urueda
-	
+public final class KeyUp extends KeyAction { 
 	private static final long serialVersionUID = -7035337967443813849L;
 
-	public KeyUp(KBKeys key){
+	public KeyUp(KBKeys key) {
 		super(key);
 	}
 	
-	public String toString() { return "Release Key " + key; }
+	public String toString() { 
+		return "Release Key " + key; 
+	}
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters){
-			if (r.name().equals(ActionRoles.KeyUp.name()))
+		for (Role r : discardParameters) {
+			if (r.name().equals(ActionRoles.KeyUp.name())) {
 				return "Key released";
+			}
 		}
 		return toString();
 	}
 	
-	// by urueda
 	@Override
 	protected void performKeyAction(SUT system, KBKeys key) {
 		system.get(Tags.StandardKeyboard).release(key);		
 	}
 
-	// by urueda
 	@Override
-	protected void altNumpad(SUT system, String numpadCodes){}
+	protected void altNumpad(SUT system, String numpadCodes) {}
 	
 	@Override
 	public boolean equals(Object o) {

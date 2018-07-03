@@ -53,7 +53,7 @@ public class ZipManager {
 	         ObjectOutput out = new ObjectOutputStream(bos)) {
 	        out.writeObject(object);
 	        return bos.toByteArray();
-	    } catch (IOException e){
+	    } catch (IOException e) {
 	    	return null;
 	    }
 	}
@@ -65,10 +65,11 @@ public class ZipManager {
 		} 
 	}
 	
-	public static Object compress(Object o){
+	public static Object compress(Object o) {
 		byte[] bytes = ZipManager.convertToBytes(o);
-		if (bytes == null)
+		if (bytes == null) {
 			return o;
+		}
 		try {
 			Deflater def = new Deflater(Deflater.BEST_COMPRESSION);
 			def.setInput(bytes);
@@ -76,7 +77,7 @@ public class ZipManager {
 			def.finish();
 			byte[] buff = new byte[1024];
 			int count;
-			while (!def.finished()){
+			while (!def.finished()) {
 				count = def.deflate(buff);
 				baos.write(buff,0,count);
 			}
@@ -87,14 +88,14 @@ public class ZipManager {
 		}
 	}
 	
-	public static Object uncompress(byte[] bytes){
+	public static Object uncompress(byte[] bytes) {
 		try {
 			Inflater inf = new Inflater();
 			inf.setInput(bytes);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length * 1024);
 			byte[] buff = new byte[1024];
 			int count;
-			while (!inf.finished()){
+			while (!inf.finished()) {
 				count = inf.inflate(buff);
 				baos.write(buff,0,count);
 			}
@@ -104,6 +105,5 @@ public class ZipManager {
 			e.printStackTrace();
 			return null; // cannot uncompress!
 		}
-	}
-	
+	}	
 }

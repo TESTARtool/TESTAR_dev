@@ -32,14 +32,17 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
 public class ConfigException extends Exception {
 	private static final long serialVersionUID = -8323700470248568846L;
-	public ConfigException(String msg, Throwable cause){ 
+	
+	public ConfigException(String msg, Throwable cause) { 
 		super(msg, cause); 
 	}
-	public ConfigException(String msg){ 
+	
+	public ConfigException(String msg) { 
 		super(msg); 
 	}
 }

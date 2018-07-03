@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.gdiplus;
 
-
 import org.bridj.BridJ;
 import org.bridj.Pointer;
 import org.bridj.ann.Library;
@@ -45,7 +44,7 @@ import java.io.IOException;
 public class LibGdiPlus {
 
 
-    static{
+    static {
         try {
             BridJ.getNativeLibrary("libgdiplus");
         } catch (IOException e) {

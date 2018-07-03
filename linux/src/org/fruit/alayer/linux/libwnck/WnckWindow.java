@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.libwnck;
 
-
 import org.fruit.alayer.linux.util.BridJHelper;
 
 
@@ -44,23 +43,30 @@ public class WnckWindow {
 
 
     private long _windowPtr;
+    
     public long windowPtr() {
         return _windowPtr;
     }
 
 
     private boolean _hasName;
-    public boolean hasName() { return LibWnck.wnck_window_has_name(_windowPtr); }
+    
+    public boolean hasName() { 
+    	return LibWnck.wnck_window_has_name(_windowPtr); 
+    }
 
 
     private String _name;
+    
     public String name() {
         return BridJHelper.convertToString(LibWnck.wnck_window_get_name(_windowPtr));
     }
 
-
     private int _pid;
-    public int pid() { return LibWnck.wnck_window_get_pid(_windowPtr); }
+    
+    public int pid() { 
+    	return LibWnck.wnck_window_get_pid(_windowPtr); 
+    }
 
 
     //endregion

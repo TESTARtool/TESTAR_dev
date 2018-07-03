@@ -1,3 +1,5 @@
+package org.fruit.monkey;
+
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
@@ -32,7 +34,8 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-package org.fruit.monkey;
+
+import static org.fruit.monkey.ConfigTags.*;
 
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -47,16 +50,13 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
-
 import javax.swing.*;
-
-import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
-  // by urueda
-  private static void overrideWithUserProperties(Settings settings) { // overrides test.settings
-    String pS, p;
+  private static void overrideWithUserProperties(Settings settings) { 
+    String pS;
+    String p;
     // headless mode
     pS = ConfigTags.ShowVisualSettingsDialogOnStartup.name();
     p = System.getProperty(pS, null);
@@ -154,13 +154,10 @@ public class Main {
     }
   }
 
-  // begin by urueda
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
   public static String SSE_ACTIVATED = null;
-  // end by urueda
 
-  // by urueda
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
     for (File f : new File("./resources/settings").listFiles()) {
@@ -187,7 +184,6 @@ public class Main {
       try {
         File f = new File("./resources/settings/" + sse);
         if (f.createNewFile()) {
-          //System.out.println("[Main] Using <" + s + "> test settings");
           SSE_ACTIVATED = s;
           return;
         }
@@ -198,7 +194,6 @@ public class Main {
     SSE_ACTIVATED = null;
   }
 
-  // by urueda
   public static String[] getSSE() {
     return new File("./resources/settings/").list(new FilenameFilter() {
       @Override
@@ -210,10 +205,8 @@ public class Main {
 
   public static void main(String[] args) throws IOException {
     Settings settings = null;
-    //by fraalpe2
     Locale.setDefault(Locale.ENGLISH);
 
-    // begin by urueda
     String[] files = getSSE();
     if (files != null && files.length > 1) {
       System.out.println("[Main] Too many *.sse files - exactly one expected!");
@@ -234,11 +227,10 @@ public class Main {
     String testSettings = "./resources/settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
     System.out.println("[Main] Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
-    // end by urueda
 
     try {
       settings = loadSettings(args, testSettings);
-      overrideWithUserProperties(settings); // by urueda
+      overrideWithUserProperties(settings); 
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
       
       if (SST != null) {
@@ -264,12 +256,8 @@ public class Main {
         System.exit(-1);
       }
 
-      //logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
-      //logln("Hello, I'm the FRUIT Monkey!" + Util.lineSep() + Util.lineSep() + "These are my settings:", Main.LogLevel.Critical);
-      // start by urueda
       LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
-      // end by urueda
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
       List<String> cp = settings.get(MyClassPath);
@@ -279,36 +267,26 @@ public class Main {
       }
       loader = new URLClassLoader(classPath);
 
-      //logln("Trying to load monkey protocol in class '" + settings.get(ProtocolClass) + "' with class path '" + Util.toString(cp) + "'", Main.LogLevel.Debug);
       String protocolClass = settings.get(ProtocolClass).replace("/","."); // by urueda
-      LogSerialiser.log("Trying to load TESTAR protocol in class '" +
-          protocolClass +
-          "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
+      LogSerialiser.log("Trying to load TESTAR protocol in class '"
+    	  + protocolClass
+    	  + "' with class path '" 
+    	  + Util.toString(cp) 
+    	  + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
-
-      //logln("Monkey protocol loaded!", Main.LogLevel.Debug);
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
-
-      //logln("Starting monkey protocol ...", Main.LogLevel.Debug);
       LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
-      
       protocol.run(settings);
-
     } catch (ConfigException ce) {
       LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
+
     } catch (Throwable t) {
       LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
       t.printStackTrace(System.out);
       t.printStackTrace(LogSerialiser.getLogStream());
+
     } finally {
-      //logln("Monkey stopped execution.", Main.LogLevel.Critical);
-      //logln(Util.dateString("dd.MMMMM.yyyy HH:mm:ss"));
-      //LogSerialiser.log("TESTAR stopped execution at " + Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + "\n", LogSerialiser.LogLevel.Critical); // by urueda
-      //LogSerialiser.finish(); // by urueda
-      //if(settings != null && settings.get(ShowSettingsAfterTest))
-      //Runtime.getRuntime().exec("cmd /c start monkey.bat && exit");
-      // begin by urueda
       TestSerialiser.exit();
       ScreenshotSerialiser.exit();
       LogSerialiser.exit();
@@ -320,13 +298,12 @@ public class Main {
           e.printStackTrace();
         }
       }
-      // end by urueda
       System.exit(0);
     }
   }
 
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-    Assert.notNull(file); // by urueda
+    Assert.notNull(file); 
     try {
       List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
 
@@ -338,7 +315,7 @@ public class Main {
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
-      defaults.add(Pair.from(PathToReplaySequence, "./output/temp")); // by urueda
+      defaults.add(Pair.from(PathToReplaySequence, "./output/temp")); 
       defaults.add(Pair.from(ActionDuration, 0.1));
       defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
       defaults.add(Pair.from(ExecuteActions, true));
@@ -363,7 +340,6 @@ public class Main {
       defaults.add(Pair.from(StopGenerationOnFault, true));
       defaults.add(Pair.from(TimeToFreeze, 10.0));
       defaults.add(Pair.from(ShowSettingsAfterTest, true));
-      // begin by urueda
       defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
       defaults.add(Pair.from(TestGenerator, "random"));
       defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -382,14 +358,11 @@ public class Main {
       defaults.add(Pair.from(UnattendedTests, false)); // disabled
       defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
       defaults.add(Pair.from(SUTProcesses, ""));
-      // end by urueda
-      defaults.add(Pair.from(GraphDBEnabled, false));
+       defaults.add(Pair.from(GraphDBEnabled, false));
       defaults.add(Pair.from(GraphDBUrl, ""));
       defaults.add(Pair.from(GraphDBUser, ""));
       defaults.add(Pair.from(GraphDBPassword, ""));
-
       defaults.add(Pair.from(AlwaysCompile, true));
-
       defaults.add(Pair.from(TgherkinDocument, ""));
       defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
       defaults.add(Pair.from(ContinueToApplyDefault, true));
@@ -409,5 +382,4 @@ public class Main {
       throw new ConfigException("Unable to load configuration file!", ioe);
     }
   }
-
 }

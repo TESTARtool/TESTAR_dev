@@ -29,7 +29,6 @@
 
 package org.fruit.example.tests;
 
-
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.atspi.LibAtSpi;
 import org.fruit.alayer.linux.LinuxProcess;
@@ -126,7 +125,7 @@ public class LibAtSpiTests {
 
         // Test gedit children's state.
         for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")){
+            if (a.name().equals("gedit")) {
 
                 geditChildren = AtSpiAccessible.getAccessibleChildren(a);
                 assertEquals("frame", geditChildren.get(0).roleName());
@@ -199,7 +198,7 @@ public class LibAtSpiTests {
 
 
         for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")){
+            if (a.name().equals("gedit")) {
                 geditAcc = a;
             }
         }

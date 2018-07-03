@@ -52,7 +52,7 @@ import org.fruit.alayer.windows.UIATags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
 /**
- * Various utilities for evaluating accessibility
+ * Various utilities for evaluating accessibility.
  * @author Davy Kager
  *
  */
@@ -107,7 +107,7 @@ public final class AccessibilityUtil {
 		AC_NAVIGATE_PREVIOUS_TAB = parseShortcutKey("Ctrl+Shift+Tab");
 	
 	/**
-	 * The prefix for log messages related to accessibility
+	 * The prefix for log messages related to accessibility.
 	 */
 	public static final String LOG_PREFIX = "[a11y]";
 	
@@ -134,8 +134,9 @@ public final class AccessibilityUtil {
 				return null;
 			}
 			keyString = keyString.toUpperCase();
-			if (AlternativeKeyNames.map.containsKey(keyString))
+			if (AlternativeKeyNames.map.containsKey(keyString)) {
 				keyString = AlternativeKeyNames.map.get(keyString);
+			}
 			String vkString = VIRTUAL_KEY_PREFIX + keyString;
 			if (!KBKeys.contains(vkString)) {
 				logA11y("Failed to parse part <" + keyString + "> of shortcut key <" + combination + ">");
@@ -155,7 +156,7 @@ public final class AccessibilityUtil {
 	// for the UIA properties in other accessibility APIs.
 	
 	/**
-	 * Checks whether the given widget is relevant to accessibility evaluation
+	 * Checks whether the given widget is relevant to accessibility evaluation.
 	 * @param w The widget.
 	 * @return True if the widget is relevant, else false.
 	 */
@@ -168,26 +169,30 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Gets all non-standard actions that can be performed on the given widget
+	 * Gets all non-standard actions that can be performed on the given widget.
 	 * @param w The widget.
 	 * @return The set of actions.
 	 */
 	public static Set<Action> getApplicableActions(Widget w) {
 		Role r = getRole(w);
 		Set<Action> actions = new HashSet<>();
-		if (Role.isOneOf(r, R_LEFT_RIGHT))
+		if (Role.isOneOf(r, R_LEFT_RIGHT)) {
 			actions.addAll(AC_LEFT_RIGHT);
-		if (Role.isOneOf(r, R_UP_DOWN))
+		}
+		if (Role.isOneOf(r, R_UP_DOWN)) {
 			actions.addAll(AC_UP_DOWN);
-		if (Role.isOneOf(r, R_HOME_END))
+		}
+		if (Role.isOneOf(r, R_HOME_END)) {
 			actions.addAll(AC_HOME_END);
-		if (Role.isOneOf(r, R_DELETE))
+		}
+		if (Role.isOneOf(r, R_DELETE)) {
 			actions.addAll(AC_DELETE);
+		}
 		return actions;
 	}
 	
 	/**
-	 * Gets the language for the given widget
+	 * Gets the language for the given widget.
 	 * @param w The widget.
 	 * @return The language, as unprocessed language code.
 	 */
@@ -196,7 +201,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the given widget has keyboard focus
+	 * Checks whether the given widget has keyboard focus.
 	 * @param w The widget.
 	 * @return True if the widget has keyboard focus, else false.
 	 */
@@ -205,7 +210,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the given widget can receive keyboard focus
+	 * Checks whether the given widget can receive keyboard focus.
 	 * @param w The widget.
 	 * @return True if the widget can receive keyboard focus, else false.
 	 */
@@ -214,7 +219,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Gets the access key for the given widget
+	 * Gets the access key for the given widget.
 	 * @param w The widget.
 	 * @return The access key, as unprocessed string.
 	 */
@@ -223,21 +228,22 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Gets the accelerator key for the given widget
+	 * Gets the accelerator key for the given widget.
 	 * @param w The widget.
 	 * @return The shortcut key, as unprocessed string.
 	 */
 	public static String getAcceleratorKey(Widget w) {
 		String key = w.get(UIATags.UIAAcceleratorKey, "");
-		if (key != null && !key.isEmpty())
+		if (key != null && !key.isEmpty()) {
 			return key;
+		}
 		if (getRole(w).isA(UIAMenuItem)) {
 			// many menu items contain an accelerator key even if the accelerator key property is not set
 			// find these by pattern matching (may return the wrong thing, but better than nothing)
 			String name = w.get(UIATags.UIAName, "");
 			int index = name.lastIndexOf("\t");
 			if (index != -1) {
-				key = name.substring(index+1);
+				key = name.substring(index + 1);
 				logA11y("Discovered shortcut key <" + key + "> in <" + name + ">");
 				return key;
 			}
@@ -246,7 +252,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether shortcut keys can be used provided that the given widget has keyboard focus
+	 * Checks whether shortcut keys can be used provided that the given widget has keyboard focus.
 	 * @param focusW The widget with keyboard focus.
 	 * @return True if shortcut keys can be used, else false.
 	 */
@@ -258,7 +264,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the role of the given widget is unknown
+	 * Checks whether the role of the given widget is unknown.
 	 * @param w The widget.
 	 * @return True if the widget role is unknown, else false.
 	 */
@@ -268,7 +274,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the given widget is an image
+	 * Checks whether the given widget is an image.
 	 * @param w The widget.
 	 * @return True if the widget is an image, else false.
 	 */
@@ -277,7 +283,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the given widget is a tab item
+	 * Checks whether the given widget is a tab item.
 	 * @param w The widget.
 	 * @return True if the widget is a tab item, else false.
 	 */
@@ -286,7 +292,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Checks whether the given widget is a window
+	 * Checks whether the given widget is a window.
 	 * @param w The widget.
 	 * @return True if the widget is a window, else false.
 	 */
@@ -308,7 +314,7 @@ public final class AccessibilityUtil {
 	// #########
 	
 	/**
-	 * Prints debug info about a widget that is useful for evaluating accessibility
+	 * Prints debug info about a widget that is useful for evaluating accessibility.
 	 * @param w The widget.
 	 */
 	public static void printWidgetDebugInfo(Widget w) {
@@ -322,7 +328,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Logs a message about accessibility
+	 * Logs a message about accessibility.
 	 * An identifying prefix <code>LOG_PREFIX)</code> is added to the message,
 	 * and a newline character is appended.
 	 * @param msg The message to log.
@@ -332,7 +338,7 @@ public final class AccessibilityUtil {
 	}
 	
 	/**
-	 * Logs a message about accessibility
+	 * Logs a message about accessibility.
 	 * An identifying prefix <code>LOG_PREFIX)</code> is added to the message,
 	 * and a newline character is appended.
 	 * @param msg The message to log.
@@ -341,5 +347,4 @@ public final class AccessibilityUtil {
 	public static void logA11y(String msg, LogSerialiser.LogLevel logLevel) {
 		LogSerialiser.log(LOG_PREFIX + " " + msg + "\n", logLevel);
 	}
-	
 }

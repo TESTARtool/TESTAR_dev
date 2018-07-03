@@ -101,16 +101,19 @@ public class CodingManager {
 	 * An example for an enabled "ok" button could be: Buttonoktrue0,0,1 ("0,0,1" being the path in the widget-tree).
  	 *
 	 */
-	public static synchronized void buildIDs(Widget widget){
-		if (widget.parent() != null){
+	public static synchronized void buildIDs(Widget widget) {
+		if (widget.parent() != null) {
 			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
 		} else if (widget instanceof State) { // UI root
-			String cid = "", a_R_id = "", a_R_T_id = "", a_R_T_P_id = "";
-			for (Widget w : (State) widget){
-				if (w != widget){
+			String cid = ""; 
+			String a_R_id = ""; 
+			String a_R_T_id = ""; 
+			String a_R_T_P_id = "";
+			for (Widget w : (State) widget) {
+				if (w != widget) {
 					buildIDs(w);
 					cid += w.get(Tags.ConcreteID);
 					a_R_id += w.get(Tags.Abstract_R_ID);
@@ -130,111 +133,56 @@ public class CodingManager {
 	 * @param state Current State of the SUT
 	 * @param actions The actions.
 	 */
-	public static synchronized void buildIDs(State state, Set<Action> actions){
-		for (Action a : actions)
+	public static synchronized void buildIDs(State state, Set<Action> actions) {
+		for (Action a : actions) {
 			CodingManager.buildIDs(state,a);
+		}
 	}
 	
 	/**
 	 * Builds IDs (abstract, concrete, precise) for an action.
 	 * @param action An action.
 	 */
-	public static synchronized void buildIDs(State state, Action action){		
-		action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-				   CodingManager.codify(state.get(Tags.ConcreteID), action));
-		action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-				   CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
+	public static synchronized void buildIDs(State state, Action action) {		
+		action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE 
+				   + CodingManager.codify(state.get(Tags.ConcreteID), action));
+		action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT 
+				   + CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
 	}
 	
 	// ###############
 	//  STATES CODING
 	// ###############
 	
-	private static String codify(Widget state, boolean codifyContext, Tag<?>... tags){
+	private static String codify(Widget state, boolean codifyContext, Tag<?>... tags) {
 		return toID(getWidgetString(state,codifyContext,tags));
 	}
 	
-	private static String getWidgetString(Widget widget, boolean codifyContext, Tag<?>... tags){
+	private static String getWidgetString(Widget widget, boolean codifyContext, Tag<?>... tags) {
 		String ws = getTaggedString(widget,tags);
-		if (codifyContext)
+		if (codifyContext) {
 			ws += "#" + getWidgetContextString(widget);
+		}
 		return ws;
 	}
 	
-	private static String getTaggedString(Widget leaf, Tag<?>... tags){
+	private static String getTaggedString(Widget leaf, Tag<?>... tags) {
 		StringBuilder sb = new StringBuilder();
-		for(Tag<?> t : tags)
+		for(Tag<?> t : tags) {
 			sb.append(leaf.get(t, null));
+		}
 		return sb.toString();
 	}
 	
-	private static String getWidgetContextString(Widget widget){
+	private static String getWidgetContextString(Widget widget) {
 		return "";
-		/*int depth = Util.depth(widget), lvls = 0;
-		switch(depth){
-		case 0:
-		case 1:
-			return "";
-		case 2:
-		case 3:
-			lvls = depth - 1;
-			break;
-		default:
-			lvls = 3;
-		}
-		String ctx = "";
-		List<Widget> ancestors = Util.ancestors(widget,lvls);
-		for (Widget ancestor : ancestors){
-			ctx += getTaggedString(ancestor,Tags.Role);
-		}
-		ctx += "@" + getAncestorsContext(ancestors);
-		//ctx += "$" + getIndexPathContext(widget,lvls);
-		return ctx;*/
 	}
-	
-	/*private static String getAncestorsContext(List<Widget> ancestors){
-		String ctx = "";
-		for (Widget ancestor : ancestors){
-			ctx += getAncestorContext(ancestor);
-		}
-		return ctx;
-	}*/	
-	
-	/*private static String getAncestorContext(Widget ancestor){
-		Widget child;
-		Role role;
-		TreeSet<Role> childrenTags = new TreeSet<Role>(new Comparator<Role>(){
-			@Override
-			public int compare(Role o1, Role o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
-		for (int i=0; i<ancestor.childCount(); i++){
-			child = ancestor.child(i);
-			role = child.get(Tags.Role, null);
-			if (role != null && !childrenTags.contains(role))
-				childrenTags.add(role);
-		}
-		String ctx = "";
-		for (Role r : childrenTags)
-			ctx += r.toString();
-		return ctx;
-	}*/
-	
-	/*private static String getIndexPathContext(Widget widget, int levels){
-		String idxCtx = "";
-		int[] idxPath = Util.indexPath(widget);
-		for (int i=idxPath.length - levels; i<idxPath.length; i++){
-			idxCtx += "[" + idxPath[i] + "]";
-		}
-		return idxCtx;
-	}*/	
 		
 	// ################
 	//  ACTIONS CODING
 	// ################
 
-	private static String codify(String stateID, Action action, Role... discardParameters){
+	private static String codify(String stateID, Action action, Role... discardParameters) {
 		return toID(stateID + action.toString(discardParameters));
 	}	
 	
@@ -242,42 +190,25 @@ public class CodingManager {
 	//  IDS CODING
 	// ############
 
-	private static String lowCollisionID(String text){ // reduce ID collision probability
-		CRC32 crc32 = new CRC32(); crc32.update(text.getBytes());
-		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
-			   Integer.toHexString(text.length()) +
-			   crc32.getValue();
+	private static String lowCollisionID(String text) { // reduce ID collision probability
+		CRC32 crc32 = new CRC32(); 
+		crc32.update(text.getBytes());
+		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) 
+				+ Integer.toHexString(text.length()) 
+				+ crc32.getValue();
 	}
-	
-	/*private static final boolean DEBUG_ID_COLLISIONS = false;
-	private static Map<String,String> idMap = new HashMap<String,String>(); // id x text
-	private static int idCollisions = 0;
-	private static int debugCounter = 0;*/
-	
-	private static String toID(String text){
-		/*if (DEBUG_ID_COLLISIONS){
-			String id = lowCollisionID(text);
-			String t = idMap.get(id);
-			if (t == null)
-				idMap.put(id, text);
-			else if (!t.equals(text))
-				idCollisions++;
-			if (idCollisions > 0 && debugCounter++ > 1000){
-				debugCounter = 0;
-				System.out.println("[" + getClass().getSimpleName() + "]  " +  idCollisions + " ID collisions! (" + idMap.size() + ")");
-			}
-			return id;
-		} else*/
-			return lowCollisionID(text);
+		
+	private static String toID(String text) {
+		return lowCollisionID(text);
 	}
 	
 	// #################
 	//  Utility methods
 	// #################
 	
-	public static Widget find(State state, String widgetID, String idType){
+	public static Widget find(State state, String widgetID, String idType) {
 		Tag<String> t = null;
-		switch(idType){
+		switch(idType) {
 		case CodingManager.CONCRETE_ID:
 			t = Tags.ConcreteID;
 			break;
@@ -291,11 +222,11 @@ public class CodingManager {
 			t = Tags.Abstract_R_T_P_ID;
 			break;
 		}
-		for (Widget w : state){
-			if (widgetID.equals(w.get(t)))
+		for (Widget w : state) {
+			if (widgetID.equals(w.get(t))) {
 				return w;
+			}
 		}
 		return null; // not found
-	}
-	
+	}	
 }

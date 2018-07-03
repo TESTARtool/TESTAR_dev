@@ -30,7 +30,6 @@
 
 package org.fruit.alayer.linux.atspi;
 
-
 import org.fruit.alayer.linux.atspi.enums.AtSpiComponentLayers;
 import org.fruit.alayer.linux.atspi.enums.AtSpiCoordTypes;
 

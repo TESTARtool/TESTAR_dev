@@ -42,14 +42,14 @@ public class ActionStatus {
 
 	private Action action;
 	
-	private boolean actionSucceeded,
-					problems,
-					userEventAction;
+	private boolean actionSucceeded;
+	private boolean problems;
+	private boolean userEventAction;
 	
 	/**
 	 * Constructor.
 	 */
-	public ActionStatus(){
+	public ActionStatus() {
 		this.action = null;
 		this.actionSucceeded = true;
 		this.problems = false;

@@ -34,7 +34,7 @@
 package org.fruit.alayer;
 
 public final class Roles {
-	private Roles(){}
+	private Roles() {}
 	
 	public static final Role 
 	

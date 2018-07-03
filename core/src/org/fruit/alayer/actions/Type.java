@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer.actions;
 
 import java.nio.charset.Charset;
@@ -56,7 +57,7 @@ public final class Type extends TaggableBase implements Action {
 	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
 	private final String text;
 	
-	public Type(String text){
+	public Type(String text) {
 		Assert.hasText(text);
 		checkAscii(text);
 		this.text = text;
@@ -69,67 +70,75 @@ public final class Type extends TaggableBase implements Action {
 		double d = duration / text.length();
 		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
 		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
-		for(int i = 0; i < text.length(); i++){
+		for(int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
 			boolean shift = false;
 
-			if(Character.isLetter(c)){
-				if(Character.isLowerCase(c))
+			if (Character.isLetter(c)) {
+				if (Character.isLowerCase(c)) {
 					c = Character.toUpperCase(c);
-				else
+				} else {
 					shift = true;
+				}
 			}
 			
 			KBKeys key = getKey(c);
 						
-			if(shift)
+			if (shift) {
 				shiftDown.run(system, state, .0);
+			}
 			new KeyDown(key).run(system, state, .0);
 			new KeyUp(key).run(system, state, .0);
-			if(shift)
+			if (shift) {
 				shiftUp.run(system, state, .0);
+			}
 			Util.pause(d);
 		}
 	}
 		
-	public static void checkAscii(String text){
-	    if (!asciiEncoder.canEncode(text))
+	public static void checkAscii(String text) {
+	    if (!asciiEncoder.canEncode(text)) {
 	    	throw new IllegalArgumentException("This string is not an ascii string!");
+	    }
 	}
 	
-	private KBKeys getKey(char c){
-		for(KBKeys k : KBKeys.values())
-			if(k.code() == (int) c)
+	private KBKeys getKey(char c) {
+		for (KBKeys k : KBKeys.values()) {
+			if (k.code() == (int) c) {
 				return k;
-		throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
+			}
+		}
+		throw new IllegalArgumentException(
+				"Unable to find the corresponding keycode for character '" + c 
+				+ "(" + ((int)c) +  ")'!");
 	}
 	
-	public String toString(){ return "Type text '" + text + "'"; }
+	public String toString() { 
+		return "Type text '" + text + "'"; 
+	}
 	
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters){
-			if (r.name().equals(ActionRoles.Type.name()))
+		for (Role r : discardParameters) {
+			if (r.name().equals(ActionRoles.Type.name())) {
 				return "Text typed";
+			}
 		}
 		return toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null)
+		if (r != null) {
 			return r.toString();
-		else
+		} else {
 			return toString();
+		}
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "(" + text + ")";
-	}
-	
+	}	
 }

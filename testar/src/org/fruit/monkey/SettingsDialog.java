@@ -31,6 +31,7 @@
 /**
  * @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -60,9 +61,12 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.UIManager.*;
 import static org.fruit.Util.compileProtocol;
-import static org.fruit.monkey.ConfigTags.TgherkinDocument;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
+
+/**
+ * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
+ */
 
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
@@ -71,6 +75,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private String settingsFile;
   private Settings settings;
+  //TODO: what is this ret variable. Can´t you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -85,12 +90,12 @@ public class SettingsDialog extends JFrame implements Observer {
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
+  private CleanUpPanel cleanUpPanel;
   private GraphDBPanel graphDBPanel;
   private TgherkinPanel tgherkinPanel;
 
   /**
    * Starts the settings Dialog.
-   *
    * @throws IOException when Icons cannot be found.
    */
   SettingsDialog() throws IOException {
@@ -119,13 +124,20 @@ public class SettingsDialog extends JFrame implements Observer {
     });
   }
 
+  /**
+   *
+   * @param settings
+   * @param settingsFile
+   * @return
+   */
   public Settings run(Settings settings, String settingsFile) {
     this.settings = settings;
     this.settingsFile = settingsFile;
     this.ret = null;
     this.setVisible(true);
     populateInformation(settings);
-     while (this.isShowing()) {
+
+    while (this.isShowing()) {
       Util.pause(0.1);
     }
 
@@ -136,6 +148,10 @@ public class SettingsDialog extends JFrame implements Observer {
     return ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
   }
 
+  /**
+   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * @param mode indicates the MODE button that was clicked.
+   */
   private void start(AbstractProtocol.Modes mode) {
     try {
       extractInformation(settings);
@@ -146,12 +162,14 @@ public class SettingsDialog extends JFrame implements Observer {
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(settings.get(ConfigTags.ProtocolClass));
       }
+ 
       this.dispose();
+
     } catch (IllegalStateException ise) {
       JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
     }
   }
-
+  
   private void checkSettings(Settings settings) throws IllegalStateException {
     String userInputPattern = settings.get(ConfigTags.ProcessesToKillDuringTest);
     try {
@@ -194,6 +212,10 @@ public class SettingsDialog extends JFrame implements Observer {
     }
   }
 
+  /**
+   * This replaces the original test.settings file with a complete settings file
+   * @param sutSettings
+   */
   private void switchSettings(String sutSettings) {
     String previousSSE = Main.getSSE()[0];
     String sse = sutSettings + Main.SUT_SETTINGS_EXT;
@@ -219,6 +241,7 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
+    cleanUpPanel.populateFrom(settings);
     graphDBPanel.populateFrom(settings);
     tgherkinPanel.populateFrom(settings);
     // only show Tgherkin tab if the protocol is a DocumentProtocol
@@ -258,7 +281,7 @@ public class SettingsDialog extends JFrame implements Observer {
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
     walkerPanel = new WalkerPanel();
-    jTabsPane.addTab("UI-walker", walkerPanel);
+    jTabsPane.addTab("Action Selection", walkerPanel);
     filterPanel = new FilterPanel();
     jTabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
@@ -269,6 +292,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
+    cleanUpPanel = new CleanUpPanel();
+    jTabsPane.addTab("Clean Up", cleanUpPanel);
     tgherkinPanel = new TgherkinPanel();
 
     setLayout(jTabsPane);

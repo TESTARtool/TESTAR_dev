@@ -63,7 +63,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 
-	protected void initialize(Settings settings){
+	protected void initialize(Settings settings) {
 		super.initialize(settings);
 	}
 
@@ -72,9 +72,9 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
 	 */
-	protected void beginSequence(){
+	protected void beginSequence(SUT sut, State state) {
 
-		super.beginSequence();
+		super.beginSequence(sut, state);
 
 	}
 
@@ -89,7 +89,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
 	 */
-	protected SUT startSystem() throws SystemStartException{
+	protected SUT startSystem() throws SystemStartException {
 		
 		return super.startSystem();
 
@@ -103,7 +103,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
-	protected State getState(SUT system) throws StateBuildException{
+	protected State getState(SUT system) throws StateBuildException {
 
 		return super.getState(system);
 
@@ -114,7 +114,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
-	protected Verdict getVerdict(State state){
+	protected Verdict getVerdict(State state) {
 
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
@@ -141,7 +141,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * @return  a set of actions
 	 */
 
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 
 		Set<Action> actions = super.deriveActions(system,state); // by urueda
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -154,19 +154,19 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 		//----------------------
 		
 		// iterate through all widgets
-		for(Widget w : state){
+		for(Widget w : state) {
 
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+			if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
 				// 2050104349ln("Prot "+ w.getRepresentation("\t"));
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)) {  // do not build actions for tabu widgets  
 					
 					// left clicks
-					if(whiteListed(w) || isClickable(w)) {
+					if (whiteListed(w) || isClickable(w)) {
 						actions.add(ac.leftClickAt(w));
 					}
 	
 					// type into text boxes
-					if(isTypeable(w)) {
+					if (isTypeable(w)) {
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 					}
 				}	
@@ -184,7 +184,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * @return  the selected action (non-null!)
 	 */
 
-	protected Action selectAction(State state, Set<Action> actions){ 
+	protected Action selectAction(State state, Set<Action> actions) { 
 		return super.selectAction(state, actions);
 	}
 
@@ -196,7 +196,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * @param action the action to execute
 	 * @return whether or not the execution succeeded
 	 */
-	protected boolean executeAction(SUT system, State state, Action action){
+	protected boolean executeAction(SUT system, State state, Action action) {
 		
 		return super.executeAction(system, state, action);
 		
@@ -220,7 +220,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(File recordedSequence) {
 		
 		super.finishSequence(recordedSequence);
 		

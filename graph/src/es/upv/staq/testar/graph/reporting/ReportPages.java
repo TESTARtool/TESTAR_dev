@@ -53,7 +53,7 @@ public class ReportPages {
 
   /**
    * @param env
-   * @return
+   * @return report on clusters page
    */
   public static String getClustersPageReport (IEnvironment env) {
 
@@ -63,7 +63,9 @@ public class ReportPages {
 
     report.append("STATES CLUSTERS:\n");
     HashMap<String, Set<String>> absStateGroups = env.getGraphStateClusters();
-    int gi = 1, i, nlc;
+    int gi = 1; 
+    int i;
+    int nlc;
     for (String g : absStateGroups.keySet()) {
       report.append("[" + gi++ + "] " + g + " contains:\n\t");
       i = 1;
@@ -97,7 +99,7 @@ public class ReportPages {
    * @param tGraph
    * @param orderedActions
    * @param SEQUENCE_LENGTH
-   * @return
+   * @return report on test result
    */
   public static String getTestTablePageReport (IEnvironment env, TESTARGraph tGraph,
                                                GraphEdge[] orderedActions, int SEQUENCE_LENGTH,
@@ -114,18 +116,18 @@ public class ReportPages {
 
     int ID_LENGTH = CodingManager.ID_LENTGH;
     String tableHead = String.format(
-        "%1$" + SEQUENCE_LENGTH +
-            "s %2$7" + // RAM (KB)
-            "s %3$11" + // CPU (user)
-            "s %4$11" + // CPU (system)
-            "s %5$6" + // CPU %
-            "s %6$" + ID_LENGTH +
-            "s %7$" + SEQUENCE_LENGTH +
-            "s %8$" + ID_LENGTH +
-            "s %9$" + SEQUENCE_LENGTH +
-            "s %10$" + ID_LENGTH +
-            "s %11$" + SEQUENCE_LENGTH +
-            "s %12$s",
+        "%1$" + SEQUENCE_LENGTH 
+            + "s %2$7"  // RAM (KB)
+            + "s %3$11"  // CPU (user)
+            + "s %4$11"  // CPU (system)
+            + "s %5$6"  // CPU %
+            + "s %6$" + ID_LENGTH 
+            + "s %7$" + SEQUENCE_LENGTH
+            + "s %8$" + ID_LENGTH
+            + "s %9$" + SEQUENCE_LENGTH
+            + "s %10$" + ID_LENGTH 
+            + "s %11$" + SEQUENCE_LENGTH
+            + "s %12$s",
         "#",
         "RAM(KB)", //"Sync",
         "CPUser(ms)",
@@ -153,7 +155,8 @@ public class ReportPages {
 
     int i = firstSequenceActionNumber; //int i=1;
     long[] cpu;
-    IGraphState from, to;
+    IGraphState from;
+    IGraphState to;
     IGraphAction ga;
     //List<Integer> movesSync = Grapher.getMovementsSync();
     for (GraphEdge edge : orderedActions) {
@@ -164,18 +167,18 @@ public class ReportPages {
       cpu = ga.getCPUsage();
       from = env.getSourceState(ga);
       to = env.getState(edge.getTargetStateID());
-      String actionList = String.format("%1$" + SEQUENCE_LENGTH +
-              "d %2$7" + // RAM (KB)
-              "d %3$11" + // CPU (user)
-              "d %4$11" + // CPU (system)
-              "d %5$6" + // CPU %
-              "s %6$" + ID_LENGTH +
-              "s %7$" + SEQUENCE_LENGTH +
-              "d %8$" + ID_LENGTH +
-              "s %9$" + SEQUENCE_LENGTH +
-              "s %10$" + ID_LENGTH +
-              "s %11$" + SEQUENCE_LENGTH +
-              "d %12$s",
+      String actionList = String.format("%1$" + SEQUENCE_LENGTH 
+    		  + "d %2$7" // RAM (KB)
+              + "d %3$11" // CPU (user)
+              + "d %4$11" // CPU (system)
+              + "d %5$6" // CPU %
+              + "s %6$" + ID_LENGTH
+              + "s %7$" + SEQUENCE_LENGTH
+              + "d %8$" + ID_LENGTH
+              + "s %9$" + SEQUENCE_LENGTH
+              + "s %10$" + ID_LENGTH
+              + "s %11$" + SEQUENCE_LENGTH
+              + "d %12$s",
           i,
           ga.getMemUsage(), //movesSync.get(i-1),
           cpu[0], // user
@@ -202,7 +205,7 @@ public class ReportPages {
    * @param env
    * @param tGraph
    * @param SEQUENCE_LENGTH
-   * @return
+   * @return report on exploration of curve for page
    */
   public static String getExplorationCurvePageReport (IEnvironment env, TESTARGraph tGraph, int SEQUENCE_LENGTH, int firstSequenceActionNumber) {
 
@@ -244,8 +247,8 @@ public class ReportPages {
     String sampleS;
     List<IEnvironment.ResumingMetrics> explorationCurve = env.getExplorationCurve();
     for (IEnvironment.ResumingMetrics sample : explorationCurve) {
-      sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, " +
-              "%2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$7d %10$6s %11$6s %12$7s",
+      sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, " 
+    	+ "%2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$7d %10$6s %11$6s %12$7s",
           idx++,
           sample.getStateNumber(),
           sample.getActionNumber(),
@@ -272,15 +275,16 @@ public class ReportPages {
    * @param tGraph
    * @param orderedActions
    * @param SEQUENCE_LENGTH
-   * @return
+   * @return report on stats for page
    */
   public static String getStatsPageReport (IEnvironment env, TESTARGraph tGraph,
                                            GraphEdge[] orderedActions, int SEQUENCE_LENGTH) {
 
     StringBuffer report = new StringBuffer();
 
-    int unxStates = 0, unxActions = 0,
-        totalStates = -1; // discard start node
+    int unxStates = 0;
+    int unxActions = 0;
+    int totalStates = -1; // discard start node
     String verdict = null;
     for (IGraphState vertex : tGraph.vertexStates()) {
       if (vertex.getUnexploredActionsSize() > 0) {
@@ -324,14 +328,14 @@ public class ReportPages {
         // end by fraalpe2
         "VERDICT");
     report.append(statsHead + "\n");
-    int uniqueStates = tGraph.vertexSet().size() - 2,
-        uniqueActions = tGraph.edgeSet().size() - 2,
-        abstractStates = env.getGraphStateClusters().size(),
-        longestPath = env.getLongestPathLength(),
-        abstractActions = env.getGraphActionClusters().size();
+    int uniqueStates = tGraph.vertexSet().size() - 2;
+    int uniqueActions = tGraph.edgeSet().size() - 2;
+    int abstractStates = env.getGraphStateClusters().size();
+    int longestPath = env.getLongestPathLength();
+    int abstractActions = env.getGraphActionClusters().size();
 
-    if (Grapher.testGenerator.equals(Grapher.EVOLUTIONARY_GENERATOR) &&
-        verdict.equals(Grapher.GRAPH_NODE_PASS)) { // temporal fitness.txt patch for evolutionary algorithm
+    if (Grapher.testGenerator.equals(Grapher.EVOLUTIONARY_GENERATOR) 
+    	&& verdict.equals(Grapher.GRAPH_NODE_PASS)) { // temporal fitness.txt patch for evolutionary algorithm
       try {
         java.io.Writer fitnessWriter = new java.io.FileWriter("output/fitness.txt");
         //fitnessWriter.write(new Double(abstractStates == 0 ? 2.0 : 1.0/(double)abstractStates).toString()); // fitness = 0.0 .. 1.0 (0 is best)
@@ -401,9 +405,9 @@ public class ReportPages {
 		double frac, idealFrac = 1.0 / tGraph.edgeSet().size();
 		double dist = 0;
 		IGraphAction ga;
-		for (String[] edge : tGraph.edgeSet()){
+		for (String[] edge : tGraph.edgeSet()) {
 			ga = env.getAction(edge[0]);
-			count = ga.getCount();;
+			count = ga.getCount();
 			frac = count / sequenceLength;
 			if (frac < idealFrac)
 				dist += (count > 0 ? idealFrac / frac : 100 * (idealFrac / (1.0 / sequenceLength))) - 1.0; 

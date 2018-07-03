@@ -82,8 +82,8 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 	private List<GraphEdge> orderedSequenceActions; // < action concrete ID , target state concrete ID >
 	private int actionOrder = -1;
 
-	private List<String> currentPath, // states ID
-						 longestPath = null; // how deep from START graph state?
+	private List<String> currentPath; // states ID
+	private List<String> longestPath = null; // how deep from START graph state?
 	
 	private static String syncXMLGraph = "";
 
@@ -121,99 +121,114 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 
 	}
 
-	public static TESTARGraph buildEmptyGraph(){
+	public static TESTARGraph buildEmptyGraph() {
 		return new TESTARGraph();		
 	}
 
-	private void buildSampleGraph(){
+	private void buildSampleGraph() {
 		String vx = "x", vy = "y", vz = "z";
 		IGraphState gs1 = new GraphState(vx),
 					gs2 = new GraphState(vy),
 					gs3 = new GraphState(vz);
-		super.addVertex(vx); super.addVertex(vy); super.addVertex(vz);
+		super.addVertex(vx); 
+		super.addVertex(vy); 
+		super.addVertex(vz);
 		this.graphStates.put(vx, gs1);
 		this.graphStates.put(vy, gs2);
 		this.graphStates.put(vz, gs3);
-		this.updateCluster(gs1); this.updateCluster(gs2); this.updateCluster(gs3);
+		this.updateCluster(gs1); 
+		this.updateCluster(gs2); 
+		this.updateCluster(gs3);
 
 		GraphEdge e1 = new GraphEdge(vx, vy);
 		GraphEdge e2 = new GraphEdge(vx, vz);
-		super.addEdge(vx, vy, e1); super.addEdge(vx, vz, e2);
-		GraphAction ga = new GraphAction(vx); ga.setSourceStateID(vx); ga.addTargetStateID(vy);; ga.addTargetStateID(vz);; ga.setCount(2);
+		super.addEdge(vx, vy, e1); 
+		super.addEdge(vx, vz, e2);
+		GraphAction ga = new GraphAction(vx); 
+		ga.setSourceStateID(vx); 
+		ga.addTargetStateID(vy); 
+		ga.addTargetStateID(vz); 
+		ga.setCount(2);
 		this.graphActions.put(vx, ga);
 		this.updateCluster(ga);
 
-		this.edgeAdded(ga, e1); this.edgeAdded(ga, e2);
+		this.edgeAdded(ga, e1); 
+		this.edgeAdded(ga, e2);
 		this.orderedSequenceActions.add(e1);
 		this.orderedSequenceActions.add(e2);
 	}
 
-	public boolean stateAtGraph(String stateID){
-		synchronized(this.graphStates){
+	public boolean stateAtGraph(String stateID) {
+		synchronized(this.graphStates) {
 			return this.graphStates.containsKey(stateID);
 		}
 	}
 	
-	public IGraphState getState(String stateID){
-		if (stateID == null)
+	public IGraphState getState(String stateID) {
+		if (stateID == null) {
 			return null;
-		synchronized(this.graphStates){
+		}
+		synchronized(this.graphStates) {
 			return this.graphStates.get(stateID);
 		}
 	}
 
-	public boolean stateAtGraph(IGraphState gs){
-		if (gs == null) return false;
+	public boolean stateAtGraph(IGraphState gs) {
+		if (gs == null) {
+			return false;
+		}
 		return stateAtGraph(gs.getConcreteID());
 	}
 
-	public Collection<IGraphState> vertexStates(){
-		synchronized(this.graphStates){
+	public Collection<IGraphState> vertexStates() {
+		synchronized(this.graphStates) {
 			return this.graphStates.values();
 		}
 	}
 	
-	private void updateCluster(IGraphState gs){
+	private void updateCluster(IGraphState gs) {
 		String id = gs.getConcreteID();
-		if (id.equals(Grapher.GRAPH_NODE_ENTRY) ||
-			id.equals(Grapher.GRAPH_NODE_PASS) ||
-			id.equals(Grapher.GRAPH_NODE_FAIL))
+		if (id.equals(Grapher.GRAPH_NODE_ENTRY) 
+			|| id.equals(Grapher.GRAPH_NODE_PASS) 
+			|| id.equals(Grapher.GRAPH_NODE_FAIL)) {
 			return;
+		}
 		Set<String> c = this.stateClusters.get(gs.getAbstract_R_ID());
-		if (c == null){
+		if (c == null) {
 			c = new HashSet<String>();
 			this.stateClusters.put(gs.getAbstract_R_ID(), c);
 		}
 		c.add(gs.getConcreteID());
 	}
 
-	private void updateCluster(IGraphAction ga){
-		if (ga.getConcreteID().equals(Grapher.GRAPH_ACTION_START) ||
-			ga.getConcreteID().equals(Grapher.GRAPH_ACTION_STOP))
+	private void updateCluster(IGraphAction ga) {
+		if (ga.getConcreteID().equals(Grapher.GRAPH_ACTION_START) 
+			|| ga.getConcreteID().equals(Grapher.GRAPH_ACTION_STOP)) {
 			return;
+		}
 		Set<String> c = this.actionClusters.get(ga.getAbstractID());
-		if (c == null){
+		if (c == null) {
 			c = new HashSet<String>();
 			this.actionClusters.put(ga.getAbstractID(), c);
 		}
 		c.add(ga.getConcreteID());
 	}
 
-	public HashMap<String,Set<String>> getStateClusters(){
+	public HashMap<String,Set<String>> getStateClusters() {
 		return this.stateClusters;
 	}
 
-	public HashMap<String,Set<String>> getActionClusters(){
+	public HashMap<String,Set<String>> getActionClusters() {
 		return this.actionClusters;
 	}
 
-	public void addVertex(IEnvironment env, IGraphState v){
+	public void addVertex(IEnvironment env, IGraphState v) {
 		updateLongestPath(v);
-		synchronized(this.graphStates){
-			if (this.graphStates.containsKey(v.getConcreteID()))
+		synchronized(this.graphStates) {
+			if (this.graphStates.containsKey(v.getConcreteID())) {
 				v.incCount();
-			else {
-				if (super.addVertex(v.getConcreteID())){
+			} else {
+				if (super.addVertex(v.getConcreteID())) {
 					this.graphStates.put(v.getConcreteID(),v);
 					updateCluster(v);
 				} else {
@@ -224,64 +239,74 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		}
 	}
 	
-	public void updateLongestPath(IGraphState v){ // note: longest path is not found in all cases!
+	public void updateLongestPath(IGraphState v) { // note: longest path is not found in all cases!
 		String id = v.getConcreteID();
-		if(id.equals(Grapher.GRAPH_NODE_PASS) || id.equals(Grapher.GRAPH_NODE_FAIL))
+		if (id.equals(Grapher.GRAPH_NODE_PASS) || id.equals(Grapher.GRAPH_NODE_FAIL)) {
 			return;
+		}
 		int idx = currentPath.indexOf(id);
-		if (idx == -1){ // not found
+		if (idx == -1) { // not found
 			currentPath.add(id);
-			if(currentPath.size() > longestPath.size())
+			if (currentPath.size() > longestPath.size()) {
 				longestPath = new ArrayList<String>(currentPath);
-		} else
+			}
+		} else {
 			currentPath.subList(idx + 1, currentPath.size()).clear(); // remove loop
+		}
 	}
 	
-	public String getLongestPath(){
+	public String getLongestPath() {
 		String returnS = "Longest path (";
-		if (longestPath != null){
+		if (longestPath != null) {
 			returnS += longestPath.size() + ") = ";
-			for(String id : longestPath)
+			for(String id : longestPath) {
 				returnS += id + " ";
-		} else
+			}
+		} else {
 			returnS += "NULL)";
+		}
 		return returnS;
 	}
 	
-	public List<String> getLongestPathArray(){
-		if (longestPath != null)
+	public List<String> getLongestPathArray() {
+		if (longestPath != null) {
 			return longestPath;
-		else
+		} else {
 			return new ArrayList<String>(); // empty list
+		}
 	}
 
-	public boolean actionAtGraph(String actionID){
-		synchronized(this.graphActions){
+	public boolean actionAtGraph(String actionID) {
+		synchronized(this.graphActions) {
 			return this.graphActions.containsKey(actionID);
 		}
 	}
 
-	public boolean actionAtGraph(IGraphAction ga){
-		if (ga == null) return false;
+	public boolean actionAtGraph(IGraphAction ga) {
+		if (ga == null) {
+			return false;
+		}
 		return actionAtGraph(ga.getConcreteID());
 	}
 	
-	public IGraphAction getAction(String actionID){
-		synchronized(this.graphActions){
+	public IGraphAction getAction(String actionID) {
+		synchronized(this.graphActions) {
 			return this.graphActions.get(actionID);
 		}
 	}
 		
-	public Collection<IGraphAction> edgeActions(){
-		synchronized(this.graphActions){
+	public Collection<IGraphAction> edgeActions() {
+		synchronized(this.graphActions) {
 			return this.graphActions.values();
 		}
 	}
 	
-	private void edgeAdded(IGraphAction ga, GraphEdge edge){
+	private void edgeAdded(IGraphAction ga, GraphEdge edge) {
 		String actionID = ga.getConcreteID();
-		if (actionID.equals(Grapher.GRAPH_ACTION_START) || actionID.equals(Grapher.GRAPH_ACTION_STOP))
+		if (actionID.equals(Grapher.GRAPH_ACTION_START) 
+				 || actionID.equals(Grapher.GRAPH_ACTION_STOP)) {
 			return;
+		}
 		actionOrder++;
 		ga.addOrder(edge.getTargetStateID(), new Integer(actionOrder).toString());
 		orderedSequenceActions.add(edge);
@@ -291,86 +316,87 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 	 * Note: edge nodes must be added first.
 	 * see addVertex(IEnvironment env, GraphState v)
 	 */
-	public void addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e){
-		if (!this.containsVertex(from.getConcreteID())){
-			// TEMP System.out.println("[" + getClass().getSimpleName() + 
-			// TEMP		"] WARNING - Adding missing vertex: " + from.getConcreteID());
+	public void addEdge(IEnvironment env, IGraphState from, IGraphState to, IGraphAction e) {
+		if (!this.containsVertex(from.getConcreteID())) {
 			this.addVertex(env, from);
 		}
-		if (!this.containsVertex(to.getConcreteID())){
-			// TEMP.out.println("[" + getClass().getSimpleName() + 
-			// TEMP		"] WARNING - Adding missing vertex: " + to.getConcreteID());
+		if (!this.containsVertex(to.getConcreteID())) {
 			this.addVertex(env, to);
 		}
 		GraphEdge edge = new GraphEdge(e.getConcreteID(),to.getConcreteID());
-		synchronized(this.graphActions){
-			if (super.containsEdge(edge)){
+		synchronized(this.graphActions) {
+			if (super.containsEdge(edge)) {
 				e.incCount();
 				edgeAdded(e,edge);
-			} else if (this.graphActions.containsKey(e.getConcreteID())){ // action is at graph, but the edge not => this is multi-target
-				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
+			} else if (this.graphActions.containsKey(e.getConcreteID())) { // action is at graph, but the edge not => this is multi-target
+				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)) {
 					e.incCount();
 					edgeAdded(e,edge);
 					e.addTargetStateID(to.getConcreteID());
-				} else
-					System.out.println("[" + getClass().getSimpleName() + 
-							"] WARNING - failed to add multi-target edge to graph: " + edge.toString());
-			} else{
-				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)){
+				} else {
+					System.out.println("[" + getClass().getSimpleName() 
+						+ "] WARNING - failed to add multi-target edge to graph: " + edge.toString());
+				}
+			} else {
+				if (super.addEdge(from.getConcreteID(), to.getConcreteID(), edge)) {
 					edgeAdded(e,edge);
 					e.setSourceStateID(from.getConcreteID());
 					e.addTargetStateID(to.getConcreteID());
 					this.graphActions.put(e.getConcreteID(),e);
 					updateCluster(e);
-				} else
-					System.out.println("[" + getClass().getSimpleName() + 
-							"] WARNING - failed to add new action edge to graph: " + edge.toString());
+				} else {
+					System.out.println("[" + getClass().getSimpleName() 
+						+ "] WARNING - failed to add new action edge to graph: " + edge.toString());
+				}
 			}
 		}
 	}
 
-	public List<GraphEdge> getOrderedActions(){
+	public List<GraphEdge> getOrderedActions() {
 		return this.orderedSequenceActions;
 	}
 	
 	public GraphEdge[] getSortedActionsByOrder(int fromOrder, int toOrder) {
 		List<GraphEdge> orderedSequenceActions = this.getOrderedActions();
-		int low = fromOrder >= orderedSequenceActions.size() ?
-				orderedSequenceActions.size() - 1 :
+		int low = fromOrder >= orderedSequenceActions.size() 
+				? orderedSequenceActions.size() - 1 :
 				fromOrder < 0 ? 0 : fromOrder;
-		if (toOrder < fromOrder)
+		if (toOrder < fromOrder) {
 			return null;
+		}
 		int high = toOrder >= orderedSequenceActions.size() ? orderedSequenceActions.size() - 1 : toOrder;
 		int actionsN = high - low + 1;
 		GraphEdge[] gas = new GraphEdge[actionsN];
-		for (int i=0; i < actionsN; i++)
+		for (int i = 0; i < actionsN; i++) {
 			gas[i] = orderedSequenceActions.get(low + i);
+		}
 		return gas;
 	}	
 	
-	public Iterator<GraphEdge> getForwardActions(){
+	public Iterator<GraphEdge> getForwardActions() {
 		return this.orderedSequenceActions.iterator();
 	}
 	
-	public ListIterator<GraphEdge> getBackwardActions(){
+	public ListIterator<GraphEdge> getBackwardActions() {
 		return  this.orderedSequenceActions.listIterator(this.orderedSequenceActions.size());
 	}
 	
-	private void syncXMLGraph(String xmlPath){
+	private void syncXMLGraph(String xmlPath) {
 		System.out.print("Sync XML graph: ");
-		synchronized(TESTARGraph.syncXMLGraph){
-			while (!TESTARGraph.syncXMLGraph.equals("")){
+		synchronized(TESTARGraph.syncXMLGraph) {
+			while (!"".equals(TESTARGraph.syncXMLGraph)) {
 				try {
 					System.out.print(".");
 					TESTARGraph.syncXMLGraph.wait(1000);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {
+				}
 			}
 			TESTARGraph.syncXMLGraph = xmlPath;
 		}
 		System.out.println("[" + getClass().getSimpleName() + "] synced");
 	}
 	
-	public void saveToXML(IEnvironment env, String xmlPath){
+	public void saveToXML(IEnvironment env, String xmlPath) {
 		syncXMLGraph(xmlPath);
 		PrintWriter writer = null;
  		try {
@@ -379,16 +405,17 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 			writer.write("<" + XML_TAG_TESTAR_GRAPH + " version=\"" + XML_GRAPH_VERSION + "\">\n");
 			writer.write("\t<" + XML_TAG_GRAPH_STATES + ">\n");
 			String stateID;
-			for (IGraphState gs : this.vertexStates()){
+			for (IGraphState gs : this.vertexStates()) {
 				stateID = gs.getConcreteID();
-				if (!stateID.equals(Grapher.GRAPH_NODE_ENTRY) &&
-					!stateID.equals(Grapher.GRAPH_NODE_PASS) && !stateID.equals(Grapher.GRAPH_NODE_FAIL)){
-					writer.write("\t\t<" + XML_TAG_STATE + " " + XML_ATTRIBUTE_STATE_ID + "=\"" + gs.getConcreteID() + "\" " +
-								 XML_ATTRIBUTE_STATE_ABS_ID + "=\"" + gs.getAbstract_R_ID() + "\" " +
-								 XML_ATTRIBUTE_STATE_VISITED + "=\"" + gs.getCount() + "\" " +
-								 XML_ATTRIBUTE_STATE_WIDGET_COUNT + "=\"" + gs.getStateWidgetsExecCount().size() + "\" " +
-								 XML_ATTRIBUTE_STATE_WIDGETS + "=\"" + gs.getStateWidgetsExecCount() + "\" " +
-								 XML_ATTRIBUTE_STATE_UNEXECUTED + "=\"" + gs.getUnexploredActionsString() + "\"/>\n");
+				if (!stateID.equals(Grapher.GRAPH_NODE_ENTRY) 
+					&& !stateID.equals(Grapher.GRAPH_NODE_PASS) 
+					&& !stateID.equals(Grapher.GRAPH_NODE_FAIL)) {
+					writer.write("\t\t<" + XML_TAG_STATE + " " + XML_ATTRIBUTE_STATE_ID + "=\"" + gs.getConcreteID() + "\" " 
+							+ XML_ATTRIBUTE_STATE_ABS_ID + "=\"" + gs.getAbstract_R_ID() + "\" " 
+							+ XML_ATTRIBUTE_STATE_VISITED + "=\"" + gs.getCount() + "\" "
+							+ XML_ATTRIBUTE_STATE_WIDGET_COUNT + "=\"" + gs.getStateWidgetsExecCount().size() + "\" "
+							+ XML_ATTRIBUTE_STATE_WIDGETS + "=\"" + gs.getStateWidgetsExecCount() + "\" "
+							+ XML_ATTRIBUTE_STATE_UNEXECUTED + "=\"" + gs.getUnexploredActionsString() + "\"/>\n");
 				}
 			}
 			writer.write("\t</" + XML_TAG_GRAPH_STATES + ">\n");
@@ -396,14 +423,14 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 			int idx = 1;
 			IGraphAction ga;
 			GraphEdge[] orderedActions = this.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
-			for (GraphEdge edge : orderedActions){
+			for (GraphEdge edge : orderedActions) {
 				ga = env.getAction(edge.getActionID());
-				writer.write("\t\t<" + XML_TAG_ACTION + " " + XML_ATTRIBUTE_ACTION_ORDER + "=\"" + idx++ + "\" " +
-							  XML_ATTRIBUTE_ACTION_ID + "=\"" + ga.getConcreteID() + "\" " +
-							  XML_ATTRIBUTE_ACTION_ABS_ID + "=\"" + ga.getAbstractID() + "\" " +
-							  XML_ATTRIBUTE_ACTION_VISITED + "=\"" + ga.getCount() +  "\" " +
-							  XML_ATTRIBUTE_ACTION_FROM + "=\"" + ga.getSourceStateID() +  "\" " +
-							  XML_ATTRIBUTE_ACTION_TO + "=\"" + edge.getTargetStateID() +  "\"/>\n");
+				writer.write("\t\t<" + XML_TAG_ACTION + " " + XML_ATTRIBUTE_ACTION_ORDER + "=\"" + idx++ + "\" "
+						+ XML_ATTRIBUTE_ACTION_ID + "=\"" + ga.getConcreteID() + "\" "
+						+ XML_ATTRIBUTE_ACTION_ABS_ID + "=\"" + ga.getAbstractID() + "\" " 
+						+ XML_ATTRIBUTE_ACTION_VISITED + "=\"" + ga.getCount() +  "\" " 
+						+ XML_ATTRIBUTE_ACTION_FROM + "=\"" + ga.getSourceStateID() +  "\" " 
+						+ XML_ATTRIBUTE_ACTION_TO + "=\"" + edge.getTargetStateID() +  "\"/>\n");
 			}
 			writer.write("\t</" + XML_TAG_GRAPH_ACTIONS + ">\n");
 			writer.write("</" + XML_TAG_TESTAR_GRAPH + ">\n");
@@ -412,29 +439,29 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} finally {
-			if (writer != null) writer.close();
-			synchronized(TESTARGraph.syncXMLGraph){
+			if (writer != null) {
+				writer.close();
+			}
+			synchronized(TESTARGraph.syncXMLGraph) {
 				TESTARGraph.syncXMLGraph = "";
 			}
 		}
 	}
 
 	private static float progress, lastProgress;
-	private void printGraphLoadingProgress(float nidx, float nlength){
+	private void printGraphLoadingProgress(float nidx, float nlength) {
     	progress = Math.round(nidx / nlength * 100.0);
-    	if (progress - lastProgress > 1){
+    	if (progress - lastProgress > 1) {
     		lastProgress = progress;
-    		// TEMP System.out.println("[" + getClass().getSimpleName() + 
-    		// TEMP		"] \t[" + (int)nidx + "] / [" + nlength + "]");
     	}
 	}
 	
 	// rationale: some UI parts might only be reachable starting from scratch and going through a different path
-	public int loadFromXML(String xmlPath, IEnvironment env){
+	public int loadFromXML(String xmlPath, IEnvironment env) {
 		syncXMLGraph(xmlPath);
         int graphMovements = 0;
 		File f = new File(xmlPath);
-		if (f.exists()){		
+		if (f.exists()) {		
 			ProgressFileInputStream pfis = null;
 			BufferedInputStream stream = null;
 			Document doc = null;
@@ -448,91 +475,77 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 				e.printStackTrace();
 			} catch (SAXException e) {
 				e.printStackTrace();
-			} catch(ParserConfigurationException e){
+			} catch(ParserConfigurationException e) {
 				e.printStackTrace();
-			} finally{
+			} finally {
 				if (stream != null) {
-					try { stream.close(); } catch (IOException e) {e.printStackTrace();}
+					try { 
+						stream.close(); 
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 				if (pfis != null) {
-					try { pfis.close(); } catch (IOException e) { e.printStackTrace(); }
+					try { 
+						pfis.close(); 
+					} catch (IOException e) {
+						e.printStackTrace(); 
+					}
 				}
 			}
-			if (doc == null)
+			if (doc == null) {
 				LogSerialiser.log("Exception loading graph filet: " + xmlPath, LogSerialiser.LogLevel.Critical);
-			else{
+			} else {
 				
 				Grapher.getWalker().enablePreviousWalk();
 
-				IGraphState gs; GraphAction ga;
+				IGraphState gs; 
+				GraphAction ga;
 				Map<String,IGraphState> graphStates = new HashMap<String,IGraphState>();
 				
-				Node node; Element element;
+				Node node; 
+				Element element;
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_STATE);
 		        lastProgress = 0; 
-		        // TEMP System.out.println("[" + getClass().getSimpleName() + 
-		        // TEMP		"] Loading graph vertex nodes [" + nList.getLength() + "]:");
 		        int nListLength = nList.getLength();
-		        for (int nidx = 0; nidx < nListLength; nidx++){
+		        for (int nidx = 0; nidx < nListLength; nidx++) {
 		        	printGraphLoadingProgress((float)nidx,(float)nListLength);
 		        	node = nList.item(nidx);
-		        	if (node.getNodeType() == Node.ELEMENT_NODE){
+		        	if (node.getNodeType() == Node.ELEMENT_NODE) {
 		        		element = (Element) node;
 		        		String wid = element.getAttribute(XML_ATTRIBUTE_STATE_ID),
 		        			   abswid = element.getAttribute(XML_ATTRIBUTE_STATE_ABS_ID);
 		        		gs = new GraphState(wid,abswid);
 		        		String visited = element.getAttribute(XML_ATTRIBUTE_STATE_VISITED);
-		        		try{
+		        		try {
 		        			int v = new Integer(visited).intValue();
 		        			gs.setCount(v);
-		        		} catch (NumberFormatException nfe){
+		        		} catch (NumberFormatException nfe) {
 		        			nfe.printStackTrace();
 		        		}
 		        		
-		        		//String widgets = element.getAttribute(XML_ATTRIBUTE_STATE_WIDGETS);
-		        		// TODO: add widgets to graph state
-		        		
-		        		//System.out.println("[" + getClass().getSimpleName() + "] \nZ:" + widgets + " ...");
-		        		//Properties p = new Properties();
-		        		//p.load(new StringReader(widgets.substring(1, widgets.length() - 1).replace("=","\n").replace(", ","\n")));
-		        		
-		        		//System.out.println("[" + getClass().getSimpleName() + "] A: " + widgets.substring(1, widgets.length() - 1));
-		        		//System.out.println("[" + getClass().getSimpleName() + "] B: " + widgets.substring(1, widgets.length() - 1).replace("=","\n").replace(", ","\n"));
-		        		
-		        		//Map<String, String> m = new HashMap<String, String>();
-		        		//for (Map.Entry<Object, Object> e : p.entrySet()) {
-		        		//    m.put((String)e.getKey(), (String)e.getValue());
-		        		//}		        		
-		        		//for (String k : m.keySet()){
-		        		//	System.out.println("[" + getClass().getSimpleName() + "] key = " + k + " - value = " + m.get(k));
-		        		//}
-		        		//System.out.println("[" + getClass().getSimpleName() + "] END: ... " + m.toString());
-		        		
 		        		
 		        		String unexecuted = element.getAttribute(XML_ATTRIBUTE_STATE_UNEXECUTED);
-		        		unexecuted = unexecuted.substring(1,unexecuted.length()-1); // remove []
-		        		if (!unexecuted.isEmpty()){
+		        		unexecuted = unexecuted.substring(1,unexecuted.length() - 1); // remove []
+		        		if (!unexecuted.isEmpty()) {
 			        		StringTokenizer st = new StringTokenizer(unexecuted, ",");
-			        		while (st.hasMoreTokens())
+			        		while (st.hasMoreTokens()) {
 			        			gs.actionUnexplored(st.nextToken());
+			        		}
 		        		}
 
 		        		graphStates.put(wid,gs);
-		        		//Grapher.notify(gs,null);
 		        	}
 		        }
 		        
-				int graphActionsCount = 0;
 		        nList = doc.getElementsByTagName(XML_TAG_ACTION);
 		        lastProgress = 0; 
-		        // TEMP System.out.println("[" + getClass().getSimpleName() + 
-		        // TEMP		"] Loading graph edge nodes [" + nList.getLength() + "]:");
 		        String wid, absid, from, to = null;
 		        nListLength = nList.getLength();
-		        for (int nidx = 0; nidx < nListLength; nidx++){
+		        for (int nidx = 0; nidx < nListLength; nidx++) {
 		        	printGraphLoadingProgress((float)nidx,(float)nListLength);
 		        	node = nList.item(nidx);
-		        	if (node.getNodeType() == Node.ELEMENT_NODE){
+		        	if (node.getNodeType() == Node.ELEMENT_NODE) {
 		        		element = (Element) node;
 		        		wid = element.getAttribute(XML_ATTRIBUTE_ACTION_ID);
 		        		absid = element.getAttribute(XML_ATTRIBUTE_ACTION_ABS_ID);
@@ -540,28 +553,24 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
 		        		to = element.getAttribute(XML_ATTRIBUTE_ACTION_TO);
 		        		ga = new GraphAction(wid,absid);
 		        		String visited = element.getAttribute(XML_ATTRIBUTE_ACTION_VISITED);
-		        		try{
+		        		try {
 		        			int v = new Integer(visited).intValue();
 		        			ga.setCount(v);
-		        		} catch (NumberFormatException nfe){}
+		        		} catch (NumberFormatException nfe) {
+		        		}
 		        		gs = graphStates.get(from);
 		        		Grapher.notify(gs, ga);
 		        		graphMovements++;
-		        		graphActionsCount++;
 		        	}
 		        }
 		        if (to != null) {
 		        	Grapher.notify(graphStates.get(to),null); // ending state
-		        } else {
-		        	// TEMP System.out.println("[" + getClass().getSimpleName() + "] End state missing at XML loading");
-
-				// TEMP System.out.println("[" + getClass().getSimpleName() + 
-		        // TEMP 	"] \tGraph loaded (nodes: " + graphStates.size() + "; edges: " + graphActionsCount + ")");
-		        }
+		        } 
 			}
-		} else
+		} else {
 			LogSerialiser.log("Graph file does not exist: " + xmlPath, LogSerialiser.LogLevel.Critical);
-		synchronized(TESTARGraph.syncXMLGraph){
+		}
+		synchronized(TESTARGraph.syncXMLGraph) {
 			TESTARGraph.syncXMLGraph = "";
 		}
 

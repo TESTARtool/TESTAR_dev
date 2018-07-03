@@ -29,7 +29,6 @@ package accessibility_wcag2ict;
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 import java.util.Map;
 
 import org.fruit.alayer.State;
@@ -69,12 +68,12 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 			if (!result.getType().equals(EvaluationResult.Type.OK)) {
 				SuccessCriterion sc = result.getSuccessCriterion();
 				Widget w = result.getWidget();
-				s += (!s.isEmpty() ? ";" : "") + result.getType().name() +
-						":" + sc.toString() +
-						":" + sc.getLevel().name() +
-						":" + sc.getURLSuffix() +
-						":" + (w != null ? w.get(Tags.ConcreteID) : "N/A") +
-						":" + result.getMessage();
+				s += (!s.isEmpty() ? ";" : "") + result.getType().name()
+					+ ":" + sc.toString()
+					+ ":" + sc.getLevel().name()
+					+ ":" + sc.getURLSuffix()
+					+ ":" + (w != null ? w.get(Tags.ConcreteID) : "N/A")
+					+ ":" + result.getMessage();
 			}
 		}
 		state.set(WCAG2Tags.WCAG2Violations, s);
@@ -94,8 +93,8 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 					criterion = violationInfo[1],
 					level = violationInfo[2],
 					url = SuccessCriterion.URL_BASE + violationInfo[3],
-					widgetTitle = !violationInfo[4].equals("N/A") ?
-							getWidgetTitleFromGraphDB(violationInfo[4]) : violationInfo[4],
+					widgetTitle = !violationInfo[4].equals("N/A") 
+						? getWidgetTitleFromGraphDB(violationInfo[4]) : violationInfo[4],
 					message = violationInfo[5];
 			html.writeTableRowStart()
 			.writeTableCell(violationType)

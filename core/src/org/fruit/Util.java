@@ -31,6 +31,7 @@
 /**
  * @author Sebastian Bauersfeld
  */
+
 package org.fruit;
 
 import org.fruit.alayer.*;
@@ -57,7 +58,9 @@ public final class Util {
   private Util() {
   }
 
-  public enum NullObject {NullObject;}
+  public enum NullObject {
+	  NullObject;
+  }
 
   public static final NullObject Null = NullObject.NullObject;
 
@@ -261,7 +264,8 @@ public final class Util {
     if (miliseconds <= 0) {
       return;
     }
-    long sleepT, waitUntil = System.currentTimeMillis() + miliseconds;
+    long sleepT;
+    long waitUntil = System.currentTimeMillis() + miliseconds;
     do {
       sleepT = waitUntil - System.currentTimeMillis();
       if (sleepT > 0) {
@@ -319,11 +323,9 @@ public final class Util {
 
     if (x1 == x2) {
       ret = y1 > y2 ? Point.from(x1 - r, y1) : Point.from(x1 + r, y1);
-    }
-    else if (y1 == y2) {
+    } else if (y1 == y2) {
       ret = x1 > x2 ? Point.from(x1, y1 + r) : Point.from(x1, y1 - r);
-    }
-    else {
+    } else {
       double m = -(x1 - x2) / (y1 - y2);
       double n = y1 - m * x1;
       double p = (2 * m * n - 2 * m * y1 - 2 * x1) / (1 + m * m);
@@ -371,8 +373,9 @@ public final class Util {
     Assert.notNull(widget);
     int lvl = 0;
     List<Widget> ret = Util.newArrayList();
-    while ((widget = widget.parent()) != null && ++lvl <= levels)
+    while ((widget = widget.parent()) != null && ++lvl <= levels) {
       ret.add(widget);
+    }
     return ret;
   }
 
@@ -446,7 +449,9 @@ public final class Util {
     }
 
     Comparator<Widget> comp = new Comparator<Widget>() {
-      static final int WORSE = -1, BETTER = 1, EVEN = 0;
+      static final int WORSE = -1; 
+      static final int BETTER = 1; 
+      static final int EVEN = 0;
 
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);
@@ -690,8 +695,7 @@ public final class Util {
         source = new FileInputStream(fileOrDirectory).getChannel();
         if (compress) {
           destination = Channels.newChannel(new GZIPOutputStream(new FileOutputStream(destFile), 65536));
-        }
-        else {
+        } else {
           destination = Channels.newChannel(new FileOutputStream(destFile));
         }
         source.transferTo(0, source.size(), destination);
@@ -703,8 +707,7 @@ public final class Util {
           destination.close();
         }
       }
-    }
-    else if (fileOrDirectory.isDirectory()) {
+    } else if (fileOrDirectory.isDirectory()) {
       File copyDir = new File(destDir.getAbsolutePath() + File.separator + targetName);
 
       if (!copyDir.exists()) {
@@ -720,8 +723,7 @@ public final class Util {
               compress);
         }
       }
-    }
-    else {
+    } else {
       throw new IOException("Unable to copy " + fileOrDirectory);
     }
   }
@@ -765,8 +767,8 @@ public final class Util {
   }
 
   public static void compileProtocol(String protocolClass) {
-    File compileDir = new File("./resources/settings/" +
-        new StringTokenizer(protocolClass, "/").nextToken());
+    File compileDir = new File("./resources/settings/" 
+        + new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
     try {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -791,19 +793,17 @@ public final class Util {
             options,
             null,
             compilationUnits);
-         if (!task.call()) {
+         if (task.call()) {
           for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
             System.err.format("[Util] Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
           }
           throw new RuntimeException("compile errors");
         }
-      }
-      finally {
+      } finally {
         fileManager.close();
       }
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException("[Util] Exception: " + t.getMessage());
     }
@@ -834,32 +834,23 @@ public final class Util {
 
     if (o instanceof boolean[]) {
       return Arrays.toString((boolean[]) o);
-    }
-    else if (o instanceof byte[]) {
+    } else if (o instanceof byte[]) {
       return Arrays.toString((byte[]) o);
-    }
-    else if (o instanceof char[]) {
+    } else if (o instanceof char[]) {
       return Arrays.toString((char[]) o);
-    }
-    else if (o instanceof short[]) {
+    } else if (o instanceof short[]) {
       return Arrays.toString((short[]) o);
-    }
-    else if (o instanceof int[]) {
+    } else if (o instanceof int[]) {
       return Arrays.toString((int[]) o);
-    }
-    else if (o instanceof long[]) {
+    } else if (o instanceof long[]) {
       return Arrays.toString((long[]) o);
-    }
-    else if (o instanceof float[]) {
+    } else if (o instanceof float[]) {
       return Arrays.toString((float[]) o);
-    }
-    else if (o instanceof double[]) {
+    } else if (o instanceof double[]) {
       return Arrays.toString((double[]) o);
-    }
-    else if (o instanceof Object[]) {
+    } else if (o instanceof Object[]) {
       return Arrays.toString((Object[]) o);
-    }
-    else {
+    } else {
       return o.toString();
     }
   }
@@ -869,8 +860,9 @@ public final class Util {
     //int i = 0;
     int i = 1; // by urueda
     File f;
-    while ((f = new File(dir + File.separator + prefix + i)).exists())
+    while ((f = new File(dir + File.separator + prefix + i)).exists()) {
       i++;
+    }
     return f;
   }
 
@@ -892,12 +884,12 @@ public final class Util {
     Assert.notNull(format);
     DateFormat dateFormat = new SimpleDateFormat(format);
     try {
-      Date from = dateFormat.parse(fromDate),
-          to = dateFormat.parse(toDate);
+      Date from = dateFormat.parse(fromDate);
+      Date to = dateFormat.parse(toDate);
       long ms = to.getTime() - from.getTime();
-      return Long.toString(ms / 1000) + " seconds or " +
-          Long.toString(ms / 60000) + " minutes or " +
-          Long.toString(ms / 3600000) + " hours";
+      return Long.toString(ms / 1000) + " seconds or " 
+    	 + Long.toString(ms / 60000) + " minutes or "
+         + Long.toString(ms / 3600000) + " hours";
     } catch (ParseException e) {
       System.out.println("[Util] Exception caught calculating time between <" + fromDate + "> and <" + toDate + ">");
       e.printStackTrace();
@@ -946,5 +938,4 @@ public final class Util {
     System.arraycopy(second, 0, result, first.length, second.length);
     return result;
   }
-
 }

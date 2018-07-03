@@ -61,13 +61,14 @@ import org.fruit.alayer.windows.UIAStateBuilder;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
 
-public final class Test{
+public final class Test {
 
-	public static String queryAllTags(State s){
+	public static String queryAllTags(State s) {
 		StringBuilder sb = new StringBuilder();
-		for(Widget w : s){
-			for(Tag<?> t : w.tags())
+		for(Widget w : s) {
+			for(Tag<?> t : w.tags()) {
 				sb.append(w.get(t));
+			}
 		}
 		return sb.toString();
 	}
@@ -91,16 +92,13 @@ public final class Test{
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-
 		String info;
 		info = queryAllTags(s);
 		System.out.println("[Test] Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 		System.out.println("[Test] " + Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
 
-		//s.set(Tags.Screenshot, AWTCanvas.fromScreenshot(Rect.from(0, 0, 1920, 1080), AWTCanvas.StorageFormat.PNG, 1));
-
 		double tuff1 = Util.time();
-		for(int i = 0; i < 100; i++){
+		for(int i = 0; i < 100; i++) {
 			oos.writeObject(s);
 			oos.reset();
 		}
@@ -130,12 +128,12 @@ public final class Test{
 
 	}
 
-	public static void saveImage(AWTCanvas image, String file) throws IOException{
+	public static void saveImage(AWTCanvas image, String file) throws IOException {
 		FileOutputStream fos = new FileOutputStream(new File(file));
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-		for(int i = 0; i < 1; i++){
+		for(int i = 0; i < 1; i++) {
 			oos.writeObject(image);
 			oos.reset();
 		}
@@ -144,7 +142,7 @@ public final class Test{
 		bos.close();
 	}
 
-	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException{
+	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(new File(file));
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(bis);
@@ -155,7 +153,7 @@ public final class Test{
 	}
 
 	
-	public static void main(String[] args) throws IOException, ClassNotFoundException{
+	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		UIAStateBuilder sb = new UIAStateBuilder();
 		//SUT system = WinProcess.fromExecutable("C:\\Program Files\\CTE XL 3.1.3 Professional\\cte.exe");
 		//SUT system = WinProcess.fromExecutable("C:\\Windows\\System32\\calc.exe");
@@ -182,7 +180,7 @@ public final class Test{
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		
 		State state = null;
-		for(int i = 0; i < COUNT; i++){
+		for(int i = 0; i < COUNT; i++) {
 			state = sb.apply(system);
 			
 			cv.begin();
@@ -193,17 +191,17 @@ public final class Test{
 
 			//state.set(Tags.Screenshot, AWTCanvas.fromScreenshot((Rect)state.get(Tags.Shape), AWTCanvas.StorageFormat.BMP, 1.0));
 			
-			if(under != null){
+			if (under != null) {
 				Shape s = under.get(Tags.Shape, null);
-				if(s != null){
+				if (s != null) {
 					s.paint(cv, cv.defaultPen());
 					//System.out.println("[" + getClass().getSimpleName() + "] under cursor: " + under.get(Tags.Desc, null) + ",  " + under.get(Tags.ZIndex) + ",  " + under.get(Tags.Role, Roles.Widget));
 				}
 			}
 
-//			for(Widget u : unders){
+//			for(Widget u : unders) {
 //				Shape s = u.get(Tags.Shape, null);
-//				if(s != null){
+//				if (s != null) {
 //					s.paint(cv, cv.defaultPen());
 //					cv.text(cv.defaultPen(), s.x(), s.y() - 20, 0, Utils.indexString(u));
 //				}
@@ -241,7 +239,7 @@ public final class Test{
 		sb.release();
 		//System.out.println("[" + getClass().getSimpleName() + "] sb released");
 		
-//		if(1==1)
+//		if (1==1)
 //			return;
 		
 		t1 = Util.time();
@@ -250,7 +248,7 @@ public final class Test{
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(bis);
 
-		for(int i = 0; i < COUNT; i++){
+		for(int i = 0; i < COUNT; i++) {
 			Taggable t = (Taggable) ois.readObject();
 			state = t.get(Tags.SystemState);
 			cv.begin();

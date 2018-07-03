@@ -54,12 +54,13 @@ public class DrawableText extends DrawableObject {
         // Set the stroke width.
         Double sw = _pen.strokeWidth();
 
-        if (sw == null)
+        if (sw == null) {
             sw = _defaultPen.strokeWidth();
-
-        if (sw != null)
+        }
+        if (sw != null) {
             g2d.setStroke(new BasicStroke(sw.floatValue()));
-
+        }
+        
         // Create a font.
         String fontName = _pen.font();
         Double fontSize = _pen.fontSize();
@@ -108,6 +109,7 @@ public class DrawableText extends DrawableObject {
 
 
     private String _text;
+    
     /**
      * The text that will be drawn.
      * @return The text that will be drawn.

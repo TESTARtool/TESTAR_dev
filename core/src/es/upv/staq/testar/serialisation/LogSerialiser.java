@@ -51,50 +51,62 @@ public class LogSerialiser extends Thread {
 	private static LogSerialiser singletonLogSerialiser;
 	private static boolean alive;
 
-	private LogSerialiser(){}
+	private LogSerialiser() {
+	}
 	
-	public static void start(PrintStream log, int logLevel){
+	public static void start(PrintStream log, int logLevel) {
 		Assert.isTrue(!alive);
 		Assert.isTrue(logSavingQueue.isEmpty());
 		LogSerialiser.log = log;
 		LogSerialiser.logLevel = logLevel;
 		logTimes = 0;
 		alive = true;
-		//ExecutorService exeSrv = Executors.newFixedThreadPool(1);
-		//exeSrv.execute(singletonLogManager);	
 		singletonLogSerialiser = new LogSerialiser();
 		singletonLogSerialiser.setPriority(Thread.MIN_PRIORITY);
 		singletonLogSerialiser.start();		
 	}
 	
-	public static void finish(){
+	public static void finish() {
 		alive = false;
 	}
 	
 	// by Sebastian Bauersfeld
-	public static enum LogLevel{ 
+	public enum LogLevel { 
 		Critical(0), Info(1), Debug(2);
-		final int significance;
-		LogLevel(int significance){ this.significance = significance; }
-		public int significance(){ return significance; }
+		private final int significance;
+		
+		LogLevel(int significance) { 
+			this.significance = significance; 
+		}
+		
+		public int significance() { 
+			return significance; 
+		}
 	}
 	
-	private static class LogRecord{
-		public String logS; public LogLevel logL;
-		public LogRecord(String logS, LogLevel logL){ this.logS = logS; this.logL = logL;}
+	private static class LogRecord {
+		public String logS; 
+		
+		public LogLevel logL;
+		
+		public LogRecord(String logS, LogLevel logL) { 
+			this.logS = logS; 
+			this.logL = logL;
+		}
 	}
 	
 	@Override
-	public void run(){
-		while (alive || !logSavingQueue.isEmpty()){
-			while(alive && logSavingQueue.isEmpty()){
+	public void run() {
+		while (alive || !logSavingQueue.isEmpty()) {
+			while (alive && logSavingQueue.isEmpty()) {
 				try {
 					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e1) {}
+				} catch (InterruptedException e1) {
+				}
 			}
-			if (!logSavingQueue.isEmpty()){
+			if (!logSavingQueue.isEmpty()) {
 				LogRecord logR;
-				synchronized(logSavingQueue){
+				synchronized(logSavingQueue) {
 					logR = logSavingQueue.removeFirst();
 				}
 				logthis(logR.logS, logR.logL);
@@ -102,50 +114,51 @@ public class LogSerialiser extends Thread {
 		}
 		log.flush();
 		log.close();
-		synchronized(log){
+		synchronized(log) {
 			System.out.println("[LogSerialiser] <" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
 			singletonLogSerialiser = null;
 			log.notifyAll();
 		}
 	}
 	
-	public static void log(String logS){
-		if (alive)
+	public static void log(String logS) {
+		if (alive) {
 			log(logS,LogLevel.Info);
+		}
 	}
 	
-	public static void log(String logS, LogLevel logLevel){
-		if(alive && logLevel.significance() <= LogSerialiser.logLevel){
-			synchronized(logSavingQueue){
+	public static void log(String logS, LogLevel logLevel) {
+		if (alive && logLevel.significance() <= LogSerialiser.logLevel) {
+			synchronized(logSavingQueue) {
 				logSavingQueue.add(new LogRecord(logS,logLevel));
 			}
 		}
 	}
 	
-	private static void logthis(String string, LogLevel level){
+	private static void logthis(String string, LogLevel level) {
 		Assert.notNull(log);
 		log.print(string);
 		logTimes++;
-		if (logTimes >= FLUSH_INTERVAL){
+		if (logTimes >= FLUSH_INTERVAL) {
 			logTimes = 0;
 			log.flush();
 		}
 	}
 	
-	public static void flush(){
+	public static void flush() {
 		log.flush();
 	}
 	
-	public static PrintStream getLogStream(){
+	public static PrintStream getLogStream() {
 		return log;
 	}
 	
-	public static void exit(){
-		if (singletonLogSerialiser != null){
+	public static void exit() {
+		if (singletonLogSerialiser != null) {
 			LogSerialiser.finish();
 			try {
-				synchronized(log){
-					while (singletonLogSerialiser != null){
+				synchronized(log) {
+					while (singletonLogSerialiser != null) {
 						try {
 							log.wait(10);
 						} catch (InterruptedException e) {
@@ -153,14 +166,14 @@ public class LogSerialiser extends Thread {
 						}
 					}
 				}
-			} catch (Exception e) {} // log may be set to null when we try to sync on it	
-			//System.out.println("[" + getClass().getSimpleName() + "] LogManager exited");
+			} catch (Exception e) {
+				// log may be set to null when we try to sync on it	
+			} 
 			log = null;
 		}
 	}
 	
-	public static int queueLength(){
+	public static int queueLength() {
 		return logSavingQueue.size();
-	}
-	
+	}	
 }

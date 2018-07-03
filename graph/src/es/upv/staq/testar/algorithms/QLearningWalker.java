@@ -51,13 +51,13 @@ public class QLearningWalker extends AbstractWalker { // Q = Reward
 	protected double maxReward;
 	protected double discount;
 		
-	public QLearningWalker(double discount, double maxReward){
+	public QLearningWalker(double discount, double maxReward) {
 		this.maxReward = maxReward;
 		this.discount = discount;
 	}
 	
 	@Override
-	public double getBaseReward(){
+	public double getBaseReward() {
 		return this.maxReward;
 	}	
 
@@ -68,16 +68,17 @@ public class QLearningWalker extends AbstractWalker { // Q = Reward
 	}
 	
 	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState state){
+	public double calculateRewardForState(IEnvironment env, IGraphState state) {
 		double r = super.calculateRewardForState(env, state);
-		if (r == getBaseReward())
+		if (r == getBaseReward()) {
 			return r;
-		else
+		} else {
 			return r / Math.log(state.getCount() + Math.E - 1);
+		}
 	}
 
 	@Override
-	protected double calculateRewardForAction(IEnvironment env, IGraphAction action){
+	protected double calculateRewardForAction(IEnvironment env, IGraphAction action) {
 		double r = super.calculateRewardForAction(env, action);
 		return discount * r;
 	}

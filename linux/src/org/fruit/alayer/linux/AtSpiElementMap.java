@@ -41,7 +41,7 @@ import java.util.List;
  * Data structure representing a mapping of AtSpiElements to be something - only used for AtSpiElements
  * that are TopLevelContainers.
  *
- * This map could (perhaps should) be made generic...
+ * <p>This map could (perhaps should) be made generic...
  */
 public class AtSpiElementMap implements Serializable {
 
@@ -65,7 +65,7 @@ public class AtSpiElementMap implements Serializable {
     /**
      * Default empty constructor.
      */
-    AtSpiElementMap(){
+    AtSpiElementMap() {
 
     }
 
@@ -111,10 +111,11 @@ public class AtSpiElementMap implements Serializable {
      * @param y The y-coordinate of the point to encompass.
      * @return The first top level container element that encompasses a certain point on the screen.
      */
-    public AtSpiElement at(double x, double y){
-        for(AtSpiElement element : elements){
-            if(element.boundingBoxOnScreen.contains(x, y))
+    public AtSpiElement at(double x, double y) {
+        for (AtSpiElement element : elements) {
+            if (element.boundingBoxOnScreen.contains(x, y)) {
                 return element;
+            }
         }
         return null;
     }

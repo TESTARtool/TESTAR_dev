@@ -41,7 +41,7 @@ public class UsedResources {
     private final double RAMPeak;
 
     /**
-     * Constructs new instance of a UsedResources object
+     * Constructs new instance of a UsedResources object.
      * @param userCPU cpu time spent in user space.
      * @param systemCPU cpu time spent in system space
      * @param ramBase minimum used memory.

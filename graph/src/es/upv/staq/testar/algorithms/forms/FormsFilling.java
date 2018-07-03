@@ -47,7 +47,6 @@ import org.fruit.alayer.actions.ActionRoles;
 
 /**
  * Forms filling algorithm utility.
- * 
  * Status: experimental
  * 
  * @author Urko Rueda Molina (alias: urueda)
@@ -65,7 +64,7 @@ public class FormsFilling {
 	// slides actions prioritizing (to reveal extra text-input fields in forms)
 	private static HashMap<String,Integer> slidingHistory = new HashMap<
 		String, // slide from->to 
-		Integer // 0 => slide-to missing; >0 => slided with count-down on the #executed_ations for re-sliding{
+		Integer // 0 => slide-to missing; >0 => slided with count-down on the #executed_ations for re-sliding {
 		>();
 
     // -----------------------
@@ -73,13 +72,13 @@ public class FormsFilling {
     // -----------------------
 
 	// get the target widgets of typing actions    
-    public static HashMap<Widget,Action> getTypeableWidgets(State state, Set<Action> actions){
+    public static HashMap<Widget,Action> getTypeableWidgets(State state, Set<Action> actions) {
     	HashMap<Widget,Action> widgets = new HashMap<Widget,Action>();
     	List<Finder> targets;
 		Set<Action> typingActions = getTypingActions(actions); 
-		for (Action a : typingActions){
+		for (Action a : typingActions) {
 			targets = a.get(Tags.Targets,null);
-			if (targets != null){
+			if (targets != null) {
 				widgets.put(targets.get(0).apply(state),a); // typing actions has exactly one target
 			}
 		}
@@ -87,36 +86,39 @@ public class FormsFilling {
     }
 
     // filter actions that do type
-    public static Set<Action> getTypingActions(Set<Action> actions){
+    public static Set<Action> getTypingActions(Set<Action> actions) {
     	Set<Action> typingActions = new HashSet<Action>();
     	Role r;
-    	for (Action a : actions){
+    	for (Action a : actions) {
     		r = a.get(Tags.Role, null);
-    		if (r != null && r.name().equals(ActionRoles.ClickTypeInto.name()))
+    		if (r != null && r.name().equals(ActionRoles.ClickTypeInto.name())) {
     			typingActions.add(a);
+    		}
     	}
     	return typingActions;
     }
     
-    public static Set<Action> getSlides(Set<Action> actions){
+    public static Set<Action> getSlides(Set<Action> actions) {
     	Set<Action> slideActions = new HashSet<Action>();
     	Position[] slider;
-    	for (Action a : actions){
+    	for (Action a : actions) {
     		slider = a.get(Tags.Slider, null);
-    		if (slider != null)
+    		if (slider != null) {
     			slideActions.add(a);
+    		}
     	}
-    	if (slideActions.isEmpty())
+    	if (slideActions.isEmpty()) {
     		return null;
-    	else
+    	} else {
     		return slideActions;
+    	}
     }    
 
     // ----------
     // AUXILIARY
     // ----------
     
-    private static String getSlideID(State state, Position[] slide){
+    private static String getSlideID(State state, Position[] slide) {
 		return (slide[0].apply(state)).toString() + // from
 			   (slide[1].apply(state)).toString(); // to
     }
@@ -126,67 +128,73 @@ public class FormsFilling {
 	// ------------------------------------
 
     // prioritize typing actions for text inputs dependent behaviors
-    public static Set<Action> filterFormActions(State state, Set<Action> actions){
+    public static Set<Action> filterFormActions(State state, Set<Action> actions) {
     	Set<Action> returnActions = new HashSet<Action>();
     	String widgetID;
     	Integer status;
     	HashMap<Widget,Action> typeableWidgets = getTypeableWidgets(state,actions); 
-    	for (Widget w : typeableWidgets.keySet()){
+    	for (Widget w : typeableWidgets.keySet()) {
     		widgetID = w.get(Tags.ConcreteID);
     		status = widgetsTypingHistory.get(widgetID);
-    		if (status == null){ // new typeable widget?
+    		if (status == null) { // new typeable widget?
     			status = new Integer(0);
     			widgetsTypingHistory.put(widgetID,status);
     		}
-			if (status.intValue() <= 0) // widget to be typed
+			if (status.intValue() <= 0) {
+				// widget to be typed
 				returnActions.add(typeableWidgets.get(w));
+			}	
     	}
-    	if (returnActions.isEmpty()){
+    	if (returnActions.isEmpty()) {
     		String slideS;
-    		Point from, to;
+    		Point from;
+    		Point to;
     		Position[] slide;
     		Set<Action> slides = getSlides(actions); 
-    		if (slides != null){
-	    		for (Action s : slides){
+    		if (slides != null) {
+	    		for (Action s : slides) {
 	    			slide = s.get(Tags.Slider);
 	    			slideS = getSlideID(state,slide);
 	    			status = slidingHistory.get(slideS);
-	    			if (status == null){ // new slide?
+	    			if (status == null) { // new slide?
 	    				status = new Integer(0);
 	    				slidingHistory.put(slideS,status);
 	    			}
-	    			if (status.intValue() <= 0) // slide to performed
+	    			if (status.intValue() <= 0) {
+	    				// slide to performed
 	    				returnActions.add(s);
+	    			}
 	    		}
     		}
-    		if (returnActions.isEmpty())
+    		if (returnActions.isEmpty()) {
     			return actions;
+    		}
     	}
     	return returnActions;
     }    
 
     // update typing actions management
-    public static void updateFormActions(State state, Action selectedAction){
+    public static void updateFormActions(State state, Action selectedAction) {
 		Set<Action> as = new HashSet<Action>();
 		as.add(selectedAction);
 		HashMap<Widget,Action> tw = getTypeableWidgets(state,as);
-		if (tw.size() == 1){ // widget typed?
+		if (tw.size() == 1) { // widget typed?
 			widgetsTypingHistory.put(tw.keySet().iterator().next().get(Tags.ConcreteID),
 									new Integer(WIDGET_TYPING_COUNTDOWN_THRESHOULD + 1));
 		}
 		Set<Action> slides = getSlides(as);
-		if (slides != null) // slide performed=
+		if (slides != null) {
 			slidingHistory.put(getSlideID(state,slides.iterator().next().get(Tags.Slider)),
 							   new Integer(WIDGET_TYPING_COUNTDOWN_THRESHOULD + 1));
+		}
 		Integer cd;
-		for (String w : widgetsTypingHistory.keySet()){
+		for (String w : widgetsTypingHistory.keySet()) {
 			cd = widgetsTypingHistory.get(w);
 			widgetsTypingHistory.put(w,new Integer(cd--));
 		}
-		for (String s : slidingHistory.keySet()){
+		for (String s : slidingHistory.keySet()) {
 			cd = slidingHistory.get(s);
 			slidingHistory.put(s,new Integer(cd--));
 		}
-    }    
-    
+    }       
 }

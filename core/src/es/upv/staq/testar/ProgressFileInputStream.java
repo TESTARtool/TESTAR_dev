@@ -47,7 +47,8 @@ public class ProgressFileInputStream  extends FileInputStream {
 	private String fileName;
 	private long fileLength;
 	
-	private float progress, lastProgress;
+	private float progress;
+	private float lastProgress;
 	
 	public ProgressFileInputStream(File file) throws FileNotFoundException {
 		super(file);
@@ -57,15 +58,15 @@ public class ProgressFileInputStream  extends FileInputStream {
 	}
 	
 	@Override
-	public int available() throws IOException{
+	public int available() throws IOException {
 		int remainingBytes = super.available();
 		printStreamProgress(remainingBytes);
 		return remainingBytes;
 	}
 
-	private void printStreamProgress(int remaining){
+	private void printStreamProgress(int remaining) {
     	progress = (float)(this.fileLength - remaining) / (float)this.fileLength * 100f;
-    	if (progress - lastProgress > 1f){
+    	if (progress - lastProgress > 1f) {
     		lastProgress = progress;
     		System.out.println("[" + getClass().getSimpleName() + "] <" + this.fileName + "> remaining bytes = <" + remaining + "> progress (%) = <" + progress + ">");
     	}		

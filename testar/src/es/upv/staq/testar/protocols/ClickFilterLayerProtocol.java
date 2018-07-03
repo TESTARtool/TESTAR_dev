@@ -57,9 +57,12 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
     private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
-    private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
+    private boolean ctrlPressed = false;
+    private boolean altPressed = false;
+    private boolean shiftPressed = false;
 
-    private double mouseX = Double.MIN_VALUE, mouseY = Double.MIN_VALUE;
+    private double mouseX = Double.MIN_VALUE;
+    private double mouseY = Double.MIN_VALUE;
     private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
     
     private FilteringManager filteringManager;
@@ -68,7 +71,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     /**
      * Constructor.
      */
-	public ClickFilterLayerProtocol(){
+	public ClickFilterLayerProtocol() {
 		super();
 		filteringManager = new FilteringManager();
 		dataManager = new DataManager();
@@ -79,7 +82,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     @Override
     public void keyDown(KBKeys key) {    	
         super.keyDown(key);        
-        if (mode() == Modes.Spy){ 
+        if (mode() == Modes.Spy) { 
         	if (key == KBKeys.VK_CAPS_LOCK) {
         		displayWhiteTabu = !displayWhiteTabu;
         	}
@@ -89,11 +92,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
         	else if (key == KBKeys.VK_SHIFT) {
         		shiftPressed = true;
         	}
-	    	else if (key == KBKeys.VK_CONTROL){
+	    	else if (key == KBKeys.VK_CONTROL) {
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
-	    	} else if (key == KBKeys.VK_ALT){
+	    	} else if (key == KBKeys.VK_ALT) {
 	    		altPressed = true;
 	    		if (!ctrlPressed && !shiftPressed) {
 	    			filteringManager.setWidgetFilter(this.state,this.mouse,preciseCoding);
@@ -105,14 +108,15 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
     @Override
     public void keyUp(KBKeys key) {    	
     	super.keyUp(key);
-        if (mode() == Modes.Spy){
+        if (mode() == Modes.Spy) {
         	if (key == KBKeys.VK_SHIFT) {
 	    		shiftPressed = false;
         	}
-        	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
+        	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu) {
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
-	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
+	    		ctrlPressed = false; 
+	    		whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(this.state,this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
 	    	} else if (key == KBKeys.VK_ALT) {
 	    		altPressed = false;
@@ -127,23 +131,23 @@ public class ClickFilterLayerProtocol extends DefaultProtocol { // OraclesLayerP
 	}
 	    
     @Override
-	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions) {
 		super.visualizeActions(canvas, state, actions);
-    	if(displayWhiteTabu && (mode() == Modes.Spy)) {// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){ 
+    	if (displayWhiteTabu && (mode() == Modes.Spy)) {// || mode() == Modes.GenerateDebug)) { // && settings().get(ConfigTags.VisualizeActions)) { 
     		filteringManager.visualizeActions(canvas,state);
     		}
 	}
     
-    protected boolean blackListed(Widget w){
+    protected boolean blackListed(Widget w) {
     	return filteringManager.blackListed(w);
     }
 
-    protected boolean whiteListed(Widget w){
+    protected boolean whiteListed(Widget w) {
     	return filteringManager.whiteListed(w);
     }
     
     @Override
-    protected String getRandomText(Widget w){
+    protected String getRandomText(Widget w) {
     	String randomText = filteringManager.getRandomText(w);
     	if (randomText == null || randomText.length() == 0) {
     		return super.getRandomText(w);

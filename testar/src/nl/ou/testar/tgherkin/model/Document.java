@@ -67,7 +67,7 @@ public class Document {
 		if (currentFeature() != null && currentFeature().moreSequences()) {
 			// scenario outline: each table row instance is a new sequence 
 			currentFeature().beginSequence();
-		}else {
+		} else {
 			nextFeature().beginSequence();
 		}
 	}
@@ -97,7 +97,7 @@ public class Document {
 	 * @return true if current action failed, otherwise false 
 	 */
 	public boolean hasFailed() {
-		if(currentFeature() != null) {
+		if (currentFeature() != null) {
 			return currentFeature().hasFailed();
 		}
 		return false;
@@ -130,7 +130,7 @@ public class Document {
 	 * Get registered execution modes.
 	 * @return registered execution modes.
 	 */
-	public static String[] getRegisteredExecutionModes(){
+	public static String[] getRegisteredExecutionModes() {
 		return new String[]{
 				SEQUENTIAL_MODE
 		};

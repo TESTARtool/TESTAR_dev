@@ -1,8 +1,8 @@
 /**
  *  Tgherkin editor.
  */
-package nl.ou.testar.tgherkin;
 
+package nl.ou.testar.tgherkin;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -40,7 +40,7 @@ import org.fruit.Util;
  * TgherkinEditor is responsible for editing Tgherkin documents.
  * 
  */
-public class TgherkinEditor extends javax.swing.JDialog{	
+public class TgherkinEditor extends javax.swing.JDialog {
 
 	/**
 	 * Margin width in pixels.
@@ -152,7 +152,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 			}
 			if (errorList.size() == 0) {
 				console.setText(console.getText() + "OK");
-			}else {
+			} else {
 				StringBuilder stringBuilder = new StringBuilder();
 				for(String errorText : errorList) {
 					stringBuilder.append(errorText);
@@ -175,7 +175,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 			if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
 				check();
 			}
-		}else if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
+		} else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			this.dispose();
 		}
 	}                                     
@@ -189,13 +189,13 @@ public class TgherkinEditor extends javax.swing.JDialog{
 	}                                 
 
 	private void consoleKeyPressed(java.awt.event.KeyEvent evt) {                                   
-		if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
+		if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			this.dispose();
 		}    
 	}                                  
 
 	private void btnCheckKeyPressed(java.awt.event.KeyEvent evt) {                                      
-		if(evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			this.dispose();
 		}    
 	}                                     
@@ -246,7 +246,7 @@ public class TgherkinEditor extends javax.swing.JDialog{
 						g.setFont(font);
 						if (isCurrentLine(startOffset)) {
 							g.setColor(Color.RED);
-						}else {
+						} else {
 							g.setColor(Color.BLACK);
 						}
 						g.drawString(lineNumber, x, y);

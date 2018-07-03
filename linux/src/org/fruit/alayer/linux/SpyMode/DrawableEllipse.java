@@ -71,6 +71,7 @@ public class DrawableEllipse extends DrawableObject {
 
 
     private Rectangle _boundingBox;
+    
     /**
      * The bounding box of the ellipse that will be drawn.
      * @return The bounding box of the ellipse that will be drawn.

@@ -53,7 +53,7 @@ public class PrologWalker extends AbstractWalker {
 
 	private Random rnd;
 	
-	public PrologWalker(Random rnd){
+	public PrologWalker(Random rnd) {
 		this.rnd = rnd;
 	}
 
@@ -67,23 +67,25 @@ public class PrologWalker extends AbstractWalker {
 		List<String> solutionsA = PrologUtil.getSolutions("A", solutions);
 		List<Action> candidates = new ArrayList<Action>(solutionsA.size());
 		Action a;
-		for (String as : solutionsA){
+		for (String as : solutionsA) {
 			a = get(as,actions);
-			if (a != null)
+			if (a != null) {
 				candidates.add(a);
+			}
 		}
-		if (candidates.isEmpty())
+		if (candidates.isEmpty()) {
 			return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-		else
+		} else {
 			return new ArrayList<Action>(candidates).get(rnd.nextInt(candidates.size()));
+		}
 	}
 
-	private Action get(String concreteID, Set<Action> actions){
-		for (Action a : actions){
-			if (a.get(Tags.ConcreteID).equals(concreteID))
+	private Action get(String concreteID, Set<Action> actions) {
+		for (Action a : actions) {
+			if (a.get(Tags.ConcreteID).equals(concreteID)) {
 				return a;
+			}
 		}
 		return null;
 	}
-	
 }

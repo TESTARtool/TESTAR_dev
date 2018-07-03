@@ -41,7 +41,7 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 
 public final class UIARoles {
-	private UIARoles(){}
+	private UIARoles() {}
 	
 	private static final Map<Long, Role> typeIdToRole = Util.newHashMap();
 
@@ -93,19 +93,19 @@ public final class UIARoles {
 	UIAUnknown = from(-2, "UIAWindow", UIAWidget, Roles.Control)
 	;
 
-	private static Role from(long id, String name, Role...inheritFrom){
+	private static Role from(long id, String name, Role...inheritFrom) {
 		Role ret = Role.from(name, inheritFrom);
 		typeIdToRole.put(id, ret);
 		return ret;
 	}
 		
-	public static Role fromTypeId(long typeId){
+	public static Role fromTypeId(long typeId) {
 		Role ret = typeIdToRole.get(typeId);
 		return (ret == null) ? UIAUnknown : ret; 
 	}
 	
 	// by urueda
-	public static Collection<Role> rolesSet(){
+	public static Collection<Role> rolesSet() {
 		return typeIdToRole.values();
 	}
 	

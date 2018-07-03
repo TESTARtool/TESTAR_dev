@@ -37,9 +37,12 @@ package org.fruit;
  */
 public class Drag {
 	
-	private double fromX, fromY, toX, toY;
+	private double fromX;
+	private double fromY;
+	private double toX;
+	private double toY;
 	
-	public Drag(double fromX, double fromY, double toX, double toY){
+	public Drag(double fromX, double fromY, double toX, double toY) {
 		this.fromX = fromX;
 		this.fromY = fromY;
 		this.toX = toX;

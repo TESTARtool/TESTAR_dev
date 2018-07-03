@@ -114,11 +114,13 @@ public interface IEnvironment {
 
   /**
    * Retrieves the graph states.
+   * @return graph state
    */
   public Collection<IGraphState> getGraphStates ();
 
   /**
    * Retrieves the graph actions.
+   * @return graph actions
    */
   public Collection<IGraphAction> getGraphActions ();
 
@@ -475,9 +477,9 @@ public interface IEnvironment {
     }
 
     public String getExplorationCurveString () {
-      return String.format("ExplorationCurve (unique states/actions, " +
-              "abstract states/actions, unexplored_count): " +
-              "%d, %d, %d, %d; %d, %d, %d, %d",
+      return String.format("ExplorationCurve (unique states/actions, " 
+    	+ "abstract states/actions, unexplored_count): "
+    	+ "%d, %d, %d, %d; %d, %d, %d, %d",
           stateNumber, actionNumber, abstractStateNumber, abstractActionNumber,
           unexploredActionNumber, longesthPath, minCvg, maxCvg);
     }

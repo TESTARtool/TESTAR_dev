@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import org.fruit.Assert;
@@ -43,63 +44,55 @@ public final class WidgetPosition extends AbstractPosition {
 
 	private static final long serialVersionUID = -6963490602249863461L;
 	private final Finder finder;
-	private final double relX, relY;
+	private final double relX;
+	private final double relY;
 	private final Tag<? extends Shape> shapeTag;
 	private final boolean hitTest;
 	private transient Point cachedWidgetPoint = null; // by urueda
 
-	public static WidgetPosition fromFinder(Finder finder){
+	public static WidgetPosition fromFinder(Finder finder) {
 		return fromFinder(finder, 0.5, 0.5);
 	}
 
-	public static WidgetPosition fromFinder(Finder finder, double relX, double relY){
+	public static WidgetPosition fromFinder(Finder finder, double relX, double relY) {
 		return new WidgetPosition(finder, Tags.Shape, relX, relY, true);
 	}
 
-	public WidgetPosition(Finder finder, Tag<? extends Shape> shapeTag, double relX, double relY, boolean hitTest){
+	public WidgetPosition(Finder finder, Tag<? extends Shape> shapeTag, double relX, double relY, boolean hitTest) {
 		Assert.notNull(finder, shapeTag);		
 		this.shapeTag = shapeTag;
 		this.finder = finder;
-		// begin by urueda
 		Widget cachedWidget = finder.getCachedWidget();
-		if (cachedWidget != null)
+		if (cachedWidget != null) {
 			cachedWidgetPoint = Util.relToAbs(cachedWidget.get(shapeTag), relX, relY);
-		// end by urueda
+		}
 		this.relX = relX;
 		this.relY = relY;
 		this.hitTest = hitTest;
 	}
 	
-	@Override // by urueda
+	@Override 
 	public Point apply(State state) throws PositionException {
-		try{
+		try {
 			Widget widget = finder.apply(state);
-			//if(hitTest && !Util.hitTest(widget, relX, relY))
-			if(hitTest && !Util.hitTest(widget, relX, relY,this.obscuredByChildEnabled))
+			if (hitTest && !Util.hitTest(widget, relX, relY,this.obscuredByChildEnabled)) {
 				throw new PositionException("Widget found, but hittest failed!");
-			//return Util.relToAbs(widget.get(shapeTag), relX, relY);
-			// start by urueda
+			}
 			cachedWidgetPoint = Util.relToAbs(widget.get(shapeTag), relX, relY);
 			return cachedWidgetPoint;
-			// end by uureda
-		}catch(WidgetNotFoundException wnfe){
+		} catch(WidgetNotFoundException wnfe) {
 			throw new PositionException(wnfe);
-		}catch(NoSuchTagException pue){
+		} catch(NoSuchTagException pue) {
 			throw new PositionException(pue);
 		}
 	}
 	
-	@Override // by urueda
-	public String toString(){
-		//return "WidgetPosition (" + relX + ", " + relY + ")";
-		// start by urueda
-		//return "WidgetPosition" +
-		//		((cachedWidgetPoint == null) ? "" : cachedWidgetPoint.toString()) +
-		//		" (" + relX + ", " + relY + ")";
-		if (cachedWidgetPoint == null)
+	@Override 
+	public String toString() {
+		if (cachedWidgetPoint == null) {
 			return "(" + relX + "," + relY + ")";
-		else
+		} else {
 			return cachedWidgetPoint.toString();
-		// end by urueda
+		}
 	}
 }

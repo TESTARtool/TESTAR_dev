@@ -46,7 +46,7 @@ import org.fruit.Assert;
 public abstract class Pen implements Serializable {	
 	private static final long serialVersionUID = 8309231237087967825L;
 
-	public static final int DEFAULT_FONT_SIZE = 16; // by urueda
+	public static final int DEFAULT_FONT_SIZE = 16; 
 	
 	public static final Pen PEN_IGNORE  = Pen.newPen().build();
 	public static final Pen PEN_FILL    = Pen.newPen().setFillPattern(FillPattern.Solid).build();
@@ -100,7 +100,7 @@ public abstract class Pen implements Serializable {
 	 * @param percent The darken percent in the range 0.0 (black) .. 1.0 (base). 
 	 * @return The darker color.
 	 */
-	public static Color darken(Color base, double percent){
+	public static Color darken(Color base, double percent) {
 		return Color.from((int)(base.red() * percent),
 						  (int)(base.green() * percent),
 						  (int)(base.blue() * percent),
@@ -109,69 +109,79 @@ public abstract class Pen implements Serializable {
 	
 	// end by urueda
 	
-	public static Builder newPen(){ return new Builder(null); }
-	public static Builder startFrom(Pen base){ return new Builder(base); }
-	public static Pen merge(Pen priorityPen, Pen backupPen){ return new MergedPen(priorityPen, backupPen); }
+	public static Builder newPen() { 
+		return new Builder(null); 
+	}
+	
+	public static Builder startFrom(Pen base) { 
+		return new Builder(base); 
+	}
+	
+	public static Pen merge(Pen priorityPen, Pen backupPen) { 
+		return new MergedPen(priorityPen, backupPen); 
+	}
 
-	public static final class Builder{
-		Color color;
-		Double strokeWidth, fontSize;
-		String font;
-		StrokePattern strokePattern;
-		FillPattern fillPattern;
-		StrokeCaps strokeCaps;
-		Pen base;
+	public static final class Builder {
+		private Color color;
+		private Double strokeWidth, fontSize;
+		private String font;
+		private StrokePattern strokePattern;
+		private FillPattern fillPattern;
+		private StrokeCaps strokeCaps;
+		private Pen base;
 
-		private Builder(Pen base){ this.base = base; }
+		private Builder(Pen base) { 
+			this.base = base; 
+		}
 
-		public Builder setColor(Color c){
+		public Builder setColor(Color c) {
 			Assert.notNull(c);
 			color = c;
 			return this;
 		}
 
-		public Builder setFont(String font){
+		public Builder setFont(String font) {
 			Assert.notNull(font);
 			this.font = font;
 			return this;
 		}
 
-		public Builder setStrokeWidth(double width){
+		public Builder setStrokeWidth(double width) {
 			Assert.isTrue(width >= 0);
 			strokeWidth = width;
 			return this;
 		}
 
-		public Builder setFontSize(double size){
+		public Builder setFontSize(double size) {
 			Assert.isTrue(size >= 0);
 			fontSize = size;
 			return this;
 		}
 
-		public Builder setStrokePattern(StrokePattern pattern){
+		public Builder setStrokePattern(StrokePattern pattern) {
 			Assert.notNull(pattern);
 			this.strokePattern = pattern;
 			return this;
 		}
 
-		public Builder setFillPattern(FillPattern pattern){
+		public Builder setFillPattern(FillPattern pattern) {
 			Assert.notNull(pattern);
 			this.fillPattern = pattern;
 			return this;
 		}
 
-		public Builder setStrokeCaps(StrokeCaps caps){
+		public Builder setStrokeCaps(StrokeCaps caps) {
 			Assert.notNull(caps);
 			this.strokeCaps = caps;
 			return this;
 		}
 
-		public Pen build(){
+		public Pen build() {
 			return base == null ? new StdPen(this) : merge(new StdPen(this), base);
 		}
 	}
 	
-	private Pen(){}
+	private Pen() {}
 	public abstract Color color();
 	public abstract Double strokeWidth();
 	public abstract Double fontSize();
@@ -181,16 +191,16 @@ public abstract class Pen implements Serializable {
 	public abstract StrokeCaps strokeCaps();
 
 
-	private static final class StdPen extends Pen{
+	private static final class StdPen extends Pen {
 		private static final long serialVersionUID = -7928196200263289513L;
-		final Color color;
-		final Double strokeWidth, fontSize;
-		final String font;
-		final StrokePattern strokePattern;
-		final FillPattern fillPattern;
-		final StrokeCaps strokeCaps;
+		private final Color color;
+		private final Double strokeWidth, fontSize;
+		private final String font;
+		private final StrokePattern strokePattern;
+		private final FillPattern fillPattern;
+		private final StrokeCaps strokeCaps;
 
-		private StdPen(Builder b){
+		private StdPen(Builder b) {
 			color = b.color;
 			strokeWidth = b.strokeWidth;
 			fontSize = b.fontSize;
@@ -200,48 +210,75 @@ public abstract class Pen implements Serializable {
 			strokePattern = b.strokePattern;
 		}
 
-		public Color color(){ return color; }
-		public Double strokeWidth(){ return strokeWidth; }
-		public Double fontSize(){ return fontSize; }
-		public String font(){ return font; }
-		public StrokePattern strokePattern(){ return strokePattern; }
-		public FillPattern fillPattern(){ return fillPattern; }
-		public StrokeCaps strokeCaps(){ return strokeCaps; }
+		public Color color() { 
+			return color; 
+		}
+		
+		public Double strokeWidth() { 
+			return strokeWidth; 
+		}
+		
+		public Double fontSize() { 
+			return fontSize; 
+		}
+		
+		public String font() { 
+			return font; 
+		}
+		
+		public StrokePattern strokePattern() { 
+			return strokePattern; 
+		}
+		
+		public FillPattern fillPattern() { 
+			return fillPattern; 
+		}
+		
+		public StrokeCaps strokeCaps() { 
+			return strokeCaps; 
+		}
 	}
 	
 	
-	private static final class MergedPen extends Pen{
+	private static final class MergedPen extends Pen {
 		private static final long serialVersionUID = 6526439728542225584L;
-		final Pen pen1, pen2;
-		private MergedPen(Pen pen1, Pen pen2){
+		private final Pen pen1, pen2;
+		private MergedPen(Pen pen1, Pen pen2) {
 			Assert.notNull(pen1, pen2);
 			this.pen1 = pen1;
 			this.pen2 = pen2;
 		}
+		
 		public Color color() {
 			Color c = pen1.color();
 			return c == null ? pen2.color() : c;
 		}
+		
 		public Double strokeWidth() {
 			Double sw = pen1.strokeWidth();
 			return sw == null ? pen2.strokeWidth() : sw;
 		}
+		
 		public Double fontSize() {
 			Double fs = pen1.fontSize();
 			return fs == null ? pen2.fontSize() : fs;
 		}
+		
 		public String font() {
 			String f = pen1.font();
 			return f == null ? pen2.font() : f;
 		}
+		
 		public FillPattern fillPattern() {
 			FillPattern fp = pen1.fillPattern();
 			return fp == null ? pen2.fillPattern() : fp;
 		}
+		
 		public StrokePattern strokePattern() {
 			StrokePattern sp = pen1.strokePattern();
 			return sp == null ? pen2.strokePattern() : sp;
 		}
+		
 		public StrokeCaps strokeCaps() {
 			StrokeCaps sc = pen1.strokeCaps();
 			return sc == null ? pen2.strokeCaps() : sc;

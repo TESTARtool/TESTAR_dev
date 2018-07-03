@@ -30,6 +30,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.alayer;
 
 import org.fruit.UnFunc;
@@ -43,11 +44,14 @@ public final class YieldFirst implements UnFunc<Widget, SearchFlag> {
 		return SearchFlag.Stop;
 	}
 	
-	public Widget result() throws WidgetNotFoundException{
-		if(result == null)
+	public Widget result() throws WidgetNotFoundException {
+		if (result == null) {
 			throw new WidgetNotFoundException();
+		}
 		return result;
 	}
 
-	public boolean hasResult(){ return result != null; }
+	public boolean hasResult() { 
+		return result != null; 
+	}
 }

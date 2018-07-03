@@ -31,45 +31,51 @@
 package es.upv.staq.testar.graph;
 
 /**
- * A graph edge representation as a pair: action concrete ID x target state concrete ID
+ * A graph edge representation as a pair: action concrete ID x target state concrete ID.
  * 
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class GraphEdge {
 	
-	private String actionID, // concrete ID
-				   targetStateID; // concrete ID
+	private String actionID; // concrete ID
+	private String targetStateID; // concrete ID
 	
-	private GraphEdge(){}
+	private GraphEdge() {
+	}
 	
-	public GraphEdge(String actionID, String targetStateID){
+	public GraphEdge(String actionID, String targetStateID) {
 		this();
 		this.actionID = actionID;
 		this.targetStateID = targetStateID;
 	}
 	
-	public String getActionID(){
+	public String getActionID() {
 		return this.actionID;
 	}
 	
-	public String getTargetStateID(){
+	public String getTargetStateID() {
 		return this.targetStateID;
 	}
 
 	@Override
-	public boolean equals(Object o){
-		if (o == this) return true;
-		if (o == null) return false;
-		if (!(o instanceof GraphEdge)) return false;
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof GraphEdge)) {
+			return false;
+		}
 		GraphEdge edge = (GraphEdge) o;
-		return edge.getActionID().equals(this.getActionID()) &&
-			   edge.getTargetStateID().equals(this.getTargetStateID());
+		return edge.getActionID().equals(this.getActionID()) 
+			&& edge.getTargetStateID().equals(this.getTargetStateID());
 	}
 	
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return (this.actionID + this.targetStateID).hashCode(); 
-	}
-	
+	}	
 }

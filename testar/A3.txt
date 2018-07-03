@@ -1,11 +1,32 @@
+[Windows temp] true
 [Windows] Loading external lib ... ../windows/target/resources/main/windows.dll
 [LogSerialiser] <Thread-3> LogSerialiser finished
 [Grapher] <Random> test generator enabled
 [Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
-[Protocol_testOU] SUT accessible after <1171> ms
-[Protocol_testOU] Finish sequence
-[Protocol_testOU] Will kill process: PID <5920> HANDLE <1912> DESC <chrome.exe>
-[Protocol_testOU] currentseq: .\resources\output\temp\tmpsequence
-[Protocol_testOU] [Protocol_testOU]  verdict,FAILS,minCvg(%),maxCvg(%),maxpath,graph-states,abstract-states,graph-actions,test-actions,SUTRAM(KB),SUTCPU(%),TestRAM(MB),TestCPU(s),fitness
-   PASS,    0,     0.00,     0.00,      3,           2,              2,            0,           0,       0.0,     0.00,        0.0,     0.000,7.575757575757576E-4
+[Protocol_testOU] Trying to kill potential running SUT: <"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --force-renderer-accessibility "https://mijn.awo.ou.nl">
+[Protocol_testOU] 	Will kill <chrome.exe> with PID <1264>
+[Protocol_testOU] 	Will kill <chrome.exe> with PID <7192>
+[Protocol_testOU] 	Will kill <chrome.exe> with PID <5096>
+[Protocol_testOU] 	Will kill <chrome.exe> with PID <2592>
+[Protocol_testOU] Retry SUT start: <"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --force-renderer-accessibility "https://mijn.awo.ou.nl">
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+Thread: name=main, id=1, SUT throws exception
+[Protocol_testOU] Will kill process: PID <9040> HANDLE <3256> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <7680> HANDLE <3260> DESC <chrome.exe>
+[ScreenshotSerialiser] ScreenshotSerialiser finished
+[Grapher] TESTAR sequence graph dump on way ...
+[Grapher] ... finished TESTAR sequence graph dump
+[Grapher] TESTAR grapher reset
+[Protocol_testOU] Exception <SUT not running after <1000> ms!> has been caught; Stack trace:
+	[1] org.fruit.monkey.DefaultProtocol.startSystem(DefaultProtocol.java:200)
+	[2] org.fruit.monkey.DefaultProtocol.tryKillAndStartSystem(DefaultProtocol.java:212)
+	[3] org.fruit.monkey.DefaultProtocol.startSystem(DefaultProtocol.java:198)
+	[4] org.fruit.monkey.DefaultProtocol.startSystem(DefaultProtocol.java:143)
+	[5] org.fruit.monkey.DefaultProtocol.startSystem(DefaultProtocol.java:133)
+	[6] testOU.Protocol_testOU.startSystem(Protocol_testOU.java:72)
+	[7] org.fruit.monkey.AbstractProtocol.runTest(AbstractProtocol.java:1430)
+	[8] org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:1788)
+	[9] org.fruit.monkey.AbstractProtocol.run(AbstractProtocol.java:1)
+	[10] org.fruit.monkey.Main.main(Main.java:280)
 [TestSerialiser] TestSerialiser finished
+[LogSerialiser] <Thread-6> LogSerialiser finished

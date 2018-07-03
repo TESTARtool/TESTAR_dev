@@ -55,10 +55,10 @@ public class MaxCoverageWalker extends AbstractWalker {
 	
 	private Random rnd;
 	
-	public static final int MAX_REPEATED_WIDGET_ACTIONS = 100,
-							MIN_WALKER_STEPS = 500; // force this number of actions (e.g. random) even if everything is fully explored
+	public static final int MAX_REPEATED_WIDGET_ACTIONS = 100;
+	public static final int MIN_WALKER_STEPS = 500; // force this number of actions (e.g. random) even if everything is fully explored
 	
-	public MaxCoverageWalker(Random rnd, int testSequenceLength){
+	public MaxCoverageWalker(Random rnd, int testSequenceLength) {
 		this.rnd = rnd;
 		RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
 	}
@@ -74,39 +74,41 @@ public class MaxCoverageWalker extends AbstractWalker {
 		String targetWidgetID;
 		Integer cInt;
 		IGraphAction ga;
-		for (Action a : actions){
+		for (Action a : actions) {
 			ga = env.get(a);
 			flag = false;
-			if (!env.actionAtGraph(ga)){
+			if (!env.actionAtGraph(ga)) {
 				targetWidgetID = ga.getTargetWidgetID();
-				if (targetWidgetID == null)
+				if (targetWidgetID == null) {
 					flag = true;
-				else {
+				} else {
 					cInt = env.get(state).getStateWidgetsExecCount().get(targetWidgetID);
-					if (cInt == null)
+					if (cInt == null) {
 						flag = true;
-					else if (cInt.intValue() < MAX_REPEATED_WIDGET_ACTIONS)
+					} else if (cInt.intValue() < MAX_REPEATED_WIDGET_ACTIONS) {
 						flag = true;
+					}
 				}
 			}
-			if (flag)
-				unexploredActions.add(a);				
+			if (flag) {
+				unexploredActions.add(a);	
+			}
 		}
-		if (!unexploredActions.isEmpty())
+		if (!unexploredActions.isEmpty()) {
 			return new ArrayList<Action>(unexploredActions).get(rnd.nextInt(unexploredActions.size()));
-
+		}
 		// check target states
 		boolean allStatesUnexplored = true;
-		for(Action a : actions){
+		for(Action a : actions) {
 			ga = env.get(a);
-			if (env.actionAtGraph(ga)){
-				for (IGraphState gs : env.getTargetStates(ga)){
-					if (gs.getUnexploredActionsSize() == 0){
+			if (env.actionAtGraph(ga)) {
+				for (IGraphState gs : env.getTargetStates(ga)) {
+					if (gs.getUnexploredActionsSize() == 0) {
 						allStatesUnexplored = false;
 						break;
 					}
 				}
-				if (allStatesUnexplored){
+				if (allStatesUnexplored) {
 					System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Moving to unexplored state from >" + state.get(Tags.ConcreteID) + "> through <" + ga.getConcreteID() + ">");
 					return a;
 				}
@@ -115,13 +117,13 @@ public class MaxCoverageWalker extends AbstractWalker {
 
 		System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Completely explored state: " + state.get(Tags.ConcreteID));
 		// jump to unexplored state
-		if (RestartsWalkerUtil.forceStateRestart(this,env, state)){
+		if (RestartsWalkerUtil.forceStateRestart(this,env, state)) {
 			System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Trying to discover new UI states by state-restart from: " + state.get(Tags.ConcreteID));
 			return super.selectProportional(env, state, actions);
 		}
 		
 		System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] No unexplored UI reachable from: " + state.get(Tags.ConcreteID));
-		if (RestartsWalkerUtil.getTestSquenceIdx() < MIN_WALKER_STEPS){
+		if (RestartsWalkerUtil.getTestSquenceIdx() < MIN_WALKER_STEPS) {
 			System.out.println("[" + getClass().getSimpleName() + "] [MaxCoverageWalker] Test steps <" + RestartsWalkerUtil.getTestSquenceIdx() + "> lower than MIN_WALKER_STEPS < " + MIN_WALKER_STEPS + ">: doing RANDOM");
 			return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size())); // force random
 		} else {
@@ -137,12 +139,12 @@ public class MaxCoverageWalker extends AbstractWalker {
 	}
 	
 	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
+	public double calculateRewardForState(IEnvironment env, IGraphState targetState) {
 		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
-		if (r != Double.MIN_VALUE)
+		if (r != Double.MIN_VALUE) {
 			return r;
-		else
+		} else {
 			return super.calculateRewardForState(env, targetState);
+		}
 	}		
-		
 }

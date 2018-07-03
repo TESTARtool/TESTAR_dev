@@ -51,7 +51,7 @@ public class AdhocTestClient {
 	public static void main(String[] argv) {
 		boolean notrun = true;
 		Socket socketClient = null;
-		do{
+		do {
 			try {
 				socketClient = new Socket("localhost", 47357); // TESTAR must be on "AdhocTest" mode
 				System.out.println("[AdhocTest] client engaged");
@@ -63,7 +63,7 @@ public class AdhocTestClient {
 				int i = 0;
 				boolean alive = true;
 				String action, result;
-				while (reader.readLine().trim().equals("READY") && alive){
+				while (reader.readLine().trim().equals("READY") && alive) {
 					if (i == 0) {
 						//action = BriefActionRolesMap.LC + "(" + x + "," + y + ")"; // mouse_left_click at (x,y) point
 						action = "LC(" + x + "," + y + ")"; // mouse_left_click at (x,y) point
@@ -76,27 +76,29 @@ public class AdhocTestClient {
 					writer.write(action + "\r\n");
 					writer.flush();
 					result = reader.readLine().trim();
-					if (result.equals("???")) {
+					if ("???".equals(result)) {
 						System.out.println("[AdhocTest] [" + i + "] Unrecognised action: " + action);
 						}
-					else if (result.equals("404")) {
+					else if ("404".equals(result)) {
 						System.out.println("[AdhocTest] [" + i + "] Invalid action:      " + action);
 					}
-					else if (result.equals("FAIL")) {
+					else if ("FAIL".equals(result)) {
 						System.out.println("[AdhocTest] [" + i + "] Action failed:       " + action);
 						}
-					else if (result.equals("OK")) {
+					else if ("OK".equals(result)) {
 						System.out.println("[AdhocTest] [" + i + "] Action succeded:     " + action);
 					}
-					else{
+					else {
 						System.out.println("[AdhocTest] [" + i + "] Unexpected server token: " + result);
 						alive = false;
 					}
 				}
-			} catch (java.io.IOException e){
+			} catch (java.io.IOException e) {
 				System.out.println("[AdhocTest] client waiting for server ...");
-			} catch (java.lang.NullPointerException npe){} // socket channels vanished
-			if (socketClient != null){
+			} catch (java.lang.NullPointerException npe) {
+				// socket channels vanished
+			} 
+			if (socketClient != null) {
 				try {
 					socketClient.close();
 				} catch (IOException e) {
@@ -104,7 +106,7 @@ public class AdhocTestClient {
 				}
 			}
 			System.out.println("[AdhocTest] client finished");
-		} while(notrun); 
+		} while (notrun); 
 	}
 
 }

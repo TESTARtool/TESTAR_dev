@@ -29,7 +29,6 @@
 
 package org.fruit.example.tests;
 
-
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.util.BridJHelper;
 import org.fruit.alayer.linux.LinuxProcess;

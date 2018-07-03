@@ -29,7 +29,6 @@
 
 package org.fruit.example.tests;
 
-
 import org.fruit.alayer.linux.LinuxProcess;
 import org.fruit.alayer.linux.atspi.AtSpiAccessible;
 import org.fruit.alayer.linux.atspi.TreeWalker;

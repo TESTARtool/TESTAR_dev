@@ -96,7 +96,7 @@ public class AccessBridgeControlTypes {
 
 	/** 
 	 * A specialized pane whose primary use is inside a DIALOG
-	 * see ACCESSIBLE_DIALOG
+	 * see ACCESSIBLE_DIALOG.
 	 */
 	static final String ACCESSIBLE_OPTION_PANE  = "option pane";
 
@@ -156,7 +156,7 @@ public class AccessBridgeControlTypes {
 	static final String ACCESSIBLE_FILLER  = "filler";
 
 	/**
-	 * A hypertext anchor
+	 * A hypertext anchor.
 	 */
 	static final String ACCESSIBLE_HYPERLINK  = "hyperlink";
 
@@ -300,7 +300,7 @@ public class AccessBridgeControlTypes {
 
 	/**
 	 * A text object used for passwords, or other places where the 
-	 * text contents is not shown visibly to the user
+	 * text contents is not shown visibly to the user.
 	 */
 	static final String ACCESSIBLE_PASSWORD_TEXT  = "password text";
 
@@ -445,7 +445,7 @@ public class AccessBridgeControlTypes {
 	static final String ACCESSIBLE_STATUS_BAR  = "status bar";
 
 	/**
-	 * A DATE_EDITOR is a component that allows users to edit
+	 * A DATE_EDITOR is a component that allows users to edit.
 	 * java.util.Date and java.util.Time objects
 	 */
 	static final String ACCESSIBLE_DATE_EDITOR  = "date editor";
@@ -469,22 +469,22 @@ public class AccessBridgeControlTypes {
 	static final String ACCESSIBLE_GROUP_BOX  = "group box";
 
 	/**
-	 * A text header
+	 * A text header.
 	 */
 	static final String ACCESSIBLE_HEADER  = "header";
 
 	/**
-	 * A text footer
+	 * A text footer.
 	 */
 	static final String ACCESSIBLE_FOOTER  = "footer";
 
 	/**
-	 * A text paragraph
+	 * A text paragraph.
 	 */
 	static final String ACCESSIBLE_PARAGRAPH  = "paragraph";
 
 	/**
-	 * A ruler is an object used to measure distance
+	 * A ruler is an object used to measure distance.
 	 */
 	static final String ACCESSIBLE_RULER  = "ruler";
 
@@ -501,7 +501,7 @@ public class AccessBridgeControlTypes {
 	 */
 	static final String PROGRESS_MONITOR  = "progress monitor";
 
-	private static final Map<String,Long> MAP_2_UIA = new HashMap<String,Long>(){
+	private static final Map<String,Long> MAP_2_UIA = new HashMap<String,Long>() {
 		private static final long serialVersionUID = 617334006202177665L;
 	{
 		put(AccessBridgeControlTypes.ACCESSIBLE_ALERT, new Long(Windows.UIA_ControlTypePropertyId));
@@ -572,15 +572,16 @@ public class AccessBridgeControlTypes {
 	 * @param accessibleRole An AccessBridge accessible role.
 	 * @return The UIA automation control type, or MISSING_UIA if not equivalent found.
 	 */
-	public static long toUIA(String accessibleRole){
-		if (accessibleRole == null || accessibleRole.isEmpty()){
+	public static long toUIA(String accessibleRole) {
+		if (accessibleRole == null || accessibleRole.isEmpty()) {
 			System.out.println("[AccessBridgeControlTypes] WARNING - null/empty accessible role <" + accessibleRole + ">");
 			return MISSING_UIA;
 		}
 		
 		Long uia = MAP_2_UIA.get(accessibleRole);
-		if (uia != null)
+		if (uia != null) {
 			return uia.longValue();
+		}
 
 		System.out.println("[AccessBridgeControlTypes] WARNING - missed accessible role <" + accessibleRole + ">");
 		return MISSING_UIA;		

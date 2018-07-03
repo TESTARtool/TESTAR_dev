@@ -93,7 +93,7 @@ public class DataManager {
 	 * Computes a random number.
 	 * @return The random number.
 	 */
-	public static String getRandomPrimitiveDataTypeNumber(){
+	public static String getRandomPrimitiveDataTypeNumber() {
 		return new Integer(rnd.nextInt()).toString();		
 	}
 	
@@ -101,10 +101,10 @@ public class DataManager {
 	 * Computes a random text. 
 	 * @return The random text.
 	 */
-	public static String getRandomPrimitiveDataTypeText(){
+	public static String getRandomPrimitiveDataTypeText() {
     	int textLength = rnd.nextInt(MAX_TEXT_LENGTH) + 1;
     	StringBuffer sb = new StringBuffer(textLength);
-    	for (int i=0; i<textLength; i++) {
+    	for (int i = 0; i < textLength; i++) {
     		sb.append((char)('a' + rnd.nextInt(LETTER_COUNT))); 
     	}
     	return sb.toString();
@@ -115,7 +115,7 @@ public class DataManager {
 	 * @param data Data sample from which to select randomly.
 	 * @return The selected random data.
 	 */
-    public static String getRandom(Set<String> data){
+    public static String getRandom(Set<String> data) {
     	return (String) data.toArray()[rnd.nextInt(data.size())];    	
     }
     
@@ -123,8 +123,8 @@ public class DataManager {
      * Computes a random text data from the available data types.
      * @return The random data.
      */
-    public static String getRandomData(){
-    	switch( rnd.nextInt(3)){
+    public static String getRandomData() {
+    	switch( rnd.nextInt(3)) {
     	case 0: // primitive text
     		return DataManager.getRandomPrimitiveDataTypeText();
     	case 1: // primitive number
@@ -134,18 +134,18 @@ public class DataManager {
     	}
     }
 	
-	public DataManager(){
+	public DataManager() {
 		populateDefaultData();
-		try{
+		try {
 			docFactory = DocumentBuilderFactory.newInstance();
 			docBuilder = docFactory.newDocumentBuilder();
-		} catch(ParserConfigurationException e){
+		} catch(ParserConfigurationException e) {
 			e.printStackTrace();
 		}    	
 	}
 	
 	@SuppressWarnings("serial")
-	private void populateDefaultData(){
+	private void populateDefaultData() {
 		DATA_TYPES = new LinkedHashMap<String,Integer>();
 		DATA_TYPES.put("ANY",				ANY_DATA_TYPE);
 		DATA_TYPES.put("PRIMITIVE_TEXT", 	PRIMITIVE_DATA_TYPE_TEXT);
@@ -154,7 +154,7 @@ public class DataManager {
 		DATA_TYPES.put("BASIC_EMAIL", 		BASIC_DATA_TYPE_EMAIL);
 		DATA_TYPES.put("BASIC_WEBURL",		BASIC_DATA_TYPE_WEBURL);		
 		INPUT_VALUES = new HashMap<Integer,Set<String>>();
-		INPUT_VALUES.put(BASIC_DATA_TYPE_DATE, new HashSet<String>(){{
+		INPUT_VALUES.put(BASIC_DATA_TYPE_DATE, new HashSet<String>() {{
     		add("22-03-2017");
     		add("03-22-2017");
     		add("2017-03-22");
@@ -174,7 +174,7 @@ public class DataManager {
     		add("fooboo@org.com");
     		add("foo-boo@foo.com");
     	}});
-    	INPUT_VALUES.put(BASIC_DATA_TYPE_WEBURL, new HashSet<String>(){{
+    	INPUT_VALUES.put(BASIC_DATA_TYPE_WEBURL, new HashSet<String>() {{
     		add("www.foo.com");
     		add("www.boo.com");
     		add("www.fooboo.com");
@@ -186,26 +186,27 @@ public class DataManager {
     	INPUT_VALUES_ARRAY = INPUT_VALUES.keySet().toArray(new Integer[INPUT_VALUES.size()]);
 	}
 		
-	public void loadInputValues(){
+	public void loadInputValues() {
 		File f = new File(DATA_FILE);
-		if (f.exists()){
+		if (f.exists()) {
 			BufferedInputStream stream = null;
 			try {
 				stream = new BufferedInputStream(new FileInputStream(f));
 				Document doc = docBuilder.parse(stream);					
-		        Node node; Element element;
+		        Node node; 
+		        Element element;
 
 		        NodeList nList = doc.getElementsByTagName(XML_TAG_DATA);
 		        String typeS, desc, example;
-		        for (int nidx = 0; nidx < nList.getLength(); nidx++){
+		        for (int nidx = 0; nidx < nList.getLength(); nidx++) {
 		        	node = nList.item(nidx);
-		        	if (node.getNodeType() == Node.ELEMENT_NODE){
+		        	if (node.getNodeType() == Node.ELEMENT_NODE) {
 		        		element = (Element) node;
 		        		typeS = element.getAttribute(XML_ATTRIBUTE_TYPE);
 		        		desc = element.getAttribute(XML_ATTRIBUTE_DESC);
 		        		example = element.getAttribute(XML_ATTRIBUTE_EXAMPLE);
-		        		if (typeS != null && desc != null && example != null &&
-		        			typeS.length() > 0 && desc.length() > 0 && example.length() > 0){
+		        		if (typeS != null && desc != null && example != null 
+		        			&& typeS.length() > 0 && desc.length() > 0 && example.length() > 0) {
 		        			DATA_TYPES.put(desc + "(" + example + ")", new Integer(typeS));
 		        		} else {
 		        			System.out.println("[" + getClass().getSimpleName() + "] DataManager: WRONG DATA TYPE");
@@ -217,16 +218,16 @@ public class DataManager {
 		        Integer key;
 		        Set<String> typeValues;
 		        String valueS;
-		        for (int nidx = 0; nidx < nList.getLength(); nidx++){
+		        for (int nidx = 0; nidx < nList.getLength(); nidx++) {
 		        	node = nList.item(nidx);
-		        	if (node.getNodeType() == Node.ELEMENT_NODE){
+		        	if (node.getNodeType() == Node.ELEMENT_NODE) {
 		        		element = (Element) node;
 		        		typeS = element.getAttribute(XML_ATTRIBUTE_TYPE);
 		        		valueS = element.getAttribute(XML_ATTRIBUTE_VALUE);
-		        		if (typeS != null && valueS != null && typeS.length() > 0 && valueS.length() > 0){
+		        		if (typeS != null && valueS != null && typeS.length() > 0 && valueS.length() > 0) {
 		        			key = new Integer(typeS);
 		        			typeValues = INPUT_VALUES.get(key);
-		        			if (typeValues == null){
+		        			if (typeValues == null) {
 		        				typeValues = new HashSet<String>();
 		        				INPUT_VALUES.put(key, typeValues);		        				
 		        			}
@@ -245,19 +246,20 @@ public class DataManager {
 			if (stream != null) {
 				try {
 					stream.close();
-				} catch (IOException e) {}
+				} catch (IOException e) {
+				}
 			}
 		}
 	}
 	
-	public static void printData(){
+	public static void printData() {
 		System.out.println("[DataManager] DATA TYPES (description x type_number):");
 		for (String key : DATA_TYPES.keySet()) {
 			System.out.println("[DataManager] \t" + key + ": " + DATA_TYPES.get(key).intValue());
 		}
 		System.out.println("[DataManager] DATA VALUES (type_number x value):");
 		Set<String> values;
-		for (Integer key : INPUT_VALUES.keySet()){
+		for (Integer key : INPUT_VALUES.keySet()) {
 			values = INPUT_VALUES.get(key);
 			for (String v : values) {
 				System.out.println("[DataManager] \t" + key + ": " + v);

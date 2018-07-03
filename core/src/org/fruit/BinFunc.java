@@ -30,6 +30,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit;
 
 public interface BinFunc<L, R, T> {
