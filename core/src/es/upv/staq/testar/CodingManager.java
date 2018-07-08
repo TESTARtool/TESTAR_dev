@@ -321,19 +321,26 @@ public class CodingManager {
 	public static Widget find(State state, String widgetID, String idType){
 		Tag<String> t = null;
 		switch(idType){
-		case CodingManager.CONCRETE_ID:
-			t = Tags.ConcreteID;
-			break;
-		case CodingManager.ABSTRACT_R_ID:
-			t = Tags.Abstract_R_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_ID:
-			t = Tags.Abstract_R_T_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_P_ID:
-			t = Tags.Abstract_R_T_P_ID;
-			break;
+			case CodingManager.CONCRETE_ID:
+				t = Tags.ConcreteID;
+				break;
+			case CodingManager.ABSTRACT_R_ID:
+				t = Tags.Abstract_R_ID;
+				break;
+			case CodingManager.ABSTRACT_R_T_ID:
+				t = Tags.Abstract_R_T_ID;
+				break;
+			case CodingManager.ABSTRACT_R_T_P_ID:
+				t = Tags.Abstract_R_T_P_ID;
+				break;
+			case CodingManager.CONCRETE_ID_CUSTOM:
+				t = Tags.ConcreteIDCustom;
+				break;
+			case CodingManager.ABSTRACT_ID_CUSTOM:
+				t = Tags.AbstractIDCustom;
+				break;
 		}
+
 		for (Widget w : state){
 			if (widgetID.equals(w.get(t)))
 				return w;
