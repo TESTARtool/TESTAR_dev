@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -116,6 +116,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -145,6 +146,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	
 	protected boolean faultySequence;
+	protected Semaphore semaphore = new Semaphore(1, true);
+	protected Verdict processVerdict= Verdict.OK;
+	protected void setProcessVerdict(Verdict processVerdict) {
+		this.processVerdict = processVerdict;
+	}
+	protected Verdict getProcessVerdict() {
+		return this.processVerdict;
+	}
 
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 	private Settings settings;
@@ -1042,6 +1051,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				fragment.set(SystemState, state);
 							
 				Verdict verdict = state.get(OracleVerdict, Verdict.OK);
+				Verdict processVerdict =  getProcessVerdict();
 				if (faultySequence) problems = true;
 				fragment.set(OracleVerdict, verdict);
 				int waitCycleIdx = 0;
@@ -1068,17 +1078,28 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							}
 						}
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
+						
+						try {
+							semaphore.acquire();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 						state = getState(system);
 						graphDB.addState(state);
 						if (faultySequence) problems = true;
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){
 							saveStateSnapshot(state);
+							processVerdict = getProcessVerdict();
 							verdict = state.get(OracleVerdict, Verdict.OK);
-							fragment.set(OracleVerdict, verdict);
+							fragment.set(OracleVerdict, verdict.join(processVerdict));
 							fragment = new TaggableBase();
 							fragment.set(SystemState, state);
 						}
+						
+						semaphore.release();
 					}
 				}
 	
@@ -1107,7 +1128,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 				//System.out.println("currentseq: " + currentSeq);
 				
-				Verdict finalVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
+				Verdict stateVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
+				Verdict finalVerdict;
+				
+				finalVerdict = stateVerdict.join(processVerdict);
+				
+				setProcessVerdict(Verdict.OK);
 				
 				if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 					finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
