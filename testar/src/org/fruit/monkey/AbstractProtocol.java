@@ -146,7 +146,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	
 	protected boolean faultySequence;
-	protected Semaphore semaphore = new Semaphore(1);
+	protected Semaphore semaphore = new Semaphore(1, true);
 	protected Verdict processVerdict= Verdict.OK;
 	protected void setProcessVerdict(Verdict processVerdict) {
 		this.processVerdict = processVerdict;
@@ -1130,10 +1130,10 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				
 				Verdict stateVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
 				Verdict finalVerdict;
-				if(processVerdict!=null)
-					finalVerdict = stateVerdict.join(processVerdict);
-				else
-					finalVerdict = stateVerdict;
+				
+				finalVerdict = stateVerdict.join(processVerdict);
+				
+				setProcessVerdict(Verdict.OK);
 				
 				if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 					finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
