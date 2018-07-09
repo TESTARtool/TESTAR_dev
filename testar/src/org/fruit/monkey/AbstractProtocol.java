@@ -144,7 +144,7 @@ IEventListener {
 		GenerateManual,
 		Generate, GenerateDebug, Quit, View, AdhocTest, Replay, ReplayDebug;
 	}
-	
+
 	protected boolean faultySequence;
 	
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
@@ -393,7 +393,7 @@ IEventListener {
 	//TODO think about creating pre- and post- methods, for example preSelectAction(), postSelectAction()
 	//abstract methods for TESTAR flow:
 	protected final double timeElapsed(){ return Util.time() - startTime; }
-	protected final Settings settings(){ return settings; }
+	protected Settings settings(){ return settings; }
 	protected final GraphDB graphDB(){ return graphDB; }
 	protected void beginSequence(SUT system, State state) {}
 	protected void finishSequence(File recordedSequence) {}
@@ -421,6 +421,8 @@ IEventListener {
 	protected abstract void runGenerate(SUT system);
 	protected abstract void runSpy(SUT system);
 	protected abstract void replay();
+	protected abstract void detectLoopMode(SUT system);
+	protected abstract void quitSUT(SUT system);
 
 
 	// TODO: The methods below are all about visualization of the state, widgets and actions. They need to be moved out of the Abstract Protocol
@@ -817,27 +819,6 @@ IEventListener {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	//Method to change between the different loops that represent the principal modes of execution on TESTAR
-	protected void detectLoopMode(SUT system) {
-		if(mode() == Modes.Spy ){
-			runSpy(system);
-		}else if(mode() == Modes.Generate || mode() == Modes.GenerateDebug || mode() == Modes.GenerateManual){
-			runGenerate(system);
-		}else if(mode() == Modes.Quit) {
-			quitSUT(system);
-		}
-	}
-
-	//close SUT because we're on Quit mode
-	protected void quitSUT(SUT system) {
-
-		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-		stopSystem(system);
-		//If stopSystem did not really stop the system, we will do it for you ;-)
-		if (system != null)
-			system.stop();
 	}
 
 	protected void storeWidget(String stateID, Widget widget) {
