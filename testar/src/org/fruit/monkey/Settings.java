@@ -60,6 +60,16 @@ public class Settings extends TaggableBase implements Serializable {
 			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
 			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
 	
+	private static String settingsPath;
+	
+	public static String getSettingsPath() {
+		return settingsPath;
+	}
+
+	public static void setSettingsPath(String path) {
+		settingsPath = path;
+	}
+	
 	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
 		public ConfigParseException(String message) {

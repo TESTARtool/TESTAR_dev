@@ -666,18 +666,16 @@ public class DefaultProtocol extends AbstractProtocol{
 		return !m.matches();
 	}
 
-	//TODO: seperate Clickable from Unfiltered.
 	/**
-	 * Check whether a widget is clickable and NOT filtered by the regular expression in the TESTAR SettingsDialog
+	 * Check whether a widget is clickable
 	 * @param w
 	 * @return
 	 */
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
 		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
-			return isUnfiltered(w);
+			return true;
 		return false;
-		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
 	}
 
 	/**
@@ -686,8 +684,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	 * @return
 	 */
 	protected boolean isTypeable(Widget w){
-		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
-		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
+		return NativeLinker.isNativeTypeable(w);
 	}
 
 	/**
