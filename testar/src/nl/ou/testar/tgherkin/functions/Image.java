@@ -12,7 +12,9 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
+import org.fruit.alayer.webdriver.CanvasDimensions;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 import org.sikuli.script.Finder;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
@@ -102,6 +104,14 @@ public class Image {
 			Rectangle actionArea = new Rectangle(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
 			Shape shape = widget.get(Tags.Shape);				
 			Rectangle r = new Rectangle((int)shape.x(), (int)shape.y(), (int)shape.width(), (int)shape.height());
+			//####TEMP CHANGE Begin
+			String sutConnector = proxy.getSettings().get(ConfigTags.SUTConnector,"");
+			if (sutConnector.equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
+				// correction for web driver viewport
+				r.x = r.x + CanvasDimensions.getCanvasX();
+				r.y = r.y + CanvasDimensions.getCanvasY();
+			}
+			//####TEMP CHANGE End
 			actionArea = actionArea.union(r);
 			if (!actionArea.isEmpty()) {
 				AWTCanvas widgetShot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),

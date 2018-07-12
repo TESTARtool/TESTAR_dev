@@ -61,13 +61,16 @@ public class TypeGesture extends Gesture {
     }
     
     private Action clearScreenText(Widget widget) {
-    	// click on widget and apply Shift-Home, Del and Escape actions.
+    	// click on widget and apply Home, Shift-End, Del and Escape actions.
 		Builder builder = new CompoundAction.Builder();
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		builder.add(ac.leftClickAt(widget),1);
 		List<KBKeys> keys = new ArrayList<KBKeys>();
+		keys.add(KBKeys.VK_HOME);  
+		builder.add(ac.hitShortcutKey(keys), 1);
+		keys.clear();
 		keys.add(KBKeys.VK_SHIFT);
-		keys.add(KBKeys.VK_HOME);
+		keys.add(KBKeys.VK_END);
 		builder.add(ac.hitShortcutKey(keys), 1);
 		keys.clear();
 		keys.add(KBKeys.VK_DELETE);

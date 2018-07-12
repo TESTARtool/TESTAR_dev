@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -48,6 +48,9 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.GraphDB;
+import nl.ou.testar.ProcessInfo;
+import nl.ou.testar.SutVisualization;
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
@@ -113,6 +116,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -132,6 +136,7 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
+//TODO move eventListener out of abstract
 												  IEventListener {
 	
 	public static enum Modes{
@@ -141,6 +146,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 	
 	protected boolean faultySequence;
+	protected Semaphore semaphore = new Semaphore(1, true);
+	protected Verdict processVerdict= Verdict.OK;
+	protected void setProcessVerdict(Verdict processVerdict) {
+		this.processVerdict = processVerdict;
+	}
+	protected Verdict getProcessVerdict() {
+		return this.processVerdict;
+	}
 
 	private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
 	private Settings settings;
@@ -152,6 +165,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		firstSequenceActionNumber;
 	protected int lastSequenceActionNumber;
 	double startTime;
+	protected List<ProcessInfo> contextRunningProcesses = null;
 
 	// TODO: DATE-FORMAT
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -194,114 +208,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected GraphDB graphDB;
     
 	protected boolean nonSuitableAction = false;
-    
-	protected class ProcessInfo{
-		public SUT sut;
-		public long pid;
-		public long handle;
-		public String Desc;
-		public ProcessInfo(SUT sut, long pid, long handle, String desc){
-			this.sut = sut;
-			this.pid = pid;
-			this.handle = handle;
-			this.Desc = desc;
-		}
-		public String toString(){
-			return "PID <" + this.pid + "> HANDLE <" + this.handle + "> DESC <" + this.Desc + ">";
-		}
-	}
-	protected List<ProcessInfo> contextRunningProcesses = null;
 
-	/**
-	 * Retrieve a list of Running processes
-	 * @param debugTag Tag used in debug output
-	 * @return a list of running processes
-	 */
-	protected List<ProcessInfo> getRunningProcesses(String debugTag){
-		List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
-		long pid, handle; String desc;
-		List<SUT> runningP = NativeLinker.getNativeProcesses();
-		System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
-		int i = 1;
-		for (SUT sut : runningP){
-			//System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
-			pid = sut.get(Tags.PID, Long.MIN_VALUE);
-			if (pid != Long.MIN_VALUE){
-				handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);
-				desc = sut.get(Tags.Desc, null);
-				runningProcesses.add(new ProcessInfo(sut,pid,handle,desc));
-			}
-		}
-		return runningProcesses;
-	}
-	
-	final static long MAX_KILL_WINDOW = 10000; // 10 seconds
-	
-	protected void killTestLaunchedProcesses(){
-		boolean kill;
-		for (ProcessInfo pi1 : getRunningProcesses("END")){
-			kill = true;
-			for (ProcessInfo pi2 : this.contextRunningProcesses){
-				if (pi1.pid == pi2.pid){
-					kill = false;
-					break;
-				}
-			}
-			if (kill)
-				killProcess(pi1,MAX_KILL_WINDOW);
-		}
-	}
-
-	/**
-	 * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
-	 * @param sut
-	 * @param KILL_WINDOW
-	 * @return
-	 */
-	protected boolean killRunningProcesses(SUT sut, long KILL_WINDOW){
-		boolean allKilled = true;
-		for(ProcessHandle ph : Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))){
-			if (ph.name() != null && sut.get(Tags.Desc, "").contains(ph.name())){
-				try{
-					System.out.println("\tWill kill <" + ph.name() +"> with PID <" + ph.pid() + ">");
-					ph.kill();
-				} catch (SystemStopException e){
-					System.out.println("Exception killing SUT running processes: " + e.getMessage());
-					allKilled = false;
-				}
-			}
-		}
-		return allKilled;
-	}
-
-	/**
-	 * Kill process with info pi
-	 * @param pi
-	 * @param KILL_WINDOW indicates a time frame
-	 * @return
-	 */
-	private boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
-		if (pi.sut.isRunning()){
-			System.out.println("Will kill process: " + pi.toString());
-			long now = System.currentTimeMillis(),
-				 elapsed;
-			do{
-				elapsed = System.currentTimeMillis() - now;
-				try {
-					NativeLinker.getNativeProcessHandle(pi.pid).kill();
-				} catch (Exception e){
-					System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
-					Util.pauseMs(500);
-				}
-			} while (pi.sut.isRunning() && elapsed < KILL_WINDOW);
-			return pi.sut.isRunning();
-		} else{
-			System.out.println("Did not kill process as it is not running: " + pi.toString());
-			return true;
-		}
-	}
-
-
+	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
+	//TODO move to TestarControlKeyCommands
+	//TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
+	// (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
+	// event is not recorded as a user event).
 	/**
 	 * Override the default keylistener to implement the TESTAR shortcuts
 	 * SHIFT + SPACE
@@ -313,11 +225,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 * SHIFT + ALT
 	 * @param key
 	 */
-	//TODO: Should this method be in the AbstractProtocol? or move somewhere else?
-
-	//TODO: Investigate better shortcut combinations to control TESTAR that does not intefere with
-	// SUT (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
-	// event is not recorded as a user event).
 	@Override
 	public void keyDown(KBKeys key){
 		pressed.add(key);
@@ -372,7 +279,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))
 			System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES","true");
 
-		// TODO: Find out if this commented code is anything usefull
+		// TODO: Find out if this commented code is anything useful
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
 			protocolUtil.startAdhocServer();
 			mode = Modes.AdhocTest;
@@ -393,11 +300,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			markParentWidget = !markParentWidget;
 	}
 
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	@Override
 	public void keyUp(KBKeys key){
 		pressed.remove(key);
 	}
 
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	/**
 	 * TESTAR does not listen to mouse down clicks in any mode
 	 * @param btn
@@ -407,6 +316,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	@Override
 	public void mouseDown(MouseButtons btn, double x, double y){}
 
+	//TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
 	/**
 	 * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
 	 * @param btn
@@ -432,6 +342,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 */
 	public synchronized Modes mode(){ return mode; }
 
+	//TODO think how the modes should be implemented
 	/**
 	 * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
 	 * Show the flashfeedback in the upperleft corner of the screen
@@ -486,6 +397,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
 	}
 
+	//TODO think about creating pre- and post- methods, for example preSelectAction(), postSelectAction()
+	//abstract methods for TESTAR flow:
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected final Settings settings(){ return settings; }
 	protected final GraphDB graphDB(){ return graphDB; }
@@ -510,230 +423,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	private String lastPrintParentsOf = "null-id";
 
-	/**
-	 *
-	 * @param canvas
-	 * @param state
-	 * @param system
-	 */
-	private synchronized void visualizeState(Canvas canvas, State state, SUT system){
-		if((mode() == Modes.Spy
-			|| mode() == Modes.GenerateManual
-			|| mode() == Modes.ReplayDebug) && settings().get(ConfigTags.DrawWidgetUnderCursor)){
-			Point cursor = mouse.cursor();
-			Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-
-			if(cursorWidget != null){
-				Widget rootW = cursorWidget;
-				while (rootW.parent() != null && rootW.parent() != rootW)
-					rootW = rootW.parent();
-				Shape cwShape = cursorWidget.get(Tags.Shape, null);
-
-				if(cwShape != null){
-					cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
-					cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
-					if (!settings().get(ConfigTags.DrawWidgetInfo) && !settings().get(ConfigTags.DrawWidgetTree) && !markParentWidget){
-						String rootText = "State: " + rootW.get(Tags.ConcreteID),
-							   widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
-							   roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-							   idxText = "Path: " + cursorWidget.get(Tags.Path);
-
-						double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
-						double miniwidgetInfoH = 80; // 20 * 4
-						Shape minicwShape = Rect.from(cwShape.x() + cwShape.width()/2 + 32,
-													  cwShape.y() + cwShape.height()/2 + 32,
-													  miniwidgetInfoW, miniwidgetInfoH); 
-						Shape repositionShape = protocolUtil.calculateWidgetInfoShape(canvas,minicwShape, miniwidgetInfoW, miniwidgetInfoH);
-						if (repositionShape != minicwShape){
-							double x = repositionShape.x() - repositionShape.width() - 32,
-								   y = repositionShape.y() - repositionShape.height() - 32;
-							if (x < 0) x = 0; if (y < 0) y = 0;
-							minicwShape = Rect.from(x,y,repositionShape.width(), repositionShape.height());
-						}
-						canvas.rect(Pen.PEN_WHITE_ALPHA, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-						canvas.rect(Pen.PEN_BLACK, minicwShape.x(), minicwShape.y(), miniwidgetInfoW, miniwidgetInfoH);
-						canvas.text(Pen.PEN_RED, minicwShape.x(), minicwShape.y(), 0, rootText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 20, 0, idxText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 40, 0, roleText);
-						canvas.text(Pen.PEN_BLUE, minicwShape.x(), minicwShape.y() + 60, 0, widConcreteText);
-					}
-
-					if (markParentWidget){
-						String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
-						boolean print = !cursorWidgetID.equals(lastPrintParentsOf); 
-						if (print){
-							lastPrintParentsOf = cursorWidgetID;
-							System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
-						}
-						int lvls = protocolUtil.markParents(canvas,cursorWidget,protocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
-						if (lvls > 0){
-							Shape legendShape = protocolUtil.repositionShape(canvas,Rect.from(cursor.x(), cursor.y(), 110, lvls*25));
-							canvas.rect(Pen.PEN_WHITE_ALPHA, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-							canvas.rect(Pen.PEN_BLACK, legendShape.x(), legendShape.y(), legendShape.width(), legendShape.height());
-							int shadow = 2;
-							String l;
-							Iterator<String> it = protocolUtil.ancestorsMarkingColors.keySet().iterator();
-							for (int i=0; i<lvls; i++){
-								l = it.next();
-								Pen lpen = Pen.newPen().setColor(protocolUtil.ancestorsMarkingColors.get(l)).build();
-								canvas.text(lpen, legendShape.x() - shadow, legendShape.y() - shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() - shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() + shadow, legendShape.y() + shadow + i*25, 0, l);
-								canvas.text(lpen, legendShape.x() - shadow, legendShape.y() + shadow + i*25, 0, l);
-								canvas.text(Pen.PEN_BLACK, legendShape.x()         , legendShape.y() + i*25         , 0, l);								
-							}
-						}
-					}
-					int MAX_ANCESTORS_PERLINE = 6;
-					double widgetInfoW = canvas.width()/2; //550;
-					double widgetInfoH = (1 + Util.size(cursorWidget.tags()) +
-										  Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
-										 * 20;
-					cwShape = protocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
-					
-					if(settings().get(ConfigTags.DrawWidgetInfo)){
-						//canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-						//canvas.rect(apen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-						canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
-						canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
-						
-						//canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
-						//canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
-						int pos = -20;
-						StringBuilder sb = new StringBuilder();
-						sb.append("Ancestors: ");
-
-						//for(Widget p : Util.ancestors(cursorWidget))
-						//	sb.append("::").append(p.get(Role, Roles.Widget));							
-						//canvas.text(apen, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-						// (fix too many ancestors)
-						int i=0;
-						for(Widget p : Util.ancestors(cursorWidget)){
-							sb.append("::").append(p.get(Role, Roles.Widget));
-							i++;
-							if (i >= MAX_ANCESTORS_PERLINE){
-								canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-								i=0;
-								sb = new StringBuilder();
-								sb.append("\t");
-							}
-						}
-						if (i > 0)
-							canvas.text(Pen.PEN_BLACK, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-
-						for(Tag<?> t : cursorWidget.tags()){
-							canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
-										 cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-							// (multi-line display without abbreviation)
-							/*final int MAX_TEXT = 50;
-							String text = Util.abbreviate(Util.toString(cursorWidget.get(t)), Integer.MAX_VALUE, "NO_SENSE");
-							int fragment = 0, limit;
-							while (fragment < text.length()){
-								limit = fragment + MAX_TEXT > text.length() ? text.length() : fragment + MAX_TEXT;
-								canvas.text((t.equals(Tags.Title) || t.equals(Tags.Role)) ? rpen : apen, cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " +
-									text.substring(fragment,limit));
-								fragment = limit;
-							}*/
-						}
-					}
-
-					if (settings().get(ConfigTags.DrawWidgetTree)){
-						canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-						protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);						
-					}
-					if (settings().get(ConfigTags.GraphsActivated) && this.delay != Double.MIN_VALUE){ // slow motion?
-						canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-						IEnvironment env = Grapher.getEnvironment();
-						IGraphState gs = env.get(state);
-						String wid = cursorWidget.get(Tags.ConcreteID);
-						String graphDebug = "Widget <" + wid + "> count = " + gs.getStateWidgetsExecCount().get(wid);
-						canvas.text(Pen.PEN_WHITE_TEXT_12px, 10, 10, 0, graphDebug);
-					}
-				}
-			}
-		}
-	}
-
-
-	private int getTargetZindex(State state, Action a){
-		try{
-			String targetID = a.get(Tags.TargetID);
-			Widget w;
-			if (targetID != null){
-				w = getWidget(state,targetID);
-				if (w != null)
-					return (int)w.get(Tags.ZIndex).doubleValue();
-			}
-		} catch(NoSuchTagException ex){}
-		return 1; // default
-	}
-	
-	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		if((mode() == Modes.Spy ||
-			mode() == Modes.GenerateManual ||
-			mode() == Modes.GenerateDebug) && settings().get(ConfigTags.VisualizeActions)){
-			IEnvironment env = Grapher.getEnvironment();
-			int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
-			Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
-			for(Action a : actions){
-				//a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
-				zindex = getTargetZindex(state,a);
-				zindexes.put(a, new Integer(zindex));
-				if (zindex < minz)
-					minz = zindex;
-				if (zindex > maxz)
-					maxz = zindex;
-			}
-			int alfa;
-			for(Action a : actions){
-				zindex = 1; // default
-				Pen vp = Pen.PEN_IGNORE;
-				if (env != null){ // graphs enabled
-					Integer widgetExeCount = env.get(state).getStateWidgetsExecCount().get(env.get(a).getTargetWidgetID());
-					if (widgetExeCount != null && widgetExeCount.intValue() > 0)
-						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,0,255,255),1.0/(1 + (widgetExeCount.intValue()/10)))).build(); // mark executed widgets with a different color
-					else{
-						zindex = zindexes.get(a).intValue();
-						if (minz == maxz || zindex == maxz)
-							alfa = 255;							
-						else if (zindex == minz)
-							alfa = 64;
-						else
-							alfa = 128;
-						vp = Pen.newPen().setColor(Pen.darken(Color.from(0,255,0,alfa),1.0)).build(); // color depends on widgets zindex
-					}
-				}
-				a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
-			}
-		}
-	}
-
-	private void visualizeSelectedAction(Canvas canvas, State state, Action action){
-		if(mode() == Modes.GenerateDebug || mode() == Modes.ReplayDebug){
-			Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
-			Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
-			//final int BLINK_COUNT = 3;
-			//final double BLINK_DELAY = 0.5;
-			double actionDuration = settings.get(ConfigTags.ActionDuration);
-			final int BLINK_COUNT = 3;
-			final double BLINK_DELAY = actionDuration / BLINK_COUNT;
-			for(int i = 0; i < BLINK_COUNT; i++){
-				Util.pause(BLINK_DELAY);
-				canvas.begin();
-				visualizer.run(state, canvas, Pen.PEN_IGNORE);
-				canvas.end();
-				Util.pause(BLINK_DELAY);
-				canvas.begin();
-				visualizer.run(state, canvas, redPen);
-				canvas.end();
-			}
-		}
-	}
-
-	// End of all the visualization methods that need to be moved out of the Abstract protocol.
-	// END TODO
-
-
+	//TODO is this process handling Windows specific? move to SystemProcessHandling and call from Default protocol
 	/**
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
 	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
@@ -750,6 +440,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		//Then here we will select the action to do that killing
 
 		if (this.forceKillProcess != null){
+			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 			Action a = KillProcess.byName(this.forceKillProcess, 0);
 			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
@@ -772,6 +463,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		//TODO: This seems not to be used yet...
 		// It is set in a method actionExecuted that is not being called anywhere (yet?)
 		else if (this.forceNextActionESC){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			CodingManager.buildIDs(state, a);
@@ -781,6 +473,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			return null;
 	}
 
+	//TODO move to default protocol (platform independent?)
 	/**
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
@@ -801,7 +494,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	
 	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
-
+	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
+	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		 try{
@@ -823,7 +517,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
-
+	//TODO move away from abstract, to helper class, call from Default protocol with a setting to turn on/off
 	/**
 	 * Creates a file out of the given state.
 	 * could be more interesting as XML instead of Java Serialisation
@@ -848,6 +542,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
+	/**
+	 * Records user action (for example for Generate-Manual)
+	 *
+	 * @param state
+	 * @return
+	 */
 	private Action mapUserEvent(State state){
 		Assert.notNull(userEvent);		
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
@@ -886,13 +587,17 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	//TODO: Is this method needed??
 	/**
+	 * This is used for synchronizing the loops of TESTAR between automated and manual (and between two automated loops)
+	 *
 	 * Action execution listeners override.
+	 *
 	 * @param system
 	 * @param state
 	 * @param action
 	 */
 	protected abstract void actionExecuted(SUT system, State state, Action action);
 
+	//TODO move to KeyControl or user action recording
 	private boolean isESC(Action action){
 		Role r = action.get(Tags.Role, null);
 		if (r != null && r.isA(ActionRoles.HitKey)){
@@ -903,6 +608,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return false;
 	}
 
+	//TODO move to KeyControl or user action recording
 	private boolean isNOP(Action action){
 		String as = action.toString();
 		if (as != null && as.equals(NOP.NOP_ID))
@@ -920,6 +626,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	private static final long NOP_WAIT_WINDOW = 100; // ms
 	private double sutRAMbase, sutRAMpeak, sutCPUpeak, testRAMpeak, testCPUpeak;
 
+
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
 	/**
 	 * Waits for an user UI action.
 	 * Requirement: Mode must be GenerateManual.
@@ -936,16 +644,18 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 					this.wait(10);
 				} catch (InterruptedException e) {}
 			}
-			//cv.begin();
-			//Util.clear(cv);
-			visualizeState(cv, state, system);
+			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 			visualizeActions(cv, state, actions);
-			//cv.end();
 		}		
 	}
-	
+
+	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+	}
+
+	//TODO move away from abstract, to Default protocol or ManualRecording helper class
 	/**
 	 * Waits for an event (UI action) from adhoc-test.
 	 * @param state
@@ -999,7 +709,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		CodingManager.buildIDs(state, actionStatus.getAction());
 		return false;
 	}
-	
+
+	//TODO part of generate loop, move to Default protocol
 	/**
 	 * Waits for an automatically selected UI action.
 	 * @param system
@@ -1047,8 +758,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return false;
 	}
 	
-	// (refactor run() method)
-	 // return: problems?
+	// TODO move to default protocol
 	private boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
 		LOGGER.info("[RA} start runAction");
@@ -1056,8 +766,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		waitUserActionLoop(cv,system,state,actionStatus);
 
 		cv.begin(); Util.clear(cv);
-		//visualizeState(cv, state);
-		visualizeState(cv, state,system);
+		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 		LogSerialiser.log("Building action set...\n", LogSerialiser.LogLevel.Debug);
 
 		if (actionStatus.isUserEventAction()){ // user action
@@ -1093,7 +802,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
 
-		visualizeSelectedAction(cv, state, actionStatus.getAction());
+		SutVisualization.visualizeSelectedAction(mode, settings, cv, state, actionStatus.getAction());
 
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		
@@ -1205,6 +914,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		return actionStatus.isProblems();
 	}
 
+	//TODO move to profiler helper
 	private void debugResources(){
 		long nowStamp = System.currentTimeMillis();
 		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;		
@@ -1218,7 +928,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		lastStamp = nowStamp;
 	}
 
-	// (refactor run() method)
+	// TODO move to default protocol
 	private void runTest(){
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
@@ -1341,6 +1051,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				fragment.set(SystemState, state);
 							
 				Verdict verdict = state.get(OracleVerdict, Verdict.OK);
+				Verdict processVerdict =  getProcessVerdict();
 				if (faultySequence) problems = true;
 				fragment.set(OracleVerdict, verdict);
 				int waitCycleIdx = 0;
@@ -1367,17 +1078,28 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 							}
 						}
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
+						
+						try {
+							semaphore.acquire();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 						state = getState(system);
 						graphDB.addState(state);
 						if (faultySequence) problems = true;
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){
 							saveStateSnapshot(state);
+							processVerdict = getProcessVerdict();
 							verdict = state.get(OracleVerdict, Verdict.OK);
-							fragment.set(OracleVerdict, verdict);
+							fragment.set(OracleVerdict, verdict.join(processVerdict));
 							fragment = new TaggableBase();
 							fragment.set(SystemState, state);
 						}
+						
+						semaphore.release();
 					}
 				}
 	
@@ -1406,7 +1128,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	
 				//System.out.println("currentseq: " + currentSeq);
 				
-				Verdict finalVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
+				Verdict stateVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
+				Verdict finalVerdict;
+				
+				finalVerdict = stateVerdict.join(processVerdict);
+				
+				setProcessVerdict(Verdict.OK);
 				
 				if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 					finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
@@ -1450,7 +1177,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			} catch(Exception e){
 				System.out.println("Thread: name="+Thread.currentThread().getName()+",id="+Thread.currentThread().getId()+", SUT throws exception");
 				e.printStackTrace();
-				this.killTestLaunchedProcesses();
+				SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 				ScreenshotSerialiser.finish();
 				TestSerialiser.finish();				
 				Grapher.walkFinished(false, null, null);
@@ -1481,6 +1208,14 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			this.forceToSequenceLengthAfterFail = false;
 	}
 
+	//TODO move to reporting helper etc
+	/**
+	 * Making a log file of a sequence
+	 *
+	 * @param generatedSequence
+	 * @param fileSuffix
+	 * @param page
+	 */
 	private void saveReportPage(String generatedSequence, String fileSuffix, String page){
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
@@ -1495,6 +1230,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 	}
 
+	//TODO move to reporting helper etc
 	private void saveReport(String[] reportPages, String generatedSequence){
 		this.saveReportPage(generatedSequence, "clusters", reportPages[0]);
 		this.saveReportPage(generatedSequence, "testable", reportPages[1]);
@@ -1502,6 +1238,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		this.saveReportPage(generatedSequence, "stats", reportPages[3]);
 	}
 
+	//TODO move to reporting helper etc
 	private void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
 		String targetFolder = "";
 		final double sev = verdict.severity();
@@ -1533,6 +1270,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);		
 	}
 
+
+	//TODO move to reporting helper etc
 	private void saveSequenceMetrics(String testSequenceName, boolean problems){
 		if (Grapher.GRAPHS_ACTIVATED){
 			try {
@@ -1599,7 +1338,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			}
 		}
 	}
-	
+
+	/**
+	 * Initializing the TESTAR loop
+	 *
+	 * @param settings
+	 */
 	public final void run(final Settings settings) {		
 		startTime = Util.time();
 		this.settings = settings;
@@ -1659,6 +1403,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		}
 	}
 
+	//TODO move to default protocol
 	private void replay(){
 		boolean graphsActivated = Grapher.GRAPHS_ACTIVATED;
 		Grapher.GRAPHS_ACTIVATED = false;
@@ -1700,13 +1445,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 				while(!success && (Util.time() - start < rrt)){
 					tries++;
 					cv.begin(); Util.clear(cv);
-					//visualizeState(cv, state);
-					visualizeState(cv, state, system);
+					SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 					cv.end();
 
 					if(mode() == Modes.Quit) break;
 					Action action = fragment.get(ExecutedAction, new NOP());
-					visualizeSelectedAction(cv, state, action);
+					SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
 					if(mode() == Modes.Quit) break;
 
 					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
@@ -1785,13 +1529,5 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		graphDB.addWidget(stateID, widget);
 	}
 
-	protected Widget getWidget(State state, String concreteID){
-		for (Widget w : state){
-			if (w.get(Tags.ConcreteID).equals(concreteID)){
-				return w;
-			}
-		}
-		return null;
-	}
 	
 }

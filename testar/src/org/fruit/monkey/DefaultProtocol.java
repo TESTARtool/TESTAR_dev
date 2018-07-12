@@ -1,6 +1,6 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -123,28 +124,32 @@ public class DefaultProtocol extends AbstractProtocol{
 	}
 
 	protected void finishSequence(File recordedSequence){
-		//System.out.println("Finish sequence");
-		
-		this.killTestLaunchedProcesses();
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 	
+	//TODO: Move out of DefaultProtocol?
 	/**
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
 	 */
 	protected void processListeners(SUT system, String specificSuspiciousTitle) {
-		
+
 		//Only if we executed SUT with command_line
 		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-			
-			Pattern defaultOracles= Pattern.compile(settings().get(ConfigTags.SuspiciousTitles)+"|"+specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
-			
+
+			//Online Oracles use SuspiciousTitles String from settings protocol file
+			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			//Offline Oracles use specificSuspiciousTitle String from method of protocol file
+			Pattern offlineOracles= Pattern.compile(specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+
 			int seqn = generatedSequenceCount();
+			//Create File to save the logs of these oracles
 			File dir = new File("output/StdOutErr");
 			if(!dir.exists())
 				dir.mkdirs();
 			
+			//Prepare runnable to read Error buffer
 			Runnable readErrors = new Runnable() {
 				public void run() {
 					try {
@@ -152,14 +157,54 @@ public class DefaultProtocol extends AbstractProtocol{
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 						String actionId = "";
 						String ch;
-						Matcher m;
+						Matcher mOffline, mOnline;
 						while ((ch = input.readLine()) != null)
 						{	
-							m= defaultOracles.matcher(ch);
-							if(defaultOracles!=null & m.matches()) {
+							mOffline= offlineOracles.matcher(ch);
+							mOnline = onlineOracles.matcher(ch);
+
+							if(onlineOracles!=null && mOnline.matches()) {		
+
+								try {
+									semaphore.acquire();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+								//Prepare Verdict report
+								State state = getState(system);
+								actionId=lastExecutedAction().get(Tags.ConcreteID);
+								Visualizer visualizer = Util.NullVisualizer;
+								// visualize the problematic state
+								if(state.get(Tags.Shape, null) != null)
+									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
+
+								setProcessVerdict(verdict);
+
+								faultySequence = true;
+								
+								//Prepare Log report
 								String DateString = Util.dateString(DATE_FORMAT);
 								System.out.println("SUT StdErr:	" +ch);
-								
+
+								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
+								if(lastExecutedAction()!=null)
+									actionId=lastExecutedAction().get(Tags.ConcreteID);
+								writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
+								writerError.flush();
+								writerError.close();
+
+								semaphore.release();
+
+							}
+							//OnlineOracle has priority
+							else if(offlineOracles!=null && mOffline.matches()) {
+								String DateString = Util.dateString(DATE_FORMAT);
+								System.out.println("SUT StdErr:	" +ch);
+
 								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
 								if(lastExecutedAction()!=null)
 									actionId=lastExecutedAction().get(Tags.ConcreteID);
@@ -168,16 +213,18 @@ public class DefaultProtocol extends AbstractProtocol{
 								writerError.close();
 							}
 						}
-						if(!system.isRunning()) {
-							input.close();
-							Thread.currentThread().interrupt();
-						}
+						
+						input.close();
+						//Thread.currentThread().interrupt();
+						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			};
+			
+			//Prepare runnable to read Output buffer
 			Runnable readOutput = new Runnable() {
 				public void run() {
 					try {
@@ -185,14 +232,54 @@ public class DefaultProtocol extends AbstractProtocol{
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 						String actionId = "";
 						String ch;
-						Matcher m;
+						Matcher mOffline, mOnline;
 						while ((ch = input.readLine()) != null)
 						{	
-							m = defaultOracles.matcher(ch);
-							if(defaultOracles!=null & m.matches()) {
+							mOffline = offlineOracles.matcher(ch);
+							mOnline = onlineOracles.matcher(ch);
+							
+							if(onlineOracles!=null && mOnline.matches()) {	
+
+								try {
+									semaphore.acquire();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+								//Prepare Verdict report
+								State state = getState(system);
+								actionId=lastExecutedAction().get(Tags.ConcreteID);
+								Visualizer visualizer = Util.NullVisualizer;
+								// visualize the problematic state
+								if(state.get(Tags.Shape, null) != null)
+									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
+								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
+
+								setProcessVerdict(verdict);
+
+								faultySequence = true;
+								
+								//Prepare Log report
 								String DateString = Util.dateString(DATE_FORMAT);
 								System.out.println("SUT StdOut:	" +ch);
-								
+
+								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
+								if(lastExecutedAction()!=null)
+									actionId=lastExecutedAction().get(Tags.ConcreteID);
+								writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
+								writerOut.flush();
+								writerOut.close();
+
+								semaphore.release();
+
+							}
+							//OnlineOracle has priority
+							else if(offlineOracles!=null && mOffline.matches()) {
+								String DateString = Util.dateString(DATE_FORMAT);
+								System.out.println("SUT StdOut:	" +ch);
+
 								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
 								if(lastExecutedAction()!=null)
 									actionId=lastExecutedAction().get(Tags.ConcreteID);
@@ -201,19 +288,25 @@ public class DefaultProtocol extends AbstractProtocol{
 								writerOut.close();
 							}
 						}
-						if(!system.isRunning()) {
+						
 						input.close();
-						Thread.currentThread().interrupt();
-						}
+						//Thread.currentThread().interrupt();
+						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-			};
-
+			}; 
+			//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
+			//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
+			//¿ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
+			
 			new Thread(readErrors).start();
 			new Thread(readOutput).start();
+
+			/*int nbThreads =  Thread.getAllStackTraces().keySet().size();
+			System.out.println("Number of Threads running on VM: "+nbThreads);*/
 		}
 	}
 
@@ -234,7 +327,7 @@ public class DefaultProtocol extends AbstractProtocol{
 
 
 	protected SUT startSystem(String mustContain, boolean tryToKillIfRunning, long maxEngageTime) throws SystemStartException{
-		this.contextRunningProcesses = getRunningProcesses("START");
+		this.contextRunningProcesses = SystemProcessHandling.getRunningProcesses("START");
 		try{// refactored from "protected SUT startSystem() throws SystemStartException"
 			for(String d : settings().get(ConfigTags.Delete))
 				Util.delete(d);
@@ -286,7 +379,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
 		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
-		if (this.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
+		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
 			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
@@ -370,7 +463,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			if(verdict.severity()==SEVERITY_NOT_RESPONDING){
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
-				killRunningProcesses(system, 100);
+				SystemProcessHandling.killRunningProcesses(system, 100);
 			}
 		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
 			passSeverity = verdict.severity();
@@ -573,18 +666,16 @@ public class DefaultProtocol extends AbstractProtocol{
 		return !m.matches();
 	}
 
-	//TODO: seperate Clickable from Unfiltered.
 	/**
-	 * Check whether a widget is clickable and NOT filtered by the regular expression in the TESTAR SettingsDialog
+	 * Check whether a widget is clickable
 	 * @param w
 	 * @return
 	 */
 	protected boolean isClickable(Widget w){
 		Role role = w.get(Tags.Role, Roles.Widget);
 		if(Role.isOneOf(role, NativeLinker.getNativeClickableRoles()))
-			return isUnfiltered(w);
+			return true;
 		return false;
-		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
 	}
 
 	/**
@@ -593,8 +684,7 @@ public class DefaultProtocol extends AbstractProtocol{
 	 * @return
 	 */
 	protected boolean isTypeable(Widget w){
-		return NativeLinker.isNativeTypeable(w) && isUnfiltered(w);
-		//FIXME: take the isUnfiltered out, we want to explicity say that in the user protocol
+		return NativeLinker.isNativeTypeable(w);
 	}
 
 	/**

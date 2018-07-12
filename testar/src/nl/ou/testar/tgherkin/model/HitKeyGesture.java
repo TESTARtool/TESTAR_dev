@@ -12,7 +12,10 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.linux.AtSpiTags;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.alayer.windows.UIATags;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 
 /**
@@ -32,6 +35,12 @@ public class HitKeyGesture extends Gesture {
 
 	@Override
 	public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
+		//####TEMP CHANGE Begin
+		String sutConnector = proxy.getSettings().get(ConfigTags.SUTConnector,"");
+		if (sutConnector.equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
+			return super.gesturePossible(widget, proxy, dataTable) && widget.get(WdTags.WebHasKeyboardFocus, false);
+		}
+		//####TEMP CHANGE End
 		return super.gesturePossible(widget, proxy, dataTable) && (widget.get(UIATags.UIAHasKeyboardFocus, false) || widget.get(AtSpiTags.AtSpiHasFocus, false));
 	}
 	

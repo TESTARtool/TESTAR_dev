@@ -201,6 +201,7 @@ public class SettingsDialog extends JFrame implements Observer {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
