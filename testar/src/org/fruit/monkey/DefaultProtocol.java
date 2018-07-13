@@ -843,7 +843,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			}
 			synchronized(this){
 				try {
-					this.wait(10);
+					this.wait(100);
 				} catch (InterruptedException e) {}
 			}
 			cv.begin(); Util.clear(cv);
@@ -1186,8 +1186,6 @@ public class DefaultProtocol extends AbstractProtocol {
 			}
 			LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
 
-			this.cv = buildCanvas();
-
 			String startDateString = Util.dateString(DATE_FORMAT);
 			LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
 
@@ -1197,6 +1195,7 @@ public class DefaultProtocol extends AbstractProtocol {
 					system = null;
 					system = startSystem();
 					processListeners(system, "");
+					this.cv = buildCanvas();
 				}
 
 				lastCPU = NativeLinker.getCPUsage(system);
@@ -1384,20 +1383,18 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 		//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
 
-		State state = getState(system);
-
 		while(mode() == Modes.Spy && system.isRunning()) {
+			State state = getState(system);
 			cv.begin(); Util.clear(cv);
 			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
 			visualizeActions(cv, state, actions);
 			cv.end();
-			state = getState(system);
 		}
 
 		if(startedSpy){
-			cv.release();
+			//cv.release();
 			detectLoopMode(system);
 		}
 
