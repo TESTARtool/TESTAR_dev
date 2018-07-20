@@ -66,7 +66,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_simple_stategraph_sikulix/Protocol_desktop_simple_stategraph_sikulix
+ProtocolClass = desktop_simple_stategraph_eye/Protocol_desktop_simple_stategraph_eye
 
 #################################################################
 # Graphdatabase settings (experimental)

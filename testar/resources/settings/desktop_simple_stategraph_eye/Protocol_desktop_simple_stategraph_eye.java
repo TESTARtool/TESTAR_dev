@@ -32,11 +32,8 @@
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Set;
-
-import eye.Match;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
@@ -53,9 +50,8 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-import org.sikuli.script.FindFailed;
-import org.sikuli.script.Screen;
 import eye.Eye;
+import eye.Match;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
