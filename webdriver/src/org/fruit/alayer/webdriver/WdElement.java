@@ -116,10 +116,7 @@ public class WdElement implements Serializable {
   private void setName() {
     Map<String, String> labelmap = WdStateFetcher.getLabelmap();
 
-    if (labelmap.get(name) != null) {
-      name = labelmap.get(name);
-      return;
-    }
+    name = labelmap.getOrDefault(name, name);
     if (name == null || name.equals("null") || name.isEmpty()) {
       if (!id.isEmpty()) {
         name = id;

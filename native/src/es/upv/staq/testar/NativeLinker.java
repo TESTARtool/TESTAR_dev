@@ -86,6 +86,9 @@ public class NativeLinker {
     else if (osName.contains("linux")) {
       enumSet.add(OperatingSystems.UNIX);
     }
+    else if (osName.contains("mac os x")) {
+      enumSet.add(OperatingSystems.MAC);
+    }
     else {
       enumSet.add(OperatingSystems.UNKNOWN);
     }
