@@ -37,35 +37,6 @@ public class CanvasDimensions extends Thread {
     running = false;
   }
 
-  @Override
-  public void run() {
-    while (running) {
-      updateDimensions();
-      Util.pause(0.5);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void updateDimensions() {
-    // This assumes no status bars on the left or on the bottom
-      try {
-        List<Long> screen = (List<Long>)
-          WdDriver.executeScript("return canvasDimensionsTestar()");
-      if (screen == null) {
-        return;
-      }
-      canvasX = Math.toIntExact(screen.get(0));
-      canvasY = Math.toIntExact(screen.get(1));
-      canvasWidth = Math.toIntExact(screen.get(2));
-      canvasHeight = Math.toIntExact(screen.get(3));
-      innerWidth = Math.toIntExact(screen.get(4));
-      innerHeight = Math.toIntExact(screen.get(5));
-      }
-      catch (WebDriverException ignored) {
-
-    }
-  }
-
   public static int getCanvasX() {
     return canvasX;
   }
@@ -88,5 +59,34 @@ public class CanvasDimensions extends Thread {
 
   public static int getInnerHeight() {
     return innerHeight;
+  }
+
+  @Override
+  public void run() {
+    while (running) {
+      updateDimensions();
+      Util.pause(0.5);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void updateDimensions() {
+    // This assumes no status bars on the left or on the bottom
+    try {
+      List<Long> screen = (List<Long>)
+          WdDriver.executeScript("return canvasDimensionsTestar()");
+      if (screen == null) {
+        return;
+      }
+      canvasX = Math.toIntExact(screen.get(0));
+      canvasY = Math.toIntExact(screen.get(1));
+      canvasWidth = Math.toIntExact(screen.get(2));
+      canvasHeight = Math.toIntExact(screen.get(3));
+      innerWidth = Math.toIntExact(screen.get(4));
+      innerHeight = Math.toIntExact(screen.get(5));
+    }
+    catch (WebDriverException ignored) {
+
+    }
   }
 }

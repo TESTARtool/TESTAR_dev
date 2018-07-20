@@ -150,7 +150,6 @@ public class WdDriver extends SUTBase {
     return webDriver;
   }
 
-
   /*
    * Update the list of handles with added handles (new tabs) 
    * Remove handles from closed tabs
