@@ -55,7 +55,7 @@ public class PrintWidgetTree {
 			return;
 		}
 				
-		SUT system = WinProcess.fromExecutable(args[0]); // run the given executable
+		SUT system = WinProcess.fromExecutable(args[0], false); // run the given executable
 		
 		Util.pause(5);
 		State state = new UIAStateBuilder().apply(system);   // get the system's current state

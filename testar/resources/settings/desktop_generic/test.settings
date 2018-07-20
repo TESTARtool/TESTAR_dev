@@ -40,7 +40,18 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Process Listener
+#
+# Enable the reading of the SUT process to work with oracles at the process level
+# Available for desktop applications through COMMAND_LINE
+#################################################################
+
+ProcessListenerEnabled = false
+ProcessOnlineOracles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+ProcessOfflineOracles = .*[fF]ailed.*|.*[nN]ull.*
 
 #################################################################
 # Actionfilter

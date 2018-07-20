@@ -134,14 +134,14 @@ public class DefaultProtocol extends AbstractProtocol{
 	 */
 	protected void processListeners(SUT system, String specificSuspiciousTitle) {
 
-		//Only if we executed SUT with command_line
-		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+		//Only if we enabled ProcessListener and executed SUT with command_line
+		if(settings().get(ConfigTags.ProcessListenerEnabled) && settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 			//Online Oracles use SuspiciousTitles String from settings protocol file
-			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.ProcessOnlineOracles), Pattern.UNICODE_CHARACTER_CLASS);
 			//Offline Oracles use specificSuspiciousTitle String from method of protocol file
-			Pattern offlineOracles= Pattern.compile(specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+			Pattern offlineOracles= Pattern.compile(settings().get(ConfigTags.ProcessOfflineOracles), Pattern.UNICODE_CHARACTER_CLASS);
 
 			int seqn = generatedSequenceCount();
 			//Create File to save the logs of these oracles
@@ -347,7 +347,7 @@ public class DefaultProtocol extends AbstractProtocol{
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
