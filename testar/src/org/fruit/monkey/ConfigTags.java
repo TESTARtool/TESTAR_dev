@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -103,4 +103,8 @@ public final class ConfigTags {
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
+  
+  public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
+  public static final Tag<String> ProcessOnlineOracles = Tag.from("ProcessOnlineOracles", String.class);
+  public static final Tag<String> ProcessOfflineOracles = Tag.from("ProcessOfflineOracles", String.class);
 }

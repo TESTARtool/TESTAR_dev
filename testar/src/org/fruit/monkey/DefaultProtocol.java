@@ -174,16 +174,16 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
 	 */
-	protected void processListeners(SUT system, String specificSuspiciousTitle) {
+	protected void processListeners(SUT system) {
 
-		//Only if we executed SUT with command_line
-		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+		//Only if we enabled ProcessListener and executed SUT with command_line
+		if(settings().get(ConfigTags.ProcessListenerEnabled) && settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 			//Online Oracles use SuspiciousTitles String from settings protocol file
-			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
+			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.ProcessOnlineOracles), Pattern.UNICODE_CHARACTER_CLASS);
 			//Offline Oracles use specificSuspiciousTitle String from method of protocol file
-			Pattern offlineOracles= Pattern.compile(specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+			Pattern offlineOracles= Pattern.compile(settings().get(ConfigTags.ProcessOfflineOracles), Pattern.UNICODE_CHARACTER_CLASS);
 
 			int seqn = generatedSequenceCount();
 			//Create File to save the logs of these oracles
@@ -200,19 +200,19 @@ public class DefaultProtocol extends AbstractProtocol {
 						String actionId = "";
 						String ch;
 						Matcher mOffline, mOnline;
-						while ((ch = input.readLine()) != null)
+						while (system.isRunning() && (ch = input.readLine()) != null)
 						{	
 							mOffline= offlineOracles.matcher(ch);
 							mOnline = onlineOracles.matcher(ch);
 
 							if(onlineOracles!=null && mOnline.matches()) {		
 
-								try {
+								/*try {
 									semaphore.acquire();
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 
 								//Prepare Verdict report
 								State state = getState(system);
@@ -239,7 +239,7 @@ public class DefaultProtocol extends AbstractProtocol {
 								writerError.flush();
 								writerError.close();
 
-								semaphore.release();
+								//semaphore.release();
 
 							}
 							//OnlineOracle has priority
@@ -257,6 +257,7 @@ public class DefaultProtocol extends AbstractProtocol {
 						}
 						
 						input.close();
+						//System.out.println("Closing Thread: "+Thread.currentThread().getId());
 						//Thread.currentThread().interrupt();
 						
 					} catch (IOException e) {
@@ -275,19 +276,19 @@ public class DefaultProtocol extends AbstractProtocol {
 						String actionId = "";
 						String ch;
 						Matcher mOffline, mOnline;
-						while ((ch = input.readLine()) != null)
+						while (system.isRunning() && (ch = input.readLine()) != null)
 						{	
 							mOffline = offlineOracles.matcher(ch);
 							mOnline = onlineOracles.matcher(ch);
 							
 							if(onlineOracles!=null && mOnline.matches()) {	
 
-								try {
+								/*try {
 									semaphore.acquire();
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 
 								//Prepare Verdict report
 								State state = getState(system);
@@ -314,7 +315,7 @@ public class DefaultProtocol extends AbstractProtocol {
 								writerOut.flush();
 								writerOut.close();
 
-								semaphore.release();
+								//semaphore.release();
 
 							}
 							//OnlineOracle has priority
@@ -332,6 +333,7 @@ public class DefaultProtocol extends AbstractProtocol {
 						}
 						
 						input.close();
+						//System.out.println("Closing Thread: "+Thread.currentThread().getId());
 						//Thread.currentThread().interrupt();
 						
 					} catch (IOException e) {
@@ -389,7 +391,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
@@ -1194,7 +1196,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(system == null || !system.isRunning()) {
 					system = null;
 					system = startSystem();
-					processListeners(system, "");
+					processListeners(system);
 					this.cv = buildCanvas();
 				}
 
@@ -1237,12 +1239,12 @@ public class DefaultProtocol extends AbstractProtocol {
 
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 
-						try {
+						/*try {
 							semaphore.acquire();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}
+						}*/
 						
 						state = getState(system);
 						graphDB.addState(state);
@@ -1257,7 +1259,7 @@ public class DefaultProtocol extends AbstractProtocol {
 							fragment.set(SystemState, state);
 						}
 						
-						semaphore.release();
+						//semaphore.release();
 					}
 				}
 				
@@ -1376,7 +1378,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 			system = startSystem();
-			processListeners(system, "");
+			processListeners(system);
 			startedSpy = true;
 			Grapher.GRAPHS_ACTIVATED = false;
 			this.cv = buildCanvas();

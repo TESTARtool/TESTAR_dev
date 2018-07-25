@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -294,6 +294,17 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"SuspiciousTitles = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Process Listener\n"
+					+"#\n"
+					+"# Enable the reading of the SUT process to work with oracles at the process level\n"
+					+"# Available for desktop applications through COMMAND_LINE\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessListenerEnabled = " + Util.lineSep()
+					+"ProcessOnlineOracles = " + Util.lineSep()
+					+"ProcessOfflineOracles = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Actionfilter\n"
