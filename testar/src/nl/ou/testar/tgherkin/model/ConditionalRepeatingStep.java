@@ -31,7 +31,7 @@ public class ConditionalRepeatingStep extends RepeatingStep {
      * @param type type of loop
      * @param loopCondition condition that defines repetition of the step
      * @param givenCondition widget tree condition that defines the Given clause
-     * result.append(getGivenCondition().toString());
+     * @param whenClause definition of the When clause
      * @param thenCondition widget tree condition that defines the Then clause
      */
     public ConditionalRepeatingStep(String title, Type type, WidgetTreeCondition loopCondition, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {

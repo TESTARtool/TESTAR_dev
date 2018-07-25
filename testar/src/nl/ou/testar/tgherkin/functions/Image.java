@@ -135,7 +135,8 @@ public class Image {
 				while (finder.hasNext()) {
 					Match match = finder.next();
 					// check if found rectangle covers minimum percentage of entire screen shot
-					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * 100) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)){
+					final int percentageFactor = 100;
+					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * percentageFactor) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)){
 						if (confidence < match.getScore()) {
 							confidence = match.getScore(); 
 						}
