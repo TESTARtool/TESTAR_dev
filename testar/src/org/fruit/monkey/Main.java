@@ -43,6 +43,8 @@ import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
 
+import nl.ou.testar.tgherkin.model.Document;
+
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
@@ -400,6 +402,21 @@ public class Main {
 
       defaults.add(Pair.from(AlwaysCompile, true));
 
+      defaults.add(Pair.from(TgherkinDocument, ""));
+      defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
+      defaults.add(Pair.from(ContinueToApplyDefault, true));
+      defaults.add(Pair.from(RepeatTgherkinScenarios, true));
+      defaults.add(Pair.from(GenerateTgherkinReport, false));		
+      defaults.add(Pair.from(StoreTgherkinReport, false));
+      defaults.add(Pair.from(ReportDerivedGestures, false));
+      defaults.add(Pair.from(ReportState, false));
+      defaults.add(Pair.from(ConfidenceThreshold, 0.7));
+      defaults.add(Pair.from(TgherkinReportIncludeOCR, false));
+      defaults.add(Pair.from(TgherkinReportIncludeImageRecognition, false));
+      defaults.add(Pair.from(TgherkinNrOfNOPRetries, 0));
+      defaults.add(Pair.from(TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]));
+      defaults.add(Pair.from(MinimumPercentageForImageRecognition, 95.0));
+      
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file

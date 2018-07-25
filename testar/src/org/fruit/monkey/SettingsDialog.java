@@ -35,6 +35,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
+import nl.ou.testar.TgherkinPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -80,6 +81,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnReplay;
   private JButton btnView;
 
+  private JTabbedPane jTabsPane;
   private GeneralPanel generalPanel;
   private WalkerPanel walkerPanel;
   private FilterPanel filterPanel;
@@ -87,6 +89,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private GraphDBPanel graphDBPanel;
+  private TgherkinPanel tgherkinPanel;
 
   /**
    * Starts the settings Dialog.
@@ -234,6 +237,19 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
     graphDBPanel.populateFrom(settings);
+    tgherkinPanel.populateFrom(settings);
+    // only show Tgherkin tab if the protocol is a DocumentProtocol
+    if (tgherkinPanel.isDocumentProtocol()) {
+        if (!tgherkinPanel.isActive()) {
+        	jTabsPane.addTab("Tgherkin", tgherkinPanel);
+        	tgherkinPanel.setActive(true);
+        }
+    }else {
+        if (tgherkinPanel.isActive()) {
+        	jTabsPane.remove(tgherkinPanel);
+        	tgherkinPanel.setActive(false);
+        }
+    }
   }
 
   private void extractInformation(Settings settings) {
@@ -244,6 +260,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     graphDBPanel.extractInformation(settings);
+    tgherkinPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -253,7 +270,7 @@ public class SettingsDialog extends JFrame implements Observer {
     btnReplay = getBtnReplay();
     btnView = getBtnView();
 
-    JTabbedPane jTabsPane = new JTabbedPane();
+    jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
@@ -269,7 +286,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
-
+    tgherkinPanel = new TgherkinPanel();
+    
     setLayout(jTabsPane);
     pack();
     setCentreScreen();
