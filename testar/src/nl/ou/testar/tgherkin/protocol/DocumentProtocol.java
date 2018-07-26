@@ -39,6 +39,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		super();
 	}
 	
+	@Override
 	/** 
 	 * Initialize document protocol.
 	 * Called once during the life time of TESTAR
@@ -55,6 +56,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		}
 	}
 	
+	@Override
 	/**
 	 * Begin sequence.
 	 * @param system the SUT
@@ -68,6 +70,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		}
 	}
 	
+	@Override
 	/**
 	 * Get verdict.
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -89,6 +92,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return verdict;				
 	}
 
+	@Override
 	/**
 	 * Derive actions.
 	 * This method is used by TESTAR to determine the set of currently available actions.
@@ -117,6 +121,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return actions;		
 	}
 
+	@Override
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 * @param state the SUT's current state
@@ -135,6 +140,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return action;
 	}
 
+	@Override
 	/**
 	 * Execute the selected action.
 	 * @param system the SUT
@@ -150,6 +156,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return super.executeAction(system, state, action);
 	}
 	
+	@Override
 	/**
 	 * Determine whether more actions should be executed.
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -170,7 +177,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 		return super.moreActions(state);
 	}
 
-
+	@Override
 	/** 
 	 * Finish sequence.
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
@@ -187,6 +194,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	}
 
 
+	@Override
 	/**
 	 * Determine whether more sequences should be executed.
 	 * TESTAR uses this method to determine when to stop the entire test.
