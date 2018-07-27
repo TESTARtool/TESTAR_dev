@@ -399,10 +399,10 @@ public class Main {
       defaults.add(Pair.from(GraphDBPassword, ""));
 
       defaults.add(Pair.from(AlwaysCompile, true));
-	  
+      
       defaults.add(Pair.from(ProcessListenerEnabled, false));
-      defaults.add(Pair.from(ProcessOnlineOracles, "(?!x)x"));
-      defaults.add(Pair.from(ProcessOfflineOracles, "(?!x)x"));
+      defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
+      defaults.add(Pair.from(ProcessLogs, ".*.*"));
 
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);

@@ -296,15 +296,27 @@ public class Settings extends TaggableBase implements Serializable {
 					+"SuspiciousTitles = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
-					+"# Process Listener\n"
+					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
 					+"#\n"
-					+"# Enable the reading of the SUT process to work with oracles at the process level\n"
-					+"# Available for desktop applications through COMMAND_LINE\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Regular expression defines the suspicious outputs\n"
 					+"#################################################################\n"
 					+"\n"
 					+"ProcessListenerEnabled = " + Util.lineSep()
-					+"ProcessOnlineOracles = " + Util.lineSep()
-					+"ProcessOfflineOracles = " + Util.lineSep()
+					+"SuspiciousProcessOutput = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Process Logs\n"
+					+"#\n"
+					+"# Required ProcessListenerEnabled\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Allow TESTAR to store in its logs other possible matches found in the process\n"
+					+"# Use the regular expression .*.* if you want to store all the possible outputs of the process\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessLogs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Actionfilter\n"

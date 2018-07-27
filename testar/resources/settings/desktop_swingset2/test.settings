@@ -54,15 +54,27 @@ SequenceLength = 100
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
-# Process Listener
+# Oracles based on Suspicious Outputs detected by Process Listeners
 #
-# Enable the reading of the SUT process to work with oracles at the process level
-# Available for desktop applications through COMMAND_LINE
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
 #################################################################
 
 ProcessListenerEnabled = false
-ProcessOnlineOracles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
-ProcessOfflineOracles = .*[fF]ailed.*|.*[nN]ull.*
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
 
 #################################################################
 # Actionfilter

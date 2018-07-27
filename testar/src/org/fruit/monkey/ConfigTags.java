@@ -105,6 +105,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
   
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
-  public static final Tag<String> ProcessOnlineOracles = Tag.from("ProcessOnlineOracles", String.class);
-  public static final Tag<String> ProcessOfflineOracles = Tag.from("ProcessOfflineOracles", String.class);
+  public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
+  public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
 }
