@@ -152,48 +152,48 @@ public class TgherkinPanel extends JPanel {
 		tgGenerateTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be generated.\n</html>");
 		add(tgGenerateTgherkinReportCheckBox);
 
-		tgTgherkinReportIncludeOCRCheckBox = new JCheckBox("Include OCR in Tgherkin report");
-		tgTgherkinReportIncludeOCRCheckBox.setBounds(30, 154, 300, 23);
-		tgTgherkinReportIncludeOCRCheckBox.setToolTipText("<html>\nIndicates whether Optical Character Recognition (OCR) results should be included in the Tgherkin report.\nOCR will significantly slow down processing.\n</html>");
+		tgStoreTgherkinReportCheckBox = new JCheckBox("Store Tgherkin report in GraphDB");
+		tgStoreTgherkinReportCheckBox.setBounds(10, 154, 300, 23);
+		tgStoreTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be stored in the GraphDB database.\n</html>");
+		add(tgStoreTgherkinReportCheckBox);
+
+		tgReportDerivedGesturesCheckBox = new JCheckBox("Report Tgherkin derived gestures");
+		tgReportDerivedGesturesCheckBox.setBounds(10, 178, 300, 23);
+		tgReportDerivedGesturesCheckBox.setToolTipText("<html>\nIndicates whether Tgherkin derived gestures should be reported.\n</html>");
+		add(tgReportDerivedGesturesCheckBox);
+
+		tgReportStateCheckBox = new JCheckBox("Report state");
+		tgReportStateCheckBox.setBounds(10, 202, 300, 23);
+		tgReportStateCheckBox.setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
+		add(tgReportStateCheckBox);
+		
+		tgTgherkinReportIncludeOCRCheckBox = new JCheckBox("Include OCR in Tgherkin state report");
+		tgTgherkinReportIncludeOCRCheckBox.setBounds(30, 226, 300, 23);
+		tgTgherkinReportIncludeOCRCheckBox.setToolTipText("<html>\nIndicates whether Optical Character Recognition (OCR) results should be included in the Tgherkin state report.\nOCR will significantly slow down processing.\n</html>");
 		add(tgTgherkinReportIncludeOCRCheckBox);
 
-		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
+		tgReportStateCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeOCRCheckBox.isSelected()){
+				if (!tgReportStateCheckBox.isSelected() && tgTgherkinReportIncludeOCRCheckBox.isSelected()){
 					tgTgherkinReportIncludeOCRCheckBox.setSelected(false);
 				}
 				tgTgherkinReportIncludeOCRCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
 			}
 		});
 
-		tgTgherkinReportIncludeImageRecognitionCheckBox = new JCheckBox("Include Image recognition in Tgherkin report");
-		tgTgherkinReportIncludeImageRecognitionCheckBox.setBounds(30, 178, 300, 23);
-		tgTgherkinReportIncludeImageRecognitionCheckBox.setToolTipText("<html>\nIndicates whether image recognition results should be included in the Tgherkin report.\nImage recognition will significantly slow down processing.\n</html>");
+		tgTgherkinReportIncludeImageRecognitionCheckBox = new JCheckBox("Include Image recognition in Tgherkin state report");
+		tgTgherkinReportIncludeImageRecognitionCheckBox.setBounds(30, 250, 300, 23);
+		tgTgherkinReportIncludeImageRecognitionCheckBox.setToolTipText("<html>\nIndicates whether image recognition results should be included in the Tgherkin state report.\nImage recognition will significantly slow down processing.\n</html>");
 		add(tgTgherkinReportIncludeImageRecognitionCheckBox);
 
-		tgGenerateTgherkinReportCheckBox.addActionListener(new ActionListener() {
+		tgReportStateCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (!tgGenerateTgherkinReportCheckBox.isSelected() && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()){
+				if (!tgReportStateCheckBox.isSelected() && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()){
 					tgTgherkinReportIncludeImageRecognitionCheckBox.setSelected(false);
 				}
 				tgTgherkinReportIncludeImageRecognitionCheckBox.setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
 			}
 		});
-		
-		tgStoreTgherkinReportCheckBox = new JCheckBox("Store Tgherkin report in GraphDB");
-		tgStoreTgherkinReportCheckBox.setBounds(10, 202, 300, 23);
-		tgStoreTgherkinReportCheckBox.setToolTipText("<html>\nIndicates whether a Tgherkin report should be stored in the GraphDB database.\n</html>");
-		add(tgStoreTgherkinReportCheckBox);
-
-		tgReportDerivedGesturesCheckBox = new JCheckBox("Report Tgherkin derived gestures");
-		tgReportDerivedGesturesCheckBox.setBounds(10, 226, 300, 23);
-		tgReportDerivedGesturesCheckBox.setToolTipText("<html>\nIndicates whether Tgherkin derived gestures should be reported.\n</html>");
-		add(tgReportDerivedGesturesCheckBox);
-
-		tgReportStateCheckBox = new JCheckBox("Report state");
-		tgReportStateCheckBox.setBounds(10, 250, 300, 23);
-		tgReportStateCheckBox.setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
-		add(tgReportStateCheckBox);
 		
 		tgConfidenceThreshold = new JSpinner();
 		tgConfidenceThreshold.setBounds(280, 274, 100, 25);
