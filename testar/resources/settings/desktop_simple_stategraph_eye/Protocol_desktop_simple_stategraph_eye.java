@@ -56,6 +56,20 @@ import eye.Match;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
+/**
+ * This protocol uses:
+ * - Simple state graph in selectAction() to choose new actions and select path to GUI state with new actions
+ * - HTML Sequence Report
+ * - Eye library for image recognition in executeAction() to interact with the GUI under testing
+ *
+ * More information on the Eye library and its API can be found from http://eyeautomate.com/eye.html
+ *
+ * In some cases, it is possible that TESTAR gets wrong coordinates through Windows UI Automation API, resulting
+ * TESTAR to miss the controls it trying to click. Using image recognition to locate the control fixes this issue,
+ * but makes TESTAR slower.
+ *
+ * Eye library seems to be slower than SikuliX library.
+ */
 public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProtocol {
 
 	//Attributes for adding slide actions
