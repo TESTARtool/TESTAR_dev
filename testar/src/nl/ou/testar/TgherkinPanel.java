@@ -331,11 +331,12 @@ public class TgherkinPanel extends JPanel {
 		});
 		Arrays.sort(tgherkinDocuments);
 		tgComboBoxTgherkinDocument.setModel(new DefaultComboBoxModel<String>(tgherkinDocuments));
-		int maxRows = 16;
+		final int maxRows = 16;
+		int maxRowCount = maxRows;
 		if (tgherkinDocuments.length < maxRows) {
-			maxRows = tgherkinDocuments.length;
+			maxRowCount = tgherkinDocuments.length;
 		}
-		tgComboBoxTgherkinDocument.setMaximumRowCount(maxRows);
+		tgComboBoxTgherkinDocument.setMaximumRowCount(maxRowCount);
 		if (tgherkinDocument.length() > 0) {
 			// set selection to tgherkin document in settings
 			String[] parts = tgherkinDocument.split("/");
