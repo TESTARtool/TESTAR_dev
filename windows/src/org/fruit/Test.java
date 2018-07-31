@@ -124,8 +124,6 @@ public final class Test {
 		ois.close();
 		info = queryAllTags(rs);
 		System.out.println("[Test] " + "Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
-
-
 	}
 
 	public static void saveImage(AWTCanvas image, String file) throws IOException {
@@ -159,9 +157,6 @@ public final class Test {
 		//SUT system = WinProcess.fromExecutable("C:\\Windows\\System32\\calc.exe");
 		//SUT system = WinProcess.fromPID(2512);
 		SUT system = WinProcess.fromPID(5692);
-		
-		//SUT system = WinProcess.fromProcName("firefox.exe");
-		//SUT system = WinProcess.fromExecutable("C:\\Program Files (x86)\\Microsoft Office\\Office14\\winword.exe");
 		Util.pause(5);
 
 		GDIScreenCanvas cv = GDIScreenCanvas.fromPrimaryMonitor();
@@ -187,25 +182,13 @@ public final class Test {
 			Util.clear(cv);
 			Point cursor = mouse.cursor();
 			Widget under = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-            //Iterable<Widget> unders = Utils.widgetsFromPoint(state, cursor.x(), cursor.y());
-
-			//state.set(Tags.Screenshot, AWTCanvas.fromScreenshot((Rect)state.get(Tags.Shape), AWTCanvas.StorageFormat.BMP, 1.0));
 			
 			if (under != null) {
 				Shape s = under.get(Tags.Shape, null);
 				if (s != null) {
 					s.paint(cv, cv.defaultPen());
-					//System.out.println("[" + getClass().getSimpleName() + "] under cursor: " + under.get(Tags.Desc, null) + ",  " + under.get(Tags.ZIndex) + ",  " + under.get(Tags.Role, Roles.Widget));
 				}
 			}
-
-//			for(Widget u : unders) {
-//				Shape s = u.get(Tags.Shape, null);
-//				if (s != null) {
-//					s.paint(cv, cv.defaultPen());
-//					cv.text(cv.defaultPen(), s.x(), s.y() - 20, 0, Utils.indexString(u));
-//				}
-//			}
 			
 			cv.end();
 			
@@ -233,14 +216,7 @@ public final class Test {
 		System.out.println("[Test] " + "stopping system...");
 		Util.stop(system);
 		System.out.println("[Test] " + "system stopped");
-		
-		//System.exit(0);
-
 		sb.release();
-		//System.out.println("[" + getClass().getSimpleName() + "] sb released");
-		
-//		if (1==1)
-//			return;
 		
 		t1 = Util.time();
 
@@ -252,7 +228,6 @@ public final class Test {
 			Taggable t = (Taggable) ois.readObject();
 			state = t.get(Tags.SystemState);
 			cv.begin();
-			//state.get(Tags.Screenshot).paint(cv, 0, 0, 300, 300);
 			cv.end();
 			Set<Tag<?>> tags = new HashSet<Tag<?>>();
 			tags.addAll(Tags.tagSet());

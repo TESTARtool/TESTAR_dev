@@ -55,6 +55,7 @@ public final class Tag<T> implements Serializable {
 	 * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>. 
 	 * @param name The name of the tag
 	 * @param valueType The type of the values that are associated with this tag.
+	 * @param <T> tag type
 	 * @return A tag object.
 	 */
 	@SuppressWarnings("unchecked")

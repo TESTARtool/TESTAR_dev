@@ -45,4 +45,5 @@ package org.fruit.alayer;
  * the system itself. For example
  *
  */
-public interface State extends Widget, Iterable<Widget>{ }
+public interface State extends Widget, Iterable<Widget> {
+}

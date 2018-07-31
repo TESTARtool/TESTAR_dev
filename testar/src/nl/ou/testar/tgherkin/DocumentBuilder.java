@@ -4,22 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.gen.TgherkinParser.HitKeyArgumentContext;
 import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
-import nl.ou.testar.tgherkin.model.Gesture;
-import nl.ou.testar.tgherkin.model.HitKeyGesture;
-import nl.ou.testar.tgherkin.model.MouseMoveGesture;
-import nl.ou.testar.tgherkin.model.ParameterBase;
-import nl.ou.testar.tgherkin.model.Parameters;
-import nl.ou.testar.tgherkin.model.ConditionalRepeatingStep;
+
 import nl.ou.testar.tgherkin.model.AnyGesture;
 import nl.ou.testar.tgherkin.model.Background;
 import nl.ou.testar.tgherkin.model.ClickGesture;
 import nl.ou.testar.tgherkin.model.ConditionalGesture;
+import nl.ou.testar.tgherkin.model.ConditionalRepeatingStep;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.tgherkin.model.DoubleClickGesture;
@@ -28,12 +21,17 @@ import nl.ou.testar.tgherkin.model.DragSliderGesture;
 import nl.ou.testar.tgherkin.model.DropDownAtGesture;
 import nl.ou.testar.tgherkin.model.Examples;
 import nl.ou.testar.tgherkin.model.Feature;
+import nl.ou.testar.tgherkin.model.Gesture;
+import nl.ou.testar.tgherkin.model.HitKeyGesture;
+import nl.ou.testar.tgherkin.model.MouseMoveGesture;
+import nl.ou.testar.tgherkin.model.NumberOfTimesRepeatingStep;
+import nl.ou.testar.tgherkin.model.ParameterBase;
+import nl.ou.testar.tgherkin.model.Parameters;
 import nl.ou.testar.tgherkin.model.RightClickGesture;
 import nl.ou.testar.tgherkin.model.Scenario;
 import nl.ou.testar.tgherkin.model.ScenarioDefinition;
 import nl.ou.testar.tgherkin.model.ScenarioOutline;
 import nl.ou.testar.tgherkin.model.Step;
-import nl.ou.testar.tgherkin.model.NumberOfTimesRepeatingStep;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.tgherkin.model.Tag;
@@ -42,6 +40,7 @@ import nl.ou.testar.tgherkin.model.TypeGesture;
 import nl.ou.testar.tgherkin.model.WhenClause;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * The DocumentBuilder class creates the corresponding model of a Tgherkin text file.

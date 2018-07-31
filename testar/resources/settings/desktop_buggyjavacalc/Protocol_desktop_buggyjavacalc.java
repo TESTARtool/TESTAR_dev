@@ -35,25 +35,26 @@ package desktop_buggyjavacalc;
  *  @author Urko Rueda Molina (protocol refactor & cleanup)
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
 import java.io.File;
 import java.util.Set;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { // DefaultProtocol {
 
@@ -71,7 +72,9 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
-	 */
+	 * @param sut SUT
+	 * @param state State of SUT
+     */
 	protected void beginSequence(SUT sut, State state) {
 
 		super.beginSequence(sut, state);
@@ -88,6 +91,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
+	 * @throws SystemStartException if error occurs
 	 */
 	protected SUT startSystem() throws SystemStartException {
 		
@@ -102,6 +106,8 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
+	 * @param system SUT
+	 * @throws StateBuildException if error occurs
 	 */
 	protected State getState(SUT system) throws StateBuildException {
 
@@ -113,6 +119,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 * @param state State of SUT
 	 */
 	protected Verdict getVerdict(State state) {
 
@@ -139,6 +146,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @return  a set of actions
+	 * @throws ActionBuildException if error occurs
 	 */
 
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
@@ -208,6 +216,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	 * current sequence. You could stop the sequence's generation after a given amount of executed
 	 * actions or after a specific time etc.
 	 * @return  if <code>true</code> continue generation, else stop
+	 * @param state State of SUT
 	 */
 	protected boolean moreActions(State state) {
 
@@ -219,6 +228,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 * @param recordedSequence file containing recorded sequence
 	 */
 	protected void finishSequence(File recordedSequence) {
 		

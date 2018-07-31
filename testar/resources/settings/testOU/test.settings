@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" --force-renderer-accessibility "https://mijn.awo.ou.nl"
+SUTConnectorValue = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"  --force-renderer-accessibility "https://mijn.awo.ou.nl"
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -91,9 +91,9 @@ GraphDBPassword = testar
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
-ReportDerivedGestures = true
-Reportstate = true
-TgherkinDocument = ./resources/settings/testOU/OU_ATI.tgherkin
+ReportDerivedGestures = false
+Reportstate = false
+TgherkinDocument = ./resources/settings/testOU/OU_ATI - order course.tgherkin
 Discount = 0.95
 TgherkinNrOfNOPRetries = 100
 TempDir = ./resources/output/temp
@@ -103,7 +103,7 @@ PrologActivated = false
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
-ApplyDefaultOnMismatch = false
+ApplyDefaultOnMismatch = true
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 AlgorithmFormsFilling = false
@@ -114,7 +114,7 @@ MaxReward = 9999999.0
 StoreTgherkinReport = false
 LogLevel = 1
 VisualizeSelectedAction = true
-TgherkinReportIncludeOCR = false
+TgherkinReportIncludeOCR = true
 Delete = 
 MyClassPath = ./resources/settings
 ReplayRetryTime = 30.0
@@ -124,7 +124,7 @@ ForceToSequenceLength = false
 OutputDir = ./resources/output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 1.0
+StartupTime = 3.0
 ActionDuration = 0.2
 NonReactingUIThreshold = 100
 ContinueToApplyDefault = false

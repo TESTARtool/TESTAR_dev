@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import nl.ou.testar.tgherkin.protocol.DerivedGesturesReportItem;
+import nl.ou.testar.tgherkin.protocol.Report;
+import nl.ou.testar.utils.report.Reporter;
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
@@ -15,10 +17,6 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.monkey.ConfigTags;
-
-import nl.ou.testar.tgherkin.protocol.DerivedGesturesReportItem;
-import nl.ou.testar.tgherkin.protocol.Report;
-import nl.ou.testar.utils.report.Reporter;
 
 /**
  * Representation of a Tgherkin step.

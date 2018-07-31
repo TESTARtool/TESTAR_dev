@@ -83,7 +83,7 @@ public class TgherkinErrorListenerTest {
 
     private void setUpTestCase4() {
         // test case 4: feature is missing
-        testMap.put( 
+        testMap.put(
                 "  Scenario: Add two numbers\r\n" 
                 + "    Step: Step 1 \r\n" 
                 + "        When  $Title=\"Een\" click()\r\n" 

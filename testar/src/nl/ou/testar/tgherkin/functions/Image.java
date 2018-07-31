@@ -2,9 +2,16 @@ package nl.ou.testar.tgherkin.functions;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.tgherkin.TgherkinException;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Shape;
@@ -16,10 +23,6 @@ import org.sikuli.script.Finder;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.tgherkin.TgherkinException;
-import nl.ou.testar.tgherkin.model.ProtocolProxy;
-
 /**
  * Singleton class responsible for image recognition.
  * This class supports the Tgherkin image function.
@@ -27,6 +30,7 @@ import nl.ou.testar.tgherkin.model.ProtocolProxy;
  */
 public class Image {
 
+	private int teller = 0;
 	private static final double TOLERANCE = 5E-16;
 	private static Image image = new Image();
 	private boolean invalidSikuliXInstallation;
@@ -47,8 +51,6 @@ public class Image {
 		return image;
 	}
 	
-
-
 	/**
 	 * Collect image recognition results for all top widgets of the state.
 	 * @param proxy document protocol proxy 
@@ -56,11 +58,10 @@ public class Image {
 	 */
 	public void updateAllWidgets(ProtocolProxy proxy, String imageFile) {
 		for (Widget widget : proxy.getTopWidgets(state)) {
-			isRecognized(proxy, widget, imageFile);
+			;
 		}
 	}
 	
-
 	/**
 	 * Determine whether the widget image is recognized as the reference image.
 	 * @param proxy document protocol proxy
@@ -69,7 +70,8 @@ public class Image {
 	 * @return true if recognized, otherwise false
 	 */
 	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile) {
-		return (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+		boolean istrue = (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+		return istrue;
 	}
 
 	/**
@@ -123,6 +125,15 @@ public class Image {
 
 	// SikuliX image recognition
 	private Double imageRecognition(ProtocolProxy proxy, BufferedImage refShot, BufferedImage widgetShot) {
+	  /* create image files for buffered images
+	    try {
+            BufferedImage bi = widgetShot;
+            File outputfile = new File("temp_image" + teller++ + ".png");
+            ImageIO.write(bi, "png",outputfile);
+        } 
+        catch (IOException e2) {
+        }
+        */
 		double confidence = 0;
 		if (!invalidSikuliXInstallation) {
 			try {
@@ -158,5 +169,4 @@ public class Image {
 		}
 		return confidence;
 	}
-	
 }

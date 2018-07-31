@@ -218,6 +218,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	
 	/**
 	 * Write implementation-specific offline evaluation result details to the HTML report.
+	 * @param results evaluation results
 	 */
 	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {}
 

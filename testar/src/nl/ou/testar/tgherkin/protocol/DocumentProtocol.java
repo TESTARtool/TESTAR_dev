@@ -5,6 +5,12 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
+
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.tgherkin.Utils;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
+import nl.ou.testar.tgherkin.model.Document;
+import nl.ou.testar.utils.report.Reporter;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -15,12 +21,6 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import nl.ou.testar.tgherkin.Utils;
-import nl.ou.testar.tgherkin.model.ProtocolProxy;
-import nl.ou.testar.tgherkin.model.Document;
-import nl.ou.testar.utils.report.Reporter;
 
 /**
  * Class responsible for executing a protocol enriched with a Tgherkin Document model.
@@ -53,6 +53,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 			PrintStream out = new PrintStream(new FileOutputStream("A3.txt"));
 			System.setOut(out);
 		} catch(Exception e) {
+			e.printStackTrace();
 		}
 		//####TEMP End
 		super.initialize(settings);

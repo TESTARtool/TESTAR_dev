@@ -34,15 +34,14 @@
  */
 package org.fruit.alayer.windows;
 
-import org.fruit.Util;
-import org.fruit.alayer.*;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import org.fruit.Util;
+import org.fruit.alayer.*;
 
 public class StateFetcher implements Callable<UIAState> {
 	
@@ -115,18 +114,14 @@ public class StateFetcher implements Callable<UIAState> {
 		
 		String processName = Windows.GetProcessNameFromHWND(hwnd);
 		
-		if (processName != null && !(processName.isEmpty()) 
-				&& StateFetcher.sutProcessesMatcher.matcher(processName).matches()) {
-			return true;
-		} else {
-			return false;
-		}
+		return processName != null && !(processName.isEmpty()) 
+				&& StateFetcher.sutProcessesMatcher.matcher(processName).matches();
 	}
 
 	/**
 	 * 
 	 * @param system
-	 * @return
+	 * @return root element
 	 */
 	private UIARootElement buildSkeletton(SUT system) {
 		UIARootElement uiaRoot = buildRoot(system);

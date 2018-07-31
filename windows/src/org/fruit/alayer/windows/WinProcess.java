@@ -105,7 +105,6 @@ public final class WinProcess extends SUTBase {
 		throw new SystemStartException("Process '" + processName + "' not found!");
 	}
 	
-	// by urueda
 	public static List<SUT> fromAll() {
 		List<WinProcHandle> processes = runningProcesses();
 		if (processes == null || processes.isEmpty()) {
@@ -139,8 +138,6 @@ public final class WinProcess extends SUTBase {
 			throw new SystemStartException(fe);
 		}
 	}
-
-	// begin by wcoux
 	
 	public static WinProcess fromExecutableUwp(String appUserModelId) 
 			throws SystemStartException {
@@ -195,12 +192,9 @@ public final class WinProcess extends SUTBase {
 		}
 	}
 
-	// end by wcoux
-
 	public static boolean isForeground(long pid) {
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("[WinProcess] foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
 		return !Windows.IsIconic(hwnd) && (wpid == pid);
 	}
 

@@ -9,13 +9,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.fruit.Util;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.monkey.ConfigTags;
-
 import nl.ou.testar.tgherkin.TgherkinImageFileAnalyzer;
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.functions.Image;
@@ -23,6 +16,11 @@ import nl.ou.testar.tgherkin.functions.OCR;
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.utils.report.ReportItem;
+import org.fruit.Util;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
 
 /**
  * Class responsible for the generation of the Tgherkin State report.

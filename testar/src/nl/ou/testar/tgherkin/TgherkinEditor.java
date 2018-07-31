@@ -263,6 +263,8 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		 * Returns the line number of the element based on the given (start) offset
 		 * in the editor model. Returns null if no line number should or could be
 		 * provided (e.g. for wrapped lines).
+		 * @param offset offset in the editor model
+		 * @return line number
 		 */
 		private String getLineNumber(int offset) {
 			Element root = editor.getDocument().getDefaultRootElement();
@@ -277,6 +279,9 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		/**
 		 * Returns the y axis position for the line number belonging to the element
 		 * at the given (start) offset in the model.
+		 * @throws BadLocationException if error occurs	
+		 * @param offset offset in the model
+		 * @return offset for y coordinate
 		 */
 		private int getOffsetY(int offset) throws BadLocationException {
 			FontMetrics fontMetrics = editor.getFontMetrics(editor.getFont());
@@ -289,6 +294,8 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		/**
 		 * Returns true if the given start offset in the model is the selected (by
 		 * cursor position) element.
+		 * @param offset offset in the model
+		 * @return current line
 		 */
 		private boolean isCurrentLine(int offset) {
 			int caretPosition = editor.getCaretPosition();

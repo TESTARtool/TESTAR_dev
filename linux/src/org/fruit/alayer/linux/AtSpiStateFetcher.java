@@ -543,7 +543,6 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         }
 
 
-        //System.out.println("[" + getClass().getSimpleName() + "] Could not find frame, window, dialog element and set the z-index on it and its children.");
         return false;
 
 

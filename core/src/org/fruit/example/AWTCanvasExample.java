@@ -48,6 +48,11 @@ import org.fruit.alayer.Pen;
 import org.fruit.alayer.Rect;
 
 public class AWTCanvasExample {
+	
+	private AWTCanvasExample() {
+		// default constructor
+	}
+	
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		final int xres = 1024;

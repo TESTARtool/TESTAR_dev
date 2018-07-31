@@ -34,12 +34,6 @@
 
 package org.fruit;
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-
-import javax.tools.*;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -49,6 +43,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
+import javax.tools.*;
+import org.fruit.alayer.*;
+import org.fruit.alayer.devices.Mouse;
+import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.exceptions.WidgetNotFoundException;
+
+
 
 /**
  * Utility methods.
@@ -272,6 +273,7 @@ public final class Util {
         try {
           Thread.sleep(sleepT);
         } catch (InterruptedException e) {
+        	e.printStackTrace();
         }
       }
     } while (sleepT > 0);

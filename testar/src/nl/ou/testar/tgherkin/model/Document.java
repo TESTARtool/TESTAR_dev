@@ -33,7 +33,6 @@ public class Document {
 		index = -1;
 	}
 
-
 	/**
 	 * Retrieve features.
 	 * @return list of features

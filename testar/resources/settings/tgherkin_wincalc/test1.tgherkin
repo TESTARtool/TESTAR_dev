@@ -4,14 +4,14 @@ Feature: Perform calculations with windows calculator
   Background: Clear.
     Step: Select Clear
 		When	matches($UIAAutomationId,"clearButton") click()
-				image("settings\tgherkin_wincalc\clearButton.png") click()
+				image("resources\settings\tgherkin_wincalc\clearButton.png") click()
 				$UIAAutomationId="clearButton" click()
 				xpath("//widget[Title='Wissen']") click()
 			
   @Sc1 @Prod
   Scenario: Add two numbers
     Step: Select 2
-		When  image("settings\tgherkin_wincalc\num2Button.png") click()
+		When  image("resources\settings\tgherkin_wincalc\num2Button.png") click()
 			$UIAAutomationId="num2Button" click()
 			ocr()="^2$" click()
 

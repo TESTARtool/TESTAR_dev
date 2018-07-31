@@ -2,12 +2,10 @@ package nl.ou.testar.tgherkin;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
 import nl.ou.testar.tgherkin.gen.TgherkinParser.HitKeyArgumentContext;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * TgherkinTokenAnalyzer analyzes a Tgherkin text for usage within an editor.

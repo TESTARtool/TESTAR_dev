@@ -66,6 +66,7 @@ public final class TextVisualizer implements Visualizer {
 			Pair<Double, Double> m = cv.textMetrics(pen, text);
 			cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
 		} catch (PositionException pe) {
+			pe.printStackTrace();
 		}			
 	}
 }

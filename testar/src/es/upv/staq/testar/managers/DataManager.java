@@ -124,7 +124,7 @@ public class DataManager {
      * @return The random data.
      */
     public static String getRandomData() {
-    	switch( rnd.nextInt(3)) {
+    	switch (rnd.nextInt(3)) {
     	case 0: // primitive text
     		return DataManager.getRandomPrimitiveDataTypeText();
     	case 1: // primitive number
@@ -247,6 +247,7 @@ public class DataManager {
 				try {
 					stream.close();
 				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

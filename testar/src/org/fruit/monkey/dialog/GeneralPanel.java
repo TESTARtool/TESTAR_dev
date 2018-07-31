@@ -27,15 +27,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.ProtocolEditor;
-import org.fruit.monkey.Settings;
-import org.fruit.monkey.SettingsDialog;
+import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -43,8 +38,11 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
-
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
+import javax.swing.*;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.ProtocolEditor;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsDialog;
 
 public class GeneralPanel extends JPanel {
   private static final long serialVersionUID = 1L;

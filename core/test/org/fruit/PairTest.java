@@ -30,9 +30,9 @@
 
 package org.fruit;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * Unit test for Pair class

@@ -5,7 +5,7 @@ public class Calculator {
         System.out.println("[" + getClass().getSimpleName() + "]  " +  calc);
     }
 
-    public static enum Keys{
+    public enum Keys{
         Zero, One, Two, Three, Four, Five,
         Six, Seven, Eight, Nine, Plus, Minus,
         Times, Divide, Equals, Cos, Tan, Sin,

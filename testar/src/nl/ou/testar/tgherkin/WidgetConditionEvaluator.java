@@ -1,20 +1,12 @@
 package nl.ou.testar.tgherkin;
 
+import es.upv.staq.testar.NativeLinker;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.linux.AtSpiTags;
-import org.fruit.alayer.windows.UIATags;
-
-import es.upv.staq.testar.NativeLinker;
 import nl.ou.testar.tgherkin.functions.Image;
 import nl.ou.testar.tgherkin.functions.Matches;
 import nl.ou.testar.tgherkin.functions.OCR;
@@ -25,6 +17,12 @@ import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
 import nl.ou.testar.tgherkin.model.DataTable;
+import org.fruit.alayer.Shape;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+import org.fruit.alayer.linux.AtSpiTags;
+import org.fruit.alayer.windows.UIATags;
 
 /**
  * Class responsible for the evaluation of a WidgetCondition.

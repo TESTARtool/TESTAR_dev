@@ -34,18 +34,17 @@
 package org.fruit.alayer;
 
 import es.upv.staq.testar.CodingManager;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.fruit.Pair;
 import org.fruit.Proc;
 import org.fruit.UnFunc;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.ProcessHandle;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public final class Tags extends TagsBase {
 	

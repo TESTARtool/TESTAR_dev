@@ -190,8 +190,9 @@ public class JIPrologWrapper { // implements JIPEventListener{
 	private void debugStateFactsNrules() {
 		System.out.println("[" + getClass().getSimpleName() + "] \n>>> State-Rules <<<\n-------------------\n");
 		if (this.prologBase.stateRules != null) {
-			for (String s : this.prologBase.stateRules)
+			for (String s : this.prologBase.stateRules) {
 				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
+			}
 		}
 		System.out.println("[" + getClass().getSimpleName() + "] \n>>> State-Facts <<<\n-------------------\n");    	
 		if (this.prologBase.stateFacts != null) {
@@ -204,21 +205,24 @@ public class JIPrologWrapper { // implements JIPEventListener{
 	private void debugActionFactsNrules() {    	
 		System.out.println("[" + getClass().getSimpleName() + "] >>> Action-Rules <<<\n--------------------\n");
 		if (this.prologBase.actionRules != null) {
-			for (String s : this.prologBase.actionRules)
+			for (String s : this.prologBase.actionRules) {
 				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
+			}
 		}
 		System.out.println("[" + getClass().getSimpleName() + "] >>> Action-Facts <<<\n--------------------\n");
 		if (this.prologBase.actionFacts != null) {
-			for (String s : this.prologBase.actionFacts)
+			for (String s : this.prologBase.actionFacts) {
 				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
+			}
 		}
 	}
 
 	private void debugEnvironmentFactsNrules() {
 		System.out.println("[" + getClass().getSimpleName() + "] >>> Environment-Rules <<<\n-------------------------\n");
 		if (this.prologBase.envRules != null) {
-			for (String s : this.prologBase.envRules)
+			for (String s : this.prologBase.envRules) {
 				System.out.println("[" + getClass().getSimpleName() + "]  " +  s);
+			}
 		}
 		System.out.println("[" + getClass().getSimpleName() + "] >>> Environment-Facts <<<\n-------------------------\n");    	
 		if (this.prologBase.envFacts != null) {

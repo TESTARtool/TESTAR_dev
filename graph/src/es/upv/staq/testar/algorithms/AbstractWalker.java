@@ -154,7 +154,7 @@ public abstract class AbstractWalker implements IWalker {
 		if (actionWCount[0] == 0) { // action count (concrete) 
 			actionReward = 1.0d;
 		} else {
-			actionReward = 1.0d / ( actionWCount[0] * // action count (concrete)
+			actionReward = 1.0d / (actionWCount[0] * // action count (concrete)
 									Math.log(actionWCount[1] + Math.E - 1)); // action type count (abstract)
 		}
 		IGraphState gs = env.getSourceState(action);

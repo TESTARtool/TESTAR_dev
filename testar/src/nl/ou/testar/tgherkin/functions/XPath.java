@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.tgherkin.TgherkinException;
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 
 /**
  * Singleton class responsible for the handling of XPath expressions.

@@ -33,15 +33,13 @@ package nl.ou.testar.a11y.wcag2;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.GremlinStart;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 
 /**
  * A WCAG 2.0 guideline.

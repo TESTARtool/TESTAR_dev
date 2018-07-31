@@ -130,7 +130,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * @author urueda
 	 * @param mustContain Format is &lt;SUTConnector:string&gt; (e.g. SUT_PROCESS_NAME:proc_name or SUT_WINDOW_TITLE:window_title)
 	 * @return running SUT
-	 * @throws SystemStartException
+	 * @throws SystemStartException if error occurs
 	 */
 	protected SUT startSystem(String mustContain) throws SystemStartException {
 		return startSystem(mustContain, true, Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0));
@@ -161,34 +161,33 @@ public class DefaultProtocol extends AbstractProtocol {
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME)) {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		}
-		else { 
+		else {
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
-			
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
-					   ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
+					   engageTime = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 			State state;
 			do {
 				if (sut.isRunning()) {
 					System.out.println("[" + getClass().getSimpleName() + "] SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 					state = builder.apply(sut);
 					if (state != null && state.childCount() > 0) {
-						long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
+						long extraTime = tryToKillIfRunning ? 0 : engageTime;
 						System.out.println("[" + getClass().getSimpleName() + "] SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 						return sut;
 					}
 				}
 				Util.pauseMs(500);				
-			} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
+			} while (mode() != Modes.Quit && System.currentTimeMillis() - now < engageTime);
 			if (sut.isRunning()) {
 				sut.stop();
 			}
 			// issue starting the SUT
 			if (tryToKillIfRunning) {
-				return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
+				return tryKillAndStartSystem(mustContain, sut, engageTime);
 			} else {
-				throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+				throw new SystemStartException("SUT not running after <" + Math.round(engageTime * 2.0) + "> ms!");							
 			}
 		}
 	}

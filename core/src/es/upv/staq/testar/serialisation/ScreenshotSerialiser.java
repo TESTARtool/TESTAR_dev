@@ -91,7 +91,8 @@ public class ScreenshotSerialiser extends Thread {
 			while (alive && scrshotSavingQueue.isEmpty()) {
 				try {
 					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e1) {
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			if (!scrshotSavingQueue.isEmpty()) {

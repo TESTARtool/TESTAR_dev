@@ -236,6 +236,7 @@ public class FilteringManager {
 				try {
 					stream.close();
 				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

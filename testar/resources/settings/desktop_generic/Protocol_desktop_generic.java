@@ -35,27 +35,24 @@ package desktop_generic;
  * @author Urko Rueda Molina
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
+
 import java.io.File;
 import java.util.Set;
-
 import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-
+import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.ConfigTags;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
-
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_desktop_generic extends ClickFilterLayerProtocol { // DefaultProtocol {
 

@@ -107,6 +107,8 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence.
+	 * @param sut SUT
+	 * @param state State of SUT
 	 */
 	protected void beginSequence(SUT sut, State state) {
 		
@@ -124,6 +126,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
+	 * @throws SystemStartException if error occurs
 	 */
 	protected SUT startSystem() throws SystemStartException {
         
@@ -139,7 +142,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * own state fetching routine. The state should have attached an oracle 
 	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
 	 * state is erroneous and if so why.
+	 * @param   system  SUT
 	 * @return  the current state of the SUT with attached oracle.
+	 * @throws StateBuildException if error occurs
 	 */
 	protected State getState(SUT system) throws StateBuildException {
 		
@@ -160,6 +165,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
+	 * @param state State of SUT
 	 */
 	protected Verdict getVerdict(State state) {
 		
@@ -243,6 +249,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @return  a set of actions
+	 * @throws ActionBuildException if error occurs
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		
@@ -347,11 +354,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	// by urueda
 	private boolean isAtBrowserCanvas(Widget w) {
 		Shape shape = w.get(Tags.Shape,null);
-		if (shape != null && shape.y() > browser_toolbar_filter) {
-			return true;
-		} else {
-			return false;	
-		}
+		return shape != null && shape.y() > browser_toolbar_filter;
 	}
 		
 	/**
@@ -384,6 +387,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * current sequence. You could stop the sequence's generation after a given amount of executed
 	 * actions or after a specific time etc.
 	 * @return  if <code>true</code> continue generation, else stop
+	 * @param state State of SUT
 	 */
 	protected boolean moreActions(State state) {
 		
@@ -394,6 +398,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 * @param recordedSequence file containing recorded sequence
 	 */
 	protected void finishSequence(File recordedSequence) {
 		

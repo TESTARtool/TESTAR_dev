@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
@@ -35,15 +34,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.fruit.Assert;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.a11y.protocols.Evaluator;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
-
+import org.fruit.Assert;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Widget;
 /**
  * An abstract WCAG guideline
  * Subclasses implement specific guideline behavior.

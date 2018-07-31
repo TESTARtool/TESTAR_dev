@@ -429,7 +429,10 @@ public class GraphReporter {
 				for (IGraphAction gaBT : actionsIntersect) {
 					clusterCount += gaBT.getCount();
 					clusterOrder += gaBT.getOrder(env.getGraphStateClusters().get(abstractTID));
-					if (gaBT.knowledge()) k = true; if (gaBT.revisited()) {
+					if (gaBT.knowledge()) {
+						k = true; 
+					}
+					if (gaBT.revisited()) {
 						r = true;
 					}
 				}
@@ -664,13 +667,15 @@ public class GraphReporter {
 		report[0] = ReportPages.getClustersPageReport(env);
 
 		GraphEdge[] orderedActions = env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
-		int SEQUENCE_LENGTH = (int)Math.log10((double)orderedActions.length) + 1;
-		if (SEQUENCE_LENGTH < 4)
-			SEQUENCE_LENGTH = 4; // minimum column width
+		int sequenceLength = (int)Math.log10((double)orderedActions.length) + 1;
+		if (sequenceLength < 4) {
+			// minimum column width
+			sequenceLength = 4; 
+		}
 		
-		report[1] = ReportPages.getTestTablePageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH,firstSequenceActionNumber);
-		report[2] = ReportPages.getExplorationCurvePageReport(env,tGraph,SEQUENCE_LENGTH,firstSequenceActionNumber);
-		report[3] = ReportPages.getStatsPageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH);
+		report[1] = ReportPages.getTestTablePageReport(env,tGraph,orderedActions,sequenceLength,firstSequenceActionNumber);
+		report[2] = ReportPages.getExplorationCurvePageReport(env,tGraph,sequenceLength,firstSequenceActionNumber);
+		report[3] = ReportPages.getStatsPageReport(env,tGraph,orderedActions,sequenceLength);
 		return report;
 	}
 	

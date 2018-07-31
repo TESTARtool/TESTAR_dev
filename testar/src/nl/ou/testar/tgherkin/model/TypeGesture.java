@@ -15,8 +15,8 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.CompoundAction.Builder;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 
 /**

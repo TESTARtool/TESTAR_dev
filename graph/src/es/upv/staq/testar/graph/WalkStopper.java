@@ -57,7 +57,6 @@ public class WalkStopper {
 	 * @param endState Ending state.
 	 */
 	public void stopWalk(boolean status, State endState) {
-		//System.out.println("[" + getClass().getSimpleName() + "] STOPPED WALK!");
 		alive = false;
 		this.status = status;
 		this.endState = endState;

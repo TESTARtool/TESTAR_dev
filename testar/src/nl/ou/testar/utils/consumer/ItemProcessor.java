@@ -13,7 +13,7 @@ public class ItemProcessor implements Runnable  {
 	 * Poll timeout in seconds.
 	 */
 	public static final long TIMEOUT = 10;
-	private BlockingQueue< Item> jobQueue;  
+	private BlockingQueue<Item> jobQueue;  
 	private volatile boolean keepProcessing;  
 
 	/**

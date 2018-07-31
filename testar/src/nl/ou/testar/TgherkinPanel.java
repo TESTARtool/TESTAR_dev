@@ -1,11 +1,16 @@
 package nl.ou.testar;
 
+import static org.fruit.monkey.ConfigTags.MyClassPath;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -13,24 +18,14 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JLabel;
 import javax.swing.SpinnerNumberModel;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
 import nl.ou.testar.tgherkin.TgherkinEditor;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
-
-import javax.swing.JLabel;
-
-import static org.fruit.monkey.ConfigTags.MyClassPath;
-
 import org.fruit.UnProc;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
-import java.util.List;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 
 /**
@@ -314,11 +309,13 @@ public class TgherkinPanel extends JPanel {
 				documentProtocol = true;
 			}
 		} catch(Exception e) {
+			e.printStackTrace();
 		} finally {
 			if (loader != null) {
 				try { 
 					loader.close(); 
 				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}	
 		}

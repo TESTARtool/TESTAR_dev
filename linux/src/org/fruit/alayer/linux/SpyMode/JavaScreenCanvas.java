@@ -152,7 +152,6 @@ public class JavaScreenCanvas implements Canvas {
         runningCheck();
         //System.out.println("[" + getClass().getSimpleName() + "] Clear: (" + x + ", " + y + ").");
         _paneReference.clearDrawableContent();
-
     }
 
 

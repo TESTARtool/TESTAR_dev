@@ -30,14 +30,13 @@
 
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.SettingsDialog;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
+
+import java.awt.*;
+import java.io.IOException;
+import javax.swing.*;
+import org.fruit.monkey.SettingsDialog;
 
 public class AboutPanel extends JPanel {
   private static final long serialVersionUID = 1L;

@@ -339,5 +339,4 @@ public class Feature {
     	}
     	return scenarioDefinitions.get(index);
     }
-    
 }

@@ -60,6 +60,7 @@ public interface Taggable {
 	 * If this object does not have the corresponding tag, then this method
 	 * throws a <code>NoSuchTagException</code>
 	 * @param tag tag to retrieve
+	 * @param <T> tag type
 	 * @return the value associated with <code>tag</code>
 	 * @throws NoSuchTagException if the tag is not attached to this object
 	 */
@@ -70,6 +71,7 @@ public interface Taggable {
 	 * if the tag is not attached to this object.
 	 * @param tag the tag for which to retrieve the value
 	 * @param defaultValue the value that is returned if the tag is not available
+	 * @param <T> tag type
 	 * @return the value associated with <code>tag</code> or <code>defaultValue</code>.
 	 */
 	<T> T get(Tag<T> tag, T defaultValue);
@@ -84,6 +86,7 @@ public interface Taggable {
 	 * Attach <code>tag</code> to this object and associate it with <code>value</code>.
 	 * @param tag tag to attach to this object
 	 * @param value the value to associate with <code>tag</code>
+	 * @param <T> tag type
 	 */
 	<T> void set(Tag<T> tag, T value);
     

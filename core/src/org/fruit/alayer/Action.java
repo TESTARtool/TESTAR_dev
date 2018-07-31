@@ -34,13 +34,15 @@
 
 package org.fruit.alayer;
 
+import es.upv.staq.testar.CodingManager;
 import java.io.Serializable;
 import java.util.List;
 
 import org.fruit.alayer.actions.BriefActionRolesMap;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.ActionFailedException;
 
-import es.upv.staq.testar.CodingManager;
+
 
 /**
  * Actions take a system and a state as parameters and operate on the system (e.g. a left click). They
@@ -71,7 +73,8 @@ public interface Action extends Taggable, Serializable {
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param duration the duration of the action in seconds
-	 * @throws ActionFailedException
+	 * @throws ActionFailedException if error occurs
+	 * @throws ActionBuildException 
 	 */
 	void run(SUT system, State state, double duration) throws ActionFailedException;
 

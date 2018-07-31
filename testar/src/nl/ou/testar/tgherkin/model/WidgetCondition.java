@@ -1,17 +1,15 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.List;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.fruit.Assert;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.WidgetConditionEvaluator;
 import nl.ou.testar.tgherkin.WidgetConditionValidator;
 import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.fruit.Assert;
+import org.fruit.alayer.Widget;
 
 /**
  * Representation of a widget condition that delegates evaluation to WidgetConditionEvaluator.
@@ -93,6 +91,7 @@ public class WidgetCondition {
 		try {
 			result = (Boolean)evaluator.visit(parser.widget_condition());
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return result;
 	}

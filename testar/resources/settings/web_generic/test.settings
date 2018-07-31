@@ -11,19 +11,30 @@ Mode = Spy
 #
 # Indicate how you want to connect to the SUT:
 #
-# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that
 # starts the SUT.
 # It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
 # For web applications, follow the next format: web_browser_path SUT_URL.
 #
-# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed
 # in the SUT main window. The SUT must be manually started and closed.
 #
-# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.google.com/"
+SUTConnectorValue = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"  --force-renderer-accessibility "https://mijn.awo.ou.nl/home"
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = false
 
 #################################################################
 # Sequences
@@ -31,7 +42,7 @@ SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https:
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 2
 SequenceLength = 100
 
 #################################################################
@@ -58,7 +69,7 @@ ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]ri
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+SUTProcesses = 
 
 #################################################################
 # Protocolclass
@@ -72,40 +83,66 @@ ProtocolClass = web_generic/Protocol_web_generic
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBUrl = 
+GraphDBUser = 
+GraphDBPassword = 
 
 #################################################################
 # Other more advanced settings
 #################################################################
-
-ProcessesToKillDuringTest =
-OutputDir = ./resources/output
-PathToReplaySequence = ./output/temp
+TypingTextsForExecutedAction = 10
+ReportDerivedGestures = false
+Reportstate = false
+TgherkinDocument = 
+Discount = 0.95
+TgherkinNrOfNOPRetries = 0
 TempDir = ./resources/output/temp
+MaxTime = 3.1536E7
+StopGenerationOnFault = true
+PrologActivated = false
+TgherkinReportIncludeImageRecognition = false
+ExecuteActions = true
+DrawWidgetTree = false
+ApplyDefaultOnMismatch = true
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
-LogLevel = 1
-ExecuteActions = true
-FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
-MyClassPath = resources/settings
-OnlySaveFaultySequences = false
-ActionDuration = 0.0
-ShowVisualSettingsDialogOnStartup = true
-ReplayRetryTime = 30.0
-Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+AlgorithmFormsFilling = false
+GenerateTgherkinReport = false
+FaultThreshold = 1.0E-9
 DrawWidgetInfo = false
-TimeToFreeze = 30.0
-StopGenerationOnFault = true
-CopyFromTo =
-VisualizeActions = false
+MaxReward = 9999999.0
+StoreTgherkinReport = false
+LogLevel = 1
 VisualizeSelectedAction = true
+TgherkinReportIncludeOCR = false
+Delete = 
+MyClassPath = resources/settings
+ReplayRetryTime = 30.0
+ProcessesToKillDuringTest = 
+ShowSettingsAfterTest = true
+ForceToSequenceLength = true
+OutputDir = ./resources/output
+UnattendedTests = false
 TestGenerator = random
-MaxReward = 9999999
-Discount = .95
+StartupTime = 10.0
+ActionDuration = 0.0
+NonReactingUIThreshold = 100
+ContinueToApplyDefault = true
+ConfidenceThreshold = 1.0
+GraphsActivated = true
+GraphResuming = true
+CopyFromTo = 
+TimeToFreeze = 30.0
+StateScreenshotSimilarityThreshold = 1.4E-45
+ShowVisualSettingsDialogOnStartup = true
+TgherkinExecutionMode = sequential
+TimeToWaitAfterAction = 0.1
+DrawWidgetUnderCursor = true
+AlwaysCompile = true
+PathToReplaySequence = ./output/temp
+VisualizeActions = false
+ExplorationSampleInterval = 1
+OnlySaveFaultySequences = false
+RepeatTgherkinScenarios = true
+MinimumPercentageForImageRecognition = 95.0
+OfflineGraphConversion = true

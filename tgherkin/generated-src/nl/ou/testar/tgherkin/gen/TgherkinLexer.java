@@ -328,14 +328,18 @@ public class TgherkinLexer extends Lexer {
 	private void EOL_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
 		case 17:
-			 if(ignoreEOL) skip();
+			 if(ignoreEOL) {
+				 skip();
+			 }
 			break;
 		}
 	}
 	private void WS_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
 		case 18:
-			 if(ignoreWS) skip();
+			 if(ignoreWS) {
+				 skip();
+			 }
 			break;
 		}
 	}

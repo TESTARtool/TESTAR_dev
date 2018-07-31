@@ -65,7 +65,7 @@ public enum KBKeys {
 	VK_WINDOWS(KeyEvent.VK_WINDOWS), VK_CONTEXT_MENU(KeyEvent.VK_CONTEXT_MENU);
 
 	private final int code;
-	private KBKeys(int code) { 
+	KBKeys(int code) { 
 		this.code = code; 
 	}
 	

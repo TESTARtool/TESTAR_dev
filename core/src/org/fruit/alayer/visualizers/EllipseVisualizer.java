@@ -66,6 +66,7 @@ public final class EllipseVisualizer implements Visualizer {
 			Point p = position.apply(state);
 			canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
 		} catch (PositionException pe) {
+			pe.printStackTrace();
 		}
 	}
 }

@@ -57,7 +57,7 @@ public class FormsFilling {
 	private static final int WIDGET_TYPING_COUNTDOWN_THRESHOULD =
 		100; // how many executed actions to wait for before retyping takes place?
 	// typing actions prioritizing
-	private static HashMap<String,Integer> widgetsTypingHistory = new HashMap< 
+	private static HashMap<String,Integer> widgetsTypingHistory = new HashMap<
 		String, // widget-id
 		Integer // 0 => widget to be typed; >0 => widget typed with count-down on the #executed_ations for retyping
 		>();  	

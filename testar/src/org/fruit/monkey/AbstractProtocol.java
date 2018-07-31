@@ -257,7 +257,7 @@ public abstract class AbstractProtocol
 
 	/**
 	 * Kills the SUT process. 
-	 * @param sut
+	 * @param sut SUT
 	 * @param KILL_WINDOW
 	 * @return true if the process is not running anymore (killing might not happen)
 	 */
@@ -391,7 +391,6 @@ public abstract class AbstractProtocol
 		// This is not ideal, because now special characters and capital letters and other events that needs SHIFT
 		// cannot be recorded as an user event in GenerateManual....
 		} else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.GenerateManual && userEvent == null) {
-			//System.out.println("USER_EVENT key_down! " + key.toString());
 			userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
 		}
 
@@ -407,7 +406,7 @@ public abstract class AbstractProtocol
 	}
 
 	/**
-	 * TESTAR does not listen to mouse down clicks in any mode
+	 * TESTAR does not listen to mouse down clicks in any mode.
 	 * @param btn
 	 * @param x
 	 * @param y
@@ -434,8 +433,8 @@ public abstract class AbstractProtocol
 	}
 
 	/**
-	 * Return the mode TESTAR is currently in
-	 * @return
+	 * Return the mode TESTAR is currently in.
+	 * @return mode TESTAR is currently in
 	 */
 	public synchronized Modes mode() {
 		return mode;
@@ -443,7 +442,7 @@ public abstract class AbstractProtocol
 
 	/**
 	 * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
-	 * Show the flashfeedback in the upperleft corner of the screen
+	 * Show the flashfeedback in the upperleft corner of the screen.
 	 * @param forward is set in keyDown method
 	 */
 	private synchronized void nextMode(boolean forward) {
@@ -595,8 +594,8 @@ public abstract class AbstractProtocol
 	/**
 	 *
 	 * @param canvas
-	 * @param state
-	 * @param system
+	 * @param state State of SUT
+	 * @param system SUT
 	 */
 	private synchronized void visualizeState(Canvas canvas, State state, SUT system) {
 		if ((mode() == Modes.Spy
@@ -756,6 +755,7 @@ public abstract class AbstractProtocol
 				}
 			}
 		} catch (NoSuchTagException ex) {
+			ex.printStackTrace();
 		}
 		return 1; // default
 	}
@@ -835,7 +835,7 @@ public abstract class AbstractProtocol
 	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
 	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
 	 * Otherwise it returns null.
-	 * @param state
+	 * @param state State of SUT
 	 * @param actions
 	 * @return null if no preSelected actions are needed.
 	 */
@@ -880,9 +880,9 @@ public abstract class AbstractProtocol
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
 	 * action selection mechanism selected.
-	 * @param state
+	 * @param state State of SUT
 	 * @param actions
-	 * @return
+	 * @return selected action
 	 */
 	protected Action selectAction(State state, Set<Action> actions) {
 		Assert.isTrue(actions != null && !actions.isEmpty());
@@ -890,8 +890,9 @@ public abstract class AbstractProtocol
 		Action a = preSelectAction(state, actions);
 		if (a != null) {
 			return a;
-		} else
+		} else {
 			return Grapher.selectAction(state,actions);
+		}
 	}
 
 	static final double MAX_ACTION_WAIT_FRAME = 1.0; // seconds
@@ -920,7 +921,7 @@ public abstract class AbstractProtocol
 	/**
 	 * Creates a file out of the given state.
 	 * could be more interesting as XML instead of Java Serialisation
-	 * @param state
+	 * @param state State of SUT
 	 */
 	private void saveStateSnapshot(final State state) {
 		try {
@@ -985,8 +986,8 @@ public abstract class AbstractProtocol
 	//TODO: Is this method needed??
 	/**
 	 * Action execution listeners override.
-	 * @param system
-	 * @param state
+	 * @param system SUT
+	 * @param state State of SUT
 	 * @param action
 	 */
 	protected abstract void actionExecuted(SUT system, State state, Action action);
@@ -1004,11 +1005,7 @@ public abstract class AbstractProtocol
 
 	private boolean isNOP(Action action) {
 		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID)) {
-			return true;
-		} else {
-			return false;
-		}
+		return as != null && as.equals(NOP.NOP_ID);
 	}
 
 	private long stampLastExecutedAction = -1;
@@ -1024,7 +1021,9 @@ public abstract class AbstractProtocol
 	 * Waits for an user UI action.
 	 * Requirement: Mode must be GenerateManual.
 	 * @author urueda
-	 */
+	 * @param system SUT
+     * @param state State of SUT
+    */
 	private void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus) {
 		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()) {
 			if (userEvent != null) {
@@ -1036,6 +1035,7 @@ public abstract class AbstractProtocol
 				try {
 					this.wait(10);
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			visualizeState(cv, state, system);
@@ -1047,7 +1047,7 @@ public abstract class AbstractProtocol
 
 	/**
 	 * Waits for an event (UI action) from adhoc-test.
-	 * @param state
+	 * @param state State of SUT
 	 * @param actionStatus
 	 * @return 'true' if problems were found.
 	 */
@@ -1057,6 +1057,7 @@ public abstract class AbstractProtocol
 				try {
 					this.wait(10);
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -1066,6 +1067,7 @@ public abstract class AbstractProtocol
 				try {
 					this.wait(adhocTestInterval - System.currentTimeMillis() + stampLastExecutedAction + 1);
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -1103,11 +1105,11 @@ public abstract class AbstractProtocol
 
 	/**
 	 * Waits for an automatically selected UI action.
-	 * @param system
-	 * @param state
+	 * @param system SUT
+	 * @param state State of SUT
 	 * @param fragment
 	 * @param actionStatus
-	 * @return
+	 * @return true if action is selected
 	 */
 	private boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus) {
 		Set<Action> actions = deriveActions(system, state);
@@ -1340,7 +1342,7 @@ public abstract class AbstractProtocol
 		while (mode() != Modes.Quit && moreSequences()) {
 			long tStart = System.currentTimeMillis();
 			LOGGER.info("[RT] Runtest started for sequence {}", sequenceCount);
-
+            System.out.println("[AbstractProtocol] Runtest started for sequence " + sequenceCount);
 			String generatedSequence = 
 				Util.generateUniqueFile(settings.get(ConfigTags.OutputDir)
 					+ File.separator + "sequences", "sequence").getName();
@@ -1886,6 +1888,7 @@ public abstract class AbstractProtocol
 						actionCount++;
 						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
 					} catch (ActionFailedException afe) {
+						afe.printStackTrace();
 					}
 
 					Util.pause(actionDelay);

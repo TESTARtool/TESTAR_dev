@@ -36,9 +36,13 @@ package web_ati_mocking;
  * @author Urko Rueda Molina, Govert Buijs
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
+import java.io.File;
+import java.util.*;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -48,12 +52,6 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
-import java.io.File;
-import java.util.*;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	
@@ -383,7 +381,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		Action action = super.selectAction(state, actions);
         System.out.println("[prot temp 1] " + mockPassed);
 		// optional mock actions
-		if ( !mockPassed) {
+		if (!mockPassed) {
 			System.out.println("[prot temp 2] " + mockPassed);
 			if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE)) {
 				System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");

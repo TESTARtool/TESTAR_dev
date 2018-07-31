@@ -11,11 +11,11 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.WidgetPosition;
 import org.fruit.alayer.actions.CompoundAction;
+import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.KeyUp;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 
 public class UrlActionCompiler extends StdActionCompiler {
@@ -36,7 +36,7 @@ public class UrlActionCompiler extends StdActionCompiler {
 			.add(leftClickAt(position), 1)
 			.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
 		// Delete the current text
-		for ( int i = 0; i < currentUrlLength + 10; i++) {
+		for (int i = 0; i < currentUrlLength + 10; i++) {
 			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
 		}
 		builder.add(new Type(text), 1);

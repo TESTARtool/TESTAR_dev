@@ -1,5 +1,6 @@
 package nl.ou.testar.tgherkin;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,13 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
+import nl.ou.testar.tgherkin.functions.Image;
+import nl.ou.testar.tgherkin.functions.OCR;
+import nl.ou.testar.tgherkin.gen.TgherkinLexer;
+import nl.ou.testar.tgherkin.gen.TgherkinParser;
+import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -28,14 +33,6 @@ import org.fruit.alayer.Widget;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.tgherkin.functions.Image;
-import nl.ou.testar.tgherkin.functions.OCR;
-import nl.ou.testar.tgherkin.gen.TgherkinLexer;
-import nl.ou.testar.tgherkin.gen.TgherkinParser;
-import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
-import nl.ou.testar.tgherkin.model.ProtocolProxy;
 
 /**
  * Utilities for processing the Tgherkin language.

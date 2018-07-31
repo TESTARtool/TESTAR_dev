@@ -30,14 +30,13 @@
 
 package es.upv.staq.testar.serialisation;
 
+import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Taggable;
-
-import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 
 /**
  * Tests serialiser..
@@ -82,7 +81,8 @@ public class TestSerialiser extends Thread {
 			while (alive && testSavingQueue.isEmpty()) {
 				try {
 					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e1) {
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			if (!testSavingQueue.isEmpty()) {

@@ -29,9 +29,9 @@
 
 package org.fruit;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 /**
  * Verify the Assert Utility cless has the proper behaviour.

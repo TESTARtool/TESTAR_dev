@@ -208,7 +208,8 @@ public class ProtocolUtil {
 					shape.y() + lvl * margin,
 				    shape.width() - lvl * margin * 2, 
 				    shape.height() - lvl * margin * 2);
-		} catch(java.lang.IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
+			e.printStackTrace();
 		}
 		shape.paint(canvas, mark);
 		

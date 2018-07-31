@@ -874,7 +874,6 @@ public final class Windows {
 
 	private static void loadExternalLib(String name) throws IOException {
 		File f = new File(name);
-		System.out.println("[Windows temp] " + f.exists());
 		if (f.exists()) {
 			System.out.println("[Windows] Loading external lib ... " + name);
 			System.load(f.getAbsolutePath());

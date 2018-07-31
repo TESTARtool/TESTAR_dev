@@ -27,9 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.windows;
 
+import static org.fruit.alayer.windows.UIARoles.*;
+
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -45,11 +47,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
-import static org.fruit.alayer.windows.UIARoles.*;
-
 import org.fruit.alayer.windows.UIATags;
-
-import es.upv.staq.testar.serialisation.LogSerialiser;
 
 /**
  * Various utilities for evaluating accessibility.

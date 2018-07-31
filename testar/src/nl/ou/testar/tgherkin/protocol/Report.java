@@ -3,11 +3,10 @@ package nl.ou.testar.tgherkin.protocol;
 import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.utils.report.Reporter;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
 
 /**
  * Utility for reporting DocumentProtocol execution results.

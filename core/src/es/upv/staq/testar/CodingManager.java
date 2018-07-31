@@ -142,6 +142,7 @@ public class CodingManager {
 	/**
 	 * Builds IDs (abstract, concrete, precise) for an action.
 	 * @param action An action.
+	 * @param state  State of SUT
 	 */
 	public static synchronized void buildIDs(State state, Action action) {		
 		action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE 

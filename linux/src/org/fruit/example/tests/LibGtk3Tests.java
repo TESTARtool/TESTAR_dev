@@ -71,9 +71,6 @@ public class LibGtk3Tests {
 
 
         LibGtk3.gdk_display_close(displayPointer);
-        //System.out.println("[" + getClass().getSimpleName() + "] Display closed!");
-
-
 
         long displayMngrPtr = LibGtk3.gdk_display_manager_get();
         assertEquals(true, displayMngrPtr > 0);

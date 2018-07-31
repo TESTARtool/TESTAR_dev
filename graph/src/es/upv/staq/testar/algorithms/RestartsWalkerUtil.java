@@ -121,9 +121,9 @@ public class RestartsWalkerUtil {
 
 	/**
 	 *
-	 * @param walker
+	 * @param walker 
 	 * @param env
-	 * @param state
+	 * @param state State of SUT
 	 * @return 'true' if a restart is feasible, 'false' otherwise
 	 */
 	public static boolean forceStateRestart(IWalker walker, IEnvironment env, State state) {
@@ -145,7 +145,7 @@ public class RestartsWalkerUtil {
 	/**
 	 * 
 	 * @param env
-	 * @param state
+	 * @param state State of SUT
 	 * @return 'true' if a restart must happen, 'false' otherwise
 	 */
 	public static boolean notifyActionSelection(IWalker walker, IEnvironment env, State state) {

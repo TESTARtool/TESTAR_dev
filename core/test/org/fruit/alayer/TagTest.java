@@ -29,10 +29,11 @@
 
 package org.fruit.alayer;
 
+import static org.junit.Assert.*;
+
+import java.io.*;
 import org.junit.AfterClass;
 import org.junit.Test;
-import java.io.*;
-import static org.junit.Assert.*;
 
 /**
  * Test to validate the operation of the Tag class.

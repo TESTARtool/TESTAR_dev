@@ -36,8 +36,13 @@ package web_ati_graphdb;
  * @author Urko Rueda Molina, Govert Buijs
  */
 
+import static org.fruit.alayer.Tags.Blocked;
+import static org.fruit.alayer.Tags.Enabled;
+
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import java.io.File;
+import java.util.*;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -46,12 +51,6 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
-import java.io.File;
-import java.util.*;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 	// Each browser (and locale!) uses different names for standard elements

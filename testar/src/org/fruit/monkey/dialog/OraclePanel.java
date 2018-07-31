@@ -27,18 +27,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import javax.swing.*;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
+
+import javax.swing.*;
+
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 public class OraclePanel extends JPanel {
   private static final long serialVersionUID = 1L;

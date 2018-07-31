@@ -242,24 +242,23 @@ public class Main {
             return;
           }
         }
-     
       try {
         String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
         File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
         if (logFile.exists()) {
           logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
         }
-        LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
+        LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); 
       } catch (Throwable t) {
         System.out.println("[Main] Cannot initialize log file!");
         t.printStackTrace(System.out);
         System.exit(-1);
       }
 
-      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
+      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + " with the next settings:\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
-      LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); // by urueda
+      LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical); 
       List<String> cp = settings.get(MyClassPath);
       URL[] classPath = new URL[cp.size()];
       for (int i = 0; i < cp.size(); i++) {
@@ -267,17 +266,19 @@ public class Main {
       }
       loader = new URLClassLoader(classPath);
 
-      String protocolClass = settings.get(ProtocolClass).replace("/","."); // by urueda
+      String protocolClass = settings.get(ProtocolClass).replace("/","."); 
       LogSerialiser.log("Trying to load TESTAR protocol in class '"
     	  + protocolClass
     	  + "' with class path '" 
     	  + Util.toString(cp) 
-    	  + "'\n", LogSerialiser.LogLevel.Debug); // by urueda
+    	  + "'\n", LogSerialiser.LogLevel.Debug); 
       @SuppressWarnings("unchecked")
       UnProc<Settings> protocol = (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
-      LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); // by urueda
-      LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); // by urueda
+      LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug); 
+      LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug); 
       protocol.run(settings);
+      
+      
     } catch (ConfigException ce) {
       LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", LogSerialiser.LogLevel.Critical);
 
@@ -358,7 +359,7 @@ public class Main {
       defaults.add(Pair.from(UnattendedTests, false)); // disabled
       defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
       defaults.add(Pair.from(SUTProcesses, ""));
-       defaults.add(Pair.from(GraphDBEnabled, false));
+      defaults.add(Pair.from(GraphDBEnabled, false));
       defaults.add(Pair.from(GraphDBUrl, ""));
       defaults.add(Pair.from(GraphDBUser, ""));
       defaults.add(Pair.from(GraphDBPassword, ""));

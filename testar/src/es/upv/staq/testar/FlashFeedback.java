@@ -76,7 +76,8 @@ public class FlashFeedback  extends JDialog implements Runnable {
 		synchronized(this) {
 			try {
 				this.wait(FLASH_DURATION);
-			} catch (java.lang.InterruptedException e) {
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 		this.setVisible(false);

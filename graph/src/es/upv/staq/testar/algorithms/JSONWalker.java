@@ -123,7 +123,7 @@ public class JSONWalker extends AbstractWalker {
 	// ############################
 	// json individuals definitions
 	
-	private static enum SORT_ORDER { 
+	private enum SORT_ORDER { 
 		LEAST, MOST, NONE 
 	}
 	
@@ -466,27 +466,15 @@ public class JSONWalker extends AbstractWalker {
 	}	
 		
 	private boolean isLT(int leftValue, int rightValue) {
-		if (leftValue < rightValue) {
-			return true;
-		} else {
-			return false;
-		}
+		return leftValue < rightValue;
 	}
 
 	private boolean isLE(int leftValue, int rightValue) {
-		if (leftValue <= rightValue) {
-			return true;
-		} else {
-			return false;
-		}
+		return leftValue <= rightValue;
 	}
 
 	private boolean isEQ(int leftValue, int rightValue) {
-		if (leftValue == rightValue) {
-			return true;
-		} else {
-			return false;
-		}
+		return leftValue == rightValue;
 	}
 
 	private String getPreviousActionType() {
@@ -550,5 +538,4 @@ public class JSONWalker extends AbstractWalker {
 		});
 		return sortedActions;
 	}
-
 }

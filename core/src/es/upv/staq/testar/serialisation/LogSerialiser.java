@@ -101,7 +101,8 @@ public class LogSerialiser extends Thread {
 			while (alive && logSavingQueue.isEmpty()) {
 				try {
 					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e1) {
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 			if (!logSavingQueue.isEmpty()) {

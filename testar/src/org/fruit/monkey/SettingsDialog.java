@@ -34,6 +34,14 @@
 
 package org.fruit.monkey;
 
+import static java.util.logging.Logger.getLogger;
+import static javax.swing.GroupLayout.DEFAULT_SIZE;
+import static javax.swing.GroupLayout.PREFERRED_SIZE;
+import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
+import static javax.swing.UIManager.*;
+import static org.fruit.Util.compileProtocol;
+import static org.fruit.monkey.dialog.ToolTipTexts.*;
+
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
 import nl.ou.testar.TgherkinPanel;
@@ -54,15 +62,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import static java.util.logging.Logger.getLogger;
-import static javax.swing.GroupLayout.DEFAULT_SIZE;
-import static javax.swing.GroupLayout.PREFERRED_SIZE;
-import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
-import static javax.swing.UIManager.*;
-import static org.fruit.Util.compileProtocol;
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
-
 
 /**
  * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
@@ -126,9 +125,9 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    *
-   * @param settings
-   * @param settingsFile
-   * @return
+   * @param settings   content of settings	
+   * @param settingsFile   filename of file containing settings
+   * @return null
    */
   public Settings run(Settings settings, String settingsFile) {
     this.settings = settings;
@@ -149,7 +148,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog.
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(AbstractProtocol.Modes mode) {
@@ -214,7 +213,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    * This replaces the original test.settings file with a complete settings file
-   * @param sutSettings
+   * @param sutSettings   settings of the SUT
    */
   private void switchSettings(String sutSettings) {
     String previousSSE = Main.getSSE()[0];
@@ -302,7 +301,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * Make the window appear centre screen
+   * Make the window appear centre screen.
    */
   private void setCentreScreen() {
     Dimension scrDim = Toolkit.getDefaultToolkit().getScreenSize();

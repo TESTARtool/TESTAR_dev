@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ConsumerImpl implements Consumer {
 
-	private BlockingQueue< Item > itemQueue = new LinkedBlockingQueue<Item>();  
+	private BlockingQueue< Item> itemQueue = new LinkedBlockingQueue<Item>();  
 	private ExecutorService executorService = Executors.newCachedThreadPool();  
 	private List<ItemProcessor> jobList = new LinkedList<ItemProcessor>();  
 	private volatile boolean shutdownCalled = false;  

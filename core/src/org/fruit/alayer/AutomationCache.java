@@ -164,7 +164,7 @@ public abstract class AutomationCache {
 	
 	/**
 	 * 
-	 * @param ac
+	 * @param ac automation element
 	 * @return true if age of cache larger than minimum value
 	 */
 	public boolean isSoftCacheCandidate(CachedAutomationElement ac) {
