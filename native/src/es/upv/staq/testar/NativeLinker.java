@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -164,13 +164,13 @@ public class NativeLinker {
 	 * @param executableCommand The application/ process/ command that will be run.
 	 * @return A handle to the process in a SUT object.
 	 */
-	public static SUT getNativeSUT(String executableCommand){
+	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
-				return WinProcess.fromExecutable(executableCommand);
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
-					return WinProcess.fromExecutable(executableCommand);
+					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
 				else
 					return WinProcess.fromExecutableUwp(executableCommand);
 			}
