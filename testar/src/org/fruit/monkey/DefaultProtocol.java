@@ -462,7 +462,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			suts = NativeLinker.getNativeProcesses();
 			if (suts != null){
 				for (SUT theSUT : suts){
-					state = getState(theSUT);
+					state = getStateByWindowTitle(theSUT);
 					if (state.get(Tags.Foreground)){
 						for (Widget w : state){
 							role = w.get(Tags.Role, null);
@@ -479,6 +479,24 @@ public class DefaultProtocol extends AbstractProtocol {
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
 		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
+	}
+	
+	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
+		Assert.notNull(system);
+		//State state = builder.apply(system);
+		state = builder.apply(system);
+
+		CodingManager.buildIDs(state);
+
+		Shape viewPort = state.get(Tags.Shape, null);
+		if(viewPort != null){
+			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
+			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state));
+		}
+
+		calculateZIndices(state);
+		
+		return state;
 	}
 
 	@Override
