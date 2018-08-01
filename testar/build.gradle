@@ -38,6 +38,7 @@ dependencies {
     compile project(':tgherkin')
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/sikulixapi.jar')
+    compile files('./lib/eye2.jar')
     compile 'com.1stleg:jnativehook:2.1.0'
     compile group: 'net.sourceforge.tess4j', name: 'tess4j', version: '4.0.0'
     runtime project(':windows')

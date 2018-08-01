@@ -410,7 +410,7 @@ IEventListener {
 	protected void initialize(Settings settings){}
 	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
 	protected final Action lastExecutedAction() {return lastExecutedAction;}
-	protected abstract void processListeners(SUT system, String specificSuspiciousTitle);
+	protected abstract void processListeners(SUT system);
 	
 	protected abstract void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus);
 	protected abstract boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus);
@@ -424,7 +424,7 @@ IEventListener {
 	protected abstract void detectLoopMode(SUT system);
 	protected abstract void quitSUT(SUT system);
 
-
+	
 	// TODO: The methods below are all about visualization of the state, widgets and actions. They need to be moved out of the Abstract Protocol
 
 	protected String lastPrintParentsOf = "null-id";
