@@ -1,6 +1,8 @@
 var getStateTreeTestar = function (ignoredTags) {
     var body = document.body;
     var bodyWrapped = wrapElementTestar(body);
+    bodyWrapped['documentHasFocus'] = document.hasFocus();
+    bodyWrapped['documentTitle'] = document.title;
     traverseElementTestar(bodyWrapped, body, ignoredTags);
     return bodyWrapped;
 };
@@ -36,13 +38,13 @@ function wrapElementTestar(element) {
     return {
         element: element,
 
-        id: element.id,
-        name: element.name,
+        id: element.getAttribute("id"),
+        name: element.getAttribute("name"),
         tagName: element.tagName.toLowerCase(),
         textContent: "",
-        title: element.title,
+        title: element.getAttribute("title"),
         value: element.value,
-        href: element.href,
+        href: element.getAttribute("href"),
         cssClasses: element.getAttribute("class"),
         display: computedStyle.getPropertyValue('display'),
         type: element.getAttribute("type"),
@@ -53,9 +55,6 @@ function wrapElementTestar(element) {
         isBlocked: getIsBlockedTestar(element),
         isClickable: isClickableTestar(element),
         hasKeyboardFocus: document.activeElement === element,
-
-        documentHasFocus: document.hasFocus(),
-        documentTitle: document.title,
 
         wrappedChildren: []
     };
@@ -80,8 +79,8 @@ function getRectTestar(element) {
     }
 
     return [
-        parseInt(rect.x),
-        parseInt(rect.y),
+        parseInt(rect.left),
+        parseInt(rect.top),
         parseInt(element === document.body ? window.innerWidth : rect.width),
         parseInt(element === document.body ? window.innerHeight : rect.height)
     ];

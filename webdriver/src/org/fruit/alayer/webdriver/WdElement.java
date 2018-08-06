@@ -118,7 +118,7 @@ public class WdElement implements Serializable {
 
     name = labelmap.getOrDefault(name, name);
     if (name == null || name.equals("null") || name.isEmpty()) {
-      if (!id.isEmpty()) {
+      if (id != null && !id.isEmpty()) {
         name = id;
       }
       else {

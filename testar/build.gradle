@@ -73,8 +73,8 @@ task prepareWindowsDLL(type: Copy) {
     include 'windows.dll'
 }
 
-applicationDistribution.from("../webdriver/resources/chrome-extension") {
-    into "chrome-extension"
+applicationDistribution.from("../webdriver/resources/web-extension") {
+    into "web-extension"
 }
 
 prepareOracles.dependsOn(oracleClasses)

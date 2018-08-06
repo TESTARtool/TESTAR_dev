@@ -55,7 +55,7 @@ public class WdDriver extends SUTBase {
         .build();
     ChromeOptions options = new ChromeOptions();
     String path = System.getProperty("user.dir");
-    path = path.substring(0, path.length() - 3) + "chrome-extension";
+    path = path.substring(0, path.length() - 3) + "web-extension";
     options.addArguments("load-extension=" + path);
     options.addArguments("disable-infobars");
     webDriver = new ChromeDriver(service, options);
