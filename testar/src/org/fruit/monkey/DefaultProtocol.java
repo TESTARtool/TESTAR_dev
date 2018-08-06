@@ -34,42 +34,15 @@
  */
 package org.fruit.monkey;
 
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.concurrent.Semaphore;
-
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -111,17 +84,42 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.monkey.AbstractProtocol.Modes;
 
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.IsRunning;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Title;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public class DefaultProtocol extends AbstractProtocol {
 
@@ -179,20 +177,20 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
 	 */
-	protected void processListeners(SUT system, String specificSuspiciousTitle) {
+	protected void processListeners(SUT system) {
 
-		//Only if we executed SUT with command_line
-		if(settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+		//Only if we enabled ProcessListener and executed SUT with command_line
+		if(settings().get(ConfigTags.ProcessListenerEnabled) && settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-			//Online Oracles use SuspiciousTitles String from settings protocol file
-			Pattern onlineOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousTitles), Pattern.UNICODE_CHARACTER_CLASS);
-			//Offline Oracles use specificSuspiciousTitle String from method of protocol file
-			Pattern offlineOracles= Pattern.compile(specificSuspiciousTitle, Pattern.UNICODE_CHARACTER_CLASS);
+			//Process Oracles use SuspiciousProcessOutput regular expression from test settings file
+			Pattern processOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousProcessOutput), Pattern.UNICODE_CHARACTER_CLASS);
+			//Process Logs use ProcessLogs regular expression from test settings file
+			Pattern processLogs= Pattern.compile(settings().get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
 
 			int seqn = generatedSequenceCount();
 			//Create File to save the logs of these oracles
-			File dir = new File("output/StdOutErr");
+			File dir = new File("output/ProcessLogs");
 			if(!dir.exists())
 				dir.mkdirs();
 			
@@ -204,20 +202,20 @@ public class DefaultProtocol extends AbstractProtocol {
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 						String actionId = "";
 						String ch;
-						Matcher mOffline, mOnline;
-						while ((ch = input.readLine()) != null)
+						Matcher mOracles, mLogs;
+						while (system.isRunning() && (ch = input.readLine()) != null)
 						{	
-							mOffline= offlineOracles.matcher(ch);
-							mOnline = onlineOracles.matcher(ch);
+							mOracles = processOracles.matcher(ch);
+							mLogs= processLogs.matcher(ch);
 
-							if(onlineOracles!=null && mOnline.matches()) {		
+							if(processOracles!=null && mOracles.matches()) {		
 
-								try {
+								/*try {
 									semaphore.acquire();
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 
 								//Prepare Verdict report
 								State state = getState(system);
@@ -244,13 +242,13 @@ public class DefaultProtocol extends AbstractProtocol {
 								writerError.flush();
 								writerError.close();
 
-								semaphore.release();
+								//semaphore.release();
 
 							}
-							//OnlineOracle has priority
-							else if(offlineOracles!=null && mOffline.matches()) {
+							//processOracle has priority
+							else if(processLogs!=null && mLogs.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdErr:	" +ch);
+								System.out.println("SUT Log StdErr:	" +ch);
 
 								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
 								if(lastExecutedAction()!=null)
@@ -279,20 +277,20 @@ public class DefaultProtocol extends AbstractProtocol {
 						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 						String actionId = "";
 						String ch;
-						Matcher mOffline, mOnline;
-						while ((ch = input.readLine()) != null)
+						Matcher mOracles, mLogs;
+						while (system.isRunning() && (ch = input.readLine()) != null)
 						{	
-							mOffline = offlineOracles.matcher(ch);
-							mOnline = onlineOracles.matcher(ch);
+							mOracles = processOracles.matcher(ch);
+							mLogs = processLogs.matcher(ch);
 							
-							if(onlineOracles!=null && mOnline.matches()) {	
+							if(processOracles!=null && mOracles.matches()) {	
 
-								try {
+								/*try {
 									semaphore.acquire();
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
-								}
+								}*/
 
 								//Prepare Verdict report
 								State state = getState(system);
@@ -319,13 +317,13 @@ public class DefaultProtocol extends AbstractProtocol {
 								writerOut.flush();
 								writerOut.close();
 
-								semaphore.release();
+								//semaphore.release();
 
 							}
-							//OnlineOracle has priority
-							else if(offlineOracles!=null && mOffline.matches()) {
+							//processOracle has priority
+							else if(processLogs!=null && mLogs.matches()) {
 								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdOut:	" +ch);
+								System.out.println("SUT Log StdOut:	" +ch);
 
 								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
 								if(lastExecutedAction()!=null)
@@ -344,7 +342,7 @@ public class DefaultProtocol extends AbstractProtocol {
 						e.printStackTrace();
 					}
 				}
-			}; 
+			};  
 			//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
 			//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
 			//¿ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
@@ -394,7 +392,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue));
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
@@ -467,7 +465,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			suts = NativeLinker.getNativeProcesses();
 			if (suts != null){
 				for (SUT theSUT : suts){
-					state = getState(theSUT);
+					state = getStateByWindowTitle(theSUT);
 					if (state.get(Tags.Foreground)){
 						for (Widget w : state){
 							role = w.get(Tags.Role, null);
@@ -484,6 +482,24 @@ public class DefaultProtocol extends AbstractProtocol {
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
 		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
+	}
+	
+	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
+		Assert.notNull(system);
+		//State state = builder.apply(system);
+		state = builder.apply(system);
+
+		CodingManager.buildIDs(state);
+
+		Shape viewPort = state.get(Tags.Shape, null);
+		if(viewPort != null){
+			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
+			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state));
+		}
+
+		calculateZIndices(state);
+		
+		return state;
 	}
 
 	@Override
@@ -1199,7 +1215,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(system == null || !system.isRunning()) {
 					system = null;
 					system = startSystem();
-					processListeners(system, "");
+					processListeners(system);
 					this.cv = buildCanvas();
 				}
 
@@ -1242,12 +1258,12 @@ public class DefaultProtocol extends AbstractProtocol {
 
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 
-						try {
+						/*try {
 							semaphore.acquire();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}
+						}*/
 						
 						state = getState(system);
 						graphDB.addState(state);
@@ -1262,7 +1278,7 @@ public class DefaultProtocol extends AbstractProtocol {
 							fragment.set(SystemState, state);
 						}
 						
-						semaphore.release();
+						//semaphore.release();
 					}
 				}
 				
@@ -1381,7 +1397,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 			system = startSystem();
-			processListeners(system, "");
+			processListeners(system);
 			startedSpy = true;
 			Grapher.GRAPHS_ACTIVATED = false;
 			this.cv = buildCanvas();

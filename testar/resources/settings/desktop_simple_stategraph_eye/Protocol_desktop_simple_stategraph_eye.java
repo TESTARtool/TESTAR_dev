@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,13 @@
 *******************************************************************************************************/
 
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Set;
-import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import nl.ou.testar.HtmlSequenceReport;
 import org.fruit.Drag;
+import org.fruit.Util;
 import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Point;
 import org.fruit.alayer.Action;
@@ -42,16 +47,36 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
+import eye.Eye;
+import eye.Match;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
+/**
+ * This protocol uses:
+ * - Simple state graph in selectAction() to choose new actions and select path to GUI state with new actions
+ * - HTML Sequence Report
+ * - Eye library for image recognition in executeAction() to interact with the GUI under testing
+ *
+ * More information on the Eye library and its API can be found from http://eyeautomate.com/eye.html
+ *
+ * In some cases, it is possible that TESTAR gets wrong coordinates through Windows UI Automation API, resulting
+ * TESTAR to miss the controls it trying to click. Using image recognition to locate the control fixes this issue,
+ * but makes TESTAR slower.
+ *
+ * Eye library seems to be slower than SikuliX library.
+ */
+public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProtocol {
 
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
+	private HtmlSequenceReport htmlReport;
+	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -60,6 +85,10 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
+		// initializing simple GUI state graph:
+		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
 
@@ -71,7 +100,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		super.beginSequence(system, state);
 	}
 
-	 /**
+	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of 
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
@@ -228,14 +257,26 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//adding state to the HTML sequence report:
+		try {
+			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+		}catch(Exception e){
+			// catching null for the first state or any new state, when unvisited actions is still null
+			htmlReport.addState(state, actions);
+		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action a = preSelectAction(state, actions);
 		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+			// returning pre-selected action
+		} else{
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
+			a = stateGraphWithVisitedActions.selectAction(state,actions);
+			//a = RandomActionSelector.selectAction(actions);
+		}
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
+		return a;
 	}
 
 	/**
@@ -247,7 +288,58 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		return super.executeAction(system, state, action);
+		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
+		try{
+			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
+			//System.out.println("DEBUG: action: "+action.toString());
+			//System.out.println("DEBUG: action short: "+action.toShortString());
+			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
+				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				Eye eye = new Eye();
+				try {
+					//System.out.println("DEBUG: sikuli clicking ");
+					while(!new File(widgetScreenshotPath).exists()){
+						//System.out.println("Waiting for image file to exist");
+						Util.pause(halfWait);
+					}
+					Util.pause(1);
+					BufferedImage image = eye.loadImage(widgetScreenshotPath);
+					Match match = eye.findImage(image);
+					eye.click(match.getCenterLocation());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+			}else if(action.toShortString().contains("ClickTypeInto(")){
+				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
+				//System.out.println("parsed text:"+textToType);
+				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
+				Util.pause(halfWait);
+				Eye eye = new Eye();
+				try {
+					//System.out.println("DEBUG: sikuli typing ");
+					while(!new File(widgetScreenshotPath).exists()){
+						//System.out.println("Waiting for image file to exist");
+						Util.pause(halfWait);
+					}
+					Util.pause(1);
+					BufferedImage image = eye.loadImage(widgetScreenshotPath);
+					Match match = eye.findImage(image);
+					eye.click(match.getCenterLocation());
+					eye.type(textToType);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
+			else {
+				//System.out.println("DEBUG: TESTAR action");
+				//System.out.println("DEBUG: action desc: "+action.get(Tags.Desc));
+				action.run(system, state, settings().get(ConfigTags.ActionDuration));
+			}return true;
+		}catch(ActionFailedException afe){
+			return false;
+		}
 	}
 
 	/**

@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,18 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "suts/SwingSet2.jar"
-
-#################################################################
-# Java Swing applications & Access Bridge Enabled
-#
-# Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
-#
-# Enable the variable Access Bridge Enabled in TESTAR as true
-#################################################################
-
-AccessBridgeEnabled = true
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -51,30 +40,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-
-#################################################################
-# Oracles based on Suspicious Outputs detected by Process Listeners
-#
-# (Only available for desktop applications through COMMAND_LINE)
-#
-# Regular expression defines the suspicious outputs
-#################################################################
-
-ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
-
-#################################################################
-# Process Logs
-#
-# Required ProcessListenerEnabled
-# (Only available for desktop applications through COMMAND_LINE)
-#
-# Allow TESTAR to store in its logs other possible matches found in the process
-# Use the regular expression .*.* if you want to store all the possible outputs of the process
-#################################################################
-
-ProcessLogs = .*.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Actionfilter
@@ -83,7 +49,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[eE]xit.*|.*Close.*|.*[sS]ave.*|.*Minimize.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -100,7 +66,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_swingset2/Protocol_desktop_SwingSet2
+ProtocolClass = desktop_simple_stategraph_eye/Protocol_desktop_simple_stategraph_eye
 
 #################################################################
 # Graphdatabase settings (experimental)
