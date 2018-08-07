@@ -30,24 +30,19 @@
 
 import java.io.File;
 import java.util.Set;
-import org.fruit.alayer.Action;
+
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 import es.upv.staq.testar.NativeLinker;
+import org.fruit.alayer.windows.UIARoles;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -179,30 +174,41 @@ public class Protocol_web_kuveytturk extends ClickFilterLayerProtocol {
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
-			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						
-						// left clicks
-						if(whiteListed(w) || isClickable(w))
-							actions.add(ac.leftClickAt(w));
-		
-						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+		// iterate through all widgets of the state
+		for(Widget w : state){
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+				if (!blackListed(w)){  // do not build actions for click filtered widgets
 
-						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					// links with ValuePattern
+						if(w.get(Tags.ValuePattern, null)!=null){ //ValuePattern is not null
+							if(w.get(Tags.ValuePattern).contains("http")){ // ValuePattern contains "http"
+								actions.add(ac.leftClickAt(w));
 
-					}
+								// Printing out all tags and their values of a single hidden menu "Accounts"
+								if(w.get(Tags.Title).equalsIgnoreCase("Accounts")){
+									System.out.println("DEBUG: -----------------------------");
+									for(Tag tag:w.tags()){
+										System.out.println("DEBUG: "+tag.toString()+"="+w.get(tag));
+									}
+								}
+							}
+						}
+
+					// left clicks
+					//if(isClickable(w))
+					//	actions.add(ac.leftClickAt(w));
+
+					// type into text boxes
+					//if(isTypeable(w))
+					//	actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+
+					// slides
+					//addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+
 				}
-			}			
-			
+			}
 		}
-		
+
 		return actions;
 		
 	}
