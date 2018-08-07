@@ -3,8 +3,17 @@ var getStateTreeTestar = function (ignoredTags) {
     var bodyWrapped = wrapElementTestar(body);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
-    traverseElementTestar(bodyWrapped, body, ignoredTags);
-    return bodyWrapped;
+
+    // For Edge we return a flattened tree (as list), see comment in WdStateFetcher
+    if (window.navigator.userAgent.indexOf("Edge") > -1) {
+		    var treeList = [];
+	      traverseElementListTestar(treeList, bodyWrapped, body, -1, ignoredTags);
+    	  return treeList;
+	  }
+	  else {
+		    traverseElementTestar(bodyWrapped, body, ignoredTags);
+	      return bodyWrapped;
+	  }
 };
 
 function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
@@ -25,6 +34,32 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         var childWrapped = wrapElementTestar(childElement);
         traverseElementTestar(childWrapped, rootElement, ignoredTags);
         parentWrapped.wrappedChildren.push(childWrapped);
+    }
+}
+
+function traverseElementListTestar(treeList, parentWrapped, rootElement, parentId, ignoredTags) {
+    parentWrapped['parentId'] = parentId;
+    treeList.push(parentWrapped);
+
+    parentId = treeList.length - 1;
+
+    var childNodes = parentWrapped.element.childNodes;
+    for (var i = 0; i < childNodes.length; i++) {
+        var childElement = childNodes[i];
+
+        // Filter ignored tags or non-element nodes
+        if (childElement.nodeType === 3) {
+            parentWrapped.textContent += childElement.textContent;
+            parentWrapped.textContent = parentWrapped.textContent.trim();
+            continue;
+        }
+        if (ignoredTags.includes(childElement.nodeName.toLowerCase()) ||
+            childElement.nodeType !== 1) {
+            continue
+        }
+
+        var childWrapped = wrapElementTestar(childElement);
+        traverseElementListTestar(treeList, childWrapped, rootElement, parentId, ignoredTags);
     }
 }
 

@@ -55,8 +55,17 @@ public class WdElement implements Serializable {
     id = (String) packedElement.get("id");
     name = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
-    textContent = ((String) packedElement.get("textContent"))
-        .replaceAll("\\s+", " ").trim();
+    try {
+      textContent = ((String) packedElement.get("textContent"))
+          .replaceAll("\\s+", " ").trim();
+    }
+    catch (NullPointerException npe) {
+      System.out.println();
+      System.out.println("Hier !!!!!");
+      System.out.println(textContent);
+
+      textContent = "";
+    }
     helpText = (String) packedElement.get("title");
     valuePattern = (String) packedElement.getOrDefault("href", "");
     if (valuePattern == null || valuePattern.equals("")) {
@@ -89,13 +98,10 @@ public class WdElement implements Serializable {
     List<Map<String, Object>> wrappedChildren =
         (List<Map<String, Object>>) packedElement.get("wrappedChildren");
     for (Map<String, Object> wrappedChild : wrappedChildren) {
-      // TODO Check if this even happens
-      if (wrappedChild != null) {
-        WdElement child = new WdElement(wrappedChild, root, this);
-        if (!Constants.hiddenTags.contains(child.tagName) &&
-            !Constants.ignoredTags.contains(child.tagName)) {
-          children.add(child);
-        }
+      WdElement child = new WdElement(wrappedChild, root, this);
+      if (!Constants.hiddenTags.contains(child.tagName) &&
+          !Constants.ignoredTags.contains(child.tagName)) {
+        children.add(child);
       }
     }
 

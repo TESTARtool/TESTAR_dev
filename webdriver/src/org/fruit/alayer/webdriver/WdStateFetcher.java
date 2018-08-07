@@ -59,8 +59,19 @@ public class WdStateFetcher implements Callable<WdState> {
 
   @SuppressWarnings("unchecked")
   public static WdRootElement buildRoot(SUT system) {
-    Map<String, Object> packedBody = (Map<String, Object>) WdDriver.executeScript(
+    Object result = WdDriver.executeScript(
         "return getStateTreeTestar(arguments[0])", Constants.ignoredTags);
+
+    // TODO As Edge limits its recursion to 20, we need to flatten the tree in JS
+    // And unflatten the list here into a nested Map (as produced by Chrome / FF)
+    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/18531786/
+    Map<String, Object> packedBody = null;
+    if (result instanceof List) {
+      packedBody = unflattenTree((List<Map<String, Object>>) result);
+    }
+    else if (result instanceof Map) {
+      packedBody = (Map<String, Object>) result;
+    }
 
     WdRootElement wdRoot = new WdRootElement(packedBody);
     wdRoot.isRunning = system.isRunning();
@@ -70,6 +81,31 @@ public class WdStateFetcher implements Callable<WdState> {
     wdRoot.pid = system.get(Tags.PID);
 
     return wdRoot;
+  }
+
+@SuppressWarnings("unchecked")
+  private static Map<String, Object> unflattenTree(List<Map<String, Object>> flatTree) {
+    for (int idx = flatTree.size() - 1; idx > 0; idx--) {
+      Map<String, Object> node = flatTree.remove(idx);
+
+      Long parentId = (Long) node.get("parentId");
+      Map<String, Object> parent = getParent(parentId.intValue(), flatTree);
+      List<Map<String, Object>> wrappedChildren = (List<Map<String, Object>>) parent.get("wrappedChildren");
+      wrappedChildren.add(node);
+    }
+
+    return flatTree.get(0);
+  }
+
+  private static Map<String, Object> getParent (int parentId,
+                                                List<Map<String, Object>> flatTree) {
+    Map<String, Object> parent = flatTree.remove(parentId);
+    Map<String, Object> newParent = new HashMap<>();
+    for (String key : parent.keySet()) {
+      newParent.put(key, parent.get(key));
+    }
+    flatTree.add(parentId, newParent);
+    return newParent;
   }
 
   public WdState call() {
@@ -101,7 +137,7 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   private void findAllLabels(Map<String, String> labelmap) {
-    // TODO Add to Chrome extension?
+    // TODO Add to web-extension?
 
     List<WebElement> labelElements = driver.findElementsByTagName("label");
     for (WebElement labelElement : labelElements) {
@@ -138,7 +174,6 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   private void createWidgetTree(WdWidget parent, WdElement element) {
-    // TODO Needed?
     if (!element.enabled) {
       return;
     }

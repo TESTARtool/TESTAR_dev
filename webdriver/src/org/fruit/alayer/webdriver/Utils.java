@@ -1,12 +1,19 @@
 package org.fruit.alayer.webdriver;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-// TODO GB Remove, just for development
+
 public class Utils {
-
+  // TODO GB Remove, just for development
   public static void logAndEnd() {
     System.out.println();
     System.out.println("We're done !");
@@ -25,8 +32,8 @@ public class Utils {
     System.exit(1);
   }
 
+  // TODO GB Remove, just for development
   private static void killWebDriver() {
-    // TODO Just for development
     try {
       Runtime rt = Runtime.getRuntime();
       Process pr = rt.exec("ps ax");
