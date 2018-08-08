@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.windows;
 
 import java.util.concurrent.ExecutionException;
@@ -39,7 +37,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import org.fruit.Assert;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
@@ -53,10 +50,8 @@ public final class UIAStateBuilder implements StateBuilder {
 	final double timeOut; // seconds
 	transient ExecutorService executor;
 	transient long pAutomation, pCondition, pCacheRequest;
-	// begin by urueda
 	boolean accessBridgeEnabled;
-	String SUTProcesses; // regex
-	// end by urueda
+	String SUTProcesses;
 
 	public UIAStateBuilder(){ this(10/*seconds*/,false,"");	}
 
@@ -64,12 +59,10 @@ public final class UIAStateBuilder implements StateBuilder {
 		Assert.isTrue(timeOut > 0);
 		this.timeOut = timeOut;
 		initialize();
-		// begin by urueda
 		this.accessBridgeEnabled = accessBridgeEnabled;
 		this.SUTProcesses = SUTProcesses;
 		if (accessBridgeEnabled)
-			new Thread(){ public void run(){ Windows.InitializeAccessBridge(); } }.start(); // based on ferpasri
-		// end by urueda
+			new Thread(){ public void run(){ Windows.InitializeAccessBridge(); } }.start();
 		executor = Executors.newFixedThreadPool(1);
 	}
 
@@ -132,8 +125,6 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_OrientationPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_RuntimeIdPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsWindowPatternAvailablePropertyId);
-
-		// begin by urueda
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsScrollPatternAvailablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticallyScrollablePropertyId);
@@ -141,7 +132,10 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalViewSizePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
-		// end by urueda
+
+		// check Microsoft Windows UI Automation for W3C Accessible Rich Internet Applications Specification
+		// https://msdn.microsoft.com/fi-fi/library/ee318412.aspx
+		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AriaRolePropertyId);
 
 		// window role properties
 		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsTopmostPropertyId);
@@ -178,7 +172,7 @@ public final class UIAStateBuilder implements StateBuilder {
 			throw new StateBuildException(e);
 		} catch (TimeoutException e) {
 			//UIAState ret = new UIAState(uiaRoot);
-			UIAState ret = new UIAState(StateFetcher.buildRoot(system)); // by urueda
+			UIAState ret = new UIAState(StateFetcher.buildRoot(system));
 			ret.set(Tags.Role, Roles.Process);
 			ret.set(Tags.NotResponding, true);
 			return ret;
