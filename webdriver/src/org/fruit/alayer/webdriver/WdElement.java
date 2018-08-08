@@ -55,17 +55,8 @@ public class WdElement implements Serializable {
     id = (String) packedElement.get("id");
     name = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
-    try {
-      textContent = ((String) packedElement.get("textContent"))
+    textContent = ((String) packedElement.get("textContent"))
           .replaceAll("\\s+", " ").trim();
-    }
-    catch (NullPointerException npe) {
-      System.out.println();
-      System.out.println("Hier !!!!!");
-      System.out.println(textContent);
-
-      textContent = "";
-    }
     helpText = (String) packedElement.get("title");
     valuePattern = (String) packedElement.getOrDefault("href", "");
     if (valuePattern == null || valuePattern.equals("")) {
