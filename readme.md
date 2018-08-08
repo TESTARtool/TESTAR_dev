@@ -32,8 +32,8 @@ $ gradle runTestar
 On OS X and Linux, open a terminal and build TESTAR with the following command :  
 $ gradle installDist  
 Next cd to the installation directory :  
-$ cd testar/target/install/testar/bin
-And start TESTAR
+$ cd testar/target/install/testar/bin  
+And start TESTAR  
 $ ./testar  
 On OS X, the terminal needs to be allowed to control the computer.  
 Under 'System Preferences', 'Security & Privacy', 'Accessibility' allow the terminal.  
