@@ -238,7 +238,7 @@ public class Protocol_desktop_simple_stategraph extends ClickFilterLayerProtocol
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding state to the HTML sequence report:
+		// Saving state and available actions into HTML report before selecting the action to execute
 		try {
 			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
 		}catch(Exception e){

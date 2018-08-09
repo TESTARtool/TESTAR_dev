@@ -190,6 +190,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 				}
 			}
 		}
+		System.out.println("Deriving actions, found "+actions.size()+" possible actions.");
 		//return the set of derived actions
 		return actions;
 	}
@@ -233,9 +234,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		Action a = preSelectAction(state, actions);
 		if (a!= null) {
 			return a;
-		} else
+		} else {
 			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+			a = RandomActionSelector.selectAction(actions);
+		}
+		System.out.println("Selecting action to execute, selected: "+a.get(Tags.Desc, "Description unavailable"));
+		return a;
 	}
 
 	/**

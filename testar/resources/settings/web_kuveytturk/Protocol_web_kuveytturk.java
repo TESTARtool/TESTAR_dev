@@ -29,8 +29,12 @@
 
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
+import nl.ou.testar.HtmlSequenceReport;
+import nl.ou.testar.RandomActionSelector;
+import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -61,13 +65,19 @@ public class Protocol_web_kuveytturk extends ClickFilterLayerProtocol {
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
 	static double scrollThick = 16; // scroll thickness (iexplorer)
-	
+
+	private HtmlSequenceReport htmlReport;
+	private Set<Action> previousActions;
+	private Action previouslySelectedAction;
+
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
 		super.initialize(settings);
 		initBrowser();
 	}
@@ -162,55 +172,155 @@ public class Protocol_web_kuveytturk extends ClickFilterLayerProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		
-		Set<Action> actions = super.deriveActions(system,state);
+	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+
+		Set<Action> actions = super.deriveActions(system, state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
+
+		Set<Action> priorityActions = new HashSet<Action>();
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
-		//----------------------
-		// BUILD CUSTOM ACTIONS
-		//----------------------
 
-		// iterate through all widgets of the state
-		for(Widget w : state){
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				if (!blackListed(w)){  // do not build actions for click filtered widgets
+			//----------------------
+			// BUILD CUSTOM ACTIONS
+			//----------------------
 
-					// links with ValuePattern
-						if(w.get(Tags.ValuePattern, null)!=null){ //ValuePattern is not null
-							if(w.get(Tags.ValuePattern).contains("http")){ // ValuePattern contains "http"
-								actions.add(ac.leftClickAt(w));
+			// iterate through all widgets of the state
+			System.out.println("---------new state---------");
+			for (Widget w : state) {
+				Action action = null;
+				if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
+					if (!blackListed(w)) {  // do not build actions for click filtered widgets
 
-								// Printing out all tags and their values of a single hidden menu "Accounts"
-								if(w.get(Tags.Title).equalsIgnoreCase("Accounts")){
-									System.out.println("DEBUG: -----------------------------");
-									for(Tag tag:w.tags()){
-										System.out.println("DEBUG: "+tag.toString()+"="+w.get(tag));
+						// links with ValuePattern
+						if (w.get(Tags.ValuePattern, null) != null) { //ValuePattern is not null
+							if (w.get(Tags.ValuePattern).contains("http")) { // ValuePattern contains "http"
+								String URL = w.get(Tags.ValuePattern);
+								String domain = URL.substring(URL.indexOf("//") + 2);
+								domain = domain.substring(0, domain.indexOf("/"));
+								String folder = URL.substring(URL.indexOf(domain) + domain.length() + 1);
+								if (folder.endsWith("/")) {
+									folder = folder.substring(0, folder.length() - 1);
+								}
+								//System.out.println("Link folder= "+folder);
+								if (URL.equalsIgnoreCase("https://www.kuveytturk.com.tr/")) {
+									// disabling Turkish language
+								}else if (URL.startsWith("https://www.kuveytturk.com.tr/ar/")) {
+									// disabling Armenian (?) language
+								}else if (URL.startsWith("https://www.kuveytturk.com.tr/en/")) {
+									if (folder.startsWith("en/")) {
+										folder = folder.substring(3);
+										//System.out.println("Link folder= "+folder);
 									}
+									if (folder.contains("/")) {
+										//System.out.println("Internal link that is NOT visible, folder="+folder);
+										if (previouslySelectedAction != null) {
+											if (previouslySelectedAction.toShortString().startsWith("Left")) {
+												String target = getClickTargetFromActionDesc(previouslySelectedAction.get(Tags.Desc));
+												target = target.toLowerCase();
+												if (folder.contains(target)) {
+													//System.out.println("DEBUG: folder is the target of previous action");
+													action = ac.leftClickAt(w);
+												}
+											}
+										}
+									} else {
+										//System.out.println("Internal link that is visible, folder="+folder);
+										action = ac.leftClickAt(w);
+									}
+								}
+								// these links open new tabs (that are different processes?)
+//								else if (URL.contains("isube")) {
+//									//System.out.println("DEBUG: URL contains isube");
+//									if (previouslySelectedAction != null) {
+//										if(previouslySelectedAction.toShortString().startsWith("Left")){
+//											String target = getClickTargetFromActionDesc(previouslySelectedAction.get(Tags.Desc));
+//											if (target.equalsIgnoreCase("Internet Banking")) {
+//												System.out.println("DEBUG: adding isube after internet banking");
+//												action = ac.leftClickAt(w);
+//											}
+//										}
+//									}
+//								}
+								// harshly keeping to the English area of the website, not going external websites:
+//								else if (URL.contains("kuveytturk.com.tr")) {
+//									//System.out.println("Internal link not in English area, address="+URL);
+//									if (folder.contains("/")) {
+//										//System.out.println("Internal link not in English area that is NOT visible, folder="+folder);
+//									} else {
+//										//System.out.println("Internal link not in English area that is visible, folder="+folder);
+//										action = ac.leftClickAt(w);
+//									}
+//								} else {
+//									//System.out.println("External link, address="+URL);
+//									action = ac.leftClickAt(w);
+//								}
+								// Printing out all tags and their values of a single hidden menu "Accounts"
+//								if(w.get(Tags.Title).equalsIgnoreCase("Accounts")){
+//									System.out.println("DEBUG: -----------------------------");
+//									for(Tag tag:w.tags()){
+//										System.out.println("DEBUG: "+tag.toString()+"="+w.get(tag));
+//									}
+//								}
+							}
+						} // ValuePattern not null
+						else if (w.get(Tags.Title, "").equalsIgnoreCase("Internet Banking")) {
+							action = ac.leftClickAt(w);
+							//System.out.println("DEBUG: adding Internet Banking button, target="+getClickTargetFromActionDesc(action.get(Tags.Desc)));
+						}
+
+						if (action != null) {
+							actions.add(action);
+							if (previousActions != null) {
+								if (wasNotAvailableInPreviousState(action)) {
+									//System.out.println("DEBUG: new action: "+action.get(Tags.Desc));
+									priorityActions.add(action);
 								}
 							}
 						}
+						// left clicks
+						//if(isClickable(w))
+						//	actions.add(ac.leftClickAt(w));
 
-					// left clicks
-					//if(isClickable(w))
-					//	actions.add(ac.leftClickAt(w));
+						// type into text boxes
+						//if(isTypeable(w))
+						//	actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 
-					// type into text boxes
-					//if(isTypeable(w))
-					//	actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						// slides
+						//addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
 
-					// slides
-					//addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					} // not black lister
+				} // enabled and not blocked
+			} // Iterating through all widgets
 
-				}
-			}
+		System.out.println("Deriving actions, found "+actions.size()+" possible actions.");
+		//updating this action set to be previous actions for next state:
+		previousActions = actions;
+		if(priorityActions.size()>0){
+			System.out.println("Prioritizing "+priorityActions.size()+" new actions that were not available in previous state.");
+			return priorityActions;
 		}
-
 		return actions;
 		
+	}
+
+	private boolean wasNotAvailableInPreviousState(Action action){
+		if(previousActions!=null){
+			boolean similarActionFound = false;
+			for(Action a:previousActions){
+				if(a.get(Tags.Desc, null)!=null && action.get(Tags.Desc, null)!=null){
+					if(a.get(Tags.Desc).equalsIgnoreCase(action.get(Tags.Desc))){
+						//System.out.println("Similar actions: "+a.get(Tags.Desc)+"=="+action.get(Tags.Desc));
+						similarActionFound = true;
+					}
+				}
+			}
+			if(!similarActionFound){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -248,9 +358,29 @@ public class Protocol_web_kuveytturk extends ClickFilterLayerProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
-		
-		return super.selectAction(state, actions);
-		
+		// Saving state and available actions into HTML report before selecting the action to execute
+		htmlReport.addState(state, actions);
+
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action a = preSelectAction(state, actions);
+		if (a!= null) {
+			// returning pre-selected action
+		} else{
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			a = RandomActionSelector.selectAction(actions);
+		}
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
+		System.out.println("Selecting action to execute, selected: "+a.get(Tags.Desc, "Description unavailable"));
+		previouslySelectedAction=a;
+		return a;
+	}
+
+	private String getClickTargetFromActionDesc(String actionDesc){
+		String clickTarget = actionDesc;
+		clickTarget = clickTarget.substring(clickTarget.indexOf("'")+1);
+		clickTarget = clickTarget.substring(0,clickTarget.indexOf("'"));
+		return clickTarget;
 	}
 
 	/**
