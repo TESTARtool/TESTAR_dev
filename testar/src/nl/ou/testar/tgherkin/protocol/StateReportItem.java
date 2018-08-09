@@ -29,7 +29,8 @@ import nl.ou.testar.utils.report.ReportItem;
  *
  */
 public class StateReportItem extends ReportItem {
-	private static final String REPORT_NAME_PREFIX = "output" + File.separator + "State_";
+	private static final String OUT_DIR = "output" + File.separator + "tgherkin" + File.separator;
+	private static final String REPORT_NAME_PREFIX = "State_";
 	private static final String REPORT_NAME_SUFFIX = ".csv";
 	private static final String OCR_COLUMN_NAME = "OCR";
 	private static final String IMAGE_RECOGNITION_COLUMN_PREFIX = "Image_";
@@ -43,7 +44,8 @@ public class StateReportItem extends ReportItem {
 	 * @param proxy document protocol proxy
 	 */
 	public StateReportItem(boolean append, ProtocolProxy proxy) {
-		super(REPORT_NAME_PREFIX + 
+		super(OUT_DIR + "sequence" + proxy.getSequenceCount() +  File.separator +
+				REPORT_NAME_PREFIX + 
 				proxy.getSequenceCount() + "_" + proxy.getActionCount() + "_" + 
 				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
 				REPORT_NAME_SUFFIX,

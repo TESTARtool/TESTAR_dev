@@ -48,11 +48,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	 */
 	protected void initialize(Settings settings){
 		super.initialize(settings);
-		if (documentExecutionMode()) {
+		if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
 			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
 			document = Utils.getDocument(sourceCode);
 			// report header
-			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);			
+			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
 		}
 	}
 	
@@ -295,7 +295,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	}
 
 	private boolean documentExecutionMode() {
-		return mode() == Modes.Generate || mode() == Modes.GenerateDebug;
+		return (mode() == Modes.Generate || mode() == Modes.GenerateDebug) && document != null;
 	}
 
     private boolean checkActionSwitches() {

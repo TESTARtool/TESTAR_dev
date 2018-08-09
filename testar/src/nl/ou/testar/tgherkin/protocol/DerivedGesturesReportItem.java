@@ -23,7 +23,8 @@ import nl.ou.testar.utils.report.ReportItem;
  *
  */
 public class DerivedGesturesReportItem extends ReportItem {
-	private static final String REPORT_NAME_PREFIX = "output" + File.separator + "DerivedGestures_";
+	private static final String OUT_DIR = "output" + File.separator + "tgherkin" + File.separator;
+	private static final String REPORT_NAME_PREFIX = "DerivedGestures_";
 	private static final String REPORT_NAME_SUFFIX = ".csv";
 	private Map<Widget, List<Gesture>> gesturesMap;
 	private boolean nopAction;	
@@ -37,7 +38,8 @@ public class DerivedGesturesReportItem extends ReportItem {
 	 * @param nopAction indicates whether a NOP (no operation) action is derived
 	 */
 	public DerivedGesturesReportItem(boolean append, int sequenceCount, int actionCount, Map<Widget, List<Gesture>> gesturesMap, boolean nopAction) {
-		super(REPORT_NAME_PREFIX + 
+		super(OUT_DIR + "sequence" + sequenceCount +  File.separator +
+				REPORT_NAME_PREFIX + 
 				sequenceCount + "_" + actionCount + "_" + 
 				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
 				REPORT_NAME_SUFFIX,

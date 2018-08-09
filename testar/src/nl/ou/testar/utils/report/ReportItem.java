@@ -5,6 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import nl.ou.testar.utils.consumer.Item;
 
@@ -40,6 +43,16 @@ public class ReportItem implements Item {
 
 	@Override
 	public void process() {
+        // create directories, if required
+		try {
+        	Files.createDirectories(Paths.get(fileName).getParent());
+        }
+        catch(FileAlreadyExistsException e) {
+        }
+        catch(IOException e) {
+        	e.printStackTrace();
+        }
+		// write data to file 
 		PrintWriter pWriter = null;
         try {
 			FileWriter fWriter = new FileWriter(fileName, append);
