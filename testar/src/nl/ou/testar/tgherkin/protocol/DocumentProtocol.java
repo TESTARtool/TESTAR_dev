@@ -31,6 +31,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	private boolean actionSwitchesOn;
 	private Action lastAction;
 	private String sourceCode;
+	private Modes activeMode;
 	
 	/**
      * Constructor.
@@ -49,11 +50,9 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	protected void initialize(Settings settings){
 		super.initialize(settings);
 		if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
-			sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
-			document = Utils.getDocument(sourceCode);
-			// report header
-			Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
+			initializeDocument();
 		}
+		activeMode = mode();
 	}
 	
 	@Override
@@ -89,6 +88,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 			}
 			Report.appendReportDetail(Report.StringColumn.VERDICT, verdict.toString());
 		}
+		activeMode = mode();
 		return verdict;				
 	}
 
@@ -295,7 +295,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
 	}
 
 	private boolean documentExecutionMode() {
-		return (mode() == Modes.Generate || mode() == Modes.GenerateDebug) && document != null;
+		boolean result = activeMode == Modes.Generate || activeMode == Modes.GenerateDebug;
+		if (result && document == null) {
+			initializeDocument();
+		}
+		return result;
 	}
 
     private boolean checkActionSwitches() {
@@ -307,4 +311,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
     	return actionSwitchesOn;		
 	}
 
+	private void initializeDocument(){
+		sourceCode = Utils.readTgherkinSourceFile(getSettings().get(ConfigTags.TgherkinDocument));
+		document = Utils.getDocument(sourceCode);
+		// report header
+		Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
+	}
+    
 }

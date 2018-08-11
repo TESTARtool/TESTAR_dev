@@ -48,6 +48,9 @@ public class Document {
 	 * @return true if more actions exist, otherwise false
 	 */
 	public boolean moreActions(ProtocolProxy proxy) {
+		if (currentFeature() == null) {
+			return false;
+		}
 		return !(currentFeature().hasFailed() && !proxy.getSettings().get(ConfigTags.ForceToSequenceLength)) 
 				&& currentFeature().moreActions(proxy);
 	}
