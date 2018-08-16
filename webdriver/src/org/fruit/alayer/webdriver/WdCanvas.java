@@ -17,9 +17,7 @@ public class WdCanvas implements Canvas {
   private Pen defaultPen;
   private double fontSize, strokeWidth;
   private String font;
-  private StrokePattern strokePattern;
   private FillPattern fillPattern;
-  private StrokeCaps strokeCaps;
   private Color color;
 
   public WdCanvas(Pen defaultPen) {
@@ -48,13 +46,12 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void begin() {
-    check();
+    checkCanvasExists();
   }
 
   @Override
   public void end() {
-    // TODO What ??
-    pause(1);
+    
   }
 
   @Override
@@ -63,15 +60,12 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void clear(double x, double y, double width, double height) {
-    check();
-
     Object[] args = new Object[]{x, y, width, height};
     WdDriver.executeScript("clearCanvasTestar(arguments)", args);
   }
 
   @Override
   public void text(Pen pen, double x, double y, double angle, String text) {
-    check();
     adjustPen(pen);
 
     Object[] args = new Object[]{cssColor(), Math.round(fontSize), font, text,
@@ -81,7 +75,6 @@ public class WdCanvas implements Canvas {
 
   @Override
   public Pair<Double, Double> textMetrics(Pen pen, String text) {
-    check();
     // TODO Copied from GDIScreenCanvas, no idea if it works
     Assert.notNull(pen, text);
     return Pair.from(text.length() * 2., 20.);
@@ -89,7 +82,9 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void line(Pen pen, double x1, double y1, double x2, double y2) {
-    check();
+    if (!needToDraw(x1, y1, x2, y2)) {
+      return;
+    }
     adjustPen(pen);
 
     Object[] args = new Object[]{cssColor(), strokeWidth, x1, y1, x2, y2};
@@ -98,7 +93,6 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void triangle(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3) {
-    check();
     adjustPen(pen);
 
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
@@ -116,7 +110,6 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void ellipse(Pen pen, double x, double y, double width, double height) {
-    check();
     adjustPen(pen);
 
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
@@ -127,7 +120,6 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void rect(Pen pen, double x, double y, double width, double height) {
-    check();
     adjustPen(pen);
 
     String fillStroke = fillPattern == FillPattern.Solid ? "fillRect" : "strokeRect";
@@ -144,10 +136,6 @@ public class WdCanvas implements Canvas {
   private void adjustPen(Pen pen) {
     strokeWidth = pen.strokeWidth() != null ?
         pen.strokeWidth() : defaultPen.strokeWidth();
-    strokePattern = pen.strokePattern() != null ?
-        pen.strokePattern() : defaultPen.strokePattern();
-    strokeCaps = pen.strokeCaps() != null ?
-        pen.strokeCaps() : defaultPen.strokeCaps();
 
     color = pen.color() != null ?
         pen.color() : defaultPen.color();
@@ -166,17 +154,35 @@ public class WdCanvas implements Canvas {
         color.red(), color.green(), color.blue(), color.alpha() / 256.0);
   }
 
+  // Check if we actually need to draw the element, i.e. inside viewport
+  private boolean needToDraw(double x1, double y1, double x2, double y2) {
+    int width = CanvasDimensions.getCanvasWidth();
+    int height = CanvasDimensions.getCanvasHeight();
+
+    if (x1 < 0 || x2 < 0 || x1 > width || x2 > width) {
+      return false;
+    }
+
+    if (y1 < 0 || y2 < 0 || y1 > height || y2 > height) {
+      return false;
+    }
+
+    return true;
+  }
+
+
   // Add the canvas if the page doesn't have one
-  private void check() {
+  private void checkCanvasExists() {
     try {
       WdDriver.executeScript("addCanvasTestar()");
-    } catch (Exception e) {
+    }
+      catch (Exception e) {
       // TODO
       System.out.println();
       e.printStackTrace();
 
       pause(1);
-      check();
+      checkCanvasExists();
     }
   }
 }
