@@ -136,14 +136,16 @@ function getDimensionsTestar(element) {
     return {
         overflowX: style.getPropertyValue('overflow-x'),
         overflowY: style.getPropertyValue('overflow-y'),
-        innerWidth: window.innerWidth,
-        innerHeight: window.innerHeight,
         clientWidth: element.clientWidth,
         clientHeight: element.clientHeight,
+        offsetWidth: element.offsetWidth,
+        offsetHeight: element.offsetHeight,
         scrollWidth: element.scrollWidth,
         scrollHeight: element.scrollHeight,
         scrollLeft: scrollLeft,
-        scrollTop: scrollTop
+        scrollTop: scrollTop,
+        borderWidth: parseInt(style.borderLeftWidth, 10) + parseInt(style.borderRightWidth, 10),
+        borderHeight: parseInt(style.borderTopWidth, 10) + parseInt(style.borderBottomWidth, 10)
     };
 }
 

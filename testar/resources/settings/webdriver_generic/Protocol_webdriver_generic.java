@@ -25,7 +25,6 @@ import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.protocols.ProtocolUtil;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import org.fruit.Pair;
 import org.fruit.alayer.*;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -184,8 +183,16 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
     // iterate through all widgets
     for (Widget widget: state) {
-      // only consider enabled, non-blocked widgets and non-tabu widgets
-      if (!widget.get(Enabled, true) || widget.get(Blocked, false) || blackListed(widget)) {
+      // only consider enabled and non-tabu widgets
+      if (!widget.get(Enabled, true) || blackListed(widget)) {
+        continue;
+      }
+
+      // slides can happen, even though the widget might be blocked
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+
+      // If the element is blocked, Testar can't click on or type in the widget
+      if (widget.get(Blocked, false)) {
         continue;
       }
 
@@ -200,9 +207,6 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
         actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
       }
-
-      // slides
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
     }
 
     return actions;

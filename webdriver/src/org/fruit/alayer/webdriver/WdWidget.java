@@ -138,13 +138,13 @@ public class WdWidget implements Widget, Serializable {
 
   @Override
   public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
-    boolean hasScroll = get(WebScrollPattern, null);
-    if (!hasScroll) {
+    boolean hScroll = get(WebHorizontallyScrollable, Boolean.FALSE);
+    boolean vScroll = get(WebVerticallyScrollable, Boolean.FALSE);
+    if (!hScroll && !vScroll) {
       return null;
     }
 
     Drag[] hDrags = null;
-    boolean hScroll = get(WebHorizontallyScrollable, Boolean.FALSE);
     if (hScroll) {
       double hViewSize = get(WebScrollHorizontalViewSize, Double.MIN_VALUE);
       if (hViewSize > 0) {
@@ -157,7 +157,6 @@ public class WdWidget implements Widget, Serializable {
     }
 
     Drag[] vDrags = null;
-    boolean vScroll = get(WebVerticallyScrollable, Boolean.FALSE);
     if (vScroll) {
       double vViewSize = get(WebScrollVerticalViewSize, Double.MIN_VALUE);
       if (vViewSize > 0) {

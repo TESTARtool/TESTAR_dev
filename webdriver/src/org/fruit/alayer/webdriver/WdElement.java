@@ -11,6 +11,14 @@ import java.util.Map;
 public class WdElement implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
 
+  private static final List<String> scrollOn = Arrays.asList("auto", "scroll");
+  private static final List<String> scrollableChildren = Arrays.asList(
+      "block", "run-in", "flow", "flow-root", "table", "flex", "grid",
+      "list-item", "table-row", "table-cell", "table-caption", "inline-block",
+      "inline-table", "inline-flex", "inline-grid");
+  private static final List<String> focusableTags = Arrays.asList(
+      "input", "select", "textarea", "a", "button", "area");
+
   // TODO Access
   List<WdElement> children = new ArrayList<>();
   WdElement parent;
@@ -39,12 +47,12 @@ public class WdElement implements Serializable {
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
 
   // Keep these here for fillScrollValues
-  // TODO Check overflow with Firefox
   protected String overflowX, overflowY;
-  protected long innerWidth, innerHeight;
   protected long clientWidth, clientHeight;
+  private long offsetWidth, offsetHeight;
   public long scrollWidth, scrollHeight;
   public long scrollLeft, scrollTop;
+  private long borderWidth, borderHeight;
 
   @SuppressWarnings("unchecked")
   public WdElement(Map<String, Object> packedElement,
@@ -131,20 +139,23 @@ public class WdElement implements Serializable {
     // https://gist.github.com/jamiewilson/c3043f8c818b6b0ccffd
     // https://www.w3.org/TR/html5/editing.html#focus
 
-    List<String> focusableTags =
-        Arrays.asList("input", "select", "textarea", "a", "button", "area");
     return focusableTags.contains(tagName);
   }
 
   protected void fillScrollValues() {
-    List<String> scrollOn = Arrays.asList("auto", "scroll", "visible");
-    hScroll = scrollOn.contains(overflowX) && scrollWidth > clientWidth;
+    // https://stackoverflow.com/a/29956778
+
+    boolean hasHorizontalScrollbar = offsetHeight > (clientHeight + borderHeight);
+    hScroll = scrollWidth > clientWidth &&
+        (scrollOn.contains(overflowX) || hasHorizontalScrollbar);
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
     }
     hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
-    vScroll = scrollOn.contains(overflowY) && scrollHeight > clientHeight;
+    boolean hasVerticalScrollbar = offsetWidth > (clientWidth + borderWidth);
+    vScroll = scrollHeight > clientHeight &&
+        (scrollOn.contains(overflowY) || hasVerticalScrollbar);
     if (scrollHeight != clientHeight) {
       vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
     }
@@ -177,14 +188,15 @@ public class WdElement implements Serializable {
     Map<String, Object> dims = (Map<String, Object>) packedElement.get("dimensions");
     overflowX = (String) dims.get("overflowX");
     overflowY = (String) dims.get("overflowY");
-    // TODO Not used?
-    innerWidth = (long) dims.get("innerWidth");
-    innerHeight = (long) dims.get("innerHeight");
     clientWidth = (long) dims.get("clientWidth");
     clientHeight = (long) dims.get("clientHeight");
+    offsetWidth = (long) dims.get("offsetWidth");
+    offsetHeight = (long) dims.get("offsetHeight");
     scrollWidth = (long) dims.get("scrollWidth");
     scrollHeight = (long) dims.get("scrollHeight");
     scrollLeft = (long) dims.get("scrollLeft");
     scrollTop = (long) dims.get("scrollTop");
+    borderWidth = (long) dims.get("borderWidth");
+    borderHeight = (long) dims.get("borderHeight");
   }
 }
