@@ -36,7 +36,7 @@ public class AbstractStateModel {
      */
     private AbstractStateModel(String abstractionLevelIdentifier) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
-        // both sets are empty when the model is just created
+        // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
         stateTransitionsBySource = new HashMap<>();
         stateTransitionsByTarget = new HashMap<>();

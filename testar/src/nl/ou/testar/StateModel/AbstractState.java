@@ -57,4 +57,20 @@ public class AbstractState {
     public Set<String> getActionIds() {
         return actionIds;
     }
+
+    /**
+     * This method returns the concrete state ids that correspond to this abstract state.
+     * @return
+     */
+    public Set<String> getConcreteStateIds() {
+        return concreteStateIds;
+    }
+
+    /**
+     * This method returns the actions that have not yet been visited from this state
+     * @return
+     */
+    public Set<String> getUnvisitedActionIds() {
+        return unvisitedActionIds;
+    }
 }
