@@ -244,6 +244,8 @@ public class Main {
       //Use the only file that was found
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
+    //FIXME a bug: if there is *sse in the name of protocol, like in desktop_ponsse_4g, the path is cut like:
+    //  Test settings is <./settings/desktop_po/test.settings>
     String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;

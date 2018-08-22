@@ -77,7 +77,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_ponsse_4g/Protocol_desktop_ponsse_4g
+ProtocolClass = desktop_ponse_4g/Protocol_desktop_ponse_4g
 
 #################################################################
 # Graphdatabase settings (experimental)
