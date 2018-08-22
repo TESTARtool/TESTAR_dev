@@ -34,7 +34,7 @@ public class AbstractStateModel {
      * constructor
      * @param abstractionLevelIdentifier
      */
-    private AbstractStateModel(String abstractionLevelIdentifier) {
+    public AbstractStateModel(String abstractionLevelIdentifier) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
@@ -168,6 +168,24 @@ public class AbstractStateModel {
         if (abstractStateId == null || abstractStateId.equals("")) {
             throw new InvalidStateIdException();
         }
+    }
+
+    /**
+     * This method returns all the outgoing transitions for a given state.
+     * @param stateId
+     * @return
+     */
+    public Set<AbstractStateTransition> getOutgoingTransitionsForState(String stateId) {
+        return stateTransitionsBySource.get(stateId);
+    }
+
+    /**
+     * This method returns all the incoming transitions for a given state.
+     * @param stateId
+     * @return
+     */
+    public Set<AbstractStateTransition> getIncomingTransitionsForState(String stateId) {
+        return stateTransitionsByTarget.get(stateId);
     }
 
 }

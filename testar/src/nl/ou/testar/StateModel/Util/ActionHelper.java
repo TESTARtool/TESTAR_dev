@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel.Util;
 
+import nl.ou.testar.StateModel.AbstractAction;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
 import java.util.HashSet;
@@ -13,12 +15,25 @@ public class ActionHelper {
      * @param actions
      * @return
      */
-    public static Set<String> getAbstractIds(Set<Action> actions) {
+    public static Set<String> getAbstractIds(Set<AbstractAction> actions) {
         Set<String> actionIds = new HashSet<>();
-        for(Action action:actions) {
-            actionIds.add(action.get(Tags.AbstractID));
+        for(AbstractAction action:actions) {
+            actionIds.add(action.getActionId());
         }
         return actionIds;
+    }
+
+    /**
+     * This helper method converts alayer actions to abstract actions for use in the state model
+     * @param actions
+     * @return
+     */
+    public static Set<AbstractAction> convertActionsToAbstractActions(Set<Action> actions) {
+        Set<AbstractAction> abstractActions = new HashSet<>();
+        for(Action action:actions) {
+            abstractActions.add(new AbstractAction(action.get(Tags.AbstractID)));
+        }
+        return abstractActions;
     }
 
 }

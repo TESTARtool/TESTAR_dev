@@ -1,5 +1,7 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Exception.StateNotFoundException;
 import nl.ou.testar.StateModel.Util.ActionHelper;
@@ -21,12 +23,16 @@ public class StateModelManager {
     // the action that is currently being executed, if applicable
     private AbstractAction actionUnderExecution;
 
+    // action selector that chooses actions to execute
+    private ActionSelector actionSelector;
+
     /**
      * Constructor
      * @param abstractStateModel
      */
-    public StateModelManager(AbstractStateModel abstractStateModel) {
+    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector) {
         this.abstractStateModel = abstractStateModel;
+        this.actionSelector = actionSelector;
     }
 
     /**
@@ -51,7 +57,7 @@ public class StateModelManager {
         }
         catch (StateModelException ex) {
             // state wasn't found
-            newAbstractState = new AbstractState(abstractStateId, ActionHelper.getAbstractIds(actions));
+            newAbstractState = new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
         }
 
         // add the abstract state to the model
@@ -82,6 +88,24 @@ public class StateModelManager {
      */
     public void notifyActionExecution(Action actionUnderExecution) {
         this.actionUnderExecution = new AbstractAction(actionUnderExecution.get(Tags.AbstractID));
+    }
+
+    /**
+     * This method uses the abstract state model to return the abstract id of an action to execute
+     * @return
+     */
+    public String getAbstractActionIdToExecute() {
+        //@todo we will probably want to replace this method with one that returns the actual actions to execute
+
+        if (currentAbstractState == null) {
+            return null;
+        }
+        try {
+            return actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
+        } catch (ActionNotFoundException e) {
+            System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
+        }
+        return null;
     }
 
 

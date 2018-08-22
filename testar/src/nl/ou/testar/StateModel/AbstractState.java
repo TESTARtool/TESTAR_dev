@@ -1,6 +1,11 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
+import nl.ou.testar.StateModel.Util.ActionHelper;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class AbstractState {
@@ -8,7 +13,7 @@ public class AbstractState {
     // abstract state id
     private String stateId;
     // list of possible actions that can be executed from this state
-    private Set<String> actionIds;
+    private Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
     private Set<String> unvisitedActionIds;
     // a set of strings containing the concrete state ids that correspond to this abstract state
@@ -17,12 +22,15 @@ public class AbstractState {
     /**
      * Constructor
      * @param stateId
-     * @param actionIds
+     * @param actions
      */
-    public AbstractState(String stateId, Set<String> actionIds) {
+    public AbstractState(String stateId, Set<AbstractAction> actions) {
         this.stateId = stateId;
-        this.actionIds = actionIds;
-        this.unvisitedActionIds = actionIds; // all are unvisited when creating
+        this.actions = new HashMap<>();
+        for(AbstractAction action:actions) {
+            this.actions.put(action.getActionId(), action);
+        }
+        this.unvisitedActionIds = ActionHelper.getAbstractIds(actions); // all are unvisited when creating
         concreteStateIds = new HashSet<>();
     }
 
@@ -55,7 +63,43 @@ public class AbstractState {
      * @return executable actions for this state
      */
     public Set<String> getActionIds() {
-        return actionIds;
+        return actions.keySet();
+    }
+
+    /**
+     * This method returns all the abstract actions that are executable from this abstract state
+     * @return
+     */
+    public Set<AbstractAction> getActions() {
+        return new HashSet<>(actions.values());
+    }
+
+    /**
+     * This method returns all the state's executable actions for a given set of ids
+     * @param actionIds
+     * @return
+     */
+    public Set<AbstractAction> getActions(Set<String> actionIds) {
+        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
+        for (String actionId:actionIds) {
+            if (actions.containsKey(actionId)) {
+                abstractActions.add(actions.get(actionId));
+            }
+        }
+        return abstractActions;
+    }
+
+    /**
+     * This method returns the action for a given action identifier
+     * @param actionId
+     * @return
+     * @throws ActionNotFoundException
+     */
+    public AbstractAction getAction(String actionId) throws ActionNotFoundException{
+        if (!actions.containsKey(actionId)) {
+            throw new ActionNotFoundException();
+        }
+        return actions.get(actionId);
     }
 
     /**
