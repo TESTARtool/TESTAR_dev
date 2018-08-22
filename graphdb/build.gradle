@@ -19,7 +19,7 @@ jmhReport {
 
 dependencies {
     compile project(':core')
-    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '2.2.29'
+    compile group: 'com.orientechnologies', name: 'orientdb-graphdb', version: '3.0.6'
     compile group: 'com.tinkerpop.gremlin', name: 'gremlin-java', version: '2.6.0'
     compile group: 'com.tinkerpop.gremlin', name: 'gremlin-groovy', version: '2.6.0'
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.9'
