@@ -70,35 +70,14 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
 
+import nl.ou.testar.ProcessInfo;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.UsedResources;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
@@ -388,9 +367,23 @@ public class DefaultProtocol extends AbstractProtocol {
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
+			System.out.println("DefaultProtocol: Starting SUT process");
+			List<ProcessInfo> processesBeforeSUT = SystemProcessHandling.getRunningProcesses("Before starting SUT");
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
+			List<ProcessInfo> processesAfterSUT = SystemProcessHandling.getRunningProcesses("After starting SUT");
+			for(ProcessInfo pi:processesAfterSUT){
+				boolean processExistedBeforeStartingSUT = false;
+				for(ProcessInfo piBefore:processesBeforeSUT){
+					if(pi.pid==piBefore.pid){
+						processExistedBeforeStartingSUT = true;
+					}
+				}
+				if(!processExistedBeforeStartingSUT){
+					System.out.println("SUT process: ["+pi.pid+"] "+pi.Desc);
+				}
+			}
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
 					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
@@ -403,6 +396,18 @@ public class DefaultProtocol extends AbstractProtocol {
 								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 								return sut;
+							}else if(state == null){
+								System.out.println("DEBUG: state == null");
+							}else if(state.childCount()==0){
+								System.out.println("DEBUG: state.childCount() == 0");
+//								for(Tag t:state.tags()){
+//									System.out.println("DEBUG: "+t+"="+state.get(t));
+//								}
+							}
+						}else{
+							System.out.println("DEBUG: system not running, status="+sut.getStatus());
+							for(Tag t:sut.tags()){
+								System.out.println("DEBUG: "+t+"="+sut.get(t));
 							}
 						}
 						Util.pauseMs(500);				

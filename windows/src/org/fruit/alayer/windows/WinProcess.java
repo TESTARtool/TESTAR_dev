@@ -120,6 +120,7 @@ public final class WinProcess extends SUTBase {
 	}
 
 	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
+		System.out.println("WinProcess: fromExecutable(): path="+path);
 		try{
 			Assert.notNull(path);
 			
@@ -348,7 +349,7 @@ public final class WinProcess extends SUTBase {
 
 	public boolean isRunning() {
 		return hProcess != 0 && 
-				Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+				(Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE || Windows.GetExitCodeProcess(hProcess)==0); //0 = function fails
 	}
 
 	public String toString(){
@@ -394,6 +395,14 @@ public final class WinProcess extends SUTBase {
 	}
 	
 	public String getStatus(){
+//		System.out.println("DEBUG: hProcess="+hProcess+", exit code ="+Windows.GetExitCodeProcess(hProcess)+", active="+Windows.STILL_ACTIVE);
+		//Exit Code: https://docs.microsoft.com/fi-fi/windows/desktop/api/processthreadsapi/nf-processthreadsapi-terminateprocess
+		// If the function succeeds, the return value is nonzero. If the function fails, the return value is zero. To get extended error information, call GetLastError.
+		if(Windows.GetExitCodeProcess(hProcess)==0){
+			System.out.println("Windows.GetExitCodeProcess(hProcess) function fails (exit code==0)");
+			//TODO implement Windows.GetLastError
+//			System.out.println("Last error: "+Windows.GetL
+		}
 		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] ... " + this.get(Tags.Desc,"");
 	}
 
