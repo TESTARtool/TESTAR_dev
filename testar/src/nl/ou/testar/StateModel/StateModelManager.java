@@ -50,7 +50,7 @@ public class StateModelManager {
      */
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         //@todo ad: replace the abstract id tag with the custom tag from my dev branch
-        String abstractStateId = newState.get(Tags.AbstractID);
+        String abstractStateId = newState.get(Tags.Abstract_R_ID);
         AbstractState newAbstractState;
         try {
             newAbstractState = abstractStateModel.getState(abstractStateId);

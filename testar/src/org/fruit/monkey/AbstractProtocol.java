@@ -49,6 +49,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.ProcessInfo;
+import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -199,6 +200,7 @@ IEventListener {
 	protected int testFailTimes = 0;
 	protected final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
 	protected GraphDB graphDB;
+	protected StateModelManager stateModelManager;
 
 	protected boolean nonSuitableAction = false;
 
@@ -503,6 +505,7 @@ IEventListener {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
+		stateModelManager.notifyActionExecution(action);
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds

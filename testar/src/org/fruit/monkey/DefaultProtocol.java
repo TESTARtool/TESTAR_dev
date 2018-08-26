@@ -70,6 +70,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
 
+import nl.ou.testar.StateModel.StateModelManager;
+import nl.ou.testar.StateModel.StateModelManagerFactory;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -140,6 +142,7 @@ public class DefaultProtocol extends AbstractProtocol {
 
 	private StateBuilder builder;
 
+
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
 			BluePen = Pen.newPen().setColor(Color.Blue).
@@ -152,6 +155,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				settings.get(ConfigTags.AccessBridgeEnabled),
 				settings.get(ConfigTags.SUTProcesses)
 				);
+		stateModelManager = StateModelManagerFactory.getStateModelManager();
 	}
 
 	protected Canvas buildCanvas() {
@@ -1226,6 +1230,12 @@ public class DefaultProtocol extends AbstractProtocol {
 				LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
 				state = getState(system);
 				graphDB.addState(state,true);
+
+				// notify the state model manager of the newly reached state
+                Set<Action> actions = deriveActions(system, state);
+                CodingManager.buildIDs(state, actions);
+				stateModelManager.notifyNewStateReached(state, actions);
+
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
 
@@ -1264,6 +1274,12 @@ public class DefaultProtocol extends AbstractProtocol {
 						
 						state = getState(system);
 						graphDB.addState(state);
+
+                        // notify the state model manager of the newly reached state
+                        actions = deriveActions(system, state);
+                        CodingManager.buildIDs(state, actions);
+                        stateModelManager.notifyNewStateReached(state, actions);
+
 						if (faultySequence) problems = true;
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){
