@@ -3,20 +3,20 @@ package nl.ou.testar.StateModel;
 public class AbstractStateTransition {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
-    private String sourceStateId;
-    private String targetStateId;
-    private String actionId;
+    private AbstractState sourceState;
+    private AbstractState targetState;
+    private AbstractAction action;
 
     /**
      * Constructor
-     * @param sourceStateId
-     * @param targetStateId
-     * @param actionId
+     * @param sourceState
+     * @param targetState
+     * @param action
      */
-    public AbstractStateTransition(String sourceStateId, String targetStateId, String actionId) {
-        this.sourceStateId = sourceStateId;
-        this.targetStateId = targetStateId;
-        this.actionId = actionId;
+    public AbstractStateTransition(AbstractState sourceState, AbstractState targetState, AbstractAction action) {
+        this.sourceState = sourceState;
+        this.targetState = targetState;
+        this.action = action;
     }
 
     /**
@@ -24,7 +24,7 @@ public class AbstractStateTransition {
      * @return
      */
     public String getSourceStateId() {
-        return sourceStateId;
+        return sourceState.getStateId();
     }
 
     /**
@@ -32,7 +32,7 @@ public class AbstractStateTransition {
      * @return
      */
     public String getTargetStateId() {
-        return targetStateId;
+        return targetState.getStateId();
     }
 
     /**
@@ -40,6 +40,30 @@ public class AbstractStateTransition {
      * @return
      */
     public String getActionId() {
-        return actionId;
+        return action.getActionId();
+    }
+
+    /**
+     * Get the source state for this transition
+     * @param sourceState
+     */
+    public void setSourceState(AbstractState sourceState) {
+        this.sourceState = sourceState;
+    }
+
+    /**
+     * Get the target state for this transition
+     * @param targetState
+     */
+    public void setTargetState(AbstractState targetState) {
+        this.targetState = targetState;
+    }
+
+    /**
+     * Get the action for this transition
+     * @param action
+     */
+    public void setAction(AbstractAction action) {
+        this.action = action;
     }
 }

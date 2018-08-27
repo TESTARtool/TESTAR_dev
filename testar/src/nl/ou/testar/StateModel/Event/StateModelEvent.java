@@ -1,6 +1,24 @@
 package nl.ou.testar.StateModel.Event;
 
-public abstract class StateModelEvent {
+public class StateModelEvent {
+
+    private StateModelEventType eventType;
+
+    /**
+     * Constructor
+     * @param eventType
+     */
+    public StateModelEvent(StateModelEventType eventType) {
+        this.eventType = eventType;
+    }
+
+    /**
+     * Get the event type for this event.
+     * @return
+     */
+    public StateModelEventType getEventType() {
+        return eventType;
+    }
 
     /**
      * Subject of the event

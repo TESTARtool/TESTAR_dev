@@ -1,5 +1,7 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Event.StateModelEvent;
+import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.ElementAlreadyExistsException;
 import nl.ou.testar.StateModel.Exception.InvalidStateIdException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
@@ -30,6 +32,9 @@ public class AbstractStateModel {
     // set of executed actions
     private Map<String, AbstractAction> executedActions;
 
+    // a set of event listeners
+    private Set<StateModelEventListener> eventListeners;
+
     /**
      * constructor
      * @param abstractionLevelIdentifier
@@ -43,6 +48,7 @@ public class AbstractStateModel {
         states = new HashMap<>();
         initialStates = new HashMap<>();
         executedActions = new HashMap<>();
+        eventListeners = new HashSet<>();
         initStateModel();
     }
 
@@ -75,7 +81,7 @@ public class AbstractStateModel {
         }
 
         // new transition
-        AbstractStateTransition newStateTransition = new AbstractStateTransition(sourceState.getStateId(), targetState.getStateId(), executedAction.getActionId());
+        AbstractStateTransition newStateTransition = new AbstractStateTransition(sourceState, targetState, executedAction);
         addTransition(newStateTransition);
         addState(sourceState);
         addState(targetState);
@@ -187,5 +193,24 @@ public class AbstractStateModel {
     public Set<AbstractStateTransition> getIncomingTransitionsForState(String stateId) {
         return stateTransitionsByTarget.get(stateId);
     }
+
+    /**
+     * Add an event listener to this state model
+     * @param eventListener
+     */
+    public void addEventListener(StateModelEventListener eventListener) {
+        eventListeners.add(eventListener);
+    }
+
+    /**
+     * Notify our listeners of emitted events
+     * @param event
+     */
+    private void emitEvent(StateModelEvent event) {
+        for (StateModelEventListener eventListener: eventListeners) {
+            eventListener.eventReceived(event);
+        }
+    }
+
 
 }

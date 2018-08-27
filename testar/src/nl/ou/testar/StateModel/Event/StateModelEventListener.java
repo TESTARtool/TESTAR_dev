@@ -1,9 +1,11 @@
 package nl.ou.testar.StateModel.Event;
 
-public class StateModelEventListener {
+public interface StateModelEventListener {
 
-    public void eventReceived(StateModelEvent event) {
-
-    }
+    /**
+     * This method handles the reception of a state model event.
+     * @param event
+     */
+    void eventReceived(StateModelEvent event);
 
 }
