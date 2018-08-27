@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -104,8 +105,7 @@ public final class WinProcess extends SUTBase {
 		}
 		throw new SystemStartException("Process '" + processName + "' not found!");
 	}
-	
-	// by urueda
+
 	public static List<SUT> fromAll(){
 		List<WinProcHandle> processes = runningProcesses();
 		if (processes == null || processes.isEmpty())
@@ -271,9 +271,6 @@ public final class WinProcess extends SUTBase {
 		return ret;
 	}
 
-	/**
-	 * by urueda
-	 */
 	public static long getMemUsage(WinProcess wp){
 		long pid = -1;
 		try{
@@ -284,10 +281,7 @@ public final class WinProcess extends SUTBase {
 		}
 		return Windows.GetProcessMemoryInfo(pid);
 	}
-	
-	/**
-	 * by urueda
-	 */
+
 	public static long[] getCPUsage(WinProcess wp){
 		long pid = -1;
 		try{
@@ -327,10 +321,8 @@ public final class WinProcess extends SUTBase {
 			Windows.CoUninitialize();
 			pApplicationActivationManager = 0;
 		}
-		// begin by urueda
 		if (this.getNativeAutomationCache() != null)
 			this.getNativeAutomationCache().releaseCachedAutomationElements();
-		// end by urueda
 	}
 
 
@@ -349,7 +341,8 @@ public final class WinProcess extends SUTBase {
 
 	public boolean isRunning() {
 		return hProcess != 0 && 
-				(Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE || Windows.GetExitCodeProcess(hProcess)==0); //0 = function fails
+				(Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE );
+						//|| Windows.GetExitCodeProcess(hProcess)==0); //0 = function fails
 	}
 
 	public String toString(){
@@ -373,10 +366,8 @@ public final class WinProcess extends SUTBase {
 			return (T)mouse;
 		else if(tag.equals(Tags.PID))
 			return (T)(Long)pid;
-		// begin by urueda
 		else if (tag.equals(Tags.HANDLE))
 			return (T)(Long)hProcess;
-		// end by urueda
 		else if(tag.equals(Tags.ProcessHandles))
 			return (T)runningProcesses().iterator();
 		else if(tag.equals(Tags.SystemActivator))

@@ -64,6 +64,7 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	public static UIARootElement buildRoot(SUT system){
+		System.out.println("DEBUG: StateFetcher.buildRoot()");
 		UIARootElement uiaRoot = new UIARootElement();	
 		uiaRoot.isRunning = system.isRunning();
 
@@ -79,7 +80,7 @@ public class StateFetcher implements Callable<UIAState>{
 
 	public UIAState call() throws Exception {				
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
-		
+		System.out.println("DEBUG: StateFetcher.call()");
 		UIARootElement uiaRoot = buildSkeletton(system);
 				
 		UIAState root = createWidgetTree(uiaRoot);
@@ -117,6 +118,7 @@ public class StateFetcher implements Callable<UIAState>{
 	 * @return
 	 */
 	private UIARootElement buildSkeletton(SUT system){
+		System.out.println("DEBUG: StateFetcher.buildSkeletton()");
 		UIARootElement uiaRoot = buildRoot(system);
 
 		if(!uiaRoot.isRunning)
@@ -139,19 +141,24 @@ public class StateFetcher implements Callable<UIAState>{
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
 			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
+			System.out.println("DEBUG: visibleTopLevelWindow ["+hwnd+"], PID="+hwndPID+", SUT PID="+uiaRoot.pid);
 			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); // ( SUT as a set of windows/processes )
 				if(!owned){
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
 															  uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
-				} else
+				} else {
+					System.out.println("DEBUG: adding owned window");
 					ownedWindows.add(hwnd);
+				}
+			}else{
+				System.out.println("DEBUG: not SUT window");
 			}
 		}
 		
 		// if UIAutomation missed an owned window, we'll collect it here
-		for(long hwnd : ownedWindows){				
+		for(long hwnd : ownedWindows){				 // TODO is this a bug? should we iterate through all windows, not ownedWindows?
 			if(!uiaRoot.hwndMap.containsKey(hwnd)){
 				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 				UIAElement modalE;
@@ -212,7 +219,7 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	/* lists all visible top level windows in ascending z-order (foreground window last) */
-	private Iterable<Long> visibleTopLevelWindows(){
+	public static Iterable<Long> visibleTopLevelWindows(){
 		Deque<Long> ret = new ArrayDeque<Long>();
 		long hwnd = Windows.GetWindow(Windows.GetDesktopWindow(), Windows.GW_CHILD);
 
@@ -233,6 +240,35 @@ public class StateFetcher implements Callable<UIAState>{
 		
 		return ret;
 	}
+
+	public static List<Long> getNewWindows(Iterable<Long> oldVisibleTopLevelWindows){
+		List<Long> newWindows = new ArrayList<Long>();
+		Iterable<Long> currentVisibleWindows = visibleTopLevelWindows();
+		for(Long currentHwnd:currentVisibleWindows){
+			boolean existedBefore = false;
+			for(Long oldHwnd:oldVisibleTopLevelWindows){
+				if(currentHwnd.longValue()==oldHwnd.longValue()){
+//					System.out.println("DEBUG: window existed before "+oldHwnd+"=="+currentHwnd);
+					existedBefore = true;
+				}
+//				else{
+//					System.out.println("DEBUG: not SUT window "+oldHwnd+"!="+currentHwnd);
+//				}
+			}
+			if(!existedBefore){
+				System.out.println("SUT window: ["+currentHwnd+"]");
+				newWindows.add(currentHwnd);
+			}
+		}
+		return newWindows;
+	}
+
+	public static void printVisibleWindows(Iterable<Long> _visibleTopLevelWindows){
+		for(Long hwnd:_visibleTopLevelWindows){
+			System.out.println("Visible window ["+hwnd+"]");
+		}
+	}
+
 	
 	/* fire up the cache request */
 	private long uiaCacheWindowTree(long hwnd){
@@ -487,6 +523,7 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	private UIAState createWidgetTree(UIARootElement root){
+		System.out.println("DEBUG: StateFetcher.createWidgetTree()");
 		UIAState state = new UIAState(root);
 		root.backRef = state;
 		for(UIAElement childElement : root.children){

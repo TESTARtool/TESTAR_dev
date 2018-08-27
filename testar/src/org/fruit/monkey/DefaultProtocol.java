@@ -90,6 +90,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.windows.StateFetcher;
+import org.fruit.alayer.windows.WinProcess;
 import org.fruit.monkey.AbstractProtocol.Modes;
 
 import es.upv.staq.testar.ActionStatus;
@@ -369,22 +371,20 @@ public class DefaultProtocol extends AbstractProtocol {
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			System.out.println("DefaultProtocol: Starting SUT process");
 			List<ProcessInfo> processesBeforeSUT = SystemProcessHandling.getRunningProcesses("Before starting SUT");
+			Iterable<Long> visibleWindowsBeforeSUT = StateFetcher.visibleTopLevelWindows();
+			StateFetcher.printVisibleWindows(visibleWindowsBeforeSUT);
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
-			List<ProcessInfo> processesAfterSUT = SystemProcessHandling.getRunningProcesses("After starting SUT");
-			for(ProcessInfo pi:processesAfterSUT){
-				boolean processExistedBeforeStartingSUT = false;
-				for(ProcessInfo piBefore:processesBeforeSUT){
-					if(pi.pid==piBefore.pid){
-						processExistedBeforeStartingSUT = true;
-					}
-				}
-				if(!processExistedBeforeStartingSUT){
-					System.out.println("SUT process: ["+pi.pid+"] "+pi.Desc);
-				}
+			List<ProcessInfo> sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+			// Waiting until a new window has found after starting the SUT:
+			List<Long> sutWindows = new ArrayList<Long>();
+			while(sutWindows.size()==0){
+				Util.pauseMs(500);
+				sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
+				System.out.println("DEBUG: SUT windows: "+sutWindows.size());
 			}
-			Util.pause(settings().get(ConfigTags.StartupTime));
+			Util.pause(settings().get(ConfigTags.StartupTime)); //TODO this code not needed anymore?
 			final long now = System.currentTimeMillis(),
 					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 					State state;
@@ -406,8 +406,28 @@ public class DefaultProtocol extends AbstractProtocol {
 							}
 						}else{
 							System.out.println("DEBUG: system not running, status="+sut.getStatus());
-							for(Tag t:sut.tags()){
-								System.out.println("DEBUG: "+t+"="+sut.get(t));
+//							for(Tag t:sut.tags()){
+//								System.out.println("DEBUG: "+t+"="+sut.get(t));
+//							}
+							sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+							for(ProcessInfo pi:sutProcesses) {
+								sut = pi.sut;
+								if (sut.isRunning()) {
+									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
+									state = builder.apply(sut);
+									if (state != null && state.childCount() > 0) {
+										long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
+										System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+										return sut;
+									}else if(state == null){
+										System.out.println("DEBUG: state == null");
+									}else if(state.childCount()==0){
+										System.out.println("DEBUG: state.childCount() == 0");
+//								for(Tag t:state.tags()){
+//									System.out.println("DEBUG: "+t+"="+state.get(t));
+//								}
+									}
+								}
 							}
 						}
 						Util.pauseMs(500);				
