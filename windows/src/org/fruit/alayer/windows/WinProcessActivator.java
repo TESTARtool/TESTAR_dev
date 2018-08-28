@@ -43,6 +43,7 @@ public final class WinProcessActivator implements Proc {
 	
 	public void run() {
 		try{
+			System.out.println("DEBUG: WinProcessActivator trying to bring process to foreground, PID="+pid);
 			WinProcess.toForeground(pid);
 		}catch(WinApiException wae){
 			throw new ActionFailedException(wae);

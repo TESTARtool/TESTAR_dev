@@ -413,7 +413,7 @@ public class DefaultProtocol extends AbstractProtocol {
 									state = builder.apply(sut,sutWindows);
 									if (state != null && state.childCount() > 0) {
 										long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-										System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+										System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms, SUT process: "+ sut.getStatus());
 										return sut;
 									}else if(state == null){
 //										System.out.println("DEBUG: state == null");

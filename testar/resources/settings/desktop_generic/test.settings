@@ -81,7 +81,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+SUTProcesses = .*[lL]askin.*|.*[cC]alculator.*
 
 #################################################################
 # Protocolclass

@@ -56,10 +56,10 @@ public class StateFetcher implements Callable<UIAState>{
 		this.pCacheRequest = pCacheRequest;
 		this.accessBridgeEnabled = accessBridgeEnabled;
 		if (SUTProcesses == null || SUTProcesses.isEmpty()) {
-			System.out.println("StateFetcher: sutProcessMatcher = null");
+//			System.out.println("StateFetcher: sutProcessMatcher = null");
 			StateFetcher.sutProcessesMatcher = null;
 		}else {
-			System.out.println("StateFetcher: sutProcessMatcher - SUTProcesses is not empty in settings");
+//			System.out.println("StateFetcher: sutProcessMatcher - SUTProcesses is not empty in settings");
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
 		}
 	}
@@ -72,10 +72,10 @@ public class StateFetcher implements Callable<UIAState>{
 		this.accessBridgeEnabled = accessBridgeEnabled;
 		this.sutWindows = sutWindows;
 		if (SUTProcesses == null || SUTProcesses.isEmpty()) {
-			System.out.println("StateFetcher: sutProcessMatcher = null");
+//			System.out.println("StateFetcher: sutProcessMatcher = null");
 			StateFetcher.sutProcessesMatcher = null;
 		}else {
-			System.out.println("StateFetcher: sutProcessMatcher - SUTProcesses is not empty in settings");
+//			System.out.println("StateFetcher: sutProcessMatcher - SUTProcesses is not empty in settings");
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
 		}
 	}
@@ -122,10 +122,11 @@ public class StateFetcher implements Callable<UIAState>{
 			return false;
 		
 		String processName = Windows.GetProcessNameFromHWND(hwnd);
-		
-		if (processName != null && !(processName.isEmpty()) && StateFetcher.sutProcessesMatcher.matcher(processName).matches())
+//		System.out.println("DEBUG: process name:"+processName+", matcher:"+StateFetcher.sutProcessesMatcher.toString());
+		if (processName != null && !(processName.isEmpty()) && StateFetcher.sutProcessesMatcher.matcher(processName).matches()) {
+			System.out.println("DEBUG: matching process found: "+processName+", matcher:"+StateFetcher.sutProcessesMatcher.toString());
 			return true;
-		else
+		}else
 			return false;
 	}
 
@@ -170,11 +171,13 @@ public class StateFetcher implements Callable<UIAState>{
 					ownedWindows.add(hwnd);
 				}
 			}else if(sutWindows!=null && sutWindows.size()>0){
+				//setting SUT as foreground - otherwise TESTAR will try to bring it foreground:
+				uiaRoot.isForeground = true;
 //				System.out.println("DEBUG: checking SUT windows, hwnd="+hwnd+", hwndPID="+hwndPID);
 //				printVisibleWindows(sutWindows);
 				for(Long sutWindowHwnd:sutWindows) {
 					if (hwnd == sutWindowHwnd.longValue()) {
-//						System.out.println("DEBUG: adding SUT window");
+						System.out.println("DEBUG: matching windows that SUT started");
 						ownedWindows.add(hwnd);
 					}
 				}

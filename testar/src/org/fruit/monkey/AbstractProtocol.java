@@ -458,6 +458,7 @@ IEventListener {
 		//Then here we will select the action to do that
 
 		else if (this.forceToForeground){
+			System.out.println("DEBUG: preActionSelection, Forcing SUT activation (bring to foreground) action");
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
