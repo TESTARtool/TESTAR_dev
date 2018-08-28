@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,11 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import static org.fruit.alayer.Tags.ActionDelay;
@@ -369,10 +365,10 @@ public class DefaultProtocol extends AbstractProtocol {
 		else if (sutConnector.startsWith(Settings.SUT_CONNECTOR_PROCESS_NAME))
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
-			System.out.println("DefaultProtocol: Starting SUT process");
+//			System.out.println("DefaultProtocol: Starting SUT process");
 			List<ProcessInfo> processesBeforeSUT = SystemProcessHandling.getRunningProcesses("Before starting SUT");
 			Iterable<Long> visibleWindowsBeforeSUT = StateFetcher.visibleTopLevelWindows();
-			StateFetcher.printVisibleWindows(visibleWindowsBeforeSUT);
+//			StateFetcher.printVisibleWindows(visibleWindowsBeforeSUT);
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
@@ -382,7 +378,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			while(sutWindows.size()==0){
 				Util.pauseMs(500);
 				sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
-				System.out.println("DEBUG: SUT windows: "+sutWindows.size());
+//				System.out.println("DEBUG: SUT windows: "+sutWindows.size());
 			}
 			Util.pause(settings().get(ConfigTags.StartupTime)); //TODO this code not needed anymore?
 			final long now = System.currentTimeMillis(),
@@ -391,21 +387,21 @@ public class DefaultProtocol extends AbstractProtocol {
 					do{
 						if (sut.isRunning()){
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
-							state = builder.apply(sut);
+							state = builder.apply(sut,sutWindows);
 							if (state != null && state.childCount() > 0){
 								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 								return sut;
 							}else if(state == null){
-								System.out.println("DEBUG: state == null");
+//								System.out.println("DEBUG: state == null");
 							}else if(state.childCount()==0){
-								System.out.println("DEBUG: state.childCount() == 0");
+//								System.out.println("DEBUG: state.childCount() == 0");
 //								for(Tag t:state.tags()){
 //									System.out.println("DEBUG: "+t+"="+state.get(t));
 //								}
 							}
 						}else{
-							System.out.println("DEBUG: system not running, status="+sut.getStatus());
+//							System.out.println("DEBUG: system not running, status="+sut.getStatus());
 //							for(Tag t:sut.tags()){
 //								System.out.println("DEBUG: "+t+"="+sut.get(t));
 //							}
@@ -413,16 +409,16 @@ public class DefaultProtocol extends AbstractProtocol {
 							for(ProcessInfo pi:sutProcesses) {
 								sut = pi.sut;
 								if (sut.isRunning()) {
-									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
-									state = builder.apply(sut);
+//									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
+									state = builder.apply(sut,sutWindows);
 									if (state != null && state.childCount() > 0) {
 										long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
 										System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 										return sut;
 									}else if(state == null){
-										System.out.println("DEBUG: state == null");
+//										System.out.println("DEBUG: state == null");
 									}else if(state.childCount()==0){
-										System.out.println("DEBUG: state.childCount() == 0");
+//										System.out.println("DEBUG: state.childCount() == 0");
 //								for(Tag t:state.tags()){
 //									System.out.println("DEBUG: "+t+"="+state.get(t));
 //								}

@@ -39,6 +39,7 @@ import org.fruit.alayer.linux.util.GdkHelper;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.concurrent.*;
 
 
@@ -153,6 +154,11 @@ public class AtSpiStateBuilder implements StateBuilder {
         }
 
 
+    }
+
+    public State apply(SUT system,List<Long> sutWindows) throws StateBuildException {
+        System.out.println("ERROR: NOT IMPLEMENTED!");//TODO implement for Linux too
+        return null;
     }
 
 

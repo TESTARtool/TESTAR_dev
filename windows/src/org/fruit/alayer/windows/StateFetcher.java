@@ -47,9 +47,10 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean releaseCachedAutomatinElement;
 	private boolean accessBridgeEnabled;
 	private static Pattern sutProcessesMatcher;
-	
+	private List<Long> sutWindows = null;
+
 	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
-						boolean accessBridgeEnabled, String SUTProcesses){		
+						boolean accessBridgeEnabled, String SUTProcesses){
 		this.system = system;
 		this.pAutomation = pAutomation;
 		this.pCacheRequest = pCacheRequest;
@@ -63,8 +64,24 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 	}
 
+	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
+						boolean accessBridgeEnabled, String SUTProcesses, List<Long> sutWindows){
+		this.system = system;
+		this.pAutomation = pAutomation;
+		this.pCacheRequest = pCacheRequest;
+		this.accessBridgeEnabled = accessBridgeEnabled;
+		this.sutWindows = sutWindows;
+		if (SUTProcesses == null || SUTProcesses.isEmpty()) {
+			System.out.println("StateFetcher: sutProcessMatcher = null");
+			StateFetcher.sutProcessesMatcher = null;
+		}else {
+			System.out.println("StateFetcher: sutProcessMatcher - SUTProcesses is not empty in settings");
+			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+		}
+	}
+
 	public static UIARootElement buildRoot(SUT system){
-		System.out.println("DEBUG: StateFetcher.buildRoot()");
+//		System.out.println("DEBUG: StateFetcher.buildRoot()");
 		UIARootElement uiaRoot = new UIARootElement();	
 		uiaRoot.isRunning = system.isRunning();
 
@@ -80,7 +97,7 @@ public class StateFetcher implements Callable<UIAState>{
 
 	public UIAState call() throws Exception {				
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
-		System.out.println("DEBUG: StateFetcher.call()");
+//		System.out.println("DEBUG: StateFetcher.call()");
 		UIARootElement uiaRoot = buildSkeletton(system);
 				
 		UIAState root = createWidgetTree(uiaRoot);
@@ -118,7 +135,7 @@ public class StateFetcher implements Callable<UIAState>{
 	 * @return
 	 */
 	private UIARootElement buildSkeletton(SUT system){
-		System.out.println("DEBUG: StateFetcher.buildSkeletton()");
+//		System.out.println("DEBUG: StateFetcher.buildSkeletton()");
 		UIARootElement uiaRoot = buildRoot(system);
 
 		if(!uiaRoot.isRunning)
@@ -141,7 +158,7 @@ public class StateFetcher implements Callable<UIAState>{
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
 			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
-			System.out.println("DEBUG: visibleTopLevelWindow ["+hwnd+"], PID="+hwndPID+", SUT PID="+uiaRoot.pid);
+//			System.out.println("DEBUG: visibleTopLevelWindow ["+hwnd+"], PID="+hwndPID+", SUT PID="+uiaRoot.pid);
 			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); // ( SUT as a set of windows/processes )
 				if(!owned){
@@ -149,11 +166,20 @@ public class StateFetcher implements Callable<UIAState>{
 					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
 															  uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
 				} else {
-					System.out.println("DEBUG: adding owned window");
+//					System.out.println("DEBUG: adding owned window");
 					ownedWindows.add(hwnd);
 				}
+			}else if(sutWindows!=null && sutWindows.size()>0){
+//				System.out.println("DEBUG: checking SUT windows, hwnd="+hwnd+", hwndPID="+hwndPID);
+//				printVisibleWindows(sutWindows);
+				for(Long sutWindowHwnd:sutWindows) {
+					if (hwnd == sutWindowHwnd.longValue()) {
+//						System.out.println("DEBUG: adding SUT window");
+						ownedWindows.add(hwnd);
+					}
+				}
 			}else{
-				System.out.println("DEBUG: not SUT window");
+//				System.out.println("DEBUG: not SUT window");
 			}
 		}
 		
@@ -523,7 +549,6 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	private UIAState createWidgetTree(UIARootElement root){
-		System.out.println("DEBUG: StateFetcher.createWidgetTree()");
 		UIAState state = new UIAState(root);
 		root.backRef = state;
 		for(UIAElement childElement : root.children){

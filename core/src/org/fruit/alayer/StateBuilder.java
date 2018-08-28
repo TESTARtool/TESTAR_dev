@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,13 +28,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.fruit.alayer.exceptions.StateBuildException;
 
@@ -43,5 +41,6 @@ import org.fruit.alayer.exceptions.StateBuildException;
 public interface StateBuilder extends Serializable{
 
 	State apply(SUT system) throws StateBuildException;
+	State apply(SUT system,List<Long> sutWindows) throws StateBuildException;
     	
 }

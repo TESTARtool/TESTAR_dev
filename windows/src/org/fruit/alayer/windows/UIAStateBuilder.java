@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.windows;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,6 +68,7 @@ public final class UIAStateBuilder implements StateBuilder {
 	}
 
 	private void initialize(){
+		System.out.println("DEBUG: UIAStateBuilder.initialize()");
 
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
 		//System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
@@ -158,10 +160,34 @@ public final class UIAStateBuilder implements StateBuilder {
 	public void finalize(){ release(); }
 
 	public UIAState apply(SUT system) throws StateBuildException {
-		//System.out.println("DEBUG: UIAStateBuilder: apply()");
+		System.out.println("DEBUG: UIAStateBuilder.apply(SUT)");
 		try {
 			Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
 																	   this.accessBridgeEnabled, this.SUTProcesses));
+			return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			System.out.println("DEBUG: UIAStateBuilder: apply() interrupted");
+			throw new StateBuildException(e);
+		} catch (ExecutionException e) {
+			System.out.println("DEBUG: UIAStateBuilder: apply() execution exception");
+			e.printStackTrace(); // make the exception traceable
+			throw new StateBuildException(e);
+		} catch (TimeoutException e) {
+			System.out.println("DEBUG: UIAStateBuilder: apply() timeout");
+			//UIAState ret = new UIAState(uiaRoot);
+			UIAState ret = new UIAState(StateFetcher.buildRoot(system));
+			ret.set(Tags.Role, Roles.Process);
+			ret.set(Tags.NotResponding, true);
+			return ret;
+		}
+	}
+
+
+	public UIAState apply(SUT system, List<Long> sutWindows) throws StateBuildException {
+		System.out.println("DEBUG: UIAStateBuilder.apply(SUT, sutWindows)");
+		try {
+			Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
+					this.accessBridgeEnabled, this.SUTProcesses, sutWindows));
 			return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			System.out.println("DEBUG: UIAStateBuilder: apply() interrupted");
