@@ -1,4 +1,9 @@
 package nl.ou.testar.StateModel.Persistence;
 
-public class PersistenceManagerFactory {
+import org.fruit.monkey.Settings;
+
+public interface PersistenceManagerFactory {
+
+    PersistenceManager getPersistenceManager(Settings settings);
+
 }

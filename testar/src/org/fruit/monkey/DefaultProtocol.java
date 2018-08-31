@@ -155,7 +155,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				settings.get(ConfigTags.AccessBridgeEnabled),
 				settings.get(ConfigTags.SUTProcesses)
 				);
-		stateModelManager = StateModelManagerFactory.getStateModelManager();
+		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 	}
 
 	protected Canvas buildCanvas() {

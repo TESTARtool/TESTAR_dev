@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Exception.StateNotFoundException;
+import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.ActionHelper;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -26,13 +27,19 @@ public class StateModelManager {
     // action selector that chooses actions to execute
     private ActionSelector actionSelector;
 
+    // persistence manager interface for persisting our model entities
+    private PersistenceManager persistenceManager;
+
     /**
      * Constructor
      * @param abstractStateModel
+     * @param actionSelector
      */
-    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector) {
+    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
+        this.persistenceManager = persistenceManager;
+        init();
     }
 
     /**
@@ -59,6 +66,8 @@ public class StateModelManager {
             // state wasn't found
             newAbstractState = new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
         }
+        // we want to provide the abstract state with the identifier of the concrete state
+        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteID));
 
         // add the abstract state to the model
         try {

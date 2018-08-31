@@ -1,4 +1,4 @@
 package nl.ou.testar.StateModel.Exception;
 
-public class EntityNotFoundException {
+public class EntityNotFoundException extends StateModelException {
 }
