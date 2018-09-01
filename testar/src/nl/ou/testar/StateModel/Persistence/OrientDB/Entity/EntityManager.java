@@ -63,6 +63,8 @@ public class EntityManager {
             vertexType = graph.createVertexType(entityClass.getClassName());
             for (Property property : entityClass.getProperties()) {
                 OrientVertexType.OrientVertexProperty vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
+                System.out.println("Mandatory: " + property.isMandatory());
+                System.out.println("Nullable: " + property.isNullable());
                 vertexProperty.setReadonly(property.isReadOnly());
                 vertexProperty.setMandatory(property.isMandatory());
                 vertexProperty.setNotNull(!property.isNullable());
@@ -75,9 +77,9 @@ public class EntityManager {
         OrientEdgeType edgeType = graph.getEdgeType(entityClass.getClassName());
         if (edgeType == null) {
             // no edge class with this name exists yet. Let's make one!
-            OrientEdgeType orientEdgeType = graph.createEdgeType(entityClass.getClassName());
+            edgeType = graph.createEdgeType(entityClass.getClassName());
             for (Property property : entityClass.getProperties()) {
-                OProperty edgeProperty = orientEdgeType.createProperty(property.getPropertyName(), property.getPropertyType());
+                OProperty edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType());
                 edgeProperty.setReadonly(property.isReadOnly());
                 edgeProperty.setMandatory(property.isMandatory());
                 edgeProperty.setNotNull(!property.isNullable());
