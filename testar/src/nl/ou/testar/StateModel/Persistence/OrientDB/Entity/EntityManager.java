@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
+import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
@@ -62,7 +63,13 @@ public class EntityManager {
         OrientVertexType vertexType = graph.getVertexType(entityClass.getClassName());
         if (vertexType == null) {
             // no vertex class with this name exists yet. Let's make one!
-            graph.createVertexType(entityClass.getClassName());
+            vertexType = graph.createVertexType(entityClass.getClassName());
+            for (Property property : entityClass.getProperties()) {
+                OrientVertexType.OrientVertexProperty vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
+                vertexProperty.setReadonly(property.isReadOnly());
+                vertexProperty.setMandatory(property.isMandatory());
+                vertexProperty.setNotNull(!property.isNullable());
+            }
         }
     }
 
@@ -71,7 +78,13 @@ public class EntityManager {
         OrientEdgeType edgeType = graph.getEdgeType(entityClass.getClassName());
         if (edgeType == null) {
             // no edge class with this name exists yet. Let's make one!
-            graph.createEdgeType(entityClass.getClassName());
+            OrientEdgeType orientEdgeType = graph.createEdgeType(entityClass.getClassName());
+            for (Property property : entityClass.getProperties()) {
+                OProperty edgeProperty = orientEdgeType.createProperty(property.getPropertyName(), property.getPropertyType());
+                edgeProperty.setReadonly(property.isReadOnly());
+                edgeProperty.setMandatory(property.isMandatory());
+                edgeProperty.setNotNull(!property.isNullable());
+            }
         }
     }
 
