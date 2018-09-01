@@ -19,7 +19,9 @@ public class StateModelManagerFactory {
         PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(PersistenceManagerFactoryBuilder.ManagerType.ORIENTDB);
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
         // we provide it to our statemodel as a listener
-        abstractStateModel.addEventListener((OrientDBManager)persistenceManager);
+        if (persistenceManager instanceof OrientDBManager) {
+            abstractStateModel.addEventListener((OrientDBManager)persistenceManager);
+        }
         return new StateModelManager(abstractStateModel, actionSelector, persistenceManager);
     }
 
