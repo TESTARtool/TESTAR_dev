@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class EntityClass {
@@ -25,6 +26,7 @@ public class EntityClass {
     public EntityClass(String classname, EntityType entityType) {
         this.className = classname;
         this.entityType = entityType;
+        properties = new HashSet<>();
     }
 
     public String getSuperClassName() {
