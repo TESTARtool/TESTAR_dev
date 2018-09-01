@@ -9,8 +9,15 @@ import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClassFactory;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class OrientDBManager implements PersistenceManager, StateModelEventListener {
 
@@ -25,12 +32,31 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     private EntityManager entityManager;
 
     /**
+     * A set of orientdb classes that this class needs to operate
+     */
+    private Set<EntityClassFactory.EntityClassName> entityClassNames = new HashSet<>(Arrays.asList(
+            EntityClassFactory.EntityClassName.AbstractAction,
+            EntityClassFactory.EntityClassName.AbstractState));
+
+    /**
      * Constructor
      * @param eventHelper
      */
     public OrientDBManager(EventHelper eventHelper, EntityManager entityManager) {
         this.eventHelper = eventHelper;
         this.entityManager = entityManager;
+        init();
+    }
+
+    /**
+     * Initialization code goes here.
+     */
+    private void init() {
+        // we need to make sure before operation that the required classes exist.
+        for (EntityClassFactory.EntityClassName className : entityClassNames) {
+            EntityClass entityClass = EntityClassFactory.createEntityClass(className);
+            entityManager.createClass(entityClass);
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
 import nl.ou.testar.StateModel.Persistence.DummyManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactory;
 import nl.ou.testar.StateModel.Util.EventHelper;

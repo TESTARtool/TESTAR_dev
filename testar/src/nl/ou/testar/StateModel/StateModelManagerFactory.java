@@ -11,7 +11,6 @@ import org.fruit.monkey.Settings;
 public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(Settings settings) {
-        // simple creation logic for now
         //@todo replace this hash with a real one later
         String abstractionHash = "12345679";
         AbstractStateModel abstractStateModel = new AbstractStateModel(abstractionHash);
