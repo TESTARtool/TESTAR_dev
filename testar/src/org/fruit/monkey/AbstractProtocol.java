@@ -770,7 +770,7 @@ IEventListener {
 		initialize(settings);
 		eventHandler = new EventHandler(this);
 
-		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+		graphDB = new GraphDB(false,
 				settings.get(ConfigTags.GraphDBUrl),
 				settings.get(ConfigTags.GraphDBUser),
 				settings.get(ConfigTags.GraphDBPassword));
