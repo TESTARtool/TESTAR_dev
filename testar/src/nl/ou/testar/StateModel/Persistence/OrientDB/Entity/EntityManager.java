@@ -2,10 +2,7 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.orient.OrientEdgeType;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
-import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
-import com.tinkerpop.blueprints.impls.orient.OrientVertexType;
+import com.tinkerpop.blueprints.impls.orient.*;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
 
 import java.util.Collection;
@@ -59,7 +56,7 @@ public class EntityManager {
     }
 
     private void createVertexClass(EntityClass entityClass) {
-        OrientGraph graph = graphFactory.getTx();
+        OrientGraphNoTx graph = graphFactory.getNoTx();
         OrientVertexType vertexType = graph.getVertexType(entityClass.getClassName());
         if (vertexType == null) {
             // no vertex class with this name exists yet. Let's make one!
@@ -74,7 +71,7 @@ public class EntityManager {
     }
 
     private void createEdgeClass(EntityClass entityClass) {
-        OrientGraph graph = graphFactory.getTx();
+        OrientGraphNoTx graph = graphFactory.getNoTx();
         OrientEdgeType edgeType = graph.getEdgeType(entityClass.getClassName());
         if (edgeType == null) {
             // no edge class with this name exists yet. Let's make one!
