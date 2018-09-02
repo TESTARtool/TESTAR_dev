@@ -36,6 +36,7 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 public final class ConfigTags {
@@ -103,6 +104,11 @@ public final class ConfigTags {
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
+
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);

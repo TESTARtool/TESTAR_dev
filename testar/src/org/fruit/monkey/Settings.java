@@ -40,17 +40,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
+import es.upv.staq.testar.CodingManager;
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.exceptions.NoSuchTagException;
+
+import static java.util.stream.Collectors.toList;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -80,12 +81,13 @@ public class Settings extends TaggableBase implements Serializable {
 	public static <T> String print(Tag<T> tag, T value){
 		if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			StringBuilder sb = new StringBuilder();
+			String stringSeparator = getStringSeparator(tag);
 			List<?> l = (List<?>) value;
 			
 			int i = 0;
 			for(Object o : l){
 				if(i > 0)
-					sb.append(';');
+					sb.append(stringSeparator);
 				sb.append(Util.toString(o));
 				i++;
 			}
@@ -145,7 +147,7 @@ public class Settings extends TaggableBase implements Serializable {
 		}else if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<String>();
-			return (T)Arrays.asList(stringValue.split(";"));
+			return (T)(Arrays.asList(stringValue.split(getStringSeparator(tag))).stream().map(String::trim).collect(toList()));
 		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<Pair<String, String>>();
@@ -214,10 +216,9 @@ public class Settings extends TaggableBase implements Serializable {
 			}else{
 				set((Tag)defTag, parse(value, defTag));
 			}
-
-
-
 		}
+
+		verifySettings();
 	}
 
 	public String toString(){
@@ -353,6 +354,16 @@ public class Settings extends TaggableBase implements Serializable {
 					+"GraphDBPassword =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# State identifier attributes\n"
+					+"#\n"
+					+"# Specify the widget attributes that you wish to use in constructing\n"
+					+"# the widget and state hash strings. Use a comma separated list.\n"
+					+"# Allowed value are: Role,Path,Title,Enabled\n"
+                    +"#################################################################\n"
+			        +"ConcreteStateAttributes =" + Util.lineSep()
+			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Other more advanced settings\n"
 					+"#################################################################\n");
 
@@ -384,4 +395,46 @@ public class Settings extends TaggableBase implements Serializable {
 	
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
+
+	private void verifySettings() {
+		// verify the concrete and abstract state settings
+		// the values provided should be allowed by the Coding Manager
+        Set<String> stateSet = new HashSet<>();
+        Set<String> allowedStateAttributes = CodingManager.allowedStateTags.keySet();
+
+        // first the concrete states
+		try {
+			List<String> concreteStateAttributes = get(ConfigTags.ConcreteStateAttributes);
+			for (String concreteStateAttribute : concreteStateAttributes) {
+                if (allowedStateAttributes.contains(concreteStateAttribute)) {
+                    stateSet.add(concreteStateAttribute);
+                }
+			}
+			set(ConfigTags.ConcreteStateAttributes, new ArrayList<>(stateSet));
+		}
+		catch (NoSuchTagException ex) {
+			// no need to do anything, nothing to verify
+		}
+
+        stateSet.clear();
+
+		// then the abstract states
+        try {
+            List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
+            for (String abstractStateAttribute : abstractStateAttributes) {
+                if (allowedStateAttributes.contains(abstractStateAttribute)) {
+                    stateSet.add(abstractStateAttribute);
+                }
+            }
+            set(ConfigTags.AbstractStateAttributes, new ArrayList<>(stateSet));
+        }
+        catch (NoSuchTagException ex) {
+            // no need to do anything, nothing to verify
+        }
+	}
+
+	private static String getStringSeparator(Tag<?> tag) {
+		return tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
+				? "," : ";";
+	}
 }
