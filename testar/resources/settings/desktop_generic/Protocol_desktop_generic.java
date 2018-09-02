@@ -1,37 +1,34 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 import java.util.Set;
-
-import nl.ou.testar.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.alayer.AbsolutePosition;
@@ -55,34 +52,28 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
-	private HtmlSequenceReport htmlReport;
-	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 
-	/** 
+	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings  the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
-		// initializing simple GUI state graph:
-		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
 
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
 	}
 
-	 /**
+	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
+	 * take care of
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
 	 *      out what executable to run)
 	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -90,13 +81,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
 	 *   4) bypassing a login screen by filling the username and password
-     * @return  a started SUT, ready to be tested.
+	 * @return  a started SUT, ready to be tested.
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-		
+
 		SUT sut = super.startSystem();
-		
+
 		return sut;
 
 	}
@@ -104,8 +95,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
@@ -130,7 +121,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
-        //--------------------------------------------------------
+		//--------------------------------------------------------
 
 		return verdict;
 	}
@@ -147,6 +138,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		Set<Action> actions = super.deriveActions(system,state);
@@ -236,27 +228,14 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding state to the HTML sequence report:
-		try {
-			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
-		}catch(Exception e){
-			// catching null for the first state or any new state, when unvisited actions is still null
-			htmlReport.addState(state, actions);
-		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action a = preSelectAction(state, actions);
 		if (a!= null) {
-			// returning pre-selected action
-		} else{
-			//if no preSelected actions are needed, then implement your own action selection strategy
-
-			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = stateGraphWithVisitedActions.selectAction(state,actions);
-			//a = RandomActionSelector.selectAction(actions);
-		}
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
-		return a;
+			return a;
+		} else
+			//if no preSelected actions are needed, then implement your own strategy
+			return RandomActionSelector.selectAction(actions);
 	}
 
 	/**

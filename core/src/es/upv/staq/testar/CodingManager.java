@@ -106,6 +106,14 @@ public class CodingManager {
 		customTagsForAbstractId = tags;
 	}
 
+	/**
+	 * Returns the tags that are currently being used to create a custom abstract state id
+	 * @return
+	 */
+	public Tag<?>[] getCustomTagsForAbstractId() {
+		return customTagsForAbstractId;
+	}
+
 	// this map holds the state tags that should be provided to the coding manager
     // for use in constructing concrete and abstract state id's
 	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
