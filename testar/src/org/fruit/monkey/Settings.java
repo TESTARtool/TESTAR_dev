@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -60,6 +60,16 @@ public class Settings extends TaggableBase implements Serializable {
 	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
 			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
 			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
+	
+	private static String settingsPath;
+	
+	public static String getSettingsPath() {
+		return settingsPath;
+	}
+
+	public static void setSettingsPath(String path) {
+		settingsPath = path;
+	}
 	
 	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
@@ -285,6 +295,29 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"\n"
 					+"SuspiciousTitles = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
+					+"#\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Regular expression defines the suspicious outputs\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessListenerEnabled = " + Util.lineSep()
+					+"SuspiciousProcessOutput = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Process Logs\n"
+					+"#\n"
+					+"# Required ProcessListenerEnabled\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Allow TESTAR to store in its logs other possible matches found in the process\n"
+					+"# Use the regular expression .*.* if you want to store all the possible outputs of the process\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessLogs = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Actionfilter\n"

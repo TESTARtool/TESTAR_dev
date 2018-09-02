@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -119,13 +119,14 @@ public final class WinProcess extends SUTBase {
 		return suts;
 	}
 
-	public static WinProcess fromExecutable(String path) throws SystemStartException{
+	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
 		try{
 			Assert.notNull(path);
 			
 			//TODO: With the new way of invoking the SUT, Chrome runs but remains "not responding" until TESTAR is closed,
 			//then loads (probably by the inclusion of --force-renderer-accessibility --incognito)
-			if(path.contains("chrome.exe")) {
+			//It works with iexplore, but it's not necessary to spend resources. For browsers we need to interact with the ports.
+			if( !ProcessListenerEnabled || path.contains("chrome.exe") || path.contains("iexplore.exe")) {
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
 				long hProcess = handles[0];
 				long hThread = handles[1];

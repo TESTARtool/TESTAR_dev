@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -79,20 +79,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
 	}
-
-	 /**
-	  * This method is invoked each time TESTAR starts through COMMAND_LINE.
-	  * It examines the SUT's process to work with oracles at the process level.
-	  * By default it works with the settings oracles, but you can also add specific oracles.
-	  */
-	 protected void processListeners(SUT system, String specificSuspiciousTitle) {
-
-		 //Use .*.* if u want to read all possible output errors
-		 specificSuspiciousTitle=".*Exception.*|failed|.*null.*";
-
-		 super.processListeners(system, specificSuspiciousTitle);
-
-	 }
 
 	 /**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should

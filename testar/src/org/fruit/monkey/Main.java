@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -438,6 +438,10 @@ public class Main {
       defaults.add(Pair.from(GraphDBPassword, ""));
 
       defaults.add(Pair.from(AlwaysCompile, true));
+      
+      defaults.add(Pair.from(ProcessListenerEnabled, false));
+      defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
+      defaults.add(Pair.from(ProcessLogs, ".*.*"));
 
       defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
       defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {

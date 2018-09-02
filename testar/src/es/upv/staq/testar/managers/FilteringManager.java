@@ -60,6 +60,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.monkey.Settings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -78,7 +79,8 @@ import es.upv.staq.testar.protocols.ProtocolUtil;
 public class FilteringManager {
 
 	public static final String XML_UI_FILTER_VERSION = "1.0.20170515";
-    public static final String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
+    //By default it uses the root path (bin), but it's modified to the selected settings
+    public static String PROTOCOL_FILTER_FILE = "protocol_filter.xml";
 
 	private static final String XML_TAG_UI_FILTER_ROOT = "TESTAR_uifilter",
 								XML_TAG_UI_FILTERING_TYPES = "filtering_types",
@@ -130,6 +132,7 @@ public class FilteringManager {
     
     public FilteringManager(){
 		try{
+			PROTOCOL_FILTER_FILE = Settings.getSettingsPath()+"/protocol_filter.xml";
 			docFactory = DocumentBuilderFactory.newInstance();
 			docBuilder = docFactory.newDocumentBuilder();
 		} catch(ParserConfigurationException e){
