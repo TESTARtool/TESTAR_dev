@@ -66,16 +66,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        // first see if the state is already present in the orientdb database
-        Vertex abstractStateVertex;
-        try {
-            abstractStateVertex = entityManager.getVertexWithFilter("AbstractState.id", abstractState.getStateId());
+        // we don't update, we only create new states
+        if (!entityManager.hasVertex("AbstractState.id", abstractState.getStateId())) {
+
         }
-        catch (EntityNotFoundException ex) {
-            // state not found, create one
-            //@todo call the state creation code here in the entityManager
-        }
-        // found it. Update the existing abstract state
     }
 
     @Override
@@ -93,7 +87,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         try {
             eventHelper.validateEvent(event);
         } catch (InvalidEventException e) {
-            // invalid event. we do nothing and exit
+            // There is something wrong with the event. we do nothing and exit
             return;
         }
 

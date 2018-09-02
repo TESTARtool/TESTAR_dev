@@ -2,14 +2,23 @@ package nl.ou.testar.StateModel.Event;
 
 public class StateModelEvent {
 
+    /**
+     * The type of event
+     */
     private StateModelEventType eventType;
+
+    /**
+     * Subject of the event
+     */
+    private Object payload;
 
     /**
      * Constructor
      * @param eventType
      */
-    public StateModelEvent(StateModelEventType eventType) {
+    public StateModelEvent(StateModelEventType eventType, Object payload) {
         this.eventType = eventType;
+        this.payload = payload;
     }
 
     /**
@@ -18,19 +27,6 @@ public class StateModelEvent {
      */
     public StateModelEventType getEventType() {
         return eventType;
-    }
-
-    /**
-     * Subject of the event
-     */
-    private Object payload;
-
-    /**
-     * Set the payload object
-     * @param payload
-     */
-    public void setPayload(Object payload) {
-        this.payload = payload;
     }
 
     /**

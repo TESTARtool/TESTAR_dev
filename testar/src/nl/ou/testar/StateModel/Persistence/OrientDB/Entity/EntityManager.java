@@ -30,7 +30,7 @@ public class EntityManager {
      * @throws EntityNotFoundException
      */
     public Vertex getVertexWithFilter(String filterField, String filterValue) throws EntityNotFoundException {
-        OrientGraph graph = graphFactory.getTx();
+        OrientGraphNoTx graph = graphFactory.getNoTx();
         Iterable<Vertex> vertices = graph.getVertices(filterField, filterValue);
         if (vertices instanceof Collection) {
             int size = ((Collection<?>) vertices).size();
@@ -40,6 +40,23 @@ public class EntityManager {
             }
         }
         return vertices.iterator().next();
+    }
+
+    /**
+     * This method checks if the database contains a vertex with the given filter value
+     * @param filterfield
+     * @param filterValue
+     * @return
+     */
+    public boolean hasVertex (String filterfield, String filterValue) {
+        boolean hasVertex = true;
+        try {
+            getVertexWithFilter(filterfield, filterValue);
+        }
+        catch (EntityNotFoundException ex) {
+            hasVertex = false;
+        }
+        return hasVertex;
     }
 
     /**
@@ -55,16 +72,19 @@ public class EntityManager {
         }
     }
 
+    /**
+     * This private method attempts to create a new vertex class in the orient database
+     * @param entityClass
+     */
     private void createVertexClass(EntityClass entityClass) {
         OrientGraphNoTx graph = graphFactory.getNoTx();
         OrientVertexType vertexType = graph.getVertexType(entityClass.getClassName());
         if (vertexType == null) {
             // no vertex class with this name exists yet. Let's make one!
             vertexType = graph.createVertexType(entityClass.getClassName());
+            // add the classes properties
             for (Property property : entityClass.getProperties()) {
                 OrientVertexType.OrientVertexProperty vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
-                System.out.println("Mandatory: " + property.isMandatory());
-                System.out.println("Nullable: " + property.isNullable());
                 vertexProperty.setReadonly(property.isReadOnly());
                 vertexProperty.setMandatory(property.isMandatory());
                 vertexProperty.setNotNull(!property.isNullable());
@@ -72,12 +92,17 @@ public class EntityManager {
         }
     }
 
+    /**
+     * This private method attempts to create a new edge class in the orient database
+     * @param entityClass
+     */
     private void createEdgeClass(EntityClass entityClass) {
         OrientGraphNoTx graph = graphFactory.getNoTx();
         OrientEdgeType edgeType = graph.getEdgeType(entityClass.getClassName());
         if (edgeType == null) {
             // no edge class with this name exists yet. Let's make one!
             edgeType = graph.createEdgeType(entityClass.getClassName());
+            // add the classes properties
             for (Property property : entityClass.getProperties()) {
                 OProperty edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType());
                 edgeProperty.setReadonly(property.isReadOnly());

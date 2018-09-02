@@ -2,6 +2,7 @@ package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
+import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Exception.ElementAlreadyExistsException;
 import nl.ou.testar.StateModel.Exception.InvalidStateIdException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
@@ -118,6 +119,7 @@ public class AbstractStateModel {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
             this.states.put(newState.getStateId(), newState);
+            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
         }
     }
 
