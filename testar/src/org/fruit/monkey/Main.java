@@ -34,6 +34,7 @@
  */
 package org.fruit.monkey;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -42,6 +43,7 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
@@ -217,6 +219,42 @@ public class Main {
     });
   }
 
+  /**
+   * This method initializes the coding manager with custom tags to use for constructing
+   * concrete and abstract state id's, if provided of course.
+   * @param settings
+   */
+  private static void initCodingManager(Settings settings) {
+    // we look if there are user-provided custom state tags in the settings
+    // if so, we provide these to the coding manager
+    int i;
+
+    // first the attributes for the concrete state id
+    if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+      i = 0;
+
+      Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+      for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+        concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+      }
+
+      CodingManager.setCustomTagsForConcreteId(concreteTags);
+    }
+
+    // then the attributes for the abstract state id
+    if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+      i = 0;
+
+      Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+      for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+        abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+      }
+
+      CodingManager.setCustomTagsForAbstractId(abstractTags);
+    }
+
+  }
+
   public static void main(String[] args) throws IOException {
     Settings settings = null;
     Locale.setDefault(Locale.ENGLISH);
@@ -252,6 +290,7 @@ public class Main {
     try {
       settings = loadSettings(args, testSettings);
       overrideWithUserProperties(settings);
+      initCodingManager(settings);
       Float SST = settings.get(ConfigTags.StateScreenshotSimilarityThreshold, null);
 
       if (SST != null) {
@@ -404,6 +443,13 @@ public class Main {
       defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
       defaults.add(Pair.from(ProcessLogs, ".*.*"));
 
+      defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
+      defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+        {
+          add("Role");
+        }
+      }));
+
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
@@ -411,6 +457,17 @@ public class Main {
       //PrologActivated is ALWAYS false.
       //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
       settings.set(ConfigTags.PrologActivated, false);
+
+      // check that the abstract state properties and the abstract action properties have at least 1 value
+      if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
+      }
+
+      // check that the abstract state properties and the abstract action properties have at least 1 value
+      if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+        throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+      }
+
       return settings;
     } catch (IOException ioe) {
       throw new ConfigException("Unable to load configuration file!", ioe);
