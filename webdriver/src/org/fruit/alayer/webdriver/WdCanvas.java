@@ -174,6 +174,7 @@ public class WdCanvas implements Canvas {
   // Add the canvas if the page doesn't have one
   private void checkCanvasExists() {
     try {
+      WdDriver.waitDocumentReady();
       WdDriver.executeScript("addCanvasTestar()");
     }
       catch (Exception e) {

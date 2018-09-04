@@ -31,6 +31,8 @@ import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -399,5 +401,15 @@ public class WdDriver extends SUTBase
     catch (NoSuchWindowException nswe) {
       return null;
     }
+  }
+
+  public static void waitDocumentReady ()
+  {
+    WebDriverWait wait = new WebDriverWait(webDriver, 60);
+    ExpectedCondition<Boolean> documentReady = driver -> {
+      Object result = executeScript("return document.readyState");
+      return result != null && result.equals("complete");
+    };
+    wait.until(documentReady);
   }
 }
