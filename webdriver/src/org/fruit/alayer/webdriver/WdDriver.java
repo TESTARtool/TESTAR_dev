@@ -316,14 +316,10 @@ public class WdDriver extends SUTBase
       return (T) (Long) pid;
     }
     else if (tag.equals(Tags.HANDLE)) {
-      Utils.logAndEnd();
       return null;
-      // return (T) (Long) hProcess;
     }
     else if (tag.equals(Tags.ProcessHandles)) {
-      Utils.logAndEnd();
       return null;
-      // return (T) runningProcesses().iterator();
     }
     else if (tag.equals(Tags.SystemActivator)) {
       return (T) new WdProcessActivator();

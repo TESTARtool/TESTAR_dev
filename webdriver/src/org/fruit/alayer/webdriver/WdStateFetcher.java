@@ -38,8 +38,6 @@ import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,13 +45,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class WdStateFetcher implements Callable<WdState> {
-  private static Map<String, String> labelmap;
-
-  private final RemoteWebDriver driver;
   private final SUT system;
 
   public WdStateFetcher(SUT system) {
-    this.driver = ((WdDriver) system).getRemoteWebDriver();
     this.system = system;
   }
 
@@ -127,40 +121,10 @@ public class WdStateFetcher implements Callable<WdState> {
    * @return WdRootElement the root element of the page
    */
   private WdRootElement buildSkeletton() {
-    // TODO Incorparate in building of the tree?
-    labelmap = new HashMap<>();
-    findAllLabels(labelmap);
-
     WdRootElement rootElement = buildRoot(system);
     system.set(Tags.Desc, rootElement.documentTitle);
 
     return rootElement;
-  }
-
-  private void findAllLabels(Map<String, String> labelmap) {
-    // TODO Add to web-extension?
-
-    List<WebElement> labelElements = driver.findElementsByTagName("label");
-    for (WebElement labelElement : labelElements) {
-      String target = labelElement.getAttribute("for");
-      String label = labelElement.getText();
-
-      if (target != null && !"null".equals(target) &&
-          !target.isEmpty() && !label.isEmpty()) {
-        labelmap.put(target, label);
-      }
-    }
-
-    List<WebElement> iframeElements = driver.findElementsByTagName("iframe");
-    for (WebElement iframeElement : iframeElements) {
-      driver.switchTo().frame(iframeElement);
-      findAllLabels(labelmap);
-      driver.switchTo().parentFrame();
-    }
-  }
-
-  public static Map<String, String> getLabelmap() {
-    return labelmap;
   }
 
   private WdState createWidgetTree(WdRootElement root) {

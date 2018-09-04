@@ -117,18 +117,9 @@ public class WdElement implements Serializable {
     ois.defaultReadObject();
   }
 
-  // TODO Check if this is correct
   private void setName() {
-    Map<String, String> labelmap = WdStateFetcher.getLabelmap();
-
-    name = labelmap.getOrDefault(name, name);
     if (name == null || name.equals("null") || name.isEmpty()) {
-      if (id != null && !id.isEmpty()) {
-        name = id;
-      }
-      else {
-        name = textContent;
-      }
+      name = textContent;
     }
   }
 

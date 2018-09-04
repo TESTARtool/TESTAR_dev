@@ -1,19 +1,24 @@
+var labelMap;
+
 var getStateTreeTestar = function (ignoredTags) {
     var body = document.body;
     var bodyWrapped = wrapElementTestar(body);
     bodyWrapped['documentHasFocus'] = document.hasFocus();
     bodyWrapped['documentTitle'] = document.title;
 
+    // Find all labels on the page
+    getLabelMapTestar();
+
     // For Edge we return a flattened tree (as list), see comment in WdStateFetcher
     if (window.navigator.userAgent.indexOf("Edge") > -1) {
-		    var treeList = [];
-	      traverseElementListTestar(treeList, bodyWrapped, body, -1, ignoredTags);
-    	  return treeList;
-	  }
-	  else {
-		    traverseElementTestar(bodyWrapped, body, ignoredTags);
-	      return bodyWrapped;
-	  }
+        var treeList = [];
+        traverseElementListTestar(treeList, bodyWrapped, body, -1, ignoredTags);
+        return treeList;
+    }
+    else {
+        traverseElementTestar(bodyWrapped, body, ignoredTags);
+        return bodyWrapped;
+    }
 };
 
 function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
@@ -26,8 +31,7 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
             parentWrapped.textContent += childElement.textContent;
             continue;
         }
-        if (ignoredTags.includes(childElement.nodeName.toLowerCase()) ||
-            childElement.nodeType !== 1) {
+        if (ignoredTags.includes(childElement.nodeName.toLowerCase()) || childElement.nodeType !== 1) {
             continue
         }
 
@@ -53,8 +57,7 @@ function traverseElementListTestar(treeList, parentWrapped, rootElement, parentI
             parentWrapped.textContent = parentWrapped.textContent.trim();
             continue;
         }
-        if (ignoredTags.includes(childElement.nodeName.toLowerCase()) ||
-            childElement.nodeType !== 1) {
+        if (ignoredTags.includes(childElement.nodeName.toLowerCase()) || childElement.nodeType !== 1) {
             continue
         }
 
@@ -74,7 +77,7 @@ function wrapElementTestar(element) {
         element: element,
 
         id: element.getAttribute("id"),
-        name: element.getAttribute("name"),
+        name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
         textContent: "",
         title: element.getAttribute("title"),
@@ -93,6 +96,27 @@ function wrapElementTestar(element) {
 
         wrappedChildren: []
     };
+}
+
+function getNameTestar(element) {
+    var name = element.getAttribute("name");
+    var id = element.getAttribute("id");
+
+    try {
+        if (id && labelMap[id]) {
+            return labelMap[id];
+        }
+    }
+    catch (err) {
+    }
+
+    if (name) {
+        return name;
+    }
+    if (id) {
+        return id;
+    }
+    return "";
 }
 
 function getZIndexTestar(element) {
@@ -172,4 +196,15 @@ function isClickableTestar(element) {
     // onClick added via JS
     var arr = element.getEventListeners('click');
     return arr !== undefined && arr.length > 0;
+}
+
+function getLabelMapTestar() {
+    labelMap = {};
+    var labelList = document.getElementsByTagName("LABEL");
+    for (var i = 0; i < labelList.length; i++) {
+        var item = labelList[i];
+        if (item.getAttribute("for")) {
+            labelMap[item.getAttribute("for")] = item.textContent;
+        }
+    }
 }

@@ -8,7 +8,7 @@ import static org.fruit.Util.pause;
 
 
 /**
- * Represents a canvas for a webdriver on which can be painted.
+ * Represents a webdriver canvas on which can be painted.
  */
 public class WdCanvas implements Canvas {
   private static final int textOffsetX = 5;
@@ -75,7 +75,6 @@ public class WdCanvas implements Canvas {
 
   @Override
   public Pair<Double, Double> textMetrics(Pen pen, String text) {
-    // TODO Copied from GDIScreenCanvas, no idea if it works
     Assert.notNull(pen, text);
     return Pair.from(text.length() * 2., 20.);
   }

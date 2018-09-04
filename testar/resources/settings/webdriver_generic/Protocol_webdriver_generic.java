@@ -104,9 +104,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
     // See remarks in WdMouse
     mouse = sut.get(Tags.StandardMouse);
+
     // Override ProtocolUtil to allow WebDriver screenshots
-    protocolUtil = new WdProtocolUtil();
-    ((WdProtocolUtil) protocolUtil).webDriver = ((WdDriver) sut).getRemoteWebDriver();
+    protocolUtil = new WdProtocolUtil(sut);
+
     // Propagate followLinks setting
     WdDriver.followLinks = followLinks;
 
@@ -392,7 +393,6 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * @return the selected action (non-null!)
    */
   protected Action selectAction(State state, Set<Action> actions) {
-
     return super.selectAction(state, actions);
   }
 
@@ -439,6 +439,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
   public class WdProtocolUtil extends ProtocolUtil {
     private RemoteWebDriver webDriver;
+
+    private WdProtocolUtil (SUT sut) { 
+      webDriver = ((WdDriver) sut).getRemoteWebDriver();
+    }
 
     @Override
     public String getStateshot(State state) {
