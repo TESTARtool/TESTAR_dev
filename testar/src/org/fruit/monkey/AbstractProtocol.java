@@ -34,6 +34,7 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.AdhocServer;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.EventHandler;
 import es.upv.staq.testar.FlashFeedback;
@@ -41,39 +42,24 @@ import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphState;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.ProcessInfo;
 import nl.ou.testar.SutVisualization;
-import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Rect;
 import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.UsedResources;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.ActivateSystem;
@@ -84,35 +70,24 @@ import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
-import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-import org.fruit.monkey.AbstractProtocol.Modes;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,25 +96,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.Role;
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Visualizer;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
-//TODO move eventListener out of abstract
-IEventListener {
+	//TODO move eventListener out of abstract
+	IEventListener {
 
-	public static enum Modes{
+	public enum Modes{
 		Spy,
 		GenerateManual,
 		Generate, GenerateDebug, Quit, View, AdhocTest, Replay, ReplayDebug;
@@ -249,7 +215,7 @@ IEventListener {
 		else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
 			LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
 			mode = Modes.Quit;
-			protocolUtil.stopAdhocServer();
+			AdhocServer.stopAdhocServer();
 		}
 
 		// SHIFT + 1 --> toggle action visualization
@@ -274,7 +240,7 @@ IEventListener {
 
 		// TODO: Find out if this commented code is anything useful
 		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
-			protocolUtil.startAdhocServer();
+			AdhocServer.startAdhocServer();
 			mode = Modes.AdhocTest;
 			LogSerialiser.log("'" + mode + "' mode active.\n", LogSerialiser.LogLevel.Info);
 		}*/
@@ -349,7 +315,7 @@ IEventListener {
 			case GenerateManual: mode = Modes.Generate; break;
 			case Generate: mode = Modes.GenerateDebug; break;
 			case GenerateDebug: mode = Modes.Spy; break;
-			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break;
+			case AdhocTest: mode = Modes.Spy; AdhocServer.stopAdhocServer(); break;
 			case Replay: mode = Modes.ReplayDebug; break;
 			case ReplayDebug: mode = Modes.Replay; break;
 			default: break;
@@ -361,7 +327,7 @@ IEventListener {
 			case GenerateManual: mode = Modes.Spy; break;
 			case Generate: userEvent = null; mode = Modes.GenerateManual; break;
 			case GenerateDebug: mode = Modes.Generate; break;
-			case AdhocTest: mode = Modes.Spy; protocolUtil.stopAdhocServer(); break;
+			case AdhocTest: mode = Modes.Spy; AdhocServer.stopAdhocServer(); break;
 			case Replay: mode = Modes.ReplayDebug; break;
 			case ReplayDebug: mode = Modes.Replay; break;
 			default: break;
@@ -814,7 +780,7 @@ IEventListener {
 						GlobalScreen.unregisterNativeHook();
 					}
 				}
-				protocolUtil.stopAdhocServer();
+				AdhocServer.stopAdhocServer();
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
