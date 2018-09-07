@@ -31,26 +31,20 @@
 import java.io.File;
 import java.util.Set;
 
+import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import org.fruit.Drag;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
 
@@ -93,6 +87,25 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
+		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+		 StdActionCompiler ac = new AnnotatingActionCompiler();
+	 	// driving the GUI into a state to start testing
+		 for(Widget w : state){
+		 	// the test users name is "test"
+			 if(w.get(Tags.Title, "no title").equalsIgnoreCase("test")){
+			 	Action a = ac.leftClickAt(w);
+			 	//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+			 	executeAction(system,state,a);
+			 	//waiting for the GUI to load:
+			 	try{
+			 		Thread.sleep(5000);
+				}catch (Exception e){
+			 		e.printStackTrace();
+				}
+			 }
+		 }
+
 		super.beginSequence(system, state);
 	}
 
@@ -197,23 +210,25 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 					//if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) { //in Ponsse GUI apparently nothing is clickable
 					try{
 						if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAPane") && w.get(UIATags.UIAName).length()>0) { //in Ponsse GUI all buttons seem to have role "UIAPane"
-
-//							try{
-//								System.out.println("DEBUG: Title: "+w.get(Tags.Title));
-//							}catch (Exception e){}
-//							try{
-//								System.out.println("DEBUG: Blocked: "+w.get(Tags.Blocked));
-//							}catch (Exception e){}
-//							try{
-//								System.out.println("DEBUG: Text: "+w.get(Tags.Text));
-//							}catch (Exception e){}
-//							try{
-//								System.out.println("DEBUG: Shape: "+w.get(Tags.Shape));
-//							}catch (Exception e){}
-							//Store the widget in the Graphdatabase
-							storeWidget(state.get(Tags.ConcreteID), w);
-							//Create a left click action with the Action Compiler, and add it to the set of derived actions
-							actions.add(ac.leftClickAt(w));
+							// not pressing EcoDrive or Mittari buttons:
+							if(w.get(Tags.Title, "no title").equalsIgnoreCase("EcoDrive")){
+								// it seems in the Ponsse GUI there is no difference in the TESTAR parameters of "enabled" and "disabled" button
+//								System.out.println("-------------- EcoDrive -------------");
+//								for(Tag t:w.tags()){
+//									System.out.println("DEBUG: "+t+"="+w.get(t));
+//								}
+//
+							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Mittari")){
+//								System.out.println("-------------- Mittari -------------");
+//								for(Tag t:w.tags()){
+//									System.out.println("DEBUG: "+t+"="+w.get(t));
+//								}
+							}else{
+								//Store the widget in the Graphdatabase
+								storeWidget(state.get(Tags.ConcreteID), w);
+								//Create a left click action with the Action Compiler, and add it to the set of derived actions
+								actions.add(ac.leftClickAt(w));
+							}
 						}
 					}catch(Exception e){}
 
@@ -310,8 +325,10 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
-			//System.out.println("DEBUG: action: "+action.toString());
-			//System.out.println("DEBUG: action short: "+action.toShortString());
+			System.out.println("Executing action: "+action.get(Tags.Desc));
+			for(Tag t:action.tags()){
+				System.out.println("Debug: "+t+"="+action.get(t));
+			}
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
