@@ -39,6 +39,10 @@ public class EntityClassFactory {
         id.setNullable(false);
         id.setIdentifier(true);
         abstractStateClass.addProperty(id);
+        Property unvisitedActions = new Property("unvisitedActions", OType.EMBEDDEDSET);
+        unvisitedActions.setMandatory(false);
+        unvisitedActions.setNullable(false);
+        abstractStateClass.addProperty(unvisitedActions);
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
         return abstractStateClass;
     }

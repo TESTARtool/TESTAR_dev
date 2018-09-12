@@ -29,7 +29,7 @@ public class EntityManager {
      * @return
      * @throws EntityNotFoundException
      */
-    public Vertex getVertexWithFilter(String filterField, String filterValue) throws EntityNotFoundException {
+    public Vertex getVertexWithFilter(String filterField, Object filterValue) throws EntityNotFoundException {
         OrientGraphNoTx graph = graphFactory.getNoTx();
         Iterable<Vertex> vertices = graph.getVertices(filterField, filterValue);
         if (!vertices.iterator().hasNext()) {
@@ -44,7 +44,7 @@ public class EntityManager {
      * @param filterValue
      * @return
      */
-    public boolean hasVertex (String filterfield, String filterValue) {
+    public boolean hasVertex (String filterfield, Object filterValue) {
         boolean hasVertex = true;
         try {
             getVertexWithFilter(filterfield, filterValue);
@@ -107,6 +107,49 @@ public class EntityManager {
             }
         }
     }
+
+    /**
+     * This method will save a new or exisiting entity to the orient database
+     * @param entity
+     */
+    public void saveEntity(DocumentEntity entity) {
+        // not a fan of an if/else if structure like this, as it can get out of hand quickly as the application grows
+        if (entity instanceof VertexEntity) {
+            saveVertexEntity((VertexEntity) entity);
+        }
+        else if (entity instanceof EdgeEntity){
+            saveEdgeEntity((EdgeEntity) entity);
+        }
+    }
+
+    /**
+     * This method will save a vertex entity to the database
+     * @param entity
+     */
+    private void saveVertexEntity(VertexEntity entity) {
+        Vertex vertex;
+        // check to see if the entity already exists in the database
+        String idField = entity.getEntityClass().getClassName() + "." + entity.getEntityClass().getIdentifier().getPropertyName();
+        Object idValue = entity.getPropertyValue(entity.getEntityClass().getIdentifier().getPropertyName()).right();
+        try {
+            vertex = getVertexWithFilter(idField, idValue);
+        }
+        catch (EntityNotFoundException ex) {
+            OrientGraph graph = graphFactory.getTx();
+            vertex = graph.addVertex("class:" + entity.getEntityClass().getClassName());
+        }
+        // add the properties
+        for (String propertyName : entity.getPropertyNames()) {
+            vertex.setProperty(propertyName, entity.getPropertyValue(propertyName).right());
+        }
+    }
+
+    /**
+     * This method will save an edge entity to the database.
+     * @param entity
+     */
+    private void saveEdgeEntity(EdgeEntity entity) {}
+
 
 
 

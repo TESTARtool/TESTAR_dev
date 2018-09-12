@@ -5,6 +5,7 @@ import org.fruit.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class DocumentEntity {
 
@@ -41,6 +42,14 @@ public abstract class DocumentEntity {
      */
     public Pair<OType, Object> getPropertyValue(String propertyName) {
         return entityProperties.getOrDefault(propertyName, null);
+    }
+
+    /**
+     * Returns a set of names of all the properties connected to this entity
+     * @return
+     */
+    public Set<String> getPropertyNames() {
+        return entityProperties.keySet();
     }
 
 }

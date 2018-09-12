@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
@@ -70,7 +71,14 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
             target.addPropertyValue(tag.name(), TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag));
         }
 
-        
+        Property unvisitedActions = getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
+        if (unvisitedActions == null) {
+            throw new HydrationException();
+        }
+        // we need to look for unvisited actions and add them to the entity
+        if (!((AbstractState) source).getUnvisitedActionIds().isEmpty()) {
+            target.addPropertyValue(unvisitedActions.getPropertyName(), unvisitedActions.getPropertyType(), ((AbstractState) source).getUnvisitedActionIds());
+        }
 
     }
 

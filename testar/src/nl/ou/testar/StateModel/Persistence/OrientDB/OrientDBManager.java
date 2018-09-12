@@ -1,17 +1,19 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
-import com.tinkerpop.blueprints.Vertex;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.AbstractStateTransition;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
-import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
+import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClassFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
 
@@ -66,9 +68,21 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        if (!entityManager.hasVertex("AbstractState.id", abstractState.getStateId())) {
+        // create an entity to persist to the database
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
 
+        // hydrate the entity to a format the orient database can store
+        EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+        try {
+            hydrator.hydrate(vertexEntity, abstractState);
+        } catch (HydrationException e) {
+            System.out.println("Encounted a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
+            return;
         }
+
+        // save the entity!
+        entityManager.saveEntity(vertexEntity);
     }
 
     @Override
