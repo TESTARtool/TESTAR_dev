@@ -64,7 +64,7 @@ public class StateModelManager {
         }
         catch (StateModelException ex) {
             // state wasn't found
-            newAbstractState = new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
+            newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
         // we want to provide the abstract state with the identifier of the concrete state
         newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteID));

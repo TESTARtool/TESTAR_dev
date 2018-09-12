@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.Exception.ElementAlreadyExistsException;
 import nl.ou.testar.StateModel.Exception.InvalidStateIdException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Exception.StateNotFoundException;
+import org.fruit.alayer.Tag;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -17,6 +18,9 @@ public class AbstractStateModel {
 
     // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
     private String abstractionLevelIdentifier;
+
+    // a set of tags that was used to `form` the abstract state model
+    private Set<Tag<?>> tags;
 
     private Set<AbstractStateTransition> stateTransitions;
     // we store the transitions twice extra, once by the source state and once by the target state for fast bi-directional lookup
@@ -40,8 +44,9 @@ public class AbstractStateModel {
      * constructor
      * @param abstractionLevelIdentifier
      */
-    public AbstractStateModel(String abstractionLevelIdentifier) {
+    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        this.tags = tags;
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
         stateTransitionsBySource = new HashMap<>();

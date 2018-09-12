@@ -56,4 +56,18 @@ public class EntityClass {
     public Set<Property> getProperties() {
         return properties;
     }
+
+    /**
+     * Get the property that is identifying for this state.
+     * @return
+     */
+    public Property getIdentifier() {
+        Property returnProperty = null;
+        for (Property property:properties) {
+            if (property.isIdentifier()) {
+                returnProperty = property;
+            }
+        }
+        return returnProperty;
+    }
 }

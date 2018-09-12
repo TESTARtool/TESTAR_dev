@@ -16,6 +16,9 @@ public class Property {
 
     private boolean isNullable = true;
 
+    // is this property the identifying property for a given class?
+    private boolean identifier = false;
+
     /**
      * Constructor
      * @param propertyName
@@ -64,5 +67,13 @@ public class Property {
 
     public void setNullable(boolean nullable) {
         isNullable = nullable;
+    }
+
+    public boolean isIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(boolean identifier) {
+        this.identifier = identifier;
     }
 }

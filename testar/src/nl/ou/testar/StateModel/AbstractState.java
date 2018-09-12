@@ -2,16 +2,13 @@ package nl.ou.testar.StateModel;
 
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Util.ActionHelper;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AbstractState {
+public class AbstractState extends AbstractEntity {
 
-    // abstract state id
-    private String stateId;
     // list of possible actions that can be executed from this state
     private Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
@@ -25,7 +22,7 @@ public class AbstractState {
      * @param actions
      */
     public AbstractState(String stateId, Set<AbstractAction> actions) {
-        this.stateId = stateId;
+        super(stateId);
         this.actions = new HashMap<>();
         for(AbstractAction action:actions) {
             this.actions.put(action.getActionId(), action);
@@ -47,7 +44,7 @@ public class AbstractState {
      * @return String
      */
     public String getStateId() {
-        return stateId;
+        return getId();
     }
 
     /**
@@ -117,4 +114,5 @@ public class AbstractState {
     public Set<String> getUnvisitedActionIds() {
         return unvisitedActionIds;
     }
+
 }

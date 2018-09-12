@@ -32,12 +32,8 @@ public class EntityManager {
     public Vertex getVertexWithFilter(String filterField, String filterValue) throws EntityNotFoundException {
         OrientGraphNoTx graph = graphFactory.getNoTx();
         Iterable<Vertex> vertices = graph.getVertices(filterField, filterValue);
-        if (vertices instanceof Collection) {
-            int size = ((Collection<?>) vertices).size();
-            if (size == 0 || size > 1) {
-                //@todo should split this into different exceptions at some point
-                throw new EntityNotFoundException();
-            }
+        if (!vertices.iterator().hasNext()) {
+            throw new EntityNotFoundException();
         }
         return vertices.iterator().next();
     }

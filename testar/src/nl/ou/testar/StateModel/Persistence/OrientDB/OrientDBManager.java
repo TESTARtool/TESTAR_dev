@@ -66,7 +66,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        // we don't update, we only create new states
         if (!entityManager.hasVertex("AbstractState.id", abstractState.getStateId())) {
 
         }
