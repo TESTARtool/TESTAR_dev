@@ -1194,9 +1194,9 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(system == null || !system.isRunning()) {
 					system = null;
 					system = startSystem();
-					processListeners(system);
 					this.cv = buildCanvas();
 				}
+				processListeners(system);
 
 				lastCPU = NativeLinker.getCPUsage(system);
 
@@ -1376,7 +1376,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 			system = startSystem();
-			processListeners(system);
+			//processListeners(system);
 			startedSpy = true;
 			Grapher.GRAPHS_ACTIVATED = false;
 			this.cv = buildCanvas();
