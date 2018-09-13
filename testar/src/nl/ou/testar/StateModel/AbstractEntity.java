@@ -1,7 +1,11 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Event.StateModelEvent;
+import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
+
+import java.util.Set;
 
 public abstract class AbstractEntity {
 
@@ -10,6 +14,9 @@ public abstract class AbstractEntity {
 
     // a unique string identifier for this entity
     private String id;
+
+    // a set of event listeners
+    private Set<StateModelEventListener> eventListeners;
 
     public AbstractEntity(String id) {
         this.id = id;
@@ -43,5 +50,23 @@ public abstract class AbstractEntity {
      */
     public TaggableBase getAttributes() {
         return attributes;
+    }
+
+    /**
+     * Add an event listener to this state model
+     * @param eventListener
+     */
+    public void addEventListener(StateModelEventListener eventListener) {
+        eventListeners.add(eventListener);
+    }
+
+    /**
+     * Notify our listeners of emitted events
+     * @param event
+     */
+    protected void emitEvent(StateModelEvent event) {
+        for (StateModelEventListener eventListener: eventListeners) {
+            eventListener.eventReceived(event);
+        }
     }
 }

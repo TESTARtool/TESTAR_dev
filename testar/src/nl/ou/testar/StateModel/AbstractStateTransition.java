@@ -66,4 +66,28 @@ public class AbstractStateTransition {
     public void setAction(AbstractAction action) {
         this.action = action;
     }
+
+    /**
+     * Get the source state for this transition
+     * @return
+     */
+    public AbstractState getSourceState() {
+        return sourceState;
+    }
+
+    /**
+     * Get the target state for this transition
+     * @return
+     */
+    public AbstractState getTargetState() {
+        return targetState;
+    }
+
+    /**
+     * Get the executed action for this transition
+     * @return
+     */
+    public AbstractAction getAction() {
+        return action;
+    }
 }

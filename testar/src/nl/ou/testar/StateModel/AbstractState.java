@@ -1,5 +1,7 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Event.StateModelEvent;
+import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Util.ActionHelper;
 import java.util.HashMap;
@@ -36,7 +38,10 @@ public class AbstractState extends AbstractEntity {
      * @param concreteStateId the concrete id to add
      */
     public void addConcreteStateId(String concreteStateId) {
-        this.concreteStateIds.add(concreteStateId);
+        if (!concreteStateIds.contains(concreteStateId)) {
+            this.concreteStateIds.add(concreteStateId);
+            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
+        }
     }
 
     /**
@@ -52,7 +57,10 @@ public class AbstractState extends AbstractEntity {
      * @param actionId the id for the visited action
      */
     public void addVisitedAction(String actionId){
-        unvisitedActionIds.remove(actionId);
+        if (unvisitedActionIds.contains(actionId)) {
+            unvisitedActionIds.remove(actionId);
+            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
+        }
     }
 
     /**

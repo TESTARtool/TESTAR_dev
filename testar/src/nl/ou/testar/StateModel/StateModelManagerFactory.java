@@ -18,7 +18,7 @@ import java.util.Set;
 public class StateModelManagerFactory {
 
     public static StateModelManager getStateModelManager(Settings settings) {
-        // then the attributes for the abstract state id
+        // check the attributes for the abstract state id
         if (settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
             throw new RuntimeException("No Abstract State Attributes were provided in the settings file");
         }

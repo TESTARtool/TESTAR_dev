@@ -57,7 +57,7 @@ public class StateModelManager {
      */
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         //@todo ad: replace the abstract id tag with the custom tag from my dev branch
-        String abstractStateId = newState.get(Tags.Abstract_R_ID);
+        String abstractStateId = newState.get(Tags.AbstractIDCustom);
         AbstractState newAbstractState;
         try {
             newAbstractState = abstractStateModel.getState(abstractStateId);
@@ -67,12 +67,13 @@ public class StateModelManager {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
         // we want to provide the abstract state with the identifier of the concrete state
-        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteID));
+        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
 
         // add the abstract state to the model
         try {
             abstractStateModel.addState(newAbstractState);
             if (currentAbstractState == null) {
+                // it's apparantly the first state in our run
                 abstractStateModel.addInitialState(newAbstractState);
             }
             else {

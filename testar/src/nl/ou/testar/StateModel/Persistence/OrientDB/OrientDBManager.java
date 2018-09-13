@@ -92,6 +92,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
+        // persisting a transition basically means we want to add an edge between two vertices in our database
 
     }
 
@@ -106,11 +107,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         switch (event.getEventType()) {
             case ABSTRACT_STATE_ADDED:
+            case ABSTRACT_STATE_CHANGED:
                 persistAbstractState((AbstractState) (event.getPayload()));
-                break;
-
-            case ABSTRACT_ACTION_ADDED:
-                persistAbstractAction((AbstractAction) (event.getPayload()));
                 break;
 
             case ABSTRACT_STATE_TRANSITION_ADDED:

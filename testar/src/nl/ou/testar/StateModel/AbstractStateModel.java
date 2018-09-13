@@ -94,6 +94,7 @@ public class AbstractStateModel {
         addAction(executedAction);
         // we also set the action to visited for the source state
         sourceState.addVisitedAction(executedAction.getActionId());
+        emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, newStateTransition));
     }
 
     /**
@@ -123,6 +124,10 @@ public class AbstractStateModel {
     public void addState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
+            // provide the state with the event listeners from this state model
+            for (StateModelEventListener eventListener: eventListeners) {
+                newState.addEventListener(eventListener);
+            }
             this.states.put(newState.getStateId(), newState);
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
         }
