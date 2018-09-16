@@ -93,6 +93,25 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
         // persisting a transition basically means we want to add an edge between two vertices in our database
+        // knowing how the state model code works, we could technically assume that the source and target states
+        // already exist in the database.
+        // However, that assumption might at some point in time no longer be valid (think a-sync persistance operation).
+        // therefor we will check to make sure the states exists and if not, we will persist them first.
+
+        // create an entity to persist to the database
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
+        VertexEntity targetVertexEntity = new VertexEntity(entityClass);
+
+        // hydrate the entity to a format the orient database can store
+        EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+        try {
+            hydrator.hydrate(sourceVertexEntity, abstractStateTransition.getSourceState());
+            hydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
+        } catch (HydrationException e) {
+            //@todo add some meaningful logging here
+            return;
+        }
 
     }
 
