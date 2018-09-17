@@ -11,18 +11,14 @@ public class EventHelper {
     public void validateEvent(StateModelEvent event) throws InvalidEventException {
         switch (event.getEventType()) {
             case ABSTRACT_STATE_ADDED:
+            case ABSTRACT_STATE_CHANGED:
                 if (!(event.getPayload() instanceof AbstractState)) {
                     throw new InvalidEventException();
                 }
                 break;
 
-            case ABSTRACT_ACTION_ADDED:
-                if (!(event.getPayload() instanceof AbstractAction)) {
-                    throw new InvalidEventException();
-                }
-                break;
-
             case ABSTRACT_STATE_TRANSITION_ADDED:
+            case ABSTRACT_ACTION_CHANGED:
                 if (!(event.getPayload() instanceof AbstractStateTransition)) {
                     throw new InvalidEventException();
                 }

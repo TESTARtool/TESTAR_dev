@@ -81,7 +81,13 @@ public class AbstractStateModel {
             // loop through all the transitions that have the same source state and check for matches
             for(AbstractStateTransition stateTransition : stateTransitionsBySource.get(sourceState.getStateId())) {
                 if (targetState.getStateId().equals(stateTransition.getTargetStateId()) && executedAction.getActionId().equals(stateTransition.getActionId())) {
-                    throw new ElementAlreadyExistsException();
+                    // the transition already exists. What we want to do is update the action to reflect that there may
+                    // be an extra concrete action.
+                    for(String concreteActionId : executedAction.getConcreteActionIds()) {
+                        stateTransition.getAction().addConcreteActionId(concreteActionId);
+                    }
+                    // now we notify our listeners of the possible update
+                    emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_CHANGED, stateTransition));
                 }
             }
         }

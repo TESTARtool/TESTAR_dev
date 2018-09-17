@@ -134,6 +134,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case ABSTRACT_STATE_TRANSITION_ADDED:
+            case ABSTRACT_ACTION_CHANGED:
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
         }
