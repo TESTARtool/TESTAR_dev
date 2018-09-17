@@ -11,4 +11,19 @@ public class EdgeEntity extends DocumentEntity {
         this.targetEntity = targetEntity;
     }
 
+    /**
+     * Returns this edge's source vertex entity
+     * @return
+     */
+    public VertexEntity getSourceEntity() {
+        return sourceEntity;
+    }
+
+    /**
+     * Returns this edge's target vertex entity
+     * @return
+     */
+    public VertexEntity getTargetEntity() {
+        return targetEntity;
+    }
 }

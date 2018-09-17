@@ -8,10 +8,7 @@ import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClassFactory;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityManager;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
@@ -73,8 +70,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         VertexEntity vertexEntity = new VertexEntity(entityClass);
 
         // hydrate the entity to a format the orient database can store
-        EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
         try {
+            EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
             hydrator.hydrate(vertexEntity, abstractState);
         } catch (HydrationException e) {
             System.out.println("Encounted a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
@@ -92,27 +89,33 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
-        // persisting a transition basically means we want to add an edge between two vertices in our database
-        // knowing how the state model code works, we could technically assume that the source and target states
-        // already exist in the database.
-        // However, that assumption might at some point in time no longer be valid (think a-sync persistance operation).
-        // therefor we will check to make sure the states exists and if not, we will persist them first.
-
-        // create an entity to persist to the database
+        // create entities for the target and source states
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
         VertexEntity targetVertexEntity = new VertexEntity(entityClass);
 
-        // hydrate the entity to a format the orient database can store
-        EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+        // hydrate the entities to a format the orient database can store
         try {
-            hydrator.hydrate(sourceVertexEntity, abstractStateTransition.getSourceState());
-            hydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
+            EntityHydrator stateHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
+            stateHydrator.hydrate(sourceVertexEntity, abstractStateTransition.getSourceState());
+            stateHydrator.hydrate(targetVertexEntity, abstractStateTransition.getTargetState());
         } catch (HydrationException e) {
             //@todo add some meaningful logging here
             return;
         }
 
+        // now we create an action entity that will link our two state entities
+        entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+        EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
+
+        try {
+            EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+            actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
+        }
+        catch (HydrationException ex) {
+            //@todo add some meaningfull logging here as well
+        }
+        entityManager.saveEntity(actionEntity);
     }
 
     @Override

@@ -3,10 +3,7 @@ package nl.ou.testar.StateModel;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractAction {
-
-    // identifier for this action
-    private String actionId;
+public class AbstractAction extends AbstractEntity {
 
     // collection of concrete actions that are abstracted by this action
     private Set<String> concreteActionIds;
@@ -16,7 +13,7 @@ public class AbstractAction {
      * @param actionId
      */
     public AbstractAction(String actionId) {
-        this.actionId = actionId;
+        super(actionId);
         concreteActionIds = new HashSet<>();
     }
 
@@ -25,7 +22,7 @@ public class AbstractAction {
      * @return id for this action
      */
     public String getActionId() {
-        return actionId;
+        return getId();
     }
 
     /**

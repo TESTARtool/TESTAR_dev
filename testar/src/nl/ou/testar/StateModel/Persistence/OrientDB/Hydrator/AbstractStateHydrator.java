@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
@@ -43,7 +44,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 continue;
             }
 
-            Tag tag = getTag(((AbstractState) source).getAttributes(), property.getPropertyName());
+            Tag tag = HydrationHelper.getTag(((AbstractState) source).getAttributes(), property.getPropertyName());
             if (tag == null && (property.isMandatory() || !property.isNullable())) {
                 throw new HydrationException();
             }
@@ -51,7 +52,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 throw new HydrationException();
             }
 
-            if (!typesMatch(property, ((AbstractState) source).getAttributes().get(tag).getClass())) {
+            if (!HydrationHelper.typesMatch(property, ((AbstractState) source).getAttributes().get(tag).getClass())) {
                 throw new HydrationException();
             }
 
@@ -62,7 +63,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         // the orientdb schema, which is perfectly fine
         TaggableBase attributes = ((AbstractState) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
-            if (getProperty(target.getEntityClass().getProperties(), tag.name()) != null) {
+            if (HydrationHelper.getProperty(target.getEntityClass().getProperties(), tag.name()) != null) {
                 // skip, we already processed this one
                 continue;
             }
@@ -71,46 +72,16 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
             target.addPropertyValue(tag.name(), TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag));
         }
 
-        Property unvisitedActions = getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
+        // specifically for abstract states we need to add the ids of unvisited actions
+        Property unvisitedActions = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
         if (unvisitedActions == null) {
             throw new HydrationException();
         }
-        // we need to look for unvisited actions and add them to the entity
         if (!((AbstractState) source).getUnvisitedActionIds().isEmpty()) {
             target.addPropertyValue(unvisitedActions.getPropertyName(), unvisitedActions.getPropertyType(), ((AbstractState) source).getUnvisitedActionIds());
         }
 
     }
 
-    /**
-     * Returns a tag for a given tag name
-     * @param tags
-     * @param tagName
-     * @return
-     */
-    private Tag<?> getTag(TaggableBase tags, String tagName) {
-        Tag<?> tag = null;
-        for (Tag t : tags.tags()) {
-            if (t.name().equals(tagName)) {
-                tag = t;
-                break;
-            }
-        }
-        return tag;
-    }
 
-    private boolean typesMatch(Property property, Class clazz) {
-        return property.getPropertyType() == TypeConvertor.getInstance().getOrientDBType(clazz);
-    }
-
-    private Property getProperty(Set<Property> properties, String propertyName) {
-        Property property = null;
-        for (Property prop : properties) {
-            if (prop.getPropertyName().equals(propertyName)) {
-                property = prop;
-                break;
-            }
-        }
-        return property;
-    }
 }

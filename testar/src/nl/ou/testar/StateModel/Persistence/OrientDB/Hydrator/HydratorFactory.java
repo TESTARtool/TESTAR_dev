@@ -1,14 +1,23 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
+import nl.ou.testar.StateModel.Exception.HydrationException;
+
 public abstract class HydratorFactory {
 
     public static final int HYDRATOR_ABSTRACT_STATE = 1;
 
-    public static EntityHydrator getHydrator(int hydratorType) {
+    public static final int HYDRATOR_ABSTRACT_ACTION = 2;
+
+    public static EntityHydrator getHydrator(int hydratorType) throws HydrationException {
         switch (hydratorType) {
             case HYDRATOR_ABSTRACT_STATE:
-            default:
                 return new AbstractStateHydrator();
+
+            case HYDRATOR_ABSTRACT_ACTION:
+                return new AbstractActionHydrator();
+
+            default:
+                throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
         }
     }
 
