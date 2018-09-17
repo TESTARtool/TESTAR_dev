@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public abstract class AbstractEntity {
@@ -21,6 +22,7 @@ public abstract class AbstractEntity {
     public AbstractEntity(String id) {
         this.id = id;
         attributes = new TaggableBase();
+        eventListeners = new HashSet<>();
     }
 
     /**
