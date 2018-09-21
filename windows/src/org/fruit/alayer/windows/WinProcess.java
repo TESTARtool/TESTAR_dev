@@ -163,6 +163,7 @@ public final class WinProcess extends SUTBase {
 		    //Windows.CloseHandle(procHandle);
 			
 			ret.set(Tags.Path, path);
+			ret.set(Tags.Desc, path);
 			return ret;
 		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
