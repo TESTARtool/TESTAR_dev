@@ -44,7 +44,7 @@ public class AbstractStateModel {
      * constructor
      * @param abstractionLevelIdentifier
      */
-    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags) {
+    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags, StateModelEventListener ...eventListener) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
         this.tags = tags;
         // sets are empty when the model is just created
@@ -55,6 +55,9 @@ public class AbstractStateModel {
         initialStates = new HashMap<>();
         executedActions = new HashMap<>();
         eventListeners = new HashSet<>();
+        for (int i = 0; i < eventListener.length;i++) {
+            eventListeners.add(eventListener[i]);
+        }
         initStateModel();
     }
 
@@ -63,6 +66,7 @@ public class AbstractStateModel {
      */
     private void initStateModel() {
         // add code here to initialize the model, such as loading a model from disk/database/external storage
+        emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_MODEL_INITIALIZED, this));
     }
 
     /**
@@ -88,6 +92,7 @@ public class AbstractStateModel {
                     }
                     // now we notify our listeners of the possible update
                     emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_CHANGED, stateTransition));
+                    return;
                 }
             }
         }
@@ -130,6 +135,8 @@ public class AbstractStateModel {
     public void addState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
+            // provide the state with this state model's abstract identifier
+            newState.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
             // provide the state with the event listeners from this state model
             for (StateModelEventListener eventListener: eventListeners) {
                 newState.addEventListener(eventListener);
@@ -169,6 +176,7 @@ public class AbstractStateModel {
     public void addInitialState(AbstractState initialState) throws StateModelException{
         checkStateId(initialState.getStateId());
         if (!initialStates.containsKey(initialState.getStateId())) {
+            initialState.setInitial(true);
             initialStates.put(initialState.getStateId(), initialState);
         }
     }
@@ -230,5 +238,19 @@ public class AbstractStateModel {
         }
     }
 
+    /**
+     * THis method returns the unique hash that was calculated to identify this abstract state model
+     * @return
+     */
+    public String getAbstractionLevelIdentifier() {
+        return abstractionLevelIdentifier;
+    }
 
+    /**
+     * This method returns the tags that were used in determining what the unique states are for this model.
+     * @return
+     */
+    public Set<Tag<?>> getTags() {
+        return tags;
+    }
 }

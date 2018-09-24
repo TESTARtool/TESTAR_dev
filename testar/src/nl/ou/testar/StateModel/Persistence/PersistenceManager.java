@@ -31,4 +31,10 @@ public interface PersistenceManager {
      */
     void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition);
 
+    /**
+     * This method initializes and abstract state model before use in Testar.
+     * @param abstractStateModel
+     */
+    public void initAbstractStateModel(AbstractStateModel abstractStateModel);
+
 }

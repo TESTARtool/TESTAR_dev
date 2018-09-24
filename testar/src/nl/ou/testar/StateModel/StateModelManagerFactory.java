@@ -28,15 +28,14 @@ public class StateModelManagerFactory {
             abstractTags.add(CodingManager.allowedStateTags.get(abstractStateAttribute));
         }
 
-        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), abstractTags);
-        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector();
-        // add an orientdb persistence manager
+        // get an orientdb persistence manager
         PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(PersistenceManagerFactoryBuilder.ManagerType.ORIENTDB);
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
-        // we provide it to our statemodel as a listener
-        if (persistenceManager instanceof OrientDBManager) {
-            abstractStateModel.addEventListener((OrientDBManager)persistenceManager);
-        }
+
+        // create the abstract state model and then the state model manager
+        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), abstractTags, (OrientDBManager)persistenceManager);
+        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector();
+
         return new StateModelManager(abstractStateModel, actionSelector, persistenceManager);
     }
 

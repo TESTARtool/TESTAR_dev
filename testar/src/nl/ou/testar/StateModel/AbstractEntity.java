@@ -16,6 +16,9 @@ public abstract class AbstractEntity {
     // a unique string identifier for this entity
     private String id;
 
+    // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
+    private String abstractionLevelIdentifier;
+
     // a set of event listeners
     private Set<StateModelEventListener> eventListeners;
 
@@ -31,6 +34,22 @@ public abstract class AbstractEntity {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Retrieves the abstraction level modifier of the model this entity is a part of.
+     * @return
+     */
+    public String getAbstractionLevelIdentifier() {
+        return abstractionLevelIdentifier;
+    }
+
+    /**
+     * Sets the abstraction level modifier of the model this entity is a part of.
+     * @param abstractionLevelIdentifier
+     */
+    public void setAbstractionLevelIdentifier(String abstractionLevelIdentifier) {
+        this.abstractionLevelIdentifier = abstractionLevelIdentifier;
     }
 
     /**

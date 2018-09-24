@@ -6,6 +6,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
 import java.util.Set;
+import java.util.zip.CRC32;
 
 public abstract class HydrationHelper {
 
@@ -30,6 +31,12 @@ public abstract class HydrationHelper {
         return property.getPropertyType() == TypeConvertor.getInstance().getOrientDBType(clazz);
     }
 
+    /**
+     * This method searches a set of properties for a given property name and returns it if found.
+     * @param properties
+     * @param propertyName
+     * @return
+     */
     public static Property getProperty(Set<Property> properties, String propertyName) {
         Property property = null;
         for (Property prop : properties) {
@@ -39,6 +46,18 @@ public abstract class HydrationHelper {
             }
         }
         return property;
+    }
+
+    /**
+     * This method returns a unique identifier for a given input string.
+     * @param text
+     * @return
+     */
+    public static String lowCollisionID(String text){ // reduce ID collision probability
+        CRC32 crc32 = new CRC32(); crc32.update(text.getBytes());
+        return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
+                Integer.toHexString(text.length()) +
+                crc32.getValue();
     }
 
 }

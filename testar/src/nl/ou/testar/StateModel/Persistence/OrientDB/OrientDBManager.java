@@ -35,7 +35,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      */
     private Set<EntityClassFactory.EntityClassName> entityClassNames = new HashSet<>(Arrays.asList(
             EntityClassFactory.EntityClassName.AbstractAction,
-            EntityClassFactory.EntityClassName.AbstractState));
+            EntityClassFactory.EntityClassName.AbstractState,
+            EntityClassFactory.EntityClassName.AbstractStateModel));
 
     /**
      * Constructor
@@ -74,7 +75,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
             hydrator.hydrate(vertexEntity, abstractState);
         } catch (HydrationException e) {
-            System.out.println("Encounted a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
+            e.printStackTrace();
+            System.out.println("Encountered a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
             return;
         }
 
@@ -113,9 +115,29 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
         }
         catch (HydrationException ex) {
-            //@todo add some meaningfull logging here as well
+            //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(actionEntity);
+    }
+
+    public void initAbstractStateModel(AbstractStateModel abstractStateModel) {
+        // there are two options here: either the abstract state model already exists in the database,
+        // in which case we load it, or it doesn't exist yet, in which case we save it
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
+
+        // hydrate the entity with the abstract state model information
+        try {
+            EntityHydrator stateModelHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE_MODEL);
+            stateModelHydrator.hydrate(vertexEntity, abstractStateModel);
+        }
+        catch (HydrationException ex) {
+            ex.printStackTrace();
+        }
+
+        // step 1: persist the state model entity to the database. if it already exists, nothing will happen
+        entityManager.saveEntity(vertexEntity);
+
     }
 
     @Override
@@ -137,6 +159,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             case ABSTRACT_ACTION_CHANGED:
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
+
+            case ABSTRACT_STATE_MODEL_INITIALIZED:
+                initAbstractStateModel((AbstractStateModel) (event.getPayload()));
         }
 
     }

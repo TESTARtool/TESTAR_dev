@@ -34,6 +34,11 @@
  */
 package org.fruit.monkey;
 
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.orient.*;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -255,6 +260,32 @@ public class Main {
 
   }
 
+  /*public static void main(String[] args) throws IOException {
+    String connectionString = "remote:localhost/test_db";
+    String username = "test";
+    String password = "test";
+    OrientGraphFactory graphFactory = new OrientGraphFactory(connectionString, username, password);
+//    OrientGraphNoTx graph = graphFactory.getNoTx();
+//    OrientVertexType vertexType = graph.createVertexType("TestClass");
+//    OrientVertexType.OrientVertexProperty prop = vertexType.createProperty("testId", OType.STRING);
+//    prop.setMandatory(true);
+//
+//    graph.shutdown();
+
+//    graph.createKeyIndex("testing", Vertex.class, new Parameter("type", "UNIQUE"), new Parameter("class", "TestClass"));
+
+//    if (vertexType != null) System.out.println("Vertex type found!");
+//    graph.shutdown();
+    OrientGraph graphTx = graphFactory.getTx();
+//    Vertex vertex = graphTx.addVertex("class:TestClass", "testId", "123456");
+//    vertex.setProperty("testId", "654321");
+//
+    for (Vertex vertex : graphTx.getVertices("TestClass.testId", "123456")) {
+      System.out.println(vertex.getId().toString());
+    }
+    graphTx.shutdown();
+  }*/
+
   public static void main(String[] args) throws IOException {
     Settings settings = null;
     Locale.setDefault(Locale.ENGLISH);
@@ -319,7 +350,7 @@ public class Main {
         System.exit(-1);
       }
       //TODO: DATE-FORMAT not consistent
-      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
+      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + Util.lineSep() + Util.lineSep() + " with the next settings:\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);

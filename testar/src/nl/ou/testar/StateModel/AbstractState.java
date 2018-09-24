@@ -17,6 +17,8 @@ public class AbstractState extends AbstractEntity {
     private Set<String> unvisitedActionIds;
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
+    // is this an initial state?
+    private boolean isInitial = false;
 
     /**
      * Constructor
@@ -123,4 +125,18 @@ public class AbstractState extends AbstractEntity {
         return unvisitedActionIds;
     }
 
+    /**
+     * Returns true if this is one of the starting states of the model. False otherwise.
+     */
+    public boolean isInitial() {
+        return isInitial;
+    }
+
+    /**
+     * Set to true if this is one of the starting states of the model
+     * @param initial
+     */
+    public void setInitial(boolean initial) {
+        isInitial = initial;
+    }
 }
