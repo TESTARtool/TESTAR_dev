@@ -54,27 +54,7 @@ import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Rect;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.UsedResources;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.ActivateSystem;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -92,6 +72,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
+import org.fruit.alayer.windows.StateFetcher;
 import org.fruit.monkey.AbstractProtocol.Modes;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -201,6 +182,11 @@ IEventListener {
 	protected GraphDB graphDB;
 
 	protected boolean nonSuitableAction = false;
+
+	public StateBuilder builder;
+	public List<ProcessInfo> processesBeforeSUT, sutProcesses, processesPreviouslyDetected;
+	public Iterable<Long> visibleWindowsBeforeSUT, visibleWindowsPreviouslyDetected;
+	public List<Long> sutWindows = new ArrayList<Long>();
 
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
 	//TODO move to TestarControlKeyCommands
@@ -504,6 +490,10 @@ IEventListener {
 	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
 	//TODO check how well the CPU usage based waiting works
 	protected boolean executeAction(SUT system, State state, Action action){
+		System.out.println("AbstractProtocol.executeAction(): checking processes and windows before executing action");
+		processesPreviouslyDetected = SystemProcessHandling.getRunningProcesses("update");
+		visibleWindowsPreviouslyDetected = StateFetcher.visibleTopLevelWindows();
+
 		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds

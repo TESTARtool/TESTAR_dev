@@ -115,8 +115,6 @@ public class DefaultProtocol extends AbstractProtocol {
 		return this.processVerdict;
 	}
 
-	private StateBuilder builder;
-
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
 			BluePen = Pen.newPen().setColor(Color.Blue).
@@ -366,15 +364,14 @@ public class DefaultProtocol extends AbstractProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 //			System.out.println("DefaultProtocol: Starting SUT process");
-			List<ProcessInfo> processesBeforeSUT = SystemProcessHandling.getRunningProcesses("Before starting SUT");
-			Iterable<Long> visibleWindowsBeforeSUT = StateFetcher.visibleTopLevelWindows();
+			processesBeforeSUT = SystemProcessHandling.getRunningProcesses("Before starting SUT");
+			visibleWindowsBeforeSUT = StateFetcher.visibleTopLevelWindows();
 //			StateFetcher.printVisibleWindows(visibleWindowsBeforeSUT);
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
 			//sut.setNativeAutomationCache();
-			List<ProcessInfo> sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+			sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
 			// Waiting until a new window has found after starting the SUT:
-			List<Long> sutWindows = new ArrayList<Long>();
 			while(sutWindows.size()==0){
 				Util.pauseMs(500);
 				sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
@@ -523,6 +520,23 @@ public class DefaultProtocol extends AbstractProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		Assert.notNull(system);
+		System.out.println("DefaultProtocol.getState(): checking processes and windows");
+		if(processesPreviouslyDetected==null){
+			//no action taken yet - or in SPY mode
+			processesPreviouslyDetected = SystemProcessHandling.getRunningProcesses("update");
+			sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+		}else{
+			//action taken, checking if action created new processes or windows
+			sutProcesses = SystemProcessHandling.getNewProcesses(processesPreviouslyDetected);
+		}
+		if(visibleWindowsPreviouslyDetected==null){
+			//no action taken yet - or in SPY mode
+			visibleWindowsPreviouslyDetected = StateFetcher.visibleTopLevelWindows();
+			sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
+		}else{
+			//action taken, checking if action created new processes or windows
+			sutWindows = StateFetcher.getNewWindows(visibleWindowsPreviouslyDetected);
+		}
 		//State state = builder.apply(system);
 		state = builder.apply(system);
 
@@ -1422,14 +1436,30 @@ public class DefaultProtocol extends AbstractProtocol {
 		}
 		//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
 
-		while(mode() == Modes.Spy && system.isRunning()) {
-			State state = getState(system);
-			cv.begin(); Util.clear(cv);
-			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
-			visualizeActions(cv, state, actions);
-			cv.end();
+		while(mode() == Modes.Spy) {
+			if(system.isRunning()){
+				State state = getState(system);
+				if(state.get(Tags.Foreground)==true) {
+					visualizeSUT(system);
+				}else{
+					System.out.println("DefaultProtocol.runSpy(): SUT process is not on foreground!");
+					system = getRunningForegroundSUT();
+					state = getState(system);
+					if(system!=null){
+						visualizeSUT(system);
+					}
+				}
+			}else{
+				//System is not running, check if process has been changed and one of the SUT processes is on foreground
+				System.out.println("DefaultProtocol.runSpy(): SUT process is not running, trying to find SUT process!");
+				//TODO check what would be suitable waiting time:
+				Util.pause(5);
+				system = getRunningForegroundSUT();
+				state = getState(system);
+				if(system!=null){
+					visualizeSUT(system);
+				}
+			}
 		}
 
 		if(startedSpy){
@@ -1437,6 +1467,85 @@ public class DefaultProtocol extends AbstractProtocol {
 			detectLoopMode(system);
 		}
 
+	}
+
+	private SUT getRunningForegroundSUT(){
+		SUT system=null;
+		for(ProcessInfo pi:sutProcesses) {
+			system = pi.sut;
+			if (system.isRunning()) {
+//									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
+				state = builder.apply(system);
+				if (state != null && state.childCount() > 0) {
+					if(state.get(Tags.Foreground)==true) {
+						System.out.println("DefaultProtocol.getRunningForegroundSUT(): possible SUT process found: "+pi.Desc);
+						return system;
+//						try{
+//							deriveActions(system, state);
+//						}catch(Exception e){
+//							System.out.println("DefaultProtocol.getRunningForegroundSUT(): deriveActions() fails - not SUT process.");
+//						}
+					}else {
+						System.out.println("DefaultProtocol.getRunningForegroundSUT(): SUT process is STILL not on foreground!");
+					}
+				}else if(state == null){
+//										System.out.println("DEBUG: state == null");
+				}else if(state.childCount()==0){
+//										System.out.println("DEBUG: state.childCount() == 0");
+//								for(Tag t:state.tags()){
+//									System.out.println("DEBUG: "+t+"="+state.get(t));
+//								}
+				}
+			}
+		}
+		System.out.println("DefaultProtocol.getRunningForegroundSUT(): checking all processes started after initial SUT startup.");
+		sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+		for(ProcessInfo pi:sutProcesses) {
+			system = pi.sut;
+			if (system.isRunning()) {
+//									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
+				state = builder.apply(system);
+				if (state != null && state.childCount() > 0) {
+					if(state.get(Tags.Foreground)==true) {
+						System.out.println("DefaultProtocol.getRunningForegroundSUT(): possible SUT process found: "+pi.Desc);
+						return system;
+//						try{
+//							deriveActions(system, state);
+//						}catch(Exception e){
+//							System.out.println("DefaultProtocol.getRunningForegroundSUT(): deriveActions() fails - not SUT process.");
+//						}
+					}else {
+						System.out.println("DefaultProtocol.getRunningForegroundSUT(): SUT process is STILL not on foreground!");
+					}
+				}else if(state == null){
+//										System.out.println("DEBUG: state == null");
+				}else if(state.childCount()==0){
+//										System.out.println("DEBUG: state.childCount() == 0");
+//								for(Tag t:state.tags()){
+//									System.out.println("DEBUG: "+t+"="+state.get(t));
+//								}
+				}
+			}
+		}
+		return system;
+	}
+
+	private void visualizeSUT(SUT system){
+		cv.begin();
+		Util.clear(cv);
+		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+		Set<Action> actions = deriveActions(system, state);
+//			if(actions.size()==0){
+//				System.out.println("DefaultProtocol.runSpy(): 0 actions found!");
+//			}else{
+//				System.out.println("DefaultProtocol.runSpy(): "+actions.size() +" found.");
+////				for(Tag t:state.tags()){
+////					System.out.println("DEBUG: Tag "+t+"="+state.get(t));
+////				}
+//			}
+		CodingManager.buildIDs(state, actions);
+		visualizeActions(cv, state, actions);
+		cv.end();
 	}
 
 	protected void replay(){
