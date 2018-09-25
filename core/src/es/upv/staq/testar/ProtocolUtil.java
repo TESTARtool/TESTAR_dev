@@ -28,23 +28,9 @@
 *******************************************************************************************************/
 
 
-package es.upv.staq.testar.protocols;
+package es.upv.staq.testar;
 
-import java.awt.Rectangle;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.fruit.Assert;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Action;
@@ -53,7 +39,6 @@ import org.fruit.alayer.Color;
 import org.fruit.alayer.FillPattern;
 import org.fruit.alayer.Finder;
 import org.fruit.alayer.Pen;
-import org.fruit.alayer.Point;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.SUT;
@@ -61,11 +46,11 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.devices.MouseButtons;
 
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import java.awt.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Utility class to enhance TESTAR protocol.
@@ -75,91 +60,6 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
  */
 public class ProtocolUtil {
 
-	public BufferedReader adhocTestServerReader = null;
-	public BufferedWriter adhocTestServerWriter = null;
-
-	private ServerSocket adhocTestServerSocket = null;
-	private Socket adhocTestSocket = null;
-
-	public ProtocolUtil(){
-	}
-	
-	// ################
-	//  Static methods
-	// ################
-	
-    public static Widget getWidgetUnderCursor(State state, Mouse mouse){
-    	if (state == null) return null;
-		Point cursor = mouse.cursor();
-        Assert.notNull(cursor);
-		return Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-    }	
-	
-	// ##############
-	//	Adhoc Server
-	// ##############
-	
-	public void startAdhocServer() {
-		new Thread(){
-			public void run(){
-				int port = 47357;
-				try {
-					adhocTestServerSocket = new ServerSocket(port);
-					System.out.println("AdhocTest Server started @" + port);
-					adhocTestSocket = adhocTestServerSocket.accept();
-					System.out.println("AdhocTest Client engaged");
-					adhocTestServerReader = new BufferedReader(new InputStreamReader(adhocTestSocket.getInputStream()));
-					adhocTestServerWriter = new BufferedWriter(new OutputStreamWriter(adhocTestSocket.getOutputStream()));
-				} catch(Exception e){
-					stopAdhocServer();
-				}
-			}
-		}.start();
-	}
-	
-	// by urueda
-	public void stopAdhocServer(){
-		if (adhocTestServerSocket != null){
-			try {
-				if (adhocTestServerReader != null)
-						adhocTestServerReader.close();
-				if (adhocTestServerWriter != null)
-					adhocTestServerWriter = null;
-				if (adhocTestSocket != null)
-					adhocTestSocket.close();
-				adhocTestServerSocket.close();
-				adhocTestServerSocket = null;				
-				System.out.println(" AdhocTest Server sttopped  " );		
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public Object[] compileAdhocTestServerEvent(String event){				
-		//Pattern p = Pattern.compile(BriefActionRolesMap.LC + "\\((\\d+.\\d+),(\\d+.\\d+)\\)");
-		Pattern p = Pattern.compile("LC\\((\\d+.\\d+),(\\d+.\\d+)\\)");
-		Matcher m = p.matcher(event);
-		if (m.find())
-			return new Object[]{MouseButtons.BUTTON1,new Double(m.group(1)),new Double(m.group(2))};
-		
-		//p = Pattern.compile(BriefActionRolesMap.RC + "\\((\\d+.\\d+),(\\d+.\\d+)\\)");
-		p = Pattern.compile("RC\\((\\d+.\\d+),(\\d+.\\d+)\\)");
-		m = p.matcher(event);
-		if (m.find())
-			return new Object[]{MouseButtons.BUTTON3,new Double(m.group(1)),new Double(m.group(2))};
-
-		//p = Pattern.compile(BriefActionRolesMap.T + "\\((.*)\\)");
-		p = Pattern.compile("T\\((.*)\\)");
-		m = p.matcher(event);
-		if (m.find()){
-			String text = m.group(1);
-			return new Object[]{ KBKeys.contains(text) ? KBKeys.valueOf(text) : text };
-		}
-
-		return null;
-	}
-	
 	// ###################
 	//	Ancestors marking
 	// ###################
