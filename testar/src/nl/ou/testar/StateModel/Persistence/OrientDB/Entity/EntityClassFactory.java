@@ -57,10 +57,14 @@ public class EntityClassFactory {
         isInitial.setMandatory(true);
         isInitial.setNullable(false);
         abstractStateClass.addProperty(isInitial);
-        Property unvisitedActions = new Property("unvisitedActions", OType.EMBEDDEDSET);
+        Property unvisitedActions = new Property("unvisitedActions", OType.EMBEDDEDSET, OType.STRING);
         unvisitedActions.setMandatory(false);
-        unvisitedActions.setNullable(false);
+        unvisitedActions.setNullable(true);
         abstractStateClass.addProperty(unvisitedActions);
+        Property concreteStateIds = new Property("concreteStateIds", OType.EMBEDDEDSET, OType.STRING);
+        concreteStateIds.setMandatory(false);
+        concreteStateIds.setNullable(false);
+        abstractStateClass.addProperty(concreteStateIds);
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
         return abstractStateClass;
     }
@@ -72,7 +76,7 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(true);
         abstractActionClass.addProperty(actionId);
-        Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET);
+        Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
         unvisitedActions.setMandatory(false);
         unvisitedActions.setNullable(false);
         abstractActionClass.addProperty(unvisitedActions);
@@ -87,7 +91,7 @@ public class EntityClassFactory {
         id.setNullable(false);
         id.setIdentifier(true);
         abstractStateModelClass.addProperty(id);
-        Property abstractionAttributes = new Property("abstractionAttributes", OType.EMBEDDEDSET);
+        Property abstractionAttributes = new Property("abstractionAttributes", OType.EMBEDDEDSET, OType.STRING);
         abstractionAttributes.setMandatory(true);
         abstractionAttributes.setNullable(false);
         abstractStateModelClass.addProperty(abstractionAttributes);

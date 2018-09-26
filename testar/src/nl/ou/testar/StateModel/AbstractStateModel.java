@@ -135,6 +135,7 @@ public class AbstractStateModel {
     public void addState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
+            System.out.println("Adding the new state to the model");
             // provide the state with this state model's abstract identifier
             newState.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
             // provide the state with the event listeners from this state model

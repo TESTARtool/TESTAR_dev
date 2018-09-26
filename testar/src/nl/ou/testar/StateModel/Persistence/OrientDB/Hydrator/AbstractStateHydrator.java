@@ -37,15 +37,21 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
-                target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), ((AbstractState) source).getStateId());
+                target.addPropertyValue(prop.getPropertyName(), prop.getPropertyType(), ((AbstractState) source).getStateId());
                 stateId = ((AbstractState) source).getStateId();
             }
             else if (prop.getPropertyName().equals("abstractionLevelIdentifier")) {
+                // testing
+                String absId = ((AbstractState) source).getAbstractionLevelIdentifier();
+                System.out.println("absId is null: " + (absId == null));
+                Class clazz = absId.getClass();
+                OType pt = TypeConvertor.getInstance().getOrientDBType(clazz);
+
                 OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getAbstractionLevelIdentifier().getClass());
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
-                target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), ((AbstractState) source).getAbstractionLevelIdentifier());
+                target.addPropertyValue(prop.getPropertyName(), prop.getPropertyType(), ((AbstractState) source).getAbstractionLevelIdentifier());
                 abstractionLevelIdentifier = ((AbstractState) source).getAbstractionLevelIdentifier();
             }
         }
@@ -72,13 +78,22 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         target.addPropertyValue(isInitial.getPropertyName(), isInitial.getPropertyType(), ((AbstractState) source).isInitial());
 
         // specifically for abstract states we need to add the ids of unvisited actions
-        /*Property unvisitedActions = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
+        Property unvisitedActions = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
         if (unvisitedActions == null) {
             throw new HydrationException();
         }
         if (!((AbstractState) source).getUnvisitedActionIds().isEmpty()) {
             target.addPropertyValue(unvisitedActions.getPropertyName(), unvisitedActions.getPropertyType(), ((AbstractState) source).getUnvisitedActionIds());
-        }*/
+        }
+
+        // we need to add the concrete state ids
+        Property concreteStateIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteStateIds");
+        if (concreteStateIds == null) {
+            throw new HydrationException();
+        }
+        if (!((AbstractState) source).getConcreteStateIds().isEmpty()) {
+            target.addPropertyValue(concreteStateIds.getPropertyName(), concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds());
+        }
 
     }
 

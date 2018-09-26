@@ -10,6 +10,9 @@ public class Property {
     // orientdb type to use for the property
     private OType propertyType;
 
+    // needed child type in case of embedded list, sets, maps
+    private OType childType;
+
     private boolean isMandatory = false;
 
     private boolean isReadOnly = false;
@@ -25,8 +28,18 @@ public class Property {
      * @param propertyType
      */
     public Property(String propertyName, OType propertyType) {
+        this(propertyName, propertyType, null);
+    }
+
+    /**
+     * Constructor
+     * @param propertyName
+     * @param propertyType
+     */
+    public Property(String propertyName, OType propertyType, OType childType) {
         this.propertyName = propertyName;
         this.propertyType = propertyType;
+        this.childType = childType;
     }
 
     public String getPropertyName() {
@@ -39,6 +52,14 @@ public class Property {
 
     public OType getPropertyType() {
         return propertyType;
+    }
+
+    public OType getChildType() {
+        return childType;
+    }
+
+    public void setChildType(OType childType) {
+        this.childType = childType;
     }
 
     public void setPropertyType(OType propertyType) {

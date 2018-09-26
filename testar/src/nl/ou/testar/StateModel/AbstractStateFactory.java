@@ -18,7 +18,7 @@ public abstract class AbstractStateFactory {
      * @return the new abstract state
      */
     public static AbstractState createAbstractState(State newState, Set<Action> actions) {
-        String abstractStateId = newState.get(Tags.Abstract_R_ID);
+        String abstractStateId = newState.get(Tags.AbstractIDCustom);
         AbstractState newAbstractState = new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
         // add the needed tags and their values to the abstract state
 //        for (Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {

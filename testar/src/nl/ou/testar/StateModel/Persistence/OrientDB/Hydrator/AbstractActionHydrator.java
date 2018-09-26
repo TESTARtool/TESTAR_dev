@@ -41,12 +41,12 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         }
 
         // we need to store the concrete action ids that are connected to this abstract action id
-//        Property concreteActionIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteActionIds");
-//        if (concreteActionIds == null) {
-//            throw new HydrationException();
-//        }
-//        if (!((AbstractAction) source).getConcreteActionIds().isEmpty()) {
-//            target.addPropertyValue(concreteActionIds.getPropertyName(), concreteActionIds.getPropertyType(), ((AbstractAction) source).getConcreteActionIds());
-//        }
+        Property concreteActionIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteActionIds");
+        if (concreteActionIds == null) {
+            throw new HydrationException();
+        }
+        if (!((AbstractAction) source).getConcreteActionIds().isEmpty()) {
+            target.addPropertyValue(concreteActionIds.getPropertyName(), concreteActionIds.getPropertyType(), ((AbstractAction) source).getConcreteActionIds());
+        }
     }
 }

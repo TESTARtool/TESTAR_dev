@@ -56,14 +56,18 @@ public class StateModelManager {
      * @param actions
      */
     public void notifyNewStateReached(State newState, Set<Action> actions) {
+        System.out.println("===============================================");
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
+        System.out.println("AbstractIdCustom: " + abstractStateId);
         AbstractState newAbstractState;
         try {
             newAbstractState = abstractStateModel.getState(abstractStateId);
+            System.out.println("found state in model");
         }
         catch (StateModelException ex) {
             // state wasn't found
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
+            System.out.println("generated new state");
         }
         // we want to provide the abstract state with the identifier of the concrete state
         newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
@@ -74,6 +78,7 @@ public class StateModelManager {
             if (currentAbstractState == null) {
                 // it's apparantly the first state in our run
                 abstractStateModel.addInitialState(newAbstractState);
+                System.out.println("It's the first state");
             }
             else {
                 // it's not the first state, so we want to add a transition
@@ -81,6 +86,12 @@ public class StateModelManager {
                     // this should never happen if the notification process is followed correctly
                     System.exit(-1); //@todo this needs some proper error handling
                 }
+                System.out.println("Adding transition");
+                System.out.println("Source state id: " + currentAbstractState.getStateId());
+                System.out.println("Target state id: " + newAbstractState.getStateId());
+                System.out.println("Source abstraction id: " + currentAbstractState.getAbstractionLevelIdentifier());
+                System.out.println("Target abstraction id: " + newAbstractState.getAbstractionLevelIdentifier());
+                System.out.println("Action id: " + actionUnderExecution.getActionId());
                 abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
                 actionUnderExecution = null;
             }
@@ -89,6 +100,7 @@ public class StateModelManager {
         }
 
         currentAbstractState = newAbstractState;
+        System.out.println("=================================================");
     }
 
     /**

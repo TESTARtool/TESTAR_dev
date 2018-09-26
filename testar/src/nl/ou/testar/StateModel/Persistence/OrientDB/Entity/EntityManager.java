@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.orient.*;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
@@ -95,7 +96,13 @@ public class EntityManager {
                 vertexType = graph.createVertexType(entityClass.getClassName(), entityClass.getSuperClassName());
                 // add the classes properties
                 for (Property property : entityClass.getProperties()) {
-                    OrientVertexType.OrientVertexProperty vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
+                    OrientVertexType.OrientVertexProperty vertexProperty = null;
+                    if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                        vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
+                    }
+                    else {
+                        vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
+                    }
                     vertexProperty.setReadonly(property.isReadOnly());
                     vertexProperty.setMandatory(property.isMandatory());
                     vertexProperty.setNotNull(!property.isNullable());
@@ -105,7 +112,7 @@ public class EntityManager {
                 // however, this is complex to do with the java api, so we'll look at it later
                 Property identifier = entityClass.getIdentifier();
                 String indexFieldName = identifier.getPropertyName();
-                graph.createKeyIndex(indexFieldName, Vertex.class, new Parameter("class", entityClass.getClassName()), new Parameter("collate", "ci"));
+                graph.createKeyIndex(indexFieldName, Vertex.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
             }
         } finally {
             graph.shutdown();
@@ -125,7 +132,13 @@ public class EntityManager {
                 edgeType = graph.createEdgeType(entityClass.getClassName(), entityClass.getSuperClassName());
                 // add the classes properties
                 for (Property property : entityClass.getProperties()) {
-                    OProperty edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType());
+                    OProperty edgeProperty = null;
+                    if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                        edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
+                    }
+                    else {
+                        edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType());
+                    }
                     edgeProperty.setReadonly(property.isReadOnly());
                     edgeProperty.setMandatory(property.isMandatory());
                     edgeProperty.setNotNull(!property.isNullable());
@@ -133,7 +146,7 @@ public class EntityManager {
                 // we add an index for the identifier fields for fast lookup
                 Property identifier = entityClass.getIdentifier();
                 String indexFieldName = identifier.getPropertyName();
-                graph.createKeyIndex(indexFieldName, Edge.class, new Parameter("class", entityClass.getClassName()), new Parameter("collate", "ci"));
+                graph.createKeyIndex(indexFieldName, Edge.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
             }
         } finally {
             graph.shutdown();
@@ -262,6 +275,12 @@ public class EntityManager {
         }
     }
 
+    /**
+     * Helper method to format a property before adding it to a map.
+     * @param map
+     * @param propertyName
+     * @param propertyValue
+     */
     private void setProperty(HashMap<String, Object> map, String propertyName, Object propertyValue) {
         if (propertyValue instanceof Boolean)
             map.put(propertyName, ((Boolean) propertyValue).booleanValue());
