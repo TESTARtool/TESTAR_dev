@@ -181,7 +181,6 @@ public class EntityManager {
         // check to see if the entity already exists in the database
         try {
             vertex = retrieveVertex(entity, graph);
-            System.out.println("Vertex found!");
             // add the properties
             for (String propertyName : entity.getPropertyNames()) {
                 vertex.setProperty(propertyName, entity.getPropertyValue(propertyName).right());

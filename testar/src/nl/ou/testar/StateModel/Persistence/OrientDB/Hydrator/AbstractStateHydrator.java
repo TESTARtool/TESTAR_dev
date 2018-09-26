@@ -41,12 +41,6 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 stateId = ((AbstractState) source).getStateId();
             }
             else if (prop.getPropertyName().equals("abstractionLevelIdentifier")) {
-                // testing
-                String absId = ((AbstractState) source).getAbstractionLevelIdentifier();
-                System.out.println("absId is null: " + (absId == null));
-                Class clazz = absId.getClass();
-                OType pt = TypeConvertor.getInstance().getOrientDBType(clazz);
-
                 OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getAbstractionLevelIdentifier().getClass());
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
