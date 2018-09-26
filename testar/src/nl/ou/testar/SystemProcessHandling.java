@@ -30,11 +30,13 @@
 package nl.ou.testar;
 
 import es.upv.staq.testar.NativeLinker;
+import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.windows.StateFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;

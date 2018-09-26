@@ -516,28 +516,18 @@ public class DefaultProtocol extends AbstractProtocol {
 
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		Assert.notNull(system);
-		System.out.println("DefaultProtocol.getState(): checking processes and windows");
-		if(processesPreviouslyDetected==null){
-			//no action taken yet - or in SPY mode
-			processesPreviouslyDetected = SystemProcessHandling.getRunningProcesses("update");
-			sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
-		}else{
-			//action taken, checking if action created new processes or windows
-			sutProcesses = SystemProcessHandling.getNewProcesses(processesPreviouslyDetected);
-		}
-		if(visibleWindowsPreviouslyDetected==null){
-			//no action taken yet - or in SPY mode
-			visibleWindowsPreviouslyDetected = StateFetcher.visibleTopLevelWindows();
-			sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
-		}else{
-			//action taken, checking if action created new processes or windows
-			sutWindows = StateFetcher.getNewWindows(visibleWindowsPreviouslyDetected);
-		}
-		//State state = builder.apply(system);
-		state = builder.apply(system);
+        Assert.notNull(system);
 
-		CodingManager.buildIDs(state);
+        // Updating SUT processes and windows:
+        updateSutProcessesAndWindows();
+
+        state = builder.apply(system); // TODO why is state a class variable? especially since this function returns state
+        CodingManager.buildIDs(state);
+
+        if(!state.get(Tags.Foreground)){
+            System.out.println("DefaultProtocol.getState(): SUT process is not foreground! Returning null state!");
+            return null;
+        }
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
@@ -566,6 +556,33 @@ public class DefaultProtocol extends AbstractProtocol {
 
 		return state;
 	}
+
+    /**
+     * Updates sutProcesses and sutWindows class variables
+     */
+    private void updateSutProcessesAndWindows(){
+        // System.out.println("DefaultProtocol.checkNewProcessesAndWindows(): checking processes and windows");
+        if(processesPreviouslyDetected==null){
+            System.out.println("DefaultProtocol.checkNewProcessesAndWindows(): 1st time checking processes");
+            //no action taken yet - or in SPY mode
+            processesPreviouslyDetected = SystemProcessHandling.getRunningProcesses("update");
+            sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+        }else{
+            //action taken, checking if action created new processes or windows
+            sutProcesses = SystemProcessHandling.getNewProcesses(processesPreviouslyDetected);
+            processesPreviouslyDetected = SystemProcessHandling.getRunningProcesses("update");
+        }
+        if(visibleWindowsPreviouslyDetected==null){
+            System.out.println("DefaultProtocol.checkNewProcessesAndWindows(): 1st time checking windows");
+            //no action taken yet - or in SPY mode
+            visibleWindowsPreviouslyDetected = StateFetcher.visibleTopLevelWindows();
+            sutWindows = StateFetcher.getNewWindows(visibleWindowsBeforeSUT);
+        }else{
+            //action taken, checking if action created new processes or windows
+            sutWindows = StateFetcher.getNewWindows(visibleWindowsPreviouslyDetected);
+            visibleWindowsPreviouslyDetected = StateFetcher.visibleTopLevelWindows();
+        }
+    }
 
 	@Override
 	protected Verdict getVerdict(State state){
@@ -959,15 +976,19 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * @param state
 	 * @param fragment
 	 * @param actionStatus
-	 * @return
+	 * @return boolean true if problems found
 	 */
 	protected boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus){
+        //----------------------------------
+	    // Calling deriveActions() from protocol:
+        //----------------------------------
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state,actions);
 
 		if(actions.isEmpty()){
+            System.out.println("DefaultProtocol.waitAutomaticAction(): no actions found!");
 			if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-				LogSerialiser.log("No available actions to execute! Tryed ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+				LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
 				actionStatus.setProblems(true); // problems found
 			}
 			//----------------------------------
@@ -979,15 +1000,24 @@ public class DefaultProtocol extends AbstractProtocol {
 			actions.add(escAction);
 			escAttempts++;
 		} else
-			escAttempts = 0;
+			escAttempts = 0; // resetting ESC attempts to 0
 
 		fragment.set(ActionSet, actions);
 		LogSerialiser.log("Built action set!\n", LogSerialiser.LogLevel.Debug);
+		//TODO visualize actions does not work on generate mode, should be settings to make faster
 		visualizeActions(cv, state, actions);
 
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
+		if(mode() == Modes.Quit)
+		    return actionStatus.isProblems();
+
 		LogSerialiser.log("Selecting action...\n", LogSerialiser.LogLevel.Debug);
-		if(mode() == Modes.Spy) return false;
+
+		if(mode() == Modes.Spy)
+		    return false;
+
+		//----------------------------------
+		// Calling selectAction() from protocol:
+        //----------------------------------
 		actionStatus.setAction(selectAction(state, actions));
 
 		if (actionStatus.getAction() == null){ // (no suitable actions?)
@@ -1009,6 +1039,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			waitUserActionLoop(cv,system,state,actionStatus);
 
 		cv.begin(); Util.clear(cv);
+		//TODO sut visualization does not work in generate mode:
 		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 		LogSerialiser.log("Building action set...\n", LogSerialiser.LogLevel.Debug);
 
@@ -1020,6 +1051,9 @@ public class DefaultProtocol extends AbstractProtocol {
 				return true; // problems
 			}
 		} else{ // automatically derived action
+            //----------------------------------
+		    // Derive and select action:
+            //----------------------------------
 			if (waitAutomaticAction(system,state,fragment,actionStatus)){
 				cv.end();
 				return true; // problems
@@ -1070,6 +1104,9 @@ public class DefaultProtocol extends AbstractProtocol {
 					actionStatus.getAction().get(Desc, actionStatus.getAction().toString())) + "\n", LogSerialiser.LogLevel.Debug);
 
 			if (actionStatus.isUserEventAction() ||
+                    //----------------------------------
+                    // Calling executeAction():
+                    //----------------------------------
 					(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){
 
 				cv.begin();
@@ -1144,14 +1181,16 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * Method to run TESTAR on Generate mode
 	 * @param system
 	 */
-	protected void runGenerate(SUT system){
+	protected void runGenerate(SUT system){ //TODO put SUT system into class variables and take out of function variables because the process may change during execution
 		LogSerialiser.finish(); LogSerialiser.exit();
 		sequenceCount = 1;
 		lastStamp = System.currentTimeMillis();
 		escAttempts = 0; nopAttempts = 0;
 		boolean problems;
 
+        //----------------------------------
 		//New sequence starts
+        //----------------------------------
 		while(mode() != Modes.Quit && moreSequences()){
 			long tStart = System.currentTimeMillis();
 			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
@@ -1229,9 +1268,11 @@ public class DefaultProtocol extends AbstractProtocol {
 			LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
 
 			try{
-				//If system it's null means that we have started TESTAR from the Generate mode
+				//If system is null, we have started TESTAR from the Generate mode and it is not yet started
 				if(system == null || !system.isRunning()) {
-					system = null;
+                    //----------------------------------
+					// Starting the system for the sequence
+                    //----------------------------------
 					system = startSystem();
 					processListeners(system);
 					this.cv = buildCanvas();
@@ -1241,11 +1282,32 @@ public class DefaultProtocol extends AbstractProtocol {
 
 				LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
 				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+				// Getting state:
 				State state = getState(system);
+                if(state == null){
+                    // SUT process was not on foreground
+                    System.out.println("DefaultProtocol.runGenerate(): SUT is not on foreground!");
+                    if(sutProcesses.size()>0){
+                        System.out.println("DefaultProtocol.runGenerate(): trying if one of other possible SUT processes is on foreground");
+                        system = getRunningForegroundSUT();
+                        state = getState(system);
+                    }
+                }
 				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
+				// Executing beginSequence if defined:
 				beginSequence(system, state);
 				LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
+				// Getting state again:
 				state = getState(system);
+                if(state == null){
+                    // SUT process was not on foreground
+                    System.out.println("DefaultProtocol.runGenerate(): SUT is not on foreground!");
+                    if(sutProcesses.size()>0){
+                        System.out.println("DefaultProtocol.runGenerate(): trying if one of other possible SUT processes is on foreground");
+                        system = getRunningForegroundSUT();
+                        state = getState(system);
+                    }
+                }
 				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 				saveStateSnapshot(state);
@@ -1258,8 +1320,9 @@ public class DefaultProtocol extends AbstractProtocol {
 				if (faultySequence) problems = true;
 				fragment.set(OracleVerdict, verdict);
 
-				long spyTime;
-				//We begin to make the number of actions indicated in our sequence
+				long spyTime; //for putting time of mode change into reports
+
+				// Running this Generate loop until actions per sequence reached or mode changed by the user:
 				while(mode() != Modes.Quit && moreActions(state)){
 
 					//User wants to move to Spy mode, after that we will continue the actions
@@ -1270,8 +1333,11 @@ public class DefaultProtocol extends AbstractProtocol {
 					}
 
 					if (problems)
-						faultySequence = true;
+						faultySequence = true; //TODO no more actions if fault found? that should be in settings?
 					else{
+                        //----------------------------------
+					    // Derive, select and execute action:
+                        //----------------------------------
 						problems = runAction(cv,system,state,fragment);
 
 						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
@@ -1284,6 +1350,15 @@ public class DefaultProtocol extends AbstractProtocol {
 						}*/
 						
 						state = getState(system);
+						if(state == null){
+						    // SUT process was not on foreground
+                            System.out.println("DefaultProtocol.runGenerate(): SUT is not on foreground!");
+                            if(sutProcesses.size()>0){
+                                System.out.println("DefaultProtocol.runGenerate(): trying if one of other possible SUT processes is on foreground");
+                                system = getRunningForegroundSUT();
+                                state = getState(system);
+                            }
+                        }
 						graphDB.addState(state);
 						if (faultySequence) problems = true;
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
@@ -1301,10 +1376,13 @@ public class DefaultProtocol extends AbstractProtocol {
 				}
 				
 				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
+				System.out.println("DefaultProtocol.runGenerate(): calling stopSystem()");
 				stopSystem(system);
 				//If stopSystem did not really stop the system, we will do it for you ;-)
-				if (system != null && system.isRunning())
-					system.stop();
+				if (system != null && system.isRunning()) {
+                    System.out.println("DefaultProtocol.runGenerate(): calling system.stop()");
+                    system.stop();
+                }
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
 				ScreenshotSerialiser.finish();
@@ -1321,6 +1399,10 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(problems)
 					LogSerialiser.log("Sequence contained problems!\n", LogSerialiser.LogLevel.Critical);
 
+
+                //----------------------------------
+                // Calling finishSequence() from the protocol
+                //----------------------------------
 				finishSequence(currentSeq);
 
 				Verdict stateVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
@@ -1425,16 +1507,13 @@ public class DefaultProtocol extends AbstractProtocol {
 		while(mode() == Modes.Spy) {
 			if(system.isRunning()){
 				State state = getState(system);
-				if(state.get(Tags.Foreground)==true) {
-					visualizeSUT(system);
-				}else{
+				if(state==null) {
 					System.out.println("DefaultProtocol.runSpy(): SUT process is not on foreground!");
-					system = getRunningForegroundSUT();
+					system = getRunningForegroundSUT(); //TODO system is not updated back to caller of runSpy()
 					state = getState(system);
-					if(system!=null){
-						visualizeSUT(system);
-					}
+					//TODO what if state is still null?
 				}
+                visualizeSUT(system);
 			}else{
 				//System is not running, check if process has been changed and one of the SUT processes is on foreground
 				System.out.println("DefaultProtocol.runSpy(): SUT process is not running, trying to find SUT process!");

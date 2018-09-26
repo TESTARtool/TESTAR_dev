@@ -29,6 +29,7 @@
 
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Set;
 
 import es.upv.staq.testar.CodingManager;
@@ -98,14 +99,31 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 				CodingManager.buildIDs(state,a);
 			 	executeAction(system,state,a);
 			 	//waiting for the GUI to load:
-			 	try{
-			 		Thread.sleep(5000);
-				}catch (Exception e){
-			 		e.printStackTrace();
-				}
+			 	Util.pause(10);
 			 }
 		 }
-
+		 state = getState(system);
+		 for(Widget w : state){
+			 if(w.get(Tags.Title, "no title").equals("REPORTING")){
+				 Action a = ac.leftClickAt(w);
+				 //creating ConcreteID tag for the action:
+				 CodingManager.buildIDs(state,a);
+				 executeAction(system,state,a);
+				 //waiting for the GUI to load:
+				 Util.pause(1);
+			 }
+		 }
+		 state = getState(system);
+		 for(Widget w : state){
+			 if(w.get(Tags.Title, "no title").equals("Reporting")){
+				 Action a = ac.leftClickAt(w);
+				 //creating ConcreteID tag for the action:
+				 CodingManager.buildIDs(state,a);
+				 executeAction(system,state,a);
+				 //waiting for the GUI to load:
+				 Util.pause(4);
+			 }
+		 }
 		super.beginSequence(system, state);
 	}
 
@@ -184,6 +202,11 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
+		Set<Widget> widgets = deriveModalWidgets(state);
+		if(widgets.size()>0){
+			System.out.println("Ponsse protocol: there are "+widgets.size()+" modal widgets!");
+		}
+
 		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
 		for(Widget w : state){
 			//optional: iterate through top level widgets based on Z-index:
@@ -223,7 +246,15 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //								for(Tag t:w.tags()){
 //									System.out.println("DEBUG: "+t+"="+w.get(t));
 //								}
-							}else{
+							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Pienenna")){
+								// removing this action
+							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiWin")){
+								// removing this action
+							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiReport")){
+								// removing this action from Reporting - seems to crash
+							}
+							//TODO skip following actions: drag action
+							else{
 								//Store the widget in the Graphdatabase
 								storeWidget(state.get(Tags.ConcreteID), w);
 								//Create a left click action with the Action Compiler, and add it to the set of derived actions
@@ -252,6 +283,19 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 		//return the set of derived actions
 		return actions;
+	}
+
+	private Set<Widget> deriveModalWidgets(State state){
+		Set<Widget> widgets = new HashSet<Widget>();
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+
+		for(Widget w : state){
+			if(w.get(Tags.Modal, false)){
+				widgets.add(w);
+			}
+		}
+
+		return widgets;
 	}
 
 	/**
@@ -299,15 +343,16 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		System.out.println("Number of available actions: "+actions.size());
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			// returning pre-selected action
-		} else{
+		// disabling bring to foreground actions:
+//		Action a = preSelectAction(state, actions);
+//		if (a!= null) {
+//			// returning pre-selected action
+//		} else{
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = stateGraphWithVisitedActions.selectAction(state,actions);
+		Action a = stateGraphWithVisitedActions.selectAction(state,actions);
 			//a = RandomActionSelector.selectAction(actions);
-		}
+//		}
 		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
 		System.out.println("Selected action:" + a.get(Tags.Desc, "Desc not available"));
 		return a;
