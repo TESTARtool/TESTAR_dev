@@ -48,23 +48,11 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.ProcessInfo;
 import nl.ou.testar.SutVisualization;
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
 import org.fruit.UnProc;
 import org.fruit.Util;
-<<<<<<< HEAD
 import org.fruit.alayer.*;
-=======
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Taggable;
-import org.fruit.alayer.TaggableBase;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
->>>>>>> master
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.ActivateSystem;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
@@ -79,13 +67,7 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-<<<<<<< HEAD
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.windows.StateFetcher;
-import org.fruit.monkey.AbstractProtocol.Modes;
-=======
->>>>>>> master
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
@@ -97,12 +79,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -182,7 +159,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	public StateBuilder builder;
 	public List<ProcessInfo> processesBeforeSUT, sutProcesses, processesPreviouslyDetected;
 	public Iterable<Long> visibleWindowsBeforeSUT, visibleWindowsPreviouslyDetected;
-	public List<Long> sutWindows = new ArrayList<Long>();
+	public List<Long> sutWindows = new ArrayList<>();
 
 	//TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
 	//TODO move to TestarControlKeyCommands
