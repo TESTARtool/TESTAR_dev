@@ -109,6 +109,13 @@ When TESTAR finishes, the data be inspected in the database. The easiest way to 
 graph is to type the following query in the graph tab "Select * From E". This will display the complete
 graph.
 
+### Requirements for a protocol when using GraphDB.
+
+A part of the interaction with the graph database occurs in the method *deriveActions*. In this method, the available 
+widgets are stored as they are derived within the protocol. When using the graph database extension, the user needs
+to be aware the widgets are stored. When this is not done, the model in the database is incomplete. A sample can be 
+found in the protocol *desktop_generic_graphdb.java*.
+
 ### Exploring the graph database with Gremlin.
 
 [Gremlin](http://tinkerpop.apache.org/docs/current/reference/#_tinkerpop3) is a graph traversel engine which can be used 
