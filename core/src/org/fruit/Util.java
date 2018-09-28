@@ -727,7 +727,7 @@ public final class Util {
   }
 
   // refactored from testar -> ProtocolEditor (by urueda)
-  public static void compileJava(List<File> dir, String classPath) {
+  public static void compileJava(String destDir, List<File> dir, String classPath) {
     for (File f : dir) {
       System.out.println("Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
     }
@@ -744,7 +744,7 @@ public final class Util {
         options.add("-classpath");
         options.add(classPath);
         options.add("-d");
-        options.add("./settings/");
+        options.add(destDir);
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,
@@ -764,8 +764,8 @@ public final class Util {
     }
   }
 
-  public static void compileProtocol(String protocolClass) {
-    File compileDir = new File("./settings/" +
+  public static void compileProtocol(String settingsDir, String protocolClass) {
+    File compileDir = new File(settingsDir +
         new StringTokenizer(protocolClass, "/").nextToken());
     List<File> dir = Collections.singletonList(compileDir);
 
@@ -785,7 +785,7 @@ public final class Util {
         options.add("-classpath");
         options.add(System.getProperty("java.class.path"));
         options.add("-d");
-        options.add("./settings/");
+        options.add(settingsDir);
         JavaCompiler.CompilationTask task = compiler.getTask(
             null,
             fileManager,

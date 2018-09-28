@@ -54,14 +54,16 @@ import java.util.WeakHashMap;
 public class TESTAREnvironment implements IEnvironment {
   private TESTARGraph g;
 
+  private String graphOutputDir;
   // Concrete state ID -> actions
   private HashMap<String, Set<Action>> discoveredStateActions;
   private Map<String, IGraphState> cachedGetStates;
   private Map<String, IGraphAction> cachedGetActions;
   private List<ResumingMetrics> explorationCurve;
 
-  public TESTAREnvironment (String testSequencePath) {
+  public TESTAREnvironment (String graphOutputDir, String testSequencePath) {
     this(TESTARGraph.buildEmptyGraph());
+    this.graphOutputDir = graphOutputDir;
     this.discoveredStateActions = new HashMap<>();
     this.cachedGetStates = new WeakHashMap<>();
     this.cachedGetActions = new WeakHashMap<>();
@@ -620,6 +622,6 @@ public class TESTAREnvironment implements IEnvironment {
     // [1] = test table,
     // [2] = exploration curve,
     // [3] = UI exploration data
-    return GraphReporter.getReport(this, g, firstSequenceActionNumber);
+    return GraphReporter.getReport(this, graphOutputDir, g, firstSequenceActionNumber);
   }
 }
