@@ -34,6 +34,16 @@
  */
 package org.fruit.monkey;
 
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.AdhocServer;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 import static org.fruit.alayer.Tags.ActionDelay;
 import static org.fruit.alayer.Tags.ActionDuration;
 import static org.fruit.alayer.Tags.ActionSet;
@@ -70,7 +80,6 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
 
-import nl.ou.testar.StateModel.StateModelManager;
 import nl.ou.testar.StateModel.StateModelManagerFactory;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
@@ -113,20 +122,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.monkey.AbstractProtocol.Modes;
-
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol {
-
 
 	protected State state = null,
 			lastState = null;
@@ -887,13 +884,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * @return 'true' if problems were found.
 	 */
 	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
-		while(protocolUtil.adhocTestServerReader == null || protocolUtil.adhocTestServerWriter == null){
-			synchronized(this){
-				try {
-					this.wait(10);
-				} catch (InterruptedException e) {}
-			}
-		}
+		AdhocServer.waitReaderWriter(this);
 		int adhocTestInterval = 10; // ms
 		while (System.currentTimeMillis() < stampLastExecutedAction + adhocTestInterval){
 			synchronized(this){
@@ -905,23 +896,20 @@ public class DefaultProtocol extends AbstractProtocol {
 		do{
 			System.out.println("AdhocTest waiting for event ...");
 			try{
-				protocolUtil.adhocTestServerWriter.write("READY\r\n");
-				protocolUtil.adhocTestServerWriter.flush();
+				AdhocServer.adhocWrite("READY");
 			} catch (Exception e){
 				return true; // AdhocTest client disconnected?
 			}
 			try{
-				String socketData = protocolUtil.adhocTestServerReader.readLine().trim(); // one event per line
+				String socketData = AdhocServer.adhocRead(); // one event per line
 				System.out.println("\t... AdhocTest event = " + socketData);
-				userEvent = protocolUtil.compileAdhocTestServerEvent(socketData); // hack into userEvent
+				userEvent = AdhocServer.compileAdhocTestServerEvent(socketData); // hack into userEvent
 				if (userEvent == null){
-					protocolUtil.adhocTestServerWriter.write("???\r\n"); // not found
-					protocolUtil.adhocTestServerWriter.flush();									
+					AdhocServer.adhocWrite("???");
 				}else{
 					actionStatus.setAction(mapUserEvent(state));
 					if (actionStatus.getAction() == null){
-						protocolUtil.adhocTestServerWriter.write("404\r\n"); // not found
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("404");
 					}
 				}
 				userEvent = null;
@@ -1075,8 +1063,7 @@ public class DefaultProtocol extends AbstractProtocol {
 
 				if (mode() == Modes.AdhocTest){
 					try {
-						protocolUtil.adhocTestServerWriter.write("OK\r\n"); // adhoc action executed
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("OK");
 					} catch (Exception e){} // AdhocTest client disconnected?
 				}
 
@@ -1093,8 +1080,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			}else{
 				LogSerialiser.log("Execution of action failed!\n");
 				try {
-					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
-					protocolUtil.adhocTestServerWriter.flush();
+					AdhocServer.adhocWrite("FAIL");
 				} catch (Exception e) {
 					LogSerialiser.log("protocolUtil Failed!\n");
 				} // AdhocTest client disconnected?
