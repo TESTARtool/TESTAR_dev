@@ -138,6 +138,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	protected Verdict getProcessVerdict() {
 		return this.processVerdict;
 	}
+	protected boolean processListenerEnabled;
 
 	private StateBuilder builder;
 
@@ -171,6 +172,21 @@ public class DefaultProtocol extends AbstractProtocol {
 	}
 	
 	//TODO: Move out of DefaultProtocol?
+	protected boolean enableProcessListeners(){
+		//User doesn't want to enable
+		if(!settings().get(ConfigTags.ProcessListenerEnabled))
+			return false;
+		//Only for SUTs executed with command_line
+		if(!settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE"))
+			return false;
+
+		String path = settings().get(ConfigTags.SUTConnectorValue);
+		//Disable for browsers
+		if(path.contains("chrome.exe") || path.contains("iexplore.exe") || path.contains("firefox.exe") || path.contains("MicrosoftEdge"))
+			return false;
+
+		return true;
+	}
 	/**
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
@@ -178,7 +194,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	protected void processListeners(SUT system) {
 
 		//Only if we enabled ProcessListener and executed SUT with command_line
-		if(settings().get(ConfigTags.ProcessListenerEnabled) && settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+		if(processListenerEnabled){
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 			//Process Oracles use SuspiciousProcessOutput regular expression from test settings file
@@ -390,7 +406,8 @@ public class DefaultProtocol extends AbstractProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
+			processListenerEnabled = enableProcessListeners();
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), processListenerEnabled);
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
@@ -1202,9 +1219,9 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(system == null || !system.isRunning()) {
 					system = null;
 					system = startSystem();
-					processListeners(system);
 					this.cv = buildCanvas();
 				}
+				processListeners(system);
 
 				lastCPU = NativeLinker.getCPUsage(system);
 
@@ -1384,7 +1401,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 			system = startSystem();
-			processListeners(system);
+			//processListeners(system);
 			startedSpy = true;
 			Grapher.GRAPHS_ACTIVATED = false;
 			this.cv = buildCanvas();
