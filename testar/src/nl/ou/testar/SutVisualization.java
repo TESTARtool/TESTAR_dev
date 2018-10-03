@@ -4,7 +4,7 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.graph.IEnvironment;
 import es.upv.staq.testar.graph.IGraphState;
-import es.upv.staq.testar.protocols.ProtocolUtil;
+import es.upv.staq.testar.ProtocolUtil;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.devices.Mouse;

@@ -30,10 +30,7 @@
 
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.ProtocolEditor;
-import org.fruit.monkey.Settings;
-import org.fruit.monkey.SettingsDialog;
+import org.fruit.monkey.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -117,7 +114,8 @@ public class GeneralPanel extends JPanel {
 
     comboBoxProtocol = new JComboBox<>();
     comboBoxProtocol.setBounds(286, 248, 194, 20);
-    String[] sutSettings = new File("./settings/")
+ //   String[] sutSettings = new File("./settings/")
+    String[] sutSettings = new File(Main.getSettingsDir())
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
@@ -216,7 +214,7 @@ public class GeneralPanel extends JPanel {
   }
 
   private void btnEditProtocolActionPerformed(ActionEvent evt) {
-    JDialog dialog = new ProtocolEditor(settings.get(ConfigTags.ProtocolClass));
+    JDialog dialog = new ProtocolEditor(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
     dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
     dialog.setVisible(true);
   }

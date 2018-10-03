@@ -114,6 +114,7 @@ import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.monkey.AbstractProtocol.Modes;
 
 import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.AdhocServer;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.graph.Grapher;
@@ -900,13 +901,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * @return 'true' if problems were found.
 	 */
 	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
-		while(protocolUtil.adhocTestServerReader == null || protocolUtil.adhocTestServerWriter == null){
-			synchronized(this){
-				try {
-					this.wait(10);
-				} catch (InterruptedException e) {}
-			}
-		}
+		AdhocServer.waitReaderWriter(this);
 		int adhocTestInterval = 10; // ms
 		while (System.currentTimeMillis() < stampLastExecutedAction + adhocTestInterval){
 			synchronized(this){
@@ -918,23 +913,20 @@ public class DefaultProtocol extends AbstractProtocol {
 		do{
 			System.out.println("AdhocTest waiting for event ...");
 			try{
-				protocolUtil.adhocTestServerWriter.write("READY\r\n");
-				protocolUtil.adhocTestServerWriter.flush();
+				AdhocServer.adhocWrite("READY");
 			} catch (Exception e){
 				return true; // AdhocTest client disconnected?
 			}
 			try{
-				String socketData = protocolUtil.adhocTestServerReader.readLine().trim(); // one event per line
+				String socketData = AdhocServer.adhocRead(); // one event per line
 				System.out.println("\t... AdhocTest event = " + socketData);
-				userEvent = protocolUtil.compileAdhocTestServerEvent(socketData); // hack into userEvent
+				userEvent = AdhocServer.compileAdhocTestServerEvent(socketData); // hack into userEvent
 				if (userEvent == null){
-					protocolUtil.adhocTestServerWriter.write("???\r\n"); // not found
-					protocolUtil.adhocTestServerWriter.flush();									
+					AdhocServer.adhocWrite("???");
 				}else{
 					actionStatus.setAction(mapUserEvent(state));
 					if (actionStatus.getAction() == null){
-						protocolUtil.adhocTestServerWriter.write("404\r\n"); // not found
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("404");
 					}
 				}
 				userEvent = null;
@@ -1088,8 +1080,7 @@ public class DefaultProtocol extends AbstractProtocol {
 
 				if (mode() == Modes.AdhocTest){
 					try {
-						protocolUtil.adhocTestServerWriter.write("OK\r\n"); // adhoc action executed
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("OK");
 					} catch (Exception e){} // AdhocTest client disconnected?
 				}
 
@@ -1106,8 +1097,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			}else{
 				LogSerialiser.log("Execution of action failed!\n");
 				try {
-					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
-					protocolUtil.adhocTestServerWriter.flush();
+					AdhocServer.adhocWrite("FAIL");
 				} catch (Exception e) {
 					LogSerialiser.log("protocolUtil Failed!\n");
 				} // AdhocTest client disconnected?
@@ -1182,13 +1172,13 @@ public class DefaultProtocol extends AbstractProtocol {
 					settings.get(ConfigTags.GraphsActivated),
 					settings.get(ConfigTags.PrologActivated),
 					settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-							true :
-								settings.get(ConfigTags.GraphResuming),
-								settings.get(ConfigTags.OfflineGraphConversion),
-								jipWrapper);
+							true : settings.get(ConfigTags.GraphResuming),
+					settings.get(ConfigTags.OfflineGraphConversion),
+					settings.get(ConfigTags.OutputDir),
+					jipWrapper);
 
 			Grapher.waitEnvironment();
-			ScreenshotSerialiser.start(generatedSequence);
+			ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
 
 			problems = false;
 			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;

@@ -44,9 +44,10 @@ import org.fruit.alayer.AWTCanvas;
  *
  */
 public class ScreenshotSerialiser extends Thread {
-	
-	private static final String OUT_DIR = "output/scrshots/";	
-	private static String testSequenceFolder = null;
+
+    public static final String SCRSHOTS = "scrshots";
+    private static String testSequenceFolder = null;
+	private static String scrshotOutputFolder = null;
 	private static LinkedList<ScrshotRecord> scrshotSavingQueue =  new LinkedList<ScrshotRecord>();
 	private static final int QUEUE_LIMIT = 16; //32;
 	private static ScreenshotSerialiser singletonScreenshotSerialiser;
@@ -59,16 +60,17 @@ public class ScreenshotSerialiser extends Thread {
 	}
 	
 	private ScreenshotSerialiser(){}
-	private ScreenshotSerialiser(String testSequenceFolder){
+	private ScreenshotSerialiser(String scrshotOutputFolder, String testSequenceFolder){
 		ScreenshotSerialiser.testSequenceFolder = testSequenceFolder;
-		(new File(OUT_DIR + testSequenceFolder)).mkdirs();
+		ScreenshotSerialiser.scrshotOutputFolder = scrshotOutputFolder;
+		(new File(scrshotOutputFolder + File.separator + testSequenceFolder)).mkdirs();
 	}
 		
-	public static void start(String testSequenceFolder){
+	public static void start(String outputFolder, String testSequenceFolder){
 		Assert.isTrue(!alive);
 		Assert.isTrue(scrshotSavingQueue.isEmpty());
 		alive = true; queueBoost = false;
-		singletonScreenshotSerialiser = new ScreenshotSerialiser(testSequenceFolder);
+		singletonScreenshotSerialiser = new ScreenshotSerialiser(outputFolder + File.separator + SCRSHOTS, testSequenceFolder);
 		singletonScreenshotSerialiser.setPriority(Thread.MIN_PRIORITY);
 		singletonScreenshotSerialiser.start();
 	}
@@ -112,14 +114,14 @@ public class ScreenshotSerialiser extends Thread {
 	}
 	
 	public static String saveStateshot(String stateID, AWTCanvas stateshot){
-		String statePath = OUT_DIR + testSequenceFolder + "/" + stateID + ".png";
+		String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
 		if (!new File(statePath).exists())
 			savethis(statePath,stateshot);
 		return statePath;
 	}
 	
 	public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot){
-		String actionPath = OUT_DIR + testSequenceFolder + "/" + stateID + "_" + actionID + ".png";
+		String actionPath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + "_" + actionID + ".png";
 		if (!new File(actionPath).exists())
 			savethis(actionPath,actionshot);
 		return actionPath;
