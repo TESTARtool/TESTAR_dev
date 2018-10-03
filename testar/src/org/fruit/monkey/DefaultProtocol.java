@@ -34,16 +34,42 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.AdhocServer;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.IsRunning;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Title;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.concurrent.Semaphore;
+
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -85,44 +111,21 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.monkey.AbstractProtocol.Modes;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.AdhocServer;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol {
+
 
 	protected State state = null,
 			lastState = null;
@@ -1152,13 +1155,13 @@ public class DefaultProtocol extends AbstractProtocol {
 					settings.get(ConfigTags.GraphsActivated),
 					settings.get(ConfigTags.PrologActivated),
 					settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-							true :
-								settings.get(ConfigTags.GraphResuming),
-								settings.get(ConfigTags.OfflineGraphConversion),
-								jipWrapper);
+							true : settings.get(ConfigTags.GraphResuming),
+					settings.get(ConfigTags.OfflineGraphConversion),
+					settings.get(ConfigTags.OutputDir),
+					jipWrapper);
 
 			Grapher.waitEnvironment();
-			ScreenshotSerialiser.start(generatedSequence);
+			ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
 
 			problems = false;
 			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;

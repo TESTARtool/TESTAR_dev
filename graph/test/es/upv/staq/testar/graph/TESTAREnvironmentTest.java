@@ -45,7 +45,7 @@ public class TESTAREnvironmentTest {
 
   @Before
   public void createEnviroment () {
-    environment = new TESTAREnvironment("test");
+    environment = new TESTAREnvironment("output/graphs", "test");
   }
 
   @Test
