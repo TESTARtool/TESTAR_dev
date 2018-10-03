@@ -44,6 +44,7 @@ public class HtmlSequenceReport {
                     newFilenameFound = true;
                 }
             }
+            System.out.println("Starting sequence report into file: "+filename);
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);

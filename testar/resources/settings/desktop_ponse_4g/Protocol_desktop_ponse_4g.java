@@ -199,90 +199,116 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		//the foreground. You should add all other actions here yourself.
 		Set<Action> actions = super.deriveActions(system,state);
 
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		Set<Widget> widgets = deriveModalWidgets(state);
 		if(widgets.size()>0){
 			System.out.println("Ponsse protocol: there are "+widgets.size()+" modal widgets!");
+		}else{
+			System.out.println("Ponsse protocol: no modal widgets found.");
 		}
 
-		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
+		// Ponsse GUI has some modal pop-up dialogs - trying if getTopWidgets would handle those:
+		for(Widget w : getTopWidgets(state)){
+			Action action = derivePonsseAction(w);
+			if(action!=null){
+				actions.add(action);
+			}
+		}
 
-			//System.out.println("DEBUG: widget: "+w.toString());
+		if(actions.isEmpty()){
+			System.out.println("Ponsse protocol: found 0 actions from top level widgets, trying all widgets");
+			for(Widget w: state){
+				Action action = derivePonsseAction(w);
+				if(action!=null){
+					actions.add(action);
+				}
+			}
+		}
 
-			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true)
-					//&& !w.get(Blocked, false) //in Ponsse GUI all seem to be blocked
-					){
+		System.out.println("Ponsse protocol: found "+actions.size()+" actions (after filtering):");
+		for(Action a:actions){
+			System.out.println(a.get(Tags.Desc, "Desc not available"));
+		}
 
-				// Do not build actions for widgets on the blacklist
-				// The blackListed widgets are those that have been filtered during the SPY mode with the
-				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-				if (!blackListed(w)){
+		//return the set of derived actions
+		return actions;
+	}
 
-					//For widgets that are:
-					// - clickable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of left clicking on them
-					//if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) { //in Ponsse GUI apparently nothing is clickable
-					try{
-						if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAPane") && w.get(UIATags.UIAName).length()>0) { //in Ponsse GUI all buttons seem to have role "UIAPane"
-							// not pressing EcoDrive or Mittari buttons:
-							if(w.get(Tags.Title, "no title").equalsIgnoreCase("EcoDrive")){
-								// it seems in the Ponsse GUI there is no difference in the TESTAR parameters of "enabled" and "disabled" button
+	private Action derivePonsseAction(Widget w){
+		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		//optional: iterate through top level widgets based on Z-index:
+		//for(Widget w : getTopWidgets(state)){
+
+		//System.out.println("DEBUG: widget: "+w.toString());
+
+		// Only consider enabled and non-blocked widgets
+		if(w.get(Enabled, true)
+			//&& !w.get(Blocked, false) //in Ponsse GUI all seem to be blocked
+				){
+
+			// Do not build actions for widgets on the blacklist
+			// The blackListed widgets are those that have been filtered during the SPY mode with the
+			//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+			if (!blackListed(w)){
+
+				//For widgets that are:
+				// - clickable
+				// and
+				// - unFiltered by any of the regular expressions in the Filter-tab, or
+				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+				// We want to create actions that consist of left clicking on them
+				//if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) { //in Ponsse GUI apparently nothing is clickable
+				try{
+					if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAPane") && w.get(UIATags.UIAName).length()>0) { //in Ponsse GUI all buttons seem to have role "UIAPane"
+						// not pressing EcoDrive or Mittari buttons:
+						if(w.get(Tags.Title, "no title").equalsIgnoreCase("EcoDrive")){
+							// it seems in the Ponsse GUI there is no difference in the TESTAR parameters of "enabled" and "disabled" button
 //								System.out.println("-------------- EcoDrive -------------");
 //								for(Tag t:w.tags()){
 //									System.out.println("DEBUG: "+t+"="+w.get(t));
 //								}
 //
-							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Mittari")){
+						}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Mittari")){
 //								System.out.println("-------------- Mittari -------------");
 //								for(Tag t:w.tags()){
 //									System.out.println("DEBUG: "+t+"="+w.get(t));
 //								}
-							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Pienenna")){
-								// removing this action
-							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiWin")){
-								// removing this action
-							}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiReport")){
-								// removing this action from Reporting - seems to crash
-							}
-							//TODO skip following actions: drag action
-							else{
-								//Store the widget in the Graphdatabase
-								storeWidget(state.get(Tags.ConcreteID), w);
-								//Create a left click action with the Action Compiler, and add it to the set of derived actions
-								actions.add(ac.leftClickAt(w));
-							}
+						}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("Pienenna")){
+							// removing this action
+						}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiWin")){
+							// removing this action
+						}else if(w.get(Tags.Title, "no title").equalsIgnoreCase("OptiReport")){
+							// removing this action from Reporting - seems to crash
 						}
-					}catch(Exception e){}
-
-					//For widgets that are:
-					// - typeable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Store the widget in the Graphdatabase
-						storeWidget(state.get(Tags.ConcreteID), w);
-						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						//TODO skip following actions: drag action
+						else{
+							//Store the widget in the Graphdatabase
+							storeWidget(state.get(Tags.ConcreteID), w);
+							//Create a left click action with the Action Compiler, and add it to the set of derived actions
+							return(ac.leftClickAt(w));
+						}
 					}
-					//Add sliding actions (like scroll, drag and drop) to the derived actions
-					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+				}catch(Exception e){}
+
+				//For widgets that are:
+				// - typeable
+				// and
+				// - unFiltered by any of the regular expressions in the Filter-tab, or
+				// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+				// We want to create actions that consist of typing into them
+				if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+					//Store the widget in the Graphdatabase
+					storeWidget(state.get(Tags.ConcreteID), w);
+					//Create a type action with the Action Compiler, and add it to the set of derived actions
+					return(ac.clickTypeInto(w, this.getRandomText(w)));
 				}
+				//Add sliding actions (like scroll, drag and drop) to the derived actions
+				//method defined below.
+				//addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
 			}
 		}
-		//return the set of derived actions
-		return actions;
+		return null;
 	}
 
 	private Set<Widget> deriveModalWidgets(State state){
@@ -371,9 +397,9 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
 			System.out.println("Executing action: "+action.get(Tags.Desc));
-			for(Tag t:action.tags()){
-				System.out.println("Debug: "+t+"="+action.get(t));
-			}
+//			for(Tag t:action.tags()){
+//				System.out.println("Debug: "+t+"="+action.get(t));
+//			}
 			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
@@ -448,6 +474,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
+		htmlReport.close();
 		super.stopSystem(system);
 	}
 

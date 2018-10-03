@@ -160,7 +160,7 @@ public final class UIAStateBuilder implements StateBuilder {
 	public void finalize(){ release(); }
 
 	public UIAState apply(SUT system) throws StateBuildException {
-		System.out.println("DEBUG: UIAStateBuilder.apply(SUT)");
+//		System.out.println("DEBUG: UIAStateBuilder.apply(SUT)");
 		try {
 			Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
 																	   this.accessBridgeEnabled, this.SUTProcesses));
