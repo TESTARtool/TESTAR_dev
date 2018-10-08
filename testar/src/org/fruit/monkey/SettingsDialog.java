@@ -153,7 +153,7 @@ public class SettingsDialog extends JFrame implements Observer {
       settings.set(ConfigTags.Mode, mode);
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
-        compileProtocol(settings.get(ConfigTags.ProtocolClass));
+        compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
       }
       this.dispose();
     } catch (IllegalStateException ise) {
@@ -215,9 +215,10 @@ public class SettingsDialog extends JFrame implements Observer {
       return;
     }
     saveCurrentSettings();
-    new File("./settings/" + previousSSE).renameTo(new File("./settings/" + sse));
+    String settingsDir = Main.getSettingsDir();
+    new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
-      settingsFile = "./settings/" + sutSettings + "/" + Main.SETTINGS_FILE;
+      settingsFile = settingsDir + sutSettings + File.separator + Main.SETTINGS_FILE;
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");

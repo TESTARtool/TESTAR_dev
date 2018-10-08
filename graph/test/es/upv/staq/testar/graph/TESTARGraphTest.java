@@ -42,7 +42,7 @@ public class TESTARGraphTest {
 
    private TESTARGraph graph;
 
-   private TESTAREnvironment env = new TESTAREnvironment("junit");
+   private TESTAREnvironment env = new TESTAREnvironment( "output/graphs", "junit");
 
    @Before
    public void createSUT() {

@@ -121,8 +121,9 @@ public class Grapher implements Runnable {
 	public static boolean offlineGraphConversion = false;
 	
 	private static transient ExecutorService exeSrv;
-	
-	private Grapher(){}
+    private static String graphOutputDir = null;
+
+    private Grapher(){}
 	
 	public static String[] getRegisteredAlgorithms(){
 		return new String[]{
@@ -142,7 +143,7 @@ public class Grapher implements Runnable {
 	public static void grapher(String testSequencePath, int sequenceLength, boolean formsFilling, int typingTexts,
 							   String testGenerator, Double maxReward, Double discount,
 							   Integer explorationSampleInterval, boolean graphsActivated, boolean prologActivated,
-							   boolean graphResumingActivated, boolean offlineGraphConversion,
+							   boolean graphResumingActivated, boolean offlineGraphConversion, String outputDir,
 							   JIPrologWrapper jipWrapper) {
 		try {
 			synchronized(env){
@@ -174,6 +175,7 @@ public class Grapher implements Runnable {
 		Grapher.PROLOG_ACTIVATED = false;
 		Grapher.GRAPH_RESUMING_ACTIVATED = graphResumingActivated;
 		Grapher.offlineGraphConversion = offlineGraphConversion;
+		Grapher.graphOutputDir = outputDir + File.separator + "graphs";
 		Grapher.jipWrapper = jipWrapper;
 		exeSrv = Executors.newFixedThreadPool(1);
 		exeSrv.execute(singletonGrapher);
@@ -354,7 +356,7 @@ public class Grapher implements Runnable {
 	}
 
 	// try to resume previous test sequence graph
-	private void resumeGraph(){
+	private void resumeGraph(String graphOutputDir){
 		String prevSeq = null;
 		if (testSequencePath.startsWith("sequence")){
 			int ps = 0;
@@ -365,7 +367,7 @@ public class Grapher implements Runnable {
 			} catch(NumberFormatException nfe){}
 		}
 		if (prevSeq != null){
-			File f = new File("output/graphs/" + prevSeq);
+			File f = new File(graphOutputDir + File.separator + prevSeq);
 			String[] list = f.list(new FilenameFilter() {
 			    @Override
 			    public boolean accept(File dir, String name) {
@@ -388,7 +390,7 @@ public class Grapher implements Runnable {
 	@Override
 	public void run() {
 		long graphTime = System.currentTimeMillis();
-		GraphReporter.useGraphData(graphTime,testSequencePath);
+		GraphReporter.useGraphData(graphTime,testSequencePath, graphOutputDir);
 		//WalkReport wr = new WalkReport("Q-Learning", 0, 0, 0, 0, 0, 0);
 		//System.out.println(wr);
 		
@@ -426,8 +428,8 @@ public class Grapher implements Runnable {
 				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
 				Grapher.graphLoadingMovement = 0;
 			}
-			env = new TESTAREnvironment(testSequencePath);
-			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
+			env = new TESTAREnvironment(graphOutputDir, testSequencePath);
+			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph(graphOutputDir);
 		}
 
 		if (Grapher.GRAPHS_ACTIVATED){

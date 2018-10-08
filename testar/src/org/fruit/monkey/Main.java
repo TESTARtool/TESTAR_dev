@@ -52,6 +52,10 @@ import java.util.*;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
+  public static final String SETTINGS_DIR_PROPERTY = "SettingsDir";
+  public static final String SETTINGS_DIR_DEFAULT = "./settings/";
+
+  private static String settingsDir = null;
 
   // TODO: Understand what this exactly does?
   /**
@@ -157,6 +161,16 @@ public class Main {
     }
   }
 
+  public static String getSettingsDir() {
+    if (settingsDir == null) {
+      settingsDir = System.getenv(SETTINGS_DIR_PROPERTY);
+      if (settingsDir == null) {
+        settingsDir = SETTINGS_DIR_DEFAULT;
+      }
+      LogSerialiser.log("Property <" + SETTINGS_DIR_PROPERTY + "> set to <" + settingsDir + ">", LogSerialiser.LogLevel.Info);
+    }
+    return  settingsDir;
+  }
 
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
@@ -169,7 +183,7 @@ public class Main {
   //FIXME: This method throws a NullPointerException when you do not start testar explicitly from the bin directorybecause it cannot find the settings files
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./settings/").listFiles()) {
+    for (File f : new File(getSettingsDir()).listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -191,7 +205,7 @@ public class Main {
       }
       final String sse = s + SUT_SETTINGS_EXT;
       try {
-        File f = new File("./settings/" + sse);
+        File f = new File(getSettingsDir() + File.separator + sse);
         if (f.createNewFile()) {
           //System.out.println("Using <" + s + "> test settings");
           SSE_ACTIVATED = s;
@@ -209,7 +223,7 @@ public class Main {
    * @return A list of file names that have extension SUT_SETTINGS_EXT
    */
   public static String[] getSSE() {
-    return new File("./settings/").list(new FilenameFilter() {
+    return new File(getSettingsDir()).list(new FilenameFilter() {
       @Override
       public boolean accept(File dir, String name) {
         return name.endsWith(SUT_SETTINGS_EXT);
@@ -244,9 +258,13 @@ public class Main {
       //Use the only file that was found
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
+<<<<<<< HEAD
     //FIXME a bug: if there is *sse in the name of protocol, like in desktop_ponsse_4g, the path is cut like:
     //  Test settings is <./settings/desktop_po/test.settings>
     String testSettings = "./settings/" + SSE_ACTIVATED + "/" + SETTINGS_FILE;
+=======
+    String testSettings = getSettingsDir() + File.separator + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+>>>>>>> master
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // TODO: put the above code into a seperate method/class that returns the testSettings String
@@ -293,7 +311,9 @@ public class Main {
       }
       loader = new URLClassLoader(classPath);
 
-      String protocolClass = settings.get(ProtocolClass).split("/")[1];
+      String pc = settings.get(ProtocolClass);
+      String protocolClass = pc.substring(pc.lastIndexOf('/')+1, pc.length());
+//      String protocolClass = settings.get(ProtocolClass).split("/")[1];
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);

@@ -123,11 +123,10 @@ public final class WinProcess extends SUTBase {
 		System.out.println("WinProcess: fromExecutable(): path="+path);
 		try{
 			Assert.notNull(path);
-			
-			//TODO: With the new way of invoking the SUT, Chrome runs but remains "not responding" until TESTAR is closed,
-			//then loads (probably by the inclusion of --force-renderer-accessibility --incognito)
-			//It works with iexplore, but it's not necessary to spend resources. For browsers we need to interact with the ports.
-			if( !ProcessListenerEnabled || path.contains("chrome.exe") || path.contains("iexplore.exe")) {
+
+			//Disabled with browsers, only allow it with desktop applications executed with command_line
+			if(!ProcessListenerEnabled) {
+
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
 				long hProcess = handles[0];
 				long hThread = handles[1];
@@ -161,9 +160,11 @@ public final class WinProcess extends SUTBase {
 			ret.set(Tags.StdOut, p.getInputStream());
 			ret.set(Tags.StdIn, p.getOutputStream());
 		    
-		    Windows.CloseHandle(procHandle);
+			//Investigate why this cause issue with cpu
+		    //Windows.CloseHandle(procHandle);
 			
 			ret.set(Tags.Path, path);
+			ret.set(Tags.Desc, path);
 			return ret;
 		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
