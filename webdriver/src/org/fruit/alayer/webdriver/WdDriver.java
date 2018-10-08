@@ -5,19 +5,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.SUTBase;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
+import org.fruit.alayer.*;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -391,10 +387,22 @@ public class WdDriver extends SUTBase
     // Choose first or last tab, depending on user prefs
     activate();
 
+    // Wait until document is ready for script
+    waitDocumentReady();
+    waitCanvasReady(true);
+
     try {
       return webDriver.executeScript(script, args);
     }
-    catch (NoSuchWindowException nswe) {
+    catch (WebDriverException wde) {
+      // Canvas not present : add canvas and retry script
+      if (wde.getMessage().contains("testarCtx is not defined")) {
+        waitDocumentReady();
+        waitCanvasReady(true);
+        return webDriver.executeScript(script, args);
+      }
+
+      // Unknown error occurred
       return null;
     }
   }
@@ -403,9 +411,28 @@ public class WdDriver extends SUTBase
   {
     WebDriverWait wait = new WebDriverWait(webDriver, 60);
     ExpectedCondition<Boolean> documentReady = driver -> {
-      Object result = executeScript("return document.readyState");
+      Object result = webDriver.executeScript("return document.readyState");
       return result != null && result.equals("complete");
     };
     wait.until(documentReady);
+  }
+
+  // Add the canvas if the page doesn't have one
+  public static void waitCanvasReady(boolean first) {
+    try {
+      WebDriverWait wait = new WebDriverWait(webDriver, 60);
+      ExpectedCondition<Boolean> canvasReady = driver -> {
+        Object result = webDriver.executeScript("return addCanvasTestar()");
+        return result != null && result.equals("object");
+      };
+      wait.until(canvasReady);
+    }
+    catch (Exception e) {
+      // Try one more time
+      if (first) {
+        waitDocumentReady();
+        waitCanvasReady(false);
+      }
+    }
   }
 }

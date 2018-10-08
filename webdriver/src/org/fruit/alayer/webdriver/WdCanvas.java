@@ -2,9 +2,10 @@ package org.fruit.alayer.webdriver;
 
 import org.fruit.Assert;
 import org.fruit.Pair;
-import org.fruit.alayer.*;
-
-import static org.fruit.Util.pause;
+import org.fruit.alayer.Canvas;
+import org.fruit.alayer.Color;
+import org.fruit.alayer.FillPattern;
+import org.fruit.alayer.Pen;
 
 
 /**
@@ -46,12 +47,12 @@ public class WdCanvas implements Canvas {
 
   @Override
   public void begin() {
-    checkCanvasExists();
+
   }
 
   @Override
   public void end() {
-    
+
   }
 
   @Override
@@ -167,22 +168,5 @@ public class WdCanvas implements Canvas {
     }
 
     return true;
-  }
-
-
-  // Add the canvas if the page doesn't have one
-  private void checkCanvasExists() {
-    try {
-      WdDriver.waitDocumentReady();
-      WdDriver.executeScript("addCanvasTestar()");
-    }
-      catch (Exception e) {
-      // TODO
-      System.out.println();
-      e.printStackTrace();
-
-      pause(1);
-      checkCanvasExists();
-    }
   }
 }

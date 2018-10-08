@@ -53,7 +53,6 @@ public class WdStateFetcher implements Callable<WdState> {
 
   @SuppressWarnings("unchecked")
   public static WdRootElement buildRoot(SUT system) {
-    WdDriver.waitDocumentReady();
     Object result = WdDriver.executeScript(
         "return getStateTreeTestar(arguments[0])", Constants.ignoredTags);
 

@@ -24,7 +24,7 @@ public class WdTags extends TagsBase {
    */
   public static final Tag<String> WebItemType = from("WebItemType", String.class);
   public static final Tag<String> WebItemStatus = from("WebItemStatus", String.class);
-  public static final Tag<String> WebProviderDescription = from("WebProviderDescription", String.class);
+  public static final Tag<String> Desc = from("Desc", String.class);
 
   public static final Tag<String> WebTagName = from("WebTagName", String.class);
 

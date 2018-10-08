@@ -22,11 +22,11 @@
  */
 
 import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import es.upv.staq.testar.protocols.ProtocolUtil;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import org.fruit.alayer.*;
 import org.fruit.alayer.Shape;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -41,8 +41,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.*;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;

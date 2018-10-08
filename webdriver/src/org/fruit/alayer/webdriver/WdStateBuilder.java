@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 public class WdStateBuilder implements StateBuilder {
   private static final long serialVersionUID = -8640937524707589772L;
 
-  private static final int _defaultThreadPoolCount = 1;
+  private static final int defaultThreadPoolCount = 1;
 
   private final double timeOut;
   private transient ExecutorService executor;
@@ -19,7 +19,7 @@ public class WdStateBuilder implements StateBuilder {
     this.timeOut = timeOut;
 
     // Needed to be able to schedule asynchornous tasks conveniently.
-    executor = Executors.newFixedThreadPool(_defaultThreadPoolCount);
+    executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
   }
 
   @Override

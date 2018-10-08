@@ -1,7 +1,7 @@
 function addCanvasTestar() {
     // Only add when needed
-    if (typeof testar_canvas !== 'undefined') {
-        return;
+    if (typeof testar_canvas === 'object') {
+        return typeof testar_canvas;
     }
 
     // Create canvas, get reference to context
@@ -16,6 +16,8 @@ function addCanvasTestar() {
     // Make sure canvas keeps size of viewport on resize or scroll
     window.addEventListener('resize', resizeCanvasTestar, true);
     window.addEventListener('scroll', resizeCanvasTestar, true);
+
+    return typeof testar_canvas;
 }
 
 function canvasDimensionsTestar() {
