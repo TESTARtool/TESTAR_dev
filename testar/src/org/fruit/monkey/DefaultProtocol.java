@@ -34,15 +34,42 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+import static org.fruit.alayer.Tags.ActionDelay;
+import static org.fruit.alayer.Tags.ActionDuration;
+import static org.fruit.alayer.Tags.ActionSet;
+import static org.fruit.alayer.Tags.Desc;
+import static org.fruit.alayer.Tags.ExecutedAction;
+import static org.fruit.alayer.Tags.IsRunning;
+import static org.fruit.alayer.Tags.OracleVerdict;
+import static org.fruit.alayer.Tags.SystemState;
+import static org.fruit.alayer.Tags.Title;
+import static org.fruit.monkey.ConfigTags.LogLevel;
+import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.concurrent.Semaphore;
+
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -84,42 +111,18 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.monkey.AbstractProtocol.Modes;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import es.upv.staq.testar.ActionStatus;
+import es.upv.staq.testar.AdhocServer;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.graph.Grapher;
+import es.upv.staq.testar.managers.DataManager;
+import es.upv.staq.testar.prolog.JIPrologWrapper;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import es.upv.staq.testar.serialisation.TestSerialiser;
 
 public class DefaultProtocol extends AbstractProtocol {
 
@@ -135,6 +138,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	protected Verdict getProcessVerdict() {
 		return this.processVerdict;
 	}
+	protected boolean processListenerEnabled;
 
 	private StateBuilder builder;
 
@@ -173,6 +177,21 @@ public class DefaultProtocol extends AbstractProtocol {
 	}
 	
 	//TODO: Move out of DefaultProtocol?
+	protected boolean enableProcessListeners(){
+		//User doesn't want to enable
+		if(!settings().get(ConfigTags.ProcessListenerEnabled))
+			return false;
+		//Only for SUTs executed with command_line
+		if(!settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE"))
+			return false;
+
+		String path = settings().get(ConfigTags.SUTConnectorValue);
+		//Disable for browsers
+		if(path.contains("chrome.exe") || path.contains("iexplore.exe") || path.contains("firefox.exe") || path.contains("MicrosoftEdge"))
+			return false;
+
+		return true;
+	}
 	/**
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
@@ -180,7 +199,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	protected void processListeners(SUT system) {
 
 		//Only if we enabled ProcessListener and executed SUT with command_line
-		if(settings().get(ConfigTags.ProcessListenerEnabled) && settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+		if(processListenerEnabled){
 			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 			//Process Oracles use SuspiciousProcessOutput regular expression from test settings file
@@ -392,7 +411,8 @@ public class DefaultProtocol extends AbstractProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), settings().get(ConfigTags.ProcessListenerEnabled));
+			processListenerEnabled = enableProcessListeners();
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), processListenerEnabled);
 			//sut.setNativeAutomationCache();
 			Util.pause(settings().get(ConfigTags.StartupTime));
 			final long now = System.currentTimeMillis(),
@@ -886,13 +906,7 @@ public class DefaultProtocol extends AbstractProtocol {
 	 * @return 'true' if problems were found.
 	 */
 	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
-		while(protocolUtil.adhocTestServerReader == null || protocolUtil.adhocTestServerWriter == null){
-			synchronized(this){
-				try {
-					this.wait(10);
-				} catch (InterruptedException e) {}
-			}
-		}
+		AdhocServer.waitReaderWriter(this);
 		int adhocTestInterval = 10; // ms
 		while (System.currentTimeMillis() < stampLastExecutedAction + adhocTestInterval){
 			synchronized(this){
@@ -904,23 +918,20 @@ public class DefaultProtocol extends AbstractProtocol {
 		do{
 			System.out.println("AdhocTest waiting for event ...");
 			try{
-				protocolUtil.adhocTestServerWriter.write("READY\r\n");
-				protocolUtil.adhocTestServerWriter.flush();
+				AdhocServer.adhocWrite("READY");
 			} catch (Exception e){
 				return true; // AdhocTest client disconnected?
 			}
 			try{
-				String socketData = protocolUtil.adhocTestServerReader.readLine().trim(); // one event per line
+				String socketData = AdhocServer.adhocRead(); // one event per line
 				System.out.println("\t... AdhocTest event = " + socketData);
-				userEvent = protocolUtil.compileAdhocTestServerEvent(socketData); // hack into userEvent
+				userEvent = AdhocServer.compileAdhocTestServerEvent(socketData); // hack into userEvent
 				if (userEvent == null){
-					protocolUtil.adhocTestServerWriter.write("???\r\n"); // not found
-					protocolUtil.adhocTestServerWriter.flush();									
+					AdhocServer.adhocWrite("???");
 				}else{
 					actionStatus.setAction(mapUserEvent(state));
 					if (actionStatus.getAction() == null){
-						protocolUtil.adhocTestServerWriter.write("404\r\n"); // not found
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("404");
 					}
 				}
 				userEvent = null;
@@ -1074,8 +1085,7 @@ public class DefaultProtocol extends AbstractProtocol {
 
 				if (mode() == Modes.AdhocTest){
 					try {
-						protocolUtil.adhocTestServerWriter.write("OK\r\n"); // adhoc action executed
-						protocolUtil.adhocTestServerWriter.flush();
+						AdhocServer.adhocWrite("OK");
 					} catch (Exception e){} // AdhocTest client disconnected?
 				}
 
@@ -1092,8 +1102,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			}else{
 				LogSerialiser.log("Execution of action failed!\n");
 				try {
-					protocolUtil.adhocTestServerWriter.write("FAIL\r\n"); // action execution failed
-					protocolUtil.adhocTestServerWriter.flush();
+					AdhocServer.adhocWrite("FAIL");
 				} catch (Exception e) {
 					LogSerialiser.log("protocolUtil Failed!\n");
 				} // AdhocTest client disconnected?
@@ -1168,13 +1177,13 @@ public class DefaultProtocol extends AbstractProtocol {
 					settings.get(ConfigTags.GraphsActivated),
 					settings.get(ConfigTags.PrologActivated),
 					settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-							true :
-								settings.get(ConfigTags.GraphResuming),
-								settings.get(ConfigTags.OfflineGraphConversion),
-								jipWrapper);
+							true : settings.get(ConfigTags.GraphResuming),
+					settings.get(ConfigTags.OfflineGraphConversion),
+					settings.get(ConfigTags.OutputDir),
+					jipWrapper);
 
 			Grapher.waitEnvironment();
-			ScreenshotSerialiser.start(generatedSequence);
+			ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
 
 			problems = false;
 			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;
@@ -1215,9 +1224,9 @@ public class DefaultProtocol extends AbstractProtocol {
 				if(system == null || !system.isRunning()) {
 					system = null;
 					system = startSystem();
-					processListeners(system);
 					this.cv = buildCanvas();
 				}
+				processListeners(system);
 
 				lastCPU = NativeLinker.getCPUsage(system);
 
@@ -1397,7 +1406,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 			system = startSystem();
-			processListeners(system);
+			//processListeners(system);
 			startedSpy = true;
 			Grapher.GRAPHS_ACTIVATED = false;
 			this.cv = buildCanvas();

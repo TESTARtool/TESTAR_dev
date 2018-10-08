@@ -68,8 +68,6 @@ public class GraphReporter {
 
 	private static String testSequenceFolder = null;
 	
-	private static final String OUT_DIR = "output/graphs/";
-	
 	final static String THICK_PROPERTY = ", penwidth=3",
 						CLUSTER_THICK_PROPERTY = ", penwidth=5";
 	
@@ -82,10 +80,10 @@ public class GraphReporter {
 
 	private static HashMap<String,String> mapToAbstractStateIDs = new HashMap<String,String>(); // concrete -> abstract_R
 
-	public static void useGraphData(long graphTime, String testSequencePath){		
+	public static void useGraphData(long graphTime, String testSequencePath, String graphOutputDir){
 		GraphReporter.testSequenceFolder = testSequencePath.replaceAll(".*(sequence[0-9]*)", "$1");		
 		usingGraphTime = graphTime;
-		(new File(OUT_DIR + testSequenceFolder)).mkdirs();
+		(new File(graphOutputDir + File.separator + testSequenceFolder)).mkdirs();
 	}
 		
 	// [0] screenshots, [1] tiny, [2] minimal [3] abstract screenshoted, [4] abstract tiny, [5] abstract minimal
@@ -523,7 +521,8 @@ public class GraphReporter {
 		return new String[]{sb0.toString(),sb1.toString(),sb2.toString(),sb3.toString(),sb4.toString(),sb5.toString()};
 	}
 	
-	private static void dotConverter(String nullshotDotPath,
+	private static void dotConverter(String graphOutputDir,
+									 String nullshotDotPath,
 									 String scrshotedDotPath,
 									 String scrshotedAbstractDotPath,
 									 String minimalDotPath,
@@ -535,7 +534,7 @@ public class GraphReporter {
 			   p4S = "dot.exe -Tsvg " + abstractNullshotDotPath + " -o " + abstractNullshotDotPath + ".svg", // tiny abstract
 			   p5S = "dot.exe -Tsvg " + minimalAbstractDotPath + " -o " + minimalAbstractDotPath + ".svg", // minimal abstract
 			   p6S = "dot.exe -Tsvg " + scrshotedAbstractDotPath + " -o " + scrshotedAbstractDotPath + ".svg"; // screenshot abstract
-		String outDirS = OUT_DIR + testSequenceFolder + "/";
+		String outDirS = graphOutputDir + File.separator + testSequenceFolder + File.separator;
 		try {
 			FileWriter w = new FileWriter(outDirS + "offline_graph_conversion_"+ usingGraphTime + ".bat");
 			w.write(p5S + "\n"); // minimal abstract
@@ -596,9 +595,9 @@ public class GraphReporter {
 	}*/
 			
 	// TODO: RAM optimization for big graphs
-	public static void saveGraph(IEnvironment env, TESTARGraph g){
+	public static void saveGraph(IEnvironment env, String graphOutputDir, TESTARGraph g){
 		//System.out.print("\tExporting graph to xml ...");
-		g.saveToXML(env, OUT_DIR + testSequenceFolder + "/" + "graph_" + usingGraphTime + ".xml");
+		g.saveToXML(env, graphOutputDir + File.separator + testSequenceFolder + File.separator + "graph_" + usingGraphTime + ".xml");
 		//System.out.println("\t... xml graph export finished!");
 		
 		//System.out.print("\tPopulating .dot contents ...");
@@ -622,22 +621,22 @@ public class GraphReporter {
         		     minimalAbstractDotPath = "graph_" + usingGraphTime + "_minimal_abstract.dot";
         final String encoding = Charset.defaultCharset().name();
 		try {
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + scrshotedDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + scrshotedDotPath, encoding);
 			writer.println(scrshotedGraph);
 			writer.close();
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + scrshotedAbstractDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + scrshotedAbstractDotPath, encoding);
 			writer.println(scrshotedAbstractGraph);
 			writer.close();
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + nullshotDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + nullshotDotPath, encoding);
 			writer.println(nullshotGraph);
 			writer.close();
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + abstractNullshotDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + abstractNullshotDotPath, encoding);
 			writer.println(abstractNullshotGraph);
 			writer.close();			
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + minimalDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + minimalDotPath, encoding);
 			writer.println(minimalGraph);
 			writer.close();
-			writer = new PrintWriter(OUT_DIR + testSequenceFolder + "/" + minimalAbstractDotPath, encoding);
+			writer = new PrintWriter(graphOutputDir + File.separator + testSequenceFolder + File.separator + minimalAbstractDotPath, encoding);
 			writer.println(minimalAbstractGraph);
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -646,7 +645,7 @@ public class GraphReporter {
 		
 		Thread t = new Thread(){
 			public void run(){
-				dotConverter(nullshotDotPath, scrshotedDotPath, scrshotedAbstractDotPath, minimalDotPath, abstractNullshotDotPath, minimalAbstractDotPath);
+				dotConverter(graphOutputDir, nullshotDotPath, scrshotedDotPath, scrshotedAbstractDotPath, minimalDotPath, abstractNullshotDotPath, minimalAbstractDotPath);
 			}
 		};
 		t.setPriority(Thread.MIN_PRIORITY);
@@ -672,7 +671,7 @@ public class GraphReporter {
 	}
 	
 	 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
-	public static String[] getReport(TESTAREnvironment env, TESTARGraph g, int firstSequenceActionNumber){
+	public static String[] getReport(TESTAREnvironment env, String graphOutputDir, TESTARGraph g, int firstSequenceActionNumber){
 		if (g.vertexSet().isEmpty() || g.edgeSet().isEmpty())
 			return null; // empty graph
 		else if (!mapToAbstractStateIDs.isEmpty()){
@@ -681,7 +680,7 @@ public class GraphReporter {
 		}
 
 		//System.out.println("\tWill save graphs ...");
-		saveGraph(env,g);
+		saveGraph(env, graphOutputDir, g);
 		//System.out.println("\t... graphs saved!");
 		
 		//System.out.print("\tWill generate graph report ...");
