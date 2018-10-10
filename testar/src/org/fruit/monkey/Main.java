@@ -352,7 +352,7 @@ public class Main {
    * @throws ConfigException
    */
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-    Assert.notNull(file); // by urueda
+    Assert.notNull(file);
     try {
       List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
 
@@ -389,7 +389,7 @@ public class Main {
       defaults.add(Pair.from(StopGenerationOnFault, true));
       defaults.add(Pair.from(TimeToFreeze, 10.0));
       defaults.add(Pair.from(ShowSettingsAfterTest, true));
-      // begin by urueda
+      
       defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
       defaults.add(Pair.from(TestGenerator, "random"));
       defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -408,7 +408,7 @@ public class Main {
       defaults.add(Pair.from(UnattendedTests, false)); // disabled
       defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
       defaults.add(Pair.from(SUTProcesses, ""));
-      // end by urueda
+      
       defaults.add(Pair.from(GraphDBEnabled, false));
       defaults.add(Pair.from(GraphDBUrl, ""));
       defaults.add(Pair.from(GraphDBUser, ""));
@@ -422,6 +422,20 @@ public class Main {
 
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
+
+      //If user use command line to input properties, mix file settings with cmd properties
+      if(argv.length>0) {
+    	  try {
+    		  settings = Settings.fromFileCmd(defaults, file, argv);
+    	  }catch(Exception e) {
+    		  System.out.println("Error with command line properties. Examples:");
+    		  System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
+    		  System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
+    	  }
+    	  //SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
+    	  //SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
+      }
+
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
       //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
       //PrologActivated is ALWAYS false.
