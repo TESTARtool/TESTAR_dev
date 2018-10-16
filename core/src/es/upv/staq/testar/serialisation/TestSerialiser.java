@@ -72,6 +72,13 @@ public class TestSerialiser extends Thread {
 	
 	public static void finish(){
 		alive = false;
+		//System.out.println("Invoke Test Serialiser Finish");
+	}
+	
+	public static boolean stillWriting() {
+		if(!testSavingQueue.isEmpty())
+			return true;
+		return false;
 	}
 	
 	@Override
@@ -117,6 +124,7 @@ public class TestSerialiser extends Thread {
 	}
 	
 	public static void write(Taggable fragment){
+		//System.out.println("Invoke Write Queue");
 		if (alive){
 			synchronized(testSavingQueue){
 				testSavingQueue.add(fragment);
@@ -128,6 +136,7 @@ public class TestSerialiser extends Thread {
 		Assert.notNull(fragment);
 		try {
 			test.writeObject(fragment);
+			//System.out.println("We write on the sequence file");
 		} catch (IOException e) {
 			LogSerialiser.log("TestSerialiser - exception writing fragment: " + e.getMessage(),LogLevel.Critical);
 		}
@@ -144,6 +153,7 @@ public class TestSerialiser extends Thread {
 	}
 
 	public static void exit(){
+		//System.out.println("Invoke Test Serialiser Exit");
 		if (singletonTestSerialiser != null){
 			TestSerialiser.finish();
 			try {

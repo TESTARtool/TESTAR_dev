@@ -359,7 +359,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			};  
 			//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
 			//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
-			//¿ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
+			//ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
 			
 			new Thread(readErrors).start();
 			new Thread(readOutput).start();
@@ -1286,6 +1286,19 @@ public class DefaultProtocol extends AbstractProtocol {
 					}
 				}
 				
+				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+				TestSerialiser.write(fragment);
+				
+				//while or if condition? while can cause an infinite loop if something gone wrong
+				while(TestSerialiser.stillWriting()){
+					System.out.println("Wait... Saving sequences...");
+					synchronized(this){
+						try {
+							this.wait(1000);
+						} catch (InterruptedException e) {}
+					}
+				}
+				
 				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
 				stopSystem(system);
 				//If stopSystem did not really stop the system, we will do it for you ;-)
@@ -1294,8 +1307,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
 				ScreenshotSerialiser.finish();
-				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-				TestSerialiser.write(fragment);
+				
 				TestSerialiser.finish();
 				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
 
