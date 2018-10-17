@@ -31,7 +31,7 @@
 package nl.ou.testar.a11y.wcag2;
 
 /**
- * A WCAG 2.0 principle.
+ * A WCAG 2.0 principle
  * @author Davy Kager
  *
  */

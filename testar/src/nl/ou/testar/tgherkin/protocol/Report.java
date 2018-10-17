@@ -3,10 +3,11 @@ package nl.ou.testar.tgherkin.protocol;
 import java.text.SimpleDateFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import nl.ou.testar.GraphDB;
-import nl.ou.testar.utils.report.Reporter;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+
+import nl.ou.testar.GraphDB;
+import nl.ou.testar.utils.report.Reporter;
 
 /**
  * Utility for reporting DocumentProtocol execution results.
@@ -110,7 +111,7 @@ public class Report {
 		WHEN_DERIVED_ACTIONS;
 	}
 
-	private static Map<Enum<?>,Object> reportMap = new LinkedHashMap<Enum<?>,Object>() {
+	private static Map<Enum<?>,Object> reportMap = new LinkedHashMap<Enum<?>,Object>(){
 		private static final long serialVersionUID = 3224898550792301262L;
 	{
 		put(IntegerColumn.SEQUENCE_NR, "SequenceNr");
@@ -166,14 +167,14 @@ public class Report {
 	 * @param storeInTextFile indicator whether the report should be stored in a text file
 	 * @param storeInDB indicator whether the report should be stored in a database
 	 */
-	public static void report(State state, Action action, GraphDB graphDB, boolean storeInTextFile, boolean storeInDB) {
+	public static void report(State state, Action action, GraphDB graphDB, boolean storeInTextFile, boolean storeInDB){
 		if (storeInTextFile) {
 			StringBuilder reportDetail = new StringBuilder();
 			boolean notFirst = false;
 			for (Object value : reportMap.values()) {
 				if (notFirst) {
 					reportDetail.append(REPORT_SEPARATOR);
-				} else {
+				}else {
 					notFirst = true;
 				}
 				if (value != null) {
@@ -186,7 +187,7 @@ public class Report {
 		if (storeInDB) {
 			if (action != null) {
 				graphDB.addCustomType(action,"ReportedBy", getTgherkinInfo());
-			} else {
+			}else {
 				if (state != null) {
 					// initial state: no action has been performed yet
 					graphDB.addCustomType(state,"ReportedBy", getTgherkinInfo());
@@ -205,7 +206,7 @@ public class Report {
 	 * @param value report value
 	 * @return transformed value with corrections for usage of the report separator and line breaks
 	 */
-	public static String transformReportValue(String value) {
+	public static String transformReportValue(String value){
 		// if value contains report separator: escape any double quotes and enclose value by double quotes 
 		if (value.contains(REPORT_SEPARATOR)) {			
 			value = value.replace(DOUBLE_QUOTE, DOUBLE_QUOTE + DOUBLE_QUOTE);
@@ -220,9 +221,8 @@ public class Report {
 
 	private static TgherkinInfo getTgherkinInfo() {
 		TgherkinInfo info = new TgherkinInfo(
-				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis())
-				+ " " 
-				+ reportMap.get(IntegerColumn.SEQUENCE_NR) + "-" + reportMap.get(IntegerColumn.ACTION_NR));
+				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) +
+				" " + reportMap.get(IntegerColumn.SEQUENCE_NR) + "-" + reportMap.get(IntegerColumn.ACTION_NR));
 		// for now, do not pass null values to database
 		info.set(TgherkinTags.TGHERKIN_SEQUENCE_NR,getTgherkinValue(IntegerColumn.SEQUENCE_NR));
 		info.set(TgherkinTags.TGHERKIN_ACTION_NR,getTgherkinValue(IntegerColumn.ACTION_NR));

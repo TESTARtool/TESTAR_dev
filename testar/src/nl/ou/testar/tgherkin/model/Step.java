@@ -7,9 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import nl.ou.testar.tgherkin.protocol.DerivedGesturesReportItem;
-import nl.ou.testar.tgherkin.protocol.Report;
-import nl.ou.testar.utils.report.Reporter;
+
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
@@ -17,6 +15,10 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.monkey.ConfigTags;
+
+import nl.ou.testar.tgherkin.protocol.DerivedGesturesReportItem;
+import nl.ou.testar.tgherkin.protocol.Report;
+import nl.ou.testar.utils.report.Reporter;
 
 /**
  * Representation of a Tgherkin step.
@@ -215,7 +217,7 @@ public class Step {
 							setStatus(Status.FAILED);
 							result = false;
 						}
-					} else {
+					}else {
 						retryMode = true;
 					}
 				}	
@@ -240,7 +242,7 @@ public class Step {
 			Map<Widget,List<Gesture>> oldMap = copy(map);
 			if (whenClause.getConditionalGestures().size() > 0) {
 				evaluateWhenCondition(proxy, map, whenClause.getConditionalGestures(), dataTable);
-			} else {
+			}else {
 				// no list of conditional gestures in when clause: only NOP action must have been specified
 				map = new HashMap<Widget, List<Gesture>>();
 			}
@@ -255,29 +257,29 @@ public class Step {
 					if (proxy.getSettings().get(ConfigTags.ApplyDefaultOnMismatch)) {
 						// restore map if default should be applied 
 						map = oldMap;
-					} else {
+					}else {
 						setStatus(Status.FAILED);
 					}
-				} else {
+				}else {
 					retryMode = true;
 					Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 				}
-			} else {
+			}else {
 				Report.appendReportDetail(Report.BooleanColumn.WHEN_MISMATCH,false);
 			}
 		}
-		if (!retryMode && proxy.getSettings().get(ConfigTags.ReportDerivedGestures)) {
+		if (!retryMode && proxy.getSettings().get(ConfigTags.ReportDerivedGestures)){
 			Reporter.getInstance().report(new DerivedGesturesReportItem(false, proxy.getSequenceCount(), proxy.getActionCount(), map, nopAction));
 		}
 		// generate actions
 		return generateActions(proxy, map, dataTable, nopAction);
 	}
 	
-	private Set<Action> generateActions(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable dataTable, boolean nopAction) {
+	private Set<Action> generateActions(ProtocolProxy proxy, Map<Widget,List<Gesture>> map, DataTable dataTable, boolean nopAction){
 		Set<Action> actions = new HashSet<Action>();
 		if (retryMode) {
 			actions.add(new NOP());
-		} else {
+		}else {
 			Iterator<Map.Entry<Widget,List<Gesture>>> iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<Widget,List<Gesture>> entrySet = iterator.next();
@@ -319,14 +321,14 @@ public class Step {
 				}
 				if (newList.size() > 0) {
 					map.put(widget, newList);	
-				} else {
+				}else {
 					iterator.remove();
 				}
 			}
 		}
 	}
 
-	private static List<Gesture> getFilteredGestures(List<Gesture> originalList, Gesture gesture) {
+	private static List<Gesture> getFilteredGestures(List<Gesture> originalList, Gesture gesture){
 		List<Gesture> resultList = new ArrayList<Gesture>();
 		if (originalList.contains(gesture)) {
 			resultList.add(gesture);
@@ -344,9 +346,9 @@ public class Step {
 		return resultList;
 	}	
 
-	private static Map<Widget,List<Gesture>> copy(Map<Widget,List<Gesture>> original) {
+	private static Map<Widget,List<Gesture>> copy(Map<Widget,List<Gesture>> original){
 		Map<Widget,List<Gesture>> copy = new HashMap<Widget,List<Gesture>>();
-		for (Map.Entry<Widget,List<Gesture>> entry : original.entrySet()) {
+		for (Map.Entry<Widget,List<Gesture>> entry : original.entrySet()){
 			copy.put(entry.getKey(),new ArrayList<Gesture>(entry.getValue()));
 	    }
 		return copy;
@@ -376,14 +378,14 @@ public class Step {
 					Report.appendReportDetail(Report.BooleanColumn.THEN,false);					
 					return new Verdict(TGHERKIN_FAILURE, "Tgherkin step oracle failure!");
 				}
-			} else {
+			}else {
 				Report.appendReportDetail(Report.BooleanColumn.THEN_MISMATCH,false);
 			}
 		}
 		Report.appendReportDetail(Report.BooleanColumn.THEN,true);
 		if (getStatus() == Status.FAILED) {
 			return new Verdict(TGHERKIN_FAILURE, "Tgherkin step failure!");
-		} else {
+		}else {
 			setStatus(Status.PASSED);
 			if (isMismatch()) {
 				return new Verdict(Verdict.SEVERITY_MIN, "Default applied for Tgherkin step mismatch");

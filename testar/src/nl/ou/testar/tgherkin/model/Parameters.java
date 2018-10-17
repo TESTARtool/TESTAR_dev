@@ -8,7 +8,7 @@ import java.util.Set;
  * Class that defines the available Tgherkin parameter types.
  * 
  */
-public class Parameters {
+public class Parameters{
 
 	/**
 	 * Set of parameters. 

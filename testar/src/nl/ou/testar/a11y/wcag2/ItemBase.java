@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.fruit.Assert;
 
 /**
- * Base class for a WCAG item (principle, guideline, success criterion).
+ * Base class for a WCAG item (principle, guideline, success criterion)
  * @author Davy Kager
  *
  */
@@ -44,7 +44,7 @@ abstract class ItemBase implements Serializable {
 	private static final long serialVersionUID = 3593969061710272565L;
 
 	/**
-	 * This item's number.
+	 * This item's numbe
 	 */
 	protected final int nr;
 	
@@ -54,13 +54,13 @@ abstract class ItemBase implements Serializable {
 	protected final String name;
 	
 	/**
-	 * This item's parent.
+	 * This item's parent
 	 * This can be null if the item has no parent.
 	 */
 	protected final ItemBase parent;
 	
 	/**
-	 * Constructs a new item.
+	 * Constructs a new item
 	 * @param nr Item number
 	 * @param name Item name
 	 */
@@ -69,7 +69,7 @@ abstract class ItemBase implements Serializable {
 	}
 	
 	/**
-	 * Constructs a new item.
+	 * Constructs a new item
 	 * @param nr Item number
 	 * @param name Item name
 	 * @param parent The parent, may be null
@@ -82,7 +82,7 @@ abstract class ItemBase implements Serializable {
 	}
 
 	/**
-	 * Gets the number.
+	 * Gets the number
 	 * If the item is not at the top of the hierarchy, this will also include the parent's number.
 	 * For example: 1.2.3
 	 * @return This item's number as a String
@@ -92,7 +92,7 @@ abstract class ItemBase implements Serializable {
 	}
 
 	/**
-	 * Gets the name.
+	 * Gets the name
 	 * @return The name
 	 */
 	public String getName() {

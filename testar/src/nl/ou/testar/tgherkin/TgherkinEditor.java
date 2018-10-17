@@ -1,8 +1,8 @@
 /**
  *  Tgherkin editor.
  */
-
 package nl.ou.testar.tgherkin;
+
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -40,7 +40,7 @@ import org.fruit.Util;
  * TgherkinEditor is responsible for editing Tgherkin documents.
  * 
  */
-public class TgherkinEditor extends javax.swing.JDialog {
+public class TgherkinEditor extends javax.swing.JDialog{	
 
 	/**
 	 * Margin width in pixels.
@@ -152,7 +152,7 @@ public class TgherkinEditor extends javax.swing.JDialog {
 			}
 			if (errorList.size() == 0) {
 				console.setText(console.getText() + "OK");
-			} else {
+			}else {
 				StringBuilder stringBuilder = new StringBuilder();
 				for(String errorText : errorList) {
 					stringBuilder.append(errorText);
@@ -175,7 +175,7 @@ public class TgherkinEditor extends javax.swing.JDialog {
 			if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
 				check();
 			}
-		} else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		}else if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
 			this.dispose();
 		}
 	}                                     
@@ -189,13 +189,13 @@ public class TgherkinEditor extends javax.swing.JDialog {
 	}                                 
 
 	private void consoleKeyPressed(java.awt.event.KeyEvent evt) {                                   
-		if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
 			this.dispose();
 		}    
 	}                                  
 
 	private void btnCheckKeyPressed(java.awt.event.KeyEvent evt) {                                      
-		if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+		if(evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			this.dispose();
 		}    
 	}                                     
@@ -246,7 +246,7 @@ public class TgherkinEditor extends javax.swing.JDialog {
 						g.setFont(font);
 						if (isCurrentLine(startOffset)) {
 							g.setColor(Color.RED);
-						} else {
+						}else {
 							g.setColor(Color.BLACK);
 						}
 						g.drawString(lineNumber, x, y);
@@ -263,8 +263,6 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		 * Returns the line number of the element based on the given (start) offset
 		 * in the editor model. Returns null if no line number should or could be
 		 * provided (e.g. for wrapped lines).
-		 * @param offset offset in the editor model
-		 * @return line number
 		 */
 		private String getLineNumber(int offset) {
 			Element root = editor.getDocument().getDefaultRootElement();
@@ -279,9 +277,6 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		/**
 		 * Returns the y axis position for the line number belonging to the element
 		 * at the given (start) offset in the model.
-		 * @throws BadLocationException if error occurs	
-		 * @param offset offset in the model
-		 * @return offset for y coordinate
 		 */
 		private int getOffsetY(int offset) throws BadLocationException {
 			FontMetrics fontMetrics = editor.getFontMetrics(editor.getFont());
@@ -294,8 +289,6 @@ public class TgherkinEditor extends javax.swing.JDialog {
 		/**
 		 * Returns true if the given start offset in the model is the selected (by
 		 * cursor position) element.
-		 * @param offset offset in the model
-		 * @return current line
 		 */
 		private boolean isCurrentLine(int offset) {
 			int caretPosition = editor.getCaretPosition();

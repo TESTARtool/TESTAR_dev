@@ -13,27 +13,27 @@ public class ItemProcessor implements Runnable  {
 	 * Poll timeout in seconds.
 	 */
 	public static final long TIMEOUT = 10;
-	private BlockingQueue<Item> jobQueue;  
+	private BlockingQueue< Item> jobQueue;  
 	private volatile boolean keepProcessing;  
 
 	/**
 	 * Constructor.
 	 * @param queue queue with to be processed items.
 	 */
-	public ItemProcessor(BlockingQueue<Item> queue) {  
+	public ItemProcessor(BlockingQueue< Item > queue){  
 		jobQueue = queue;  
 		keepProcessing = true;  
 	}  
 
 	@Override
-	public void run() {  
-		while (keepProcessing || !jobQueue.isEmpty()) {  
-			try {  
+	public void run(){  
+		while(keepProcessing || !jobQueue.isEmpty()){  
+			try{  
 				Item item = jobQueue.poll(TIMEOUT, TimeUnit.SECONDS);  
-				if (item != null) {  
+				if(item != null){  
 					item.process();  
 				}  
-			} catch(InterruptedException ie) {  
+			}catch(InterruptedException ie){  
 				Thread.currentThread().interrupt();  
 				return;  
 			}  
@@ -43,7 +43,7 @@ public class ItemProcessor implements Runnable  {
 	/**
 	 * Cancel execution.
 	 */
-	public void cancelExecution() {  
+	public void cancelExecution(){  
 		this.keepProcessing = false;  
 	}  
 

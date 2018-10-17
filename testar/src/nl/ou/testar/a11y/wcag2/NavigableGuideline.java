@@ -33,16 +33,18 @@ package nl.ou.testar.a11y.wcag2;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.GremlinStart;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
 
 /**
- * A WCAG 2.0 guideline.
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
@@ -73,10 +75,9 @@ public final class NavigableGuideline extends AbstractGuideline {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
-		for (Widget w : widgets) {
+		for (Widget w : widgets)
 			// used during offline evaluation
 			w.set(WCAG2Tags.WCAG2IsWindow, AccessibilityUtil.isWindow(w));
-		}
 		return results;
 	}
 	
@@ -85,9 +86,9 @@ public final class NavigableGuideline extends AbstractGuideline {
 	public EvaluationResults query(GraphDB graphDB) {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Page Titled");
-		String gremlinTitleCount = "_().has('@class','Widget')"
-			+ ".has('" + WCAG2Tags.WCAG2IsWindow.name() +"',true)"
-			+ ".groupCount{it." + Tags.Title.name() + "}.cap";
+		String gremlinTitleCount = "_().has('@class','Widget')" +
+				".has('" + WCAG2Tags.WCAG2IsWindow.name() +"',true)" +
+				".groupCount{it." + Tags.Title.name() + "}.cap";
 		List<Object> titleCounts = graphDB.getObjectsFromGremlinPipe(gremlinTitleCount,
 				GremlinStart.VERTICES);
 		// the list contains one map with title counts
@@ -97,13 +98,12 @@ public final class NavigableGuideline extends AbstractGuideline {
 			if (entry.getValue() > SAME_TITLE_THRESHOLD) {
 				hasViolations = true;
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
-						"Possible ambiguous title \"" + entry.getKey()
-						+ "\" appeared " + entry.getValue() + " times"));
+						"Possible ambiguous title \"" + entry.getKey() +
+						"\" appeared " + entry.getValue() + " times"));
 			}
 		}
-		if (!hasViolations) {
+		if (!hasViolations)
 			results.add(evaluationPassed(sc));
-		}
 		return results;
 	}
 

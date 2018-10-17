@@ -1,32 +1,3 @@
-/***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-//cleanUpDirTTT
 package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.ConfigTags;
@@ -47,7 +18,7 @@ public class CleanUpPanel extends JPanel {
 	private static final int START_Y = 105;
 	private static final int START_SETTINGS_X = 70;
 	private static final int START_OUTPUT_X = 280;
-	private static final int DELTA = 26;
+	private static final int DELTA = 22;
 	private static final long serialVersionUID = 1L;
 	private String rootSettingsFolderName;
 	private String[] settingsDirs;
@@ -58,7 +29,8 @@ public class CleanUpPanel extends JPanel {
 	private int nOutputDirs;
 	private JCheckBox[] outputBox;
 	
-	private JButton delete;
+	private JButton btnDelete;
+	private JButton btnEmpty;
 	
 	public CleanUpPanel() {
 	}
@@ -72,21 +44,21 @@ public class CleanUpPanel extends JPanel {
 	public void populateFrom(final Settings settings) {
 		setLayout(null);
 		
-		// instructie regel
-		JLabel titel = new JLabel("Check the folder(s) you want to make empty");
+		// instruction
+		JLabel titel = new JLabel("Check the folder(s) you want to empty");
 		titel.setBounds(START_SETTINGS_X - GAP_X, START_Y - (int) (3.5  * DELTA), (int) (1.5 * BREEDTE), HOOGTE);
 		add(titel);
 
-		// root folder, sub folder en all folders
+		// root folder, sub folder and all folders
 		this.rootSettingsFolderName = settings.get(ConfigTags.OutputDir) + "/";
 		this.rootOutputFolderName = "./output/";
 
-		// instructie regel
+		// instruction
 		JLabel settingsLabel = new JLabel(rootSettingsFolderName);
 		settingsLabel.setBounds(START_SETTINGS_X - GAP_X, START_Y - 2 * DELTA, BREEDTE, HOOGTE);
 		add(settingsLabel);
 		
-		// instructie regel
+		// instruction
 		JLabel outputLabel = new JLabel(rootOutputFolderName);
 		outputLabel.setBounds(START_OUTPUT_X - 2 * GAP_X, START_Y - 2 * DELTA, BREEDTE, HOOGTE);
 		add(outputLabel);
@@ -95,33 +67,52 @@ public class CleanUpPanel extends JPanel {
 		settingsDirs = new File(rootSettingsFolderName).list(new FilenameFilter() {
 			@Override
 			public boolean accept(File current, String name) {
-				return !name.endsWith(OUTPUT_TYPE_LOG);
+				return !name.toLowerCase().endsWith(OUTPUT_TYPE_LOG);
 			}
 		});
 		this.nSettingsDirs = settingsDirs.length;
-		setupSettingsDirs();
+		boolean settingsBool = setupSettingsDirs();
 
 		outputDirs = new File(rootOutputFolderName).list(new FilenameFilter() {
 			@Override
 			public boolean accept(File current, String name) {
-				return !name.endsWith(OUTPUT_TYPE_CSV);
+				return !name.toLowerCase().endsWith(OUTPUT_TYPE_CSV);
 			}
 		});
 		this.nOutputDirs = outputDirs.length;
-		setupOutputDirs();
+		boolean outputBool = setupOutputDirs();
 
 		// delete button
-		delete = new JButton("Confirm deletion");
-		delete.setBounds(START_SETTINGS_X + GAP_X + BREEDTE, START_Y + (nSettingsDirs-1) * DELTA, BREEDTE, 2 * HOOGTE);
-		delete.addActionListener(new ActionListener() {
+		btnDelete = new JButton("Confirm deletion");
+		btnDelete.setBounds(START_SETTINGS_X + GAP_X + BREEDTE, START_Y + (nSettingsDirs-1) * DELTA, BREEDTE, 2 * HOOGTE);
+		btnEmpty = new JButton("No files to delete");
+		btnEmpty.setBounds(START_SETTINGS_X + GAP_X + BREEDTE, START_Y + (nSettingsDirs-1) * DELTA, BREEDTE, 2 * HOOGTE);
+		
+		if (settingsBool && outputBool) {
+			btnDelete.setEnabled(false);
+			btnDelete.setVisible(false);
+			btnEmpty.setEnabled(true);
+			btnEmpty.setVisible(true);
+		} else {
+			btnDelete.setEnabled(true);
+			btnDelete.setVisible(true);
+			btnEmpty.setEnabled(false);
+			btnEmpty.setVisible(false);			
+		}
+		
+		
+		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				actionButton();
 			}
 		});
-		add(delete);
+		add(btnEmpty);
+		add(btnDelete);
 	}
 
-	private void setupSettingsDirs() {
+	private boolean setupSettingsDirs() {
+		boolean empty = false;
+		int emptyAll = 0;
 		settingsBox = new JCheckBox[nSettingsDirs + 2];
 
 		// root folder
@@ -129,10 +120,11 @@ public class CleanUpPanel extends JPanel {
 		settingsBox[0].setBounds(START_SETTINGS_X, START_Y, BREEDTE, HOOGTE);
 		if (isEmptySettingsRoot()) {
 			settingsBox[0].setEnabled(false);
+			emptyAll++;
 		} else {
 			settingsBox[0].setEnabled(true);
-
 		}
+		
 		// sub folders
 		for (int i = 1; i < nSettingsDirs + 1; i++) {
 			settingsBox[i] = new JCheckBox(settingsDirs[i - 1]);
@@ -140,6 +132,7 @@ public class CleanUpPanel extends JPanel {
 			
 			if (isEmptySettingsDir(i)) {
 				settingsBox[i].setEnabled(false);
+				emptyAll++;
 			} else {
 				settingsBox[i].setEnabled(true);
 			}
@@ -147,9 +140,15 @@ public class CleanUpPanel extends JPanel {
 		// all folders
 		settingsBox[nSettingsDirs + 1] = new JCheckBox("Select all");
 		settingsBox[nSettingsDirs + 1].setBounds(START_SETTINGS_X - GAP_X, START_Y - DELTA, BREEDTE, HOOGTE);
-		settingsBox[nSettingsDirs + 1].setSelected(true);
+		empty = (emptyAll == nSettingsDirs + 1);
+		if (empty) {
+			settingsBox[nSettingsDirs + 1].setEnabled(false);
+		} else {
+			settingsBox[nSettingsDirs + 1].setEnabled(true);
+			settingsBox[nSettingsDirs + 1].setSelected(true);
+		}
 
-		// actionlisteners
+		// action listeners
 		for (int i = 0; i <= nSettingsDirs + 1; i++) {
 			int m = i;
 			settingsBox[i].addActionListener(new ActionListener() {
@@ -159,9 +158,12 @@ public class CleanUpPanel extends JPanel {
 			});
 			add(settingsBox[i]);
 		}
+		return empty;
 	}
 	
-	private void setupOutputDirs() {
+	private boolean setupOutputDirs() {
+		boolean empty = false;
+		int emptyAll = 0;
 		outputBox = new JCheckBox[nOutputDirs + 2];
 
 		// root folder
@@ -169,10 +171,11 @@ public class CleanUpPanel extends JPanel {
 		outputBox[0].setBounds(START_OUTPUT_X, START_Y, BREEDTE, HOOGTE);
 		if (isEmptyOutputRoot()) {
 			outputBox[0].setEnabled(false);
+			emptyAll++;
 		} else {
 			outputBox[0].setEnabled(true);
-
 		}
+
 		// sub folders
 		for (int i = 1; i < nOutputDirs + 1; i++) {
 			outputBox[i] = new JCheckBox(outputDirs[i - 1]);
@@ -180,16 +183,24 @@ public class CleanUpPanel extends JPanel {
 			
 			if (isEmptyOutputDir(i)) {
 				outputBox[i].setEnabled(false);
+				emptyAll++;
 			} else {
 				outputBox[i].setEnabled(true);
 			}
 		}
+		
 		// all folders
 		outputBox[nOutputDirs + 1] = new JCheckBox("Select all");
 		outputBox[nOutputDirs + 1].setBounds(START_OUTPUT_X - GAP_X, START_Y - DELTA, BREEDTE, HOOGTE);
-		outputBox[nOutputDirs + 1].setSelected(true);
+		empty = (emptyAll == nOutputDirs + 1);
+		if (empty) {
+			outputBox[nOutputDirs + 1].setEnabled(false);
+		} else {
+			outputBox[nOutputDirs + 1].setEnabled(true);
+			outputBox[nOutputDirs + 1].setSelected(true);
+		}
 		
-		// actionlisteners
+		// action listeners
 		for (int i = 0; i <= nOutputDirs + 1; i++) {
 			int m = i;
 			outputBox[i].addActionListener(new ActionListener() {
@@ -199,6 +210,7 @@ public class CleanUpPanel extends JPanel {
 			});
 			add(outputBox[i]);
 		}
+		return empty;
 	}
 
 	private void actionSettingsCheckBox(int i) {
@@ -209,6 +221,7 @@ public class CleanUpPanel extends JPanel {
 			}
 		}
 		if (i != (nSettingsDirs + 1)) {
+			outputBox[nOutputDirs + 1].setSelected(false);
 			settingsBox[nSettingsDirs + 1].setSelected(false);
 		}
 	}
@@ -222,14 +235,15 @@ public class CleanUpPanel extends JPanel {
 		}
 		if (i != (nOutputDirs + 1)) {
 			outputBox[nOutputDirs + 1].setSelected(false);
+			settingsBox[nSettingsDirs + 1].setSelected(false);
 		}
 	}
 	
 	private void actionButton() {
-		// all folders is geselecteerd
+		// all folders is selected
 		Boolean allSettingsChecked = settingsBox[nSettingsDirs + 1].isSelected();
 		for (int i = 0; i < nSettingsDirs + 1; i++) {
-			// all folders is geselecteerd of de desbetreffende folder
+			// all folders is selected or the specified folder is selected
 			if (settingsBox[i].isSelected() || allSettingsChecked) {
 				cleanSettingsDir(i);
 				settingsBox[i].setEnabled(false);
@@ -239,7 +253,7 @@ public class CleanUpPanel extends JPanel {
 		
 		Boolean allOutputChecked = outputBox[nOutputDirs + 1].isSelected();
 		for (int i = 0; i < nOutputDirs + 1; i++) {
-			// all folders is geselecteerd of de desbetreffende folder
+			// all folders is selected or the specified folder is selected
 			if (outputBox[i].isSelected() || allOutputChecked) {
 				cleanOutputDir(i);
 				outputBox[i].setEnabled(false);
@@ -259,8 +273,7 @@ public class CleanUpPanel extends JPanel {
 			if (!outputBox[i].isEnabled()) {
 				allOutputEmpty++;
 			}	
-		}
-		
+		}	
 		
 		if (allSettingsEmpty == nSettingsDirs + 1) {
 			settingsBox[nSettingsDirs + 1].setEnabled(false);
@@ -270,7 +283,8 @@ public class CleanUpPanel extends JPanel {
 		}
 		if (allSettingsEmpty == nSettingsDirs + 1 
 			&& allOutputEmpty == nOutputDirs + 1) {
-			delete.setEnabled(false);
+			btnDelete.setEnabled(false);
+			btnEmpty.setEnabled(true);
 		}
 	}
 	
@@ -313,7 +327,6 @@ public class CleanUpPanel extends JPanel {
 		}
 		return false;
 	}
-
 	
 	private boolean isEmptySettingsRoot() {
 		File[] files = 
@@ -345,6 +358,23 @@ public class CleanUpPanel extends JPanel {
 		return false;
 	}
 	
+	private void printLine(String string) {
+		System.out.println("++++ ");
+		System.out.println("++++ " + string);
+		int nf = string.length();
+		String stringf = "";
+		for (int j = 0; j < nf; j++) {
+			stringf = stringf + "-";
+		}
+		System.out.println("++++ " + stringf);
+	}
+	
+	private void printDelete(File f) {
+		if (f.delete()) {
+			System.out.println("++++ " + f.getName() + " deleted");
+		}
+	}
+
 	private void cleanSettingsDir(int i) {
 		String folderName;
 		if (i == 0) {
@@ -355,19 +385,12 @@ public class CleanUpPanel extends JPanel {
 		
 		File[] files = new File(folderName).listFiles();
 		
-		if (files.length > 0) {
-			System.out.println();
-			System.out.println(folderName);
-			for (int j = 0; j < folderName.length(); j++) {
-				System.out.print("-");
-			}
-			System.out.println();
-		}
+		if (files != null && files.length > 0) {
+			printLine(folderName);	
 		
-		for (File f : files) {
-			if (!f.isDirectory() && !f.getName().toLowerCase().contains("dummy")) {
-				if (f.delete()) {
-					System.out.println(f.getName() + " deleted");
+			for (File f : files) {
+				if (!f.isDirectory() && !f.getName().toLowerCase().contains("dummy")) {
+					printDelete(f);
 				}
 			}
 		}
@@ -383,30 +406,21 @@ public class CleanUpPanel extends JPanel {
 		
 		File[] files = new File(folderName).listFiles();
 		
-		if (files.length > 0) {
-			System.out.println();
-			System.out.println(folderName);
-			for (int j = 0; j < folderName.length(); j++) {
-				System.out.print("-");
-			}
-			System.out.println();
-		}
+		if (files != null && files.length > 0) {
+			printLine(folderName);
 		
-		for (File f : files) {
-
-			if (f.isDirectory()) {
-				String fname = f.getName();
-				System.out.println(folderName + "/" + fname);
-				File subfiles = new File(folderName + "/" + fname);
-				for (File g : subfiles.listFiles()) {
-					if (g.delete()) {
-						System.out.println(fname + "." + g.getName() + " deleted");
+			for (File f : files) {
+	
+				if (f.isDirectory()) {
+					String fname = f.getName();
+					printLine(folderName + "/" + fname);
+					
+					File subfiles = new File(folderName + "/" + fname);
+					for (File g : subfiles.listFiles()) {
+						printDelete(g);
 					}
-
 				}
-			}
-			if (f.delete()) {
-				System.out.println(f.getName() + " deleted");
+				printDelete(f);
 			}
 		}
 	}
