@@ -9,6 +9,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import nl.ou.testar.tgherkin.TgherkinException;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Shape;
@@ -20,10 +23,6 @@ import org.sikuli.script.Finder;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.tgherkin.TgherkinException;
-import nl.ou.testar.tgherkin.model.ProtocolProxy;
-
 /**
  * Singleton class responsible for image recognition.
  * This class supports the Tgherkin image function.
@@ -31,6 +30,7 @@ import nl.ou.testar.tgherkin.model.ProtocolProxy;
  */
 public class Image {
 
+	private int teller = 0;
 	private static final double TOLERANCE = 5E-16;
 	private static Image image = new Image();
 	private boolean invalidSikuliXInstallation;
@@ -47,24 +47,21 @@ public class Image {
 	 * Retrieve singleton instance.
 	 * @return singleton instance
 	 */
-	public static Image getInstance( ) {
+	public static Image getInstance() {
 		return image;
 	}
 	
-
-
 	/**
 	 * Collect image recognition results for all top widgets of the state.
 	 * @param proxy document protocol proxy 
 	 * @param imageFile name of the file with the reference image
 	 */
-	public void updateAllWidgets(ProtocolProxy proxy, String imageFile){
+	public void updateAllWidgets(ProtocolProxy proxy, String imageFile) {
 		for (Widget widget : proxy.getTopWidgets(state)) {
-			isRecognized(proxy, widget, imageFile);
+			;
 		}
 	}
 	
-
 	/**
 	 * Determine whether the widget image is recognized as the reference image.
 	 * @param proxy document protocol proxy
@@ -72,8 +69,9 @@ public class Image {
 	 * @param imageFile name of the file with the reference image
 	 * @return true if recognized, otherwise false
 	 */
-	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile){
-		return (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile) {
+		boolean istrue = (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+		return istrue;
 	}
 
 	/**
@@ -83,21 +81,21 @@ public class Image {
 	 * @param imageFile name of the file with the reference image
 	 * @return confidence value between 0 and 1 that indicates the level of confidence (1 is highest level)
 	 */
-	public Double getRecognitionConfidence(ProtocolProxy proxy, Widget widget, String imageFile){
+	public Double getRecognitionConfidence(ProtocolProxy proxy, Widget widget, String imageFile) {
 		return imageRecognition(proxy, widget, imageFile);
 	}
 
-	private Double imageRecognition(ProtocolProxy proxy, Widget widget, String imageFile){
+	private Double imageRecognition(ProtocolProxy proxy, Widget widget, String imageFile) {
 		if (state != proxy.getState()) {
 			state = proxy.getState();
 			imagesMap.clear();
 		}
 		double confidence = 0;
-		if (imagesMap.containsKey(imageFile)){
+		if (imagesMap.containsKey(imageFile)) {
 			if (imagesMap.get(imageFile).containsKey(widget)) {
 				return imagesMap.get(imageFile).get(widget);
 			}
-		}else {
+		} else {
 			imagesMap.put(imageFile, new HashMap<Widget, Double>());
 		}
 		try {
@@ -118,7 +116,7 @@ public class Image {
 					confidence = widgetShot.compareImage(refShot);
 				}
 			}	
-		}catch(Exception e) {
+		} catch(Exception e) {
 			throw new TgherkinException("Image recognition error");
 		}
 		imagesMap.get(imageFile).putIfAbsent(widget, confidence);
@@ -126,8 +124,8 @@ public class Image {
 	}
 
 	// SikuliX image recognition
-	private Double imageRecognition(ProtocolProxy proxy, BufferedImage refShot, BufferedImage widgetShot){
-		/* create image files for buffered images
+	private Double imageRecognition(ProtocolProxy proxy, BufferedImage refShot, BufferedImage widgetShot) {
+	  /* create image files for buffered images
 	    try {
             BufferedImage bi = widgetShot;
             File outputfile = new File("temp_image" + teller++ + ".png");
@@ -135,7 +133,7 @@ public class Image {
         } 
         catch (IOException e2) {
         }
-        */		
+        */
 		double confidence = 0;
 		if (!invalidSikuliXInstallation) {
 			try {
@@ -147,8 +145,7 @@ public class Image {
 				while (finder.hasNext()) {
 					Match match = finder.next();
 					// check if found rectangle covers minimum percentage of entire screen shot
-					final int percentageFactor = 100;
-					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * percentageFactor) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)){
+					if (((match.w * match.h) / (widgetShot.getWidth() * widgetShot.getHeight()) * 100) >= proxy.getSettings().get(ConfigTags.MinimumPercentageForImageRecognition)) {
 						if (confidence < match.getScore()) {
 							confidence = match.getScore(); 
 						}
@@ -158,14 +155,14 @@ public class Image {
 					LogSerialiser.log("Image recognition is based on SikuliX\n", LogSerialiser.LogLevel.Info);					
 					firstTime = false;	
 				}				
-			}catch(Throwable t) {
+			} catch(Throwable t) {
 				if (firstTime) {
 					// dirty workaround: SikuliX installation might be invalid, in that case the SikuliX setup has to be executed manually
 					// image recognition will continue with the standard Testar compareImage
 					firstTime = false;
 					invalidSikuliXInstallation = true;
 					LogSerialiser.log("Invalid SikuliX installation, switching to AWTCanvas.compareImage()\n", LogSerialiser.LogLevel.Info);
-				}else{
+				} else {
 					throw(t); 
 				}
 			}

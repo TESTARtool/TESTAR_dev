@@ -27,15 +27,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.ProtocolEditor;
-import org.fruit.monkey.Settings;
-import org.fruit.monkey.SettingsDialog;
+import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -43,13 +38,14 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
-
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
+import javax.swing.*;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.ProtocolEditor;
+import org.fruit.monkey.Settings;
+import org.fruit.monkey.SettingsDialog;
 
 public class GeneralPanel extends JPanel {
-
-  private static final long serialVersionUID = -7401834140061189752L;
-
+  private static final long serialVersionUID = 1L;
   private Settings settings;
   private JComboBox<String> cboxSUTconnector;
   private JTextArea txtSutPath;
@@ -142,12 +138,12 @@ public class GeneralPanel extends JPanel {
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);
 
-   // paCheckbox = new JCheckBox("Prolog activated");
-   // paCheckbox.setBounds(10, 282, 192, 21);
-   // add(paCheckbox);
+    paCheckbox = new JCheckBox("Prolog activated");
+    paCheckbox.setBounds(10, 282, 192, 21);
+    add(paCheckbox);
 
     offlineGraphConversionCheckBox = new JCheckBox("Offline graph conversion");
-    offlineGraphConversionCheckBox.setBounds(10, 282, 192, 23);
+    offlineGraphConversionCheckBox.setBounds(10, 304, 192, 23);
     add(offlineGraphConversionCheckBox);
   }
 
@@ -160,7 +156,7 @@ public class GeneralPanel extends JPanel {
     JButton btnEditProtocol = new JButton("Edit Protocol");
     btnEditProtocol.setBounds(286, 298, 194, 35);
     btnEditProtocol.addActionListener(this::btnEditProtocolActionPerformed);
-    btnEditProtocol.setToolTipText(btnEditProtocolTTT);
+    btnEditProtocol.setToolTipText("Edit the protocol");
     btnEditProtocol.setMaximumSize(new Dimension(160, 35));
     btnEditProtocol.setMinimumSize(new Dimension(160, 35));
     btnEditProtocol.setPreferredSize(new Dimension(160, 35));
@@ -236,7 +232,7 @@ public class GeneralPanel extends JPanel {
     esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
     offlineGraphConversionCheckBox.setSelected(settings.get(ConfigTags.OfflineGraphConversion));
     f2slCheckBox.setSelected(settings.get(ConfigTags.ForceToSequenceLength));
-    //paCheckbox.setSelected(settings.get(ConfigTags.PrologActivated));
+    paCheckbox.setSelected(settings.get(ConfigTags.PrologActivated));
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
     comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
@@ -255,7 +251,7 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
     settings.set(ConfigTags.ForceToSequenceLength, f2slCheckBox.isSelected());
-   // settings.set(ConfigTags.PrologActivated, paCheckbox.isSelected());
+    settings.set(ConfigTags.PrologActivated, paCheckbox.isSelected());
     settings.set(ConfigTags.OfflineGraphConversion, offlineGraphConversionCheckBox.isSelected());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());

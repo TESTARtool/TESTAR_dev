@@ -27,22 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
-
-import org.fruit.Pair;
-import org.fruit.Util;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import javax.swing.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.List;
-
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
@@ -50,10 +35,19 @@ import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
 import static org.fruit.monkey.dialog.ToolTipTexts.copyFilesTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.deleteFiles;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.List;
+import javax.swing.*;
+import org.fruit.Pair;
+import org.fruit.Util;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
 public class MiscPanel extends JPanel {
-
-  private static final long serialVersionUID = 8435304494218446662L;
-
+  private static final long serialVersionUID = 1L;
   private File currentDirectory;
   private JTable tblCopyFromTo;
   private JTable tblDelete;
@@ -307,10 +301,10 @@ public class MiscPanel extends JPanel {
       String right = (String) tblCopyFromTo.getValueAt(i, 1);
 
       if (left != null || right != null) {
-        if ((left != null && right == null) ||
-            (left == null && right != null) ||
-            left.trim().equals("") ||
-            right.trim().equals("")) {
+        if ((left != null && right == null) 
+        	|| (left == null && right != null) 
+            || left.trim().equals("") 
+            || right.trim().equals("")) {
           throw new IllegalStateException(
               "CopyFromTo Table has unfinished entries!");
         }

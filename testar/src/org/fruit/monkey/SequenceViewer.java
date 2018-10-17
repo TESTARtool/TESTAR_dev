@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
 import static org.fruit.monkey.ConfigTags.PathToReplaySequence;
@@ -71,17 +72,18 @@ import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
 
-public class SequenceViewer extends javax.swing.JFrame{
+public class SequenceViewer extends javax.swing.JFrame {
 
 	private static final long serialVersionUID = -7545369239319448135L;
-	ObjectInputStream stream;
-	BufferedImage buffer = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
-	int stateCount;
+	private ObjectInputStream stream;
+	private BufferedImage buffer = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
+	private int stateCount;
 	
 	// begin by urueda
 	private List<Taggable> cachedSequence;
 	private int sequenceViewIndex;
-	private static final int DIRECTION_NEXT = 1, DIRECTION_PREVIOUS = -1;
+	private static final int DIRECTION_NEXT = 1;
+	private static final int DIRECTION_PREVIOUS = -1;
 	// end by urueda
 
 	public SequenceViewer(Settings settings) {
@@ -91,7 +93,8 @@ public class SequenceViewer extends javax.swing.JFrame{
 		// begin by urueda
 		this.setTitle("Sequence viewer"); // by urueda
 		cachedSequence = new ArrayList<Taggable>();
-		sequenceViewIndex = -1; stateCount = -1;
+		sequenceViewIndex = -1; 
+		stateCount = -1;
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		// end by urueda
 	}
@@ -106,9 +109,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 		panel2 = new java.awt.Panel();
 		scrollPane1 = new java.awt.ScrollPane();
 
-		display = new Canvas(){
+		display = new Canvas() {
 			private static final long serialVersionUID = 5259423015295162447L;
-			public void paint(Graphics g){
+			public void paint(Graphics g) {
 				g.setColor(java.awt.Color.BLACK);
 				g.fillRect(0, 0, display.getWidth(), display.getHeight());
 				double wfactor = (double)(display.getWidth()) / (double)buffer.getWidth();
@@ -119,8 +122,8 @@ public class SequenceViewer extends javax.swing.JFrame{
 		};
 
 
-		addComponentListener(new ComponentAdapter(){
-			public void componentResized(ComponentEvent e){
+		addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
 				display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
 			}
 		});
@@ -203,7 +206,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}                      
 
 	// refactor by urueda
-	private void postActionPerformed(){
+	private void postActionPerformed() {
 		display.setBounds(0, 0, buffer.getWidth(), buffer.getHeight());
 		display.repaint();
 		display.paint(display.getGraphics());
@@ -258,7 +261,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}                	
 	
 	// refactor by urueda
-	public void movePic(Taggable fragment, int direction) throws IOException, ClassNotFoundException{
+	public void movePic(Taggable fragment, int direction) throws IOException, ClassNotFoundException {
 		State state = fragment.get(Tags.SystemState, new StdState());
 
 		//Image img = state.get(Tags.Screenshot, null);
@@ -266,7 +269,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 		String scrshotPath = state.get(Tags.ScreenshotPath, null);
 		Image img = AWTCanvas.fromFile(scrshotPath);
 		// end by urueda
-		if(img == null){
+		if (img == null) {
 			AWTCanvas awtc = new AWTCanvas(0.0, 0.0, new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB), AWTCanvas.StorageFormat.PNG, 1.0);
 			awtc.begin();
 			Pen blackFill = Pen.newPen().setColor(Color.Black).setFillPattern(FillPattern.Solid).build();
@@ -277,8 +280,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 			img = awtc;
 		}
 
-		if(img.width() != buffer.getWidth() || img.height() != buffer.getHeight())
+		if (img.width() != buffer.getWidth() || img.height() != buffer.getHeight()) {
 			buffer = new BufferedImage((int)img.width(), (int)img.height(), BufferedImage.TYPE_INT_ARGB);
+		}
 
 		AWTCanvas cv = new AWTCanvas(0.0, 0.0, buffer, AWTCanvas.StorageFormat.PNG, 1);
 		cv.begin();
@@ -288,10 +292,10 @@ public class SequenceViewer extends javax.swing.JFrame{
 		//Visualizer v = a.get(Tags.Visualizer, Util.NullVisualizer);
 		//v.run(state, cv, Pen.startFrom(Pen.DefaultPen).setColor(Color.Red).setFillPattern(FillPattern.Solid).build());
 		// begin by urued
-		if (state.childCount() > 0){
+		if (state.childCount() > 0) {
 			Shape sutShape = state.child(0).get(Tags.Shape);
 			List<Finder> targets = a.get(Tags.Targets, null);
-			if (targets != null){
+			if (targets != null) {
 				Assert.notNull(sutShape);
 				Visualizer v;
 				Widget w;
@@ -301,7 +305,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 						.setFillPattern(FillPattern.Stroke)
 						.setStrokeWidth(2.0)
 						.build();
-				for (Finder f : targets){
+				for (Finder f : targets) {
 					w = f.apply(state);
 					s = w.get(Tags.Shape);
 					Assert.notNull(s);
@@ -313,7 +317,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 			}
 		}
 		Verdict verdict = fragment.get(Tags.OracleVerdict, null);
-		if (verdict != null){
+		if (verdict != null) {
 			Pen penVerdict = Pen.startFrom(Pen.PEN_DEFAULT)
 					.setColor(Color.Blue)
 					.setFillPattern(FillPattern.Stroke)
@@ -331,10 +335,11 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}
 
 	// by urueda
-	public void beginPic() throws IOException, ClassNotFoundException{
-		synchronized(cachedSequence){			
-			if (sequenceViewIndex <= 0)
+	public void beginPic() throws IOException, ClassNotFoundException {
+		synchronized(cachedSequence) {			
+			if (sequenceViewIndex <= 0) {
 				return; // next must be invoked first! 
+			}
 	
 			int steps = sequenceViewIndex;
 			sequenceViewIndex = 0;		
@@ -343,19 +348,20 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}
 
 	// by urueda
-	public void prevPic() throws IOException, ClassNotFoundException{
-		synchronized(cachedSequence){			
-			if (sequenceViewIndex <= 0)
+	public void prevPic() throws IOException, ClassNotFoundException {
+		synchronized(cachedSequence) {			
+			if (sequenceViewIndex <= 0) {
 				return; // next must be invoked first! 
+			}
 	
 			sequenceViewIndex--;		
 			movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS); // refactor
 		}
 	}
 
-	public void nextPic() throws IOException, ClassNotFoundException{
-		synchronized(cachedSequence){ // by urueda			
-			if(stream == null){
+	public void nextPic() throws IOException, ClassNotFoundException {
+		synchronized(cachedSequence) { // by urueda			
+			if (stream == null) {
 				FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
 				//BufferedInputStream bis = new BufferedInputStream(fis);
 				BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
@@ -365,14 +371,16 @@ public class SequenceViewer extends javax.swing.JFrame{
 			Taggable fragment = null;
 
 			// begin by urueda
-			if (sequenceViewIndex < cachedSequence.size() - 1)
+			if (sequenceViewIndex < cachedSequence.size() - 1) {
 				fragment = cachedSequence.get(sequenceViewIndex + 1);
-			else {
+			} else {
 				// end by urueda
-				try{
+				try {
 					fragment = (Taggable) stream.readObject();
 					cachedSequence.add(fragment); // by urueda
-				} catch (IOException ioe){ return; }
+				} catch (IOException ioe) { 
+					return; 
+				}
 			}
 
 			// begin by urueda
@@ -383,9 +391,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}
 
 	// by urueda
-	public void endPic() throws IOException, ClassNotFoundException{
-		synchronized(cachedSequence){		
-			if(stream == null){
+	public void endPic() throws IOException, ClassNotFoundException {
+		synchronized(cachedSequence) {		
+			if (stream == null) {
 				FileInputStream fis = new FileInputStream(new File(settings.get(PathToReplaySequence)));
 				//BufferedInputStream bis = new BufferedInputStream(fis);
 				BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis)); // by urueda
@@ -396,20 +404,20 @@ public class SequenceViewer extends javax.swing.JFrame{
 			sequenceViewIndex = cachedSequence.size() - 1;
 			
 			Taggable fragment = null;
-			try{
-				do{
+			try {
+				do {
 					fragment = (Taggable) stream.readObject();
 					cachedSequence.add(fragment); // by urueda
 					steps++;
 					sequenceViewIndex++;
-				}while(true); // til end of file
+				} while (true); // til end of file
 			} catch (IOException ioe) { // end of file reached?
 				movePic(fragment == null ? cachedSequence.get(sequenceViewIndex) : fragment, steps); // refactor
 			}			
 		}
 	}	
 
-	public void updateInfo(String actionText){
+	public void updateInfo(String actionText) {
 		lblInfo.setText("State: " + Integer.toString(stateCount) + "  Action: " + actionText);
 	}
 
@@ -417,7 +425,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 
 	// prevent thread finish while dialog is visible
 	public void run() {
-		while(isShowing()){
+		while (isShowing()) {
 			Util.pause(1);
 		}
 	}

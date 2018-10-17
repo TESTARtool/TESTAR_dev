@@ -60,7 +60,7 @@ public class ScenarioOutline extends ScenarioDefinition {
 	public boolean moreActions(ProtocolProxy proxy) {
 		if (currentStep() != null && currentStep().hasNextAction(proxy, examples.getDataTable())) {
 			return true;
-		}else {
+		} else {
 			// search for next step with actions
 			int savedIndex = getIndex();
 			while (hasNextStep()) {
@@ -92,7 +92,7 @@ public class ScenarioOutline extends ScenarioDefinition {
 		if (currentStep() != null && currentStep().hasNextAction(proxy,examples.getDataTable())) {
 			// current step has more actions
 			currentStep().nextAction();
-		}else {
+		} else {
 			// search for next step with actions
 			while (hasNextStep()) {
 				nextStep();
@@ -116,7 +116,7 @@ public class ScenarioOutline extends ScenarioDefinition {
     @Override
 	public Verdict getVerdict(ProtocolProxy proxy) {
 		// scenario level
-		if (getOracle() != null && !getOracle().evaluate(proxy, examples.getDataTable())){
+		if (getOracle() != null && !getOracle().evaluate(proxy, examples.getDataTable())) {
 			setFailed();
 			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario outline oracle failure!");

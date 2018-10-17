@@ -30,25 +30,22 @@
 
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.SettingsDialog;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 
+import java.awt.*;
+import java.io.IOException;
+import javax.swing.*;
+import org.fruit.monkey.SettingsDialog;
+
 public class AboutPanel extends JPanel {
-
-  private static final long serialVersionUID = 5542811933551996647L;
-
+  private static final long serialVersionUID = 1L;
   private JLabel lblUPVLogo = getLogo("/icons/logos/upv.png");
   private JLabel testarLogo = getLogo("/icons/logos/testar_logo.png");
   private JLabel prosLogo = getLogo("/icons/logos/pros.png");
   private JLabel ouLogo = getLogo("/icons/logos/ou.jpg");
 
-  public AboutPanel () throws IOException {
+  public AboutPanel() throws IOException {
     setBackground(Color.WHITE);
 
     GroupLayout aboutPanelLayout = new GroupLayout(this);
@@ -83,7 +80,7 @@ public class AboutPanel extends JPanel {
 
   }
 
-  private JLabel getLogo (String iconPath) throws IOException{
+  private JLabel getLogo(String iconPath) throws IOException {
     return new JLabel(new ImageIcon(SettingsDialog.loadIcon(iconPath)));
   }
 }

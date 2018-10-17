@@ -4,22 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.gen.TgherkinParser.HitKeyArgumentContext;
 import nl.ou.testar.tgherkin.gen.TgherkinParserBaseVisitor;
-import nl.ou.testar.tgherkin.model.Gesture;
-import nl.ou.testar.tgherkin.model.HitKeyGesture;
-import nl.ou.testar.tgherkin.model.MouseMoveGesture;
-import nl.ou.testar.tgherkin.model.ParameterBase;
-import nl.ou.testar.tgherkin.model.Parameters;
-import nl.ou.testar.tgherkin.model.ConditionalRepeatingStep;
+
 import nl.ou.testar.tgherkin.model.AnyGesture;
 import nl.ou.testar.tgherkin.model.Background;
 import nl.ou.testar.tgherkin.model.ClickGesture;
 import nl.ou.testar.tgherkin.model.ConditionalGesture;
+import nl.ou.testar.tgherkin.model.ConditionalRepeatingStep;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
 import nl.ou.testar.tgherkin.model.DoubleClickGesture;
@@ -28,12 +21,17 @@ import nl.ou.testar.tgherkin.model.DragSliderGesture;
 import nl.ou.testar.tgherkin.model.DropDownAtGesture;
 import nl.ou.testar.tgherkin.model.Examples;
 import nl.ou.testar.tgherkin.model.Feature;
+import nl.ou.testar.tgherkin.model.Gesture;
+import nl.ou.testar.tgherkin.model.HitKeyGesture;
+import nl.ou.testar.tgherkin.model.MouseMoveGesture;
+import nl.ou.testar.tgherkin.model.NumberOfTimesRepeatingStep;
+import nl.ou.testar.tgherkin.model.ParameterBase;
+import nl.ou.testar.tgherkin.model.Parameters;
 import nl.ou.testar.tgherkin.model.RightClickGesture;
 import nl.ou.testar.tgherkin.model.Scenario;
 import nl.ou.testar.tgherkin.model.ScenarioDefinition;
 import nl.ou.testar.tgherkin.model.ScenarioOutline;
 import nl.ou.testar.tgherkin.model.Step;
-import nl.ou.testar.tgherkin.model.NumerOfTimesRepeatingStep;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.tgherkin.model.Tag;
@@ -42,6 +40,7 @@ import nl.ou.testar.tgherkin.model.TypeGesture;
 import nl.ou.testar.tgherkin.model.WhenClause;
 import nl.ou.testar.tgherkin.model.WidgetCondition;
 import nl.ou.testar.tgherkin.model.WidgetTreeCondition;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
  * The DocumentBuilder class creates the corresponding model of a Tgherkin text file.
@@ -56,22 +55,25 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 	 */
 	public static final String DATA_SEPARTATOR_META = "\\|";
 
-	private class ExecOptions{		
+	private class ExecOptions {
 		private List<Tag> excludeTags;
 		private List<Tag> includeTags;
+
 		private ExecOptions(List<Tag> excludeTags, List<Tag> includeTags) {
 			super();
 			this.excludeTags = excludeTags;
 			this.includeTags = includeTags;
 		}
+
 		private List<Tag> getExcludeTags() {
 			return excludeTags;
 		}
+
 		private List<Tag> getIncludeTags() {
 			return includeTags;
 		}
 	}
-	
+
 	private ExecOptions execOptions;
 	private List<WidgetCondition> widgetConditions;
 	private Queue<WidgetCondition.Type> operatorQueue = new LinkedList<WidgetCondition.Type>();
@@ -91,19 +93,19 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		Document document = new Document(features);
 		return document;
 	}
-	
+
 	@Override
 	public ExecOptions visitExecOptions(TgherkinParser.ExecOptionsContext ctx) {
 		List<Tag> excludeTags;
 		List<Tag> includeTags;
-		if (ctx.execOptionExclude() != null){
+		if (ctx.execOptionExclude() != null) {
 			excludeTags = visitExecOptionExclude(ctx.execOptionExclude()); 
-		}else {
+		} else {
 			excludeTags = new ArrayList<Tag>();
 		}
-		if (ctx.execOptionInclude() != null){
+		if (ctx.execOptionInclude() != null) {
 			includeTags = visitExecOptionInclude(ctx.execOptionInclude());
-		}else {
+		} else {
 			includeTags = new ArrayList<Tag>();
 		}
 		return new ExecOptions(excludeTags, includeTags);
@@ -126,7 +128,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		}		
 		return tags;		
 	}
-	
+
 	@Override 
 	public Feature visitFeature(TgherkinParser.FeatureContext ctx) {
 		List<Tag> tags = new ArrayList<Tag>();
@@ -167,7 +169,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 				scenarioDefinitions.add(scenarioDefinition);
 			}
 		}		
-		if (scenarioDefinitions.size() == 0 ) {
+		if (scenarioDefinitions.size() == 0) {
 			// no scenarios selected for the execution option settings.
 			return null;
 		}
@@ -348,12 +350,12 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 			thenCondition = visitThenClause(ctx.thenClause());
 		}
 		if (ctx.stepIteration() != null) {
-			if (ctx.stepIteration().stepRange()!=null) {
+			if (ctx.stepIteration().stepRange() != null) {
 				int fromRange = Integer.valueOf(ctx.stepIteration().stepRange().from.getText());
 				int toRange = Integer.valueOf(ctx.stepIteration().stepRange().to.getText());
-				return new NumerOfTimesRepeatingStep(title, fromRange, toRange, givenCondition, whenClause, thenCondition);
+				return new NumberOfTimesRepeatingStep(title, fromRange, toRange, givenCondition, whenClause, thenCondition);
 			}
-			if (ctx.stepIteration().stepWhile()!=null) {
+			if (ctx.stepIteration().stepWhile() != null) {
 				widgetConditions = new ArrayList<WidgetCondition>();
 				operatorQueue.add(null);
 				if (ctx.stepIteration().stepWhile().widget_tree_condition() != null) {
@@ -361,7 +363,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 				}
 				return new ConditionalRepeatingStep(title, ConditionalRepeatingStep.Type.WHILE_STEP, new WidgetTreeCondition(widgetConditions), givenCondition, whenClause, thenCondition);
 			}
-			if (ctx.stepIteration().stepRepeatUntil()!=null) {
+			if (ctx.stepIteration().stepRepeatUntil() != null) {
 				widgetConditions = new ArrayList<WidgetCondition>();
 				operatorQueue.add(null);
 				if (ctx.stepIteration().stepRepeatUntil().widget_tree_condition() != null) {
@@ -379,7 +381,7 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
 		operatorQueue.add(null);
 		if (ctx.widget_tree_condition() != null) {
 			visit(ctx.widget_tree_condition());
-		}else {
+		} else {
 			// no condition defined: always true
 			widgetConditions.add(new WidgetCondition("true"));
 		}

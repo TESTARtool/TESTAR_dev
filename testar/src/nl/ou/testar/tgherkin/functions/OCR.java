@@ -7,19 +7,22 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 
-import net.sourceforge.tess4j.*;
-import nl.ou.testar.tgherkin.TgherkinException;
-import nl.ou.testar.tgherkin.model.ProtocolProxy;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import javax.imageio.ImageIO;
+import net.sourceforge.tess4j.*;
+
+import nl.ou.testar.tgherkin.TgherkinException;
+import nl.ou.testar.tgherkin.model.ProtocolProxy;
 
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
@@ -37,6 +40,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
  */
 public class OCR {
 
+	private static int teller = 0;
 	/**
 	 * Tesseract OCR data path.
 	 */
@@ -65,12 +69,12 @@ public class OCR {
 	/**
 	 * Jar entry name.  
 	 */
-	public static final String JAR_ENTRY_NAME = "jar:file:./lib/" + TESS4J_JAR + "!/tessdata/" + TESSERACT_LANGUAGE + TESSERACT_LANGUAGE_SUFFIX;
+	public static final String JAR_ENTRY_NAME = "jar:file:./lib/" + TESS4J_JAR + "!/tessdata/eng.traineddata";
 
 	/**
 	 * Target file for extraction of Jar entry. 
 	 */
-	public static final String TARGET_FILE = "resources/output/Temp/" + TESSERACT_LANGUAGE + TESSERACT_LANGUAGE_SUFFIX;
+	public static final String TARGET_FILE = "resources/output/Temp/eng.traineddata";
 	
 	private static OCR ocr = new OCR();
 	private State state;
@@ -79,11 +83,11 @@ public class OCR {
 	// private Constructor prevents instantiation by other classes.
 	private OCR() {
 		File file = new File(TESSERACT_LANGUAGE_FILE); 
-		if(!file.exists() || file.isDirectory()) {
+		if (!file.exists() || file.isDirectory()) {
 			// if tesseract data not available then extract tesseract data file from jar
-			try{
+			try {
 				extractTesseractDataFromJar();
-			}catch(Exception e) {
+			} catch(Exception e) {
 				throw new TgherkinException("Extraction of Tesseract data failed with exception: " + e.getMessage().toString());
 			}
 		}
@@ -93,7 +97,7 @@ public class OCR {
 	 * Retrieve singleton instance.
 	 * @return singleton instance
 	 */
-	public static OCR getInstance( ) {
+	public static OCR getInstance() {
 		return ocr;
 	}
 	
@@ -139,20 +143,18 @@ public class OCR {
 			op.filter(widgetShot.image(),grayImage);
 			try {
 				result = getOCR(grayImage);
-			}catch(Throwable t) {
+			} catch(Throwable t) {
 				LogSerialiser.log(t.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
 			}
 		}	
-		if (result !=null) {
+		if (result != null) {
 			result = result.trim();
 		}
 		ocrMap.putIfAbsent(widget, result);
 		return result;
-	}
+	}	
 	
-	
-	private static String getOCR(java.awt.image.BufferedImage bi) {
-	    
+	private static String getOCR(java.awt.image.BufferedImage bi) {  
 		String result = null;
 		ITesseract instance = new Tesseract();  // JNA Interface Mapping
         instance.setDatapath(TESSERACT_DATA_PATH);
@@ -168,6 +170,7 @@ public class OCR {
 	private static void extractTesseractDataFromJar() throws Exception {
 		InputStream in = null;
 		OutputStream out = null;
+		
 		try {
 			// to access a Jar content from the local file system
 			URL url = new URL(JAR_ENTRY_NAME);
@@ -186,7 +189,7 @@ public class OCR {
 				out.write(buffer, 0, nBytes);
 			}
 			LogSerialiser.log("Tesseract OCR data file has been extracted.\n", LogSerialiser.LogLevel.Info);
-		}finally {
+		} finally {
 			if (in != null) {
 				in.close();
 			}

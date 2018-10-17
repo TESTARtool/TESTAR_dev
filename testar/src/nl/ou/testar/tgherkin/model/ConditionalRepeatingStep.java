@@ -31,7 +31,7 @@ public class ConditionalRepeatingStep extends RepeatingStep {
      * @param type type of loop
      * @param loopCondition condition that defines repetition of the step
      * @param givenCondition widget tree condition that defines the Given clause
-     * @param whenClause definition of the When clause
+     * result.append(getGivenCondition().toString());
      * @param thenCondition widget tree condition that defines the Then clause
      */
     public ConditionalRepeatingStep(String title, Type type, WidgetTreeCondition loopCondition, WidgetTreeCondition givenCondition, WhenClause whenClause, WidgetTreeCondition thenCondition) {
@@ -88,7 +88,7 @@ public class ConditionalRepeatingStep extends RepeatingStep {
     	result.append(System.getProperty("line.separator"));
     	if (getType() == Type.WHILE_STEP) {
     		result.append("While " + getLoopCondition().toString());	
-    	}else{
+    	} else {
     		result.append("Repeat until " + getLoopCondition().toString());
     	}
     	result.append(System.getProperty("line.separator"));

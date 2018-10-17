@@ -18,7 +18,7 @@ public class TgherkinImageFileAnalyzer extends TgherkinParserBaseVisitor<Object>
 
 	@Override 
 	public List<String> visitDocument(TgherkinParser.DocumentContext ctx) { 
-		for (TgherkinParser.FeatureContext featureContext : ctx.feature()){
+		for (TgherkinParser.FeatureContext featureContext : ctx.feature()) {
 			visitFeature(featureContext);
 		}
 		return imageList;
@@ -27,7 +27,7 @@ public class TgherkinImageFileAnalyzer extends TgherkinParserBaseVisitor<Object>
 	@Override 
 	public Object visitImageFunction(TgherkinParser.ImageFunctionContext ctx) { 
 		// unquote 
-		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		imageList.add(imageFile); 
 		return visitChildren(ctx); 
 	}

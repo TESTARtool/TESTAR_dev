@@ -31,8 +31,8 @@
 /**
  * @author Sebastian Bauersfeld
  */
-package org.fruit.monkey;
 
+package org.fruit.monkey;
 
 import static java.util.logging.Logger.getLogger;
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
@@ -44,8 +44,8 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
-import nl.ou.testar.SubroutinePanel;
 import nl.ou.testar.TgherkinPanel;
+
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -74,6 +74,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private String settingsFile;
   private Settings settings;
+  //TODO: what is this ret variable. Can´t you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -91,7 +92,6 @@ public class SettingsDialog extends JFrame implements Observer {
   private CleanUpPanel cleanUpPanel;
   private GraphDBPanel graphDBPanel;
   private TgherkinPanel tgherkinPanel;
-  private SubroutinePanel subroutinePanel;
 
   /**
    * Starts the settings Dialog.
@@ -148,7 +148,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog.
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(AbstractProtocol.Modes mode) {
@@ -161,12 +161,14 @@ public class SettingsDialog extends JFrame implements Observer {
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(settings.get(ConfigTags.ProtocolClass));
       }
+ 
       this.dispose();
+
     } catch (IllegalStateException ise) {
       JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
     }
   }
-
+  
   private void checkSettings(Settings settings) throws IllegalStateException {
     String userInputPattern = settings.get(ConfigTags.ProcessesToKillDuringTest);
     try {
@@ -188,6 +190,7 @@ public class SettingsDialog extends JFrame implements Observer {
     } catch (PatternSyntaxException exception) {
       throw new IllegalStateException("Your Oracle is not a valid regular expression!");
     }
+
     if (!new File(settings.get(ConfigTags.OutputDir)).exists()) {
       throw new IllegalStateException("Output Directory does not exist!");
     }
@@ -202,8 +205,7 @@ public class SettingsDialog extends JFrame implements Observer {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
-      System.out.println("Saved current settings to <" + settingsFile + ">");
+      System.out.println("[" + getClass().getSimpleName() + "] Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
     }
@@ -211,7 +213,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    * This replaces the original test.settings file with a complete settings file
-   * @param sutSettings  settings of the SUT
+   * @param sutSettings   settings of the SUT
    */
   private void switchSettings(String sutSettings) {
     String previousSSE = Main.getSSE()[0];
@@ -241,8 +243,6 @@ public class SettingsDialog extends JFrame implements Observer {
     cleanUpPanel.populateFrom(settings);
     graphDBPanel.populateFrom(settings);
     tgherkinPanel.populateFrom(settings);
-    subroutinePanel.populateFrom(settings);
-    
     // only show Tgherkin tab if the protocol is a DocumentProtocol
     if (tgherkinPanel.isDocumentProtocol()) {
         if (!tgherkinPanel.isActive()) {
@@ -253,19 +253,6 @@ public class SettingsDialog extends JFrame implements Observer {
         if (tgherkinPanel.isActive()) {
         	jTabsPane.remove(tgherkinPanel);
         	tgherkinPanel.setActive(false);
-        }
-    }
-    
-    // only show subroutine tab if the protocol is a SubroutineProtocol
-    if (subroutinePanel.isSubroutineProtocol()) {
-        if (!subroutinePanel.isActive()) {
-        	jTabsPane.addTab("Subroutine Data", subroutinePanel);
-        	tgherkinPanel.setActive(true);
-        }
-    }else {
-        if (subroutinePanel.isActive()) {
-        	jTabsPane.remove(subroutinePanel);
-        	subroutinePanel.setActive(false);
         }
     }
   }
@@ -279,7 +266,6 @@ public class SettingsDialog extends JFrame implements Observer {
     miscPanel.extractInformation(settings);
     graphDBPanel.extractInformation(settings);
     tgherkinPanel.extractInformation(settings);
-    subroutinePanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -305,10 +291,9 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
-    subroutinePanel = new SubroutinePanel();
-    tgherkinPanel = new TgherkinPanel();
     cleanUpPanel = new CleanUpPanel();
     jTabsPane.addTab("Clean Up", cleanUpPanel);
+    tgherkinPanel = new TgherkinPanel();
 
     setLayout(jTabsPane);
     pack();
@@ -316,7 +301,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * Make the window appear centre screen
+   * Make the window appear centre screen.
    */
   private void setCentreScreen() {
     Dimension scrDim = Toolkit.getDefaultToolkit().getScreenSize();

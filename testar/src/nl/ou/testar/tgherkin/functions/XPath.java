@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.tgherkin.TgherkinException;
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
 
 /**
  * Singleton class responsible for the handling of XPath expressions.
@@ -38,7 +35,7 @@ public class XPath {
 	 * Retrieve singleton instance.
 	 * @return XPath singleton instance
 	 */
-	public static XPath getInstance( ) {
+	public static XPath getInstance() {
 		return xpath;
 	}
 	
@@ -61,26 +58,26 @@ public class XPath {
 	 * @param xpathExpr Xpath expression
 	 * @return list of widgets, empty list if no widget is in the XPath result.  
 	 */
-	public List<Widget> getXpathResult(ProtocolProxy proxy, String xpathExpr){
+	public List<Widget> getXpathResult(ProtocolProxy proxy, String xpathExpr) {
 		if (state != proxy.getState()) {
 			state = proxy.getState();
 			clearMaps();
 		}
-		if (xpathMap.containsKey(xpathExpr)){
+		if (xpathMap.containsKey(xpathExpr)) {
 			return xpathMap.get(xpathExpr);
 		}
 		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
 		List<Widget> widgetList = new ArrayList<Widget>();
 		try {
 			for (String concreteID : Utils.getXPathResult(Utils.getStateXML(proxy, state, imageFiles, xpathExpr.contains("ocr()")), xpathExpr)) {
-				for (Widget widget : state){
-					if (widget.get(Tags.ConcreteID).equals(concreteID)){
+				for (Widget widget : state) {
+					if (widget.get(Tags.ConcreteID).equals(concreteID)) {
 						widgetList.add(widget);
 						break;
 					}
 				}
 			}
-		}catch(Exception e) {
+		} catch(Exception e) {
 			throw new TgherkinException("Xpath expression error");
 		}
 		xpathMap.putIfAbsent(xpathExpr, widgetList);
@@ -98,7 +95,7 @@ public class XPath {
 			state = proxy.getState();
 			clearMaps();
 		}
-		if (xpathBooleanMap.containsKey(xpathExpr)){
+		if (xpathBooleanMap.containsKey(xpathExpr)) {
 			return xpathBooleanMap.get(xpathExpr);
 		}
 		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
@@ -119,7 +116,7 @@ public class XPath {
 			state = proxy.getState();
 			clearMaps();
 		}
-		if (xpathNumberMap.containsKey(xpathExpr)){
+		if (xpathNumberMap.containsKey(xpathExpr)) {
 			return xpathNumberMap.get(xpathExpr);
 		}
 		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
@@ -140,7 +137,7 @@ public class XPath {
 			state = proxy.getState();
 			clearMaps();
 		}
-		if (xpathStringMap.containsKey(xpathExpr)){
+		if (xpathStringMap.containsKey(xpathExpr)) {
 			return xpathStringMap.get(xpathExpr);
 		}
 		List<String> imageFiles = updateImageRecognitionAndOCR(proxy, xpathExpr);
@@ -163,7 +160,7 @@ public class XPath {
 		return imageFiles;
 	}
 	
-	private void clearMaps(){
+	private void clearMaps() {
 		xpathMap.clear();
 		xpathBooleanMap.clear();
 		xpathNumberMap.clear();

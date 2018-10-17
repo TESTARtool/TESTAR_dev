@@ -42,8 +42,8 @@ public class DragSliderGesture extends Gesture {
 		Set<Action> actions = new HashSet<Action>();	
     	StdActionCompiler ac = new AnnotatingActionCompiler();
 		Drag[] drags = widget.scrollDrags(SCROLL_ARROW_SIZE,SCROLL_THICKNESS);
-		if(drags != null){
-			for (Drag drag : drags){
+		if (drags != null) {
+			for (Drag drag : drags) {
 				Action action = ac.dragFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))

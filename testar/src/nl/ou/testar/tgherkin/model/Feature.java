@@ -143,13 +143,13 @@ public class Feature {
 		if (background != null) {
 			backgroundRun = true;
 			background.beginSequence();
-		}else {
+		} else {
 			backgroundRun = false;
 		}
 		if (currentScenarioDefinition() != null && currentScenarioDefinition().moreSequences()) {
 			// scenario outline: each table row instance is a new sequence
 			currentScenarioDefinition().beginSequence();
-		}else {
+		} else {
 			nextScenarioDefinition().beginSequence();
 		}
 	}
@@ -163,8 +163,8 @@ public class Feature {
 	public boolean evaluateGivenCondition(ProtocolProxy proxy) {
 		Report.appendReportDetail(Report.StringColumn.FEATURE,getTitle());
 		Report.appendReportDetail(Report.StringColumn.SCENARIO,currentScenarioDefinition().getTitle());
-		if (backgroundRun ) {
-			if (background.moreActions(proxy)){
+		if (backgroundRun) {
+			if (background.moreActions(proxy)) {
 				Report.appendReportDetail(Report.StringColumn.TYPE,background.getClass().getSimpleName());
 				return background.evaluateGivenCondition(proxy);
 			}	
@@ -185,7 +185,7 @@ public class Feature {
 		// for gestures only look at top widgets
 		for (Widget widget : proxy.getTopWidgets(proxy.getState())) {
 			// always test whether enabled and not blocked
-			if(widget.get(Enabled, true) && !widget.get(Blocked, false)) {
+			if (widget.get(Enabled, true) && !widget.get(Blocked, false)) {
 				list = new ArrayList<Gesture>();
 				if (selection.size() == 0) {
 					// no selection defined: all possible gestures are in scope
@@ -195,7 +195,7 @@ public class Feature {
 						list.add(gesture);
 						map.put(widget, list);
 					}
-				}else {
+				} else {
 					for(ConditionalGesture conditionalGesture : selection) {
 						if (conditionalGesture.isCandidate(proxy, widget, null)) {
 							list.add(conditionalGesture.getGesture());
@@ -224,7 +224,7 @@ public class Feature {
 		if (oracle != null && !oracle.evaluate(proxy, null)) {
 				if (backgroundRun ) {
 					background.setFailed();
-				}else {
+				} else {
 					currentScenarioDefinition().setFailed();
 				}
 				Report.appendReportDetail(Report.BooleanColumn.THEN,false);
@@ -242,10 +242,10 @@ public class Feature {
      * @return true if current action failed, otherwise false 
      */
 	public boolean hasFailed() {
-		if (backgroundRun ) {
+		if (backgroundRun) {
 			return background.hasFailed();
 		}
-		if(currentScenarioDefinition() != null) {
+		if (currentScenarioDefinition() != null) {
 			return currentScenarioDefinition().hasFailed();
 		}
 		return false;
@@ -330,16 +330,13 @@ public class Feature {
 
     private ScenarioDefinition nextScenarioDefinition() {
     	index++; 
-//    	System.out.println("[Feature] Next Feature: " + index);
-    	return scenarioDefinitions.get(index);
+        return scenarioDefinitions.get(index);
     }
 	
     private ScenarioDefinition currentScenarioDefinition() {
     	if (index < 0 || index >= scenarioDefinitions.size()) {
     		return null;
     	}
-//    	System.out.println("[Feature] Current Feature: " + index);
     	return scenarioDefinitions.get(index);
     }
-    
 }

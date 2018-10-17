@@ -57,12 +57,12 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	public Object visitLogicalPlaceholder(WidgetConditionParser.LogicalPlaceholderContext ctx) { 
 		// check whether placeholder is a valid column name of the data table
 		String columnName = ctx.getText().substring(1, ctx.getText().length() - 1);
-		if (dataTable == null){
+		if (dataTable == null) {
 			errorList.add("Widget condition validation error - no data table found for logical placeholder : " + columnName + System.getProperty("line.separator"));
-		}else {
-			if (!dataTable.isColumnName(columnName)){
+		} else {
+			if (!dataTable.isColumnName(columnName)) {
 				errorList.add("Widget condition validation error - invalid logical placeholder : " + columnName + System.getProperty("line.separator"));
-			}else {
+			} else {
 				checkTableContent(columnName, new Boolean(true));
 			}
 		}
@@ -74,12 +74,12 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	public Object visitNumericPlaceholder(WidgetConditionParser.NumericPlaceholderContext ctx) { 
 		// check whether placeholder is a valid column name of the data table
 		String columnName = ctx.getText().substring(1, ctx.getText().length() - 1);
-		if (dataTable == null){
+		if (dataTable == null) {
 			errorList.add("Widget condition validation error - no data table found for numeric placeholder : " + columnName + System.getProperty("line.separator"));
-		}else {
-			if (!dataTable.isColumnName(columnName)){
+		} else {
+			if (!dataTable.isColumnName(columnName)) {
 				errorList.add("Widget condition validation error - invalid numeric placeholder : " + columnName + System.getProperty("line.separator"));
-			}else {
+			} else {
 				checkTableContent(columnName, new Double(0));
 			}
 		}
@@ -90,12 +90,12 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	public Object visitStringPlaceholder(WidgetConditionParser.StringPlaceholderContext ctx) { 
 		// check whether placeholder is a valid column name of the data table
 		String columnName = ctx.getText().substring(1, ctx.getText().length() - 1);
-		if (dataTable == null){
+		if (dataTable == null) {
 			errorList.add("Widget condition validation error - no data table found for string placeholder : " + columnName + System.getProperty("line.separator"));
-		}else {
-			if (!dataTable.isColumnName(columnName)){
+		} else {
+			if (!dataTable.isColumnName(columnName)) {
 				errorList.add("Widget condition validation error - invalid string placeholder : " + columnName + System.getProperty("line.separator"));
-			}else {
+			} else {
 				checkTableContent(columnName, new String());
 			}
 		}
@@ -105,10 +105,10 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override
 	public Object visitMatchesFunction(WidgetConditionParser.MatchesFunctionContext ctx) { 
 		// unquote regex
-		String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		try {
 			Pattern.compile(regex);
-		}catch(PatternSyntaxException e){
+		} catch(PatternSyntaxException e) {
 			errorList.add("Widget condition validation error - invalid regular expression : " + regex + System.getProperty("line.separator"));		
 		}
 		return visitChildren(ctx);
@@ -117,7 +117,7 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Object visitXpathFunction(WidgetConditionParser.XpathFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		checkXPath(xpathExpr, XPathConstants.NODESET);
 		return visitChildren(ctx);
 	}	
@@ -125,7 +125,7 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Object visitXpathBooleanFunction(WidgetConditionParser.XpathBooleanFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		checkXPath(xpathExpr, XPathConstants.BOOLEAN);
 		return visitChildren(ctx);
 	}	
@@ -133,7 +133,7 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Object visitXpathNumberFunction(WidgetConditionParser.XpathNumberFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		checkXPath(xpathExpr, XPathConstants.NUMBER);
 		return visitChildren(ctx);
 	}	
@@ -141,7 +141,7 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override 
 	public Object visitXpathStringFunction(WidgetConditionParser.XpathStringFunctionContext ctx) { 
 		// unquote 
-		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String xpathExpr = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		checkXPath(xpathExpr, XPathConstants.STRING);
 		return visitChildren(ctx);
 	}	
@@ -149,16 +149,16 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	@Override
 	public Object visitImageFunction(WidgetConditionParser.ImageFunctionContext ctx) { 
 		// unquote image file
-		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
+		String imageFile = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1);
 		File file = new File(imageFile); 
-		if(!file.exists() || file.isDirectory()) {
+		if (!file.exists() || file.isDirectory()) {
 			errorList.add("Widget condition validation error - image file not found : " + imageFile + System.getProperty("line.separator"));		
 		}
 		return visitChildren(ctx);
 	}	
 
 	private void checkTableContent(String columnName, Object type) {
-		if (dataTable != null){
+		if (dataTable != null) {
 			int rows = 0;
 			while (dataTable.moreSequences()) {
 				dataTable.beginSequence();
@@ -169,16 +169,16 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 						if (!("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value))) {
 							errorList.add("Widget condition validation error - invalid boolean table value at row " + rows + " for placeholder " + columnName + " : " + value + System.getProperty("line.separator"));
 						}
-					}else {
+					} else {
 						if (type instanceof Double) {
 							try {
 								Double.valueOf(value);
-							}catch(Exception e) {
+							} catch(Exception e) {
 								errorList.add("Widget condition validation error - invalid double table value at row " + rows + " for placeholder " + columnName + " : " + value + System.getProperty("line.separator"));					
 							}
 						}						
 					}
-				}catch(Exception e) {
+				} catch(Exception e) {
 					errorList.add("Widget condition validation error - invalid table value at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
 				}
 			}
@@ -188,21 +188,21 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 	
 	private void checkXPath(String xpathExpr, QName resultType) { 
 		String xpathExprXML = Utils.getXMLXpathExpression(xpathExpr);
-		try{
+		try {
 			// Create XPathFactory object
 			XPathFactory xpathFactory = XPathFactory.newInstance();
 			// Create XPath object
 			XPath xpath = xpathFactory.newXPath();
 			//create XPathExpression object
 			xpath.compile(xpathExprXML);
-		}catch(XPathExpressionException e){
+		} catch(XPathExpressionException e) {
 			errorList.add("Widget condition validation error - invalid xpath expression : " + xpathExpr + System.getProperty("line.separator"));
 			return;
 		}
 		try {
 			// check correctness of result type with dummy xml data
 			Utils.evaluateXPathExpresion(Utils.XML_HEADER + Utils.toXMLElement("widget","test"), xpathExpr, resultType);
-		}catch (Exception e){
+		} catch (Exception e) {
 			errorList.add(e.getMessage());
 	    }
 	}	

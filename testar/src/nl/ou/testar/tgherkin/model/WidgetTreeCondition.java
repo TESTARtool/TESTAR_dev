@@ -47,7 +47,7 @@ public class WidgetTreeCondition {
 			if (widgetCondition.getType() == null) {
 				// first condition
 				result = evaluateCondition(proxy, dataTable, widgetCondition);
-			}else {
+			} else {
 				switch(widgetCondition.getType()) {
 				case ALSO:
 					if (result) {
@@ -61,6 +61,7 @@ public class WidgetTreeCondition {
 						return true;					
 					}
 					result = evaluateCondition(proxy, dataTable, widgetCondition);
+					break;
 				default:
 				}
 			}

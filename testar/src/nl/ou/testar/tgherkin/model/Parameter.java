@@ -10,7 +10,7 @@ import org.fruit.Assert;
  * @param <T> the expected class of the value
  *
  */
-public class Parameter <T> {
+public class Parameter<T> {
 
 	private static final ConcurrentHashMap<Parameter<?>, Parameter<?>> EXISTING_PARAMETERS = new ConcurrentHashMap<Parameter<?>, Parameter<?>>();
 	
@@ -23,11 +23,11 @@ public class Parameter <T> {
 	 * @return a parameter object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Parameter<T> from(String name, Class<T> valueType, boolean list){
+	public static <T> Parameter<T> from(String name, Class<T> valueType, boolean list) {
 		Assert.notNull(name, valueType);
 		Parameter<T> ret = new Parameter<T>(name, valueType, list);
 		Parameter<T> existing = (Parameter<T>)EXISTING_PARAMETERS.putIfAbsent(ret, ret);
-		if(existing != null) {
+		if (existing != null) {
 			return existing;
 		}	
 		return ret;
@@ -44,7 +44,7 @@ public class Parameter <T> {
 	 * @param clazz class of parameter value 
 	 * @param list indicator whether parameter is a list of values of a certain type
 	 */
-	protected Parameter(String name, Class<T> clazz, boolean list){
+	protected Parameter(String name, Class<T> clazz, boolean list) {
 		this.clazz = clazz;
 		this.name = name;
 		this.list = list;
@@ -76,14 +76,14 @@ public class Parameter <T> {
 	}
 
 	@Override
-	public String toString(){ 
+	public String toString() { 
 		return name; 
 	}
 	
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		int ret = hashcode;
-		if(ret == 0){
+		if (ret == 0) {
 			ret = name.hashCode(); 
 			hashcode = ret;
 		}
@@ -91,11 +91,11 @@ public class Parameter <T> {
 	}
 
 	@Override
-	public boolean equals(Object other){
-		if(other == this) {
+	public boolean equals(Object other) {
+		if (other == this) {
 			return true;
 		}	
-		if(other instanceof Parameter){
+		if (other instanceof Parameter) {
 			Parameter<?> ot = (Parameter<?>) other;
 			return name.equals(ot.name) && clazz.equals(ot.clazz);
 		}
