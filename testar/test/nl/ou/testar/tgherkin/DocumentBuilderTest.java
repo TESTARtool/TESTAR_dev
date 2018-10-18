@@ -1,7 +1,6 @@
 /**
  * 
  */
-
 package nl.ou.testar.tgherkin;
 
 import static org.junit.Assert.*;
@@ -36,66 +35,66 @@ public class DocumentBuilderTest {
 	}
 	
 	private void setUpTestCase1() {
-		testList.add("Feature: Compute with Windows calculator. \r\n"
-		   + "\r\n" 
-		   + "	Selection: click()\r\n" 
-		   + "\r\n" +  "  Scenario: Add two numbers\r\n" 
-		   + "    Step: Step 1 \r\n" 
-		   + "		When  $Title=\"Een\" click()\r\n"
-		   + "    Step: Step 2 \r\n" 
-		   + "		When  $Title=\"Een\" or $Title=\"Twee\" or $Title=\"Drie\" click()\r\n");
+		testList.add("Feature: Compute with Windows calculator. \r\n" + 
+				"\r\n" + 
+				"	Selection: click()\r\n" + 
+				"\r\n" + 
+				"  Scenario: Add two numbers\r\n" + 
+				"    Step: Step 1 \r\n" + 
+				"		When  $Title=\"Een\" click()\r\n" + 
+				"    Step: Step 2 \r\n" + 
+				"		When  $Title=\"Een\" or $Title=\"Twee\" or $Title=\"Drie\" click()\r\n");
 	}
 
 	private void setUpTestCase2() {
-		testList.add("Feature: Uitvoeren berekeningen met windows calculator. \r\n" 
-	        + "\r\n" 
-			+ "  Background: Enter 5 en clear\r\n" 
-			+ "    Step: Selecteer 5\r\n" 
-			+ "		When  $Title=\"Vijf\" click()\r\n" 
-			+ "    Step: Selecteer Clear\r\n" 
-			+ "		When  $Title=\"Wissen\" click()\r\n" 
-			+ "		\r\n" 
-			+ "  Scenario: Optellen twee getallen\r\n" 
-			+ "    Step: Selecteer 2\r\n" 
-			+ "		When  $Title=\"Twee\" click()\r\n"
-			+ "		Then  $Title=\"Weergave is 2\"\r\n" 
-			+ "    Step: Selecteer +\r\n"
-			+ "		When  $Title=\"Plus\" click()\r\n"
-			+ "		Then  $Title=\"Expressie is 2 + \"\r\n"
-			+ "    Step: Selecteer 3\r\n"
-			+ "		When  $Title=\"Drie\" click()\r\n" 
-			+ "		Then  $Title=\"Weergave is 3\"\r\n" 
-			+ "    Step: Selecteer = \r\n" 
-			+ "		When  $Title=\"Is gelijk aan\" click()\r\n"
-			+ "		Then  $Title=\"Weergave is 5\"\r\n" 
-			+ "\r\n" 
-			+ "  Scenario Outline: Optellen twee getallen\r\n" 
-			+ "    Step: Selecteer getal 1\r\n" 
-			+ "		When  $Title=<getal1> click()\r\n" 
-			+ "    Step: Selecteer +\r\n" 
-			+ "		When  $Title=\"Plus\" click()\r\n" 
-			+ "    Step: Selecteer getal 2\r\n" 
-			+ "		When  $Title=<getal2> click()\r\n" 
-			+ "    Step: Selecteer = \r\n" 
-			+ "		When  $Title=\"Is gelijk aan\" click()\r\n" 
-			+ "  Examples: Examples titel\r\n"
-			+ "    | getal1 | getal2 |\r\n" 
-			+ "    |  Negen  |  Vier |\r\n" 
-			+ "    |  Zeven  |  Zes  |  \r\n" 
-			+ "	\r\n" 
-			+ "  Scenario: Optellen twee getallen\r\n" 
-			+ "    Step: Selecteer 8\r\n" 
-			+ "		When  $Title=\"Acht\" click()\r\n"
-			+ "		Then  $Title=\"Weergave is 8\"\r\n" 
-			+ "    Step: Selecteer +\r\n" 
-			+ "		When  $Title=\"Plus\" click()\r\n" 
-			+ "		Then  $Title=\"Expressie is 8 + \"\r\n" 
-			+ "    Step: Selecteer 1\r\n" 
-			+ "		When  $Title=\"Een\" click()\r\n" 
-			+ "		Then  $Title=\"Weergave is 1\"\r\n" 
-			+ "    Step: Selecteer = \r\n" 
-			+ "		When  $Title=\"Is gelijk aan\" click()\r\n" 
-			+ "		Then  $Title=\"Weergave is 9\"\r\n" + "\r\n" + "\r\n");
+		testList.add("Feature: Uitvoeren berekeningen met windows calculator. \r\n" + "\r\n" + 
+				"  Background: Enter 5 en clear\r\n" + 
+				"    Step: Selecteer 5\r\n" + 
+				"		When  $Title=\"Vijf\" click()\r\n" + 
+				"    Step: Selecteer Clear\r\n" + 
+				"		When  $Title=\"Wissen\" click()\r\n" + 
+				"		\r\n" + 
+				"  Scenario: Optellen twee getallen\r\n" + 
+				"    Step: Selecteer 2\r\n" + 
+				"		When  $Title=\"Twee\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 2\"\r\n" + 
+				"    Step: Selecteer +\r\n" + 
+				"		When  $Title=\"Plus\" click()\r\n" + 
+				"		Then  $Title=\"Expressie is 2 + \"\r\n" + 
+				"    Step: Selecteer 3\r\n" + 
+				"		When  $Title=\"Drie\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 3\"\r\n" + 
+				"    Step: Selecteer = \r\n" + 
+				"		When  $Title=\"Is gelijk aan\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 5\"\r\n" + 
+				"\r\n" + 
+				"  Scenario Outline: Optellen twee getallen\r\n" + 
+				"    Step: Selecteer getal 1\r\n" + 
+				"		When  $Title=<getal1> click()\r\n" + 
+				"    Step: Selecteer +\r\n" + 
+				"		When  $Title=\"Plus\" click()\r\n" + 
+				"    Step: Selecteer getal 2\r\n" + 
+				"		When  $Title=<getal2> click()\r\n" + 
+				"    Step: Selecteer = \r\n" + 
+				"		When  $Title=\"Is gelijk aan\" click()\r\n" + 
+				"  Examples: Examples titel\r\n" + 
+				"    | getal1 | getal2 |\r\n" + 
+				"    |  Negen  |  Vier |\r\n" + 
+				"    |  Zeven  |  Zes  |  \r\n" + 
+				"	\r\n" + 
+				"  Scenario: Optellen twee getallen\r\n" + 
+				"    Step: Selecteer 8\r\n" + 
+				"		When  $Title=\"Acht\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 8\"\r\n" + 
+				"    Step: Selecteer +\r\n" + 
+				"		When  $Title=\"Plus\" click()\r\n" + 
+				"		Then  $Title=\"Expressie is 8 + \"\r\n" + 
+				"    Step: Selecteer 1\r\n" + 
+				"		When  $Title=\"Een\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 1\"\r\n" + 
+				"    Step: Selecteer = \r\n" + 
+				"		When  $Title=\"Is gelijk aan\" click()\r\n" + 
+				"		Then  $Title=\"Weergave is 9\"\r\n" + "\r\n" + "\r\n");
 	}
 
 	/**

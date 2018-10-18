@@ -9,6 +9,13 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.fruit.Util;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Widget;
+import org.fruit.monkey.ConfigTags;
+
 import nl.ou.testar.tgherkin.TgherkinImageFileAnalyzer;
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.functions.Image;
@@ -16,18 +23,14 @@ import nl.ou.testar.tgherkin.functions.OCR;
 import nl.ou.testar.tgherkin.gen.TgherkinParser;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.utils.report.ReportItem;
-import org.fruit.Util;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.monkey.ConfigTags;
 
 /**
  * Class responsible for the generation of the Tgherkin State report.
  *
  */
 public class StateReportItem extends ReportItem {
-	private static final String REPORT_NAME_PREFIX = "output" + File.separator + "State_";
+	private static final String OUT_DIR = "output" + File.separator + "tgherkin" + File.separator;
+	private static final String REPORT_NAME_PREFIX = "State_";
 	private static final String REPORT_NAME_SUFFIX = ".csv";
 	private static final String OCR_COLUMN_NAME = "OCR";
 	private static final String IMAGE_RECOGNITION_COLUMN_PREFIX = "Image_";
@@ -41,11 +44,11 @@ public class StateReportItem extends ReportItem {
 	 * @param proxy document protocol proxy
 	 */
 	public StateReportItem(boolean append, ProtocolProxy proxy) {
-		super(REPORT_NAME_PREFIX
-				+ proxy.getSequenceCount() + "_" 
-				+ proxy.getActionCount() + "_"
-				+  new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis())			
-				+ REPORT_NAME_SUFFIX,
+		super(OUT_DIR + "sequence" + proxy.getSequenceCount() +  File.separator +
+				REPORT_NAME_PREFIX + 
+				proxy.getSequenceCount() + "_" + proxy.getActionCount() + "_" + 
+				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
+				REPORT_NAME_SUFFIX,
 				null, 
 				append);
 		setData(reportState(proxy));
@@ -91,7 +94,7 @@ public class StateReportItem extends ReportItem {
 		return outputState(header, reportLines);
 	}
 
-	private static String outputState(SortedSet<String> header, List<SortedMap<String,String>> reportLines) {
+	private static String outputState(SortedSet<String> header, List<SortedMap<String,String>> reportLines){
 		StringBuilder reportContent = new StringBuilder();
 		// header
 		boolean notFirst = false;
@@ -100,13 +103,13 @@ public class StateReportItem extends ReportItem {
 			String columnName = headerIterator.next();
 			if (notFirst) {
 				reportContent.append(Report.REPORT_SEPARATOR);
-			} else {
+			}else {
 				notFirst = true;
 			}
 			if (columnName.startsWith("#") || columnName.startsWith("$")) {
 				// skip hash and dollar(used to get Parent and ChildCount in front of the widget tag columns)
 				reportContent.append(Report.transformReportValue(columnName.substring(1)));
-			} else {
+			}else {
 				reportContent.append(Report.transformReportValue(columnName));
 			}
 		}
@@ -119,7 +122,7 @@ public class StateReportItem extends ReportItem {
 				String columnName = headerIterator.next();
 				if (notFirst) {
 					reportContent.append(Report.REPORT_SEPARATOR);
-				} else {
+				}else {
 					notFirst = true;
 				}
 				String value = reportLine.get(columnName);
@@ -137,7 +140,7 @@ public class StateReportItem extends ReportItem {
 		if (proxy.getSettings().get(ConfigTags.TgherkinReportIncludeImageRecognition)) {
 			TgherkinParser parser = Utils.getTgherkinParser(proxy.getTgherkinSourceCode());
 			return new TgherkinImageFileAnalyzer().visitDocument(parser.document());
-		} else {
+		}else {
 			return new ArrayList<String>(); 
 		}
 		

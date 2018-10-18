@@ -41,6 +41,8 @@ import static org.fruit.alayer.Tags.Enabled;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.tgherkin.protocol.UrlActionCompiler;
+
 import java.io.File;
 import java.util.*;
 import org.fruit.Util;
@@ -55,26 +57,26 @@ import org.fruit.monkey.Settings;
 
 public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	
-	
-	private static final String PREVENT_BY_MOCK_TITLE = "LOG ON";
+	private static final String PREVENT_BY_MOCK_TITLE = "INLOGGEN";
 	private static final String MOCK_URL = "www.google.nl";
-	private static final String MOCK_ACTION_TITLE = "ADDRESS AND SEARCH BAR";
+	private static final String MOCK_ACTION_TITLE = "Adres- en zoekbalk";
 	private static final String RETURN_URL = "www.youtube.com";
 	
 	// If we encounter a login URL, determine the 'login button'and force click
 	private static String loginTitle = "inloggen"; // lower case
 	private static String loginUrl = "https://login.awo.ou.nl/sso/login";
 	
-	private static boolean mockPassed = false;
-
+	private static boolean toBeMocked = true;
 	// Each browser (and locale!) uses different names for standard elements
 	private enum Browser {
 		// Dutch version
-//		explorer("address", "UIAEdit", "back", "close"), firefox("voer zoekterm of adres in", "UIAEdit", "terug",
-//				null), chrome("adres- en zoekbalk", "UIAEdit", "vorige", "sluiten");
+		explorerNL("address", "UIAEdit", "back", "close"), 
+		firefoxNL("voer zoekterm of adres in", "UIAEdit", "terug",null), 
+		chromeNL("Adres- en zoekbalk", "UIAEdit", "vorige", "sluiten"),
 		// English version
-		explorer("address", "UIAEdit", "back", "close"), firefox("voer zoekterm of adres in", "UIAEdit", "terug",
-		null), chrome("address and search bar", "UIAEdit", "back", "close");
+		explorerEN("address", "UIAEdit", "back", "close"), 
+		firefoxEN("voer zoekterm of adres in", "UIAEdit", "terug",null),
+		chromeEN("address and search bar", "UIAEdit", "back", "close");
 
 		private String addressTitle;
 		private String addressRole;
@@ -88,6 +90,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 			this.closeTitle = closeTitle;
 		}
 	}
+
 
 	private static Role webText; // browser dependent
 	private static double browserToolbarFilter;
@@ -126,18 +129,18 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	private void initBrowser() {
 		// just init with some value
 		webText = NativeLinker.getNativeRole("UIAEdit");
-		browser = Browser.explorer;
+		browser = Browser.explorerNL;
 
 		String sutPath = settings().get(ConfigTags.SUTConnectorValue);
 		if (sutPath.contains("iexplore.exe")) {
 			webText = NativeLinker.getNativeRole("UIAEdit");
-			browser = Browser.explorer;
+			browser = Browser.explorerNL;
 		} else if (sutPath.contains("firefox")) {
 			webText = NativeLinker.getNativeRole("UIAText");
-			browser = Browser.firefox;
+			browser = Browser.firefoxNL;
 		} else if (sutPath.contains("chrome") || sutPath.contains("chromium")) {
 			webText = NativeLinker.getNativeRole("UIAEdit");
-			browser = Browser.chrome;
+			browser = Browser.chromeNL;
 		}
 	}
 
@@ -187,7 +190,6 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 				browserToolbarFilter = w.get(Tags.Shape, null).y() + w.get(Tags.Shape, null).height();
 			}
 		}
-
 		return state;
 	}
 
@@ -222,10 +224,9 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	 */
 
 	protected boolean blackListed(Widget w) {
-		String desc = w.get(Tags.Desc, null).toUpperCase();
-		
-		boolean loginParm = desc.contains("PASSWORD") || desc.contains("USERNAME");
-		
+		String desc = w.get(Tags.Desc, null);
+		boolean loginParm = desc.equalsIgnoreCase("Wachtwoord") 
+				|| desc.equalsIgnoreCase("Gebruikersnaam");
 		boolean blacklisted = super.blackListed(w) || loginParm;
 		return blacklisted;
 	}
@@ -236,15 +237,10 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 			if (targets != null) {
 				for (Widget widget: targets) {
 					if (widget != null) {
-						//String title = widget.get(Tags.Desc, null);
 						String title = widget.get(Tags.Desc, null);
-						
-						System.out.println("[prot temp 4] " + title + "==" + preventByMockActionTitle);
-						System.out.println(widget.getRepresentation(""));
-						if (title != null) {
-							if (title.equalsIgnoreCase(preventByMockActionTitle)) {
+						if (title != null 
+							&& title.equalsIgnoreCase(preventByMockActionTitle)) {
 								return true;
-							}
 						}
 					}
 				}
@@ -261,13 +257,13 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 			String title = widget.get(Tags.Title, null);
 			if (title.equalsIgnoreCase(browser.addressTitle)) {
 				System.out.println("[" + getClass().getSimpleName() 
-						+ "] Url wordt geactiveerd (" + title +"; " + mockUrl + ")");
-				
+						+ "/rerouteByUrl temp 3] " + widget.getRepresentation("\t"));			
 				action = ac.clickTypeUrl(widget, mockUrl);
 				action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
 				action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-				
-				mockPassed = true;
+				System.out.println("[" + getClass().getSimpleName() 
+						+ "] Url wordt geactiveerd (" + title +"; " + mockUrl + ")");
+				toBeMocked = false;
 			}
 		}
 		return action;
@@ -288,7 +284,6 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		Set<Action> actions = super.deriveActions(system, state);
-
 		// Ignore this protocol if Prolog is activated
 		if (settings().get(ConfigTags.PrologActivated)) {
 			return actions;
@@ -301,40 +296,44 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 		}
 
 		// iterate through all (top) widgets
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+		StdActionCompiler ac = new UrlActionCompiler();
+		
 		for (Widget widget : getTopWidgets(state)) {
-			String title = widget.get(Tags.Title,null);
-			// only consider enabled and non-blocked widgets
-			if (widget.get(Enabled, true) && !widget.get(Blocked, false) 
-				&& ((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && mockPassed) 
-				|| (PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) && !mockPassed))) {
-			// do not build actions for tabu widget
-			if (blackListed(widget)) {
-				continue;
-			}
+			String title = widget.get(Tags.Title, null);
+			String role = widget.get(Tags.Role).toString();
 
-			// left clicks
-			if (whiteListed(widget) || isClickable(widget)) {
-				// Don't allow Testar to test outside domains
-				if (isLinkDenied(widget)) {
+			// only consider enabled and non-blocked widgets
+			if (widget.get(Enabled, true) && !widget.get(Blocked, false)
+				&& ((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && !toBeMocked)
+					|| ("UIAButton".equals(role) 
+						&& PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) 
+						&& toBeMocked))) {
+
+				// do not build actions for tabu widget
+				if (blackListed(widget)) {
 					continue;
 				}
 
-				storeWidget(state.get(Tags.ConcreteID), widget);
-				actions.add(ac.leftClickAt(widget));
-			}
+				// left clicks
+				if (whiteListed(widget) || isClickable(widget)) {
+					// Don't allow Testar to test outside domains
+					if (isLinkDenied(widget)) {
+						continue;
+					}
 
-			// type into text boxes
-			if (whiteListed(widget) || isTypeable(widget)) {
-				storeWidget(state.get(Tags.ConcreteID), widget);
-				actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
-			}
-            
-			
-			// slides
-			addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget);
-			}
+					storeWidget(state.get(Tags.ConcreteID), widget);
+					actions.add(ac.leftClickAt(widget));
+				}
 
+				// type into text boxes
+				if (whiteListed(widget) || isTypeable(widget)) {
+					storeWidget(state.get(Tags.ConcreteID), widget);
+					actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
+				}
+
+				// slides
+				addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget);
+			}
 		}
 		return actions;
 	}
@@ -379,23 +378,19 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action action = super.selectAction(state, actions);
-        System.out.println("[prot temp 1] " + mockPassed);
-		// optional mock actions
-		if (!mockPassed) {
-			System.out.println("[prot temp 2] " + mockPassed);
+	     // optional mock actions
+		if (toBeMocked) {
 			if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE)) {
 				System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
 				action = rerouteByUrl(state, MOCK_URL);
-				}
-			return action;
+			}
 		} else {
-			System.out.println("[prot temp 3] " + mockPassed);
 			if (preventByMock(state, action, MOCK_ACTION_TITLE)) {
 				System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
-				action = rerouteByUrl(state, RETURN_URL);
 			}
-			return action;
 		}
+		System.out.println(action.toShortString());
+		return action;
 	}
 
 	/**
@@ -500,7 +495,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 
 			// If not in the header, we only need to look for the loginWidget
 			if (shape == null || shape.y() > browserToolbarFilter) {
-				if (title.contains(loginTitle) && "UIAButton".equalsIgnoreCase(role)) {
+				if (title.contains(loginTitle) && "UIAButton".equals(role)) {
 					loginWidget = widget;
 				}
 				continue;
@@ -509,7 +504,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 			// Application / language setting specific
 			if (title.equalsIgnoreCase(browser.addressTitle) && role.equalsIgnoreCase(browser.addressRole)) {
 				currentAddress = value;
-			} else if ((browser == Browser.explorer || browser == Browser.chrome)
+			} else if ((browser == Browser.explorerNL || browser == Browser.chromeNL)
 					&& (title.contains(browser.backTitle) || value.contains(browser.backTitle))) {
 				backWidget = widget;
 			} else if (title.contains(browser.closeTitle) || value.contains(browser.closeTitle)) {

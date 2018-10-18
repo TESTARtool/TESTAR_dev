@@ -64,7 +64,7 @@ public abstract class RepeatingStep extends Step {
 	
 	@Override
     protected void nextAction() {
-		if (!isRetryMode()) {
+		if (!isRetryMode()){
 	    	currentAction++;
 	    	setNrOfRetries(0);
 		}

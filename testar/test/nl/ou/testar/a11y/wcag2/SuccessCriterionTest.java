@@ -35,14 +35,17 @@ import static org.junit.Assert.*;
 import org.fruit.alayer.Verdict;
 import org.junit.Test;
 
+import nl.ou.testar.a11y.wcag2.AbstractGuideline;
+import nl.ou.testar.a11y.wcag2.AbstractPrinciple;
+import nl.ou.testar.a11y.wcag2.SuccessCriterion;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 public class SuccessCriterionTest {
 	
-	private final double PRIO_A = 1.0; // high
-	private final double PRIO_AA = 0.666; // medium
-	private final double PRIO_AAA = 0.333; // low
-	private final double DELTA = 0.1;
+	private final double PRIO_A = 1.0, // high
+			PRIO_AA = 0.666, // medium
+			PRIO_AAA = 0.333, // low
+			DELTA = 0.1;
 	
 	@Test
 	public void testGetNr() {

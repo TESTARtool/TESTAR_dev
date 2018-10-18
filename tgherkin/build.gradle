@@ -23,10 +23,6 @@ repositories {
     mavenCentral()
 }
 
-tasks.withType(Checkstyle) {
-    exclude './tgherkin/generated-src/nl/ou/testar/tgherkin/gen/*.*'
-}
-
 dependencies {
 	antlr("org.antlr:antlr4:4.5") 
 }

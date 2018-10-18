@@ -12,7 +12,7 @@
 .handsontable {
   position: relative;
 }
-.handsontable .hide {
+.handsontable .hide{
   display: none;
 }
 .handsontable .relative {
@@ -190,7 +190,7 @@
 .handsontable .manualColumnMover:hover,
 .handsontable .manualColumnMover.active,
 .handsontable .manualRowMover:hover,
-.handsontable .manualRowMover.active {
+.handsontable .manualRowMover.active{
   background-color: #88F;
 }
 
@@ -259,7 +259,7 @@
   position: absolute;
   font-size: 0;
 }
-.handsontable .wtBorder.hidden {
+.handsontable .wtBorder.hidden{
   display:none !important;
 }
 
@@ -319,7 +319,7 @@ TextRenderer readOnly cell
   color: #777;
 }
 
-.handsontable .htSubmenu :after {
+.handsontable .htSubmenu :after{
     content: '▶';
     color: #777;
     position: absolute;
@@ -333,13 +333,13 @@ TextRenderer horizontal alignment
 .handsontable .htLeft{
   text-align: left;
 }
-.handsontable .htCenter {
+.handsontable .htCenter{
   text-align: center;
 }
 .handsontable .htRight{
   text-align: right;
 }
-.handsontable .htJustify {
+.handsontable .htJustify{
   text-align: justify;
 }
 /*
@@ -348,10 +348,10 @@ TextRenderer vertical alignment
 .handsontable .htTop{
   vertical-align: top;
 }
-.handsontable .htMiddle {
+.handsontable .htMiddle{
   vertical-align: middle;
 }
-.handsontable .htBottom {
+.handsontable .htBottom{
   vertical-align: bottom;
 }
 
@@ -399,10 +399,10 @@ NumericRenderer
 /*
 Comment For Cell
 */
-.htCommentCell {
+.htCommentCell{
   position: relative;
 }
-.htCommentCell:after {
+.htCommentCell:after{
   content: '';
   position: absolute;
   top: 0;
@@ -587,7 +587,7 @@ Cell borders
   border-left-color: #000;
 }
 
-.htCommentTextArea {
+.htCommentTextArea{
   background-color: #FFFACD;
   box-shadow: 1px 1px 2px #bbb;
   font-family: 'Arial';

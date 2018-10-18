@@ -1,1 +1,12 @@
-/.gradle/
+.idea
+.gradle/
+bin/
+target/
+*.obj
+/windows/native_src/windows.h
+*.iml
+doc/
+.project
+*/.classpath
+.settings
+build.bat

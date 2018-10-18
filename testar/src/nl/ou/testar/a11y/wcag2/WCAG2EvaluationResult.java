@@ -35,7 +35,7 @@ import org.fruit.alayer.Widget;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
 
 /**
- * The result of evaluating a WCAG2ICT success criterion.
+ * The result of evaluating a WCAG2ICT success criterion
  * @author Davy Kager
  *
  */
@@ -46,7 +46,7 @@ public final class WCAG2EvaluationResult extends EvaluationResult {
 	private final SuccessCriterion criterion;
 	
 	/**
-	 * Constructs a new evaluation result that does not apply to a single widget.
+	 * Constructs a new evaluation result that does not apply to a single widget
 	 * @param criterion The success criterion associated with this evaluation result.
 	 * @param type The problem type.
 	 * @param message The problem description.
@@ -56,7 +56,7 @@ public final class WCAG2EvaluationResult extends EvaluationResult {
 	}
 
 	/**
-	 * Constructs a new evaluation result that applies to a single widget.
+	 * Constructs a new evaluation result that applies to a single widget
 	 * @param criterion The success criterion associated with this evaluation result.
 	 * @param type The problem type.
 	 * @param message The problem description.
@@ -68,7 +68,7 @@ public final class WCAG2EvaluationResult extends EvaluationResult {
 	}
 	
 	/**
-	 * Gets the success criterion associated with this evaluation result.
+	 * Gets the success criterion associated with this evaluation result
 	 * @return The success criterion.
 	 */
 	public SuccessCriterion getSuccessCriterion() {

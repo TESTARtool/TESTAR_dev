@@ -66,19 +66,17 @@ public class FlashFeedback  extends JDialog implements Runnable {
 		this.setOpacity(0.75f);
 	}
 	
-	public static void flash(String title) {
+	public static void flash(String title){
 		new FlashFeedback(title).run();
 	}
 	
 	@Override
 	public void run() {
 	    this.setVisible(true);
-		synchronized(this) {
-			try {
+		synchronized(this){
+			try{
 				this.wait(FLASH_DURATION);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			} catch (java.lang.InterruptedException e){}
 		}
 		this.setVisible(false);
 		this.dispose();

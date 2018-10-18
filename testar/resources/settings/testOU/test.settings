@@ -54,6 +54,29 @@ SequenceLength = 500
 SuspiciousTitles = 
 
 #################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = (?!x)x
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
 # Actionfilter
 #
 # Regular expression. More filters can be added in Spy mode,
@@ -91,15 +114,15 @@ GraphDBPassword = testar
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
-ReportDerivedGestures = false
+ReportDerivedGestures = true
 Reportstate = false
-TgherkinDocument = ./resources/settings/testOU/OU_ATI - order course.tgherkin
+SubroutineData = 
+TgherkinDocument = ./resources/settings/testOU/OU_ATI.tgherkin
 Discount = 0.95
 TgherkinNrOfNOPRetries = 100
 TempDir = ./resources/output/temp
 MaxTime = 3.1536E7
 StopGenerationOnFault = true
-PrologActivated = false
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
@@ -114,9 +137,9 @@ MaxReward = 9999999.0
 StoreTgherkinReport = false
 LogLevel = 1
 VisualizeSelectedAction = true
-TgherkinReportIncludeOCR = true
+TgherkinReportIncludeOCR = false
 Delete = 
-MyClassPath = ./resources/settings
+MyClassPath = resources/settings
 ReplayRetryTime = 30.0
 ProcessesToKillDuringTest = 
 ShowSettingsAfterTest = true
