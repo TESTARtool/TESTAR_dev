@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="es.upv.staq.testar.graph.TESTAREnvironmentTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2018-10-17T14:29:14" hostname="DESKTOP-HJN7EB1" time="0.194">
+  <properties/>
+  <testcase name="testPopulateWithTwoActions" classname="es.upv.staq.testar.graph.TESTAREnvironmentTest" time="0.154"/>
+  <testcase name="testAddPopulateWithFirstAction" classname="es.upv.staq.testar.graph.TESTAREnvironmentTest" time="0.0"/>
+  <testcase name="validateEmptyEnvironment" classname="es.upv.staq.testar.graph.TESTAREnvironmentTest" time="0.037"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

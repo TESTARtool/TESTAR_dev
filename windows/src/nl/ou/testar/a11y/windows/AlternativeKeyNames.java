@@ -34,14 +34,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Maps key names to the VK_* names from KBKeys.
+ * Maps key names to the VK_* names from KBKeys
  * @author Davy Kager
  *
  */
 final class AlternativeKeyNames {
 	
 	/**
-	 * The map from alternative key names to standard key names.
+	 * The map from alternative key names to standard key names
 	 * Based on the en-US (International) keyboard layout, all uppercase.
 	 */
 	static final Map<String,String> map = new HashMap<String,String>() {

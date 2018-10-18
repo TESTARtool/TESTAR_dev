@@ -37,7 +37,5 @@ import org.fruit.FruitException;
 
 public class WinApiException extends FruitException {
 	private static final long serialVersionUID = 4344611676441793933L;
-	public WinApiException(String message) { 
-		super(message); 
-	}
+	public WinApiException(String message) { super(message); }
 }
