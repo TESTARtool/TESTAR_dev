@@ -12,77 +12,76 @@ import org.fruit.monkey.Settings;
  */
 public interface ProtocolProxy {
 
-  /**
-   * Retrieve configuration settings.
-   * @return settings
-   */
-  Settings getSettings();
+	/**
+	 * Retrieve configuration settings.
+	 * @return settings
+	 */
+	Settings getSettings();
 
-  /**
-   * Retrieve state.
-   * @return state
-   */
-  State getState();
+	/**
+	 * Retrieve state.
+	 * @return state
+	 */
+	State getState();
 
-  /**
-   * Retrieve Tgherkin source code.
-   * @return Tgherkin source code
-   */
-  String getTgherkinSourceCode();
+	/**
+	 * Retrieve Tgherkin source code.
+	 * @return Tgherkin source code
+	 */
+	String getTgherkinSourceCode();
 
-  /**
-   * Check whether widget is not filtered.
-   * @param widget widget involved
-   * @return true if widget is not filtered, otherwise false
-   */
-  boolean isUnfiltered(Widget widget);
+	/**
+	 * Check whether widget is not filtered.
+	 * @param widget widget involved
+	 * @return true if widget is not filtered, otherwise false
+	 */
+	boolean isUnfiltered(Widget widget);
 
-  /**
-   * Check whether widget is clickable.
-   * @param widget widget involved
-   * @return true if widget is clickable, otherwise false
-   */
-  boolean isClickable(Widget widget);
+	/**
+	 * Check whether widget is clickable.
+	 * @param widget widget involved
+	 * @return true if widget is clickable, otherwise false
+	 */
+	boolean isClickable(Widget widget);
+	
+	/**
+	 * Check whether widget is typeable.
+	 * @param widget widget involved
+	 * @return true if widget is typeable, otherwise false
+	 */
+	boolean isTypeable(Widget widget);
+	
+    /**
+     * Retrieve random text.
+     * @param widget widget involved
+     * @return generated random text
+     */
+    String getRandomText(Widget widget);
+    
+	/**
+	 * Retrieve top widgets.
+	 * @param state the SUT's current state
+	 * @return list of top widgets
+	 */
+	List<Widget> getTopWidgets(State state);
 
-  /**
-   * Check whether widget is typeable.
-   * @param widget widget involved
-   * @return true if widget is typeable, otherwise false
-   */
-  boolean isTypeable(Widget widget);
+	/**
+	 * Store widget.
+	 * @param stateID state identifier
+	 * @param widget to be stored widget 
+	 */
+	void storeWidget(String stateID, Widget widget);
 
-  /**
-   * Retrieve random text.
-   * @param widget widget involved
-   * @return generated random text
-   */
-  String getRandomText(Widget widget);
+	/**
+	 * Retrieve sequence count.
+	 * @return sequence count
+	 */
+    int getSequenceCount();
 
-  /**
-   * Retrieve top widgets.
-   * @param state the SUT's current state
-   * @return list of top widgets
-   */
-  List<Widget> getTopWidgets(State state);
-
-  /**
-   * Store widget.
-   * @param stateID state identifier
-   * @param widget to be stored widget 
-   */
-  void storeWidget(String stateID, Widget widget);
-
-  /**
-   * Retrieve sequence count.
-   * @return sequence count
-   */
-  int getSequenceCount();
-
-  /**
-   * Retrieve action count.
-   * @return action count
-   */
-  int getActionCount();
+	/**
+	 * Retrieve action count.
+	 * @return action count
+	 */
+    int getActionCount();
+	
 }
-
-

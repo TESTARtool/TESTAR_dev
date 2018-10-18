@@ -11,30 +11,19 @@ Mode = Spy
 #
 # Indicate how you want to connect to the SUT:
 #
-# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
 # starts the SUT.
 # It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
 # For web applications, follow the next format: web_browser_path SUT_URL.
 #
-# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
 # in the SUT main window. The SUT must be manually started and closed.
 #
-# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
 SUTConnectorValue = "C:\\Program Files\\Microsoft Office\\Office15\\EXCEL.EXE"
-
-#################################################################
-# Java Swing applications & Access Bridge Enabled
-#
-# Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
-#
-# Enable the variable Access Bridge Enabled in TESTAR as true
-#################################################################
-
-AccessBridgeEnabled = false
 
 #################################################################
 # Sequences
@@ -42,8 +31,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 500
-SequenceLength = 500
+Sequences = 1
+SequenceLength = 100
 
 #################################################################
 # Oracles based on suspicious titles
@@ -51,30 +40,7 @@ SequenceLength = 500
 # Regular expression
 #################################################################
 
-SuspiciousTitles = 
-
-#################################################################
-# Oracles based on Suspicious Outputs detected by Process Listeners
-#
-# (Only available for desktop applications through COMMAND_LINE)
-#
-# Regular expression defines the suspicious outputs
-#################################################################
-
-ProcessListenerEnabled = false
-SuspiciousProcessOutput = (?!x)x
-
-#################################################################
-# Process Logs
-#
-# Required ProcessListenerEnabled
-# (Only available for desktop applications through COMMAND_LINE)
-#
-# Allow TESTAR to store in its logs other possible matches found in the process
-# Use the regular expression .*.* if you want to store all the possible outputs of the process
-#################################################################
-
-ProcessLogs = .*.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xception.*
 
 #################################################################
 # Actionfilter
@@ -83,7 +49,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = 
+ClickFilter = .*[mM]inimizar.*|.*[mM]inimize.*|.*[mM]aximizar.*|.*[mM]aximize.*|.*[cC]errar.*|.*[cC]lose.*|.*[rR]estaurar.*|.*[rR]estore.*|.*[aA]rchivo.*|.*[aA]brir.*|.*[oO]pen.*|.*[gG]uardar.*|.*[sS]ave.*|.*[sS]alir.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[cC]ompartir.*|.*[sS]hare.*|.*[eE]xport.*|.*[oO]ption.*|.*[oO]pci.*|.*[cC]uenta.*|.*[aA]ccount.*|.*[sS]oporte.*|.*[sS]upport.*|.*[mM]ail.*|.*[cC]orreo.*|.*[dD]esconectar.*|.*[sS]istema.*|.*[sS]ystem.*|.*[oO]ffice.*|.*[oO]ne[dD]rive.*|.*[dD]elete.*|.*[bB]orrar.*|.*[bB]rowse.*|.*SVN.*|.*[eE]nviar.*|.*[sS]lide.*|.*[sS]creenshot.*|.*[rR]ecording.*|.*[rR]eading.*
 
 #################################################################
 # Processfilter
@@ -92,7 +58,7 @@ ClickFilter =
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = 
+SUTProcesses =
 
 #################################################################
 # Protocolclass
@@ -106,66 +72,40 @@ ProtocolClass = desktop_excel/Protocol_desktop_excel
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl = remote:/localhost/TestarDemo2
-GraphDBUser = root
-GraphDBPassword = testar
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
 
 #################################################################
 # Other more advanced settings
 #################################################################
-TypingTextsForExecutedAction = 10
-ReportDerivedGestures = true
-Reportstate = false
-SubroutineData = 
-TgherkinDocument = ./resources/settings/desktop_excel/OU_ATI_webform.tgherkin
-Discount = 0.95
-TgherkinNrOfNOPRetries = 100
+
+ProcessesToKillDuringTest =
+OutputDir = ./resources/output
+PathToReplaySequence = ./output/temp
 TempDir = ./resources/output/temp
-MaxTime = 3.1536E7
-StopGenerationOnFault = true
-TgherkinReportIncludeImageRecognition = false
-ExecuteActions = true
-DrawWidgetTree = false
-ApplyDefaultOnMismatch = true
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
-AlgorithmFormsFilling = false
-GenerateTgherkinReport = true
-FaultThreshold = 1.0E-9
-DrawWidgetInfo = false
-MaxReward = 9999999.0
-StoreTgherkinReport = false
 LogLevel = 1
-VisualizeSelectedAction = true
-TgherkinReportIncludeOCR = false
-Delete = 
-MyClassPath = resources/settings
-ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
-ShowSettingsAfterTest = true
-ForceToSequenceLength = false
-OutputDir = ./resources/output
-UnattendedTests = false
-TestGenerator = random
-StartupTime = 3.0
-ActionDuration = 0.2
-NonReactingUIThreshold = 100
-ContinueToApplyDefault = false
-ConfidenceThreshold = 0.7
-GraphsActivated = true
-GraphResuming = false
-CopyFromTo = 
-TimeToFreeze = 30.0
-StateScreenshotSimilarityThreshold = 1.4E-45
-ShowVisualSettingsDialogOnStartup = true
-TgherkinExecutionMode = sequential
-TimeToWaitAfterAction = 0.2
+ExecuteActions = true
+FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
-AlwaysCompile = true
-PathToReplaySequence = ./output/temp
-VisualizeActions = false
-ExplorationSampleInterval = 1
+MyClassPath = resources/settings
 OnlySaveFaultySequences = false
-RepeatTgherkinScenarios = true
-MinimumPercentageForImageRecognition = 95.0
-OfflineGraphConversion = false
+ActionDuration = 0.0
+ShowVisualSettingsDialogOnStartup = true
+ReplayRetryTime = 30.0
+Delete =
+MaxTime = 3.1536E7
+ShowSettingsAfterTest = true
+TimeToWaitAfterAction = 0.1
+StartupTime = 10.0
+DrawWidgetInfo = false
+TimeToFreeze = 30.0
+StopGenerationOnFault = true
+CopyFromTo =
+VisualizeActions = false
+VisualizeSelectedAction = true
+TestGenerator = random
+MaxReward = 9999999
+Discount = .95

@@ -31,6 +31,7 @@
 /**
  *  @author Sebastian Bauersfeld
  */
+
 package org.fruit.example.windows;
 
 import static org.fruit.alayer.Tags.Desc;
@@ -48,30 +49,32 @@ import org.fruit.alayer.windows.WinProcess;
 
 public class PrintWidgetTree {
 	
-	public static void main(String[] args){
+	public static void main(String[] args) {
 	
-		if(args.length < 1 || !new File(args[0]).exists()){
-			System.out.println("Invalid command line arguments!");
+		if (args.length < 1 || !new File(args[0]).exists()) {
+			System.out.println("[PrintWidgetTree] Invalid command line arguments!");
 			return;
 		}
 				
-		SUT system = WinProcess.fromExecutable(args[0], false); // run the given executable
+		SUT system = WinProcess.fromExecutable(args[0]); // run the given executable
 		
 		Util.pause(5);
 		State state = new UIAStateBuilder().apply(system);   // get the system's current state
 
 		// print the role of each widget and a short description
-		for(Widget widget : state){    
+		for(Widget widget : state) {    
 			// indent
-			for(int i = 0; i < Util.depth(widget); i++)  
+			for(int i = 0; i < Util.depth(widget); i++) { 
 				System.out.print("  ");
+			}
 
 			// print widget info
 			System.out.printf("%s  %s\n", 
 					widget.get(Role, Roles.Widget), 
 					widget.get(Desc, "<desc unavailable>"));
 		}
-	
-		system.stop();              // shut down the system
+		
+		// shut down the system
+		system.stop();              
 	}
 }

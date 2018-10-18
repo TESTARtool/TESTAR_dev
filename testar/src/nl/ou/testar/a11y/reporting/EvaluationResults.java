@@ -39,7 +39,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.Verdict;
 
 /**
- * The results of evaluating muliple success criteria
+ * The results of evaluating muliple success criteria.
  * @author Davy Kager
  *
  */
@@ -48,23 +48,25 @@ public final class EvaluationResults implements Serializable {
 	private static final long serialVersionUID = 4338993838674375390L;
 
 	/**
-	 * The severity of a warning
+	 * The severity of a warning.
 	 */
 	public static final double SEVERITY_WARNING =
 			Verdict.SEVERITY_MIN + ((Verdict.SEVERITY_MAX - Verdict.SEVERITY_MIN) / 10.0);
 	// The severity of an error is computed, see getOverallVerdict().
-	
+
 	private final List<EvaluationResult> results = new ArrayList<>();
 	
-	private int passCount = 0, warningCount = 0, errorCount = 0;
+	private int passCount = 0; 
+	private int warningCount = 0; 
+	private int errorCount = 0;
 	
 	/**
-	 * Constructs a new container for evaluation results
+	 * Constructs a new container for evaluation results.
 	 */
 	public EvaluationResults() {}
 
 	/**
-	 * Add an evaluation result to the list of results
+	 * Add an evaluation result to the list of results.
 	 * @param result The result.
 	 */
 	public void add(EvaluationResult result) {
@@ -83,41 +85,41 @@ public final class EvaluationResults implements Serializable {
 				return;
 		}
 	}
-	
+
 	/**
-	 * Get a list of all evaluation results
+	 * Get a list of all evaluation results.
 	 * @return The list of results.
 	 */
 	public List<EvaluationResult> getResults() {
 		return Collections.unmodifiableList(results);
 	}
-	
+
 	/**
-	 * Get the total number of evaluation results
+	 * Get the total number of evaluation results.
 	 * @return The result count.
 	 */
 	public int getResultCount() {
 		return results.size();
 	}
-	
+
 	/**
-	 * Get the total number of evaluation results that are passes
+	 * Get the total number of evaluation results that are passes.
 	 * @return The pass count.
 	 */
 	public int getPassCount() {
 		return passCount;
 	}
-	
+
 	/**
-	 * Get the total number of evaluation results that are warnings
+	 * Get the total number of evaluation results that are warnings.
 	 * @return The warning count.
 	 */
 	public int getWarningCount() {
 		return warningCount;
 	}
-	
+
 	/**
-	 * Get the total number of evaluation results that are errors
+	 * Get the total number of evaluation results that are errors.
 	 * @return The error count.
 	 */
 	public int getErrorCount() {
@@ -125,15 +127,15 @@ public final class EvaluationResults implements Serializable {
 	}
 	
 	/**
-	 * Returns if at least one evaluation result is a violation (warning or error)
+	 * Returns if at least one evaluation result is a violation (warning or error).
 	 * @return Whether or not the results contain any violations.
 	 */
 	public boolean hasViolations() {
 		return getResultCount() - passCount > 0;
 	}
-	
+
 	/**
-	 * Computes an overall Verdict from all evaluation results
+	 * Computes an overall Verdict from all evaluation results.
 	 * The severity will match that of the highest-level problem that was found.
 	 * It will be the minimum severity if no problems were found.
 	 * @return A Verdict.
@@ -154,12 +156,11 @@ public final class EvaluationResults implements Serializable {
 		}
 		return new Verdict(severity, "Accessibility evaluation");
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Warnings: " + getWarningCount() +
-				", Errors: " + getErrorCount() +
-				", Total: " + getResultCount();
+		return "Warnings: " + getWarningCount()
+		 		+ ", Errors: " + getErrorCount()
+		 		+ ", Total: " + getResultCount();
 	}
-	
 }

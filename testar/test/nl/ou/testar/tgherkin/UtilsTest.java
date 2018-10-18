@@ -1,14 +1,14 @@
 /**
  * 
  */
+
 package nl.ou.testar.tgherkin;
 
-import java.util.Arrays;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.Arrays;
+import org.junit.Test;
 
 /**
  * Test Utils class.

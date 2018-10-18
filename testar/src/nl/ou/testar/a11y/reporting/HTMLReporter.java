@@ -39,7 +39,7 @@ import java.util.Map.Entry;
 import org.fruit.Assert;
 
 /**
- * HTML reporter for accessibility evaluation
+ * HTML reporter for accessibility evaluation.
  * @author Davy Kager
  *
  */
@@ -48,7 +48,7 @@ public final class HTMLReporter {
 	// ----
 	// HTML
 	// ----
-	
+
 	private static final String[] HEADER = new String[] {
 		"<!DOCTYPE html>",
 		"<html>",
@@ -57,12 +57,12 @@ public final class HTMLReporter {
 		"</head>",
 		"<body>"
 	};
-	
-	public static final String[] FOOTER = new String[] {
+
+	private static final String[] FOOTER = new String[] {
 		"</body>",
 		"</html>"
 	};
-	
+
 	private static final String[] HEADING = new String[] {
 			"h1", "h2", "h3", "h4", "h5", "h6"
 	};
@@ -72,21 +72,21 @@ public final class HTMLReporter {
 			TABLE = "table", TABLE_ROW = "tr", TABLE_HEADING = "th", TABLE_CELL = "td",
 			IMAGE = "img", IMAGE_SRC = "src", IMAGE_ALT = "alt",
 			LINK = "a", LINK_DEST = "href", LINK_TARGET = "target", LINK_TARGET_NEW = "_blank";
-	
+
 	// ---------
 	// Constants
 	// ---------
-	
-	public final static String CHARSET = "UTF-8";
+
+	private static final String CHARSET = "UTF-8";
 	
 	// ----------
 	// Attributes
 	// ----------
-	
+
 	private final PrintWriter out;
-	
+
 	/**
-	 * Opens a new HTML report
+	 * Opens a new HTML report.
 	 * @param filename The filename to use.
 	 * @throws FileNotFoundException On file I/O error.
 	 * @throws UnsupportedEncodingException On charset error.
@@ -94,52 +94,54 @@ public final class HTMLReporter {
 	public HTMLReporter(String filename) throws FileNotFoundException, UnsupportedEncodingException {
 		out = new PrintWriter(filename, CHARSET);
 	}
-	
+
 	/**
-	 * Writes the header to the HTML report
+	 * Writes the header to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeHeader() {
-		for (String el : HEADER)
+		for (String el : HEADER) {
 			write(el);
+		}
 		writeHeading(1, "Accessibility Evaluation Report");
 		return this;
 	}
-	
+
 	/**
-	 * Writes the footer to the HTML report
+	 * Writes the footer to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeFooter() {
-		for (String el : FOOTER)
+		for (String el : FOOTER) {
 			write(el);
+		}
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a heading
+	 * Writes the start of a heading.
 	 * @param level The heading level, 1 (highest) .. 6 (lowest).
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeHeadingStart(int level) {
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(start(HEADING[level-1]));
+		write(start(HEADING[level - 1]));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a heading
+	 * Writes the end of a heading.
 	 * @param level The heading level, 1 (highest) .. 6 (lowest).
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeHeadingEnd(int level) {
 		Assert.isTrue(level >= 1 && level <= 6, "Invalid HTML heading level");
-		write(end(HEADING[level-1]));
+		write(end(HEADING[level - 1]));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a heading
+	 * Writes a heading.
 	 * @param level The heading level, 1 (highest) .. 6 (lowest).
 	 * @param text The heading text.
 	 * @return This HTML reporter.
@@ -152,27 +154,27 @@ public final class HTMLReporter {
 		writeHeadingEnd(level);
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a paragraph to the HTML report
+	 * Writes the start of a paragraph to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeParagraphStart() {
 		write(start(PARAGRAPH));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a paragraph to the HTML report
+	 * Writes the end of a paragraph to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeParagraphEnd() {
 		write(end(PARAGRAPH));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a paragraph to the HTML report
+	 * Writes a paragraph to the HTML report.
 	 * @param text The paragraph text.
 	 * @return This HTML reporter.
 	 */
@@ -183,27 +185,27 @@ public final class HTMLReporter {
 		writeParagraphEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of an unordered list to the HTML report
+	 * Writes the start of an unordered list to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeUListStart() {
 		write(start(ULIST));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of an unordered list to the HTML report
+	 * Writes the end of an unordered list to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeUListEnd() {
 		write(end(ULIST));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of an ordered list to the HTML report
+	 * Writes the start of an ordered list to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeOListStart() {
@@ -212,16 +214,16 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the end of an ordered list to the HTML report
+	 * Writes the end of an ordered list to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeOListEnd() {
 		write(end(OLIST));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a list item to the HTML report
+	 * Writes the start of a list item to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeListItemStart() {
@@ -230,16 +232,16 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the end of a list item to the HTML report
+	 * Writes the end of a list item to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeListItemEnd() {
 		write(end(LIST_ITEM));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a list item to the HTML report
+	 * Writes a list item to the HTML report.
 	 * @param text The item text.
 	 * @return This HTML reporter.
 	 */
@@ -250,36 +252,36 @@ public final class HTMLReporter {
 		writeListItemEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a table to the HTML report
+	 * Writes the start of a table to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableStart() {
 		write(start(TABLE));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a table to the HTML report
+	 * Writes the end of a table to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableEnd() {
 		write(end(TABLE));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a table row to the HTML report
+	 * Writes the start of a table row to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRowStart() {
 		write(start(TABLE_ROW));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a table row to the HTML report
+	 * Writes the end of a table row to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRowEnd() {
@@ -288,25 +290,25 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the start of a table heading to the HTML report
+	 * Writes the start of a table heading to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableHeadingStart() {
 		write(start(TABLE_HEADING));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a table heading to the HTML report
+	 * Writes the end of a table heading to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableHeadingEnd() {
 		write(end(TABLE_HEADING));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a table heading to the HTML report
+	 * Writes a table heading to the HTML report.
 	 * @param text The heading text.
 	 * @return This HTML reporter.
 	 */
@@ -317,9 +319,9 @@ public final class HTMLReporter {
 		writeTableHeadingEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a table cell to the HTML report
+	 * Writes the start of a table cell to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableCellStart() {
@@ -328,16 +330,16 @@ public final class HTMLReporter {
 	}
 	
 	/**
-	 * Writes the end of a table cell to the HTML report
+	 * Writes the end of a table cell to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableCellEnd() {
 		write(end(TABLE_CELL));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a table cell to the HTML report
+	 * Writes a table cell to the HTML report.
 	 * @param text The cell text.
 	 * @return This HTML reporter.
 	 */
@@ -348,48 +350,51 @@ public final class HTMLReporter {
 		writeTableCellEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes a table headings row to the HTML report
+	 * Writes a table headings row to the HTML report.
 	 * @param headings The headings.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableHeadings(String... headings) {
 		writeTableRowStart();
-		for (String heading : headings)
+		for (String heading : headings) {
 			writeTableHeading(heading);
+		}
 		writeTableRowEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes a regular table row to the HTML report
+	 * Writes a regular table row to the HTML report.
 	 * @param cells The cells.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRow(String... cells) {
 		writeTableRowStart();
-		for (String cell : cells)
+		for (String cell : cells) {
 			writeTableCell(cell);
+		}
 		writeTableRowEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes a regular table row to the HTML report
+	 * Writes a regular table row to the HTML report.
 	 * @param cells The cells.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeTableRow(Object... cells) {
 		writeTableRowStart();
-		for (Object cell : cells)
+		for (Object cell : cells) {
 			writeTableCell(cell.toString());
+		}
 		writeTableRowEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Writes a reference to an image to the HTML report
+	 * Writes a reference to an image to the HTML report.
 	 * @param src The image URL.
 	 * @param alt The alternative text for the image.
 	 * @return This HTML reporter.
@@ -402,9 +407,9 @@ public final class HTMLReporter {
 		write(start(IMAGE, attrs)); // image tag is not closed
 		return this;
 	}
-	
+
 	/**
-	 * Writes the start of a link to the HTML report
+	 * Writes the start of a link to the HTML report.
 	 * @param dest The destination URL.
 	 * @param newWindow If the link should open in a new window or tab.
 	 * @return This HTML reporter.
@@ -413,23 +418,24 @@ public final class HTMLReporter {
 		Assert.notNull(dest);
 		Map<String, String> attrs = new HashMap<>();
 		attrs.put(LINK_DEST, dest);
-		if (newWindow)
+		if (newWindow) {
 			attrs.put(LINK_TARGET, LINK_TARGET_NEW);
+		}
 		write(start(LINK, attrs));
 		return this;
 	}
-	
+
 	/**
-	 * Writes the end of a link to the HTML report
+	 * Writes the end of a link to the HTML report.
 	 * @return This HTML reporter.
 	 */
 	public HTMLReporter writeLinkEnd() {
 		write(end(LINK));
 		return this;
 	}
-	
+
 	/**
-	 * Writes a link to the HTML report
+	 * Writes a link to the HTML report.
 	 * @param text The link text.
 	 * @param dest The destination URL.
 	 * @param newWindow If the link should open in a new window or tab.
@@ -442,14 +448,14 @@ public final class HTMLReporter {
 		writeLinkEnd();
 		return this;
 	}
-	
+
 	/**
-	 * Closes the HTML report
+	 * Closes the HTML report.
 	 */
 	public void close() {
 		out.close();
 	}
-	
+
 	private void write(String s) {
 		out.println(s);
 	}
@@ -457,17 +463,17 @@ public final class HTMLReporter {
 	private String start(String el) {
 		return "<" + el + ">";
 	}
-	
+
 	private String start(String el, Map<String, String> attrs) {
 		String ret = "<" + el;
-		for (Entry<String, String> attr : attrs.entrySet())
+		for (Entry<String, String> attr : attrs.entrySet()) {
 			ret += " " + attr.getKey() + "=\"" + attr.getValue() + "\"";
+		}
 		ret += ">";
 		return ret;
 	}
-	
+
 	private String end(String el) {
 		return "</" + el + ">";
 	}
-
 }

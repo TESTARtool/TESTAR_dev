@@ -212,6 +212,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 						// slides
 						addSlidingActions(actions,ac,SCROLLARROWSIZE,SCROLLTHICK,w);
+
 					}
 				}
 			}			
@@ -273,7 +274,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @return whether or not the execution succeeded
 	 */
 	protected boolean executeAction(SUT system, State state, Action action) {
-		System.out.println(action.toParametersString());
+		
 		return super.executeAction(system, state, action);
 		
 	}

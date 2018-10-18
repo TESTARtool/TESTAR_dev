@@ -44,7 +44,7 @@ public class DragDropGesture extends Gesture {
 	    			return true;
 	    		}
 	    	}
-		}else {
+		} else {
 			WidgetCondition widgetCondition = getParameterBase().get(Parameters.WIDGET_CONITION, dataTable);
 	    	for (Widget targetWidget : proxy.getTopWidgets(proxy.getState())) {
 				if (widget != targetWidget && proxy.isUnfiltered(targetWidget) && widgetCondition.evaluate(proxy, targetWidget, dataTable)) {
@@ -63,7 +63,7 @@ public class DragDropGesture extends Gesture {
 	    			targetWidgets.add(targetWidget);
 	    		}
 	    	}
-		}else {
+		} else {
 			WidgetCondition widgetCondition = getParameterBase().get(Parameters.WIDGET_CONITION, dataTable);	    	for (Widget targetWidget : proxy.getTopWidgets(proxy.getState())) {
 				if (widget != targetWidget && proxy.isUnfiltered(targetWidget) && widgetCondition.evaluate(proxy, targetWidget, dataTable)) {
 					targetWidgets.add(targetWidget);
@@ -83,7 +83,7 @@ public class DragDropGesture extends Gesture {
     		int targetNumber  = random.nextInt(targetWidgets.size());
 			Widget targetWidget = targetWidgets.get(targetNumber);
 			actions.add(getAction(widget, targetWidget));
-		}else {
+		} else {
 			for (Widget targetWidget : targetWidgets) {
 				actions.add(getAction(widget, targetWidget));
 			}

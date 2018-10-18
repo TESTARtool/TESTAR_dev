@@ -27,7 +27,7 @@ TCHAR ErrorBuffer[ERROR_BUFFER_LEN];
 
 
 /* JNI_OnLoad */
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved){
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 	JNIEnv *env;
 	if (jvm->GetEnv((void **)&env, JNI_VERSION_1_2))
 		return JNI_ERR; /* JNI version not supported */
@@ -36,32 +36,32 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved){
 }
 
 /* JNI_OnUnload */
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved){
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *jvm, void *reserved) {
 }
 
-void throwUIAException(JNIEnv *env, const char* msg){
+void throwUIAException(JNIEnv *env, const char* msg) {
 	jclass exClass = env->FindClass(UIAEXCEPTION_CLASSNAME);
 	env->ThrowNew(exClass, msg);
 }
 
-void throwGDIException(JNIEnv *env, const char* msg){
+void throwGDIException(JNIEnv *env, const char* msg) {
 	jclass exClass = env->FindClass(GDIEXCEPTION_CLASSNAME);
 	env->ThrowNew(exClass, msg);
 }
 
-void throwGDIException(JNIEnv *env, int statusCode){
+void throwGDIException(JNIEnv *env, int statusCode) {
 	jclass exClass = env->FindClass(GDIEXCEPTION_CLASSNAME); 
 	jmethodID status_constructor = env->GetMethodID(exClass, "<init>", "(I)V");  
 	jthrowable exObj = (jthrowable) env->NewObject(exClass, status_constructor, statusCode);  
 	env->Throw(exObj);
 }
 
-void throwWinApiException(JNIEnv *env, const char* msg){
+void throwWinApiException(JNIEnv *env, const char* msg) {
 	jclass exClass = env->FindClass(WINAPIEXCEPTION_CLASSNAME);
 	env->ThrowNew(exClass, msg);
 }
 
-const TCHAR* errString(const char* functionName, DWORD errCode){
+const TCHAR* errString(const char* functionName, DWORD errCode) {
 	LPVOID lpMsgBuf;
 	LPVOID lpDisplayBuf;
 
@@ -87,16 +87,16 @@ const TCHAR* errString(const char* functionName, DWORD errCode){
 
 
 /* TerminateProcess */
-JNI_SIG(jboolean, WINAPI_NS(TerminateProcess)) (JNIEnv * env, jclass cl, jlong hProcess, jlong exitCode){
+JNI_SIG(jboolean, WINAPI_NS(TerminateProcess)) (JNIEnv * env, jclass cl, jlong hProcess, jlong exitCode) {
 	return TerminateProcess((HANDLE)hProcess, exitCode) != 0;
 }
 
 
 /* GetClassName */
-JNI_SIG(jstring, WINAPI_NS(GetClassName))(JNIEnv *env, jclass, jlong hwnd){
+JNI_SIG(jstring, WINAPI_NS(GetClassName))(JNIEnv *env, jclass, jlong hwnd) {
 	const int CL_NAME_LEN = 500;
 	char name[CL_NAME_LEN];
-	if(GetClassName((HWND)hwnd, name, CL_NAME_LEN) == 0)
+	if (GetClassName((HWND)hwnd, name, CL_NAME_LEN) == 0)
 		return 0;
 	return env->NewStringUTF(name);
 }
@@ -123,7 +123,7 @@ JNI_SIG(jbyteArray, WINAPI_NS(loadFile)) (JNIEnv * env, jclass cl, jstring name)
 /* GetProcessId */
 JNI_SIG(jlong, WINAPI_NS(GetProcessId))(JNIEnv *env, jclass cl, jlong hProcess) {
 	DWORD ret = GetProcessId((HANDLE)hProcess);
-	if(ret == 0)
+	if (ret == 0)
 		throwWinApiException(env, "GetProcessId() failed!");
 	return (jlong) ret;
 }
@@ -134,7 +134,7 @@ JNI_SIG(jlong, WINAPI_NS(GetForegroundWindow)) (JNIEnv * env, jclass cl) {
 }
 
 /* WindowFromPoint */
-JNI_SIG(jint, WINAPI_NS(WindowFromPoint))(JNIEnv * env, jclass cl, jint x, jint y){
+JNI_SIG(jint, WINAPI_NS(WindowFromPoint))(JNIEnv * env, jclass cl, jint x, jint y) {
 	POINT p;
 	p.x = x;
 	p.y = y;
@@ -142,7 +142,7 @@ JNI_SIG(jint, WINAPI_NS(WindowFromPoint))(JNIEnv * env, jclass cl, jint x, jint 
 }
 
 /* ChildWindowFromPoint */
-JNI_SIG(jint, WINAPI_NS(ChildWindowFromPoint))(JNIEnv * env, jclass cl, jint parentHwnd, jint x, jint y){
+JNI_SIG(jint, WINAPI_NS(ChildWindowFromPoint))(JNIEnv * env, jclass cl, jint parentHwnd, jint x, jint y) {
 	HWND pHwnd = (HWND) parentHwnd;
 	POINT p;
 	p.x = x;
@@ -152,7 +152,7 @@ JNI_SIG(jint, WINAPI_NS(ChildWindowFromPoint))(JNIEnv * env, jclass cl, jint par
 
 /* GetClientRect */
 JNI_SIG(jintArray, WINAPI_NS(GetClientRect))
-(JNIEnv * env, jclass cl, jint hwnd){
+(JNIEnv * env, jclass cl, jint hwnd) {
 	RECT crect;
 	BOOL success = GetClientRect((HWND)hwnd, &crect);
 
@@ -167,12 +167,12 @@ JNI_SIG(jintArray, WINAPI_NS(GetClientRect))
 }
 
 /* GetWindowThreadId */
-JNI_SIG(jint, WINAPI_NS(GetWindowThreadId)) (JNIEnv * env, jclass cl, jint hwnd){
+JNI_SIG(jint, WINAPI_NS(GetWindowThreadId)) (JNIEnv * env, jclass cl, jint hwnd) {
 	return (int)GetWindowThreadProcessId((HWND)hwnd, NULL);
 }
 
 /* GetWindowProcessId */
-JNI_SIG(jlong, WINAPI_NS(GetWindowProcessId)) (JNIEnv * env, jclass cl, jlong hwnd){
+JNI_SIG(jlong, WINAPI_NS(GetWindowProcessId)) (JNIEnv * env, jclass cl, jlong hwnd) {
 	DWORD pid;
 	GetWindowThreadProcessId((HWND)hwnd, &pid);
 	return pid;
@@ -180,22 +180,22 @@ JNI_SIG(jlong, WINAPI_NS(GetWindowProcessId)) (JNIEnv * env, jclass cl, jlong hw
 
 /* SendMessage */
 JNI_SIG(jlong, WINAPI_NS(SendMessage))
-(JNIEnv *env, jclass cl, jlong hwnd, jlong msg, jlong wparam, jlong lparam){
+(JNIEnv *env, jclass cl, jlong hwnd, jlong msg, jlong wparam, jlong lparam) {
 	return SendMessage((HWND)hwnd, msg, wparam, lparam);
 }
 
 
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam){
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 	std::vector<jlong>& handles = *((std::vector<jlong>*) lParam);
 	handles.push_back((jlong)hwnd);
 	return TRUE;
 }
 
 /* EnumWindows */
-JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__)(JNIEnv *env, jclass){
+JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__)(JNIEnv *env, jclass) {
 	std::vector<jlong> handles;
 	BOOL success = EnumWindows(EnumWindowsProc, (LPARAM)&handles);
-	if(!success)
+	if (!success)
 		return 0;
 	jlongArray ret = env->NewLongArray(handles.size());
 	env->SetLongArrayRegion(ret, (jsize)0, (jsize)handles.size(), (jlong*)&handles[0]);
@@ -203,24 +203,24 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__)(JNIEnv *env, jclass){
 }
 
 
-BOOL CALLBACK EnumProcessWindowsProc(HWND hwnd, LPARAM lParam){
+BOOL CALLBACK EnumProcessWindowsProc(HWND hwnd, LPARAM lParam) {
 	std::pair<DWORD, std::vector<jlong> >& arg = *((std::pair<DWORD, std::vector<jlong> >*) lParam);
 
 	DWORD pid = 0;
 	GetWindowThreadProcessId(hwnd, &pid);
 //	printf("pid: %d  hwnd: %d  hwnd-pid: %d\n", arg.first, hwnd, pid);fflush(stdout);
-	if(pid == arg.first)
+	if (pid == arg.first)
 		arg.second.push_back((jlong)hwnd);
 	return TRUE;
 }
 
 
 /* EnumWindows (for a process) */
-JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__J)(JNIEnv *env, jclass, jlong pid){
+JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__J)(JNIEnv *env, jclass, jlong pid) {
 	std::pair<DWORD, std::vector<jlong> > arg;
 	arg.first = pid;
 	BOOL success = EnumWindows(EnumProcessWindowsProc, (LPARAM)&arg);
-	if(!success)
+	if (!success)
 		return 0;
 	jlongArray ret = env->NewLongArray(arg.second.size());
 	env->SetLongArrayRegion(ret, (jsize)0, (jsize)arg.second.size(), (jlong*)&arg.second[0]);
@@ -229,7 +229,7 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumWindows)__J)(JNIEnv *env, jclass, jlong pid){
 
 
 /* EnumAllWindows */
-JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__)(JNIEnv *env, jclass){
+JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__)(JNIEnv *env, jclass) {
 	std::vector<jlong> handles;
 	handles.push_back((jlong)GetDesktopWindow());
 	EnumChildWindows((HWND)handles[0], EnumWindowsProc, (LPARAM) &handles);
@@ -241,11 +241,11 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__)(JNIEnv *env, jclass){
 
 
 /* EnumAllWindows (for a process) */
-JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__J)(JNIEnv *env, jclass, jlong pid){
+JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__J)(JNIEnv *env, jclass, jlong pid) {
 	std::pair<DWORD, std::vector<jlong> > arg;
 	arg.first = pid;
 	BOOL success = EnumWindows(EnumProcessWindowsProc, (LPARAM)&arg);
-	if(!success)
+	if (!success)
 		return 0;
 
 	// add child windows also
@@ -260,7 +260,7 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumAllWindows)__J)(JNIEnv *env, jclass, jlong pid
 
 
 /* EnumChildWindows */
-JNI_SIG(jlongArray, WINAPI_NS(EnumChildWindows))(JNIEnv *env, jclass, jlong hwndParent){
+JNI_SIG(jlongArray, WINAPI_NS(EnumChildWindows))(JNIEnv *env, jclass, jlong hwndParent) {
 	std::vector<jlong> handles;
 	EnumChildWindows((HWND)hwndParent, EnumWindowsProc, (LPARAM)&handles); // return value not used!!!
 	jlongArray ret = env->NewLongArray(handles.size());
@@ -269,22 +269,22 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumChildWindows))(JNIEnv *env, jclass, jlong hwnd
 }
 
 /* IsWindow */
-JNI_SIG(jboolean, WINAPI_NS(IsWindow)) (JNIEnv * env, jclass cl, jlong hwnd){
+JNI_SIG(jboolean, WINAPI_NS(IsWindow)) (JNIEnv * env, jclass cl, jlong hwnd) {
 	return IsWindow((HWND)hwnd);
 }
 
 /* IsIconic */
-JNI_SIG(jboolean, WINAPI_NS(IsIconic)) (JNIEnv * env, jclass cl, jlong hwnd){
+JNI_SIG(jboolean, WINAPI_NS(IsIconic)) (JNIEnv * env, jclass cl, jlong hwnd) {
 	return IsIconic((HWND)hwnd);
 }
 
 /* IsWindowVisible */
-JNI_SIG(jboolean, WINAPI_NS(IsWindowVisible)) (JNIEnv * env, jclass cl, jlong hwnd){
+JNI_SIG(jboolean, WINAPI_NS(IsWindowVisible)) (JNIEnv * env, jclass cl, jlong hwnd) {
 	return IsWindowVisible((HWND)hwnd);
 }
 
 /* GetWindowRect (array return value) */
-JNI_SIG(jlongArray, WINAPI_NS(GetWindowRect))(JNIEnv *env, jclass, jlong hwnd){
+JNI_SIG(jlongArray, WINAPI_NS(GetWindowRect))(JNIEnv *env, jclass, jlong hwnd) {
 	RECT crect;
 	BOOL success = GetWindowRect((HWND)hwnd, &crect);
 
@@ -299,34 +299,34 @@ JNI_SIG(jlongArray, WINAPI_NS(GetWindowRect))(JNIEnv *env, jclass, jlong hwnd){
 }
 
 /* GetParent */
-JNI_SIG(jint, WINAPI_NS(GetParent)) (JNIEnv * env, jclass cl, jint hwnd){
+JNI_SIG(jint, WINAPI_NS(GetParent)) (JNIEnv * env, jclass cl, jint hwnd) {
 	return (jint)GetParent((HWND)hwnd);
 }
 
 
 /* GetWindow */
-JNI_SIG(jlong, WINAPI_NS(GetWindow)) (JNIEnv * env, jclass cl, jlong hwnd, jlong uCmd){
+JNI_SIG(jlong, WINAPI_NS(GetWindow)) (JNIEnv * env, jclass cl, jlong hwnd, jlong uCmd) {
 	return (jlong)GetWindow((HWND)hwnd, (UINT) uCmd);
 }
 
 /* GetAncestor */
-JNI_SIG(jint, WINAPI_NS(GetAncestor)) (JNIEnv * env, jclass cl, jint hwnd, jint gaFlags){
+JNI_SIG(jint, WINAPI_NS(GetAncestor)) (JNIEnv * env, jclass cl, jint hwnd, jint gaFlags) {
 	return (jint)GetAncestor((HWND)hwnd, (UINT) gaFlags);
 }
 
 
 /* GetWindowTextLength */
-JNI_SIG(jint, WINAPI_NS(GetWindowTextLength)) (JNIEnv * env, jclass cl, jint hwnd){
+JNI_SIG(jint, WINAPI_NS(GetWindowTextLength)) (JNIEnv * env, jclass cl, jint hwnd) {
 	return (jint)GetWindowTextLength((HWND)hwnd);
 }
 
 /* GetWindowText */
-JNI_SIG(jstring, WINAPI_NS(GetWindowText))(JNIEnv *env, jclass, jlong hwnd){
+JNI_SIG(jstring, WINAPI_NS(GetWindowText))(JNIEnv *env, jclass, jlong hwnd) {
 	const int MAX_TEXT_LEN = 500;
 	char name[MAX_TEXT_LEN];
 	int res = GetWindowText((HWND)hwnd, name, MAX_TEXT_LEN);
 
-	if(res == 0)
+	if (res == 0)
 		return 0;
 
 	return env->NewStringUTF(name);
@@ -334,30 +334,30 @@ JNI_SIG(jstring, WINAPI_NS(GetWindowText))(JNIEnv *env, jclass, jlong hwnd){
 
 
 /* GetShellWindow */
-JNI_SIG(jint, WINAPI_NS(GetShellWindow)) (JNIEnv * env, jclass cl){
+JNI_SIG(jint, WINAPI_NS(GetShellWindow)) (JNIEnv * env, jclass cl) {
 	return (jint)GetShellWindow();
 }
 
 /* GetDesktopWindow */
-JNI_SIG(jlong, WINAPI_NS(GetDesktopWindow)) (JNIEnv * env, jclass cl){
+JNI_SIG(jlong, WINAPI_NS(GetDesktopWindow)) (JNIEnv * env, jclass cl) {
 	return (jlong)GetDesktopWindow();
 }
 
 
 /* GetDesktopWindow */
-JNI_SIG(jlong, WINAPI_NS(GetWindowLong)) (JNIEnv * env, jclass cl, jlong hwnd, jlong nIndex){
+JNI_SIG(jlong, WINAPI_NS(GetWindowLong)) (JNIEnv * env, jclass cl, jlong hwnd, jlong nIndex) {
 	return (jlong)GetWindowLong((HWND) hwnd, nIndex);
 }
 
 
 /* GetNextWindow */
-JNI_SIG(jlong, WINAPI_NS(GetNextWindow)) (JNIEnv * env, jclass cl, jlong hWnd, jlong wCmd){
+JNI_SIG(jlong, WINAPI_NS(GetNextWindow)) (JNIEnv * env, jclass cl, jlong hWnd, jlong wCmd) {
 	return (jlong)GetNextWindow((HWND)hWnd, (UINT)wCmd);
 }
 
 /* GetToolBarItemRect */
 JNI_SIG(jintArray, WINAPI_NS(GetToolBarItemRect))
-(JNIEnv *env, jclass, jint hwnd, jint index, jboolean dropdown){
+(JNIEnv *env, jclass, jint hwnd, jint index, jboolean dropdown) {
 
 	HWND _hwnd = (HWND) hwnd;
 	DWORD pid;
@@ -390,13 +390,13 @@ JNI_SIG(jintArray, WINAPI_NS(GetToolBarItemRect))
 
 /* GetToolBarButtonCount */
 JNI_SIG(jint, WINAPI_NS(GetToolBarButtonCount))
-(JNIEnv *env, jclass, jint hwnd){
+(JNIEnv *env, jclass, jint hwnd) {
 	return SendMessage((HWND)hwnd, TB_BUTTONCOUNT, 0, 0);
 }
 
 /* GetToolButtonInfo */
 JNI_SIG(jintArray, WINAPI_NS(GetToolButtonInfo))
-(JNIEnv *env, jclass, jint hwnd, jint index){
+(JNIEnv *env, jclass, jint hwnd, jint index) {
 
 	HWND _hwnd = (HWND) hwnd;
 	DWORD pid;
@@ -432,11 +432,11 @@ JNI_SIG(jintArray, WINAPI_NS(GetToolButtonInfo))
 
 /* GetToolButtonText */
 JNI_SIG(jstring, WINAPI_NS(GetToolButtonText))
-(JNIEnv *env, jclass, jint hwnd, jint idCommand){
+(JNIEnv *env, jclass, jint hwnd, jint idCommand) {
 
 	int strLen = SendMessage((HWND)hwnd, TB_GETBUTTONTEXT, idCommand, NULL);
 
-	if(strLen <= 0)
+	if (strLen <= 0)
 		return 0;
 
 	HWND _hwnd = (HWND) hwnd;
@@ -464,12 +464,12 @@ JNI_SIG(jstring, WINAPI_NS(GetToolButtonText))
 
 
 /* CloseHandle */
-JNI_SIG(jboolean, WINAPI_NS(CloseHandle)) (JNIEnv * env, jclass cl, jlong hObject){
+JNI_SIG(jboolean, WINAPI_NS(CloseHandle)) (JNIEnv * env, jclass cl, jlong hObject) {
 	return (jboolean)CloseHandle((HANDLE)hObject);
 }
 
 /* ExitProcess */
-JNI_SIG(void, WINAPI_NS(ExitProcess)) (JNIEnv * env, jclass cl, jlong exitCode){
+JNI_SIG(void, WINAPI_NS(ExitProcess)) (JNIEnv * env, jclass cl, jlong exitCode) {
 	ExitProcess(exitCode);
 }
 
@@ -477,7 +477,7 @@ JNI_SIG(void, WINAPI_NS(ExitProcess)) (JNIEnv * env, jclass cl, jlong exitCode){
 JNI_SIG(jlongArray, WINAPI_NS(CreateProcess)) (JNIEnv * env, jclass cl, jstring applicationName,
 		jstring commandLine, jboolean inheritHandles, jlong creationFlags,
 		jobjectArray environment, jstring currentDir, jstring desktop,
-		jstring title, jlongArray startupInfo){
+		jstring title, jlongArray startupInfo) {
 
 	const char *sCommandLine = env->GetStringUTFChars(commandLine, NULL);
 
@@ -501,7 +501,7 @@ JNI_SIG(jlongArray, WINAPI_NS(CreateProcess)) (JNIEnv * env, jclass cl, jstring 
 	
 	env->ReleaseStringUTFChars(commandLine, sCommandLine);
 	
-	if(!success){
+	if (!success) {
 		throwWinApiException(env, "Unable to start process!");
 	    return 0;
 	}
@@ -520,12 +520,12 @@ JNI_SIG(jlongArray, WINAPI_NS(CreateProcess)) (JNIEnv * env, jclass cl, jstring 
 
 /* GetScrollBarInfo */
 JNI_SIG(jintArray, WINAPI_NS(GetScrollBarInfo))
-(JNIEnv *env, jclass, jint hwnd, jint idObject){
+(JNIEnv *env, jclass, jint hwnd, jint idObject) {
 
 	SCROLLBARINFO sbi;
 	sbi.cbSize = sizeof(SCROLLBARINFO);
 
-	if(GetScrollBarInfo((HWND)hwnd, (LONG)idObject, &sbi)){
+	if (GetScrollBarInfo((HWND)hwnd, (LONG)idObject, &sbi)) {
 		jint data[13];
 		data[0] = sbi.rcScrollBar.left;
 		data[1] = sbi.rcScrollBar.top;
@@ -544,23 +544,23 @@ JNI_SIG(jintArray, WINAPI_NS(GetScrollBarInfo))
 		jintArray ret = env->NewIntArray(13);
 		env->SetIntArrayRegion(ret, 0, 13, data);
 		return ret;
-	}else{
+	} else {
 		return 0;
 	}
 }
 
 /* GetSystemMetrics */
 JNI_SIG(jint, WINAPI_NS(GetSystemMetrics))
-(JNIEnv *env, jclass, jint nIndex){
+(JNIEnv *env, jclass, jint nIndex) {
 	return GetSystemMetrics(nIndex);
 }
 
 /* GetMenuItemRect */
 JNI_SIG(jintArray, WINAPI_NS(GetMenuItemRect))
-(JNIEnv *env, jclass cl, jint hwnd, jint hmenu, jint uitem){
+(JNIEnv *env, jclass cl, jint hwnd, jint hmenu, jint uitem) {
 	RECT _rect;
 	bool res = GetMenuItemRect((HWND)hwnd, (HMENU) hmenu, uitem, &_rect);
-	if(res == 0)
+	if (res == 0)
 		return 0;
 
 	jint data[4];
@@ -574,19 +574,19 @@ JNI_SIG(jintArray, WINAPI_NS(GetMenuItemRect))
 }
 
 /* GetMenu */
-JNI_SIG(jlong, WINAPI_NS(GetMenu)) (JNIEnv *env, jclass cl, jlong hwnd){
+JNI_SIG(jlong, WINAPI_NS(GetMenu)) (JNIEnv *env, jclass cl, jlong hwnd) {
 	return (jlong)GetMenu((HWND)hwnd);
 }
 
 /* GetMenuBarInfo */
 JNI_SIG(jintArray, WINAPI_NS(GetMenuBarInfo))
-(JNIEnv* env, jclass, jint hwnd, jint idObject, jint idItem){
+(JNIEnv* env, jclass, jint hwnd, jint idObject, jint idItem) {
 
 	MENUBARINFO _mbi;
 	_mbi.cbSize = sizeof(MENUBARINFO);
 	bool res = GetMenuBarInfo((HWND)hwnd, idObject, idItem, &_mbi);
 
-	if(!res)
+	if (!res)
 		return 0;
 
 	jint data[8];
@@ -605,30 +605,30 @@ JNI_SIG(jintArray, WINAPI_NS(GetMenuBarInfo))
 
 
 /* GetMenuItemCount */
-JNI_SIG(jint, WINAPI_NS(GetMenuItemCount)) (JNIEnv *env, jclass cl, jint hMenu){
+JNI_SIG(jint, WINAPI_NS(GetMenuItemCount)) (JNIEnv *env, jclass cl, jint hMenu) {
 	return (jint)GetMenuItemCount((HMENU)hMenu);
 }
 
 
 /* GetSubMenu */
-JNI_SIG(jint, WINAPI_NS(GetSubMenu)) (JNIEnv *env, jclass cl, jint hMenu, jint nPos){
+JNI_SIG(jint, WINAPI_NS(GetSubMenu)) (JNIEnv *env, jclass cl, jint hMenu, jint nPos) {
 	return (jint)GetSubMenu((HMENU)hMenu, nPos);
 }
 
 
 /* GetSystemMenu */
-JNI_SIG(jlong, WINAPI_NS(GetSystemMenu)) (JNIEnv *env, jclass cl, jlong hWnd, jboolean bRevert){
+JNI_SIG(jlong, WINAPI_NS(GetSystemMenu)) (JNIEnv *env, jclass cl, jlong hWnd, jboolean bRevert) {
 	return (jlong)GetSystemMenu((HWND)hWnd, (bool)bRevert);
 }
 
 
 /* GetMenuString */
-JNI_SIG(jstring, WINAPI_NS(GetMenuString))(JNIEnv *env, jclass, jint hMenu, jint uIDItem, jint uFlag){
+JNI_SIG(jstring, WINAPI_NS(GetMenuString))(JNIEnv *env, jclass, jint hMenu, jint uIDItem, jint uFlag) {
 	const int STR_LEN = 500;
 	char str[STR_LEN];
 	int res = GetMenuString((HMENU)hMenu, uIDItem, str, STR_LEN, uFlag);
 
-	if(res == 0)
+	if (res == 0)
 		return 0;
 
 	return env->NewStringUTF(str);
@@ -637,13 +637,13 @@ JNI_SIG(jstring, WINAPI_NS(GetMenuString))(JNIEnv *env, jclass, jint hMenu, jint
 
 /* ListView_GetItemCount */
 JNI_SIG(jint, WINAPI_NS(ListView_1GetItemCount))
-(JNIEnv *env, jclass, jint hwnd){
+(JNIEnv *env, jclass, jint hwnd) {
 	return ListView_GetItemCount((HWND)hwnd);
 }
 
 
 /* ListView_GetItemText */
-JNI_SIG(jstring, WINAPI_NS(ListView_1GetItemText))(JNIEnv *env, jclass, jint hwnd, jint iItem, jint iSubItem){
+JNI_SIG(jstring, WINAPI_NS(ListView_1GetItemText))(JNIEnv *env, jclass, jint hwnd, jint iItem, jint iSubItem) {
 	const int STR_LEN = 500;
 	//
 	HWND _hwnd = (HWND) hwnd;
@@ -683,7 +683,7 @@ JNI_SIG(jstring, WINAPI_NS(ListView_1GetItemText))(JNIEnv *env, jclass, jint hwn
 
 
 /* ListView_GetItemRect */
-JNI_SIG(jintArray, WINAPI_NS(ListView_1GetItemRect))(JNIEnv *env, jclass, jint hwnd, jint iItem, jint flags){
+JNI_SIG(jintArray, WINAPI_NS(ListView_1GetItemRect))(JNIEnv *env, jclass, jint hwnd, jint iItem, jint flags) {
 
 	DWORD pid;
 	GetWindowThreadProcessId((HWND)hwnd, &pid);
@@ -719,32 +719,32 @@ JNI_SIG(jintArray, WINAPI_NS(ListView_1GetItemRect))(JNIEnv *env, jclass, jint h
 
 /* GetAsyncKeyState */
 JNI_SIG(jint, WINAPI_NS(GetAsyncKeyState))
-(JNIEnv *env, jclass cl, jint vKey){
+(JNIEnv *env, jclass cl, jint vKey) {
 	return GetAsyncKeyState(vKey);
 }
 
 /* SetCursorPos */
 JNI_SIG(jboolean, WINAPI_NS(SetCursorPos))
-(JNIEnv *env, jclass, jint x, jint y){
+(JNIEnv *env, jclass, jint x, jint y) {
 	return SetCursorPos(x, y);
 }
 
 
 /* SetPixel */
 JNI_SIG(jint, WINAPI_NS(SetPixel))
-(JNIEnv * env, jclass cl, jint hdc, jint x, jint y, jint color){
+(JNIEnv * env, jclass cl, jint hdc, jint x, jint y, jint color) {
 	return SetPixel((HDC)hdc, x, y, color);
 }
 
 /* RGBMacro */
 JNI_SIG(jint, WINAPI_NS(RGBMacro))
-(JNIEnv * env, jclass cl, jint red, jint green, jint blue){
+(JNIEnv * env, jclass cl, jint red, jint green, jint blue) {
 	return RGB(red, green, blue);
 }
 
 /* TextOut */
 JNI_SIG(jboolean, WINAPI_NS(TextOut))
-(JNIEnv * env, jclass cl, jint hdc, jint x, jint y, jstring text){
+(JNIEnv * env, jclass cl, jint hdc, jint x, jint y, jstring text) {
 
 	const char* sText = env->GetStringUTFChars(text, NULL);
 	jboolean ret = TextOut((HDC)hdc, x, y, sText, strlen(sText));
@@ -755,13 +755,13 @@ JNI_SIG(jboolean, WINAPI_NS(TextOut))
 
 /* GetWindowDC */
 JNI_SIG(jint, WINAPI_NS(GetWindowDC))
-(JNIEnv * env, jclass cl, jint hwnd){
+(JNIEnv * env, jclass cl, jint hwnd) {
 	return (int)GetWindowDC((HWND) hwnd);
 }
 
 /* InvalidateRect */
 JNI_SIG(jboolean, WINAPI_NS(InvalidateRect))
-(JNIEnv * env, jclass cl, jint hwnd, jint x, jint y, jint width, jint height, jboolean bErase){
+(JNIEnv * env, jclass cl, jint hwnd, jint x, jint y, jint width, jint height, jboolean bErase) {
 
 	RECT rect;
 	rect.left = x;
@@ -773,19 +773,19 @@ JNI_SIG(jboolean, WINAPI_NS(InvalidateRect))
 }
 
 /* SelectObject */
-JNI_SIG(jlong, WINAPI_NS(SelectObject))(JNIEnv * env, jclass cl, jlong hdc, jlong hgdiobj){
+JNI_SIG(jlong, WINAPI_NS(SelectObject))(JNIEnv * env, jclass cl, jlong hdc, jlong hgdiobj) {
 	return (jlong)SelectObject((HDC)hdc, (HGDIOBJ)hgdiobj);
 }
 
 /* DeleteObject */
 JNI_SIG(jboolean, WINAPI_NS(DeleteObject))
-(JNIEnv * env, jclass cl, jint hgdiobj){
+(JNIEnv * env, jclass cl, jint hgdiobj) {
 	return DeleteObject((HGDIOBJ) hgdiobj);
 }
 
 /* FillRect */
 JNI_SIG(jint, WINAPI_NS(FillRect))(JNIEnv * env, jclass cl, jint hdc, jint left, jint top,
-		jint right, jint bottom, jint brush){
+		jint right, jint bottom, jint brush) {
 
 	RECT _rect;
 	_rect.left = left;
@@ -797,32 +797,32 @@ JNI_SIG(jint, WINAPI_NS(FillRect))(JNIEnv * env, jclass cl, jint hdc, jint left,
 
 /* CreateSolidBrush */
 JNI_SIG(jint, WINAPI_NS(CreateSolidBrush))
-(JNIEnv * env, jclass cl, jint color){
+(JNIEnv * env, jclass cl, jint color) {
 	return (jint)CreateSolidBrush((COLORREF) color);
 }
 
 /* ReleaseDC */
 JNI_SIG(jint, WINAPI_NS(ReleaseDC))
-(JNIEnv * env, jclass cl, jint hwnd, jint hdc){
+(JNIEnv * env, jclass cl, jint hwnd, jint hdc) {
 	return ReleaseDC((HWND) hwnd, (HDC) hdc);
 }
 
 
 /* Rectangle */
 JNI_SIG(jboolean, WINAPI_NS(Rectangle))
-(JNIEnv * env, jclass cl, jint hdc, jint nLeftRect, jint nTopRect, jint nRightRect, jint nBottomRect){
+(JNIEnv * env, jclass cl, jint hdc, jint nLeftRect, jint nTopRect, jint nRightRect, jint nBottomRect) {
 	return Rectangle((HDC) hdc, nLeftRect, nTopRect, nRightRect, nBottomRect);
 }
 
 /* GetComboBoxInfo */
 JNI_SIG(jintArray, WINAPI_NS(GetComboBoxInfo))
-(JNIEnv *env, jclass, jint hwnd){
+(JNIEnv *env, jclass, jint hwnd) {
 
 	COMBOBOXINFO _cbi;
 	_cbi.cbSize = sizeof(COMBOBOXINFO);
 	BOOL succ = GetComboBoxInfo((HWND)hwnd, &_cbi);
 
-	if(succ == 0)
+	if (succ == 0)
 		return 0;
 
 	//TODO: return Array!!!
@@ -832,11 +832,11 @@ JNI_SIG(jintArray, WINAPI_NS(GetComboBoxInfo))
 
 
 /* GetCursorPos */
-JNI_SIG(jdoubleArray, WINAPI_NS(GetCursorPos)) (JNIEnv * env, jclass){
+JNI_SIG(jdoubleArray, WINAPI_NS(GetCursorPos)) (JNIEnv * env, jclass) {
 	POINT p;
 	BOOL success = GetCursorPos(&p);
 
-	if(!success)
+	if (!success)
 		return 0;
 
 	jdouble retArr[2];
@@ -852,13 +852,13 @@ JNI_SIG(jdoubleArray, WINAPI_NS(GetCursorPos)) (JNIEnv * env, jclass){
 /* SetWindowPos */
 JNI_SIG(jboolean, WINAPI_NS(SetWindowPos)) (JNIEnv * env, jclass, 
 		jlong hwnd, jlong hwndInsertAfter, jlong x, jlong y, 
-		jlong cx, jlong cy, jlong uFlags){
+		jlong cx, jlong cy, jlong uFlags) {
 	return SetWindowPos((HWND)hwnd, (HWND)hwndInsertAfter, x, y, cx, cy, uFlags);
 }
 
 
 /* ShowWindow */
-JNI_SIG(jboolean, WINAPI_NS(ShowWindow)) (JNIEnv * env, jclass, jlong hwnd, jlong nCmdShow){
+JNI_SIG(jboolean, WINAPI_NS(ShowWindow)) (JNIEnv * env, jclass, jlong hwnd, jlong nCmdShow) {
 	return ShowWindow((HWND) hwnd, nCmdShow);
 }
 
@@ -866,12 +866,12 @@ JNI_SIG(jboolean, WINAPI_NS(ShowWindow)) (JNIEnv * env, jclass, jlong hwnd, jlon
 /* PeekMessage */
 JNI_SIG(jlongArray, WINAPI_NS(PeekMessage)) (JNIEnv * env, jclass, 
 		jlong hwnd, jlong wMsgFilterMin, jlong wMsgFilterMax, 
-		jlong wRemoveMsg){
+		jlong wRemoveMsg) {
 
 	MSG msg;
 	BOOL success = PeekMessage(&msg, (HWND)hwnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
 
-	if(!success)
+	if (!success)
 		return 0;
 
 	jlong retArr[7];
@@ -890,11 +890,11 @@ JNI_SIG(jlongArray, WINAPI_NS(PeekMessage)) (JNIEnv * env, jclass,
 
 /* GetMessage */
 JNI_SIG(jlongArray, WINAPI_NS(GetMessage)) (JNIEnv * env, jclass, 
-		jlong hwnd, jlong wMsgFilterMin, jlong wMsgFilterMax){
+		jlong hwnd, jlong wMsgFilterMin, jlong wMsgFilterMax) {
 	MSG msg;
 	BOOL success = GetMessage(&msg, (HWND)hwnd, wMsgFilterMin, wMsgFilterMax);
 
-	if(!success)
+	if (!success)
 		return 0;
 
 	jlong retArr[7];
@@ -915,7 +915,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetMessage)) (JNIEnv * env, jclass,
 
 /* TranslateMessage */
 JNI_SIG(jboolean, WINAPI_NS(TranslateMessage)) (JNIEnv * env, jclass, 
-		jlongArray lpMsg){
+		jlongArray lpMsg) {
 
 	jlong* lpMsgArr = env->GetLongArrayElements(lpMsg, NULL);
 
@@ -934,7 +934,7 @@ JNI_SIG(jboolean, WINAPI_NS(TranslateMessage)) (JNIEnv * env, jclass,
 
 /* DispatchMessage */
 JNI_SIG(jlong, WINAPI_NS(DispatchMessage)) (JNIEnv * env, jclass, 
-		jlongArray lpMsg){
+		jlongArray lpMsg) {
 	jlong* lpMsgArr = env->GetLongArrayElements(lpMsg, NULL);
 
 	MSG msg;
@@ -952,12 +952,12 @@ JNI_SIG(jlong, WINAPI_NS(DispatchMessage)) (JNIEnv * env, jclass,
 
 /* GetModuleHandleEx */
 JNI_SIG(jlong, WINAPI_NS(GetModuleHandleEx)) (JNIEnv * env, jclass, 
-		jlong dwFlags, jstring lpModuleName){
+		jlong dwFlags, jstring lpModuleName) {
 	const char *nativeModuleName = env->GetStringUTFChars(lpModuleName, NULL);
 	HMODULE hm;
 	BOOL success = GetModuleHandleEx(dwFlags, nativeModuleName, &hm);
 	env->ReleaseStringUTFChars(lpModuleName, nativeModuleName);
-	if(!success)
+	if (!success)
 		throwWinApiException(env, "Failed to get module handle!");
 	return (jlong)hm;
 }
@@ -965,7 +965,7 @@ JNI_SIG(jlong, WINAPI_NS(GetModuleHandleEx)) (JNIEnv * env, jclass,
 
 /* MonitorFromPoint */
 JNI_SIG(jlong, WINAPI_NS(MonitorFromPoint)) (JNIEnv * env, jclass, 
-		jlong x, jlong y, jlong dwFlags){
+		jlong x, jlong y, jlong dwFlags) {
 	POINT p;
 	p.x = x;
 	p.y = y;
@@ -974,7 +974,7 @@ JNI_SIG(jlong, WINAPI_NS(MonitorFromPoint)) (JNIEnv * env, jclass,
 
 
 /* GdiplusStartup */
-JNI_SIG(jlong, WINAPI_NS(GdiplusStartup)) (JNIEnv * env, jclass){
+JNI_SIG(jlong, WINAPI_NS(GdiplusStartup)) (JNIEnv * env, jclass) {
 	Gdiplus::GdiplusStartupInput 	gdiplusStartupInput;
 	ULONG_PTR   					gdiplusToken;  
 
@@ -987,19 +987,19 @@ JNI_SIG(jlong, WINAPI_NS(GdiplusStartup)) (JNIEnv * env, jclass){
 
 /* GdiplusShutdown */
 JNI_SIG(void, WINAPI_NS(GdiplusShutdown)) (JNIEnv * env, jclass, 
-		jlong gdiplusToken){
+		jlong gdiplusToken) {
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
 
 /* GetMonitorInfo */
 JNI_SIG(jlongArray, WINAPI_NS(GetMonitorInfo)) (JNIEnv * env, jclass, 
-		jlong hMonitor){
+		jlong hMonitor) {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(MONITORINFO);
 	BOOL success = GetMonitorInfo((HMONITOR)hMonitor, &mi);
 
-	if(!success){
+	if (!success) {
 		throwWinApiException(env, "Unable to retrieve monitor info!");
 		return 0;
 	}
@@ -1027,7 +1027,7 @@ JNI_SIG(void, WINAPI_NS(UpdateLayeredWindow)) (JNIEnv * env, jclass,
 		jlong hwnd, jlong hdcDst, jlong pptDstX, jlong pptDstY, 
 		jlong psizeCX, jlong psizeCY, jlong hdcSrc, jlong pptSrcX, 
 		jlong pptSrcY, jlong crKey, jint pblendOp, jint pblendFlags,
-		jint pblendSCAlpha, jint pblendAlphaFormat, jlong dwFlags){
+		jint pblendSCAlpha, jint pblendAlphaFormat, jlong dwFlags) {
 
 	POINT pptDst;
 	pptDst.x = pptDstX;
@@ -1048,41 +1048,41 @@ JNI_SIG(void, WINAPI_NS(UpdateLayeredWindow)) (JNIEnv * env, jclass,
 	pblend.AlphaFormat = pblendAlphaFormat;
 
 	BOOL success = UpdateLayeredWindow((HWND)hwnd, (HDC)hdcDst, &pptDst, &psize, (HDC)hdcSrc, &pptSrc, crKey, &pblend, dwFlags);
-	if(!success)
+	if (!success)
 		throwWinApiException(env, "Unable to update layered window!");
 }
 
 /* GetDC */
-JNI_SIG(jlong, WINAPI_NS(GetDC))(JNIEnv *env, jclass, jlong hwnd){
+JNI_SIG(jlong, WINAPI_NS(GetDC))(JNIEnv *env, jclass, jlong hwnd) {
 	HDC ret = GetDC((HWND)hwnd);
-	if(ret == NULL)
+	if (ret == NULL)
 		throwWinApiException(env, "Unable to get device context!");
 	return (jlong) ret;
 }
 
 /* CreateCompatibleDC */
 JNI_SIG(jlong, WINAPI_NS(CreateCompatibleDC))(JNIEnv *env, jclass, 
-		jlong hdc){
+		jlong hdc) {
 	return (jlong)CreateCompatibleDC((HDC)hdc);
 }
 
 /* CreateCompatibleBitmap */
 JNI_SIG(jlong, WINAPI_NS(CreateCompatibleBitmap))(JNIEnv *env, jclass, 
-		jlong hdc, jlong nWidth, jlong nHeight){
+		jlong hdc, jlong nWidth, jlong nHeight) {
 	return (jlong)CreateCompatibleBitmap((HDC)hdc, nWidth, nHeight);
 }
 
 
 /* Gdiplus_Graphics_FromHDC */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1FromHDC))(JNIEnv *env, 
-		jclass, jlong hdc){
+		jclass, jlong hdc) {
 	return (jlong)Gdiplus::Graphics::FromHDC((HDC)hdc);
 }
 
 
 /* Gdiplus_Graphics_Clear */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1Clear))(JNIEnv *env, jclass, 
-		jlong graphics, jint alpha, jint red, jint blue, jint green){
+		jlong graphics, jint alpha, jint red, jint blue, jint green) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	return pg->Clear(Gdiplus::Color(alpha, red, blue, green)); 	
 }
@@ -1091,7 +1091,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1Clear))(JNIEnv *env, jclass,
 /* Gdiplus_Graphics_DrawLine */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawLine))(JNIEnv *env, 
 		jclass, jlong graphics, jlong pen, jdouble x1, jdouble y1, 
-		jdouble x2, jdouble y2){
+		jdouble x2, jdouble y2) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Pen *pp = reinterpret_cast<Gdiplus::Pen*>(pen);
 	return pg->DrawLine(pp, (Gdiplus::REAL)x1, (Gdiplus::REAL)y1, (Gdiplus::REAL)x2, (Gdiplus::REAL)y2); 
@@ -1101,7 +1101,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawLine))(JNIEnv *env,
 /* Gdiplus_Graphics_DrawRectangle */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawRectangle))(JNIEnv *env, 
 		jclass, jlong graphics, jlong pen, jdouble x, jdouble y, 
-		jdouble width, jdouble height){
+		jdouble width, jdouble height) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Pen *pp = reinterpret_cast<Gdiplus::Pen*>(pen);
 	return pg->DrawRectangle(pp, (Gdiplus::REAL)x, (Gdiplus::REAL)y, (Gdiplus::REAL)width, (Gdiplus::REAL)height); 	
@@ -1111,7 +1111,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawRectangle))(JNIEnv *env,
 /* Gdiplus_Graphics_FillRectangle */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1FillRectangle))(JNIEnv *env, 
 		jclass, jlong graphics, jlong brush, jdouble x, jdouble y, 
-		jdouble width, jdouble height){
+		jdouble width, jdouble height) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Brush *pb = reinterpret_cast<Gdiplus::Brush*>(brush);
 	return pg->FillRectangle(pb, (Gdiplus::REAL)x, (Gdiplus::REAL)y, (Gdiplus::REAL)width, (Gdiplus::REAL)height); 
@@ -1121,7 +1121,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1FillRectangle))(JNIEnv *env,
 /* Gdiplus_Graphics_DrawEllipse */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawEllipse))(JNIEnv *env, 
 		jclass, jlong graphics, jlong pen, jdouble x, jdouble y, 
-		jdouble width, jdouble height){
+		jdouble width, jdouble height) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Pen *pp = reinterpret_cast<Gdiplus::Pen*>(pen);
 	return pg->DrawEllipse(pp, (Gdiplus::REAL)x, (Gdiplus::REAL)y, (Gdiplus::REAL)width, (Gdiplus::REAL)height); 	
@@ -1131,7 +1131,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawEllipse))(JNIEnv *env,
 /* Gdiplus_Graphics_FillEllipse */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1FillEllipse))(JNIEnv *env, 
 		jclass, jlong graphics, jlong brush, jdouble x, jdouble y, 
-		jdouble width, jdouble height){
+		jdouble width, jdouble height) {
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Brush *pb = reinterpret_cast<Gdiplus::Brush*>(brush);
 	return pg->FillEllipse(pb, (Gdiplus::REAL)x, (Gdiplus::REAL)y, (Gdiplus::REAL)width, (Gdiplus::REAL)height); 
@@ -1141,7 +1141,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1FillEllipse))(JNIEnv *env,
 /* Gdiplus_Graphics_DrawString */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawString))(JNIEnv *env, 
 		jclass, jlong graphics, jstring text, jlong font, jdouble x, 
-		jdouble y, jlong brush){
+		jdouble y, jlong brush) {
 
 	Gdiplus::Graphics *pg = reinterpret_cast<Gdiplus::Graphics*>(graphics);
 	Gdiplus::Brush *pb = reinterpret_cast<Gdiplus::Brush*>(brush);
@@ -1150,7 +1150,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawString))(JNIEnv *env,
 
 	jlong ret = 0;
 	int len = MultiByteToWideChar(CP_UTF8, 0, nativeText, -1, NULL, 0);
-	if (len > 1){ 
+	if (len > 1) { 
 		wchar_t* buffer = (wchar_t*) malloc(sizeof(wchar_t) * len);
 		MultiByteToWideChar(CP_UTF8, 0, nativeText, -1, buffer, len);
 
@@ -1166,62 +1166,62 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Graphics_1DrawString))(JNIEnv *env,
 
 /* Gdiplus_Pen_Create */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Pen_1Create))(JNIEnv *env, jclass, 
-		jint alpha, jint red, jint green, jint blue, jdouble width){
+		jint alpha, jint red, jint green, jint blue, jdouble width) {
 	return (jlong)new Gdiplus::Pen(Gdiplus::Color(alpha, red, green, blue), width);
 }
 
 /* Gdiplus_Pen_SetColor */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Pen_1SetColor))(JNIEnv *env, jclass, 
-		jlong pen, jint alpha, jint red, jint green, jint blue){
+		jlong pen, jint alpha, jint red, jint green, jint blue) {
 	Gdiplus::Pen *pp = reinterpret_cast<Gdiplus::Pen*>(pen);
 	return pp->SetColor(Gdiplus::Color(alpha, red, green, blue));
 }
 
 /* Gdiplus_Pen_SetWidth */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Pen_1SetWidth))(JNIEnv *env, 
-		jclass, jlong pen, jdouble width){
+		jclass, jlong pen, jdouble width) {
 	Gdiplus::Pen *pp = reinterpret_cast<Gdiplus::Pen*>(pen);
 	return pp->SetWidth((Gdiplus::REAL)width);
 }
 
 /* Gdiplus_Pen_Destroy */
-JNI_SIG(void, WINAPI_NS(Gdiplus_1Pen_1Destroy))(JNIEnv *env, jclass, jlong pen){
+JNI_SIG(void, WINAPI_NS(Gdiplus_1Pen_1Destroy))(JNIEnv *env, jclass, jlong pen) {
 	delete reinterpret_cast<Gdiplus::Pen*>(pen);
 }
 
 /* Gdiplus_SolidBrush_Create */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1SolidBrush_1Create))(JNIEnv *env, 
-		jclass, jint alpha, jint red, jint green, jint blue){
+		jclass, jint alpha, jint red, jint green, jint blue) {
 	return (jlong)new Gdiplus::SolidBrush(Gdiplus::Color(alpha, red, green, blue));
 }
 
 /* Gdiplus_SolidBrush_SetColor */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1SolidBrush_1SetColor))(JNIEnv *env, 
-		jclass, jlong brush, jint alpha, jint red, jint green, jint blue){
+		jclass, jlong brush, jint alpha, jint red, jint green, jint blue) {
 	Gdiplus::SolidBrush *pb = (Gdiplus::SolidBrush*)(brush);
 	return pb->SetColor(Gdiplus::Color(alpha, red, green, blue));
 }
 
 /* Gdiplus_SolidBrush_Destroy */
-JNI_SIG(void, WINAPI_NS(Gdiplus_1SolidBrush_1Destroy))(JNIEnv *env, jclass, jlong brush){
+JNI_SIG(void, WINAPI_NS(Gdiplus_1SolidBrush_1Destroy))(JNIEnv *env, jclass, jlong brush) {
 	delete reinterpret_cast<Gdiplus::SolidBrush*>(brush);
 }
 
 /* Gdiplus_Font_Create */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1Font_1Create))(JNIEnv *env, jclass, 
-		jlong fontFamily, jdouble size, jint style, jint unit){
+		jlong fontFamily, jdouble size, jint style, jint unit) {
 	return (jlong) new Gdiplus::Font(reinterpret_cast<Gdiplus::FontFamily*>(fontFamily), (Gdiplus::REAL)size, style, (Gdiplus::Unit)unit);
 }
 
 /* Gdiplus_Font_Destroy */
-JNI_SIG(void, WINAPI_NS(Gdiplus_1Font_1Destroy))(JNIEnv *env, jclass, jlong font){
+JNI_SIG(void, WINAPI_NS(Gdiplus_1Font_1Destroy))(JNIEnv *env, jclass, jlong font) {
 	delete reinterpret_cast<Gdiplus::Font*>(font);
 }
 
 
 /* Gdiplus_FontFamily_Create */
 JNI_SIG(jlong, WINAPI_NS(Gdiplus_1FontFamily_1Create))(JNIEnv *env, jclass, 
-		jstring fontName){
+		jstring fontName) {
 	const int MAX_STRING_LEN = 500;
 	const char *nativeFontName = env->GetStringUTFChars(fontName, NULL);
 
@@ -1237,7 +1237,7 @@ JNI_SIG(jlong, WINAPI_NS(Gdiplus_1FontFamily_1Create))(JNIEnv *env, jclass,
 
 /* Gdiplus_FontFamily_Destroy */
 JNI_SIG(void, WINAPI_NS(Gdiplus_1FontFamily_1Destroy))(JNIEnv *env, 
-		jclass, jlong fontFamily){
+		jclass, jlong fontFamily) {
 	delete reinterpret_cast<Gdiplus::FontFamily*>(fontFamily);
 }
 
@@ -1263,14 +1263,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 JNI_SIG(jlong, WINAPI_NS(CreateWindowEx)) (JNIEnv * env, jclass, jlong dwExStyle, 
 		jstring lpClassName, jstring lpWindowName, jlong dwStyle, jlong x, 
 		jlong y, jlong nWidth, jlong nHeight, jlong hwndParent, jlong hMenu, 
-		jlong hInstance, jlong lpParam){
+		jlong hInstance, jlong lpParam) {
 
 	const char *nativeClassName = (lpClassName == 0) ? "Default Custom Class With Standard Callback" : env->GetStringUTFChars(lpClassName, NULL);
 	const char *nativeWindowName = env->GetStringUTFChars(lpWindowName, NULL);
 
 
 	// use custom window class as default (with default callback!)
-	if(lpClassName == 0){
+	if (lpClassName == 0) {
 		WNDCLASSEX WndClass;
 		WndClass.cbSize    	= sizeof(WNDCLASSEX);
 		WndClass.style     	= NULL;
@@ -1291,16 +1291,16 @@ JNI_SIG(jlong, WINAPI_NS(CreateWindowEx)) (JNIEnv * env, jclass, jlong dwExStyle
 			nHeight, (HWND) hwndParent, (HMENU) hMenu, (HINSTANCE) hInstance, (LPVOID)lpParam);
 
 	env->ReleaseStringUTFChars(lpWindowName, nativeWindowName);
-	if(lpClassName != 0)
+	if (lpClassName != 0)
 		env->ReleaseStringUTFChars(lpClassName, nativeClassName);
 
 	return (jlong)ret;
 }
 
 /* GetCurrentModule */
-JNI_SIG(jlong, WINAPI_NS(GetCurrentModule)) (JNIEnv * env, jclass){ 
+JNI_SIG(jlong, WINAPI_NS(GetCurrentModule)) (JNIEnv * env, jclass) { 
 	HMODULE hModule = NULL;
-	if(GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)WndProc, &hModule) == 0)
+	if (GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)WndProc, &hModule) == 0)
 		return 0;
 	return (jlong) hModule;
 }
@@ -1308,10 +1308,10 @@ JNI_SIG(jlong, WINAPI_NS(GetCurrentModule)) (JNIEnv * env, jclass){
 
 /* OpenProcess */
 JNI_SIG(jlong, WINAPI_NS(OpenProcess)) (JNIEnv * env, jclass, 
-		jlong dwDesiredAccess, jboolean bInheritHandle, jlong dwProcessId){
+		jlong dwDesiredAccess, jboolean bInheritHandle, jlong dwProcessId) {
 	HANDLE ret = OpenProcess(dwDesiredAccess, bInheritHandle, dwProcessId);
 	
-	if(ret == NULL)
+	if (ret == NULL)
 		throwWinApiException(env, errString("OpenProcess", GetLastError()));
 	return (jlong) ret;
 }
@@ -1319,91 +1319,91 @@ JNI_SIG(jlong, WINAPI_NS(OpenProcess)) (JNIEnv * env, jclass,
 
 /* WaitForSingleObject */
 JNI_SIG(jlong, WINAPI_NS(WaitForSingleObject)) (JNIEnv * env, jclass, 
-		jlong hHandle, jlong dwMilliseconds){ 
+		jlong hHandle, jlong dwMilliseconds) { 
 	DWORD ret = WaitForSingleObject((HANDLE)hHandle, dwMilliseconds);
 	
-	if(ret == WAIT_FAILED)
+	if (ret == WAIT_FAILED)
 		throwWinApiException(env, errString("WaitForSingleObject", ret));
 	return (jlong) ret;
 }
 
 
 /* GetExitCodeProcess */
-JNI_SIG(jlong, WINAPI_NS(GetExitCodeProcess)) (JNIEnv * env, jclass, jlong hProcess){
+JNI_SIG(jlong, WINAPI_NS(GetExitCodeProcess)) (JNIEnv * env, jclass, jlong hProcess) {
 	DWORD exitCode;
-	if(!GetExitCodeProcess((HANDLE)hProcess, &exitCode))
+	if (!GetExitCodeProcess((HANDLE)hProcess, &exitCode))
 		throwWinApiException(env, errString("GetExitCodeProcess", GetLastError()));
 	return (jlong) exitCode;
 }
 
 
 /* CoInitializeEx */
-JNI_SIG(jlong, WINAPI_NS(CoInitializeEx)) (JNIEnv * env, jclass, jlong pvReserved, jlong dwCoInit){
+JNI_SIG(jlong, WINAPI_NS(CoInitializeEx)) (JNIEnv * env, jclass, jlong pvReserved, jlong dwCoInit) {
 	HRESULT ret = CoInitializeEx((LPVOID)pvReserved, (DWORD)dwCoInit);
-	if(FAILED(ret))
+	if (FAILED(ret))
 		throwWinApiException(env, errString("CoInitializeEx", ret));
 	return ret;
 }
 
 /* CoCreateInstance */
 JNI_SIG(jlong, WINAPI_NS(CoCreateInstance)) (JNIEnv * env, jclass, jlong rclsid, 
-		jlong pUnkOuter, jlong dwClsContext, jlong riid){
+		jlong pUnkOuter, jlong dwClsContext, jlong riid) {
 	LPVOID ppv;
 	HRESULT ret = CoCreateInstance(*(CLSID*)rclsid, (LPUNKNOWN)pUnkOuter, dwClsContext, *(CLSID*)riid, &ppv);
-	if(FAILED(ret))
+	if (FAILED(ret))
 		throwWinApiException(env, errString("CoCreateInstance", ret));
 	return (jlong)ppv;
 }
 
 /* Get_CLSID_CUIAutomation_Ptr */
-JNI_SIG(jlong, WINAPI_NS(Get_1CLSID_1CUIAutomation_1Ptr)) (JNIEnv * env, jclass){
+JNI_SIG(jlong, WINAPI_NS(Get_1CLSID_1CUIAutomation_1Ptr)) (JNIEnv * env, jclass) {
 	return (jlong) &CLSID_CUIAutomation;
 }
 
 /* Get_IID_IUIAutomation_Ptr */
-JNI_SIG(jlong, WINAPI_NS(Get_1IID_1IUIAutomation_1Ptr)) (JNIEnv * env, jclass){
+JNI_SIG(jlong, WINAPI_NS(Get_1IID_1IUIAutomation_1Ptr)) (JNIEnv * env, jclass) {
 	return (jlong) &IID_IUIAutomation;
 }
 
 /* IUnknown_QueryInterface */
 JNI_SIG(jlong, WINAPI_NS(IUnknown_1QueryInterface)) (JNIEnv * env, jclass, 
-		jlong pIUnknown, jlong pIID){
+		jlong pIUnknown, jlong pIID) {
 	IUnknown* iu = (IUnknown*)pIUnknown;
 	void* iface;
 	HRESULT res = iu->QueryInterface(*(IID*)pIID, &iface);
-	if(FAILED(res))
+	if (FAILED(res))
 		return 0;
 	return (jlong) iface;
 }
 
 /* IUnknown_AddRef */
-JNI_SIG(jlong, WINAPI_NS(IUnknown_1AddRef)) (JNIEnv * env, jclass, jlong pIUnknown){
+JNI_SIG(jlong, WINAPI_NS(IUnknown_1AddRef)) (JNIEnv * env, jclass, jlong pIUnknown) {
 	return ((IUnknown*)pIUnknown)->AddRef();
 }
 
 /* IUnknown_Release */
-JNI_SIG(jlong, WINAPI_NS(IUnknown_1Release)) (JNIEnv * env, jclass, jlong pIUnknown){
+JNI_SIG(jlong, WINAPI_NS(IUnknown_1Release)) (JNIEnv * env, jclass, jlong pIUnknown) {
 	return ((IUnknown*)pIUnknown)->Release();
 }
 
 /* CoUninitialize */
-JNI_SIG(void, WINAPI_NS(CoUninitialize)) (JNIEnv * env, jclass){
+JNI_SIG(void, WINAPI_NS(CoUninitialize)) (JNIEnv * env, jclass) {
 	CoUninitialize();
 }
 
 /* IUIAutomation_GetRootElement */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1GetRootElement)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomation){
+		jlong pIUIAutomation) {
 	IUIAutomationElement* root;
 	HRESULT res = ((IUIAutomation*)pIUIAutomation)->GetRootElement(&root);
-	if(FAILED(res))
+	if (FAILED(res))
 		throwUIAException(env, errString("IUIAutomation_GetRootElement", res));
 	return (jlong)root;
 }
 
 /* IUIAutomationElement_get_AcceleratorKey */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AcceleratorKey)) (JNIEnv * env, jclass,
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedAcceleratorKey(&value) : el->get_CurrentAcceleratorKey(&value);
@@ -1417,7 +1417,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AcceleratorKey)) (JNIEnv *
 
 /* IUIAutomationElement_get_AccessKey */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AccessKey)) (JNIEnv * env, jclass,
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedAccessKey(&value) : el->get_CurrentAccessKey(&value);
@@ -1431,7 +1431,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AccessKey)) (JNIEnv * env,
 
 /* IUIAutomationElement_get_HelpText */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1HelpText)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedHelpText(&value) : el->get_CurrentHelpText(&value);
@@ -1445,7 +1445,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1HelpText)) (JNIEnv * env, 
 
 /* IUIAutomationElement_get_ItemType */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ItemType)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedItemType(&value) : el->get_CurrentItemType(&value);
@@ -1459,7 +1459,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ItemType)) (JNIEnv * env, 
 
 /* IUIAutomationElement_get_ItemStatus */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ItemStatus)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedItemStatus(&value) : el->get_CurrentItemStatus(&value);
@@ -1474,7 +1474,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ItemStatus)) (JNIEnv * env
 
 /* IUIAutomationElement_get_LocalizedControlType */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1LocalizedControlType)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedLocalizedControlType(&value) : el->get_CurrentLocalizedControlType(&value);
@@ -1489,7 +1489,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1LocalizedControlType)) (JN
 
 /* IUIAutomationElement_get_ClassName */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ClassName)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedClassName(&value) : el->get_CurrentClassName(&value);
@@ -1504,7 +1504,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ClassName)) (JNIEnv * env,
 
 /* IUIAutomationElement_get_Name */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1Name)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedName(&value) : el->get_CurrentName(&value);
@@ -1552,7 +1552,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ValuePattern)) (JNIEnv * e
 
 /* IUIAutomationElement_get_ProviderDescription */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ProviderDescription)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedProviderDescription(&value) : el->get_CurrentProviderDescription(&value);
@@ -1566,7 +1566,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1ProviderDescription)) (JNI
 
 /* IUIAutomationElement_get_FrameworkId */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1FrameworkId)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedFrameworkId(&value) : el->get_CurrentFrameworkId(&value);
@@ -1580,7 +1580,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1FrameworkId)) (JNIEnv * en
 
 /* IUIAutomationElement_get_ControlType */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ControlType)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	CONTROLTYPEID value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedControlType(&value) : el->get_CurrentControlType(&value);
@@ -1591,7 +1591,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ControlType)) (JNIEnv * env,
 
 /* IUIAutomationElement_get_Culture */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Culture)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	int value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedCulture(&value) : el->get_CurrentCulture(&value);
@@ -1602,7 +1602,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Culture)) (JNIEnv * env, jcl
 
 /* IUIAutomationElement_get_Orientation */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Orientation)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	OrientationType value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedOrientation(&value) : el->get_CurrentOrientation(&value);
@@ -1614,7 +1614,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1Orientation)) (JNIEnv * env,
 
 /* IUIAutomationElement_get_ProcessId */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ProcessId)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	int value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedProcessId(&value) : el->get_CurrentProcessId(&value);
@@ -1626,7 +1626,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1ProcessId)) (JNIEnv * env, j
 
 /* IUIAutomationElement_get_NativeWindowHandle */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1NativeWindowHandle)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	UIA_HWND value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedNativeWindowHandle(&value) : el->get_CurrentNativeWindowHandle(&value);
@@ -1638,7 +1638,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1get_1NativeWindowHandle)) (JNIEnv
 
 /* IUIAutomationElement_get_IsContentElement */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsContentElement)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedIsContentElement(&value) : el->get_CurrentIsContentElement(&value);
@@ -1649,7 +1649,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsContentElement)) (JNIEn
 
 /* IUIAutomationElement_get_IsControlElement */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsControlElement)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedIsControlElement(&value) : el->get_CurrentIsControlElement(&value);
@@ -1660,7 +1660,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsControlElement)) (JNIEn
 
 /* IUIAutomationElement_get_IsEnabled */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsEnabled)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElement, jboolean fromCache){
+		jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedIsEnabled(&value) : el->get_CurrentIsEnabled(&value);
@@ -1671,7 +1671,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsEnabled)) (JNIEnv * env
 
 /* IUIAutomationElement_get_HasKeyboardFocus */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1HasKeyboardFocus)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedHasKeyboardFocus(&value) : el->get_CurrentHasKeyboardFocus(&value);
@@ -1684,7 +1684,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1HasKeyboardFocus)) (JNIEn
 
 /* IUIAutomationElement_get_IsKeyboardFocusable */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsKeyboardFocusable)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedIsKeyboardFocusable(&value) : el->get_CurrentIsKeyboardFocusable(&value);
@@ -1696,7 +1696,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsKeyboardFocusable)) (JN
 
 /* IUIAutomationElement_GetPattern */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1GetPattern)) (JNIEnv * env, jclass, 
-		jlong pElement, jlong patternId, jboolean fromCache){	
+		jlong pElement, jlong patternId, jboolean fromCache) {	
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	IUnknown* ret;
 	HRESULT hr = fromCache ? el->GetCachedPattern((PATTERNID)patternId, &ret) : el->GetCurrentPattern((PATTERNID)patternId, &ret);
@@ -1708,7 +1708,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1GetPattern)) (JNIEnv * env, jclas
 
 /* IUIAutomationElement_get_IsOffscreen */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsOffscreen)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	BOOL value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedIsOffscreen(&value) : el->get_CurrentIsOffscreen(&value);
@@ -1719,7 +1719,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationElement_1get_1IsOffscreen)) (JNIEnv * e
 
 /* IUIAutomationElement_get_BoundingRectangle */
 JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1get_1BoundingRectangle)) (JNIEnv * env, 
-		jclass, jlong pIUIAutomationElement, jboolean fromCache){
+		jclass, jlong pIUIAutomationElement, jboolean fromCache) {
 	RECT value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pIUIAutomationElement;
 	HRESULT hr = fromCache ? el->get_CachedBoundingRectangle(&value) : el->get_CurrentBoundingRectangle(&value);
@@ -1739,11 +1739,11 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1get_1BoundingRectangle)) (JN
 
 /* IUIAutomationElementArray_get_Length */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElementArray_1get_1Length)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElementArray){
+		jlong pIUIAutomationElementArray) {
     int length;
 	IUIAutomationElementArray* ela = (IUIAutomationElementArray*) pIUIAutomationElementArray;
 	HRESULT hr = ela->get_Length(&length);
-	if (FAILED(hr)){
+	if (FAILED(hr)) {
 		throwUIAException(env, errString("IUIAutomationElementArray_get_Length", hr));
 		return 0;
 	}
@@ -1753,7 +1753,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElementArray_1get_1Length)) (JNIEnv * env,
 
 /* IUIAutomationElementArray_GetElement */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElementArray_1GetElement)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomationElementArray, jint idx){
+		jlong pIUIAutomationElementArray, jint idx) {
 	IUIAutomationElement* el;
 	IUIAutomationElementArray* ela = (IUIAutomationElementArray*) pIUIAutomationElementArray;
 	HRESULT hr = ela->GetElement(idx, &el);
@@ -1765,7 +1765,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElementArray_1GetElement)) (JNIEnv * env, 
 
 /* IUIAutomation_ElementFromPoint */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromPoint)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomation, jlong x, jlong y){
+		jlong pIUIAutomation, jlong x, jlong y) {
 	IUIAutomationElement* el;
 	IUIAutomation* uia = (IUIAutomation*) pIUIAutomation;
 	POINT p;
@@ -1780,7 +1780,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromPoint)) (JNIEnv * env, jclass
 
 /* IUIAutomation_ElementFromHandle */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromHandle)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomation, jlong hwnd){
+		jlong pIUIAutomation, jlong hwnd) {
 	IUIAutomationElement* el;
 	IUIAutomation* uia = (IUIAutomation*) pIUIAutomation;
 	HRESULT hr = uia->ElementFromHandle((UIA_HWND)hwnd, &el);
@@ -1791,7 +1791,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromHandle)) (JNIEnv * env, jclas
 
 /* IUIAutomation_ElementFromHandleBuildCache */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromHandleBuildCache)) (JNIEnv * env, jclass, 
-		jlong pIUIAutomation, jlong hwnd, jlong pCacheRequest){
+		jlong pIUIAutomation, jlong hwnd, jlong pCacheRequest) {
 	IUIAutomationElement* el;
 	IUIAutomation* uia = (IUIAutomation*) pIUIAutomation;
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pCacheRequest;
@@ -1804,7 +1804,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1ElementFromHandleBuildCache)) (JNIEnv * 
 
 /* IUIAutomationElement_FindAll */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1FindAll)) (JNIEnv * env, jclass, 
-		jlong pElement, jlong treeScope, jlong pCondition){
+		jlong pElement, jlong treeScope, jlong pCondition) {
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	IUIAutomationCondition* ac = (IUIAutomationCondition*) pCondition;
 	IUIAutomationElementArray* ret;
@@ -1817,7 +1817,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1FindAll)) (JNIEnv * env, jclass,
 
 /* IUIAutomationElement_FindAllBuildCache */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1FindAllBuildCache)) (JNIEnv * env, jclass, 
-		jlong pElement,	jlong treeScope, jlong pCondition, jlong pCacheRequest){
+		jlong pElement,	jlong treeScope, jlong pCondition, jlong pCacheRequest) {
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	IUIAutomationCondition* ac = (IUIAutomationCondition*) pCondition;
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pCacheRequest;	
@@ -1830,7 +1830,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1FindAllBuildCache)) (JNIEnv * env
 
 /* IUIAutomation_CreateCacheRequest */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateCacheRequest)) (JNIEnv * env, jclass, 
-		jlong pAutomation){
+		jlong pAutomation) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCacheRequest* ret;
 	HRESULT hr = uia->CreateCacheRequest(&ret);
@@ -1842,7 +1842,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateCacheRequest)) (JNIEnv * env, jcla
 
 /* IUIAutomation_CreateTrueCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateTrueCondition)) (JNIEnv * env, jclass, 
-		jlong pAutomation){
+		jlong pAutomation) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* ret;
 	HRESULT hr = uia->CreateTrueCondition(&ret);
@@ -1854,7 +1854,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateTrueCondition)) (JNIEnv * env, jcl
 
 /* IUIAutomation_CreateAndCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateAndCondition)) (JNIEnv * env, jclass, 
-		jlong pAutomation, jlong pCond1, jlong pCond2){
+		jlong pAutomation, jlong pCond1, jlong pCond2) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* c1 = (IUIAutomationCondition*) pCond1;
 	IUIAutomationCondition* c2 = (IUIAutomationCondition*) pCond2;
@@ -1867,7 +1867,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreateAndCondition)) (JNIEnv * env, jcla
 
 /* IUIAutomation_CompareElements */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomation_1CompareElements)) (JNIEnv * env, jclass, 
-		jlong pAutomation, jlong pEl1, jlong pEl2){
+		jlong pAutomation, jlong pEl1, jlong pEl2) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationElement* el1 = (IUIAutomationElement*) pEl1;
 	IUIAutomationElement* el2 = (IUIAutomationElement*) pEl2;
@@ -1881,7 +1881,7 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomation_1CompareElements)) (JNIEnv * env, jcla
 
 /* IUIAutomation_CreatePropertyCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJLjava_lang_String_2)) (JNIEnv * env, jclass, 
-		jlong pAutomation, jlong propertyId, jstring value){
+		jlong pAutomation, jlong propertyId, jstring value) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* ret;
 	
@@ -1903,7 +1903,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJLjava_lang_St
 
 /* IUIAutomation_CreatePropertyCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJZ)) (JNIEnv * env, jclass, 
-		jlong pAutomation, jlong propertyId, jboolean value){
+		jlong pAutomation, jlong propertyId, jboolean value) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* ret;
 		
@@ -1920,7 +1920,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJZ)) (JNIEnv *
 
 /* IUIAutomation_CreatePropertyCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJI)) (JNIEnv * env, jclass, 
-		jlong pAutomation, jlong propertyId, jint value){
+		jlong pAutomation, jlong propertyId, jint value) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* ret;
 		
@@ -1937,7 +1937,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1CreatePropertyCondition__JJI)) (JNIEnv *
 
 /* IUIAutomation_get_ControlViewCondition */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1get_1ControlViewCondition)) (JNIEnv * env, jclass, 
-		jlong pAutomation){
+		jlong pAutomation) {
 	IUIAutomation* uia = (IUIAutomation*) pAutomation;
 	IUIAutomationCondition* ret;		
 	HRESULT hr = uia->get_ControlViewCondition(&ret);
@@ -1950,7 +1950,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomation_1get_1ControlViewCondition)) (JNIEnv * en
 
 /* IUIAutomationCacheRequest_AddProperty */
 JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1AddProperty)) (JNIEnv * env, jclass, 
-		jlong pRequest, jlong propertyId){
+		jlong pRequest, jlong propertyId) {
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pRequest;
 	HRESULT hr = cr->AddProperty(propertyId);
 	if (FAILED(hr))
@@ -1960,7 +1960,7 @@ JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1AddProperty)) (JNIEnv * env, 
 
 /* IUIAutomationCacheRequest_AddPattern */
 JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1AddPattern)) (JNIEnv * env, jclass, 
-		jlong pRequest, jlong patternId){
+		jlong pRequest, jlong patternId) {
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pRequest;
 	HRESULT hr = cr->AddPattern(patternId);
 	if (FAILED(hr))
@@ -1970,7 +1970,7 @@ JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1AddPattern)) (JNIEnv * env, j
 
 /* IUIAutomationCacheRequest_put_TreeFilter */
 JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1TreeFilter)) (JNIEnv * env, jclass, 
-		jlong pRequest, jlong pFilter){
+		jlong pRequest, jlong pFilter) {
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pRequest;
 	IUIAutomationCondition* cond = (IUIAutomationCondition*) pFilter;
 	HRESULT hr = cr->put_TreeFilter(cond);
@@ -1980,7 +1980,7 @@ JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1TreeFilter)) (JNIEnv * e
 
 /* IUIAutomationCacheRequest_put_TreeScope */
 JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1TreeScope)) (JNIEnv * env, jclass, 
-		jlong pRequest, jlong treeScope){
+		jlong pRequest, jlong treeScope) {
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pRequest;
 	HRESULT hr = cr->put_TreeScope((TreeScope)treeScope);
 	if (FAILED(hr))
@@ -1990,7 +1990,7 @@ JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1TreeScope)) (JNIEnv * en
 
 /* IUIAutomationCacheRequest_put_AutomationElementMode */
 JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1AutomationElementMode)) (JNIEnv * env, jclass, 
-		jlong pRequest, jlong mode){
+		jlong pRequest, jlong mode) {
 	IUIAutomationCacheRequest* cr = (IUIAutomationCacheRequest*) pRequest;
 	HRESULT hr = cr->put_AutomationElementMode((AutomationElementMode)mode);
 	if (FAILED(hr))
@@ -2000,7 +2000,7 @@ JNI_SIG(void, WINAPI_NS(IUIAutomationCacheRequest_1put_1AutomationElementMode)) 
 
 /* IUIAutomationElement_GetCachedChildren */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1GetCachedChildren)) (JNIEnv * env, jclass, 
-		jlong pElement){
+		jlong pElement) {
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	IUIAutomationElementArray* ret;
 	HRESULT hr = el->GetCachedChildren(&ret);
@@ -2012,7 +2012,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationElement_1GetCachedChildren)) (JNIEnv * env
 
 /* IUIAutomationElement_GetRuntimeId */
 JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env, jclass, 
-		jlong pElement){
+		jlong pElement) {
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	SAFEARRAY* ridArr;
 	HRESULT hr = el->GetRuntimeId(&ridArr);
@@ -2023,7 +2023,7 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env
 	LONG lbound = ridArr->rgsabound[0].lLbound;
 		
 	jlong* jRidArr = new jlong[elements];
-	for(LONG i = 0; i < elements; i++){
+	for(LONG i = 0; i < elements; i++) {
 		LONG ridPart;
 		ridPart = *((LONG*)ridArr->pvData + (lbound + i));
 		jRidArr[i] = ridPart;
@@ -2039,7 +2039,7 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env
 // begin by urueda
 /* IUIAutomationElement_GetCurrentPropertyValue */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIEnv * env, jclass,
-		jlong pElement, jlong propertyId, jboolean fromCache){
+		jlong pElement, jlong propertyId, jboolean fromCache) {
 	
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 		
@@ -2056,7 +2056,7 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIE
 	jclass cls;
 	jmethodID mid;
 	
-	switch(var.vt){
+	switch(var.vt) {
 	case VT_BOOL:
 		cls = env->FindClass("java/lang/Boolean");
 		mid = env->GetStaticMethodID(cls, "valueOf", "(Z)Ljava/lang/Boolean;");
@@ -2075,7 +2075,7 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIE
 
 /* IUIAutomationElement_GetPropertyValueEx */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * env, jclass, 
-		jlong pElement, jlong propertyId, jboolean ignoreDefaultValue, jboolean fromCache){
+		jlong pElement, jlong propertyId, jboolean ignoreDefaultValue, jboolean fromCache) {
 	
 	return 0; // NOT YET IMPLEMENTED!
 	
@@ -2092,7 +2092,7 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * 
 	jclass cls;
 	
 	
-	switch(var.vt){
+	switch(var.vt) {
 	case VT_BSTR: 	
 					cstr = _com_util::ConvertBSTRToString(*var.pbstrVal);
 					ret = env->NewStringUTF(cstr);
@@ -2120,13 +2120,13 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * 
 					break;
 	}
 	
-	if(var.vt >= VT_ARRAY){
-		if(var.vt == VT_ARRAY + VT_R8){    // double array
+	if (var.vt >= VT_ARRAY) {
+		if (var.vt == VT_ARRAY + VT_R8) {    // double array
 			ULONG elements = var.parray->rgsabound[0].cElements;
 			LONG lbound = var.parray->rgsabound[0].lLbound;
 			jdouble* jdArr = new jdouble[elements];
 			
-			for(LONG i = 0; i < elements; i++){
+			for(LONG i = 0; i < elements; i++) {
 				DOUBLE v;
 				v = *(((DOUBLE*)var.parray->pvData) + (lbound + i));
 				jdArr[i] = v;
@@ -2145,7 +2145,7 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * 
 
 /* IUIAutomationElement_get_AutomationId */
 JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AutomationId)) (JNIEnv * env, jclass, 
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	BSTR value;
 	IUIAutomationElement* el = (IUIAutomationElement*) pElement;
 	HRESULT hr = fromCache ? el->get_CachedAutomationId(&value) : el->get_CurrentAutomationId(&value);
@@ -2160,7 +2160,7 @@ JNI_SIG(jstring, WINAPI_NS(IUIAutomationElement_1get_1AutomationId)) (JNIEnv * e
 
 /* SafeArrayDestroy */
 JNI_SIG(void, WINAPI_NS(SafeArrayDestroy)) (JNIEnv * env, jclass, 
-		jlong pArray){
+		jlong pArray) {
 	SAFEARRAY* arr = (SAFEARRAY*) pArray;
 	HRESULT hr = SafeArrayDestroy(arr);
 	if (FAILED(hr))
@@ -2170,7 +2170,7 @@ JNI_SIG(void, WINAPI_NS(SafeArrayDestroy)) (JNIEnv * env, jclass,
 
 /* SafeArrayGetIntElement */
 JNI_SIG(jlong, WINAPI_NS(SafeArrayGetIntElement)) (JNIEnv * env, jclass, 
-		jlong pArray, jlong idx){
+		jlong pArray, jlong idx) {
 	SAFEARRAY* arr = (SAFEARRAY*) pArray;
 	LONG arrIdx = idx;
 	int el;
@@ -2183,7 +2183,7 @@ JNI_SIG(jlong, WINAPI_NS(SafeArrayGetIntElement)) (JNIEnv * env, jclass,
 
 /* SafeArrayGetUBound */
 JNI_SIG(jlong, WINAPI_NS(SafeArrayGetUBound)) (JNIEnv * env, jclass, 
-		jlong pArray, jlong dim){
+		jlong pArray, jlong dim) {
 	SAFEARRAY* arr = (SAFEARRAY*) pArray;
 	LONG ret;
 	HRESULT hr = SafeArrayGetUBound(arr, (LONG)dim, &ret);
@@ -2194,18 +2194,18 @@ JNI_SIG(jlong, WINAPI_NS(SafeArrayGetUBound)) (JNIEnv * env, jclass,
 
 
 /* EnumProcesses */
-JNI_SIG(jlongArray, WINAPI_NS(EnumProcesses)) (JNIEnv * env, jclass){
+JNI_SIG(jlongArray, WINAPI_NS(EnumProcesses)) (JNIEnv * env, jclass) {
 	const int MAX_PROCESSES = 1024;
     DWORD pids[MAX_PROCESSES], bytesReturned;
 
-    if(!EnumProcesses(pids, sizeof(pids), &bytesReturned)){
+    if (!EnumProcesses(pids, sizeof(pids), &bytesReturned)) {
     	throwWinApiException(env, errString("EnumProcesses", GetLastError()));
         return 0;
     }
 
     DWORD amount = bytesReturned / sizeof(DWORD);
     
-    if(amount == 0)
+    if (amount == 0)
     	return env->NewLongArray(0);
     
     jlong* pidArr = new jlong[amount];
@@ -2221,19 +2221,19 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumProcesses)) (JNIEnv * env, jclass){
 
 /* EnumProcessModules */
 JNI_SIG(jlongArray, WINAPI_NS(EnumProcessModules)) (JNIEnv * env, jclass,
-		jlong hProcess){
+		jlong hProcess) {
 	const int MAX_PROCESS_MODULES = 1024;
     HMODULE hModules[MAX_PROCESS_MODULES];
     DWORD cbNeeded;
 
-    if(!EnumProcessModules((HANDLE)hProcess, hModules, sizeof(hModules), &cbNeeded)){
+    if (!EnumProcessModules((HANDLE)hProcess, hModules, sizeof(hModules), &cbNeeded)) {
     	throwWinApiException(env, errString("EnumProcessModules", GetLastError()));
         return 0;
     }
 
     DWORD amount = cbNeeded / sizeof(DWORD);
 
-    if(amount == 0)
+    if (amount == 0)
     	return env->NewLongArray(0);
     
     jlong* hmArr = new jlong[amount];
@@ -2249,11 +2249,11 @@ JNI_SIG(jlongArray, WINAPI_NS(EnumProcessModules)) (JNIEnv * env, jclass,
 
 /* GetModuleBaseName */
 JNI_SIG(jstring, WINAPI_NS(GetModuleBaseName)) (JNIEnv * env, jclass,
-		jlong hProcess, jlong hModule){
+		jlong hProcess, jlong hModule) {
     TCHAR pName[MAX_PATH] = TEXT("<unknown>");
 	int slength = GetModuleBaseName((HANDLE) hProcess, (HMODULE) hModule, pName, sizeof(pName) / sizeof(TCHAR) );
 	
-	if(slength == 0){
+	if (slength == 0) {
     	throwWinApiException(env, errString("GetModuleBaseName", GetLastError()));
     	return 0;
 	}
@@ -2264,12 +2264,12 @@ JNI_SIG(jstring, WINAPI_NS(GetModuleBaseName)) (JNIEnv * env, jclass,
 
 /* IUIAutomationWindowPattern_get_CanMaximize */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1CanMaximize)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	BOOL ret;
 	HRESULT hr = fromCache ? pattern->get_CachedCanMaximize(&ret) : pattern->get_CurrentCanMaximize(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jboolean) ret;
 }
@@ -2277,12 +2277,12 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1CanMaximize)) (JNIE
 
 /* IUIAutomationWindowPattern_get_CanMinimize */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1CanMinimize)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	BOOL ret;
 	HRESULT hr = fromCache ? pattern->get_CachedCanMinimize(&ret) : pattern->get_CurrentCanMinimize(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jboolean) ret;
 }
@@ -2290,24 +2290,24 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1CanMinimize)) (JNIE
 
 /* IUIAutomationWindowPattern_get_IsModal */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1IsModal)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	BOOL ret;
 	HRESULT hr = fromCache ? pattern->get_CachedIsModal(&ret) : pattern->get_CurrentIsModal(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jboolean) ret;
 }
 
 /* IUIAutomationWindowPattern_get_IsTopmost */
 JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1IsTopmost)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	BOOL ret;
 	HRESULT hr = fromCache ? pattern->get_CachedIsTopmost(&ret) : pattern->get_CurrentIsTopmost(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jboolean) ret;
 }
@@ -2315,12 +2315,12 @@ JNI_SIG(jboolean, WINAPI_NS(IUIAutomationWindowPattern_1get_1IsTopmost)) (JNIEnv
 
 /* IUIAutomationWindowPattern_get_WindowInteractionState */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationWindowPattern_1get_1WindowInteractionState)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	WindowInteractionState ret;
 	HRESULT hr = fromCache ? pattern->get_CachedWindowInteractionState(&ret) : pattern->get_CurrentWindowInteractionState(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jlong) ret;
 }
@@ -2328,12 +2328,12 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationWindowPattern_1get_1WindowInteractionState
 
 /* IUIAutomationWindowPattern_get_WindowVisualState */
 JNI_SIG(jlong, WINAPI_NS(IUIAutomationWindowPattern_1get_1WindowVisualState)) (JNIEnv * env, jclass,
-		jlong pElement, jboolean fromCache){
+		jlong pElement, jboolean fromCache) {
 	IUIAutomationWindowPattern* pattern = (IUIAutomationWindowPattern*) pElement;
 	WindowVisualState ret;
 	HRESULT hr = fromCache ? pattern->get_CachedWindowVisualState(&ret) : pattern->get_CurrentWindowVisualState(&ret);
 	
-	if(FAILED(hr))
+	if (FAILED(hr))
 		return 0;
 	return (jlong) ret;
 }
@@ -2341,7 +2341,7 @@ JNI_SIG(jlong, WINAPI_NS(IUIAutomationWindowPattern_1get_1WindowVisualState)) (J
 
 /* Gdiplus_Graphics_DrawImage */
 JNI_SIG(void, WINAPI_NS(Gdiplus_1Graphics_1DrawImage)) (JNIEnv * env, jclass,
-		jlong pGraphics, jlong pImage, jlong x, jlong y){	
+		jlong pGraphics, jlong pImage, jlong x, jlong y) {	
 	Gdiplus::Graphics *pg = (Gdiplus::Graphics*) pGraphics;
 	Gdiplus::Image* img = (Gdiplus::Image*) pImage;
 
@@ -2355,11 +2355,11 @@ JNI_SIG(void, WINAPI_NS(Gdiplus_1Graphics_1DrawImage)) (JNIEnv * env, jclass,
 /* Gdiplus_Graphics_DrawImage */
 JNI_SIG(void, WINAPI_NS(Gdiplus_1Graphics_1DrawImage__JJJJJJJJ_3I)) (JNIEnv * env, jclass,
 		jlong pGraphics, jlong x, jlong y, jlong width, jlong height, jlong imgWidth, 
-		jlong imgHeight, jlong pixelFormat, jintArray data){	
+		jlong imgHeight, jlong pixelFormat, jintArray data) {	
 
 	jint* cdata = (jint*) env->GetPrimitiveArrayCritical(data, 0);
 		
-	if(cdata == NULL)
+	if (cdata == NULL)
 		throwGDIException(env, "Out of memory!");
 	
 	Gdiplus::Bitmap* bmp = new Gdiplus::Bitmap(imgWidth, imgHeight, imgWidth * 4, pixelFormat, (BYTE*)cdata);
@@ -2375,14 +2375,14 @@ JNI_SIG(void, WINAPI_NS(Gdiplus_1Graphics_1DrawImage__JJJJJJJJ_3I)) (JNIEnv * en
 
 
 /* Gdiplus_Bitmap_Destroy */
-JNI_SIG(void, WINAPI_NS(Gdiplus_1Bitmap_1Destroy))(JNIEnv *env, jclass, jlong pBitmap){
+JNI_SIG(void, WINAPI_NS(Gdiplus_1Bitmap_1Destroy))(JNIEnv *env, jclass, jlong pBitmap) {
 	delete (Gdiplus::Bitmap*)pBitmap;
 }
 
 /**
   * GetProcessMemoryInfo
   * by urueda */
-JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong processID){
+JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong processID) {
 
     HANDLE hProcess;
     PROCESS_MEMORY_COUNTERS pmc;
@@ -2434,7 +2434,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong p
 /**
   * InitializeAccessBridge
   * by ferpasri & urueda */
-JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
+JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass) {
 
 	MSG msg;
 	BOOL result = initializeAccessBridge();
@@ -2456,12 +2456,12 @@ JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 /**
   * GetAccessibleContext
   * by urueda (based on ferpasri) */
-JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd){
+JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd) {
 	
 	HWND window = (HWND)hwnd;
 	jlongArray ret = 0;
 
-	if (IsJavaWindow(window)){
+	if (IsJavaWindow(window)) {
 
 		long vmid;
 		AccessibleContext ac;
@@ -2487,7 +2487,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlon
 /**
   * GetHWNDFromAccessibleContext
   * by urueda */
-JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac) {
 
     HWND window = getHWNDFromAccessibleContext((long) vmid, (long) ac);
 
@@ -2498,7 +2498,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
  /**
   * GetVisibleChildrenCount
   * by urueda */
-/*JNI_SIG(jint, WINAPI_NS(GetVisibleChildrenCount)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+/*JNI_SIG(jint, WINAPI_NS(GetVisibleChildrenCount)) (JNIEnv * env, jclass, jlong vmid, jlong ac) {
 	
 	return (jint) getVisibleChildrenCount((long)vmid, (AccessibleContext)ac);
 	
@@ -2507,13 +2507,13 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 /**
   * GetVisibleChildren
   * by urueda */
-/*JNI_SIG(jlongArray, WINAPI_NS(GetVisibleChildren)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+/*JNI_SIG(jlongArray, WINAPI_NS(GetVisibleChildren)) (JNIEnv * env, jclass, jlong vmid, jlong ac) {
 
 	VisibleChildrenInfo visibleChildrenInfo;
 	
 	jlongArray ret = 0;
 	
-	if (getVisibleChildren((long)vmid, (AccessibleContext)ac, 0, &visibleChildrenInfo)){
+	if (getVisibleChildren((long)vmid, (AccessibleContext)ac, 0, &visibleChildrenInfo)) {
 				
 		ret = env->NewLongArray(2); // visibleChildren
 		env->SetLongArrayRegion(ret, (jsize)0, (jsize)1, (jlong*)visibleChildrenInfo.children);
@@ -2527,7 +2527,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 /**
   * GetAccessibleChildFromContext
   * by urueda */
-JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i){
+JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i) {
 
 	AccessibleContext child = GetAccessibleChildFromContext(vmid, ac, (int)i);
 		
@@ -2537,9 +2537,9 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
 
 /**
   * by urueda */			   
-char* wchart2String(JNIEnv * env, wchar_t *value){
+char* wchart2String(JNIEnv * env, wchar_t *value) {
 
-	char bf[sizeof(value)/sizeof(wchar_t)];
+	static char bf[sizeof(value)/sizeof(wchar_t)];
 		
 	sprintf(bf, "%ws", value);
 	
@@ -2549,9 +2549,9 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
 
 /**
   * by urueda */			   
-char* jint2String(JNIEnv * env, jint value){
+char* jint2String(JNIEnv * env, jint value) {
 
-	char bf[64];
+	static char bf[64];
 	
 	sprintf(bf, "%d", value);
 	
@@ -2562,13 +2562,13 @@ char* jint2String(JNIEnv * env, jint value){
 /**
   * GetAccessibleContextProperties
   * by urueda */
-JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac) {
 	
 	jobjectArray ret = 0;
 	
 	AccessibleContextInfo info;
 
-	if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)ac, &info)){
+	if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)ac, &info)) {
 		
 		const int ACCESSIBLE_PROPERTIES = 9;
 		
@@ -2593,7 +2593,7 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 /**
   * GetProcessNameFromHWND
   * by urueda */
-JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
+JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd) {
 
 	HWND window = (HWND) hwnd;
 	DWORD  pid;
@@ -2609,7 +2609,7 @@ JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong
 
 		DWORD nameSize = ARRAYSIZE(processName);
 		
-		if (QueryFullProcessImageName(handle, 0, processName, &nameSize)){
+		if (QueryFullProcessImageName(handle, 0, processName, &nameSize)) {
 
 			ret = env->NewStringUTF(processName);
 		

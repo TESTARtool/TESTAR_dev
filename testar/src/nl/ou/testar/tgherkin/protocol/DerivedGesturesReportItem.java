@@ -23,8 +23,7 @@ import nl.ou.testar.utils.report.ReportItem;
  *
  */
 public class DerivedGesturesReportItem extends ReportItem {
-	private static final String OUT_DIR = "output" + File.separator + "tgherkin" + File.separator;
-	private static final String REPORT_NAME_PREFIX = "DerivedGestures_";
+	private static final String REPORT_NAME_PREFIX = "output" + File.separator + "DerivedGestures_";
 	private static final String REPORT_NAME_SUFFIX = ".csv";
 	private Map<Widget, List<Gesture>> gesturesMap;
 	private boolean nopAction;	
@@ -38,11 +37,10 @@ public class DerivedGesturesReportItem extends ReportItem {
 	 * @param nopAction indicates whether a NOP (no operation) action is derived
 	 */
 	public DerivedGesturesReportItem(boolean append, int sequenceCount, int actionCount, Map<Widget, List<Gesture>> gesturesMap, boolean nopAction) {
-		super(OUT_DIR + "sequence" + sequenceCount +  File.separator +
-				REPORT_NAME_PREFIX + 
-				sequenceCount + "_" + actionCount + "_" + 
-				new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis()) + 			
-				REPORT_NAME_SUFFIX,
+		super(REPORT_NAME_PREFIX
+			+ sequenceCount + "_" + actionCount + "_"
+			+ new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS").format(System.currentTimeMillis())
+			+ REPORT_NAME_SUFFIX,
 				null,
 				append);
 		// postpone filling of data attribute: fill data from map in the process method that executed in a separate thread.
@@ -96,7 +94,7 @@ public class DerivedGesturesReportItem extends ReportItem {
 		return outputDerivedGestures(header, reportLines);
 	}
 
-	private static String outputDerivedGestures(SortedSet<String> header, List<SortedMap<String,String>> reportLines){
+	private static String outputDerivedGestures(SortedSet<String> header, List<SortedMap<String,String>> reportLines) {
 		StringBuilder reportContent = new StringBuilder();
 		// header
 		boolean notFirst = false;
@@ -105,13 +103,13 @@ public class DerivedGesturesReportItem extends ReportItem {
 			String columnName = headerIterator.next();
 			if (notFirst) {
 				reportContent.append(Report.REPORT_SEPARATOR);
-			}else {
+			} else {
 				notFirst = true;
 			}
 			if (columnName.startsWith("#")) {
 				// skip hash (used to get gestures in front of the widget tag columns)
 				reportContent.append(Report.transformReportValue(columnName.substring(1)));
-			}else {
+			} else {
 				reportContent.append(Report.transformReportValue(columnName));
 			}
 		}
@@ -124,7 +122,7 @@ public class DerivedGesturesReportItem extends ReportItem {
 				String columnName = headerIterator.next();
 				if (notFirst) {
 					reportContent.append(Report.REPORT_SEPARATOR);
-				}else {
+				} else {
 					notFirst = true;
 				}
 				String value = reportLine.get(columnName);

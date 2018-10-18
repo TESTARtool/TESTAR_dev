@@ -1,519 +1,504 @@
-Feature: Open University - A user applies for a master program.
-
+Feature: Open University - A user applies for a master program. 
+    
 Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 
   Background: A user successfully logs on the the system.
     Step: Enter username
-    When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
+	When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
     Step: Enter password
-    When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
+	When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
     Step: Press log on button
-    When  $Title="Inloggen" and $Role="UIAButton" click()
+	When  $Title="Inloggen" and $Role="UIAButton" click()
     Step: Check whether user is logged on
-    Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
-    When NOP
+	Given $Role="UIAText" and image("resources\settings\testOU\Expand.png") 
+	When NOP
     Step: Enter non-empty shopping cart
-    While $Role="UIAText" and $Title="1"
-    Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
-    When  $Role="UIACustomControl" and image("resources\settings\testOU\ShoppingCart.png") click(true)
+	While $Role="UIAText" and $Title="1"
+	Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
+	When $Role="UIACustomControl" and image("resources\settings\testOU\ShoppingCart.png") click(true)
     Step: Remove products from shopping cart (if applicable)
-    While $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png")
-    When  $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png") click(true)
+	While $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png")
+	When $Role="UIAText" and image("resources\settings\testOU\GarbageCan.png") click(true)
     Step: Click close shopping cart button (if applicable)
-    While $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png")
-    When  $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png") click(true)
+	While $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png")
+	When $Role="UIAText" and image("resources\settings\testOU\CloseShoppingCart.png") click(true)
 
   Scenario: A user successfully logs out of the system.
     Step: Expand user
-    When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
-    When  $Title="Afmelden" and $Role="UIAText" click(true)
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
     Step: Check whether user is logged off
-    When  $Role="UIAText" and $Title="U dient alle browservensters te sluiten om volledig uitgelogd te zijn." mouseMove()
+	When $Role="UIAText" and $Title="U dient alle browservensters te sluiten om volledig uitgelogd te zijn." mouseMove() 	
 
-   Scenario Outline: A user successfully changes his account details.
-    Step: Focus op pagina krijgen
-    When  $Role="UIAText" and $Title="mijnOU" click(true)
-    Step: Scroll down
-    While !state($Role="UIAImage" and ocr() = "Mijn gegevens")
-    When  hitKey(VK_DOWN)
+  Scenario Outline: A user successfully changes his account details.
     Step: Select Mijn Gegevens tile
-    When  $Role="UIAImage" and ocr() = "Mijn gegevens" click(true)
+	When  $Role="UIAImage" and ocr() = "Mijn gegevens" click(true)
     Step: Change voornamen
-    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+	When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
-    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+	When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Change Geboortenaam
-    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+	When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Change Roepnaam
-    When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
+	When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
     Step: Change Voorvoegsel geboortenaam partner
-    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+	When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
     Step: Change Geboortenaam partner
-    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
-    Step: Focus on Naamweergave titel
-    When  $Role="UIAText" and $Title="Naamweergave" click(true)
-    Step: Scroll down naar Taal titel
-    While !state($Role="UIAText" and ocr() = "Taal")
-    When  hitKey(VK_DOWN)
+	When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
     Step: Visualize Naamweergave
-    When  $Role="UIAComboBox" and xpath("//widget[Title='Naamweergave']//widget") click(true)
+	When  $Role="UIAComboBox" and xpath("//widget[Title='Naamweergave']//widget") click(true)
     Step: Ensure Achternaam - Partnernaam is displayed  (effect hitKey depends on displayed selection)
-    While !state($Role="UIAComboBox" and $ValuePattern="Achternaam - Partnernaam")
-    When  hitKey(VK_A)    
-    Step: Select Naamweergave
-    When  hitKey(<Naamweergave>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	While !state($Role="UIAComboBox" and $ValuePattern="Achternaam - Partnernaam")
+	When hitKey(VK_A)	
+    Step: Select Naamweergave 
+	When hitKey(<Naamweergave>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Change Geboortedatum
-    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+	When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Change Geboorteplaats
-    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+	When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
     Step: Visualize geslacht list
-    When  $Role="UIAComboBox" and xpath("//widget[Title='Geslacht']//widget") click(true)
-    Step: Select Geslacht
-    When  hitKey(<Geslacht>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
-    Step: Focus on Naamweergave titel
-    When  $Role="UIAText" and $Title="Taal" click(true)
-    Step: Scroll down naar OPSLAAN button
-    While state($Role="UIAText" and $Title="Roepnaam")
-    When  hitKey(VK_DOWN)
+	When  $Role="UIAComboBox" and xpath("//widget[Title='Geslacht']//widget") click(true)
+    Step: Select Geslacht 
+	When hitKey(<Geslacht>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize Taal list
-    When  $Role="UIAComboBox" and xpath("//widget[Title='Taal']//widget") click(true)
-    Step: Select Taal
-    When  hitKey(<Taal>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" and xpath("//widget[Title='Taal']//widget") click(true)
+    Step: Select Taal 
+	When  hitKey(<Taal>)
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Save entered data
-    When  $Role="UIAButton" and $Title="OPSLAAN" click()
+	When  $Role="UIAButton" and $Title="OPSLAAN" click()
     Step: Expand user
-    Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen."
-    When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+	Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen."
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
-    When  $Title="Afmelden" and $Role="UIAText" click(true)
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Account data
 |Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
 |AREM || Weijling|Adri || |VK_A|02-07-1963|Druten|VK_M|VK_N|
 |TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|
-
-    Scenario Outline: A user successfully applies for a master program.
+	
+	Scenario Outline: A user successfully applies for a master program.
     Step: Select Studieaanbod
-    When  $Role="UIAText" and $Title="Studieaanbod" click(true)
+	When  $Role="UIAText" and $Title="Studieaanbod" click(true)
     Step: Select master mark
-    When  $Role="UIACustomControl" and
-          $Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.y") and
-          $Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.x") - 1 and
-          $Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.width")
-          click(true)
+	When $Role="UIACustomControl" and 
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.width")
+	click(true)
     Step: Search for  a selectable master program
-    While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
-    When  !state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)
-          !state($UIAHasKeyboardFocus) and
-          !state($Role="UIAText" and $Title="TOON ALLES") and
-          $Role="UIAGroup" and
-          $Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
-          click(true)
-          $Role="UIAText" and $Title="TOON ALLES" click(true)
+	While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
+	When 	!state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)	
+		!state($UIAHasKeyboardFocus) and 
+		!state($Role="UIAText" and $Title="TOON ALLES") and
+		$Role="UIAGroup" and 
+		$Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
+		click(true)
+		$Role="UIAText" and $Title="TOON ALLES" click(true)
     Step: Select a master program
-    When  $Role="UIAButton" and $Title="KIEZEN" click()
+	When $Role="UIAButton" and $Title="KIEZEN" click()
     Step: Select Register (Aanmelden)
-    While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
-    When  $Role="UIAButton" and $Title="AANMELDEN" click()
-          NOP !state($Role="UIAButton" and $Title="AANMELDEN")
+	While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
+	When $Role="UIAButton" and $Title="AANMELDEN" click()
+		 NOP !state($Role="UIAButton" and $Title="AANMELDEN")
     Step: Visualize country of residence Netherlands list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select yes/no option
-    When  hitKey(VK_N)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
-    # PERSONAL DATA
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select yes/no option 
+	When hitKey(VK_N)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
+    # PERSONAL DATA	
     Step: Enter Geboortenaam
-    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+	When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Enter Voorvoegsel geboortenaam
-    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+	When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Enter voornamen
-    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+	When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Enter Geboortedatum
-    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+	When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Enter Geboorteplaats
-    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+	When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
     Step: Visualize country of birth
-    When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
-    Step: Select country of birth
-    When  hitKey(<Geboorteland>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
+    Step: Select country of birth 
+	When hitKey(<Geboorteland>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize gender
-    When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
-    Step: Select gender
-    When  hitKey(<Geslacht>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
+    Step: Select gender 
+	When hitKey(<Geslacht>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality
-    When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
-    Step: Select nationality
-    When  hitKey(<Nationaliteit>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
+    Step: Select nationality 
+	When hitKey(<Nationaliteit>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality2
-    When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
-    Step: Select nationality2
-    When hitKey(<Nationaliteit2>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
+    Step: Select nationality2 
+	When hitKey(<Nationaliteit2>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Change Geboortenaam partner
-    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
+	When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
     Step: Enter Voorvoegsel geboortenaam partner
-    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
-    Step: Select persoonlijke gegevens to enable page down
-    When  $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When  hitKey(VK_PAGE_DOWN)
+	When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+    Step: Select persoonlijke gegevens to enable page down 
+	When $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)	
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # ADRESS DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # ADRESS DATA	
     Step: Enter street name
-    When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
+	When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
     Step: Enter house number
-    When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
+	When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
     Step: Enter house letter
-    When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
+	When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
     Step: Enter house number addition
-    When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
+	When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
     Step: Enter extra address line
-    When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
+	When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
     Step: Enter postal code
-    When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
-    Step: Enter place
-    When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
+	When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
+    Step: Enter place 
+	When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
     Step: Visualize country list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select country
-    When  hitKey(<Land>)
-    Step: Remove list elements from screen
-    When  hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select country 
+	When hitKey(<Land>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # AVAILABILITY DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # AVAILABILITY DATA	
     Step: Enter net number
-    When  $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-    When  $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # EXEMPTION AND ADMISSION
-    Step: Enter prior education
-    When  $Role="UIAEdit" type(<Vooropleiding>)
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # EXEMPTION AND ADMISSION	
+    Step: Enter prior education 
+	When  $Role="UIAEdit" type(<Vooropleiding>)
     Step: Reset to enable page down
-    When  $Title="Vrijstelling" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When  hitKey(VK_PAGE_DOWN)
+	When  $Title="Vrijstelling" and $Role="UIAText" click(true)
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Press No radio buttons
-    Range 3 3
-    When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
+	Range 3 3 
+	When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # CONFIRMATION
-    Step: Enable page down
-    When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When  hitKey(VK_PAGE_DOWN)
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # CONFIRMATION	
+    Step: Enable page down 
+	When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Click truthfully filled in mark
-    When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
-    When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
+	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
 
     Step: Give Page up to display user controls at the top
-    Range 2 2
-    When  hitKey(VK_PAGE_UP)
+	Range 2 2
+	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-    When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
-    When  $Title="Afmelden" and $Role="UIAText" click(true)
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for master program data
 |Geboortenaam|Voorvoegsel_geboortenaam|Voornamen|Geboortedatum|Geboorteplaats|Geboorteland|Geslacht|Nationaliteit|Nationaliteit2|Geboortenaam_partner|Voorvoegsel_geboortenaam_partner|Straatnaam|Huisnummer|Huisletter|Huisnummer_toevoeging|Extra_adresregel|Postcode|Plaatsnaam|Land|Netnummer|Abonneenummer|Vooropleiding|
 |User|van|TEST|01-12-1990|Amsterdam|VK_Z|VK_M VK_A VK_N|VK_Z|VK_M VK_A VK_A|Partner|M|Straat|1|A|h|Adresregel|6543XP|Plaats|VK_Z|020|1234567|Geen|
 
   Scenario Outline: A user successfully applies for a bachelor program.
     Step: Select Studieaanbod
-    When  $Role="UIAText" and $Title="Studieaanbod" click(true)
+	When  $Role="UIAText" and $Title="Studieaanbod" click(true)
     Step: Select bachelor mark
-    When $Role="UIACustomControl" and
-    $Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.y") and
-    $Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.x") - 1 and
-    $Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.width")
-    click(true)
+	When $Role="UIACustomControl" and 
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Bachelor (')]/Shape.width")
+	click(true)
     Step: Search for  a selectable bachelor program
-    While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
-    When     !state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)
-        !state($UIAHasKeyboardFocus) and
-        !state($Role="UIAText" and $Title="TOON ALLES") and
-        $Role="UIAGroup" and
-        $Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
-        click(true)
-        $Role="UIAText" and $Title="TOON ALLES" click(true)
+	While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
+	When 	!state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)	
+		!state($UIAHasKeyboardFocus) and 
+		!state($Role="UIAText" and $Title="TOON ALLES") and
+		$Role="UIAGroup" and 
+		$Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
+		click(true)
+		$Role="UIAText" and $Title="TOON ALLES" click(true)
     Step: Select a bachelor program
-    When $Role="UIAButton" and $Title="KIEZEN" click()
+	When $Role="UIAButton" and $Title="KIEZEN" click()
     Step: Select Register (Aanmelden)
-    While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
-    When $Role="UIAButton" and $Title="AANMELDEN" click()
-         NOP !state($Role="UIAButton" and $Title="AANMELDEN")
+	While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
+	When $Role="UIAButton" and $Title="AANMELDEN" click()
+		 NOP !state($Role="UIAButton" and $Title="AANMELDEN")
     Step: Visualize country of residence Netherlands list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select yes/no option
-    When hitKey(VK_N)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
-    # PERSONAL DATA
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select yes/no option 
+	When hitKey(VK_N)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
+    # PERSONAL DATA	
     Step: Enter Geboortenaam
-    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+	When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Enter Voorvoegsel geboortenaam
-    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+	When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Enter voornamen
-    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+	When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Enter Geboortedatum
-    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+	When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Enter Geboorteplaats
-    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+	When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
     Step: Visualize country of birth
-    When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
-    Step: Select country of birth
-    When hitKey(<Geboorteland>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
+    Step: Select country of birth 
+	When hitKey(<Geboorteland>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize gender
-    When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
-    Step: Select gender
-    When hitKey(<Geslacht>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
+    Step: Select gender 
+	When hitKey(<Geslacht>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality
-    When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
-    Step: Select nationality
-    When hitKey(<Nationaliteit>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
+    Step: Select nationality 
+	When hitKey(<Nationaliteit>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality2
-    When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
-    Step: Select nationality2
-    When hitKey(<Nationaliteit2>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
+    Step: Select nationality2 
+	When hitKey(<Nationaliteit2>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Change Geboortenaam partner
-    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
+	When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
     Step: Enter Voorvoegsel geboortenaam partner
-    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
-    Step: Select persoonlijke gegevens to enable page down
-    When $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When hitKey(VK_PAGE_DOWN)
+	When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+    Step: Select persoonlijke gegevens to enable page down 
+	When $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)	
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # ADRESS DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # ADRESS DATA	
     Step: Enter street name
-    When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
+	When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
     Step: Enter house number
-    When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
+	When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
     Step: Enter house letter
-    When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
+	When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
     Step: Enter house number addition
-    When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
+	When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
     Step: Enter extra address line
-    When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
+	When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
     Step: Enter postal code
-    When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
-    Step: Enter place
-    When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
+	When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
+    Step: Enter place 
+	When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
     Step: Visualize country list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select country
-    When hitKey(<Land>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select country 
+	When hitKey(<Land>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # AVAILABILITY DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # AVAILABILITY DATA	
     Step: Enter net number
-    When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-    When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # EXEMPTION
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # EXEMPTION	
     Step: Press No radio button
-    When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
+	When  $Title="Nee" and $Role="UIARadioButton" and image("resources\settings\testOU\EmptyRadioButton.png") click()
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # CONFIRMATION
-    Step: Enable page down
-    When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When hitKey(VK_PAGE_DOWN)
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # CONFIRMATION	
+    Step: Enable page down 
+	When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Click truthfully filled in mark
-    When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
-    When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
+	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
     Step: Give Page up to display user controls at the top
-    Range 2 2
-    When hitKey(VK_PAGE_UP)
+	Range 2 2
+	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-    When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
-    When  $Title="Afmelden" and $Role="UIAText" click(true)
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for bachelor program data
 |Geboortenaam|Voorvoegsel_geboortenaam|Voornamen|Geboortedatum|Geboorteplaats|Geboorteland|Geslacht|Nationaliteit|Nationaliteit2|Geboortenaam_partner|Voorvoegsel_geboortenaam_partner|Straatnaam|Huisnummer|Huisletter|Huisnummer_toevoeging|Extra_adresregel|Postcode|Plaatsnaam|Land|Netnummer|Abonneenummer|
 |User|van|TEST|01-12-1990|Amsterdam|VK_Z|VK_M VK_A VK_N|VK_Z|VK_M VK_A VK_A|Partner|M|Straat|1|A|h|Adresregel|6543XP|Plaats|VK_Z|020|1234567|
 
   Scenario Outline: A user successfully applies for courses.
     Step: Select Studieaanbod
-    When  $Role="UIAText" and $Title="Studieaanbod" click(true)
+	When  $Role="UIAText" and $Title="Studieaanbod" click(true)
     Step: Select area
-    When $Role="UIACustomControl" and
-    $Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.y") and
-    $Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.x") - 1 and
-    $Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.width")
-    click(true)
+	When $Role="UIACustomControl" and 
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Onderwijswetenschappen (')]/Shape.width")
+	click(true)
     Step: Select course mark
-    When $Role="UIACustomControl" and
-    $Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.y") and
-    $Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.x") - 1 and
-    $Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.width")
-    click(true)
+	When $Role="UIACustomControl" and 
+	$Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.y") and 
+	$Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.x") - 1 and
+	$Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Cursus (')]/Shape.width")
+	click(true)
     Step: Search for  a selectable course
-    While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
-    When     !state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)
-        !state($UIAHasKeyboardFocus) and
-        !state($Role="UIAText" and $Title="TOON ALLES") and
-        $Role="UIAGroup" and
-        $Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
-        click(true)
-        $Role="UIAText" and $Title="TOON ALLES" click(true)
+	While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
+	When 	!state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)	
+		!state($UIAHasKeyboardFocus) and 
+		!state($Role="UIAText" and $Title="TOON ALLES") and
+		$Role="UIAGroup" and 
+		$Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
+		click(true)
+		$Role="UIAText" and $Title="TOON ALLES" click(true)
     Step: Select a course
-    When $Role="UIAButton" and $Title="KIEZEN" click()
+	When $Role="UIAButton" and $Title="KIEZEN" click()
     Step: Select Register (Aanmelden)
-    While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
-    When $Role="UIAButton" and $Title="AANMELDEN" click()
-         NOP !state($Role="UIAButton" and $Title="AANMELDEN")
+	While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
+	When $Role="UIAButton" and $Title="AANMELDEN" click()
+		 NOP !state($Role="UIAButton" and $Title="AANMELDEN")		 
     Step: Visualize country of residence Netherlands list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select yes/no option
-    When hitKey(VK_N)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
-    # PERSONAL DATA
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select yes/no option 
+	When hitKey(VK_N)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
+    # PERSONAL DATA	
     Step: Enter Geboortenaam
-    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+	When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Enter Voorvoegsel geboortenaam
-    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+	When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Enter voornamen
-    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+	When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Enter Geboortedatum
-    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+	When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Enter Geboorteplaats
-    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+	When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
     Step: Visualize country of birth
-    When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
-    Step: Select country of birth
-    When hitKey(<Geboorteland>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geboorteland" click(true)
+    Step: Select country of birth 
+	When hitKey(<Geboorteland>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize gender
-    When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
-    Step: Select gender
-    When hitKey(<Geslacht>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Geslacht" click(true)
+    Step: Select gender 
+	When hitKey(<Geslacht>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality
-    When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
-    Step: Select nationality
-    When hitKey(<Nationaliteit>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit" click(true)
+    Step: Select nationality 
+	When hitKey(<Nationaliteit>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Visualize nationality2
-    When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
-    Step: Select nationality2
-    When hitKey(<Nationaliteit2>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIACustomControl" and $Title="Nationaliteit 2" click(true)
+    Step: Select nationality2 
+	When hitKey(<Nationaliteit2>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Change Geboortenaam partner
-    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
+	When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
     Step: Enter Voorvoegsel geboortenaam partner
-    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
-    Step: Select persoonlijke gegevens to enable page down
-    When $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When hitKey(VK_PAGE_DOWN)
+	When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+    Step: Select persoonlijke gegevens to enable page down 
+	When $Title="Persoonlijke gegevens" and $Role="UIAText" click(true)	
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # ADRESS DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # ADRESS DATA	
     Step: Enter street name
-    When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
+	When  $Title="Straatnaam" and $Role="UIAEdit" type(<Straatnaam>)
     Step: Enter house number
-    When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
+	When  $Title="Huisnummer" and $Role="UIAEdit" type(<Huisnummer>)
     Step: Enter house letter
-    When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
+	When  $Title="Huisletter" and $Role="UIAEdit" type(<Huisletter>)
     Step: Enter house number addition
-    When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
+	When  $Title="Huisnummer toevoeging" and $Role="UIAEdit" type(<Huisnummer_toevoeging>)
     Step: Enter extra address line
-    When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
+	When  $Title="Extra adresregel" and $Role="UIAEdit" type(<Extra_adresregel>)
     Step: Enter postal code
-    When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
-    Step: Enter place
-    When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
+	When  $Title="Postcode" and $Role="UIAEdit" type(<Postcode>)
+    Step: Enter place 
+	When  $Title="Plaatsnaam" and $Role="UIAEdit" type(<Plaatsnaam>)
     Step: Visualize country list
-    When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
-    Step: Select country
-    When hitKey(<Land>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
+    Step: Select country 
+	When hitKey(<Land>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # AVAILABILITY DATA
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # AVAILABILITY DATA	
     Step: Enter net number
-    When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\Netnumber.png") type(<Netnummer>)
     Step: Enter subscriber number
-    When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
+	When $Role="UIAEdit" and image("resources\settings\testOU\SubscriberNumber.png") type(<Abonneenummer>)
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
+	When  $Title="VERDER" and $Role="UIAButton" click()
     # PERSONAL CIRCUMSTANCES
     Step: Visualize personal circumstances list
-    When  $Role="UIAComboBox" click(true)
-    Step: Select personal circumstance
-    When hitKey(<Peroonlijke_omstandigheden>)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" click(true)
+    Step: Select personal circumstance 
+	When hitKey(<Peroonlijke_omstandigheden>)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
+	When  $Title="VERDER" and $Role="UIAButton" click()
     # PAYMENT METHOD
     Step: Visualize paymwent method list
-    When  $Role="UIAComboBox" click(true)
-    Step: Select payment method
-    When hitKey(VK_A)
-    Step: Remove list elements from screen
-    When hitKey(VK_ESCAPE)
+	When  $Role="UIAComboBox" click(true)
+    Step: Select payment method 
+	When hitKey(VK_A)	
+    Step: Remove list elements from screen 
+	When hitKey(VK_ESCAPE)	
     Step: Enter IBAN
-    When  $Title="Bankrekeningnummer (IBAN)" and $Role="UIAEdit" type(<IBAN>)
+	When  $Title="Bankrekeningnummer (IBAN)" and $Role="UIAEdit" type(<IBAN>)
     Step: Select continue button
-    When  $Title="VERDER" and $Role="UIAButton" click()
-    # CONFIRMATION
-    Step: Enable page down
-    When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
-    Step: Give Page down to display additional controls
-    When hitKey(VK_PAGE_DOWN)
+	When  $Title="VERDER" and $Role="UIAButton" click()
+    # CONFIRMATION	
+    Step: Enable page down 
+	When  $Title="PERSOONLIJKE GEGEVENS" and $Role="UIAText" click(true)
+    Step: Give Page down to display additional controls 
+	When hitKey(VK_PAGE_DOWN)	
     Step: Click agree with terms and truthfully filled in marks
-    Range 2 2
-    When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
+	Range 2 2
+	When  $Role="UIACustomControl" and image("resources\settings\testOU\Mark.png") click(true)
     Step: Click finalize registration
-    When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
+	When  $Role="UIAButton" and $Title="AANMELDING AFRONDEN" mouseMove()
     Step: Give Page up to display user controls at the top
-    Range 2 2
-    When hitKey(VK_PAGE_UP)
+	Range 2 2
+	When hitKey(VK_PAGE_UP)	
     Step: Expand user
-    When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+	When $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
     Step: Signoff user
-    When  $Title="Afmelden" and $Role="UIAText" click(true)
+	When  $Title="Afmelden" and $Role="UIAText" click(true)
   Examples: Apply for bachelor program data
 |Geboortenaam|Voorvoegsel_geboortenaam|Voornamen|Geboortedatum|Geboorteplaats|Geboorteland|Geslacht|Nationaliteit|Nationaliteit2|Geboortenaam_partner|Voorvoegsel_geboortenaam_partner|Straatnaam|Huisnummer|Huisletter|Huisnummer_toevoeging|Extra_adresregel|Postcode|Plaatsnaam|Land|Netnummer|Abonneenummer|Peroonlijke_omstandigheden|IBAN|
 |User|van|TEST|01-12-1990|Amsterdam|VK_Z|VK_M VK_A VK_N|VK_Z|VK_M VK_A VK_A|Partner|M|Straat|1|A|h|Adresregel|6543XP|Plaats|VK_Z|020|1234567|VK_G|NL48ABNA0434431559|

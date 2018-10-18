@@ -27,23 +27,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import javax.swing.*;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static org.fruit.monkey.dialog.ToolTipTexts.label1TTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.label2TTT;
 
-public class FilterPanel extends JPanel {
+import javax.swing.*;
 
-  private static final long serialVersionUID = 1572649050808020748L;
- 
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
+public class FilterPanel extends JPanel {
+  private static final long serialVersionUID = 1L;
   private JTextArea txtClickFilter;
   private JTextArea txtProcessFilter;
 

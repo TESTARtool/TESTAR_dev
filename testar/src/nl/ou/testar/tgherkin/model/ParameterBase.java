@@ -67,11 +67,11 @@ public class ParameterBase {
 				if (pair.left() == null) {	
 					// no placeholder construction used
 					resultList.add((T)pair.right());
-				}else {
+				} else {
 					if (parameter.isList()) {
 						// referenced data table cell could contain multiple list elements separated by spaces
 						resultList.addAll(getPlaceholderValues(parameter, pair.left(), dataTable));
-					}else{
+					} else {
 						resultList.add(getPlaceholderValue(parameter, pair.left(), dataTable));
 					}
 				}
@@ -105,10 +105,10 @@ public class ParameterBase {
 		for (String element : elements) {
 			if (String.class.isAssignableFrom(parameter.type())) {
 				resultList.add((T)element);
-			}else {
+			} else {
 				if (Boolean.class.isAssignableFrom(parameter.type())) {
 					resultList.add((T) Boolean.valueOf(element));
-				}else {
+				} else {
 					throw new TgherkinException("Incompatible placeholder list value");
 				}
 				
@@ -141,14 +141,14 @@ public class ParameterBase {
 		Assert.notNull(parameter);
 		if (value != null) {
 			Assert.isTrue(parameter.type().isInstance(value), "Value not of type required by this parameter!");
-		}else {
+		} else {
 			Assert.notNull(placeholder);
 		}
 		List<Pair<String, Object>> list;
 		if (parameterValues.containsKey(parameter)) {
 			Assert.isTrue(parameter.isList());
 			list = parameterValues.get(parameter);
-		}else {
+		} else {
 			list = new ArrayList<Pair<String, Object>>();
 		}
 		list.add(new Pair<String, Object>(placeholder, value));
@@ -213,11 +213,11 @@ public class ParameterBase {
 	    		if (element.left() != null) {
 	    			// placeholder
 	    			result.append("<" + element.left() + ">");
-	    		}else {
+	    		} else {
 	    			if (parameter.equals(Parameters.KBKEYS)) {
 	    				// do not add enclosing quotes for key board key constants
 	    				result.append(element.right());
-	    			}else {
+	    			} else {
 	    				result.append("\"" + element.right() + "\"");
 	    			}
 	    		}

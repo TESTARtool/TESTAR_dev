@@ -24,7 +24,7 @@ public class Matches {
 	 * Retrieve singleton instance.
 	 * @return singleton instance
 	 */
-	public static Matches getInstance( ) {
+	public static Matches getInstance() {
 		return matches;
 	}
 	
@@ -39,7 +39,7 @@ public class Matches {
 		if (matchesMap.containsKey(regex)) {
 			pattern = matchesMap.get(regex);
 			
-		}else {
+		} else {
 			pattern = Pattern.compile(regex);
 			matchesMap.put(regex, pattern);
 		}

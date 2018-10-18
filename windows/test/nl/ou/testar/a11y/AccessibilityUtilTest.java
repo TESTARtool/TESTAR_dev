@@ -31,9 +31,8 @@ package nl.ou.testar.a11y;
 
 import static org.junit.Assert.*;
 
-import org.junit.Test;
-
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
+import org.junit.Test;
 
 public class AccessibilityUtilTest {
 

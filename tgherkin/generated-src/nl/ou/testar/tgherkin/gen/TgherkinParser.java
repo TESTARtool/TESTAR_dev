@@ -1002,8 +1002,11 @@ public class TgherkinParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_scenarioOutline; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof TgherkinParserVisitor ) return ((TgherkinParserVisitor<? extends T>)visitor).visitScenarioOutline(this);
-			else return visitor.visitChildren(this);
+			if ( visitor instanceof TgherkinParserVisitor ) {
+				return ((TgherkinParserVisitor<? extends T>)visitor).visitScenarioOutline(this);
+			} else {
+				return visitor.visitChildren(this);
+			}
 		}
 	}
 

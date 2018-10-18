@@ -31,7 +31,7 @@ import org.fruit.alayer.Verdict;
 import org.fruit.monkey.Settings;
 import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
 
-public class Protocol_testOU extends DocumentProtocol {
+public class Protocol_testOU extends DocumentProtocol { // DefaultProtocol {
 
 	/** 
 	 * Called once during the life time of TESTAR.
@@ -42,6 +42,7 @@ public class Protocol_testOU extends DocumentProtocol {
 	protected void initialize(Settings settings) {
 		super.initialize(settings);
 	}
+	
 
 	/**
 	 * Begin sequence.
@@ -53,6 +54,7 @@ public class Protocol_testOU extends DocumentProtocol {
 	protected void beginSequence(SUT system, State state) {
 		super.beginSequence(system, state);
 	}
+	
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -68,7 +70,10 @@ public class Protocol_testOU extends DocumentProtocol {
 	@Override
 	protected SUT startSystem() throws SystemStartException {
         return super.startSystem();
+
 	}
+
+
 
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
@@ -81,7 +86,10 @@ public class Protocol_testOU extends DocumentProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException {
 		return super.getState(system);
+
 	}
+
+
 
 	/**
 	 * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -91,6 +99,7 @@ public class Protocol_testOU extends DocumentProtocol {
 	@Override
 	protected Verdict getVerdict(State state) {
 		return super.getVerdict(state);
+		
 	}
 	
 	/**
@@ -117,7 +126,9 @@ public class Protocol_testOU extends DocumentProtocol {
 	@Override
 	protected Action selectAction(State state, Set<Action> actions) { 
 		return super.selectAction(state, actions);
+
 	}
+
 
 	/**
 	 * Execute the selected action.
@@ -130,6 +141,7 @@ public class Protocol_testOU extends DocumentProtocol {
 	protected boolean executeAction(SUT system, State state, Action action) {
 		return super.executeAction(system, state, action);
 	}
+	
 
 	/**
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -152,6 +164,7 @@ public class Protocol_testOU extends DocumentProtocol {
 		super.finishSequence(recordedSequence);
 	}
 
+
 	/**
 	 * TESTAR uses this method to determine when to stop the entire test.
 	 * You could stop the test after a given amount of generated sequences or
@@ -161,4 +174,5 @@ public class Protocol_testOU extends DocumentProtocol {
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
+	
 }

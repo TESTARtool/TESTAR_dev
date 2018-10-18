@@ -13,7 +13,7 @@ import org.fruit.alayer.Widget;
  * Simplified State representation that only defines an iterator over widgets. 
  *
  */
-public class StateMock extends StdState{
+public class StateMock extends StdState {
 
 	private static final long serialVersionUID = 7755367830576251631L;
 	private List<Widget> widgets = new ArrayList<Widget>();
@@ -36,14 +36,17 @@ public class StateMock extends StdState{
     public Iterator<Widget> iterator() {
         Iterator<Widget> it = new Iterator<Widget>() {
             private int currentIndex = 0;
+            
             @Override
             public boolean hasNext() {
                 return currentIndex < widgets.size() && widgets.get(currentIndex) != null;
             }
+            
             @Override
             public Widget next() {
                 return widgets.get(currentIndex++);
             }
+            
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();

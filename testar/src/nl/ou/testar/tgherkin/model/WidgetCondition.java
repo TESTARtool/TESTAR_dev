@@ -1,17 +1,15 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.List;
-
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.fruit.Assert;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.WidgetConditionEvaluator;
 import nl.ou.testar.tgherkin.WidgetConditionValidator;
 import nl.ou.testar.tgherkin.gen.TgherkinLexer;
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.fruit.Assert;
+import org.fruit.alayer.Widget;
 
 /**
  * Representation of a widget condition that delegates evaluation to WidgetConditionEvaluator.
@@ -42,7 +40,7 @@ public class WidgetCondition {
 	 * WidgetCondition Constructor.
 	 * @param code Tgherkin source code
 	 */
-	public WidgetCondition(String code){
+	public WidgetCondition(String code) {
 		Assert.notNull(code);		
 		this.type = null;
 		this.code = code;
@@ -53,7 +51,7 @@ public class WidgetCondition {
 	 * @param type operator type
 	 * @param code Tgherkin source code
 	 */
-	public WidgetCondition(Type type, String code){
+	public WidgetCondition(Type type, String code) {
 		Assert.notNull(code);		
 		this.type = type;
 		this.code = code;
@@ -85,14 +83,15 @@ public class WidgetCondition {
 	public boolean evaluate(ProtocolProxy proxy, Widget widget, DataTable dataTable) {				
 		if (evaluator == null) {
 			evaluator = new WidgetConditionEvaluator(proxy, widget, dataTable);
-		}else {
+		} else {
 			evaluator.set(proxy, widget, dataTable);
 		}
 		WidgetConditionParser parser = Utils.getWidgetConditionParser(getCode());
 		Boolean result = false;
 		try {
 			result = (Boolean)evaluator.visit(parser.widget_condition());
-		}catch (Exception e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return result;
 	}
@@ -117,7 +116,7 @@ public class WidgetCondition {
     	StringBuilder result = new StringBuilder();
     	if (getType() == Type.ALSO) {
     		result.append("Also ");
-    	}else {
+    	} else {
         	if (getType() == Type.EITHER) {
         		result.append("Either ");
         	}    		

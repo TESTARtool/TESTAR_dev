@@ -39,7 +39,7 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * A WCAG 2.0 guideline
+ * A WCAG 2.0 guideline.
  * @author Davy Kager
  *
  */
@@ -59,14 +59,14 @@ public final class ReadableGuideline extends AbstractGuideline {
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
 		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
-		for (Widget w : widgets)
+		for (Widget w : widgets) {
 			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0) {
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
 						"Missing top-level language identifier", w));
-			}
-			else {
+			} else {
 				results.add(evaluationPassed(sc));
 			}
+		}
 		return results;
 	}
 

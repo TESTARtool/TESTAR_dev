@@ -6,7 +6,7 @@ import org.fruit.Assert;
  * Representation of a Tgherkin data table element.
  *
  */
-public class TableCell{
+public class TableCell {
 
 	private final String value;
 

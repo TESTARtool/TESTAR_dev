@@ -15,8 +15,8 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.CompoundAction.Builder;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 
 /**
@@ -45,15 +45,15 @@ public class TypeGesture extends Gesture {
     	StdActionCompiler ac = new AnnotatingActionCompiler();
 		if (getParameterBase().size() > 0) {
 			String text = getParameterBase().get(Parameters.TEXT, dataTable);
-			if ("".equals(text)){
+			if ("".equals(text)) {
 				// type action does not allow typing of an empty string
 				// use hitkey to clear the existing text on the screen
 				actions.add(clearScreenText(widget));
-			}else{
+			} else {
 				actions.add(ac.clickTypeInto(widget, getParameterBase().get(Parameters.TEXT, dataTable)));				
 			}
 
-		}else {
+		} else {
 			// no arguments: generate random text
 			actions.add(ac.clickTypeInto(widget, proxy.getRandomText(widget)));
 		}
@@ -61,16 +61,13 @@ public class TypeGesture extends Gesture {
     }
     
     private Action clearScreenText(Widget widget) {
-    	// click on widget and apply Home, Shift-End, Del and Escape actions.
+    	// click on widget and apply Shift-Home, Del and Escape actions.
 		Builder builder = new CompoundAction.Builder();
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 		builder.add(ac.leftClickAt(widget),1);
 		List<KBKeys> keys = new ArrayList<KBKeys>();
-		keys.add(KBKeys.VK_HOME);  
-		builder.add(ac.hitShortcutKey(keys), 1);
-		keys.clear();
 		keys.add(KBKeys.VK_SHIFT);
-		keys.add(KBKeys.VK_END);
+		keys.add(KBKeys.VK_HOME);
 		builder.add(ac.hitShortcutKey(keys), 1);
 		keys.clear();
 		keys.add(KBKeys.VK_DELETE);

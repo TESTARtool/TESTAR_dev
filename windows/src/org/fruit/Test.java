@@ -61,13 +61,14 @@ import org.fruit.alayer.windows.UIAStateBuilder;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.windows.WinProcess;
 
-public final class Test{
+public final class Test {
 
-	public static String queryAllTags(State s){
+	public static String queryAllTags(State s) {
 		StringBuilder sb = new StringBuilder();
-		for(Widget w : s){
-			for(Tag<?> t : w.tags())
+		for(Widget w : s) {
+			for(Tag<?> t : w.tags()) {
 				sb.append(w.get(t));
+			}
 		}
 		return sb.toString();
 	}
@@ -91,23 +92,20 @@ public final class Test{
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-
 		String info;
 		info = queryAllTags(s);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
-		System.out.println(Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
-
-		//s.set(Tags.Screenshot, AWTCanvas.fromScreenshot(Rect.from(0, 0, 1920, 1080), AWTCanvas.StorageFormat.PNG, 1));
+		System.out.println("[Test] Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
+		System.out.println("[Test] " + Util.treeDesc(s, 2, Tags.Desc, Tags.Shape, Tags.Role));
 
 		double tuff1 = Util.time();
-		for(int i = 0; i < 100; i++){
+		for(int i = 0; i < 100; i++) {
 			oos.writeObject(s);
 			oos.reset();
 		}
 
-		System.out.println(Util.time() - tuff1);
+		System.out.println("[Test] " + (Util.time() - tuff1));
 		info = queryAllTags(s);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
+		System.out.println("[Test] " + "Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 
 		oos.close();
 		bos.close();
@@ -125,17 +123,15 @@ public final class Test{
 
 		ois.close();
 		info = queryAllTags(rs);
-		System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
-
-
+		System.out.println("[Test] " + "Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
 	}
 
-	public static void saveImage(AWTCanvas image, String file) throws IOException{
+	public static void saveImage(AWTCanvas image, String file) throws IOException {
 		FileOutputStream fos = new FileOutputStream(new File(file));
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-		for(int i = 0; i < 1; i++){
+		for(int i = 0; i < 1; i++) {
 			oos.writeObject(image);
 			oos.reset();
 		}
@@ -144,7 +140,7 @@ public final class Test{
 		bos.close();
 	}
 
-	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException{
+	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException {
 		FileInputStream fis = new FileInputStream(new File(file));
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(bis);
@@ -155,15 +151,12 @@ public final class Test{
 	}
 
 	
-	public static void main(String[] args) throws IOException, ClassNotFoundException{
+	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		UIAStateBuilder sb = new UIAStateBuilder();
 		//SUT system = WinProcess.fromExecutable("C:\\Program Files\\CTE XL 3.1.3 Professional\\cte.exe");
 		//SUT system = WinProcess.fromExecutable("C:\\Windows\\System32\\calc.exe");
 		//SUT system = WinProcess.fromPID(2512);
 		SUT system = WinProcess.fromPID(5692);
-		
-		//SUT system = WinProcess.fromProcName("firefox.exe");
-		//SUT system = WinProcess.fromExecutable("C:\\Program Files (x86)\\Microsoft Office\\Office14\\winword.exe");
 		Util.pause(5);
 
 		GDIScreenCanvas cv = GDIScreenCanvas.fromPrimaryMonitor();
@@ -182,32 +175,20 @@ public final class Test{
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		
 		State state = null;
-		for(int i = 0; i < COUNT; i++){
+		for(int i = 0; i < COUNT; i++) {
 			state = sb.apply(system);
 			
 			cv.begin();
 			Util.clear(cv);
 			Point cursor = mouse.cursor();
 			Widget under = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
-            //Iterable<Widget> unders = Utils.widgetsFromPoint(state, cursor.x(), cursor.y());
-
-			//state.set(Tags.Screenshot, AWTCanvas.fromScreenshot((Rect)state.get(Tags.Shape), AWTCanvas.StorageFormat.BMP, 1.0));
 			
-			if(under != null){
+			if (under != null) {
 				Shape s = under.get(Tags.Shape, null);
-				if(s != null){
+				if (s != null) {
 					s.paint(cv, cv.defaultPen());
-					//System.out.println("under cursor: " + under.get(Tags.Desc, null) + ",  " + under.get(Tags.ZIndex) + ",  " + under.get(Tags.Role, Roles.Widget));
 				}
 			}
-
-//			for(Widget u : unders){
-//				Shape s = u.get(Tags.Shape, null);
-//				if(s != null){
-//					s.paint(cv, cv.defaultPen());
-//					cv.text(cv.defaultPen(), s.x(), s.y() - 20, 0, Utils.indexString(u));
-//				}
-//			}
 			
 			cv.end();
 			
@@ -228,21 +209,14 @@ public final class Test{
 		
 		
 		double t2 = Util.time();
-		System.out.println("Writing took: " + writeTime + " seconds.");
-		System.out.println("Size of generated file: " + file.length() / 1000.0 + " kilo bytes.");
-		System.out.println("Overall time: " + (t2 - t1) + " seconds.");
+		System.out.println("[Test] " + "Writing took: " + writeTime + " seconds.");
+		System.out.println("[Test] " + "Size of generated file: " + file.length() / 1000.0 + " kilo bytes.");
+		System.out.println("[Test] " + "Overall time: " + (t2 - t1) + " seconds.");
 
-		System.out.println("stopping system...");
+		System.out.println("[Test] " + "stopping system...");
 		Util.stop(system);
-		System.out.println("system stopped");
-		
-		//System.exit(0);
-
+		System.out.println("[Test] " + "system stopped");
 		sb.release();
-		//System.out.println("sb released");
-		
-//		if(1==1)
-//			return;
 		
 		t1 = Util.time();
 
@@ -250,11 +224,10 @@ public final class Test{
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(bis);
 
-		for(int i = 0; i < COUNT; i++){
+		for(int i = 0; i < COUNT; i++) {
 			Taggable t = (Taggable) ois.readObject();
 			state = t.get(Tags.SystemState);
 			cv.begin();
-			//state.get(Tags.Screenshot).paint(cv, 0, 0, 300, 300);
 			cv.end();
 			Set<Tag<?>> tags = new HashSet<Tag<?>>();
 			tags.addAll(Tags.tagSet());
@@ -268,6 +241,6 @@ public final class Test{
 		ois.close();
 		
 		t2 = Util.time();
-		System.out.println("Reading took: " + (t2 - t1) + " seconds.");	
+		System.out.println("[Test] " + "Reading took: " + (t2 - t1) + " seconds.");	
 	}
 }

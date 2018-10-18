@@ -34,7 +34,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.Verdict;
 
 /**
- * A WCAG success criterion
+ * A WCAG success criterion.
  * @author Davy Kager
  *
  */
@@ -43,7 +43,7 @@ public final class SuccessCriterion extends ItemBase {
 	private static final long serialVersionUID = 2042413918878837966L;
 
 	/**
-	 * WCAG success criterion conformance levels
+	 * WCAG success criterion conformance levels.
 	 */
 	public enum Level {
 		/**
@@ -63,7 +63,7 @@ public final class SuccessCriterion extends ItemBase {
 	}
 	
 	/**
-	 * The base for building anchor URLs of success criteria
+	 * The base for building anchor URLs of success criteria.
 	 */
 	public static final String URL_BASE =
 			"https://www.w3.org/WAI/GL/2013/WD-wcag2ict-20130905/accordion#";
@@ -75,7 +75,7 @@ public final class SuccessCriterion extends ItemBase {
 	private final String urlSuffix;
 	
 	/**
-	 * Constructs a new success criterion
+	 * Constructs a new success criterion.
 	 * @param nr The number of the success criterion.
 	 * @param name The name (short description) of the success criterion.
 	 * @param parent The guideline (parent) this success criterion belongs to.
@@ -84,13 +84,14 @@ public final class SuccessCriterion extends ItemBase {
 	 */
 	SuccessCriterion(int nr, String name, AbstractGuideline parent, Level level, String urlSuffix) {
 		super(nr, name, Assert.notNull(parent));
+		Assert.notNull(level);
 		Assert.hasText(urlSuffix);
-		this.level = Assert.notNull(level);
+		this.level = level;
 		this.urlSuffix = urlSuffix;
 	}
 	
 	/**
-	 * Gets the conformance level of this success criterion
+	 * Gets the conformance level of this success criterion.
 	 * @return The conformance level.
 	 */
 	public Level getLevel() {
@@ -98,7 +99,7 @@ public final class SuccessCriterion extends ItemBase {
 	}
 	
 	/**
-	 * Gets the anchor URL suffix of this success criterion
+	 * Gets the anchor URL suffix of this success criterion.
 	 * @return The URL suffix.
 	 */
 	public String getURLSuffix() {
@@ -106,7 +107,7 @@ public final class SuccessCriterion extends ItemBase {
 	}
 	
 	/**
-	 * Gets the severity of violating this success criterion as used in verdicts
+	 * Gets the severity of violating this success criterion as used in verdicts.
 	 * The severity depends on the conformance level of the success criterion.
 	 * A low level (A) corresponds to a high severity
 	 * and a high level (AAA) to a low severity.

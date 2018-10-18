@@ -1,0 +1,103 @@
+[Windows] Loading external lib ... ../windows/target/resources/main/windows.dll
+[LogSerialiser] <Thread-3> LogSerialiser finished
+[AbstractProtocol] Runtest started for sequence 1
+[Grapher] <Random> test generator enabled
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+[Protocol_testOU] SUT accessible after <423> ms
+[Protocol_testOU] Finish sequence
+[Protocol_testOU] Will kill process: PID <9404> HANDLE <5752> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <11624> HANDLE <5756> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <1072> HANDLE <5768> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <12768> HANDLE <5772> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <2244> HANDLE <5776> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <13984> HANDLE <5780> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <7200> HANDLE <5784> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <2268> HANDLE <5788> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <6764> HANDLE <5792> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <9932> HANDLE <5796> DESC <chrome.exe>
+[TestSerialiser] TestSerialiser finished
+[ScreenshotSerialiser] ScreenshotSerialiser finished
+[Grapher] TESTAR sequence graph dump on way ...
+Sync XML graph: [TESTARGraph] synced
+[Grapher] ... finished TESTAR sequence graph dump
+[Grapher] TESTAR grapher reset
+[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\graphviz-2.38\release\bin at PATH environment variable?
+[LogSerialiser] <Thread-7> LogSerialiser finished
+[LogSerialiser] <Thread-15> LogSerialiser finished
+[LogSerialiser] <Thread-16> LogSerialiser finished
+[LogSerialiser] <Thread-17> LogSerialiser finished
+[LogSerialiser] <Thread-18> LogSerialiser finished
+[AbstractProtocol] Runtest started for sequence 2
+[Grapher] <Random> test generator enabled
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+[Protocol_testOU] SUT accessible after <176> ms
+[Protocol_testOU] Finish sequence
+[Protocol_testOU] Will kill process: PID <13872> HANDLE <8608> DESC <FMAPP.exe>
+[Protocol_testOU] Will kill process: PID <11652> HANDLE <8612> DESC <backgroundTaskHost.exe>
+[Protocol_testOU] Will kill process: PID <9088> HANDLE <8616> DESC <RuntimeBroker.exe>
+[Protocol_testOU] Will kill process: PID <12624> HANDLE <8344> DESC <RuntimeBroker.exe>
+[Protocol_testOU] Will kill process: PID <3876> HANDLE <8340> DESC <DllHost.exe>
+[TestSerialiser] TestSerialiser finished
+[ScreenshotSerialiser] ScreenshotSerialiser finished
+[Grapher] TESTAR sequence graph dump on way ...
+Sync XML graph: [TESTARGraph] synced
+[Grapher] ... finished TESTAR sequence graph dump
+[Grapher] TESTAR grapher reset
+[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\graphviz-2.38\release\bin at PATH environment variable?
+[LogSerialiser] <Thread-19> LogSerialiser finished
+[LogSerialiser] <Thread-25> LogSerialiser finished
+[LogSerialiser] <Thread-26> LogSerialiser finished
+[LogSerialiser] <Thread-27> LogSerialiser finished
+[LogSerialiser] <Thread-28> LogSerialiser finished
+[AbstractProtocol] Runtest started for sequence 3
+[Grapher] <Random> test generator enabled
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+[Protocol_testOU] SUT accessible after <250> ms
+[Protocol_testOU] Finish sequence
+[TestSerialiser] TestSerialiser finished
+[Protocol_testOU] Will kill process: PID <10624> HANDLE <10732> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <6980> HANDLE <10740> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <8404> HANDLE <10748> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <8016> HANDLE <10752> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <13256> HANDLE <10756> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <4780> HANDLE <10760> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <7400> HANDLE <10764> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <4180> HANDLE <10768> DESC <chrome.exe>
+[Protocol_testOU] Will kill process: PID <13528> HANDLE <10772> DESC <chrome.exe>
+[ScreenshotSerialiser] ScreenshotSerialiser finished
+[Grapher] TESTAR sequence graph dump on way ...
+Sync XML graph: [TESTARGraph] synced
+[Grapher] ... finished TESTAR sequence graph dump
+[Grapher] TESTAR grapher reset
+[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\graphviz-2.38\release\bin at PATH environment variable?
+[LogSerialiser] <Thread-29> LogSerialiser finished
+[LogSerialiser] <Thread-35> LogSerialiser finished
+[LogSerialiser] <Thread-36> LogSerialiser finished
+[LogSerialiser] <Thread-37> LogSerialiser finished
+[LogSerialiser] <Thread-38> LogSerialiser finished
+[AbstractProtocol] Runtest started for sequence 4
+[Grapher] <Random> test generator enabled
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+[Protocol_testOU] SUT accessible after <200> ms
+[WinProcess] SUT is not running - cannot retrieve RAM usage
+[WinProcess] SUT is not running - cannot retrieve CPU usage
+[WinProcess] SUT is not running - cannot retrieve CPU usage
+[WinProcess] SUT is not running - cannot retrieve CPU usage
+[Protocol_testOU] Finish sequence
+[Protocol_testOU] Will kill process: PID <2044> HANDLE <15180> DESC <DllHost.exe>
+[ScreenshotSerialiser] ScreenshotSerialiser finished
+[TestSerialiser] TestSerialiser finished
+[Grapher] TESTAR sequence graph dump on way ...
+Sync XML graph: [TESTARGraph] synced
+[Grapher] ... finished TESTAR sequence graph dump
+[Grapher] TESTAR grapher reset
+[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\graphviz-2.38\release\bin at PATH environment variable?
+[LogSerialiser] <Thread-39> LogSerialiser finished
+[LogSerialiser] <Thread-45> LogSerialiser finished
+[LogSerialiser] <Thread-46> LogSerialiser finished
+[LogSerialiser] <Thread-47> LogSerialiser finished
+[LogSerialiser] <Thread-48> LogSerialiser finished
+[AbstractProtocol] Runtest started for sequence 5
+[Grapher] <Random> test generator enabled
+[Protocol_testOU] SUT is running after <0> ms ... waiting UI to be accessible
+[Protocol_testOU] SUT accessible after <199> ms

@@ -27,22 +27,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
-
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import javax.swing.*;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 import static org.fruit.monkey.dialog.ToolTipTexts.maxTestTimeTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.useRecordedTTT;
 
+import javax.swing.*;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
 public class TimingPanel extends JPanel {
-
-  private static final long serialVersionUID = -5878966626046293031L;
-
+  private static final long serialVersionUID = 1L;
   private JSpinner spnActionDuration;
   private JSpinner spnActionWaitTime;
   private JSpinner spnSutStartupTime;

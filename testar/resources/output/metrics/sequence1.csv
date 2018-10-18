@@ -1,0 +1,2 @@
+verdict,FAILS,minCvg(%),maxCvg(%),maxpath,graph-states,abstract-states,graph-actions,test-actions,SUTRAM(KB),SUTCPU(%),TestRAM(MB),TestCPU(s),fitness
+   PASS,    0,     0.00,    99.90,      4,           3,              3,            2,          10,   93556.0,   332.78,        0.0,     0.000,1.0382299128442253E-5
