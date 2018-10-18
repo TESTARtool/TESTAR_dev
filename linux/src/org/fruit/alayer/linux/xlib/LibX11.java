@@ -44,7 +44,7 @@ import java.io.IOException;
 public class LibX11 {
 
 
-    static {
+    static{
         try {
             BridJ.getNativeLibrary("libX11");
         } catch (IOException e) {

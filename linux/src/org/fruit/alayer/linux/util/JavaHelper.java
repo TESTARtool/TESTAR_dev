@@ -69,7 +69,7 @@ public class JavaHelper {
     }
 
 
-    /**
+    /***
      * Checks to see if a string is null or empty.
      * @param s string to check.
      * @return true if null or empty; otherwise false.
@@ -79,15 +79,14 @@ public class JavaHelper {
     }
 
 
-    /**
+    /***
      * Checks if a string is null or empty or contains only whitespace.
      * @param s string to check.
      * @return true if null or emptry or only whitespace; otherwise false.
      */
     public static boolean isNullOrWhitespace(String s) {
-        if (isNullOrEmpty(s)) {
+        if (isNullOrEmpty(s))
             return true;
-        }
         for (int i = 0; i < s.length(); i++) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return false;

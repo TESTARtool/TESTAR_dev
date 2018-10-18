@@ -48,28 +48,34 @@ import org.fruit.alayer.Widget;
  */
 public class GraphState implements IGraphState {
 	
-	private Map<String,Integer> stateWidgetsExecCount = new HashMap<String,Integer>(); // widget ID -> execution count (how many actions on the widget)
+	//private WeakReference<State> state;
+	//private Object stateZipped;
+	
+	private Map<String,Integer> stateWidgetsExecCount = new HashMap<String,Integer>();; // widget ID -> execution count (how many actions on the widget)
 	private Map<String,String> widgetsHierarchy = new HashMap<String,String>(); // widget ID -> parent widget ID
 	private Map<String,Map<String,String>> widgetsProperties = new HashMap<String,Map<String,String>>(); // widget ID -> widget properties
+		
 	private String stateShotPath = null;
-	private String concreteID;
-	private String abstract_R_ID = null;
-	private String abstract_R_T_ID = null; 
-	private String abstract_R_T_P_ID = null;
+	
+	private String concreteID, abstract_R_ID = null, abstract_R_T_ID = null, abstract_R_T_P_ID = null;
+	
 	private int count = 1; // number of times state was traversed
-	private GraphStateExploration actionsExploration = new GraphStateExploration();
+	
+	private GraphStateExploration actionsExploration = new GraphStateExploration();;
+	
 	private Verdict verdict;
-	private boolean knowledge = false;
-	private boolean revisited = false;
 
-	public GraphState(String id) {
+	private boolean knowledge = false,
+					revisited = false;
+
+	public GraphState(String id){
 		this.concreteID = id;
 		this.abstract_R_ID = id;
 		this.abstract_R_T_ID = id;
 		this.abstract_R_T_P_ID = id;
 	}
 
-	public GraphState(String id, String abstract_R_ID) {
+	public GraphState(String id, String abstract_R_ID){
 		this.concreteID = id;
 		this.abstract_R_ID = abstract_R_ID;
 		this.abstract_R_T_ID = id;
@@ -79,16 +85,20 @@ public class GraphState implements IGraphState {
 	/**
 	 * @param state Non null state
 	 */
-	public GraphState(State state) {
+	public GraphState(State state){
+		//this.state = new WeakReference<State>((state == null) ? new StdState() : state);
+		//this.stateZipped = ZipManager.compress(state);
+		//if (this.stateZipped == state)
+		//	this.state = null; // compression failed
 		this.concreteID = state.get(Tags.ConcreteID);
 		this.abstract_R_ID = state.get(Tags.Abstract_R_ID);
 		this.abstract_R_T_ID = state.get(Tags.Abstract_R_ID);
 		this.abstract_R_T_P_ID = state.get(Tags.Abstract_R_ID);
-		if (state.childCount() > 0) {
+		if (state.childCount() > 0){
 			String wid;
 			Map<String,String> wprops;
-			for (Widget w : state) {
-				if (w != state) {
+			for (Widget w : state){
+				if (w != state){
 					wid = w.get(Tags.ConcreteID);
 					this.stateWidgetsExecCount.put(wid,new Integer(0));
 					this.widgetsHierarchy.put(wid,w.parent().get(Tags.ConcreteID));
@@ -101,43 +111,53 @@ public class GraphState implements IGraphState {
 			}
 		}
 		this.verdict = state.get(Tags.OracleVerdict, Verdict.OK);
-		if (this.verdict.severity() == Verdict.SEVERITY_OK) {
+		if (this.verdict.severity() == Verdict.SEVERITY_OK)
 			this.verdict = null;
-		}
 	}
 	
+	/*@Override
+	public State getState(){
+		State s = this.state == null ? null : this.state.get();
+		if (s != null)
+			return s;
+		if (this.stateZipped instanceof byte[])
+			return (State) ZipManager.uncompress((byte[])this.stateZipped);
+		else
+			return (State) this.stateZipped;
+	}*/
+
 	@Override
-	public String getConcreteID() {
+	public String getConcreteID(){
 		return this.concreteID;
 	}
 
 	@Override
-	public String getAbstract_R_ID() {
+	public String getAbstract_R_ID(){
 		return this.abstract_R_ID;
 	}
 	
 	@Override
-	public String getAbstract_R_T_ID() {
+	public String getAbstract_R_T_ID(){
 		return this.abstract_R_T_ID;
 	}
 	
 	@Override
-	public String getAbstract_R_T_P_ID() {
+	public String getAbstract_R_T_P_ID(){
 		return this.abstract_R_T_P_ID;
 	}
 	
 	@Override
-	public Map<String,Integer> getStateWidgetsExecCount() {
+	public Map<String,Integer> getStateWidgetsExecCount(){
 		return this.stateWidgetsExecCount;
 	}
 	
 	@Override
-	public String getParent(String widgetID) {
+	public String getParent(String widgetID){
 		return this.widgetsHierarchy.get(widgetID);
 	}
 	
 	@Override
-	public Map<String,String> getWidgetProperties(String widgetID) {
+	public Map<String,String> getWidgetProperties(String widgetID){
 		return this.widgetsProperties.get(widgetID);
 	}
 	
@@ -147,102 +167,100 @@ public class GraphState implements IGraphState {
 	}
 
 	@Override
-	public String getStateshot() {
+	public String getStateshot(){
 		return this.stateShotPath;
 	}
 	
 	@Override
-	public int getCount() {
+	public int getCount(){
 		return this.count;
 	}
 
 	@Override
-	public void setCount(int count) {
+	public void setCount(int count){
 		this.count = count;
 	}
 	
 	@Override
-	public void incCount() {
+	public void incCount(){
 		this.count++;
 	}
 
 	@Override
 	public void updateUnexploredActions(IEnvironment env,
-										Set<Action> availableActions, Set<String> exploredActions) {
+										Set<Action> availableActions, Set<String> exploredActions){
 		actionsExploration.updateUnexploredActions(env,this,availableActions,exploredActions);
 	}
 
 	@Override
-	public int getUnexploredActionsSize() {
+	public int getUnexploredActionsSize(){
 		return actionsExploration.getUnexploredActionsSize();
 	}
 	
 	@Override
-	public String getUnexploredActionsString() {
+	public String getUnexploredActionsString(){
 		return actionsExploration.getUnexploredActionsString();
 	}
 
 	@Override
-	public void actionExplored(String aid) {
+	public void actionExplored(String aid){
 		actionsExploration.actionExplored(aid);
 	}
 	
 	@Override
-	public void actionUnexplored(String aid) {
+	public void actionUnexplored(String aid){
 		actionsExploration.actionUnexplored(aid);
 	}
 	
 	@Override
-	public Verdict getVerdict() {
+	public Verdict getVerdict(){
 		return this.verdict;
 	}
 		
 	@Override
-	public void actionExecuted(String targetWidgetID) {
+	public void actionExecuted(String targetWidgetID){
 		Integer wc = this.stateWidgetsExecCount.get(targetWidgetID);
-		if (wc != null) {
+		if (wc != null)
 			this.stateWidgetsExecCount.put(targetWidgetID, new Integer(wc.intValue() + 1));
-		}
 	}
 	
 	@Override
-	public void knowledge(boolean k) {
+	public void knowledge(boolean k){
 		this.knowledge = k;
 	}
 
 	@Override
-	public boolean knowledge() {
+	public boolean knowledge(){
 		return this.knowledge;
 	}
 	
 	@Override
-	public void revisited(boolean r) {
+	public void revisited(boolean r){
 		this.revisited = r;
 	}
 	
 	@Override
-	public boolean revisited() {
+	public boolean revisited(){
 		return this.revisited;
 	}
 	
 	@Override
-	public int hashCode() {
+	public int hashCode(){
 		return this.concreteID.hashCode();
 	}
 
 	@Override
-	public String toString() {
+	public String toString(){
 		return this.concreteID;
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
+	public boolean equals(Object o){
+		if(this == o)
 			return true;
-		}
-		if (!(o instanceof GraphState)) {
+		if(!(o instanceof GraphState))
 			return false;
-		}
 		return this.concreteID.equals(((GraphState)o).getConcreteID());
 	}	
+	
 }

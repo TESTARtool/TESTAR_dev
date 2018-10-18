@@ -30,7 +30,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.example;
 
 import java.io.BufferedInputStream;
@@ -48,22 +47,16 @@ import org.fruit.alayer.Pen;
 import org.fruit.alayer.Rect;
 
 public class AWTCanvasExample {
-	
-	private AWTCanvasExample() {
-		// default constructor
-	}
-	
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException{
 
-		final int xres = 1024;
-		final int yres = 768;
+		final int xres = 1024, yres = 768;
 		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(0, 0, xres, yres));
 		AWTCanvas pic = AWTCanvas.fromFile("/Users/guitest/Desktop/fruit_logo.png");
 		//pic = AWTImage.FromScreenshot(new Rect(0, 0, xres, yres));
 		
 		scrshot.begin();
 		int crop = 10;
-		System.out.println("[AWTCanvasExample] " + pic.width());
+		System.out.println(pic.width());
 		pic.paint(scrshot, Rect.from(crop, crop, pic.width() - 2 * crop, pic.height() - 2 * crop), 
 				Rect.from(0, 0, 200, 200));
 		
@@ -79,7 +72,7 @@ public class AWTCanvasExample {
 		scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger.jpg", 0.5f);
 		scrshot.saveAsPng("/Users/guitest/Desktop/wuffinger.png");
 
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < 1; i++){
 			saveImage(scrshot, "/Users/guitest/Desktop/brabutzinger");
 			scrshot = loadImage("/Users/guitest/Desktop/brabutzinger");
 			scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger" + i + ".jpg", 0.5f);
@@ -89,12 +82,12 @@ public class AWTCanvasExample {
 	}
 
 
-	public static void saveImage(AWTCanvas image, String file) throws IOException {
+	public static void saveImage(AWTCanvas image, String file) throws IOException{
 		FileOutputStream fos = new FileOutputStream(new File(file));
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < 1; i++){
 			oos.writeObject(image);
 			oos.reset();
 		}
@@ -103,7 +96,7 @@ public class AWTCanvasExample {
 		bos.close();
 	}
 
-	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException {
+	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException{
 		FileInputStream fis = new FileInputStream(new File(file));
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		ObjectInputStream ois = new ObjectInputStream(bis);

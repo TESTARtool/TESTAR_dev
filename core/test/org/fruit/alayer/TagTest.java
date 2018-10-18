@@ -29,11 +29,13 @@
 
 package org.fruit.alayer;
 
-import static org.junit.Assert.*;
 
-import java.io.*;
 import org.junit.AfterClass;
 import org.junit.Test;
+
+import java.io.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Test to validate the operation of the Tag class.
@@ -46,7 +48,7 @@ public class TagTest {
 
       File file = new File("dummy.dat");
       if (!file.delete()) {
-         System.out.println("[TagTest] File could not be removed");
+         System.out.println("File could not be removed");
       }
    }
 

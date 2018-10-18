@@ -38,7 +38,7 @@ import org.fruit.Assert;
 import org.fruit.alayer.AWTCanvas;
 
 /**
- * SUT screenshots serialiser.
+ * SUT screenshots serialiser
  * 
  * @author Urko Rueda Molina (alias: urueda)
  *
@@ -50,61 +50,51 @@ public class ScreenshotSerialiser extends Thread {
 	private static LinkedList<ScrshotRecord> scrshotSavingQueue =  new LinkedList<ScrshotRecord>();
 	private static final int QUEUE_LIMIT = 16; //32;
 	private static ScreenshotSerialiser singletonScreenshotSerialiser;
-	private static boolean alive;
-	private static boolean queueBoost;
+	private static boolean alive, queueBoost;
 
-	private static class ScrshotRecord {
-		private String scrshotPath;
-		private AWTCanvas scrshot;
-		
-		public ScrshotRecord(String scrshotPath, AWTCanvas scrshot) {
-			this.scrshotPath = scrshotPath; 
-			this.scrshot = scrshot;
-		}
+	private static class ScrshotRecord{
+		String scrshotPath;
+		AWTCanvas scrshot;
+		public ScrshotRecord(String scrshotPath, AWTCanvas scrshot){this.scrshotPath = scrshotPath; this.scrshot = scrshot;}
 	}
 	
-	private ScreenshotSerialiser() {
-	}
-	
-	private ScreenshotSerialiser(String testSequenceFolder) {
+	private ScreenshotSerialiser(){}
+	private ScreenshotSerialiser(String testSequenceFolder){
 		ScreenshotSerialiser.testSequenceFolder = testSequenceFolder;
 		(new File(OUT_DIR + testSequenceFolder)).mkdirs();
 	}
 		
-	public static void start(String testSequenceFolder) {
+	public static void start(String testSequenceFolder){
 		Assert.isTrue(!alive);
 		Assert.isTrue(scrshotSavingQueue.isEmpty());
-		alive = true; 
-		queueBoost = false;
+		alive = true; queueBoost = false;
 		singletonScreenshotSerialiser = new ScreenshotSerialiser(testSequenceFolder);
 		singletonScreenshotSerialiser.setPriority(Thread.MIN_PRIORITY);
 		singletonScreenshotSerialiser.start();
 	}
 	
-	public static void finish() {
+	public static void finish(){
 		alive = false;
 	}
 	
 	@Override
-	public void run() {		
-		while (alive || !scrshotSavingQueue.isEmpty()) {
-			while (alive && scrshotSavingQueue.isEmpty()) {
+	public void run(){		
+		while (alive || !scrshotSavingQueue.isEmpty()){
+			while(alive && scrshotSavingQueue.isEmpty()){
 				try {
 					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				} catch (InterruptedException e1) {}
 			}
-			if (!scrshotSavingQueue.isEmpty()) {
-				if (!queueBoost && scrshotSavingQueue.size() > QUEUE_LIMIT) {
+			if (!scrshotSavingQueue.isEmpty()){
+				if (!queueBoost && scrshotSavingQueue.size() > QUEUE_LIMIT){
 					this.setPriority(NORM_PRIORITY);
 					queueBoost = true;
-				} else if (queueBoost && scrshotSavingQueue.size() < QUEUE_LIMIT / 2) { //10) {
+				} else if (queueBoost && scrshotSavingQueue.size() < QUEUE_LIMIT/2){ //10){
 					this.setPriority(MIN_PRIORITY);
 					queueBoost = false;
 				}
 				ScrshotRecord r;
-				synchronized(scrshotSavingQueue) {
+				synchronized(scrshotSavingQueue){
 					r = scrshotSavingQueue.removeFirst();
 				}
 				try {
@@ -114,43 +104,41 @@ public class ScreenshotSerialiser extends Thread {
 				}
 			}
 		}
-		synchronized(testSequenceFolder) {
-			System.out.println("[" + getClass().getSimpleName() + "] ScreenshotSerialiser finished");
+		synchronized(testSequenceFolder){
+			//System.out.println("ScreenshotSerialiser finished");
 			singletonScreenshotSerialiser = null;
 			testSequenceFolder.notifyAll();
 		}
 	}
 	
-	public static String saveStateshot(String stateID, AWTCanvas stateshot) {
+	public static String saveStateshot(String stateID, AWTCanvas stateshot){
 		String statePath = OUT_DIR + testSequenceFolder + "/" + stateID + ".png";
-		if (!new File(statePath).exists()) {
+		if (!new File(statePath).exists())
 			savethis(statePath,stateshot);
-		}
 		return statePath;
 	}
 	
-	public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot) {
+	public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot){
 		String actionPath = OUT_DIR + testSequenceFolder + "/" + stateID + "_" + actionID + ".png";
-		if (!new File(actionPath).exists()) {
+		if (!new File(actionPath).exists())
 			savethis(actionPath,actionshot);
-		}
 		return actionPath;
 	}
 		
-	private static void savethis(String scrshotPath, AWTCanvas scrshot) {
-		if (alive) {
-			synchronized(scrshotSavingQueue) {
+	private static void savethis(String scrshotPath, AWTCanvas scrshot){
+		if (alive){
+			synchronized(scrshotSavingQueue){
 				scrshotSavingQueue.add(new ScrshotRecord(scrshotPath,scrshot));
 			}
 		}
 	}
 	
-	public static void exit() {
-		if (singletonScreenshotSerialiser != null) {
+	public static void exit(){
+		if (singletonScreenshotSerialiser != null){
 			ScreenshotSerialiser.finish();
 			try {
-				synchronized(testSequenceFolder) {
-					while (singletonScreenshotSerialiser != null) {
+				synchronized(testSequenceFolder){
+					while (singletonScreenshotSerialiser != null){
 						try {
 							testSequenceFolder.wait(10);
 						} catch (InterruptedException e) {
@@ -158,14 +146,14 @@ public class ScreenshotSerialiser extends Thread {
 						}
 					}
 				}
-			} catch (Exception e) {
-				// testSequenceFolder may be set to null when we try to sync on it
-			} 
+			} catch (Exception e) {} // testSequenceFolder may be set to null when we try to sync on it
+			//System.out.println("ScreenshotManager exited");
 			testSequenceFolder = null;
 		}
 	}	
 
-	public static int queueLength() {
+	public static int queueLength(){
 		return scrshotSavingQueue.size();
-	}		
+	}	
+	
 }

@@ -44,7 +44,7 @@ import java.io.IOException;
 public class LibWnck {
 
 
-    static {
+    static{
         try {
             BridJ.getNativeLibrary("libwnck-3");
         } catch (IOException e) {

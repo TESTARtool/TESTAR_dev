@@ -212,10 +212,10 @@ public class TESTAREnvironment implements IEnvironment {
       }
     }
     if (graphStates.size() < targetStates.size()) {
-      System.out.println("[" + getClass().getSimpleName() + "] WARNING - action <" + action.getConcreteID() 
-      	+ "> from <" + action.getSourceStateID() 
-      	+ "> has <" + (targetStates.size() - graphStates.size()) 
-      	+ "> null targets: " + targetStates.toString());
+      System.out.println("WARNING - action <" + action.getConcreteID() +
+          "> from <" + action.getSourceStateID() +
+          "> has <" + (targetStates.size() - graphStates.size()) +
+          "> null targets: " + targetStates.toString());
     }
     return graphStates.toArray(new IGraphState[graphStates.size()]);
   }
@@ -355,27 +355,22 @@ public class TESTAREnvironment implements IEnvironment {
   }
 
   /**
-   * &lt;[0],[1]&gt; = &lt;min%,max%&gt; coverage (for all states).
+   * &lt;[0],[1]&gt; = &lt;min%,max%&gt; coverage (for all states)
    * [2] = % coverage from the known' explored UI space
    * [3] = known UI space scale
    * [4] = known unexplored actions
    */
   @Override
   public CoverageMetrics getCoverageMetrics () {
-    int exploredActionsCount; 
-    int unexploredActionsCount;
-    final double MAXCVG_UNKNOWN_SPACE = .999; // (actions space is unknown)
-    double sumActions;
-    double coverage = 0.0;
-    double minCoverage = MAXCVG_UNKNOWN_SPACE;
-    double maxCoverage = 0.0;
-    int totalKnownActions = 0;
-    int totalKnownExecutedActions = 0;
-    int totalKnownUnexploredActions = 0; 
+    int exploredActionsCount, unexploredActionsCount;
+    final double MAXCVG_UNKNOWN_SPACE = .999; // by urueda (actions space is unknown)
+    double sumActions, // by urueda
+        coverage = 0.0, minCoverage = MAXCVG_UNKNOWN_SPACE, maxCoverage = 0.0;
+    int totalKnownActions = 0, totalKnownExecutedActions = 0, totalKnownUnexploredActions = 0; // by urueda
     for (IGraphState v : g.vertexStates()) {
-      if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) 
-    	|| v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) 
-    	|| v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
+      if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) ||
+          v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) ||
+          v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
         continue;
       }
       exploredActionsCount = getOutgoingActions(v).size();
@@ -406,12 +401,11 @@ public class TESTAREnvironment implements IEnvironment {
 
   @Override
   public int[] getGraphResumingMetrics () {
-    int knownStates = 0;
-    int revisitedStates = 0;
+    int knownStates = 0, revisitedStates = 0;
     for (IGraphState v : g.vertexStates()) {
-      if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) 
-    	|| v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS)
-    	|| v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
+      if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) ||
+          v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) ||
+          v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
         continue;
       }
       if (v.knowledge()) {
@@ -489,33 +483,33 @@ public class TESTAREnvironment implements IEnvironment {
     if (k < 100) {
       return k + "";
     }
-    if (k < 1000) {
-    	// 1K    	// x 10
-    	return k / 10 + "a"; 
+    if (k < 1000) // 1K
+    {
+      return k / 10 + "a"; // x 10
     }
-    if (k < 10000) { 
-    	// 10K    	// x 100
-    	return k / 100 + "b"; 
+    if (k < 10000) // 10K
+    {
+      return k / 100 + "b"; // x 100
     }
-    if (k < 100000) {
-    	// 100K    	// x 1000 (1K)
-    	return k / 1000 + "c"; 
+    if (k < 100000) // 100K
+    {
+      return k / 1000 + "c"; // x 1000 (1K)
     }
-    if (k < 1000000) {
-    	// 1M    	// x 10000 (10K)
-    	return k / 10000 + "d"; 
+    if (k < 1000000) // 1M
+    {
+      return k / 10000 + "d"; // x 10000 (10K)
     }
-    if (k < 10000000) {
-    	// 10M    	// x 100000 (100K)
-    	return k / 100000 + "e"; 
+    if (k < 10000000) // 10M
+    {
+      return k / 100000 + "e"; // x 100000 (100K)
     }
-    if (k < 100000000) {
-    	// 100M    	// x 1000000 (1M)
-      return k / 1000000 + "f"; 
+    if (k < 100000000) // 100M
+    {
+      return k / 1000000 + "f"; // x 1000000 (1M)
     }
-    if (k < 1000000000) {
-    	// 1G      	// x 10000000 (10M)
-    	return k / 10000000 + "g"; 
+    if (k < 1000000000) // 1G
+    {
+      return k / 10000000 + "g"; // x 10000000 (10M)
     }
     return k + "o"; // overflow
   }
@@ -566,10 +560,8 @@ public class TESTAREnvironment implements IEnvironment {
       return null;
     }
     Collection<GraphEdge> inActions = this.getIncomingActions(graphState);
-    String lastOrder;
-    String maxOrder = "0";
-    IGraphAction lastAction = null;
-    IGraphAction ga;
+    String lastOrder, maxOrder = "0";
+    IGraphAction lastAction = null, ga;
     for (GraphEdge edge : inActions) {
       ga = g.getAction(edge.getActionID());
       lastOrder = ga.getLastOrder(edge.getTargetStateID());

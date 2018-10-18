@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -49,17 +48,11 @@ import org.fruit.Drag;
  */
 public interface Widget extends Taggable, Serializable {
 	State root();
-	
 	Widget parent();
-	
 	Widget child(int i);
-	
 	int childCount();
-	
 	void remove();
-	
 	void moveTo(Widget p, int idx);
-	
 	Widget addChild();
 	
 	/**
@@ -76,8 +69,8 @@ public interface Widget extends Taggable, Serializable {
 	 * @return Computes a string representation for the widget.
 	 * @author urueda
 	 */
-	String getRepresentation(String tab);
+	public String getRepresentation(String tab);
 	
-	String toString(Tag<?>... tags);
+	public abstract String toString(Tag<?>... tags);
 	
 }

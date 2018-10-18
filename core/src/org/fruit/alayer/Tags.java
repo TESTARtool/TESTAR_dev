@@ -34,17 +34,18 @@
 package org.fruit.alayer;
 
 import es.upv.staq.testar.CodingManager;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 import org.fruit.Pair;
 import org.fruit.Proc;
 import org.fruit.UnFunc;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.ProcessHandle;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public final class Tags extends TagsBase {
 	
@@ -76,14 +77,14 @@ public final class Tags extends TagsBase {
 	 * be obfuscated by other controls. */
 	public static final Tag<Boolean> Rendered = from("Rendered", Boolean.class);
 	
-	/** A short human-readable descriptive text for a widget / action / or system. */
+	/** A short human-readable descriptive text for a widget / action / or system */
 	public static final Tag<String> Desc = from("Desc", String.class);
 	
 	/** determines whether a widget is enabled (e.g. in many GUI-Frameworks disabled items are
 	 * greyed out) */
 	public static final Tag<Boolean> Enabled = from("Enabled", Boolean.class);
 	
-	/** determines whether a system is running. */
+	/** determines whether a system is running */
 	public static final Tag<Boolean> IsRunning = from("IsRunning", Boolean.class);
 	
 	/** determines whether a widget is blocked by anything or whether it is accessible. For example:
@@ -91,23 +92,23 @@ public final class Tags extends TagsBase {
 	 * which are consequently not clickable. */
 	public static final Tag<Boolean> Blocked = from("Blocked", Boolean.class);
 	
-	/** determines whether a widget / system / window is in the foreground. */
+	/** determines whether a widget / system / window is in the foreground */
 	public static final Tag<Boolean> Foreground = from("Foreground", Boolean.class);
 	
-	/** the title of a widget (usually visible text, such as on a button). */
+	/** the title of a widget (usually visible text, such as on a button) */
 	public static final Tag<String> Title = from("Title", String.class);
 	
-	/** ZIndex of a widget (objects with higher values are drawn on top of objects with lower values). */
+	/** ZIndex of a widget (objects with higher values are drawn on top of objects with lower values) */
 	public static final Tag<Double> ZIndex = from("ZIndex", Double.class);
 	
 	// begin by urueda
-	/** Maximum observed ZIndex for a UI state. */
+	/** Maximum observed ZIndex for a UI state */
 	public static final Tag<Double> MaxZIndex = from("MaxZIndex", Double.class);
-	/** Minimum observed ZIndex for a UI state. */
+	/** Minimum observed ZIndex for a UI state */
 	public static final Tag<Double> MinZIndex = from("MinZIndex", Double.class);
 	
-	/** Related to slides (from_Position -&lt; to_Position). */
-	public static final Tag<Position[]> Slider = from("Slider", Position[].class);
+	/** Related to slides (from_Position -&lt; to_Position) */
+	public static final Tag<Position[]> Slider = from("Slider", Position[].class);;
 	// end by urueda
 	
 	/** Usually attached to systems. Determines whether a system is non-responsive (hanging)
@@ -130,12 +131,12 @@ public final class Tags extends TagsBase {
 	/** The text of a widget (e.g. the text within a text box) */
 	public static final Tag<String> Text = from("Text", String.class);
 
-	/** The pattern value of a web-widget : hyperlink or text in input field. */
+	/** The pattern value of a web-widget : hyperlink or text in input field */
 	public static final Tag<String> ValuePattern = from("ValuePattern", String.class);
 
 	public static final Tag<WidgetMap> WidgetMap = from("WidgetMap", WidgetMap.class);
 
-	/** A unique identifier for a widget / actions / system. */
+	/** A unique identifier for a widget / actions / system */
 	public static final Tag<UID> UID = from("UID", UID.class);
 	
 	// begin by urueda
@@ -150,15 +151,15 @@ public final class Tags extends TagsBase {
 	@SuppressWarnings("unchecked")
 	public static final Tag<UnFunc<SUT, String>> DynDesc = from("DynDesc", (Class<UnFunc<SUT, String>>)(Class<?>)UnFunc.class);
 
-	/** A visualizer, which visualizes a widget or an action, so that one can get an idea of what the action will do when executed. */
+	/** A visualizer, which visualizes a widget or an action, so that one can get an idea of what the action will do when executed */
 	public static final Tag<Visualizer> Visualizer = from("Visualizer", Visualizer.class);
 	
-	/** Usually attached to actions, determines the widgets that this action will operate on. */
+	/** Usually attached to actions, determines the widgets that this action will operate on */
 	@SuppressWarnings("unchecked")
 	public static final Tag<List<Finder>> Targets = from("Targets", (Class<List<Finder>>)(Class<?>)List.class);
 	
 	// by urueda
-	/** For actions that apply to a single target, keep the target ID (abstract). */
+	/** For actions that apply to a single target, keep the target ID (abstract) */
 	public static final Tag<String> TargetID = from("TargetID", String.class);
 	
 	/** The Process ID. Usually attached to systems. */
@@ -174,8 +175,7 @@ public final class Tags extends TagsBase {
 	 */
 	public static final Tag<Long> TimeStamp = from("TimeStamp", Long.class);
 	
-	/** Usually attached to an object of {@link State}. 
-	 * The value is a screenshot of the state. */
+	/** Usually attached to an object of {@link State}. The value is a screenshot of the state. */
 	//public static final Tag<Image> Screenshot = from("Screenshot", Image.class);
 	public static final Tag<String> ScreenshotPath = from("ScreenshotPath", String.class); // by urueda
 		

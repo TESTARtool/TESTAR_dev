@@ -48,21 +48,15 @@ public class AtSpiValue {
 
 
     private double _minimumValue;
-    public double minimumValue() { 
-    	return LibAtSpi.atspi_value_get_minimum_value(_valuePtr, 0); 
-    }
+    public double minimumValue() { return LibAtSpi.atspi_value_get_minimum_value(_valuePtr, 0); }
 
 
     private double _currentValue;
-    public double currentValue() { 
-    	return LibAtSpi.atspi_value_get_current_value(_valuePtr, 0); 
-    }
+    public double currentValue() { return LibAtSpi.atspi_value_get_current_value(_valuePtr, 0); }
 
 
     private double _maximumValue;
-    public double maximumValue() { 
-    	return LibAtSpi.atspi_value_get_maximum_value(_valuePtr, 0); 
-    }
+    public double maximumValue() { return LibAtSpi.atspi_value_get_maximum_value(_valuePtr, 0); }
 
 
     //endregion

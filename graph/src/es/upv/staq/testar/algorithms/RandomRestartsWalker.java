@@ -49,18 +49,17 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
  */
 public class RandomRestartsWalker extends RandomWalker {
 	
-	public RandomRestartsWalker(Random rnd, int testSequenceLength) {
+	public RandomRestartsWalker(Random rnd, int testSequenceLength){
 		super(rnd);
 		RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
 	}
 
 	@Override
 	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
-		if (RestartsWalkerUtil.notifyActionSelection(this,env, state)) {
+		if (RestartsWalkerUtil.notifyActionSelection(this,env, state))
 			return super.selectProportional(env, state, actions);
-		} else {
+		else
 			return super.selectAction(env, state, actions, jipWrapper);
-		}
 	}
 
 	@Override
@@ -70,12 +69,12 @@ public class RandomRestartsWalker extends RandomWalker {
 	}
 	
 	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState targetState) {
+	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
 		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
-		if (r != Double.MIN_VALUE) {
+		if (r != Double.MIN_VALUE)
 			return r;
-		} else {
+		else
 			return super.calculateRewardForState(env, targetState);
-		}
 	}	
+
 }

@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -43,7 +42,7 @@ import org.fruit.alayer.exceptions.WidgetNotFoundException;
  * (typically the root). Finder's are abstract representations of widgets and implement a particular search strategy, e.g.
  * "find the widget with the title 'Save'" or "the widget which is the 3rd child of another widget of type 'Canvas'".
  * 
- * <p>Finders must be serializable and are often used to implement actions, e.g. "click on the widget with title 'Save'".
+ * Finders must be serializable and are often used to implement actions, e.g. "click on the widget with title 'Save'".
  */
 public interface Finder extends Serializable {
 	

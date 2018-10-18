@@ -53,30 +53,26 @@ public class GraphStateExploration {
 	// textbox fields => typing actions with oo texts parameter => huge set population	
 	private Map<String,Integer> unexploredTypings; // action ID (abstract) x typed count
 
-	public GraphStateExploration() {
+	public GraphStateExploration(){
 		this.unexploredActions = new HashSet<String>();
 		this.unexploredTypings = new HashMap<String,Integer>();
 	}
 	
 	public void updateUnexploredActions(IEnvironment env, IGraphState gs,
-										Set<Action> availableActions, Set<String> exploredActions) {
+										Set<Action> availableActions, Set<String> exploredActions){
 		String aid;
 		Role role;
-		synchronized(this.unexploredActions) {
-			for (Action a : availableActions) {
+		synchronized(this.unexploredActions){
+			for (Action a : availableActions){
 				aid = a.get(Tags.AbstractID);
 				role = a.get(Tags.Role, null);
-				if (role != null && Role.isOneOf(role, ActionRoles.Type, ActionRoles.ClickTypeInto)) { // typing action
-					if (this.unexploredTypings.get(aid) == null) {
+				if (role != null && Role.isOneOf(role, ActionRoles.Type, ActionRoles.ClickTypeInto)){ // typing action
+					if (this.unexploredTypings.get(aid) == null)
 						this.unexploredTypings.put(aid,new Integer(0));
-					} else {
-						// skip loop action
-						continue; 
-					}
-				} else if (exploredActions.contains(aid)) {
-					// skip explored action
-					continue; 
-				}
+					else
+						continue; // skip loop action
+				} else if (exploredActions.contains(aid))
+					continue; // skip explored action
 				this.unexploredActions.add(aid);
 			}
 		}
@@ -86,17 +82,16 @@ public class GraphStateExploration {
 	 * 
 	 * @param aid Abstract action ID.
 	 */
-	public void actionExplored(String aid) {
-		synchronized(this.unexploredActions) {
+	public void actionExplored(String aid){
+		synchronized(this.unexploredActions){
 			Integer typedCount = this.unexploredTypings.get(aid);
-			if (typedCount == null) {
+			if (typedCount == null)
 				this.unexploredActions.remove(aid);
-			} else {
-				if (typedCount.intValue() + 1 >= Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION) {
+			else{
+				if (typedCount.intValue() + 1 >= Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION)
 					this.unexploredActions.remove(aid);
-				} else {
+				else
 					this.unexploredTypings.put(aid, new Integer(typedCount.intValue() + 1));
-				}
 			}
 		}
 	}
@@ -105,28 +100,28 @@ public class GraphStateExploration {
 	 * 
 	 * @param aid Abstract action ID.
 	 */
-	public void actionUnexplored(String aid) {
-		synchronized(this.unexploredActions) {
+	public void actionUnexplored(String aid){
+		synchronized(this.unexploredActions){
 			this.unexploredActions.add(aid);
 		}		
 	}
 	
-	public int getUnexploredActionsSize() {
-		synchronized(this.unexploredActions) {
+	public int getUnexploredActionsSize(){
+		synchronized(this.unexploredActions){
 			return this.unexploredActions.size();
 		}
 	}
 	
-	public String getUnexploredActionsString() {
-		synchronized(this.unexploredActions) {
-			if (this.unexploredActions.isEmpty()) {
+	public String getUnexploredActionsString(){
+		synchronized(this.unexploredActions){
+			if (this.unexploredActions.isEmpty())
 				return "[]";
-			} else {
+			else {
 				StringBuilder sb = new StringBuilder();
-				for (String ua : this.unexploredActions) {
+				for (String ua : this.unexploredActions){
 					sb.append(ua + ",");
 				}
-				return "[" + sb.toString().substring(0,sb.length() - 1) + "]";
+				return "[" + sb.toString().substring(0,sb.length()-1) + "]";
 			}
 		}
 	}

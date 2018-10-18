@@ -51,21 +51,16 @@ public abstract class PredicateBase implements IPredicate {
 	protected Object[] predicateContext = null;
 
 	@Override
-	public Verdict getVerdict(JIPrologWrapper jipWrapper) {
-		Assert.notNull(this.refuteQuery); 
-		Assert.notNull(this.predicateContext);
+	public Verdict getVerdict(JIPrologWrapper jipWrapper){
+		Assert.notNull(this.refuteQuery); Assert.notNull(this.predicateContext);
 		Grapher.syncMovements(); // synchronize graph movements consumption			
 		jipWrapper.updatePrologFactsNrules();
 		// check predicate
 		List<List<String>> solutions = jipWrapper.setQuery(this.refuteQuery);
-		if (solutions != null && !solutions.isEmpty()) {
-			String refuteMsg = ""; 
-			for (Object o : this.predicateContext) {
-				refuteMsg += o.toString() + " ";
-			}
+		if (solutions != null && !solutions.isEmpty()){
+			String refuteMsg = ""; for (Object o : this.predicateContext) refuteMsg += o.toString() + " ";
 			refuteMsg += "predicate refuted!";
-			System.out.println("[" + getClass().getSimpleName() + "]  " +  refuteMsg); 
-			PrologUtil.printSolutions(solutions);
+			System.out.println(refuteMsg); PrologUtil.printSolutions(solutions);
 			return new Verdict(Verdict.SEVERITY_MAX, refuteMsg);
 		}
 		return Verdict.OK;  // cannot refute predicate

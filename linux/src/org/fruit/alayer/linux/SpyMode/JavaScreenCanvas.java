@@ -59,7 +59,6 @@ public class JavaScreenCanvas implements Canvas {
 
 
     private double _width;
-    
     @Override
     public double width() {
         return _width;
@@ -67,7 +66,6 @@ public class JavaScreenCanvas implements Canvas {
 
 
     private double _height;
-    
     @Override
     public double height() {
         return _height;
@@ -75,7 +73,6 @@ public class JavaScreenCanvas implements Canvas {
 
 
     private double _x;
-    
     @Override
     public double x() {
         return _x;
@@ -83,7 +80,6 @@ public class JavaScreenCanvas implements Canvas {
 
 
     private double _y;
-    
     @Override
     public double y() {
         return _y;
@@ -91,7 +87,6 @@ public class JavaScreenCanvas implements Canvas {
 
 
     private Pen _defaultPen;
-    
     @Override
     public Pen defaultPen() {
         return _defaultPen;
@@ -116,9 +111,8 @@ public class JavaScreenCanvas implements Canvas {
     @Override
     public void release() {
 
-        if (!_running) {
+        if(!_running)
             return;
-        }
         _running = false;
 
         _frameReference.setVisible(false);
@@ -150,8 +144,9 @@ public class JavaScreenCanvas implements Canvas {
     public void clear(double x, double y, double width, double height) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Clear: (" + x + ", " + y + ").");
+        //System.out.println("Clear: (" + x + ", " + y + ").");
         _paneReference.clearDrawableContent();
+
     }
 
 
@@ -159,7 +154,7 @@ public class JavaScreenCanvas implements Canvas {
     public void line(Pen pen, double x1, double y1, double x2, double y2) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Line: (" + x1 + ", " + y1 + ").");
+        //System.out.println("Draw Line: (" + x1 + ", " + y1 + ").");
         _paneReference.addDrawableContent(new DrawableLine(new Point(new Double(x1).intValue(), new Double(y1).intValue()), pen, _defaultPen, new Point(new Double(x2).intValue(), new Double(y2).intValue())));
 
     }
@@ -169,7 +164,7 @@ public class JavaScreenCanvas implements Canvas {
     public void text(Pen pen, double x, double y, double angle, String text) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Text: (" + x + ", " + y + ").");
+        //System.out.println("Draw Text: (" + x + ", " + y + ").");
         _paneReference.addDrawableContent(new DrawableText(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen, text));
 
     }
@@ -179,7 +174,7 @@ public class JavaScreenCanvas implements Canvas {
     public void ellipse(Pen pen, double x, double y, double width, double height) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Ellipse: (" + x + ", " + y + ").");
+        //System.out.println("Draw Ellipse: (" + x + ", " + y + ").");
         _paneReference.addDrawableContent(new DrawableEllipse(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen,
                 new Rectangle(new Double(x).intValue(), new Double(y).intValue(), new Double(width).intValue(), new Double(height).intValue())));
 
@@ -188,7 +183,7 @@ public class JavaScreenCanvas implements Canvas {
 
     @Override
     public void triangle(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3) {
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Triangle: (" + x1 + ", " + y1 + ").");
+        //System.out.println("Draw Triangle: (" + x1 + ", " + y1 + ").");
         throw new UnsupportedOperationException();
     }
 
@@ -196,7 +191,7 @@ public class JavaScreenCanvas implements Canvas {
     public void image(Pen pen, double x, double y, double width, double height, int[] image, int imageWidth, int imageHeight) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Image: (" + x + ", " + y + ").");
+        //System.out.println("Draw Image: (" + x + ", " + y + ").");
         //_paneReference.addDrawableContent(new DrawableImage(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen, image));
         throw new UnsupportedOperationException();
     }
@@ -206,7 +201,7 @@ public class JavaScreenCanvas implements Canvas {
     public void rect(Pen pen, double x, double y, double width, double height) {
 
         runningCheck();
-        //System.out.println("[" + getClass().getSimpleName() + "] Draw Rect: (" + x + ", " + y + ").");
+        //System.out.println("Draw Rect: (" + x + ", " + y + ").");
         _paneReference.addDrawableContent(new DrawableRect(new Point(new Double(x).intValue(), new Double(y).intValue()), pen, _defaultPen,
                 new Rectangle(new Double(x).intValue(), new Double(y).intValue(), new Double(width).intValue(), new Double(height).intValue())));
 
@@ -292,7 +287,7 @@ public class JavaScreenCanvas implements Canvas {
      * @param defaultPen The default pen used to draw stuff.
      * @return An instance of a window to draw on in Spy- mode.
      */
-    public static JavaScreenCanvas fromPrimaryMonitor(Pen defaultPen) {
+    public static JavaScreenCanvas fromPrimaryMonitor(Pen defaultPen){
 
         // Get the primary monitor bounds and create a window covering the entire screen.
         Rectangle monitorBounds =  getPrimaryMonitorBounds();
@@ -306,9 +301,8 @@ public class JavaScreenCanvas implements Canvas {
      * Checks whether the Spy- window is showing. If not, it will throw an IllegalStateException.
      */
     private void runningCheck() {
-        if (!_running) {
+        if(!_running)
             throw new IllegalStateException();
-        }
     }
 
 
@@ -347,7 +341,7 @@ public class JavaScreenCanvas implements Canvas {
 
         }
 
-        System.out.println("[JavaScreenCanvas] Could not find primary monitor! Assume 1920 x 1080 @ (0, 0)");
+        System.out.println("Could not find primary monitor! Assume 1920 x 1080 @ (0, 0)");
         return new Rectangle(0,0, 1920, 1080);
 
     }

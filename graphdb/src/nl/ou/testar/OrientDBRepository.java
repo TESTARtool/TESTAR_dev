@@ -30,6 +30,7 @@
 
 package nl.ou.testar;
 
+
 import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory;
@@ -76,15 +77,15 @@ class OrientDBRepository implements GraphDBRepository {
 
       graph.shutdown();
       long tEnd = System.currentTimeMillis();
-      // LOGGER.info("[S<] # {} # stored in #{} # ms", state.get(Tags.ConcreteID), tEnd - tStart);
+      LOGGER.info("[S<] # {} # stored in #{} # ms", state.get(Tags.ConcreteID), tEnd - tStart);
    }
 
 
    @Override
    public void addAction(final Action action, final String toStateID) {
 
-      // LOGGER.info("Store Action {} ({}) from {} to {}",
-      //  action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
+      LOGGER.info("Store Action {} ({}) from {} to {}",
+         action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), action.get(Tags.TargetID), toStateID);
 
       long tStart = System.currentTimeMillis();
 
@@ -104,13 +105,13 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      // LOGGER.info("[A<] # {} # stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
+      LOGGER.info("[A<] # {} # stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
    }
 
    @Override
    public void addActionOnState(String stateId, Action action, String toStateID) {
-      // LOGGER.info("Store Action {} ({}) from {} to {}",
-      // action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
+      LOGGER.info("Store Action {} ({}) from {} to {}",
+         action.get(Tags.ConcreteID), action.get(Tags.Desc, ""), stateId, toStateID);
       long tStart = System.currentTimeMillis();
 
       OrientGraph graph = graphFactory.getTx();
@@ -129,13 +130,13 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      // LOGGER.info("[A<] # {} stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
+      LOGGER.info("[A<] # {} stored in # {} # ms", action.get(Tags.ConcreteID), tEnd - tStart);
    }
 
    @Override
    public void addWidget(String stateID, Widget w) {
-      // LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
-      // long tStart = System.currentTimeMillis();
+      LOGGER.info("Add Widget {} with id {} to state {}", w.get(Tags.Desc, ""), w.get(Tags.ConcreteID), stateID);
+      long tStart = System.currentTimeMillis();
       OrientGraph graph = graphFactory.getTx();
       try {
          Vertex state = getStateVertex(stateID, graph);
@@ -153,7 +154,7 @@ class OrientDBRepository implements GraphDBRepository {
          graph.shutdown();
       }
       long tEnd = System.currentTimeMillis();
-      // LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID), tEnd - tStart);
+      LOGGER.info("[W<] # {} # stored in # {} # ms", w.get(Tags.ConcreteID), tEnd - tStart);
 
    }
 
@@ -184,13 +185,13 @@ class OrientDBRepository implements GraphDBRepository {
       OrientGraph graph = graphFactory.getTx();
       try {
          Vertex source = getVertexByTypeAndId(sourceType, Tags.ConcreteID.toString(), sourceId, graph);
-         if (source == null) {
+         if(source == null) {
             throw new IllegalArgumentException("Source action not found in database");
          }
          Vertex target = createVertex(instance.getType(),Tags.ConcreteID.toString(),instance.getId(),graph);
          instance.tags().forEach(tag -> setProperty(tag, instance.get(tag), target));
 
-         if ( !source.getEdges(Direction.OUT,relation).iterator().hasNext() ) {
+         if( !source.getEdges(Direction.OUT,relation).iterator().hasNext() ) {
             Edge edge = graph.addEdge(null, source, target, relation);
          }
 
@@ -209,15 +210,13 @@ class OrientDBRepository implements GraphDBRepository {
       try {
          Pipe pipe = Gremlin.compile(gremlin);
          OrientGraph graph = graphFactory.getTx();
-         if (start.equals(GremlinStart.VERTICES)) {
+         if (start.equals(GremlinStart.VERTICES))
             pipe.setStarts(graph.getVertices());
-         } else {
+         else
             pipe.setStarts(graph.getEdges());
-         }
          List<Object> ret = new ArrayList<>();
-         for (Object o : pipe) {
+         for (Object o : pipe)
             ret.add(o);
-         }
          graph.shutdown();
          return ret;
       } catch (Exception e) {
@@ -227,17 +226,16 @@ class OrientDBRepository implements GraphDBRepository {
    }
 
    /**
-    * Create new State Vertex.
+    * Create new State Vertex
     *
     * @param state State which needs to be stored as a vertex
     * @param graph Handle to the graph database.
     */
    private void createStateVertex(final State state, final OrientGraph graph,final boolean isInitial) {
       Vertex vertex = graph.addVertex("class:State");
-      for (Tag<?> t : state.tags()) {
+      for (Tag<?> t : state.tags())
          setProperty(t, state.get(t), vertex);
-      }
-      if (isInitial) {
+      if(isInitial) {
          vertex.setProperty("IsInitial", true);
       } else {
          vertex.setProperty("IsInitial",false);
@@ -250,9 +248,8 @@ class OrientDBRepository implements GraphDBRepository {
 
    private Vertex createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
       Vertex vertex = graph.addVertex("class:Widget");
-      for (Tag<?> t : w.tags()) {
+      for (Tag<?> t : w.tags())
          setProperty(t, w.get(t), vertex);
-      }
       Vertex state = getStateVertex(widgetId, graph);
       Edge edge = graph.addEdge(null, state, vertex, "has");
       graph.commit();
@@ -261,7 +258,7 @@ class OrientDBRepository implements GraphDBRepository {
    }
 
    /**
-    * Lookup state vertex in the database.
+    * Lookup state vertex in the database
     *
     * @param concreteID unique identification of the state
     * @param graph      handle to the graph database
@@ -272,7 +269,7 @@ class OrientDBRepository implements GraphDBRepository {
    }
 
    /**
-    * Lookup widget vertex in the database.
+    * Lookup widget vertex in the database
     *
     * @param concreteID unique identification of the state
     * @param graph     handle to the graph database
@@ -292,7 +289,7 @@ class OrientDBRepository implements GraphDBRepository {
     */
    private Vertex getVertexByTypeAndId(String type, String idField, String concreteID, OrientGraph graph) {
       try {
-         Iterable<Vertex> vertices = graph.getVertices(type + "." + idField, concreteID);
+         Iterable<Vertex> vertices = graph.getVertices(type+"." + idField, concreteID);
          Vertex vertex = vertices.iterator().next();
          LOGGER.debug("Vertex {} found", vertex.getId());
          return vertex;
@@ -327,7 +324,7 @@ class OrientDBRepository implements GraphDBRepository {
    }
 
    /**
-    * Get or create a vertex of a given type with a given identification (key/id).
+    * Get or create a vertex of a given type with a given identification (key/id)
     * @param type type of the vertex
     * @param key key for the required vertex
     * @param id id (value)
@@ -342,7 +339,7 @@ class OrientDBRepository implements GraphDBRepository {
          LOGGER.debug("Vertex {} found", v.getId());
       } catch (IllegalArgumentException | NoSuchElementException ex) {
          LOGGER.debug("There is no vertex inserted yet for the given Widget ConcreteID {}", id);
-         v = graph.addVertex("class:" + type);
+         v = graph.addVertex("class:"+type);
          v.setProperty(key,id);
       }
       return v;
@@ -360,29 +357,31 @@ class OrientDBRepository implements GraphDBRepository {
       name = name.replace('(','_');
       name = name.replace(')','_');
       // TODO: is there a more sophisticated way to do this?
-      if (o instanceof Boolean) {
+      if (o instanceof Boolean)
          el.setProperty(name, ((Boolean) o).booleanValue());
-      } else if (o instanceof Byte) {
+      else if (o instanceof Byte)
          el.setProperty(name, ((Byte) o).byteValue());
-      } else if (o instanceof Character) {
+      else if (o instanceof Character)
          el.setProperty(name, ((Character) o).charValue());
-      } else if (o instanceof Double) {
+      else if (o instanceof Double)
          el.setProperty(name, ((Double) o).doubleValue());
-      } else if (o instanceof Float) {
+      else if (o instanceof Float)
          el.setProperty(name, ((Float) o).floatValue());
-      } else if (o instanceof Integer) {
+      else if (o instanceof Integer)
          el.setProperty(name, ((Integer) o).intValue());
-      } else if (o instanceof Long) {
+      else if (o instanceof Long)
          el.setProperty(name, ((Long) o).longValue());
-      } else if (o instanceof Short) {
+      else if (o instanceof Short)
          el.setProperty(name, ((Short) o).shortValue());
-      } else {
+      else if (o instanceof Visualizer) {
+         //skip Don't put visualizer in the graph since it has no meaning for graph.
+         //It will get a meaning when we want to use the data for reply.
+      } else
          el.setProperty(name, o.toString());
-      }
    }
 
    /**
-    * Bind the Widget to it's abstract counter parts.
+    * Bind the Widget to it's abstract counter parts
     *
     * @param wv    the vertex of the widget to bind.
     * @param w     the widget to bind.

@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -48,26 +47,30 @@ public final class Verdict implements Serializable {
 
 	//public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
 
+	// begin by urueda
+	
 	public static final double SEVERITY_MIN = 0.0;
 	public static final double SEVERITY_MAX = 1.0;
 	
-	public static final double SEVERITY_OK = SEVERITY_MIN;
-	public static final double SEVERITY_FAIL = SEVERITY_MAX;
+	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
+	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
 	
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
 	
+	// end by urueda
+		
 	private final String info;
 	private final double severity;
 	private final Visualizer visualizer;
 	
-	public Verdict(double severity, String info) {
+	public Verdict(double severity, String info){
 		this(severity, info, Util.NullVisualizer);
 	}
 	
-	public Verdict(double severity, String info, Visualizer visualizer) {
+	public Verdict(double severity, String info, Visualizer visualizer){
 		//Assert.isTrue(severity >= 0 && severity <= 1.0);
-		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX); 
+		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX); // by urueda
 		Assert.notNull(info, visualizer);
 		this.severity = severity;
 		this.info = info;
@@ -75,20 +78,16 @@ public final class Verdict implements Serializable {
 	}
 
 	/**
-	 * returns the likelihood of the state to be erroneous (value within interval [0, 1]).
+	 * returns the likelihood of the state to be erroneous (value within interval [0, 1])
 	 * @return value within [0, 1]
 	 */
-	public double severity() { 
-		return severity; 
-	}
+	public double severity(){ return severity; }
 	
 	/**
-	 * returns a short description about whether the state is erroneous and if so, what part of it.
-	 * @return info
+	 * returns a short description about whether the state is erroneous and if so, what part of it
+	 * @return
 	 */
-	public String info() { 
-		return info; 
-		}
+	public String info(){ return info; }
 		
 	/**
 	 * This visualizer should visualize the part of the state where the problem occurred.
@@ -96,13 +95,9 @@ public final class Verdict implements Serializable {
 	 * than this should be framed or pointed to with a big red arrow. 
 	 * @return the visualizer which is guaranteed to be non-null
 	 */
-	public Visualizer visualizer() { 
-		return visualizer; 
-		}
+	public Visualizer visualizer(){ return visualizer; }
 	
-	public String toString() { 
-		return "severity: " + severity + " info: " + info; 
-		}
+	public String toString(){ return "severity: " + severity + " info: " + info; }
 	
 	/**
 	 * Retrieves the verdict result of joining two verdicts.
@@ -110,7 +105,7 @@ public final class Verdict implements Serializable {
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
 	 * @author: urueda
 	 */
-	public Verdict join(Verdict verdict) {
+	public Verdict join(Verdict verdict){		
 		return new Verdict(Math.max(this.severity, verdict.severity()),
 						   (this.info.contains(verdict.info) ? this.info :
 						    (this.severity == SEVERITY_OK ? "" : this.info + "\n") + verdict.info())												
@@ -119,9 +114,8 @@ public final class Verdict implements Serializable {
 	
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
+		if (this == o)
 			return true;
-		}
 		if (o instanceof Verdict) {
 			Verdict other = (Verdict)o;
 			return this.severity == other.severity
@@ -130,4 +124,5 @@ public final class Verdict implements Serializable {
 		}
 		return false;
 	}
+
 }

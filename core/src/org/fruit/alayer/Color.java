@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -65,19 +64,13 @@ public final class Color implements Serializable {
 	public static final Color White = from(255, 255, 255, 255);
 	public static final Color Black = from(0, 0, 0, 255);
 	
-	public static Color from(int red, int green, int blue, int alpha) { 
-		return new Color(red, green, blue, alpha); 
-	}
+	public static Color from(int red, int green, int blue, int alpha){ return new Color(red, green, blue, alpha); }
 
-	private final int red; 
-	private final int green; 
-	private final int blue; 
-	private final int alpha; 
-	private final int argb32;
+	private final int red, green, blue, alpha, argb32;
 
-	private Color(int red, int green, int blue, int alpha) {
-		Assert.isTrue(red >= 0 && green >= 0 && blue >= 0 && alpha >= 0 
-			&& red <= 255 && green <= 255 && blue <= 255 && alpha <= 255);
+	private Color(int red, int green, int blue, int alpha){
+		Assert.isTrue(red >= 0 && green >= 0 && blue >= 0 && alpha >= 0 &&
+				red <= 255 && green <= 255 && blue <= 255 && alpha <= 255);
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
@@ -85,44 +78,26 @@ public final class Color implements Serializable {
 		this.argb32 = red + (green << 8) + (blue << 16) + (alpha << 24);
 	}
 
-	public int red() { 
-		return red; 
-	}
-	
-	public int green() { 
-		return green; 
-	}
-	
-	public int blue() { 
-		return blue; 
-	}
-	
-	public int alpha() { 
-		return alpha; 
-	}
-	
-	public int argb32() { 
-		return argb32; 
-	}
-	
-	public int hashCode() { 
-		return argb32();
-	}
+	public int red(){ return red; }
+	public int green(){ return green; }
+	public int blue(){ return blue; }
+	public int alpha(){ return alpha; }
+	public int argb32(){ return argb32; }
+	public int hashCode(){ return argb32();	}
 
-	public boolean equals(Object o) {
-		if (this == o) {
+	public boolean equals(Object o){
+		if(this == o)
 			return true;
-		}
 
-		if (o instanceof Color) {
+		if(o instanceof Color){
 			Color co = (Color) o;
 			return co.alpha == alpha && co.red == red && co.green == green && co.blue == blue;
 		}
 		return false;
 	}
 	
-	public String toString() { 
-		return "Color (red: " + red() + " green: " + green() 
-		   + " blue: " + blue() + " alpha: " + alpha() + ")";
+	public String toString(){ 
+		return "Color (red: " + red() + " green: " + green() +
+			" blue: " + blue() + " alpha: " + alpha() + ")";
 	}
 }

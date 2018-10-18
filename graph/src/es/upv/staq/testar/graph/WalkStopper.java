@@ -44,10 +44,10 @@ public class WalkStopper {
 	private State endState = null; // test sequence ending state?
 	
 	/**
-	 * Is test sequence active? Is graph still being populated?.
-	 * @return answers to questions
+	 * Is test sequence active? Is graph still being populated?
+	 * @return
 	 */
-	public boolean continueWalking() {
+	public boolean continueWalking(){
 		return alive;
 	}
 	
@@ -56,17 +56,18 @@ public class WalkStopper {
 	 * @param status Test verdict: 'true' test OK, 'false' test FAIL.
 	 * @param endState Ending state.
 	 */
-	public void stopWalk(boolean status, State endState) {
+	public void stopWalk(boolean status, State endState){
+		//System.out.println("STOPPED WALK!");
 		alive = false;
 		this.status = status;
 		this.endState = endState;
 	}
 	
-	public boolean walkStatus() {
+	public boolean walkStatus(){
 		return status;
 	}
 	
-	public State walkEndState() {
+	public State walkEndState(){
 		return endState;
 	}
 	

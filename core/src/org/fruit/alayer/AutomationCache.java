@@ -27,6 +27,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+
+
 package org.fruit.alayer;
 
 import java.util.HashMap;
@@ -41,59 +43,41 @@ import java.util.Map;
  */
 public abstract class AutomationCache {
 
-	private static final long AUTOMATION_CACHE_AGE_MAX = 32000; // ms
-	private static final long AUTOMATION_CACHE_AGE_MIN = 2000; // ms
+	private static final long AUTOMATION_CACHE_AGE_MAX = 32000, // ms
+							  AUTOMATION_CACHE_AGE_MIN = 2000; // ms
 	private static final int AUTOMATION_CACHE_LIMIT = 256; // number of cached elements
 
-	private class CachedAutomationElement {
+	private class CachedAutomationElement{
 		private long cacheAge;
-		private long hwnd; // pointer
-		private long cachedElement; // pointer	
+		private long hwnd, cachedElement; // pointers	
 		private Rect hwndShape;
 		private AWTCanvas scrshot;
-		
-		public CachedAutomationElement(long hwnd, long cachedElement, Rect hwndShape, AWTCanvas scrshot) {
+		public CachedAutomationElement(long hwnd, long cachedElement, Rect hwndShape, AWTCanvas scrshot){
 			this.cacheAge = System.currentTimeMillis();
-			this.hwnd = hwnd; 
-			this.cachedElement = cachedElement;
-			this.hwndShape = hwndShape; 
-			this.scrshot = scrshot;
+			this.hwnd = hwnd; this.cachedElement = cachedElement;
+			this.hwndShape = hwndShape; this.scrshot = scrshot;
 		}
-		
-		public long getCacheAge() { 
-			return (System.currentTimeMillis() - this.cacheAge); 
-		}
-		
-		public long getHwnd() { 
-			return this.hwnd; 
-		}
-		
-		public long getCachedElement() { 
-			return this.cachedElement; 
-		}
-		
-		public Rect getHwndShape() { 
-			return this.hwndShape; 
-		}
-		
-		public AWTCanvas getScrshot() { 
-			return this.scrshot; 
-		}
+		public long getCacheAge(){ return (System.currentTimeMillis() - this.cacheAge); }
+		public long getHwnd(){ return this.hwnd; }
+		public long getCachedElement(){ return this.cachedElement; }		
+		public Rect getHwndShape(){ return this.hwndShape; }
+		public AWTCanvas getScrshot(){ return this.scrshot; }
 	}
 	
-	private int cacheHits = 0;
-	private int cacheMisses = 0;
+	private int cacheHits = 0, cacheMisses = 0;
 	private float SCRSHOT_SIMILARITY_THRESHOLD = Float.MIN_VALUE; // default is disabled
 	private transient Map<Long,CachedAutomationElement> automationCache = new HashMap<Long,CachedAutomationElement>(); // hwnd (pointer) x CachedAutomationElement
 	
-	public AutomationCache() {
+	/**
+	 * 
+	 */
+	public AutomationCache(){
 		try {
 			String propertyValue = System.getProperty("SCRSHOT_SIMILARITY_THRESHOLD");
-			if (propertyValue != null) {
+			if (propertyValue != null)
 				SCRSHOT_SIMILARITY_THRESHOLD = new Float(propertyValue).floatValue();
-			}
-		} catch (Exception e) {
-			System.out.println("[" + getClass().getSimpleName() + "] Automation cache caught exception <" + e.getMessage() + ">");
+		} catch (Exception e){
+			System.out.println("Automation cache caught exception <" + e.getMessage() + ">");
 		}
 	}
 	
@@ -101,7 +85,7 @@ public abstract class AutomationCache {
 	 * 
 	 * @param sst
 	 */
-	public void setScreenshotSimilarityThreshold(float sst) {
+	public void setScreenshotSimilarityThreshold(float sst){
 		this.SCRSHOT_SIMILARITY_THRESHOLD = sst;
 	}
 	
@@ -110,53 +94,51 @@ public abstract class AutomationCache {
 	 * @param hwnd
 	 * @return The pointer to the cached automation element. Long.MIN_VALUE otherwise (cache miss).
 	 */
-	public long getCachedAutomationElement(long hwnd, long pAutomation, long pCacheRequest) {
-		if (SCRSHOT_SIMILARITY_THRESHOLD == Float.MIN_VALUE) {
+	public long getCachedAutomationElement(long hwnd, long pAutomation, long pCacheRequest){
+		if (SCRSHOT_SIMILARITY_THRESHOLD == Float.MIN_VALUE){
+			//this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
-		System.out.println("[" + getClass().getSimpleName() + "] Automation cache SIZE <" + automationCache.size() + "> HITS <" + cacheHits + "> MISSES  <" + cacheMisses + ">");
-		for (CachedAutomationElement ac : automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])) {
-			if (ac.getCacheAge() > AUTOMATION_CACHE_AGE_MAX || isSoftCacheCandidate(ac)) {// soft reference implementation
+		System.out.println("Automation cache SIZE <" + automationCache.size() + "> HITS <" + cacheHits + "> MISSES  <" + cacheMisses + ">");
+		for (CachedAutomationElement ac : automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])){
+			if (ac.getCacheAge() > AUTOMATION_CACHE_AGE_MAX || isSoftCacheCandidate(ac)) // soft reference implementation
 				releaseCachedAutomationElement(ac);
-			}
 		}
 		long uiaPtr = nativeGetAutomationElementFromHandle(pAutomation, hwnd);
-		if (uiaPtr == 0) { // failed to retrieve automation element?
-			System.out.println("[" + getClass().getSimpleName() + "] Failed to retrieve automation element - bypassing caching");
+		if (uiaPtr == 0){ // failed to retrieve automation element?
+			System.out.println("Failed to retrieve automation element - bypassing caching");
 			this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
 		long hwndShape[] = nativeGetAutomationElementBoundingRectangl(uiaPtr, false);
 		nativeReleaseAutomationElement(uiaPtr);
 		Rect hwndRect = null;
-		if (hwndShape != null) {
+		if (hwndShape != null)
 			hwndRect = Rect.fromCoordinates(hwndShape[0], hwndShape[1], hwndShape[2], hwndShape[3]);
-		}
-		if (hwndRect == null || Rect.area(hwndRect) == 0) {
+		if (hwndRect == null || Rect.area(hwndRect) == 0){
 			this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
 		try {
 			AWTCanvas scrshot = AWTCanvas.fromScreenshot(hwndRect, AWTCanvas.StorageFormat.PNG, 1);
 			CachedAutomationElement ac = automationCache.get(new Long(hwnd));
-			if (ac != null) {
-				if (ac.getHwndShape().equals(hwndRect) && scrshot.compareImage(ac.getScrshot()) >= SCRSHOT_SIMILARITY_THRESHOLD) {
+			if (ac != null){
+				if (ac.getHwndShape().equals(hwndRect) && scrshot.compareImage(ac.getScrshot()) >= SCRSHOT_SIMILARITY_THRESHOLD){
 					this.cacheHits++;
 					return ac.getCachedElement(); // get from cache
-				} else {
+				} else
 					releaseCachedAutomationElement(ac); // force cache purge
-				}
 			}
 			// perform caching
 			long r = nativeGetAutomationElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
-			if (r != 0) { // do not cache if element request failed (r == 0)
+			if (r != 0){ // do not cache if element request failed (r == 0)
 				CachedAutomationElement caching = new CachedAutomationElement(hwnd, r, hwndRect, scrshot);
 				automationCache.put(new Long(hwnd),caching);
 			}
 			this.cacheMisses++;
 			return r;
 		} catch (Exception e) {
-			System.out.println("[" + getClass().getSimpleName() + "] Widget-tree build cache caught exception: " + e.getMessage());
+			System.out.println("Widget-tree build cache caught exception: " + e.getMessage());
 			this.cacheMisses++;
 			return Long.MIN_VALUE;
 		}
@@ -164,13 +146,12 @@ public abstract class AutomationCache {
 	
 	/**
 	 * 
-	 * @param ac automation element
-	 * @return true if age of cache larger than minimum value
+	 * @param ac
+	 * @return
 	 */
-	public boolean isSoftCacheCandidate(CachedAutomationElement ac) {
-		if (automationCache.size() <= AUTOMATION_CACHE_LIMIT) {
+	public boolean isSoftCacheCandidate(CachedAutomationElement ac){
+		if (automationCache.size() <= AUTOMATION_CACHE_LIMIT)
 			return false;
-		}
 		return ac.getCacheAge() > AUTOMATION_CACHE_AGE_MIN; // ms
 	}
 	
@@ -178,7 +159,7 @@ public abstract class AutomationCache {
 	 * 
 	 * @param cachedElement
 	 */
-	public void releaseCachedAutomationElement(CachedAutomationElement cachedElement) {
+	public void releaseCachedAutomationElement(CachedAutomationElement cachedElement){
 		automationCache.remove(new Long(cachedElement.getHwnd()));
 		nativeReleaseAutomationElement(cachedElement.getCachedElement());
 	}
@@ -186,10 +167,9 @@ public abstract class AutomationCache {
 	/**
 	 * 
 	 */
-	public synchronized void releaseCachedAutomationElements() {
-		for (CachedAutomationElement ac : automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])) {
+	public synchronized void releaseCachedAutomationElements(){
+		for (CachedAutomationElement ac : automationCache.values().toArray(new CachedAutomationElement[automationCache.size()]))
 			releaseCachedAutomationElement(ac);
-		}
 	}
 	
 	/**
@@ -203,15 +183,14 @@ public abstract class AutomationCache {
 	 * Retrieves the pointer to the automation element for a UI.
 	 * @param automationPtr
 	 * @param hwndPtr
-	 * @return pointer value
 	 */
-	public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);
+	public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);;
 		
 	/**
 	 * 
 	 * @param cachedAutomationElementPtr
 	 * @param fromCache
-	 * @return cached automation element pointer
+	 * @return
 	 */
 	public abstract long[] nativeGetAutomationElementBoundingRectangl(long cachedAutomationElementPtr, boolean fromCache);
 
@@ -220,12 +199,13 @@ public abstract class AutomationCache {
 	 * @param automationPtr
 	 * @param hwndPtr
 	 * @param cacheRequestPtr
-	 * @return pointer to cached automation element
+	 * @return
 	 */
 	public abstract long nativeGetAutomationElementFromHandleBuildCache(long automationPtr, long hwndPtr, long cacheRequestPtr);
 
 	@Override
-	public void finalize() {
+	public void finalize(){
 		releaseCachedAutomationElements();
 	}
+	
 }

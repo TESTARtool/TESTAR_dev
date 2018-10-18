@@ -31,13 +31,12 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import org.fruit.alayer.Role;
 
 public final class ActionRoles {
-	private ActionRoles() {}
+	private ActionRoles(){}
 
 	public static final Role
 

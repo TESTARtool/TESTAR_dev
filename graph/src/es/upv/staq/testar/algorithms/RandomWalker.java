@@ -50,7 +50,7 @@ public class RandomWalker extends AbstractWalker {
 
 	protected Random rnd;
 	
-	public RandomWalker(Random rnd) {
+	public RandomWalker(Random rnd){
 		this.rnd = rnd;
 	}
 

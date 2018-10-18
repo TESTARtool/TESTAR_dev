@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -53,47 +52,48 @@ public final class MouseUp extends TaggableBase implements Action {
 	private static final long serialVersionUID = -3335028037420381947L;
 	private final MouseButtons btn;
 	
-	public MouseUp(MouseButtons btn) {
+	public MouseUp(MouseButtons btn){
 		Assert.notNull(btn);
 		this.btn = btn;
 	}
 	
-	public String toString() { 
-		return "Release Mouse Button " + btn; 
-	}
+	public String toString() { return "Release Mouse Button " + btn; }
 
+	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters) {
-			if (r.name().equals(ActionRoles.MouseUp.name())) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.MouseUp.name()))
 				return "Mouse button released";
-			}
 		}
 		return toString();
 	}	
 
 	public void run(SUT system, State state, double duration) {
-		try {
+		try{
 			Assert.notNull(system);
 			Util.pause(duration);
 			system.get(Tags.StandardMouse).release(btn);
-		} catch(NoSuchTagException tue) {
+		}catch(NoSuchTagException tue){
 			throw new ActionFailedException(tue);
 		}
 	}
 	
+	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null) {
+		if (r != null)
 			return r.toString();
-		} else {
+		else
 			return toString();
-		}
 	}
 
+	// by urueda
 	@Override
 	public String toParametersString() {
+		//return "(" + btn.toString() + ")";
 		return "";
-	}	
+	}
+	
 }

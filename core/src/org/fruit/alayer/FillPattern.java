@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 public enum FillPattern { Solid, Stroke, None; }

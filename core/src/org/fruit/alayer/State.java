@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 /**
@@ -41,9 +40,8 @@ package org.fruit.alayer;
  * However, states are not restricted to visual entities and can contain
  * various kinds of additional data.
  * 
- * <p>A state forms a so called widget tree with the root node of that tree representing
+ * A state forms a so called widget tree with the root node of that tree representing
  * the system itself. For example
  *
  */
-public interface State extends Widget, Iterable<Widget> {
-}
+public interface State extends Widget, Iterable<Widget>{ }

@@ -51,7 +51,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 	private static final long serialVersionUID = 4379174151668501105L;
 	protected final KBKeys key;
 
-	public KeyAction(KBKeys key) {
+	public KeyAction(KBKeys key){
 		Assert.notNull(key);
 		this.key = key;
 	}
@@ -59,33 +59,32 @@ public abstract class KeyAction extends TaggableBase implements Action {
 	public abstract String toString();
 
 	public final void run(SUT system, State state, double duration) {
-		try {
+		try{
 			Assert.notNull(system);
 			Util.pause(duration);
-			if (key.equals(KBKeys.VK_ARROBA) 
-				|| key.equals(KBKeys.VK_EXCLAMATION_MARK) 
-				|| key.equals(KBKeys.VK_UNDERSCORE)) {// java.awt.Robot throwing "Invalid key code"
+			if (key.equals(KBKeys.VK_ARROBA) ||
+				key.equals(KBKeys.VK_EXCLAMATION_MARK) ||
+				key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
 				altNumpad(system,new Integer(key.code()).toString());
-			} else {
+			else
 				performKeyAction(system,key);
-			}
-		} catch (NoSuchTagException tue) {
+		}catch(NoSuchTagException tue){
 			throw new ActionFailedException(tue);
 		}
 	}
 	
 	protected abstract void performKeyAction(SUT system, KBKeys key);
 	
-	protected void altNumpad(SUT system, String numpadCodes) {
-		if (numpadCodes == null || !numpadCodes.matches("^\\d+$")) {
-			System.out.println("[" + getClass().getSimpleName() + "] Unknown key: " + numpadCodes);
+	protected void altNumpad(SUT system, String numpadCodes){
+		if (numpadCodes == null || !numpadCodes.matches("^\\d+$")){
+			System.out.println("Unknown key: " + numpadCodes);
 			return;
 		}               
 		Keyboard keyb = system.get(Tags.StandardKeyboard);
 		keyb.press(KBKeys.VK_ALT);
-		for (char charater : numpadCodes.toCharArray()) {
+		for (char charater : numpadCodes.toCharArray()){
 			KBKeys NUMPAD_KEY = getNumpad(charater);
-			if (NUMPAD_KEY != null) {
+			if (NUMPAD_KEY != null){
 				keyb.press(NUMPAD_KEY);
 				keyb.release(NUMPAD_KEY);
 			}
@@ -93,8 +92,8 @@ public abstract class KeyAction extends TaggableBase implements Action {
 		keyb.release(KBKeys.VK_ALT);        
 	}	
 
-	private KBKeys getNumpad(char numberChar) {
-		switch (numberChar) {
+	private KBKeys getNumpad(char numberChar){
+		switch (numberChar){
 		  case '0' : return KBKeys.VK_NUMPAD0;
 		  case '1' : return KBKeys.VK_NUMPAD1;
 		  case '2' : return KBKeys.VK_NUMPAD2;
@@ -105,25 +104,25 @@ public abstract class KeyAction extends TaggableBase implements Action {
 		  case '7' : return KBKeys.VK_NUMPAD7;
 		  case '8' : return KBKeys.VK_NUMPAD8;
 		  case '9' : return KBKeys.VK_NUMPAD9;
-  		default  : System.out.println("[" + getClass().getSimpleName() + "] AltNumpad - not a number 0-9: " + numberChar);
+  		default  : System.out.println("AltNumpad - not a number 0-9: " + numberChar);
 		return null;
 		}
 	}
 	
 	@Override
-	public String toShortString() {
+	public String toShortString(){
 		Role r = get(Tags.Role, null);
-		if (r != null) {
+		if (r != null)
 			return r.toString();
-		} else {
+		else
 			return toString();
-		}
 	}
     
 	@Override
-	public String toParametersString() {
+	public String toParametersString(){
 		return "(" + key.toString() + ")";
 	}
 	
-	public abstract boolean equals(Object o);	
+	public abstract boolean equals(Object o);
+	
 }

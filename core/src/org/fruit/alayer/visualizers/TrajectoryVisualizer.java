@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.visualizers; // refactored by urueda
 
 import java.util.Iterator;
@@ -51,14 +50,14 @@ import org.fruit.alayer.Visualizer;
 public class TrajectoryVisualizer implements Visualizer {
 
 	private static final long serialVersionUID = 1107281202398264314L;
-	private final UnFunc<State, Iterable<Point>> trajectory;
-	private final Pen pen;
+	final UnFunc<State, Iterable<Point>> trajectory;
+	final Pen pen;
 
-	public TrajectoryVisualizer(Pen pen, Position... positions) {
+	public TrajectoryVisualizer(Pen pen, Position... positions){
 		this(new SplineTrajectory(10, positions), pen);
 	}
 	
-	public TrajectoryVisualizer(UnFunc<State, Iterable<Point>> trajectory, Pen pen) {
+	public TrajectoryVisualizer(UnFunc<State, Iterable<Point>> trajectory, Pen pen){
 		Assert.notNull(trajectory, pen);
 		Assert.isTrue(pen.strokeWidth() != null);
 		this.trajectory = trajectory;		
@@ -71,15 +70,14 @@ public class TrajectoryVisualizer implements Visualizer {
 		Iterator<Point> iter = trajectory.apply(s).iterator();
 		Point last = iter.next();
 		
-		while (iter.hasNext()) {
+		while(iter.hasNext()){
 			Point current = iter.next();
 			
-			if (!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow 
-					 || pen.strokeCaps() == StrokeCaps.Arrow_)) {
+			if(!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_))
 				Util.arrow(c, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
-			} else {
+			else
 				c.line(pen, last.x(), last.y(), current.x(), current.y());
-			}
+			
 			last = current;
 		}
 	}

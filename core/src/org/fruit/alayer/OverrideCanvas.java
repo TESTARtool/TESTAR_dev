@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import org.fruit.Assert;
@@ -39,55 +38,32 @@ import org.fruit.Pair;
 
 public final class OverrideCanvas implements Canvas {
 
-	private Canvas canvas;
-	private Pen overridePen;
+	Canvas canvas;
+	Pen overridePen;
 	
-	public OverrideCanvas(Canvas canvas) {
+	public OverrideCanvas(Canvas canvas){
 		this(canvas, Pen.PEN_DEFAULT);
 	}
 	
-	public OverrideCanvas(Canvas canvas, Pen pen) {
+	public OverrideCanvas(Canvas canvas, Pen pen){
 		Assert.notNull(canvas, pen);
 		this.canvas = canvas;
 		this.overridePen = pen;
 	}
 	
-	public void setOverridePen(Pen pen) {
+	public void setOverridePen(Pen pen){
 		Assert.notNull(pen);
 		this.overridePen = pen; 
 	}
 	
-	public double width() { 
-		return canvas.width(); 
-	}
-	
-	public double height() {
-        return canvas.height(); 
-    }
-	
-	public double x() { 
-		return canvas.x(); 
-	}
-	
-	public double y() { 
-		return canvas.y(); 
-		}
-	
-	public void begin() { 
-		canvas.begin(); 
-	}
-	
-	public void end() { 
-		canvas.end(); 
-	}
-	
-	public Pen defaultPen() { 
-		return Pen.merge(overridePen, canvas.defaultPen()); 
-	}
-	
-	public void release() { 
-		canvas.release(); 
-	}
+	public double width() { return canvas.width(); }
+	public double height() {	return canvas.height(); }
+	public double x(){ return canvas.x(); }
+	public double y(){ return canvas.y(); }
+	public void begin() { canvas.begin(); }
+	public void end() { canvas.end(); }
+	public Pen defaultPen() { return Pen.merge(overridePen, canvas.defaultPen()); }
+	public void release() { canvas.release(); }
 
 	public void line(Pen pen, double x1, double y1, double x2, double y2) {
 		canvas.line(Pen.merge(overridePen, pen), x1, y1, x2, y2);

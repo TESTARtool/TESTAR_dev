@@ -37,13 +37,9 @@ package es.upv.staq.testar.oracles;
  *
  */
 public class UIOperations {
-	// widget properties
-	public enum W_PROPERTIES { 
-		TITLE 	
-	}; 
 	
-	// operation types
-	public enum OP_TYPES { 
-		CREATE, UPDATE, DELETE 
-	}; 
+	public static enum W_PROPERTIES { TITLE }; // widget properties
+	
+	public static enum OP_TYPES { CREATE, UPDATE, DELETE }; // operation types
+	
 }

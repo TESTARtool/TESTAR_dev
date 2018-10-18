@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.util.List;
@@ -57,7 +56,7 @@ public interface SUT extends Taggable {
 	 */
 	void stop() throws SystemStopException;
     
-	/** Is the system running?.
+	/** Is the system running?
 	 * @return returns whether the system is running
 	 */
 	boolean isRunning();
@@ -84,7 +83,7 @@ public interface SUT extends Taggable {
 	
 	/**
 	 * Returns the native automation cache.
-	 * @return automation cache
+	 * @return
 	 */
 	AutomationCache getNativeAutomationCache();
 	

@@ -36,7 +36,7 @@ import org.fruit.alayer.linux.atspi.LibAtSpi;
 /**
  * Java implementation of the GHashTable object.
  *
- * <p>!!! Not fully implemented - it does not retrieve any values, only the size.
+ * !!! Not fully implemented - it does not retrieve any values, only the size.
  */
 public class GHashTable {
 
@@ -45,7 +45,6 @@ public class GHashTable {
 
 
     private long _hastTablePtr;
-    
     public long hashTablePtr() {
         return _hastTablePtr;
     }

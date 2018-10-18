@@ -48,7 +48,7 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
  */
 public class QLearningRestartsWalker extends QLearningWalker {
 			
-	public QLearningRestartsWalker(double discount, double maxReward, int testSequenceLength) {
+	public QLearningRestartsWalker(double discount, double maxReward, int testSequenceLength){
 		super(discount,maxReward);
 		RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
 	}
@@ -66,12 +66,12 @@ public class QLearningRestartsWalker extends QLearningWalker {
 	}
 
 	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState targetState) {
+	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
 		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
-		if (r != Double.MIN_VALUE) {
+		if (r != Double.MIN_VALUE)
 			return r;
-		} else {
+		else
 			return super.calculateRewardForState(env, targetState);
-		}
 	}	
+	
 }

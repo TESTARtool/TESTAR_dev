@@ -29,6 +29,7 @@
 
 package org.fruit.example.tests;
 
+
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.atspi.LibAtSpi;
 import org.fruit.alayer.linux.LinuxProcess;
@@ -64,7 +65,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
+        System.out.println("Desktop pointer: " + desktopPointer);
 
 
         // Get the name of the accessible object - for now the pointer to pointer for an error object can be null.
@@ -125,7 +126,7 @@ public class LibAtSpiTests {
 
         // Test gedit children's state.
         for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")) {
+            if (a.name().equals("gedit")){
 
                 geditChildren = AtSpiAccessible.getAccessibleChildren(a);
                 assertEquals("frame", geditChildren.get(0).roleName());
@@ -173,7 +174,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
+        System.out.println("Desktop pointer: " + desktopPointer);
 
 
         // Launch gedit.
@@ -198,7 +199,7 @@ public class LibAtSpiTests {
 
 
         for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")) {
+            if (a.name().equals("gedit")){
                 geditAcc = a;
             }
         }
@@ -241,11 +242,11 @@ public class LibAtSpiTests {
         focusable.retrieveAccessibleInfo();
 
 
-        System.out.println("[" + getClass().getSimpleName() + "] BoundingBox Screen:" + focusable.component().extentsOnScreen().toString());
-        System.out.println("[" + getClass().getSimpleName() + "] BoundingBox Window:" + focusable.component().extentsOnWindow().toString());
-        System.out.println("[" + getClass().getSimpleName() + "] Position Screen:" + focusable.component().positionOnScreen().toString());
-        System.out.println("[" + getClass().getSimpleName() + "] Position Window:" + focusable.component().positionOnWindow().toString());
-        System.out.println("[" + getClass().getSimpleName() + "] Size:" + focusable.component().size().toString());
+        System.out.println("BoundingBox Screen:" + focusable.component().extentsOnScreen().toString());
+        System.out.println("BoundingBox Window:" + focusable.component().extentsOnWindow().toString());
+        System.out.println("Position Screen:" + focusable.component().positionOnScreen().toString());
+        System.out.println("Position Window:" + focusable.component().positionOnWindow().toString());
+        System.out.println("Size:" + focusable.component().size().toString());
 
 
         boolean successfullFocus = focusable.component().grabFocus();
@@ -316,7 +317,7 @@ public class LibAtSpiTests {
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
         assertEquals(true, desktopPointer > 0);
-        System.out.println("[" + getClass().getSimpleName() + "] Desktop pointer: " + desktopPointer);
+        System.out.println("Desktop pointer: " + desktopPointer);
 
 
         // Test the child count - get a reference for the current state.

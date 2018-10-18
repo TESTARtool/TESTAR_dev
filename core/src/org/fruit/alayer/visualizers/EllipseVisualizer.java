@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.visualizers; // refactored by urueda
 
 import org.fruit.Assert;
@@ -46,12 +45,11 @@ import org.fruit.alayer.exceptions.PositionException;
 public final class EllipseVisualizer implements Visualizer {
 
 	private static final long serialVersionUID = -6006402344810634504L;
-	private final double width;
-	private final double height;
+	private final double width, height;
 	private final Pen pen;
 	private final Position position;
 	
-	public EllipseVisualizer(Position position, Pen pen, double width, double height) {
+	public EllipseVisualizer(Position position, Pen pen, double width, double height){
 		Assert.notNull(position, pen);
 		this.width = width;
 		this.height = height;
@@ -65,8 +63,6 @@ public final class EllipseVisualizer implements Visualizer {
 		try { // by urueda
 			Point p = position.apply(state);
 			canvas.ellipse(pen, p.x() - width * .5, p.y() - height * .5, width, height);
-		} catch (PositionException pe) {
-			pe.printStackTrace();
-		}
+		} catch (PositionException pe) {}
 	}
 }

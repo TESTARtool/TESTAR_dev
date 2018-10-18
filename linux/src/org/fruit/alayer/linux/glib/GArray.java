@@ -40,7 +40,6 @@ import java.util.Objects;
 
 /**
  * Java implementation of the GArray object.
- * @param <T>
  */
 public class GArray<T> {
 
@@ -52,7 +51,6 @@ public class GArray<T> {
 
 
     protected long _arrayPtr;
-    
     public long arrayPtr() {
         return _arrayPtr;
     }
@@ -100,7 +98,6 @@ public class GArray<T> {
 
 
     protected List<T> _elements;
-    
     public List<T> elements() {
 
 

@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 public enum StrokeCaps { None, Arrow_Arrow, Arrow_, _Arrow; }

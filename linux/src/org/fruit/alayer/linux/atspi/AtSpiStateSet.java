@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.atspi;
 
+
 import org.fruit.alayer.linux.atspi.enums.AtSpiStateTypes;
 import org.fruit.alayer.linux.glib.GArray;
 
@@ -209,9 +210,7 @@ public class AtSpiStateSet {
 
 
     private boolean _singleLine;
-    public boolean isSingleLine() {
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SingleLine.ordinal()); 
-    }
+    public boolean isSingleLine() {return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SingleLine.ordinal()); }
 
     private boolean _stale;
     public boolean isStale() {
@@ -226,9 +225,7 @@ public class AtSpiStateSet {
 
 
     private boolean _vertical;
-    public boolean isVertical() {
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Vertical.ordinal()); 
-    }
+    public boolean isVertical() {return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Vertical.ordinal()); }
 
     private boolean _visible;
     public boolean isVisible() {
@@ -243,15 +240,11 @@ public class AtSpiStateSet {
 
 
     private boolean _indeterminate;
-    public boolean isIndeterminate() { 
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Indeterminate.ordinal()); 
-    }
+    public boolean isIndeterminate() { return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Indeterminate.ordinal()); }
 
 
     private boolean _truncated;
-    public boolean isTruncated() {
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Truncated.ordinal());
-    }
+    public boolean isTruncated() {return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.Truncated.ordinal()); }
 
 
     private boolean _required;
@@ -267,15 +260,11 @@ public class AtSpiStateSet {
 
 
     private boolean _supportsAutoCompletion;
-    public boolean isSupportsAutoCompletion() { 
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SupportsAutoCompletion.ordinal()); 
-    }
+    public boolean isSupportsAutoCompletion() { return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SupportsAutoCompletion.ordinal()); }
 
 
     private boolean _selectableText;
-    public boolean isSelectableText() { 
-    	return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SelectableText.ordinal()); 
-    }
+    public boolean isSelectableText() { return LibAtSpi.atspi_state_set_contains(_stateSetPtr, AtSpiStateTypes.SelectableText.ordinal()); }
 
     private boolean _default;
     public boolean isDefault() {

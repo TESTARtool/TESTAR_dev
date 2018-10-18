@@ -41,7 +41,7 @@ import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 /**
  * A widget TITLE property UPDATE predicate.
  * 
- * <p>status (alpha dev.):
+ * status (alpha dev.):
  *   - target-app: windows calculator
  *   - procedure: hit a number button =&gt; set calculator display as verification point
  *   - predicate: display must/should change (previous text + last hit number button)
@@ -52,12 +52,12 @@ import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
  */
 public class TitleUpdatePredicate extends PredicateBase {
 				
-	private TitleUpdatePredicate(String refuteQuery) {
+	private TitleUpdatePredicate(String refuteQuery){
 		this.refuteQuery = refuteQuery;
 		this.predicateContext = new Object[]{ UIOperations.W_PROPERTIES.TITLE, UIOperations.OP_TYPES.UPDATE };
 	}
 	
-	public static IPredicate infer(JIPrologWrapper jipWrapper) {
+	public static IPredicate infer(JIPrologWrapper jipWrapper){
 		// can we infer a predicate?
 		List<List<String>> solutions = jipWrapper.setQuery(
 			"verify(Sv,Wv),title(Wv,Tv),role(Wv,Rv),path(Wv,Pv)," + // info about the verification point
@@ -65,9 +65,9 @@ public class TitleUpdatePredicate extends PredicateBase {
 			"widget(Wva,Sa),title(Wva,Tva),role(Wva,Rv),path(Wva,Pv)," + // info about the verification point in the action state
 			"\\=(Tv,Tva)." // the action produced a change to the verification point? (hence, a state change)
 		);
-		if (solutions == null || solutions.isEmpty()) {
+		if (solutions == null || solutions.isEmpty())
 			return null;
-		} else {
+		else{
 			String Wa = PrologUtil.getSolutions("Wa", solutions).get(0);
 			// predicate exists => build a refuting predicate to use as verdict
 			String refuteQuery = "action(A,Sa,Wa,T,O),Wa='" + Wa + "',source(Ss,A),target(St,A),==(Ss,St)."; // the predicate action did not change state?
@@ -75,4 +75,5 @@ public class TitleUpdatePredicate extends PredicateBase {
 			return new TitleUpdatePredicate(refuteQuery);
 		}
 	}
+	
 }

@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux;
 
+
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.enums.AtSpiElementOrientations;
@@ -68,9 +69,7 @@ public class AtSpiElement implements Serializable {
 
 
     long accessiblePtr;
-    public String name; 
-    public String description; 
-    public String toolkitName;
+    public String name, description, toolkitName;
     public AtSpiRoles role;
     Rect boundingBoxOnScreen;
 
@@ -162,7 +161,7 @@ public class AtSpiElement implements Serializable {
      * @throws IOException An IO error occurred.
      * @throws ClassNotFoundException Class could not be found.
      */
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
         ois.defaultReadObject();
     }
 

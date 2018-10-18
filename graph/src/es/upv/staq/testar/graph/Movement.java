@@ -46,9 +46,9 @@ public class Movement {
 	 * @param v Graph state before action execution.
 	 * @param e Executed graph action.
 	 */
-	public Movement(IGraphState v, IGraphAction e) {
-		vertex = v;
-		edge = e;
+	public Movement(IGraphState v, IGraphAction e){
+		vertex=v;
+		edge=e;
 	}
 
 	public IGraphState getVertex() {
@@ -60,7 +60,7 @@ public class Movement {
 	}
 	
 	@Override
-	public String toString() {
+	public String toString(){
 		return "Movement: edge_" + getEdge().toString() + " @vertex_" + getVertex().toString();
 	}
 	

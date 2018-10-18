@@ -29,6 +29,7 @@
 
 package org.fruit.example.tests;
 
+
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.util.BridJHelper;
 import org.fruit.alayer.linux.LinuxProcess;
@@ -71,6 +72,9 @@ public class LibGtk3Tests {
 
 
         LibGtk3.gdk_display_close(displayPointer);
+        //System.out.println("Display closed!");
+
+
 
         long displayMngrPtr = LibGtk3.gdk_display_manager_get();
         assertEquals(true, displayMngrPtr > 0);

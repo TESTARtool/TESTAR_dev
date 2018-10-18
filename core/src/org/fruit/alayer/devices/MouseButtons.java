@@ -31,19 +31,12 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.devices;
 
 public enum MouseButtons {
 	BUTTON1(16), BUTTON2(8), BUTTON3(4);
 
 	private final int code;
-	
-	MouseButtons(int code) { 
-		this.code = code; 
-	}
-	
-	public int code() { 
-		return code; 
-	}
+	private MouseButtons(int code){ this.code = code; }
+	public int code(){ return code; }
 }

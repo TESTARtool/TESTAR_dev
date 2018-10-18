@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import java.util.Iterator;
@@ -62,71 +61,69 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 public final class MouseGesture extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = -6517076000591224414L;
-	private final UnFunc<State, Iterable<Point>> trajectory;
-	private final List<Action> actions;
-	private final List<Position> actionPositions;
-	private final double minDuration;
+	final UnFunc<State, Iterable<Point>> trajectory;
+	final List<Action> actions;
+	final List<Position> actionPositions;
+	final double minDuration;
 
-	public static final class Builder {
-		private final Abstractor abstractor;
-		private int smoothness;
-		private List<Action> actions = Util.newArrayList();
-		private List<Position> positions = Util.newArrayList();
-		private List<Position> actionPositions = Util.newArrayList();
-		private Position currentPos = null;
-		private double minDuration;
+	public static final class Builder{
+		final Abstractor abstractor;
+		int smoothness;
+		List<Action> actions = Util.newArrayList();
+		List<Position> positions = Util.newArrayList();
+		List<Position> actionPositions = Util.newArrayList();
+		Position currentPos = null;
+		double minDuration;
 
-		public Builder() { 
-			this(new IndexAbstractor()); 
-		}
+		public Builder(){ this(new IndexAbstractor()); }
 
-		public Builder(Abstractor abstractor) {
+		public Builder(Abstractor abstractor){
 			Assert.notNull(abstractor);
 			this.abstractor = abstractor;
 			smoothness = 10;
 			minDuration = 0;
 		}
 
-		public Builder setMinDuration(double value) {
+		public Builder setMinDuration(double value){
 			Assert.isTrue(value >= 0);
 			minDuration = value;
 			return this;
 		}
 
-		public Builder setSmoothness(int value) {
+		public Builder setSmoothness(int value){
 			Assert.isTrue(value >= 0);
 			this.smoothness = value;
 			return this;
 		}
 
-		public Builder moveTo(Position pos) {
+		public Builder moveTo(Position pos){
 			Assert.notNull(pos);
 			positions.add(pos);
 			currentPos = pos;
 			return this;
 		}
 
-		public Builder moveTo(double x, double y) {
+		public Builder moveTo(double x, double y){
 			return moveTo(new AbsolutePosition(x, y));
 		}
 
-		public Builder moveTo(Widget w) {
+		public Builder moveTo(Widget w){
 			return moveTo(w, 0.5, 0.5);
 		}
 
-		public Builder moveTo(Widget w, double x, double y) {
+		public Builder moveTo(Widget w, double x, double y){
 			Assert.notNull(w);
 			return moveTo(new WidgetPosition(abstractor.apply(w), Tags.Shape, x, y, true));
 		}
 
-		public Builder perform(Action a) {
+		public Builder perform(Action a){
 			Assert.notNull(currentPos, "You first have to define a start position for the gesture!");
 			actions.add(a);
 			actionPositions.add(currentPos);
 			return this;
 		}
 
-		public Action build() {
+		public Action build(){
 			Assert.isTrue(positions.size() >= 2, "A mouse gesture is defined by at least 2 positions!");
 			actions.add(new NOP());         // so that we really go until the end of the movement
 			actionPositions.add(currentPos);
@@ -137,7 +134,7 @@ public final class MouseGesture extends TaggableBase implements Action {
 	}
 
 	private MouseGesture(UnFunc<State, Iterable<Point>> trajectory, List<Position> actionPositions, 
-			List<Action> actions, double minDuration) {
+			List<Action> actions, double minDuration){
 		this.trajectory = trajectory;
 		this.actionPositions = actionPositions;
 		this.actions = actions;
@@ -151,26 +148,24 @@ public final class MouseGesture extends TaggableBase implements Action {
 		duration = Math.max(duration, minDuration);
 		
 		Point[] actionPoints = new Point[actionPositions.size()];
-		for(int i = 0; i < actionPoints.length; i++) {
+		for(int i = 0; i < actionPoints.length; i++)
 			actionPoints[i] = actionPositions.get(i).apply(state);
-		}
 
 		Iterable<Point> movePoints = trajectory.apply(state);
 		double trLength = length(movePoints);
 		double movetimePerUnit = 0;
 
-		if (trLength > 0) {
+		if(trLength > 0)
 			movetimePerUnit = duration / trLength;
-		}
 
 		Iterator<Point> iter = movePoints.iterator();
 		Point currentPos = iter.next();
 		new MouseMove(currentPos).run(system, state, 0.0);
 
-		for (int i = 0; i < actions.size(); i++) {
+		for(int i = 0; i < actions.size(); i++){
 			Point until = actionPoints[i];
 
-			while (iter.hasNext() && !currentPos.equals(until)) {
+			while(iter.hasNext() && !currentPos.equals(until)){
 				Point targetPos = iter.next();
 				double segmentLength = Util.length(currentPos.x(), currentPos.y(), targetPos.x(), targetPos.y());
 				new MouseMove(targetPos).run(system, state, segmentLength * movetimePerUnit);
@@ -179,16 +174,15 @@ public final class MouseGesture extends TaggableBase implements Action {
 			actions.get(i).run(system, state, 0.0);
 		}
 				
-		if (movetimePerUnit == 0) {
+		if(movetimePerUnit == 0)
 			Util.pause(duration);
-		}
 	}
 
-	private double length(Iterable<Point> t) {
+	private double length(Iterable<Point> t){
 		double ret = 0;
 		Iterator<Point> iter = t.iterator();
 		Point last = iter.next();
-		while (iter.hasNext()) {
+		while(iter.hasNext()){
 			Point current = iter.next();
 			ret += Util.length(current.x(), current.y(), last.x(), last.y());
 			last = current;
@@ -196,29 +190,31 @@ public final class MouseGesture extends TaggableBase implements Action {
 		return ret;
 	}
 	
+	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null) {
+		if (r != null)
 			return r.toString();
-		} else {
+		else
 			return toString();
-		}
 	}
 
+	// by urueda
 	@Override
 	public String toParametersString() {
 		return "(" + "UNDEF" + ")";
 	}	
 	
+	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
 	}
 	
-	public String toString() {
-		return "Mouse gesture"; 
-		// TODO: add gesture parameters
+	// by urueda
+	public String toString(){
+		return "Mouse gesture"; // TODO: add gesture parameters
 	}
 		
 }

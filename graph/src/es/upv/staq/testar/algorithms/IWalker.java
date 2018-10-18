@@ -67,7 +67,6 @@ public interface IWalker {
 	 *   3) disablePreviousWalk()
 	 */
 	public void enablePreviousWalk();
-	
 	public void disablePreviousWalk();
 
 	/**
@@ -93,7 +92,6 @@ public interface IWalker {
 	 * @return A rewarding score for the state between 0.0 (worst) and >0.0 (best).
 	 */
 	public double getStateReward(IEnvironment env, IGraphState state);
-	
 	/**
 	 * Proportional action selection.
 	 * @param env Graph environment.

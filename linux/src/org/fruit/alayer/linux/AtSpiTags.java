@@ -31,12 +31,14 @@
 package org.fruit.alayer.linux;
 
 import org.fruit.Util;
+import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.enums.AtSpiElementOrientations;
 
 import java.util.Collections;
 import java.util.Set;
+
 
 /**
  * Creates and holds tags specific to AT-SPI info.
@@ -106,7 +108,7 @@ public class AtSpiTags {
      * @param <T> The type of the value associated with the tag.
      * @return The created AtSpiTag.
      */
-    private static <T> Tag<T> from(String name, Class<T> valueType) {
+    private static <T> Tag<T> from(String name, Class<T> valueType){
         Tag<T> ret = Tag.from(name, valueType);
         _tagSet.add(ret);
         return ret;
@@ -117,9 +119,10 @@ public class AtSpiTags {
      * Returns the set of tags as an unmodifiable set.
      * @return An unmodifiable set of the tags.
      */
-    public static Set<Tag<?>> tagSet() { 
-    	return Collections.unmodifiableSet(_tagSet); 
-    }
+    public static Set<Tag<?>> tagSet(){ return Collections.unmodifiableSet(_tagSet); }
+
+
     //endregion
+
 
 }

@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux;
 
+
 import org.fruit.Assert;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -79,9 +80,7 @@ public class AtSpiStateBuilder implements StateBuilder {
     /**
      * Default constructor.
      */
-    public AtSpiStateBuilder() { 
-    	this(_defaultTimeOut); 
-    }
+    public AtSpiStateBuilder() { this(_defaultTimeOut); }
 
 
     /**
@@ -221,7 +220,7 @@ public class AtSpiStateBuilder implements StateBuilder {
      * @throws IOException An IO error occurred.
      * @throws ClassNotFoundException Class could not be found.
      */
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
         ois.defaultReadObject();
     }
 

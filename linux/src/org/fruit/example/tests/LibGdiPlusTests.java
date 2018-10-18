@@ -33,6 +33,9 @@ import org.bridj.Pointer;
 import org.fruit.alayer.linux.gdiplus.LibGdiPlus;
 import org.junit.jupiter.api.Test;
 
+
+import java.awt.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -56,10 +59,14 @@ public class LibGdiPlusTests {
 
         // Get a handle to the primary monitor.
         long pmHnd = LibGdiPlus.GdiplusStartup(token, input, output);
-        System.out.println("[" + getClass().getSimpleName() + "] Token: " + token.getInt());
-        System.out.println("[" + getClass().getSimpleName() + "] Input: " + input.getInt());
-        System.out.println("[" + getClass().getSimpleName() + "] Output: " + output.getLong());
+        System.out.println("Token: " + token.getInt());
+        System.out.println("Input: " + input.getInt());
+        System.out.println("Output: " + output.getLong());
         assertTrue(pmHnd == 0);
+
+        if (pmHnd == 0) {
+
+        }
 
 
 

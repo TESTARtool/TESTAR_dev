@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.util;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -70,7 +71,7 @@ public class xdotools {
             }
 
 
-            System.out.println("[xdotools] Could not parse '" + outputLine + "' to a PID.");
+            System.out.println("Could not parse '" + outputLine + "' to a PID.");
 
 
             return -1;

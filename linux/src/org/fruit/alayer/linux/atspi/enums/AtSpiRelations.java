@@ -40,7 +40,7 @@ package org.fruit.alayer.linux.atspi.enums;
  * which a valuator is useful, and/or the other UI components which are directly effected by user interactions with
  * the valuator. Common examples include association of scrollbars with the viewport or panel which they control.
  *
- * <p>Enumeration used to specify the type of relation encapsulated in an AtspiRelation object
+ * Enumeration used to specify the type of relation encapsulated in an AtspiRelation object
  */
 public enum AtSpiRelations {
 

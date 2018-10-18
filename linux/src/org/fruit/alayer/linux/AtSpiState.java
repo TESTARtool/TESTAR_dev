@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux;
 
+
 import org.fruit.Util;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -108,7 +109,7 @@ public class AtSpiState extends AtSpiWidget implements State {
      * @throws IOException An IO error occurred.
      * @throws ClassNotFoundException Class could not be found.
      */
-    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
         ois.defaultReadObject();
     }
 
@@ -120,9 +121,7 @@ public class AtSpiState extends AtSpiWidget implements State {
 
 
     @Override
-    public String toString() { 
-    	return Util.treeDesc(this, 2, Tags.Role, Tags.Title); 
-    }
+    public String toString(){ return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }
 
 
     //endregion

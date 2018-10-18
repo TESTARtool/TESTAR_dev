@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.atspi;
 
+
 import org.fruit.alayer.linux.atspi.enums.AtSpiRelations;
 
 import java.util.ArrayList;
@@ -52,21 +53,15 @@ public class AtSpiRelation {
 
 
     private AtSpiRelations _type;
-    public AtSpiRelations type() { 
-    	return AtSpiRelations.values()[LibAtSpi.atspi_relation_get_relation_type(_relationPtr)]; 
-    }
+    public AtSpiRelations type() { return AtSpiRelations.values()[LibAtSpi.atspi_relation_get_relation_type(_relationPtr)]; }
 
 
     private int _nrOfTargets;
-    public int nrOfTargets() { 
-    	return LibAtSpi.atspi_relation_get_n_targets(_relationPtr); 
-    }
+    public int nrOfTargets() { return LibAtSpi.atspi_relation_get_n_targets(_relationPtr); }
 
 
     private List<AtSpiAccessible> _targets;
-    public List<AtSpiAccessible> targets() { 
-    	return getTargets(this); 
-    }
+    public List<AtSpiAccessible> targets() { return getTargets(this); }
 
 
     //endregion

@@ -85,7 +85,7 @@ public class Grapher implements Runnable {
 
 	public static int EXPLORATION_SAMPLE_INTERVAL = 10;
 	public static boolean GRAPHS_ACTIVATED = true;
-	public static boolean PROLOG_ACTIVATED = true;
+	public static boolean PROLOG_ACTIVATED = false;
 	public static boolean GRAPH_RESUMING_ACTIVATED = false;
 	
 	public static final String GRAPH_NODE_ENTRY = "ENTRY";
@@ -95,8 +95,7 @@ public class Grapher implements Runnable {
 	public static final String GRAPH_ACTION_STOP = "STOP";
 	
 	public static boolean GRAPH_LOADING_TASK = false;
-	public static int GRAPH_LOADING_MOVEMENTS;
-	public static int graphLoadingMovement;
+	public static int GRAPH_LOADING_MOVEMENTS, graphLoadingMovement;
 	
 	public static boolean FORMS_TYPING_ENHANCEMENT;
 	
@@ -123,17 +122,16 @@ public class Grapher implements Runnable {
 	
 	private static transient ExecutorService exeSrv;
 	
-	private Grapher() {}
+	private Grapher(){}
 	
-	public static String[] getRegisteredAlgorithms() {
+	public static String[] getRegisteredAlgorithms(){
 		return new String[]{
-			RANDOM_GENERATOR,
-			RANDOM_RESTARTS_GENERATOR,
-			QLEARNING_GENERATOR,
-			QLEARNING_RESTARTS_GENERATOR,
-			MAXCOVERAGE_GENERATOR,
-			PROLOG_GENERATOR,
-			EVOLUTIONARY_GENERATOR
+			RANDOM_GENERATOR
+			//RANDOM_RESTARTS_GENERATOR,
+			//QLEARNING_GENERATOR,
+			//QLEARNING_RESTARTS_GENERATOR,
+			//MAXCOVERAGE_GENERATOR
+			//EVOLUTIONARY_GENERATOR
 		};
 	}
 	
@@ -147,36 +145,33 @@ public class Grapher implements Runnable {
 							   boolean graphResumingActivated, boolean offlineGraphConversion,
 							   JIPrologWrapper jipWrapper) {
 		try {
-			synchronized(env) {
-				while (env != null) { // wait until a previous test sequence grapher finishes ...
+			synchronized(env){
+				while (env != null){ // wait until a previous test sequence grapher finishes ...
 					try {
 						env.wait();
 					} catch (InterruptedException e) {
-						System.out.println("[Grapher] TESTAR grapher sync interruped\n" + e.toString());
+						System.out.println("TESTAR grapher sync interruped\n" + e.toString());
 					}
 				}
 			}
-		} catch (Exception e) {
-			// env may be set to null when we try to sync on it
-		} 
+		} catch (Exception e){} // env may be set to null when we try to sync on it
 		Grapher.testSequencePath = testSequencePath;
 		Grapher.testSequenceLength = sequenceLength;
 		Grapher.FORMS_TYPING_ENHANCEMENT = formsFilling;
 		Grapher.TYPING_TEXTS_FOR_EXECUTED_ACTION = typingTexts;
-		if (!graphsActivated && !testGenerator.equals(Grapher.RANDOM_GENERATOR)) {
-			System.out.println("[Grapher] Cannot use <" + testGenerator + "> test generator as GRAPHS are not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
+		if (!graphsActivated && !testGenerator.equals(Grapher.RANDOM_GENERATOR)){
+			System.out.println("Cannot use <" + testGenerator + "> test generator as GRAPHS are not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
 			Grapher.testGenerator = Grapher.RANDOM_GENERATOR;			
-		} else if (!prologActivated && testGenerator.equals(Grapher.PROLOG_GENERATOR)) {
-			System.out.println("[Grapher] Cannot use <" + testGenerator + "> test generator as PROLOG is not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
+		} else if (!prologActivated && testGenerator.equals(Grapher.PROLOG_GENERATOR)){
+			System.out.println("Cannot use <" + testGenerator + "> test generator as PROLOG is not activated (switching to <" + Grapher.RANDOM_GENERATOR + ">)");
 			Grapher.testGenerator = Grapher.RANDOM_GENERATOR;
-		} else {
+		} else
 			Grapher.testGenerator = testGenerator;
-		}
 		Grapher.QLEARNING_MAXREWARD_PARAM = maxReward.doubleValue();
 		Grapher.QLEARNING_DISCOUNT_PARAM = discount.doubleValue();
 		Grapher.EXPLORATION_SAMPLE_INTERVAL = explorationSampleInterval.intValue();
 		Grapher.GRAPHS_ACTIVATED = graphsActivated;
-		Grapher.PROLOG_ACTIVATED = prologActivated;
+		Grapher.PROLOG_ACTIVATED = false;
 		Grapher.GRAPH_RESUMING_ACTIVATED = graphResumingActivated;
 		Grapher.offlineGraphConversion = offlineGraphConversion;
 		Grapher.jipWrapper = jipWrapper;
@@ -184,15 +179,15 @@ public class Grapher implements Runnable {
 		exeSrv.execute(singletonGrapher);
 	}
 	
-	public static void waitEnvironment() {
+	public static void waitEnvironment(){
 		long now = System.currentTimeMillis();
-		final long WAIT_START = now;
-		final long WAIT_THRESHOLD = 10000; // 10 seconds
-		while ((Grapher.GRAPHS_ACTIVATED && Grapher.GRAPH_LOADING_TASK 
-				&& (Grapher.GRAPH_LOADING_MOVEMENTS == Integer.MAX_VALUE  || Grapher.graphLoadingMovement < Grapher.GRAPH_LOADING_MOVEMENTS)
+		final long WAIT_START = now,
+				   WAIT_THRESHOLD = 10000; // 10 seconds
+		while ((Grapher.GRAPHS_ACTIVATED && Grapher.GRAPH_LOADING_TASK &&
+				(Grapher.GRAPH_LOADING_MOVEMENTS == Integer.MAX_VALUE  || Grapher.graphLoadingMovement < Grapher.GRAPH_LOADING_MOVEMENTS)
 			   ) || (Grapher.env == null && (now - WAIT_START < WAIT_THRESHOLD))
-			  ) {
-			synchronized(Grapher.testSequencePath) {
+			  ){
+			synchronized(Grapher.testSequencePath){
 				try {
 					Grapher.testSequencePath.wait(100); // 0,1 second
 				} catch (InterruptedException e) {
@@ -201,9 +196,8 @@ public class Grapher implements Runnable {
 			}
 			now = System.currentTimeMillis();
 		}
-		if (Grapher.env == null) {
+		if (Grapher.env == null)
 			LogSerialiser.log("Graph environment is NULL!", LogLevel.Critical);
-		}
 		Grapher.GRAPH_LOADING_TASK = false;
 	}
 	
@@ -214,17 +208,14 @@ public class Grapher implements Runnable {
 	 * @param state Last known SUT state.
 	 * @param stateshotPath SUT state screenshot.
 	 */
-	public static void notify(State state, String stateshotPath) {
-		if (Grapher.GRAPHS_ACTIVATED) {
+	public static void notify(State state, String stateshotPath){
+		if (Grapher.GRAPHS_ACTIVATED){
 			IGraphState graphState = env.get(state);
 			graphState.setStateshot(stateshotPath);
-			synchronized(movementsFIFO) {
+			synchronized(movementsFIFO){
 				movementsFIFO.add(new Movement(graphState,null)); // Movements PRODUCER
 				movementsFIFO.notifyAll(); // awake CONSUMER
 			}
-		}
-		if (PROLOG_ACTIVATED) {
-			jipWrapper.setFacts(state);
 		}
 	}		
 	
@@ -241,8 +232,12 @@ public class Grapher implements Runnable {
 	 */
 	public static void notify(State state, String stateshotPath,
 										   Action action, String actionshotPath, String actionRepresentation,
-										   int memUsage, long[] cpuUsage) {
-		if (Grapher.GRAPHS_ACTIVATED) {
+										   int memUsage, long[] cpuUsage){
+		if (Grapher.GRAPHS_ACTIVATED){
+			//System.out.println("TESTAR grapher notified: ACTION_" +
+			//				   CodingManager.codify(action) + " (stateaction_" +
+			//				   CodingManager.codify(state,action) + ") [state_" +
+			//				   CodingManager.codify(state) + "]");
 			IGraphState graphState = env.get(state);
 			IGraphAction graphAction = env.get(action);
 			graphAction.setDetailedName(actionRepresentation);
@@ -260,9 +255,9 @@ public class Grapher implements Runnable {
 	 * @param graphState SUT graph state before action execution.
 	 * @param graphAction Executed graph action.
 	 */
-	public static void notify(IGraphState graphState, IGraphAction graphAction) {
-		if (Grapher.GRAPHS_ACTIVATED) {
-			synchronized(movementsFIFO) {
+	public static void notify(IGraphState graphState, IGraphAction graphAction){
+		if (Grapher.GRAPHS_ACTIVATED){
+			synchronized(movementsFIFO){
 				movementsFIFO.add(new Movement(graphState,graphAction)); // Movements PRODUCER
 				movementsFIFO.notifyAll(); // awake CONSUMER
 			}
@@ -275,14 +270,13 @@ public class Grapher implements Runnable {
 	 * @param endState Ending SUT state.
 	 * @param scrshotPath The state screenshot.
 	 */
-	public static void walkFinished(final boolean status, final State endState, final String scrshotPath) {
-		if (Grapher.GRAPHS_ACTIVATED && walkStopper != null) {
-			if (endState != null) {
+	public static void walkFinished(final boolean status, final State endState, final String scrshotPath){
+		if (Grapher.GRAPHS_ACTIVATED && walkStopper != null){
+			if (endState != null)
 				env.get(endState).setStateshot(scrshotPath);
-			}
 			walkStopper.stopWalk(status,endState);
 			graphing = false;
-			synchronized(movementsFIFO) {
+			synchronized(movementsFIFO){
 				movementsFIFO.notifyAll(); // awake CONSUMER
 			}
 		}
@@ -292,53 +286,49 @@ public class Grapher implements Runnable {
 	 * Consumes a pair of &lt;State,Action&gt; from a FIFO queue, synchronously.
 	 * @return Next non consumed movement.
 	 */
-	public static Movement getMovement() {
+	public static Movement getMovement(){
 		graphing = false;
 		Movement movement = null;
-		synchronized(movementsFIFO) {
-			while (movementsFIFO.isEmpty()) {
+		synchronized(movementsFIFO){
+			while(movementsFIFO.isEmpty()){
 				try {
-					if (walkStopper != null && walkStopper.continueWalking()) {
+					if (walkStopper != null && walkStopper.continueWalking())
 						movementsFIFO.wait();
-					} else {
+					else
 						return null;
-					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			movement = movementsFIFO.removeFirst(); // Movements CONSUMER
+			movement = movementsFIFO.removeFirst();; // Movements CONSUMER
 			graphing = true;
+			//System.out.println(movementsFIFO.size() + " pending movements while graphing: " + movement.toString());
 			movementsSync.add(movementsFIFO.size());
 			movementsFIFO.notifyAll();
 		}
-		if (Grapher.GRAPH_LOADING_TASK) {
-			Grapher.graphLoadingMovement++;
-		}
+		if (Grapher.GRAPH_LOADING_TASK) Grapher.graphLoadingMovement++;
 		return movement;
 	}
 	
-	public static List<Integer> getMovementsSync() {
+	public static List<Integer> getMovementsSync(){
 		return movementsSync;
 	}
 	
 	/**
 	 * Sync TESTAR movements productions and graph movements consumption.
 	 */
-	public static void syncMovements() {
-		synchronized(movementsFIFO) {
-			while (!movementsFIFO.isEmpty()) {
+	public static void syncMovements(){
+		synchronized(movementsFIFO){
+			while(!movementsFIFO.isEmpty()){
 				try {
 					movementsFIFO.wait();
-				} catch (InterruptedException e) {
-				}
+				} catch (InterruptedException e) {}
 			}
 		}
-		while (graphing) {
+		while(graphing){
 			try {
 				TimeUnit.MILLISECONDS.sleep(1);
-			} catch (InterruptedException e) {
-			}
+			} catch (InterruptedException e) {}
 		}
 		return;
 	}
@@ -347,40 +337,34 @@ public class Grapher implements Runnable {
 	 * Selects an action to be executed from a set of available actions for a SUT state.
 	 * @param state SUT state.
 	 * @param actions SUT state UI actions.
-	 * @return action to be executed
+	 * @return
 	 */
-	public static Action selectAction(State state, Set<Action> actions) {
-		if (PROLOG_ACTIVATED) {
-			jipWrapper.setFacts(state, actions);
-		}
-		Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT 
-			? FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
+	public static Action selectAction(State state, Set<Action> actions){
+
+		Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT ?
+			FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
 			: actions;
 		if (Grapher.GRAPHS_ACTIVATED) {
 			env.notifyEnvironment(state, filteredActions);
 		}
 		Action selectedAction = walker.selectAction(env, state, filteredActions, jipWrapper);
-		if (FORMS_TYPING_ENHANCEMENT) {
-			// update typing actions management
-			FormsFilling.updateFormActions(state,selectedAction); 
-		}
+		if (FORMS_TYPING_ENHANCEMENT)
+			FormsFilling.updateFormActions(state,selectedAction); // update typing actions management
 		return selectedAction;
 	}
 
 	// try to resume previous test sequence graph
-	private void resumeGraph() {
+	private void resumeGraph(){
 		String prevSeq = null;
-		if (testSequencePath.startsWith("sequence")) {
+		if (testSequencePath.startsWith("sequence")){
 			int ps = 0;
 			try {
 				ps = new Integer(testSequencePath.substring(8)).intValue() - 1;
-				if (ps > 0) {
+				if (ps > 0)
 					prevSeq = "sequence" + ps;
-				}
-			} catch(NumberFormatException nfe) {
-			}
+			} catch(NumberFormatException nfe){}
 		}
-		if (prevSeq != null) {
+		if (prevSeq != null){
 			File f = new File("output/graphs/" + prevSeq);
 			String[] list = f.list(new FilenameFilter() {
 			    @Override
@@ -388,71 +372,65 @@ public class Grapher implements Runnable {
 			        return name.matches("graph_[0-9]+.xml");
 			    }
 			});
-			if (list != null && list.length == 1) {
+			if (list != null && list.length == 1){
 				String path = prevSeq + "/" + list[0];
-				System.out.println("[" + getClass().getSimpleName() + "] Resuming previous graph: " + path);
-				new Thread() {
+				//System.out.println("Resuming previous graph: " + path);
+				new Thread(){
 					public void run() {
 						Grapher.GRAPH_LOADING_MOVEMENTS = env.loadFromXML("output/graphs/" + path);
 					}
 				}.start();
-			} else {
-				Grapher.GRAPH_LOADING_TASK = false;
-			}
-		} else {
+			} else Grapher.GRAPH_LOADING_TASK = false;
+		} else
 			Grapher.GRAPH_LOADING_TASK = false;
-		}
 	}
 	
 	@Override
 	public void run() {
 		long graphTime = System.currentTimeMillis();
 		GraphReporter.useGraphData(graphTime,testSequencePath);
+		//WalkReport wr = new WalkReport("Q-Learning", 0, 0, 0, 0, 0, 0);
+		//System.out.println(wr);
 		
-		if (testGenerator.equals(QLEARNING_GENERATOR)) {
-			if (QLEARNING_CALIBRATION) {
+		if (testGenerator.equals(QLEARNING_GENERATOR)){
+			if (QLEARNING_CALIBRATION){
 				QLEARNING_DISCOUNT_PARAM = Math.random(); // 0.0 .. 1.0
 				QLEARNING_MAXREWARD_PARAM = Math.random() * MAX_MAXREWARD; // 0.0 .. MAX_MAXREWARD
 			}
 			walker = new QLearningWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM);
-			System.out.println("[" + getClass().getSimpleName() + "] <Q-Learning> test generator enabled (" 
-					+ "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM + ")");
-		} else if (testGenerator.equals(QLEARNING_RESTARTS_GENERATOR)) {
+			System.out.println("<Q-Learning> test generator enabled (" +
+							   "discount = " + QLEARNING_DISCOUNT_PARAM + ", maxReward = " + QLEARNING_MAXREWARD_PARAM + ")");
+		} else if (testGenerator.equals(QLEARNING_RESTARTS_GENERATOR)){
 			walker = new QLearningRestartsWalker(QLEARNING_DISCOUNT_PARAM, QLEARNING_MAXREWARD_PARAM, Grapher.testSequenceLength);
-			System.out.println("[" + getClass().getSimpleName() + "] <Q-Learning +> test generator enabled");			
-		} else if (testGenerator.equals(MAXCOVERAGE_GENERATOR)) {
+			System.out.println("<Q-Learning +> test generator enabled");			
+		} else if (testGenerator.equals(MAXCOVERAGE_GENERATOR)){
 			walker = new MaxCoverageWalker(new Random(graphTime), Grapher.testSequenceLength);
-			System.out.println("[" + getClass().getSimpleName() + "] <MaxCoverage> test generator enabled");
-		} else if (testGenerator.equals(PROLOG_GENERATOR)) {
+			System.out.println("<MaxCoverage> test generator enabled");
+		} else if (testGenerator.equals(PROLOG_GENERATOR)){
 			walker = new PrologWalker(new Random(graphTime));
-			System.out.println("[" + getClass().getSimpleName() + "] <Prolog> test generator enabled");
-		} else if (testGenerator.equals(EVOLUTIONARY_GENERATOR)) { 
-			walker = new JSONWalker(new Random (graphTime)); 
-			System.out.println("[" + getClass().getSimpleName() + "] <Evolutionary> test generator enabled"); // by urueda
-		} else if (testGenerator.equals(RANDOM_RESTARTS_GENERATOR)) {
+			System.out.println("<Prolog> test generator enabled");
+		} else if (testGenerator.equals(EVOLUTIONARY_GENERATOR)){ // by fraalpe2
+			walker = new JSONWalker(new Random (graphTime)); // by urueda
+			System.out.println("<Evolutionary> test generator enabled"); // by urueda
+		} else if (testGenerator.equals(RANDOM_RESTARTS_GENERATOR)){
 			walker = new RandomRestartsWalker(new Random (graphTime), Grapher.testSequenceLength);
-			System.out.println("[" + getClass().getSimpleName() + "] <Random +> test generator enabled");			
-		} else { // default: RANDOM_GENERATOR
+			System.out.println("<Random +> test generator enabled");
+		} else{ // default: RANDOM_GENERATOR
 			walker = new RandomWalker(new Random(graphTime));
-			System.out.println("[" + getClass().getSimpleName() + "] <Random> test generator enabled");			
+			//System.out.println("<Random> test generator enabled");
 		}
 
-		if (Grapher.GRAPHS_ACTIVATED) {
+		if (Grapher.GRAPHS_ACTIVATED){
 			Grapher.GRAPH_LOADING_TASK = Grapher.GRAPH_RESUMING_ACTIVATED;
-			if (Grapher.GRAPH_RESUMING_ACTIVATED) {
+			if (Grapher.GRAPH_RESUMING_ACTIVATED){
 				Grapher.GRAPH_LOADING_MOVEMENTS = Integer.MAX_VALUE;
 				Grapher.graphLoadingMovement = 0;
 			}
 			env = new TESTAREnvironment(testSequencePath);
-			if (Grapher.GRAPH_RESUMING_ACTIVATED) {
-				resumeGraph();
-			}
+			if (Grapher.GRAPH_RESUMING_ACTIVATED) resumeGraph();
 		}
-		
-		if (PROLOG_ACTIVATED) {
-			walker.setProlog(jipWrapper);
-		}
-		if (Grapher.GRAPHS_ACTIVATED) {
+
+		if (Grapher.GRAPHS_ACTIVATED){
 			walkStopper = new WalkStopper();
 			walker.walk(env, walkStopper);
 		}
@@ -462,39 +440,37 @@ public class Grapher implements Runnable {
 	 * Retrieves the active walker.
 	 * @return The walker.
 	 */
-	public static IWalker getWalker() {
+	public static IWalker getWalker(){
 		return Grapher.walker;		
 	}
 	
 	// null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
-	public static String[] getReport(int firstSequenceActionNumber) {
-		if (!Grapher.GRAPHS_ACTIVATED) {
+	public static String[] getReport(int firstSequenceActionNumber){
+		if (!Grapher.GRAPHS_ACTIVATED)
 			return null;
-		}
-		System.out.println("[Grapher] TESTAR sequence graph dump on way ...");
+		//System.out.println("TESTAR sequence graph dump on way ...");
 		try {
-			while (walkStopper != null && walkStopper.continueWalking()) {
-				synchronized(walkStopper) {
+			while (walkStopper != null && walkStopper.continueWalking()){
+				synchronized(walkStopper){
 					try {
 						walkStopper.wait(100); // ms
-					} catch (InterruptedException e) {
-					}
+					} catch (InterruptedException e) {}
 				}
 			}
 			String[] report = env.getReport(firstSequenceActionNumber);
-			System.out.println("[Grapher] ... finished TESTAR sequence graph dump");			
+			//System.out.println("... finished TESTAR sequence graph dump");
 			return report;
-		} catch(java.lang.NullPointerException npe) { // premature test end <- env == null
-			System.out.println("[Grapher] Grapher exception caught:");
+		} catch(java.lang.NullPointerException npe){ // premature test end <- env == null
+			System.out.println("Grapher exception caught:");
 			npe.printStackTrace();
 			//resetGrapherFields();
 			return null;
 		} finally {
 	        // begin - sync with following test sequence grapher (if any)
-			if (env != null) {
+			if (env != null){
 		    	IEnvironment notifyEnv = env;    
 				resetGrapherFields(); // env = null; // let next test sequence grapher start
-		    	synchronized(notifyEnv) {
+		    	synchronized(notifyEnv){
 		    		notifyEnv.notifyAll();
 		    	}
 			}
@@ -502,46 +478,42 @@ public class Grapher implements Runnable {
 		}
 	}
 	
-	public static IEnvironment getEnvironment() {
+	public static IEnvironment getEnvironment(){
 		return env;
 	}
 	
-	public static String getExplorationCurveSample() {
-		if (env != null) {
+	public static String getExplorationCurveSample(){
+		if (env != null)
 			return env.getExplorationCurveSample();
-		} else {
+		else
 			return "Cannot get the exploration curve sample - Graph environment not initialised";
-		}
 	}
 	
-	public static String getLongestPath() {
-		if (env != null) {
+	public static String getLongestPath(){
+		if (env != null)
 			return env.getLongestPath();
-		} else {
+		else
 			return "Cannot get the longest path - Graph environment not initialised";
-		}
 	}
 	
-	public static void exit() {
-		if (Grapher.GRAPHS_ACTIVATED) {
+	public static void exit(){
+		if (Grapher.GRAPHS_ACTIVATED){
 			try {
-				synchronized(env) {
-					while (env != null) {
+				synchronized(env){
+					while (env != null){
 						try {
 							env.wait(500);
 						} catch (InterruptedException e) {
-							System.out.println("[Grapher] TESTAR grapher exit interrupted");
+							System.out.println("TESTAR grapher exit interrupted");
 						}
 					}
 				}
-			} catch (Exception e) {
-				// env may be set to null when we try to sync on it	
-			} 
+			} catch (Exception e) {} // env may be set to null when we try to sync on it
 		}
 	}
 	
-	private static void resetGrapherFields() {
-		System.out.println("[Grapher] TESTAR grapher reset");
+	private static void resetGrapherFields(){
+		//System.out.println("TESTAR grapher reset");
 		movementsFIFO.clear();
 		movementsSync.clear();
 		env = null;
@@ -551,11 +523,12 @@ public class Grapher implements Runnable {
 	}
 	
 	@Override
-	public void finalize() {
+	public void finalize(){
 		resetGrapherFields();
-		if (exeSrv != null) {
+		if (exeSrv != null){
 			exeSrv.shutdown();
 			exeSrv = null;
 		}
-	}	
+	}
+	
 }

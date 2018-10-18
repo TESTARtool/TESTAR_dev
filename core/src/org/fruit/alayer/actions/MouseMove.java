@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -55,19 +54,17 @@ public final class MouseMove extends TaggableBase implements Action {
 	private final Position position;
 	private final double minDuration;
 	
-	public MouseMove(Point point) {
+	public MouseMove(Point point){
 		this(new AbsolutePosition(point), 0);
 	}
 	
-	public MouseMove(double x, double y) {
+	public MouseMove(double x, double y){
 		this(new AbsolutePosition(x, y), 0);
 	}
 	
-	public MouseMove(Position position) { 
-		this(position, 0); 
-	}
+	public MouseMove(Position position){ this(position, 0); }
 	
-	public MouseMove(Position position, double minDuration) {
+	public MouseMove(Position position, double minDuration){
 		Assert.notNull(position);
 		Assert.isTrue(minDuration >= 0);
 		this.position = position;
@@ -81,38 +78,39 @@ public final class MouseMove extends TaggableBase implements Action {
 	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters) {
-			if (r.name().equals(ActionRoles.MouseMove.name())) {
+		for (Role r : discardParameters){
+			if (r.name().equals(ActionRoles.MouseMove.name()))
 				return "Mouse moved";
-			}
 		}
 		return toString();
 	}	
 
 	public void run(SUT system, State state, double duration) {
-		try {
+		try{
 			Assert.notNull(system, state);
 			Point p = position.apply(state);
 			Util.moveCursor(system.get(Tags.StandardMouse), p.x(), p.y(), Math.max(duration, minDuration));
-		} catch(NoSuchTagException tue) {
+		}catch(NoSuchTagException tue){
 			throw new ActionFailedException(tue);
-		} catch(PositionException pe) {
+		}catch(PositionException pe){
 			throw new ActionFailedException(pe);
 		}
 	}
 
+	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null) {
+		if (r != null)
 			return r.toString() + toParametersString();
-		} else {
+		else
 			return toString();
-		}
 	}
 
+	// by urueda
 	@Override
 	public String toParametersString() {
+		//return position.toString();
 		return "";
 	}	
 }

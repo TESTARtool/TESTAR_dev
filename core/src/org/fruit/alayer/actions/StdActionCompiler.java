@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import java.util.List;
@@ -52,208 +51,215 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 
 public class StdActionCompiler {
-	private Abstractor abstractor;
+	Abstractor abstractor;
 	private final Action LMouseDown = new MouseDown(MouseButtons.BUTTON1);
 	private final Action RMouseDown = new MouseDown(MouseButtons.BUTTON3);
 	private final Action LMouseUp = new MouseUp(MouseButtons.BUTTON1);
 	private final Action RMouseUp = new MouseUp(MouseButtons.BUTTON3);
 	private final Action NOP = new NOP();
 
-	public StdActionCompiler() {	
-		this(new StdAbstractor()); 
-	}
+	public StdActionCompiler(){	this(new StdAbstractor()); }
 
-	public StdActionCompiler(Abstractor abstractor) {
+	public StdActionCompiler(Abstractor abstractor){
 		this.abstractor = abstractor;
 	}
-	
-	public Action mouseMove(Widget w) {
+
+
+	public Action mouseMove(Widget w){
 		Finder wf = abstractor.apply(w);
 		Position position = new WidgetPosition(wf, Tags.Shape, 0.5, 0.5, true);
-		position.obscuredByChildFeature(false); 
-		// even if any other widget is at foreground
+		position.obscuredByChildFeature(false); // even if any other widget is at foreground
 		return mouseMove(w,position);
 	}
 	
-	public Action mouseMove(Widget w, Position position) {
+	public Action mouseMove(Widget w, Position position){
 		return new CompoundAction.Builder().add(new MouseMove(position), 0).add(NOP, 1).build();		
 	}
 	
-	
-	public Action leftClick() {
+
+	public Action leftClick(){
 		return new CompoundAction.Builder().add(LMouseDown, 0)
 				.add(LMouseUp, 0).add(NOP, 1).build();
 	}
 
-	public Action rightClick() {
-		return new CompoundAction.Builder().add(RMouseDown, 0)
-				.add(RMouseUp, 0).add(NOP, 1).build();
+	public Action rightClick(){
+		return new CompoundAction.Builder().add(RMouseDown, 0).
+				add(RMouseUp, 0).add(NOP, 1).build();
 	}
 
-	public Action leftDoubleClick() {
+	public Action leftDoubleClick(){
 		Action lc = leftClick();
-		return new CompoundAction.Builder().add(lc, 0).add(NOP, 0.1)
-				.add(lc, 0).add(NOP, 1).build();
+		//return new CompoundAction.Builder().add(lc, 0).
+		return new CompoundAction.Builder().add(lc, 0).add(NOP, 0.1).	
+				add(lc, 0).add(NOP, 1).build();
 	}
 
-	public Action leftClickAt(Position position) {
+	public Action leftClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
 				.add(LMouseDown, 0).add(LMouseUp, 0).build();
 	}
 
-	public Action leftClickAt(double absX, double absY) {
+	public Action leftClickAt(double absX, double absY){
 		return leftClickAt(new AbsolutePosition(absX, absY));
 	}
 
-	public Action leftClickAt(Widget w) {
+	public Action leftClickAt(Widget w){
 		return leftClickAt(w, 0.5, 0.5);
 	}
 
-	public Action leftClickAt(Widget w, double relX, double relY) {
+	public Action leftClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); 
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
 		return ret;
 	}
 
-	public Action rightClickAt(Position position) {
+	public Action rightClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
 				.add(RMouseDown, 0).add(RMouseUp, 0).build();
 	}
 
-	public Action rightClickAt(double absX, double absY) {
+	public Action rightClickAt(double absX, double absY){
 		return rightClickAt(new AbsolutePosition(absX, absY));
 	}
 
-	public Action rightClickAt(Widget w) {
+	public Action rightClickAt(Widget w){
 		return rightClickAt(w, 0.5, 0.5);
 	}
 
-	public Action rightClickAt(Widget w, double relX, double relY) {
+	public Action rightClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = rightClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); 
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
-	
-	public Action leftTripleClickAt(Position position) {
+
+
+	public Action leftTripleClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
 				.add(LMouseDown, 0).add(LMouseUp, 0).add(LMouseDown, 0).add(LMouseUp, 0).add(LMouseDown, 0).add(LMouseUp, 0).build();
 	}
 	
-	public Action leftTripleClickAt(double absX, double absY) {
+	public Action leftTripleClickAt(double absX, double absY){
 		return leftTripleClickAt(new AbsolutePosition(absX, absY));
 	}
 	
-	public Action leftTripleClickAt(Widget w) {
+	public Action leftTripleClickAt(Widget w){
 		return leftTripleClickAt(w, 0.5, 0.5);
 	}
 	
-	public Action leftTripleClickAt(Widget w, double relX, double relY) {
+	public Action leftTripleClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = leftTripleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets,  Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); 
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 	
-	public Action leftDoubleClickAt(Position position) {
+
+	public Action leftDoubleClickAt(Position position){
 		Assert.notNull(position);
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
 				.add(LMouseDown, 0).add(LMouseUp, 0).add(LMouseDown, 0).add(LMouseUp, 0).build();
 	}
 
-	public Action leftDoubleClickAt(double absX, double absY) {
+	public Action leftDoubleClickAt(double absX, double absY){
 		return leftDoubleClickAt(new AbsolutePosition(absX, absY));
 	}
 
-	public Action leftDoubleClickAt(Widget w) {
+	public Action leftDoubleClickAt(Widget w){
 		return leftDoubleClickAt(w, 0.5, 0.5);
 	}
 
-	public Action leftDoubleClickAt(Widget w, double relX, double relY) {
+	public Action leftDoubleClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); 
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
 		return ret;
 	}
 	
-	public Action dropDownAt(Position position) {
+	//begin mimarmu1 & fraalpe2
+	public Action dropDownAt(Position position){
 		Assert.notNull(position);
+		
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
 				.add(LMouseDown, 0).add(LMouseUp, 0).add(NOP, 0.2).add(new KeyDown(KBKeys.VK_RIGHT),0).build();
 	}
 	
-	public Action dropDownAt(double absX, double absY) {
+	public Action dropDownAt(double absX, double absY){
 		return dropDownAt(new AbsolutePosition(absX, absY));
 	}
 	
-	public Action dropDownAt(Widget w, double relX, double relY) {
+	public Action dropDownAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); 	
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda		
 		return ret;
 	}
 	
-	public Action dropDownAt(Widget w) {
+	public Action dropDownAt(Widget w){
 		return dropDownAt(w, 0.5, 0.5);
 	}
+	//end by mimarmu1 & fraalpe2	
 
-	public Action dragFromTo(Widget from, Widget to) {
+	public Action dragFromTo(Widget from, Widget to){
 		return dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
 	}
 
-	public Action dragFromTo(Widget from, double fromRelX, double fromRelY, 
-			Widget to, double toRelX, double toRelY) {
+	public Action dragFromTo(Widget from, double fromRelX, double fromRelY, Widget to, double toRelX, double toRelY){
 		return dragFromTo(new WidgetPosition(abstractor.apply(from), Tags.Shape, fromRelX, fromRelY, true),
 				new WidgetPosition(abstractor.apply(to), Tags.Shape, toRelX, toRelY, true));
 	}
 
-	public Action dragFromTo(Position from, Position to) {
+	public Action dragFromTo(Position from, Position to){
 		return new CompoundAction.Builder().add(new MouseMove(from), 1)
 				.add(LMouseDown, 0).add(new MouseMove(to), 1)
 				.add(LMouseUp, 0).build();		
 	}
 	
-	public Action slideFromTo(Position from, Position to) {
+	// by urueda
+	public Action slideFromTo(Position from, Position to){
 		Action action = dragFromTo(from,to);
 		action.set(Tags.Slider, new Position[]{from,to});
 		return action;
 	}
 
-	public Action clickTypeInto(final Position position, final String text) {
+	public Action clickTypeInto(final Position position, final String text){
 		Assert.notNull(position, text);
-		// from text additions to text replacements
-		final int TEXT_REMOVE_TRIES = 16; 
-		// VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
+		//return new CompoundAction.Builder().add(leftClickAt(position), 1).add(new Type(text), 1).build();
+		// begin by urueda (from text additions to text replacements)
+		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
+        //Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_NUM_LOCK, false); // VK_SHIFT bug fix (did not work)
 		Builder builder = new CompoundAction.Builder()
 			.add(leftClickAt(position), 1)
+			//.add(new KeyDown(KBKeys.VK_END), 1).add(new KeyUp(KBKeys.VK_END), 1)
+			//.add(new KeyDown(KBKeys.VK_SHIFT), 1)
 			.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
-		for (int i = 0; i < TEXT_REMOVE_TRIES; i++) {
+			//.add(new KeyUp(KBKeys.VK_SHIFT), 1);
+		for ( int i=0; i<TEXT_REMOVE_TRIES; i++)
 			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
-		}
 		builder.add(new Type(text), 1);
 		return builder.build();
+		// end by urueda
 	}
 
-
-	public Action clickTypeInto(Widget w, String text) {
+	public Action clickTypeInto(Widget w, String text){
 		return clickTypeInto(w, 0.5, 0.5, text);
 	}
 
-	public Action clickTypeInto(Widget w, double relX, double relY, String text) {
+	public Action clickTypeInto(Widget w, double relX, double relY, String text){
 		Finder wf = abstractor.apply(w);
 		Action ret = clickTypeInto(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
 		return ret;
 	}
 	
@@ -263,37 +269,20 @@ public class StdActionCompiler {
 	}
 	
 	public Action hitShortcutKey(List<KBKeys> keys) {
-		if (keys.size() == 1) {// single key
+		if (keys.size() == 1) // single key
 			return hitKey(keys.get(0));
-		}
 		CompoundAction.Builder builder = new CompoundAction.Builder();
-		for (int i = 0; i < keys.size(); i++) {
+		for (int i = 0; i < keys.size(); i++)
 			builder.add(new KeyDown(keys.get(i)), i == 0 ? .0 : .1);
-		}
-		for (int i = keys.size() - 1; i >= 0; i--) {
+		for (int i = keys.size() - 1; i >= 0; i--)
 			builder.add(new KeyUp(keys.get(i)), i == keys.size() - 1 ? 1.0 : .0);
-		}
 		builder.add(NOP, 1.0);
 		return builder.build();
 	}
 	
-	public Action killProcessByPID(long pid) { 
-		return killProcessByPID(pid, 0); 
-	}
-	
-	public Action killProcessByName(String name) { 
-		return killProcessByName(name, 0); 
-	}
-	
-	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling) { 
-		return KillProcess.byPID(pid, timeToWaitBeforeKilling); 
-	}
-	
-	public Action killProcessByName(String name, double timeToWaitBeforeKilling) { 
-		return KillProcess.byName(name, timeToWaitBeforeKilling); 
-	}
-	
-	public Action activateSystem() {	
-		return new ActivateSystem(); 
-	}
+	public Action killProcessByPID(long pid){ return killProcessByPID(pid, 0); }
+	public Action killProcessByName(String name){ return killProcessByName(name, 0); }
+	public Action killProcessByPID(long pid, double timeToWaitBeforeKilling){ return KillProcess.byPID(pid, timeToWaitBeforeKilling); }
+	public Action killProcessByName(String name, double timeToWaitBeforeKilling){ return KillProcess.byName(name, timeToWaitBeforeKilling); }
+	public Action activateSystem(){	return new ActivateSystem(); }
 }

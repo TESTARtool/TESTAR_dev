@@ -29,12 +29,14 @@
 
 package org.fruit.example.tests;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.linux.LinuxProcess;
+
 
 import java.util.List;
 

@@ -360,7 +360,7 @@ public enum AtSpiStateTypes {
 
     /**
      * This value of the enumeration should not be used as a parameter,
-     * it indicates the number of items in the AtspiStateType enumeration.
+     * it indicates the number of items in the AtspiStateType enumeration
      */
     LastDefined
 

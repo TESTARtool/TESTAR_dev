@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.glib;
 
+
 import org.bridj.Pointer;
 import org.fruit.alayer.linux.atspi.LibAtSpi;
 
@@ -38,7 +39,6 @@ import java.util.List;
 
 /**
  * Java implementation of the GList object.
- * @param <T>
  */
 public class GList<T> {
 
@@ -50,7 +50,6 @@ public class GList<T> {
 
 
     protected long _listPtr;
-    
     public long listPtr() {
         return _listPtr;
     }
@@ -81,7 +80,6 @@ public class GList<T> {
 
 
     protected List<T> _elements;
-    
     public List<T> elements() {
         return GLibHelper.createTypedList(dataPtr(), length(), _elementType);
     }

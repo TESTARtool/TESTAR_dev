@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.actions;
 
 import org.fruit.Util;
@@ -48,31 +47,29 @@ import org.fruit.alayer.Tags;
 public class NOP extends TaggableBase implements Action {
 	private static final long serialVersionUID = 8622084462407313716L;
 	
-	public static final String NOP_ID = "No Operation"; 
+	public static final String NOP_ID = "No Operation"; // by urueda
 	
-	public void run(SUT system, State state, double duration) { 
-		Util.pause(duration); 
-	}
+	public void run(SUT system, State state, double duration){ Util.pause(duration); }
 	
-	public String toString() { 
-		return NOP_ID; 
-	}
+	public String toString(){ return NOP_ID; }
 
+	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		return toString();
 	}
 
+	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
-		if (r != null) {
+		if (r != null)
 			return r.toString();
-		} else {
+		else
 			return toString();
-		}
 	}
 
+	// by urueda
 	@Override
 	public String toParametersString() {
 		return "";

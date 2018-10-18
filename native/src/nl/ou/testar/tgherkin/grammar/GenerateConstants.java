@@ -19,14 +19,14 @@ public class GenerateConstants {
 	 */
 	public static final String FILE_NAME = ".." + File.separator + "tgherkin" + File.separator + "src" + File.separator + "antlr" + File.separator + "Constants.g4";
 
-	private GenerateConstants() {
+	private GenerateConstants(){
 	}
 	
 	/**
 	 * Main method.
 	 * @param args given arguments
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		generateGrammarFile();
 	}
 
@@ -43,7 +43,7 @@ public class GenerateConstants {
 			for(KBKeys key : KBKeys.values()) {
 				if (notFirst) {
 					pWriter.println(" | '" + key.name() + "'");
-				} else {
+				}else {
 					notFirst = true;
 					pWriter.println("lexer grammar Constants;");
 					pWriter.println("KB_KEY_NAME :");
@@ -53,11 +53,11 @@ public class GenerateConstants {
 			if (notFirst) {
 				pWriter.println(";");
 			}
-		} catch (FileNotFoundException e) {
+		}catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}catch (IOException e) {
 			e.printStackTrace();
-		} finally {
+		}finally {
 			if (pWriter != null) {
 				pWriter.close();
 			}

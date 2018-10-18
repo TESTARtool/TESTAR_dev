@@ -52,7 +52,7 @@ public interface GraphDBRepository {
     void addState(final State state, final boolean isInitial);
 
     /**
-     * Add Action on a widget to the graph database as Edge.
+     * Add Action on a widget to the graph database as Edge
      *
      * @param action      The performed action
      * @param toStateID   ConcreteID of the new State
@@ -60,7 +60,7 @@ public interface GraphDBRepository {
     void addAction( final Action action, final String toStateID);
 
     /**
-     * Add Action on a State to the graph database as Edge.
+     * Add Action on a State to the graph database as Edge
      *
      * @param stateId id of the state on which the action is performed.
      * @param action the action.
@@ -101,7 +101,7 @@ public interface GraphDBRepository {
     void addCustomType(final Widget widget, final String relation, final CustomType instance);
     
     /**
-     * Get all objects from a pipe specified by a Gremlin-Groovy expression.
+     * Get all objects from a pipe specified by a Gremlin-Groovy expression
      * @param gremlin The Gremlin-Groovy expression.
      * @param start The starting point for the expression.
      * @return A list of all objects in the pipe.

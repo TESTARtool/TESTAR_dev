@@ -31,23 +31,13 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer.exceptions; // refactored by urueda
 
 import org.fruit.FruitException;
 
 public class PositionException extends FruitException {
 	private static final long serialVersionUID = -1132646035499653943L;
-	
-	public PositionException(String message) { 
-		this(message, null); 
-	}
-	
-	public PositionException(String message, Throwable cause) { 
-		super(message, cause); 
-	}
-	
-	public PositionException(Throwable cause) { 
-		super(cause); 
-	}
+	public PositionException(String message){ this(message, null); }
+	public PositionException(String message, Throwable cause){ super(message, cause); }
+	public PositionException(Throwable cause){ super(cause); }
 }

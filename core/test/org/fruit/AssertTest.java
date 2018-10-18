@@ -29,9 +29,9 @@
 
 package org.fruit;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Verify the Assert Utility cless has the proper behaviour.
@@ -41,7 +41,7 @@ public class AssertTest {
     @Test
     public void testTextNull()  {
 
-        try {
+        try{
             Assert.hasText(null);
             fail("An exception was expected when text is null");
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class AssertTest {
 
     @Test
     public void testTextNotEmpty()  {
-        try {
+        try{
             Assert.hasText("");
             fail("An exception was expected when text is empty");
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class AssertTest {
 
     @Test
     public void testTextIsOK()  {
-        try {
+        try{
             Assert.hasText("Good text");
         } catch (Exception e) {
             fail("An exception is not expected");

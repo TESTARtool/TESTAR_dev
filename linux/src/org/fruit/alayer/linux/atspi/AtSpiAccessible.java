@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.atspi;
 
+
 import org.fruit.alayer.linux.util.BridJHelper;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 import org.fruit.alayer.linux.glib.GArray;
@@ -85,9 +86,7 @@ public class AtSpiAccessible {
 
 
     private List<AtSpiAccessible> _children;
-    public List<AtSpiAccessible> children() { 
-    	return getAccessibleChildren(this); 
-    }
+    public List<AtSpiAccessible> children() { return getAccessibleChildren(this); }
 
 
     private int _indexInParent;
@@ -130,9 +129,7 @@ public class AtSpiAccessible {
 
 
     private GArray<String> _attributesAsArray;
-    public GArray<String> attributesAsArray() { 
-    	return GArray.CreateInstance(LibAtSpi.atspi_accessible_get_attributes_as_array(_accessiblePtr, 0), String.class); 
-    }
+    public GArray<String> attributesAsArray() { return GArray.CreateInstance(LibAtSpi.atspi_accessible_get_attributes_as_array(_accessiblePtr, 0), String.class); }
 
 
     private String _toolkitName;
@@ -151,21 +148,15 @@ public class AtSpiAccessible {
 
 
     private AtSpiAction _action;
-    public AtSpiAction action() { 
-    	return AtSpiAction.CreateInstance(LibAtSpi.atspi_accessible_get_action_iface(_accessiblePtr)); 
-    }
+    public AtSpiAction action() { return AtSpiAction.CreateInstance(LibAtSpi.atspi_accessible_get_action_iface(_accessiblePtr)); }
 
 
     private AtSpiComponent _component;
-    public AtSpiComponent component() { 
-    	return AtSpiComponent.CreateInstance(LibAtSpi.atspi_accessible_get_component_iface(_accessiblePtr)); 
-    }
+    public AtSpiComponent component() { return AtSpiComponent.CreateInstance(LibAtSpi.atspi_accessible_get_component_iface(_accessiblePtr)); }
 
 
     private AtSpiValue _value;
-    public AtSpiValue value() { 
-    	return AtSpiValue.CreateInstance(LibAtSpi.atspi_accessible_get_value_iface(_accessiblePtr)); 
-    }
+    public AtSpiValue value() { return AtSpiValue.CreateInstance(LibAtSpi.atspi_accessible_get_value_iface(_accessiblePtr)); }
 
 
     private GArray<String> _interfaces;

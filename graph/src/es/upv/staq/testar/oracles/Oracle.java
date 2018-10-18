@@ -46,15 +46,15 @@ public class Oracle {
 
 	private IPredicate predicate = null;
 	
-	public Oracle(IPredicate predicate) {
+	public Oracle(IPredicate predicate){
 		this.predicate = predicate;
 	}
 	
-	public Verdict getVerdict(JIPrologWrapper jipWrapper) {
-		if (predicate != null) {
+	public Verdict getVerdict(JIPrologWrapper jipWrapper){
+		if (predicate != null)
 			return predicate.getVerdict(jipWrapper);
-		} else {
+		else
 			return Verdict.OK;
-		}
-	}	
+	}
+	
 }

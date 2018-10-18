@@ -70,26 +70,26 @@ public class GraphReporter {
 	
 	private static final String OUT_DIR = "output/graphs/";
 	
-	private static final String THICK_PROPERTY = ", penwidth=3";
-	private static final String CLUSTER_THICK_PROPERTY = ", penwidth=5";
+	final static String THICK_PROPERTY = ", penwidth=3",
+						CLUSTER_THICK_PROPERTY = ", penwidth=5";
 	
-	static final String WARNING_COLOR = "#FF7F00";
+	final static String WARNING_COLOR = "#FF7F00";
 	
-	private static String STYLE_NORMAL = ", style=solid";
-	private static String STYLE_KNOWN = ", style=dotted";
-	private static String STYLE_VERTEX_REVISIT = ", style=diagonals";
-	private static String STYLE_EDGE_REVISIT = ", style=tapered, penwidth=3, arrowtail=none";
+	private static String STYLE_NORMAL = ", style=solid",
+						  STYLE_KNOWN = ", style=dotted",
+						  STYLE_VERTEX_REVISIT = ", style=diagonals",
+						  STYLE_EDGE_REVISIT = ", style=tapered, penwidth=3, arrowtail=none";
 
 	private static HashMap<String,String> mapToAbstractStateIDs = new HashMap<String,String>(); // concrete -> abstract_R
 
-	public static void useGraphData(long graphTime, String testSequencePath) {		
+	public static void useGraphData(long graphTime, String testSequencePath){		
 		GraphReporter.testSequenceFolder = testSequencePath.replaceAll(".*(sequence[0-9]*)", "$1");		
 		usingGraphTime = graphTime;
 		(new File(OUT_DIR + testSequenceFolder)).mkdirs();
 	}
 		
 	// [0] screenshots, [1] tiny, [2] minimal [3] abstract screenshoted, [4] abstract tiny, [5] abstract minimal
-	private static String[] buildVertexGraph(IEnvironment env, TESTARGraph g) {
+	private static String[] buildVertexGraph(IEnvironment env, TESTARGraph g){
 		int unx = 1;
 		String label;
 		StringBuffer sb0 = new StringBuffer(), // screenshots
@@ -115,32 +115,31 @@ public class GraphReporter {
 		boolean k, r;
 		String color;
 		
-		for(IGraphState vertex : g.vertexStates()) {
-			if (vertex.toString().equals(Grapher.GRAPH_NODE_PASS) || vertex.toString().equals(Grapher.GRAPH_NODE_FAIL)) {
+		for(IGraphState vertex : g.vertexStates()){
+			if (vertex.toString().equals(Grapher.GRAPH_NODE_PASS) || vertex.toString().equals(Grapher.GRAPH_NODE_FAIL))
 				verdictVertex = vertex;
-			} else if (vertex.toString().equals(Grapher.GRAPH_NODE_ENTRY)) {
+			else if (vertex.toString().equals(Grapher.GRAPH_NODE_ENTRY))
 				continue;
-			} else {
+			else{
 
 				statesCount.put(vertex.toString(),vertex.getCount());
 				statesScreenshots.put(vertex.toString(),vertex.getStateshot());
 				
 				String nodeLabel = vertex.toString() + " (" + vertex.getCount() + ")";
-				if (vertex.getStateshot() != null) {
-					label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\""
-						+ vertex.getStateshot().replace("output","../..") 
-						+ "\"/></TD></TR><TR><TD>" + nodeLabel 
-						+ "</TD></TR></TABLE>>";
-				} else {
+				if (vertex.getStateshot() != null)
+					label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							vertex.getStateshot().replace("output","../..") +
+							"\"/></TD></TR><TR><TD>" + nodeLabel +
+							"</TD></TR></TABLE>>";
+				else
 					label = "\"" + nodeLabel + "\"";				
-				}
-				if (longestPath.contains(vertex.getConcreteID())) {
+				
+				if (longestPath.contains(vertex.getConcreteID()))
 					thickS = THICK_PROPERTY;
-				} else {
+				else
 					thickS = "";
-				}
-				k = vertex.knowledge(); 
-				r = vertex.revisited();
+				
+				k = vertex.knowledge(); r = vertex.revisited();
 				
 				color = getLineColor(vertex.getCount());
 				
@@ -149,7 +148,7 @@ public class GraphReporter {
 				sb2.append(vertex.toString() + " [label=\"" + vertex.getCount() + "\", height=0.3" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color +  "];\n");
 
 				verdict = vertex.getVerdict();
-				if (verdict != null) {
+				if (verdict != null){
 					String t1 = "verdict_" + vertex.toString() + " [color=\"" + WARNING_COLOR + "\", style=solid];\n",
 						   t2 = vertex.toString() + " -> verdict_" + vertex.toString() + " [label=\"" + verdict.info() + "\", color=\"" + WARNING_COLOR + "\"];\n"; 
 					sb0.append(t1);
@@ -161,7 +160,7 @@ public class GraphReporter {
 				}
 				
 				unxC = vertex.getUnexploredActionsSize();
-				if (unxC > 0) {
+				if (unxC > 0){
 					unxBuffer.append(vertex.toString() + " -> u" + unx + " [color=pink, fontcolor=red, label=\"unexplored(" + unxC + ")\", style=dashed];\n");
 					unxBufferMinimal.append(vertex.toString() + " -> u" + unx + " [color=pink, fontcolor=red, label=\"" + unxC + "\", style=dashed];\n");
 				}
@@ -173,51 +172,44 @@ public class GraphReporter {
 		HashMap<String,Integer> unexploredClusterCount = new HashMap<String,Integer>(stateClusters.size());
 		int clusterCount, unexploredCount;
 		String scrshot;
-		for (String cluster : stateClusters.keySet()) { // abstract_R
+		for (String cluster : stateClusters.keySet()){ // abstract_R
 			clusterCount = 0;
 			unexploredCount = 0;
 			scrshot = null;
-			k = false; 
-			r = false;
-			for (String cs : stateClusters.get(cluster)) { // concrete
+			k = false; r = false;
+			for (String cs : stateClusters.get(cluster)){ // concrete
 				mapToAbstractStateIDs.put(cs, cluster);
 				clusterCount += statesCount.get(cs).intValue();
 				unexploredCount += statesUnexploredCount.get(cs).intValue(); 
-				if (statesScreenshots.get(cs) != null) {
+				if (statesScreenshots.get(cs) != null)
 					scrshot = statesScreenshots.get(cs);
-				}
 				statesScreenshots.remove(cs); // clean-up
-				if (env.getState(cs).knowledge()) {
-					k = true; 
-				}
-				if (env.getState(cs).revisited()) {
-					r = true;
-				}
+				if (env.getState(cs).knowledge()) k = true; if (env.getState(cs).revisited()) r = true;
 			}
 
 			color = getLineColor(clusterCount);
 			
 			unexploredClusterCount.put(cluster,unexploredCount);
-			if (clusterCount != 0) {
-				String toAppend = cluster + " [label=\"" + cluster + " (" + clusterCount + ")\"" 
-					+ (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n";
+			if (clusterCount != 0){
+				String toAppend = cluster + " [label=\"" + cluster + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n";
 				sb4.append(toAppend);
-				sb5.append(cluster + " [label=\"" + clusterCount + "\"" + ", height=0.3"
-					+ (k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
-				if (scrshot == null) {
+				sb5.append(cluster + " [label=\"" + clusterCount + "\"" + ", height=0.3" +
+						(k ? (r ? STYLE_VERTEX_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
+				if (scrshot == null)
 					sb3.append(toAppend); // unable to retrieve any screenshot for the cluster
-				} else {
+				else{
 					String scrShotedLabel =
-							"<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\""
-							+ scrshot.replace("output","../..") 
-							+ "\"/></TD></TR><TR><TD>" + cluster + " (" + clusterCount + ")" 
-							+ "</TD></TR></TABLE>>";
+							"<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							scrshot.replace("output","../..") +
+							"\"/></TD></TR><TR><TD>" + cluster + " (" + clusterCount + ")" +
+							"</TD></TR></TABLE>>";
 					sb3.append(cluster + " [label=" + scrShotedLabel + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
 				}
 			}
 		}
 
-		if (verdictVertex != null) {
+		if (verdictVertex != null){
 			String verdictColor = (verdictVertex.toString().equals(Grapher.GRAPH_NODE_PASS)) ? "green" : "red";
 			String verdictFontColor = (verdictVertex.toString().equals(Grapher.GRAPH_NODE_PASS)) ? "black" : "white";
 			String verdictNodeS = " [fixedsize=false, shape=doublecircle, style=filled, color=" + verdictColor + ", fontcolor=" + verdictFontColor + ", height=0.8];\n";
@@ -229,7 +221,7 @@ public class GraphReporter {
 			sb5.append(verdictVertex + verdictNodeS);
 		}
 
-		if (unxBuffer.length() > 0) {
+		if (unxBuffer.length() > 0){
 			String unxNodeS = "node [fixedsize=false, shape=ellipse, style=dashed, color=pink, fontcolor=pink, height=0.8];\n";
 			String unxNodeMinimalS = "node [fixedsize=false, shape=point, style=solid, color=pink, fontcolor=pink, height=0.3];\n";
 			sb0.append(unxNodeS);
@@ -242,7 +234,7 @@ public class GraphReporter {
 			sb1.append(unxBuffer.toString());
 			sb2.append(unxBufferMinimal.toString());
 			String unxLink; 
-			for (String cluster : unexploredClusterCount.keySet()) {
+			for (String cluster : unexploredClusterCount.keySet()){
 				unxLink = cluster + " -> u" + cluster + " [color=pink, fontcolor=red, label=\"unexplored(" + unexploredClusterCount.get(cluster).intValue() + ")\", style=dashed];\n";
 				sb3.append(unxLink);
 				sb4.append(unxLink);
@@ -253,37 +245,35 @@ public class GraphReporter {
 		return new String[]{sb0.toString(),sb1.toString(),sb2.toString(),sb3.toString(),sb4.toString(),sb5.toString()};
 	}
 	
-	private static String getLineColor(int count) {
-		if (count == 1) {
+	private static String getLineColor(int count){
+		if (count == 1)
 			return "grey";
-		} else if (count < 5) {
+		else if (count < 5)
 			return "black";
-		} else if (count < 10) {
+		else if (count < 10)
 			return "blue";
-		} else if (count < 25) {
+		else if (count < 25)
 			return "green";
-		} else if (count < 50) {
+		else if (count < 50)
 			return "yellow";
-		} else {
+		else
 			return "red";
-		}
 	}
 	
-	private static String breakInLines(String orderString) {
-		if (orderString.length() > CodingManager.ID_LENTGH * 5) {
+	private static String breakInLines(String orderString){
+		if (orderString.length() > CodingManager.ID_LENTGH * 5)
 			return "[*]";
-		}
 		StringBuffer brokenS = new StringBuffer();
 		Pattern pattern = Pattern.compile("(\\[[0-9]+\\])");
 		Matcher matcher = pattern.matcher(orderString);
 		String group;
 		final int LINE_LIMIT = 16;
 		int lineC = CodingManager.ID_LENTGH + 1; // id + blank_space
-		while (matcher.find()) {
+		while (matcher.find()){
 			group = matcher.group(1);
 			brokenS.append(group);
 			lineC += group.length();
-			if (lineC >= LINE_LIMIT) {
+			if (lineC >= LINE_LIMIT){
 				brokenS.append("\n");
 				lineC = 0;
 			}
@@ -292,7 +282,7 @@ public class GraphReporter {
 	}
 	
 	// [0] screenshots, [1] tiny, [2] minimal, [3] abstract screenshoted, [4] abstract tiny, [5] abstract minimal	
-	private static String[] buildEdgeGraph(IEnvironment env, TESTARGraph g) {
+	private static String[] buildEdgeGraph(IEnvironment env, TESTARGraph g){
 		String label, color, detailedS, linkLabel;
 		StringBuffer sb0 = new StringBuffer(), sb1 = new StringBuffer(), sb2 = new StringBuffer(),
 					 sb3 = new StringBuffer(), sb4 = new StringBuffer(), sb5 = new StringBuffer();
@@ -315,33 +305,35 @@ public class GraphReporter {
 		String abstractSourceStateID, abstractTargetStateID;
 		Set<IGraphAction> actionsSet, actionsSet2;
 
-		for(IGraphAction graphAction : g.edgeActions()) {
+		for(IGraphAction graphAction : g.edgeActions()){
+		/*IGraphAction graphAction;
+		for (GraphEdge edge : g.edgeSet()){
+			graphAction = env.getAction(edge.getActionID());*/
 
-			if (graphAction.toString().equals(Grapher.GRAPH_ACTION_START)) {
+			if (graphAction.toString().equals(Grapher.GRAPH_ACTION_START)){
 				startAction = graphAction;
 				isStartAction = true;
 				isStopAction = false;
-			} else if (graphAction.toString().equals(Grapher.GRAPH_ACTION_STOP)) {
+			} else if (graphAction.toString().equals(Grapher.GRAPH_ACTION_STOP)){
 				stopAction = graphAction;
 				isStartAction = false;
 				isStopAction = true;
-			} else {
+			} else{
 				isStartAction = false;
 				isStopAction = false;
 			}
 			
 			skipGraphDisplay = itEdges.contains(graphAction.getAbstractID());
-			if (!skipGraphDisplay) { 
+			if (!skipGraphDisplay)
 				itEdges.add(graphAction.getAbstractID());
-			}
 			
 			actions.put(graphAction.getConcreteID(), graphAction);
 			
-			if (skipGraphDisplay) {
+			if (skipGraphDisplay)
 				continue;
-			}
+			
 			Set<String> targetStates = graphAction.getTargetStateIDs();
-			for (String targetStateID : targetStates) {
+			for (String targetStateID : targetStates){
 				
 				String multiTargetVisuals = targetStates.size() == 1 ? "" : THICK_PROPERTY;
 				
@@ -349,16 +341,17 @@ public class GraphReporter {
 				sb0.append(fromToS);
 				sb1.append(fromToS);
 				sb2.append(fromToS);
+				//detailedS = ai.getDetailedName() == null ? "" : "\n{" + ai.getDetailedName() + "}";
 				detailedS = "";
 				edgeClusterCount = 0;
 				edgeClusterOrder = "";
-				if (actionClusters.containsKey(graphAction.getAbstractID())) {
-					for (String aid : actionClusters.get(graphAction.getAbstractID())) {
+				if (actionClusters.containsKey(graphAction.getAbstractID())){
+					for (String aid : actionClusters.get(graphAction.getAbstractID())){
 						edgeClusterCount += g.getAction(aid).getCount();
 						edgeClusterOrder += g.getAction(aid).getOrder(targetStateID);
 					}
 				}
-				if (edgeClusterCount > 1) {
+				if (edgeClusterCount > 1){
 					color = getLineColor(edgeClusterCount);
 					linkLabel = "G_" + graphAction.getAbstractID() + breakInLines(edgeClusterOrder) + " (" + edgeClusterCount + ")";
 				} else {
@@ -366,46 +359,46 @@ public class GraphReporter {
 					linkLabel = graphAction.getConcreteID() + " " + breakInLines(graphAction.getOrder(targetStateID)) + " (" + graphAction.getCount() + ")";
 				}
 				linkLabel += " " + detailedS;
-				if (graphAction.getStateshot() != null) {
-					label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\""
-						+ graphAction.getStateshot().replace("output","../..") 
-						+ "\"/></TD></TR><TR><TD>" 
-						+ linkLabel.replaceAll("\n","<br/>") 
-						+ "</TD></TR></TABLE>>";
-				} else {
-					label = "\"" + linkLabel + "\"";
-				}
+				if (graphAction.getStateshot() != null)
+					label = "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							graphAction.getStateshot().replace("output","../..") +
+						"\"/></TD></TR><TR><TD>" +
+						linkLabel.replaceAll("\n","<br/>") +
+						"</TD></TR></TABLE>>";
+				else
+					label = "\"" + linkLabel + "\"";						
 	
-				k = graphAction.knowledge(); 
-				r = graphAction.revisited();
+				k = graphAction.knowledge(); r = graphAction.revisited();
 				
 				sb0.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=" + label + "];\n");
+				//label = label.replaceAll("(.*->.*)((?:\\n|<br/>)\\{(?s)[^\\}]*(?-s)\\})?(.*;)","$1$2"); // no detailed edges/actions
 				sb1.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" + linkLabel + "\"];\n");
-				sb2.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" 
-					+ (edgeClusterCount == 0 ? graphAction.getConcreteID() : edgeClusterCount) + "\"" + "];\n");
+				sb2.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" +
+						   (edgeClusterCount == 0 ? graphAction.getConcreteID() : edgeClusterCount) + "\"" + "];\n");
 				
 			}
 
-			if (!isStartAction && !isStopAction) {
+			if (!isStartAction && !isStopAction){
 				// actions clustering by abstract target state
 				abstractSourceStateID = env.getState(graphAction.getSourceStateID()).getAbstract_R_ID();
 				actionsSet = actionsBySourceState.get(abstractSourceStateID);
-				if (actionsSet == null) {
+				if (actionsSet == null){
 					actionsSet = new HashSet<IGraphAction>();
 					actionsBySourceState.put(abstractSourceStateID, actionsSet);
 				}
 				actionsSet.add(graphAction);
 				// actions clustering by abstract source state
-				for (String tid : graphAction.getTargetStateIDs()) {
+				for (String tid : graphAction.getTargetStateIDs()){
 					abstractTargetStateID = mapToAbstractStateIDs.get(tid);
 					actionsSet = actionsByTargetState.get(abstractTargetStateID);
-					if (actionsSet == null) {
+					if (actionsSet == null){
 						actionsSet = new HashSet<IGraphAction>();
 						actionsByTargetState.put(abstractTargetStateID, actionsSet);
 					}
 					actionsSet.add(graphAction);
 				}
 			}
+			
 		}
 				
 		int clusterCount;
@@ -413,41 +406,39 @@ public class GraphReporter {
 		IGraphAction ga;
 		Set<IGraphAction> actionsIntersect;
 		// optimized: high population of cyclic actions in a cluster
-		for (String abstractTID : actionsByTargetState.keySet()) {
+		for (String abstractTID : actionsByTargetState.keySet()){
 			actionsSet = actionsByTargetState.get(abstractTID);
-			for (String abstractSID : actionsBySourceState.keySet()) {
+			for (String abstractSID : actionsBySourceState.keySet()){
 				actionsSet2 = actionsBySourceState.get(abstractSID);
 				actionsIntersect = new HashSet<IGraphAction>(actionsSet);
 				actionsIntersect.retainAll(actionsSet2); // source n target
-				if (actionsIntersect.isEmpty()) {
-					continue;
-				}
-				clusterCount = 0; 
-				clusterOrder = ""; 
-				k = false; 
-				r = false;
-				for (IGraphAction gaBT : actionsIntersect) {
+				if (actionsIntersect.isEmpty()) continue;
+				clusterCount = 0; clusterOrder = ""; k = false; r = false;
+				for (IGraphAction gaBT : actionsIntersect){
 					clusterCount += gaBT.getCount();
 					clusterOrder += gaBT.getOrder(env.getGraphStateClusters().get(abstractTID));
-					if (gaBT.knowledge()) {
-						k = true; 
-					}
-					if (gaBT.revisited()) {
-						r = true;
-					}
+					if (gaBT.knowledge()) k = true; if (gaBT.revisited()) r = true;
 				}
 				color = getLineColor(clusterCount);
 				clusterOrder = breakInLines(clusterOrder);
 				String toAppend = 
 						abstractSID + // source state
-						" -> " 
-						+ abstractTID; // target state
-				sb4.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" 
-					+ (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
-				sb5.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" 
-					+ (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
-				sb3.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" 
-					+ (k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+						" -> " +
+						abstractTID; // target state
+				sb4.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				sb5.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				sb3.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
+						(k ? (r ? STYLE_EDGE_REVISIT : STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+				  // which screenshot for a cluster of actions?
+				/*String scrshotLabel =
+							"<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +
+							scrshot.replace("output","../..") +
+							"\"/></TD></TR><TR><TD>" +
+							clusterCount + " " + clusterOrder.replaceAll("\n","<br/>") + " (" + clusterCount + ")" +
+							"</TD></TR></TABLE>>";								
+				sb3.append(toAppend + " [color=" + color + ", label=" + scrshotLabel + ", style=solid];\n");*/
 			}
 		}
 		// clean up
@@ -457,12 +448,12 @@ public class GraphReporter {
 		
 		String toAppend;
 		// START action
-		if (startAction != null) {
-			for (String tid : startAction.getTargetStateIDs()) {
+		if (startAction != null){
+			for (String tid : startAction.getTargetStateIDs()){
 				toAppend = 
 						g.getState(startAction.getSourceStateID()).getAbstract_R_ID() + // source state
-						" -> " 
-						+ g.getState(tid).getAbstract_R_ID() + // target state							
+						" -> " +
+						g.getState(tid).getAbstract_R_ID() + // target state							
 						" [color=black, label=\"" + startAction.toString() + "\", style=solid];\n";
 				sb3.append(toAppend);
 				sb4.append(toAppend);
@@ -470,12 +461,12 @@ public class GraphReporter {
 			}
 		}
 		// STOP action
-		if (stopAction != null) {
-			for (String tid : stopAction.getTargetStateIDs()) {
+		if (stopAction != null){
+			for (String tid : stopAction.getTargetStateIDs()){
 				toAppend = 
 						g.getState(stopAction.getSourceStateID()).getAbstract_R_ID() + // source state
-						" -> "
-						+ g.getState(tid).getAbstract_R_ID() + // target state							
+						" -> " +
+						g.getState(tid).getAbstract_R_ID() + // target state							
 						" [color=black, label=\"" + stopAction.toString() + "\", style=solid];\n";
 				sb3.append(toAppend);
 				sb4.append(toAppend);
@@ -487,7 +478,7 @@ public class GraphReporter {
 	}
 	
 	// [0] = detailed/screenshoted, [1] = non screenshoted graph, [2] = abstracted, [3] = screenshoted and abstracted
-	public static String[] buildGraph(IEnvironment env, TESTARGraph g) {
+	public static String[] buildGraph(IEnvironment env, TESTARGraph g){
 		StringBuilder sb0 = new StringBuilder(), sb1 = new StringBuilder(), sb2 = new StringBuilder(),
 					  sb3 = new StringBuilder(), sb4 = new StringBuilder(), sb5 = new StringBuilder();
 		final String regularVertexStyle = "node [fixedsize=false, shape=rect, style=solid, color=black, fontcolor=black, height=0.8];\n";
@@ -537,7 +528,7 @@ public class GraphReporter {
 									 String scrshotedAbstractDotPath,
 									 String minimalDotPath,
 									 String abstractNullshotDotPath,
-									 String minimalAbstractDotPath) {
+									 String minimalAbstractDotPath){
 		String p1S = "dot.exe -Tsvg " + nullshotDotPath + " -o " + nullshotDotPath + ".svg",  // tiny
 			   p2S = "dot.exe -Tsvg " + scrshotedDotPath + " -o " + scrshotedDotPath + ".svg", // screenshot
 			   p3S = "dot.exe -Tsvg " + minimalDotPath + " -o " + minimalDotPath + ".svg", // minimal
@@ -546,7 +537,7 @@ public class GraphReporter {
 			   p6S = "dot.exe -Tsvg " + scrshotedAbstractDotPath + " -o " + scrshotedAbstractDotPath + ".svg"; // screenshot abstract
 		String outDirS = OUT_DIR + testSequenceFolder + "/";
 		try {
-			FileWriter w = new FileWriter(outDirS + "offline_graph_conversion.bat");
+			FileWriter w = new FileWriter(outDirS + "offline_graph_conversion_"+ usingGraphTime + ".bat");
 			w.write(p5S + "\n"); // minimal abstract
 			w.write(p6S + "\n"); // screenshot abstract
 			w.write(p2S + "\n"); // screenshot
@@ -558,7 +549,7 @@ public class GraphReporter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (!Grapher.offlineGraphConversion) {
+		if (!Grapher.offlineGraphConversion){
 			try {
 				// save as SVG/PNG (tool: http://www.graphviz.org/)
 				File outdirF = new File(outDirS);
@@ -570,55 +561,57 @@ public class GraphReporter {
 				Process p6 = Runtime.getRuntime().exec(p6S, null, outdirF);
 				try {
 					int p1Status = p1.waitFor();
-					if (p1Status != 0) {
-						// tiny
-						System.out.println("[GrapherReporter] WARNING: dot2svg exit value = " + p1Status); 
-					}
+					if (p1Status != 0)
+						System.out.println("WARNING: dot2svg exit value = " + p1Status); // tiny
 					int p2Status = p2.waitFor();
-					if (p2Status != 0) {
-						// screenshot
-						System.out.println("[GrapherReporter] WARNING: dot2svg (screenshoted) exit value = " + p2Status); 
-					}
+					if (p2Status != 0)
+						System.out.println("WARNING: dot2svg (screenshoted) exit value = " + p2Status); // screenshot
 					int p3Status = p3.waitFor();
-					if (p3Status != 0) {
-						// minimal
-						System.out.println("[GrapherReporter] WARNING: dot2svg (minimal) exit value = " + p3Status); 
-					}
+					if (p3Status != 0)
+						System.out.println("WARNING: dot2svg (minimal) exit value = " + p3Status); // minimal
 					int p4Status = p4.waitFor();
-					if (p4Status != 0) {
-						// tiny abstract
-						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract) exit value = " + p4Status); 	
-					}
+					if (p4Status != 0)
+						System.out.println("WARNING: dot2svg (abstract) exit value = " + p4Status); // tiny abstract	
 					int p5Status = p5.waitFor();
-					if (p5Status != 0) {
-						// minimal abstract
-						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract minimal) exit value = " + p5Status); 	
-					}
+					if (p5Status != 0)
+						System.out.println("WARNING: dot2svg (abstract minimal) exit value = " + p5Status); // minimal abstract		
 					int p6Status = p6.waitFor();
-					if (p6Status != 0) {
-						// screenshot abstract	
-						System.out.println("[GrapherReporter] WARNING: dot2svg (abstract screenshoted) exit value = " + p6Status); 
-					}
+					if (p6Status != 0)
+						System.out.println("WARNING: dot2svg (abstract screenshoted) exit value = " + p6Status); // screenshot abstract			
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				// PNG version discarded (due to large explored spaces)
 			} catch (IOException e) {
-				System.out.println("[GrapherReporter] Unable to convert graphs from .dot to .svg ... is tools\\graphviz-2.38\\release\\bin at PATH environment variable?");
+				System.out.println("Unable to convert graphs from .dot to .svg ... is tools\\graphviz-2.38\\release\\bin at PATH environment variable?");
 			}
 		}
 	}
 	
+	/*private static String convertToMinimal(String nullshotStyleGraph){
+		return nullshotStyleGraph.replaceAll("(.*)label=\".*[(](.*)[).*]\"(.*;)", "$1label=\"$2\"$3")				
+				   				 .replaceAll("(.*)label=\"unexplored_.*\"(.*;)", "$1label=\"\"$2")
+				   				 .replaceAll("shape=rect(.*)height=0.8];","shape=rect$1height=0.3];")
+				   				 .replaceAll("shape=ellipse(.*)height=0.8];","shape=point$1height=0.3];");		
+	}*/
+			
 	// TODO: RAM optimization for big graphs
-	public static void saveGraph(IEnvironment env, TESTARGraph g) {
+	public static void saveGraph(IEnvironment env, TESTARGraph g){
+		//System.out.print("\tExporting graph to xml ...");
 		g.saveToXML(env, OUT_DIR + testSequenceFolder + "/" + "graph_" + usingGraphTime + ".xml");
+		//System.out.println("\t... xml graph export finished!");
+		
+		//System.out.print("\tPopulating .dot contents ...");
 		String[] graphString = buildGraph(env,g);
+		//System.out.println("\t... .dot contents populated!");
 		String scrshotedGraph = graphString[0],
-			   scrshotedAbstractGraph = graphString[3];
+			   scrshotedAbstractGraph = graphString[3];		
 		String nullshotGraph = graphString[1];
-		String abstractNullshotGraph = graphString[4];
+		String abstractNullshotGraph = graphString[4];	
+		//System.out.print("\tConverting .dot contents to minimal ...");
 		String minimalGraph = graphString[2], //convertToMinimal(nullshotGraph),
 			   minimalAbstractGraph = graphString[5]; //convertToMinimal(abstractNullshotGraph);
+		//System.out.println("\t... minimal conversion done!");
 						
 		PrintWriter writer;
         final String scrshotedDotPath = "graph_" + usingGraphTime + "_scrshoted.dot",
@@ -651,8 +644,8 @@ public class GraphReporter {
 			e.printStackTrace();
 		}
 		
-		Thread t = new Thread() {
-			public void run() {
+		Thread t = new Thread(){
+			public void run(){
 				dotConverter(nullshotDotPath, scrshotedDotPath, scrshotedAbstractDotPath, minimalDotPath, abstractNullshotDotPath, minimalAbstractDotPath);
 			}
 		};
@@ -661,34 +654,40 @@ public class GraphReporter {
 	}
 	
 	 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
-	private static String[] reportGraphStats(IEnvironment env, TESTARGraph tGraph, int firstSequenceActionNumber) {
+	private static String[] reportGraphStats(IEnvironment env, TESTARGraph tGraph, int firstSequenceActionNumber){
 		String[] report = new String[4];
 		
 		report[0] = ReportPages.getClustersPageReport(env);
 
 		GraphEdge[] orderedActions = env.getSortedActionsByOrder(Integer.MIN_VALUE, Integer.MAX_VALUE);
-		int sequenceLength = (int)Math.log10((double)orderedActions.length) + 1;
-		if (sequenceLength < 4) {
-			// minimum column width
-			sequenceLength = 4; 
-		}
+		int SEQUENCE_LENGTH = (int)Math.log10((double)orderedActions.length) + 1;
+		if (SEQUENCE_LENGTH < 4)
+			SEQUENCE_LENGTH = 4; // minimum column width
 		
-		report[1] = ReportPages.getTestTablePageReport(env,tGraph,orderedActions,sequenceLength,firstSequenceActionNumber);
-		report[2] = ReportPages.getExplorationCurvePageReport(env,tGraph,sequenceLength,firstSequenceActionNumber);
-		report[3] = ReportPages.getStatsPageReport(env,tGraph,orderedActions,sequenceLength);
+		report[1] = ReportPages.getTestTablePageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH,firstSequenceActionNumber);
+		report[2] = ReportPages.getExplorationCurvePageReport(env,tGraph,SEQUENCE_LENGTH,firstSequenceActionNumber);
+		report[3] = ReportPages.getStatsPageReport(env,tGraph,orderedActions,SEQUENCE_LENGTH);
+		
 		return report;
 	}
 	
 	 // null or: [0] = clusters, [1] = test table, [2] = exploration curve, [3] = UI exploration data
-	public static String[] getReport(TESTAREnvironment env, TESTARGraph g, int firstSequenceActionNumber) {
-		if (g.vertexSet().isEmpty() || g.edgeSet().isEmpty()) {
-			// empty graph
-			return null; 
-		} else if (!mapToAbstractStateIDs.isEmpty()) {
-		 	System.out.println("[GrapherReporter] WARNING - Last report not finished? Doing cleanup");
+	public static String[] getReport(TESTAREnvironment env, TESTARGraph g, int firstSequenceActionNumber){
+		if (g.vertexSet().isEmpty() || g.edgeSet().isEmpty())
+			return null; // empty graph
+		else if (!mapToAbstractStateIDs.isEmpty()){
+			System.out.println("WARNING - Last report not finished? Doing cleanup");
 			mapToAbstractStateIDs.clear();
 		}
+
+		//System.out.println("\tWill save graphs ...");
 		saveGraph(env,g);
+		//System.out.println("\t... graphs saved!");
+		
+		//System.out.print("\tWill generate graph report ...");
 		return reportGraphStats(env,g, firstSequenceActionNumber);
-	}	
+		//System.out.println("\t... graph report generated!");
+					
+	}
+	
 }

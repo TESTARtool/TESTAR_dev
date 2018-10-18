@@ -55,14 +55,14 @@ public class FactsUIStates {
 	public static final String FACT_TITLE = "title"; 		// title(W,T)		:  T = title of widget W
 	public static final String FACT_PATH = "path"; 			// path(W,P)		:  P = path of widget W in the widget-tree
 	
-	public static Set<String> getRules() {
+	public static Set<String> getRules(){
 		Set<String> stateRules = new HashSet<String>();
 		stateRules.add(FACT_ANCESTOR + "(Wa,Wc):-" + FACT_PARENT + "(Wa,Wc)."); // ancestor(Wa,Wc)
 		stateRules.add(FACT_ANCESTOR + "(Wa,Wc):-" + FACT_PARENT + "(Wp,Wc)," + FACT_ANCESTOR + "(Wa,Wp).");
 		return stateRules;
 	}
 	
-    public static Set<String> getFacts(State state) {
+    public static Set<String> getFacts(State state){
     	Set<String> facts = new HashSet<String>();
 
     	// atoms
@@ -74,12 +74,11 @@ public class FactsUIStates {
     	return facts;
     }
         
-    private static Set<String> getAtoms(String S, String P, Widget parenWidget) {
+    private static Set<String> getAtoms(String S, String P, Widget parenWidget){
     	Set<String> facts = new HashSet<String>();
     	
-		String W; 
-		Widget childWidget;
-		for (int i = 0; i < parenWidget.childCount(); i++) {
+		String W; Widget childWidget;
+		for (int i=0; i<parenWidget.childCount(); i++){
 			childWidget = parenWidget.child(i);
 			W = childWidget.get(Tags.ConcreteID);
 			facts.add(FACT_WIDGET + "('" + W + "','" + S + "')."); // widget(W,S)
@@ -91,12 +90,12 @@ public class FactsUIStates {
 		return facts;
     }
 
-    private static Set<String> getPropertiesAtoms(String widgetID, Widget w) {
+    private static Set<String> getPropertiesAtoms(String widgetID, Widget w){
     	Set<String> facts = new HashSet<String>();
     	
 		// widget properties
 		Role role = w.get(Tags.Role, null);
-		if (role != null) {
+		if (role != null){
 			// sb.append("role(" + widgetID + ",\"" + role.name() + "\").\n"); // role(W,"Wr") - capitalized atoms need double quotes (normaliseQuotedAtoms(...) required)
 			facts.add(FACT_ROLE + "('" + widgetID + "','" + role.name() + "')."); // role(W,'R') - capitalized atoms need single quotes
 		}
@@ -106,7 +105,7 @@ public class FactsUIStates {
 		return facts;
     }
     
-	public static void debugQueries(JIPrologWrapper wrapper) {
+	public static void debugQueries(JIPrologWrapper wrapper){
 		wrapper.debugQuery(FACT_STATE + "(S).");
 		wrapper.debugQuery(FACT_WIDGET + "(W,S).");
 		wrapper.debugQuery(FACT_PARENT + "(Wp,Wc).");		

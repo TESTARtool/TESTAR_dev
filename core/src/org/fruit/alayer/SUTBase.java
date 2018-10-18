@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.alayer;
 
 import java.util.Collections;
@@ -48,8 +47,9 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 public abstract class SUTBase implements SUT {
 	
 	private Map<Tag<?>, Object> tagValues = Util.newHashMap();
-	private boolean allFetched;
-	protected AutomationCache nativeAutomationCache = null; 
+	boolean allFetched;
+	
+	protected AutomationCache nativeAutomationCache = null; // by urueda
 	
 	/**
 	 * @author: urueda
@@ -61,9 +61,8 @@ public abstract class SUTBase implements SUT {
 	
 	public final <T> T get(Tag<T> tag) throws NoSuchTagException {
 		T ret = get(tag, null);
-		if (ret == null) {
+		if(ret == null)
 			throw new NoSuchTagException(tag);
-		}
 		return ret;
 	}
 
@@ -71,9 +70,8 @@ public abstract class SUTBase implements SUT {
 	public final <T> T get(Tag<T> tag, T defaultValue) {
 		Assert.notNull(tag);
 		T ret = (T) tagValues.get(tag);
-		if (ret == null && !tagValues.containsKey(tag)) {
+		if(ret == null && !tagValues.containsKey(tag))
 			ret = fetch(tag);
-		}
 		return ret == null ? defaultValue : ret;
 	}
 
@@ -83,27 +81,20 @@ public abstract class SUTBase implements SUT {
 		domain.addAll(tagValues.keySet());
 		Set<Tag<?>> ret = Util.newHashSet();
 
-		for(Tag<?> t : domain) {
-			if (tagValues.containsKey(t)) {
-				if (tagValues.get(t) != null) {
+		for(Tag<?> t : domain){
+			if(tagValues.containsKey(t)){
+				if(tagValues.get(t) != null)
 					ret.add(t);
-				}
-			} else {
-				if (fetch(t) != null) {
+			}else{
+				if(fetch(t) != null)
 					ret.add(t);
-				}
 			}
 		}
 		return ret;
 	}
 
-	protected <T> T fetch(Tag<T> tag) { 
-		return null; 
-	}
-	
-	protected Set<Tag<?>> tagDomain() { 
-		return Collections.emptySet(); 
-	}
+	protected <T> T fetch(Tag<T> tag){ return null; }
+	protected Set<Tag<?>> tagDomain(){ return Collections.emptySet(); }
 
 	public <T> void set(Tag<T> tag, T value) {
 		Assert.notNull(tag, value);
@@ -111,9 +102,7 @@ public abstract class SUTBase implements SUT {
 		tagValues.put(tag, value);
 	}
 
-	public void remove(Tag<?> tag) { 
-		tagValues.put(Assert.notNull(tag), null); 
-	}
+	public void remove(Tag<?> tag) { tagValues.put(Assert.notNull(tag), null); }
 	
 	/**
 	 * Retrieves the running processes.
@@ -121,14 +110,11 @@ public abstract class SUTBase implements SUT {
 	 * @author: urueda
 	 */
 	@Override
-	public List<Pair<Long, String>> getRunningProcesses() {
+	public List<Pair<Long, String>> getRunningProcesses(){
 		List<Pair<Long, String>> runningProcesses = Util.newArrayList();
-		for(ProcessHandle ph : 
-			Util.makeIterable(
-					this.get(Tags.ProcessHandles, 
-							Collections.<ProcessHandle>emptyList().iterator()))) {
+		for(ProcessHandle ph : Util.makeIterable(this.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator())))
 			runningProcesses.add(Pair.from(ph.pid(), ph.name()));
-		}
 		return runningProcesses;
 	}
+
 }

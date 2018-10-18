@@ -34,15 +34,15 @@ public class EnvironmentException extends Exception {
 	
 	private static final long serialVersionUID = 6136417577549066381L;
 	
-	public EnvironmentException(String message) {
+	public EnvironmentException(String message){
 		this(message, null);
 	}
 	
-	public EnvironmentException(String message, Throwable cause) {
+	public EnvironmentException(String message, Throwable cause){
 		super(message, cause);
 	}
 	
-	public EnvironmentException(Throwable cause) {
+	public EnvironmentException(Throwable cause){
 		super(cause);
 	}
 	

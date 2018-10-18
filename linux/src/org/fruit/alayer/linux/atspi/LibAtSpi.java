@@ -30,6 +30,7 @@
 
 package org.fruit.alayer.linux.atspi;
 
+
 import org.bridj.BridJ;
 import org.bridj.Pointer;
 import org.bridj.ann.Library;
@@ -44,7 +45,7 @@ import java.io.IOException;
 public class LibAtSpi {
 
 
-    static {
+    static{
         try {
             BridJ.getNativeLibrary("libatspi");
         } catch (IOException e) {
