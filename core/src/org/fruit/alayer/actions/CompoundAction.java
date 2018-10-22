@@ -99,8 +99,9 @@ public final class CompoundAction extends TaggableBase implements Action {
 	}
 			
 	public void run(SUT system, State state, double duration) {		
-		for(int i = 0; i < actions.size(); i++)
+		for(int i = 0; i < actions.size(); i++) {
 			actions.get(i).run(system, state, relativeDurations.get(i) * duration);
+		}
 	}
 		
 	public String toString(){

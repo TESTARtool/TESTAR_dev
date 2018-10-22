@@ -1,0 +1,17 @@
+  Feature: De Telefoongids
+
+  Scenario Outline: Retrieve phone number of a person.
+    Step: Focus on page
+    When  $Role="UIAText" and $Title="Personen zoeken" click(true)
+    Step: Focus on Wat Zoekt U
+    When  $Role="UIAEdit" and $Title="Wat Zoekt U?" click(true)
+    Step: Change Wie Zoekt U
+    When  $Role="UIAEdit" and $Title="Wie Zoekt U?" type(<naam>)
+    Step: Change Address
+    When  $Role="UIAEdit" and $Title="Stad, Straat, Buurt Of Postcode" type(<adres>)
+    Step: Press Personen zoeken button
+    When  $Title="Personen zoeken" and $Role="UIAButton" click()
+  Examples: Account data
+|naam|adres|
+|Paping|Veldhoven|
+ 

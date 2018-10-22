@@ -165,8 +165,10 @@ public class StdActionCompiler {
 
 	public Action leftDoubleClickAt(Position position){
 		Assert.notNull(position);
-		return new CompoundAction.Builder().add(new MouseMove(position), 1)
-				.add(LMouseDown, 0).add(LMouseUp, 0).add(LMouseDown, 0).add(LMouseUp, 0).build();
+		Builder build = new Builder();
+		build.add(new MouseMove(position), 1).add(LMouseDown, 0)
+		    .add(LMouseUp, 0).add(LMouseDown, 0).add(LMouseUp, 0);
+		return build.build();				
 	}
 
 	public Action leftDoubleClickAt(double absX, double absY){
