@@ -30,11 +30,13 @@
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.SikulixClickOnText;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import org.fruit.Drag;
 import org.fruit.Util;
@@ -47,6 +49,7 @@ import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.sikuli.script.FindFailed;
+import org.sikuli.script.Match;
 import org.sikuli.script.Screen;
 
 import static org.fruit.alayer.Tags.Blocked;
@@ -225,6 +228,13 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			}
 		}
 
+		System.out.println("Adding missing actions with SikuliX image recognition");
+		if(textExistsOnScreen("Operator")&&(textExistsOnScreen("Machine")&&(textExistsOnScreen("Stand"){
+			actions.add(new SikulixClickOnText("Operator"));
+			actions.add(new SikulixClickOnText("Machine"));
+			actions.add(new SikulixClickOnText("Stand"));
+		}
+
 		System.out.println("Ponsse protocol: found "+actions.size()+" actions (after filtering):");
 		for(Action a:actions){
 			System.out.println(a.get(Tags.Desc, "Desc not available"));
@@ -385,6 +395,56 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	}
 
 	/**
+	 * Using SikuliX library to click on text on screen
+	 * @param textToFind
+	 */
+	private void executeClickOnText(String textToFind){
+		Screen sikuliScreen = new Screen();
+		try {
+			System.out.println("DEBUG: sikuli clicking on text: "+textToFind);
+			sikuliScreen.click(textToFind);
+		} catch (FindFailed findFailed) {
+			findFailed.printStackTrace();
+		}
+	}
+
+	private boolean textExistsOnScreen(String textToFind){
+		Screen sikuliScreen = new Screen();
+		try {
+			System.out.println("DEBUG: sikuli trying to find text: "+textToFind);
+			sikuliScreen.findText(textToFind);
+			return true;
+		} catch (FindFailed findFailed) {
+			return false;
+		}
+	}
+
+	/**
+	 * Trying to use SikuliX library to check whether the given text is only once on the screen
+	 *
+	 * Does not seem to work, freezes with heavy computing...
+	 *
+	 * @param textToFind
+	 * @return
+	 */
+	private boolean textExistsExactlyOnceOnScreen(String textToFind){
+		Screen sikuliScreen = new Screen();
+		try {
+			System.out.println("DEBUG: sikuli trying to find text: "+textToFind);
+			int numberOfMatches = 0;
+			Iterator<Match> it = sikuliScreen.findAllText(textToFind);
+			while(it.hasNext()){
+				numberOfMatches++;
+			}
+			if(numberOfMatches==1)
+				return true;
+		} catch (FindFailed findFailed) {
+			return false;
+		}
+		return false;
+	}
+
+	/**
 	 * Execute the selected action.
 	 * @param system the SUT
 	 * @param state the SUT's current state
@@ -400,7 +460,10 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //			for(Tag t:action.tags()){
 //				System.out.println("Debug: "+t+"="+action.get(t));
 //			}
-			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
+			if(action.toShortString().equalsIgnoreCase("SikulixClickOnText")){
+				action.run(system,state,halfWait);
+			}
+			else if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Screen sikuliScreen = new Screen();
 				try {

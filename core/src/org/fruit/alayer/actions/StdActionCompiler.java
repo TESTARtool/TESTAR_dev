@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,25 +28,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.actions;
 
 import java.util.List;
 
 import org.fruit.Assert;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Abstractor;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Finder;
-import org.fruit.alayer.Position;
-import org.fruit.alayer.StdAbstractor;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.WidgetPosition;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
@@ -63,7 +52,6 @@ public class StdActionCompiler {
 	public StdActionCompiler(Abstractor abstractor){
 		this.abstractor = abstractor;
 	}
-
 
 	public Action mouseMove(Widget w){
 		Finder wf = abstractor.apply(w);
@@ -112,7 +100,7 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 
@@ -133,7 +121,7 @@ public class StdActionCompiler {
 	public Action rightClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = rightClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
-		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
+		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'");
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
@@ -181,11 +169,10 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
-	
-	//begin mimarmu1 & fraalpe2
+
 	public Action dropDownAt(Position position){
 		Assert.notNull(position);
 		
@@ -201,14 +188,13 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda		
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 	
 	public Action dropDownAt(Widget w){
 		return dropDownAt(w, 0.5, 0.5);
 	}
-	//end by mimarmu1 & fraalpe2	
 
 	public Action dragFromTo(Widget from, Widget to){
 		return dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
@@ -224,8 +210,7 @@ public class StdActionCompiler {
 				.add(LMouseDown, 0).add(new MouseMove(to), 1)
 				.add(LMouseUp, 0).build();		
 	}
-	
-	// by urueda
+
 	public Action slideFromTo(Position from, Position to){
 		Action action = dragFromTo(from,to);
 		action.set(Tags.Slider, new Position[]{from,to});
@@ -235,7 +220,7 @@ public class StdActionCompiler {
 	public Action clickTypeInto(final Position position, final String text){
 		Assert.notNull(position, text);
 		//return new CompoundAction.Builder().add(leftClickAt(position), 1).add(new Type(text), 1).build();
-		// begin by urueda (from text additions to text replacements)
+		// (from text additions to text replacements)
 		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
         //Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_NUM_LOCK, false); // VK_SHIFT bug fix (did not work)
 		Builder builder = new CompoundAction.Builder()
@@ -248,7 +233,6 @@ public class StdActionCompiler {
 			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
 		builder.add(new Type(text), 1);
 		return builder.build();
-		// end by urueda
 	}
 
 	public Action clickTypeInto(Widget w, String text){
@@ -259,7 +243,7 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = clickTypeInto(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 	

@@ -30,19 +30,8 @@
 
 package org.fruit.monkey;
 
-<<<<<<< HEAD
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.AdhocServer;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
-import es.upv.staq.testar.serialisation.TestSerialiser;
+
 import nl.ou.testar.ProcessInfo;
-=======
 import static org.fruit.alayer.Tags.ActionDelay;
 import static org.fruit.alayer.Tags.ActionDuration;
 import static org.fruit.alayer.Tags.ActionSet;
@@ -54,7 +43,6 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -78,8 +66,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
-
->>>>>>> master
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -99,12 +85,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-<<<<<<< HEAD
 import org.fruit.alayer.windows.StateFetcher;
-=======
-import org.fruit.monkey.AbstractProtocol.Modes;
->>>>>>> master
-
 import es.upv.staq.testar.ActionStatus;
 import es.upv.staq.testar.AdhocServer;
 import es.upv.staq.testar.CodingManager;

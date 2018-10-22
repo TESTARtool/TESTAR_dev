@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -59,7 +57,6 @@ public final class MouseDown extends TaggableBase implements Action {
 	
 	public String toString() { return "Press Mouse Button " + btn; }
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		for (Role r : discardParameters){
@@ -78,8 +75,7 @@ public final class MouseDown extends TaggableBase implements Action {
 			throw new ActionFailedException(tue);
 		}
 	}
-	
-	// by urueda
+
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -89,7 +85,6 @@ public final class MouseDown extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		//return "(" + btn.toString() + ")";

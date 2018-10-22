@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.actions;
 
 import java.util.Arrays;
@@ -110,8 +107,7 @@ public final class CompoundAction extends TaggableBase implements Action {
 			sb.append(Util.lineSep()).append(a.toString());
 		return sb.toString();
 	}
-	
-	// by urueda
+
 	@Override
 	public String toString(Role... discardParameters) {
 		StringBuilder sb = new StringBuilder();
@@ -121,7 +117,6 @@ public final class CompoundAction extends TaggableBase implements Action {
 		return sb.toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		StringBuilder sb = new StringBuilder();
@@ -138,7 +133,6 @@ public final class CompoundAction extends TaggableBase implements Action {
 		return sb.toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		String params = "";
