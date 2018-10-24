@@ -188,6 +188,9 @@ public class Settings extends TaggableBase implements Serializable {
 		props.load(in);
 		
 		for(String sett : argv) {
+			//Ignore sse value
+			if(sett.toString().contains("sse=")) continue;
+			
 			System.out.println(sett.toString());
 			StringReader sr = new StringReader(sett);
 			props.load(sr);

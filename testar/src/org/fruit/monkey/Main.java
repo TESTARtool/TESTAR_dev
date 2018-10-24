@@ -230,6 +230,46 @@ public class Main {
       }
     });
   }
+  
+  /**
+   * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
+   * @param sett
+   */
+  public static void protocolFromCmd(String sett) {
+	  String sseName = sett.substring(sett.indexOf("=")+1);
+	  boolean existSSE = false;
+
+	  //Check if choose protocol exist
+	  for (File f : new File(getSettingsDir()).listFiles()) {
+		  if (new File(getSettingsDir()+sseName + "/" + SETTINGS_FILE).exists()) {
+			  existSSE = true;
+			  break;
+		  }
+	  }
+
+	  //Command line protocol doesn't exist
+	  if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+
+	  else{
+		  //Obtain previous sse file and delete it (if exist)
+		  String[] files = getSSE();
+		  if (files != null) {
+			  for (String f : files) {
+				  //System.out.println("delete file: "+getSettingsDir()+f.toString());
+				  new File(getSettingsDir()+f).delete();
+			  }
+		  }
+
+		  //Create the new sse file
+		  String sseDir = getSettingsDir()+sseName+".sse";
+		  File f = new File(sseDir);
+		  if(!f.exists())
+			  f.mkdirs();
+
+		  System.out.println("Protocol changed from command line to: "+sseName);
+
+	  }
+  }
 
   public static void main(String[] args) throws IOException {
     Settings settings = null;
@@ -238,6 +278,15 @@ public class Main {
     // TODO: put the code below into seperate method/class
     // Get the files with SUT_SETTINGS_EXT extension and check whether it is not empty
     // and that there is exactly one.
+    
+    //Allow users to use command line to choose a protocol modifying sse file
+    for(String sett : args) {
+    	if(sett.toString().contains("sse="))
+    		try {
+    			protocolFromCmd(sett);
+    		}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
+    }
+
     String[] files = getSSE();
     // If there is more than 1, then delete them all
     if (files != null && files.length > 1) {
