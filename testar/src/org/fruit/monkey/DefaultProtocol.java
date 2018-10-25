@@ -70,6 +70,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
 
+import nl.ou.testar.FileHandling;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -99,9 +100,7 @@ import org.fruit.alayer.UsedResources;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.NOP;
-import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -238,7 +237,7 @@ public class DefaultProtocol extends AbstractProtocol {
 								// visualize the problematic state
 								if(state.get(Tags.Shape, null) != null)
 									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+								Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
 
 								setProcessVerdict(verdict);
@@ -313,7 +312,7 @@ public class DefaultProtocol extends AbstractProtocol {
 								// visualize the problematic state
 								if(state.get(Tags.Shape, null) != null)
 									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-								Verdict verdict = new Verdict(SEVERITY_SUSPICIOUS_TITLE,
+								Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
 
 								setProcessVerdict(verdict);
@@ -538,7 +537,7 @@ public class DefaultProtocol extends AbstractProtocol {
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 			// this was added to kill the SUT if it is frozen:
-			if(verdict.severity()==SEVERITY_NOT_RESPONDING){
+			if(verdict.severity()==Verdict.SEVERITY_NOT_RESPONDING){
 				//if the SUT is frozen, we should kill it!
 				LogSerialiser.log("SUT frozen, trying to kill it!\n", LogSerialiser.LogLevel.Critical);
 				SystemProcessHandling.killRunningProcesses(system, 100);
@@ -562,11 +561,11 @@ public class DefaultProtocol extends AbstractProtocol {
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
-			return new Verdict(SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
+			return new Verdict(Verdict.SEVERITY_NOT_RUNNING, "System is offline! I assume it crashed!");
 
 		// if the SUT does not respond within a given amount of time, we assume it crashed
 		if(state.get(Tags.NotResponding, false)){
-			return new Verdict(SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
+			return new Verdict(Verdict.SEVERITY_NOT_RESPONDING, "System is unresponsive! I assume something is wrong!");
 		}
 		//------------------------
 		// ORACLES ALMOST FOR FREE
@@ -590,14 +589,14 @@ public class DefaultProtocol extends AbstractProtocol {
 					// visualize the problematic widget, by marking it with a red box
 					if(w.get(Tags.Shape, null) != null)
 						visualizer = new ShapeVisualizer(RedPen, w.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-					return new Verdict(SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
+					return new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE, "Discovered suspicious widget title: '" + title + "'.", visualizer);
 				}
 			}
 		}
 
 		if (this.nonSuitableAction){
 			this.nonSuitableAction = false;
-			return new Verdict(SEVERITY_WARNING, "Non suitable action for state");
+			return new Verdict(Verdict.SEVERITY_WARNING, "Non suitable action for state");
 		}
 
 		// if everything was OK ...
@@ -651,6 +650,102 @@ public class DefaultProtocol extends AbstractProtocol {
 		return actions;
 	}
 
+	//TODO is this process handling Windows specific? move to SystemProcessHandling
+	/**
+	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
+	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
+	 * Otherwise it returns null.
+	 * @param state
+	 * @param actions
+	 * @return null if no preSelected actions are needed.
+	 */
+	protected Action preSelectAction(State state, Set<Action> actions){
+		Assert.isTrue(actions != null && !actions.isEmpty());
+
+		//If deriveActions indicated that there are processes that need to be killed
+		//because they are in the process filters
+		//Then here we will select the action to do that killing
+
+		if (this.forceKillProcess != null){
+			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
+			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
+			Action a = KillProcess.byName(this.forceKillProcess, 0);
+			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildIDs(state, a);
+			this.forceKillProcess = null;
+			return a;
+		}
+		//If deriveActions indicated that the SUT should be put back in the foreground
+		//Then here we will select the action to do that
+
+		else if (this.forceToForeground){
+			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
+			Action a = new ActivateSystem();
+			a.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildIDs(state, a);
+			this.forceToForeground = false;
+			return a;
+		}
+
+		//TODO: This seems not to be used yet...
+		// It is set in a method actionExecuted that is not being called anywhere (yet?)
+		else if (this.forceNextActionESC){
+			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
+			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
+			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildIDs(state, a);
+			this.forceNextActionESC = false;
+			return a;
+		} else
+			return null;
+	}
+
+	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
+	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
+	//TODO check how well the CPU usage based waiting works
+	protected boolean executeAction(SUT system, State state, Action action){
+		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
+		try{
+			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
+			Util.pause(halfWait); // help for a better match of the state' actions visualization
+			action.run(system, state, settings.get(ConfigTags.ActionDuration));
+			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
+			long actionCPU;
+			do {
+				long CPU1[] = NativeLinker.getCPUsage(system);
+				Util.pause(halfWait);
+				long CPU2[] = NativeLinker.getCPUsage(system);
+				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
+				waitCycles--;
+			} while (actionCPU > 0 && waitCycles > 0);
+			return true;
+		}catch(ActionFailedException afe){
+			return false;
+		}
+	}
+
+	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
+		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+	}
+
+	//TODO platform independent?
+	/**
+	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
+	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
+	 * action selection mechanism selected.
+	 * @param state
+	 * @param actions
+	 * @return
+	 */
+	protected Action selectAction(State state, Set<Action> actions){
+		Assert.isTrue(actions != null && !actions.isEmpty());
+
+		Action a = preSelectAction(state, actions);
+		if (a != null){
+			return a;
+		} else
+			return Grapher.selectAction(state,actions);
+	}
 
 	protected String getRandomText(Widget w){
 		return DataManager.getRandomData();
@@ -1234,8 +1329,11 @@ public class DefaultProtocol extends AbstractProtocol {
 				state = getState(system);
 				graphDB.addState(state,true);
 				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-				saveStateSnapshot(state);
-
+				if(isSaveStateSnapshot()) {
+					File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
+					FileHandling.saveStateSnapshot(state, file);
+					setSaveStateSnapshot(false);
+				}
 				Taggable fragment = new TaggableBase();
 				fragment.set(SystemState, state);
 
@@ -1274,7 +1372,11 @@ public class DefaultProtocol extends AbstractProtocol {
 						if (faultySequence) problems = true;
 						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
 						if (mode() != Modes.Spy){
-							saveStateSnapshot(state);
+							if(isSaveStateSnapshot()) {
+								File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
+								FileHandling.saveStateSnapshot(state, file);
+								setSaveStateSnapshot(false);
+							}
 							processVerdict = getProcessVerdict();
 							verdict = state.get(OracleVerdict, Verdict.OK);
 							fragment.set(OracleVerdict, verdict.join(processVerdict));
@@ -1330,7 +1432,7 @@ public class DefaultProtocol extends AbstractProtocol {
 					} catch (IOException e) {
 						LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
 					}
-					copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
+					FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict,settings.get(ConfigTags.OutputDir));
 				}
 				if(!problems)
 					this.forceToSequenceLengthAfterFail = false;
@@ -1351,7 +1453,7 @@ public class DefaultProtocol extends AbstractProtocol {
 				LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
 
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
+				if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence, settings.get(OutputDir), settings.get(LogLevel));; // save report
 
 				sequenceCount++;
 
@@ -1375,7 +1477,7 @@ public class DefaultProtocol extends AbstractProtocol {
 					system.stop();
 				TestSerialiser.exit();
 				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-				if (reportPages != null) this.saveReport(reportPages, generatedSequence);; // save report
+				if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence,settings.get(OutputDir), settings.get(LogLevel));; // save report
 				this.mode = Modes.Quit; // System.exit(1);
 			}
 			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);

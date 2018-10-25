@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,10 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer;
 
 import java.io.Serializable;
@@ -47,18 +44,22 @@ public final class Verdict implements Serializable {
 
 	//public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
 
-	// begin by urueda
-	
+	// Verdict severities
+	// PASS
 	public static final double SEVERITY_MIN = 0.0;
+	public static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
+	public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
+	// FAIL
+	public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
+	public static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
 	public static final double SEVERITY_MAX = 1.0;
-	
+
 	public static final double SEVERITY_OK = 			   SEVERITY_MIN;
 	public static final double SEVERITY_FAIL =	   		   SEVERITY_MAX;
 	
 	public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
 	public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
-	
-	// end by urueda
+
 		
 	private final String info;
 	private final double severity;
@@ -70,7 +71,7 @@ public final class Verdict implements Serializable {
 	
 	public Verdict(double severity, String info, Visualizer visualizer){
 		//Assert.isTrue(severity >= 0 && severity <= 1.0);
-		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX); // by urueda
+		Assert.isTrue(severity >= SEVERITY_MIN && severity <= SEVERITY_MAX);
 		Assert.notNull(info, visualizer);
 		this.severity = severity;
 		this.info = info;
@@ -103,7 +104,6 @@ public final class Verdict implements Serializable {
 	 * Retrieves the verdict result of joining two verdicts.
 	 * @param verdict A verdict to join with current verdict.
 	 * @return A new verdict that is the result of joining the current verdict with the provided verdict.
-	 * @author: urueda
 	 */
 	public Verdict join(Verdict verdict){		
 		return new Verdict(Math.max(this.severity, verdict.severity()),

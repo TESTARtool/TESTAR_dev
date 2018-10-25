@@ -118,6 +118,12 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected Modes mode;
 	protected Mouse mouse = AWTMouse.build();
 	private boolean saveStateSnapshot = false;
+	public void setSaveStateSnapshot(boolean saveStateSnapshot) {
+		this.saveStateSnapshot = saveStateSnapshot;
+	}
+	public boolean isSaveStateSnapshot() {
+		return saveStateSnapshot;
+	}
 	protected boolean markParentWidget = false;
 	protected int actionCount;
 	protected int sequenceCount;
@@ -128,15 +134,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	// TODO: DATE-FORMAT
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-	// Verdict severities
-	// PASS
-	protected static final double SEVERITY_WARNING = 		   0.00000001; // must be less than FAULT THRESHOLD @test.settings
-	protected static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
-	// FAIL
-	protected static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
-	protected static final double SEVERITY_NOT_RUNNING =	   0.99999999; // crash? unexpected close?
-
 	protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
 
 	protected double passSeverity = Verdict.SEVERITY_OK;
@@ -395,128 +392,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 	protected String lastPrintParentsOf = "null-id";
 
-	//TODO is this process handling Windows specific? move to SystemProcessHandling and call from Default protocol
-	/**
-	 * If unwanted processes need to be killed, the action returns an action to do that. If the SUT needs
-	 * to be put in the foreground, then the action that is returned is putting it in the foreground.
-	 * Otherwise it returns null.
-	 * @param state
-	 * @param actions
-	 * @return null if no preSelected actions are needed.
-	 */
-	protected Action preSelectAction(State state, Set<Action> actions){
-		Assert.isTrue(actions != null && !actions.isEmpty());
-
-		//If deriveActions indicated that there are processes that need to be killed
-		//because they are in the process filters
-		//Then here we will select the action to do that killing
-
-		if (this.forceKillProcess != null){
-			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
-			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildIDs(state, a);
-			this.forceKillProcess = null;
-			return a;
-		}
-		//If deriveActions indicated that the SUT should be put back in the foreground
-		//Then here we will select the action to do that
-
-		else if (this.forceToForeground){
-			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
-			this.forceToForeground = false;
-			return a;
-		}
-
-		//TODO: This seems not to be used yet...
-		// It is set in a method actionExecuted that is not being called anywhere (yet?)
-		else if (this.forceNextActionESC){
-			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
-			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, a);
-			this.forceNextActionESC = false;
-			return a;
-		} else
-			return null;
-	}
-
-	//TODO move to default protocol (platform independent?)
-	/**
-	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
-	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
-	 * action selection mechanism selected.
-	 * @param state
-	 * @param actions
-	 * @return
-	 */
-	protected Action selectAction(State state, Set<Action> actions){
-		Assert.isTrue(actions != null && !actions.isEmpty());
-
-		Action a = preSelectAction(state, actions);
-		if (a != null){
-			return a;
-		} else
-			return Grapher.selectAction(state,actions);
-	}
-
-
-	final static double MAX_ACTION_WAIT_FRAME = 1.0; // (seconds)
-	//TODO move the CPU metric to another helper class that is not default "TrashBinCode" or "SUTprofiler"
-	//TODO check how well the CPU usage based waiting works
-	protected boolean executeAction(SUT system, State state, Action action){
-		double waitTime = settings.get(ConfigTags.TimeToWaitAfterAction);
-		try{
-			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
-			Util.pause(halfWait); // help for a better match of the state' actions visualization
-			action.run(system, state, settings.get(ConfigTags.ActionDuration));
-			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
-			long actionCPU;
-			do {
-				long CPU1[] = NativeLinker.getCPUsage(system);
-				Util.pause(halfWait);
-				long CPU2[] = NativeLinker.getCPUsage(system);
-				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
-				waitCycles--;
-			} while (actionCPU > 0 && waitCycles > 0);
-			return true;
-		}catch(ActionFailedException afe){
-			return false;
-		}
-	}
-
-	//TODO move away from abstract, to helper class, call from Default protocol with a setting to turn on/off
-	/**
-	 * Creates a file out of the given state.
-	 * could be more interesting as XML instead of Java Serialisation
-	 * @param state
-	 */
-	protected void saveStateSnapshot(final State state){
-		try{
-			if(saveStateSnapshot){
-				//System.out.println(Utils.treeDesc(state, 2, Tags.Role, Tags.Desc, Tags.Shape, Tags.Blocked));
-				Taggable taggable = new TaggableBase();
-				taggable.set(SystemState, state);
-				LogSerialiser.log("Saving state snapshot...\n", LogSerialiser.LogLevel.Debug);
-				File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
-				ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-				oos.writeObject(taggable);
-				oos.close();
-				saveStateSnapshot = false;
-				LogSerialiser.log("Saved state snapshot to " + file.getAbsolutePath() + "\n", LogSerialiser.LogLevel.Info);
-			}
-		}catch(IOException ioe){
-			throw new RuntimeException(ioe);
-		}
-	}
-
-
-
-	//TODO: Is this method needed??
 	/**
 	 * This is used for synchronizing the loops of TESTAR between automated and manual (and between two automated loops)
 	 *
@@ -555,29 +430,16 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected static final int MAX_ESC_ATTEMPTS = 99;
 	protected static final int MAX_NOP_ATTEMPTS = 99;
 	protected static final long NOP_WAIT_WINDOW = 100; // ms
+
+	//TODO move to SutProfiler, cannot be static as keeps the values
 	protected double sutRAMbase;
 	protected double sutRAMpeak;
 	protected double sutCPUpeak;
 	protected double testRAMpeak;
 	protected double testCPUpeak;
-
-
-
-
-	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
-	}
-
-
-
-
-
-
-
-	//TODO move to profiler helper
 	private void debugResources(){
 		long nowStamp = System.currentTimeMillis();
-		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;		
+		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;
 		if (testRAM > testRAMpeak)
 			testRAMpeak = testRAM;
 		double testCPU = (nowStamp - lastStamp)/1000.0;
@@ -589,71 +451,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	}
 
 
-
-	//TODO move to reporting helper etc
-	/**
-	 * Making a log file of a sequence
-	 *
-	 * @param generatedSequence
-	 * @param fileSuffix
-	 * @param page
-	 */
-	private void saveReportPage(String generatedSequence, String fileSuffix, String page){
-		try {
-			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-					settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + "_" + fileSuffix + ".log")))),
-					settings.get(LogLevel));
-		} catch (NoSuchTagException e3) {
-			e3.printStackTrace();
-		} catch (FileNotFoundException e3) {
-			e3.printStackTrace();
-		}
-		LogSerialiser.log(page, LogSerialiser.LogLevel.Critical);
-		LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-	}
-
-	//TODO move to reporting helper etc
-	protected void saveReport(String[] reportPages, String generatedSequence){
-		this.saveReportPage(generatedSequence, "clusters", reportPages[0]);
-		this.saveReportPage(generatedSequence, "testable", reportPages[1]);
-		this.saveReportPage(generatedSequence, "curve", reportPages[2]);
-		this.saveReportPage(generatedSequence, "stats", reportPages[3]);
-	}
-
-	//TODO move to reporting helper etc
-	protected void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
-		String targetFolder = "";
-		final double sev = verdict.severity();
-		if (sev == Verdict.SEVERITY_OK)
-			targetFolder = "sequences_ok";
-		else if (sev == SEVERITY_WARNING)
-			targetFolder = "sequences_warning";
-		else if (sev == SEVERITY_SUSPICIOUS_TITLE)
-			targetFolder = "sequences_suspicioustitle";
-		else if (sev == SEVERITY_NOT_RESPONDING)
-			targetFolder = "sequences_unresponsive";
-		else if (sev == SEVERITY_NOT_RUNNING)
-			targetFolder = "sequences_unexpectedclose";
-		else if (sev == Verdict.SEVERITY_FAIL)
-			targetFolder = "sequencces_fail";
-		else
-			targetFolder = "sequences_other";
-		LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
-		try {
-			Util.copyToDirectory(currentSeq.getAbsolutePath(), 
-					settings.get(ConfigTags.OutputDir) + File.separator + targetFolder, 
-					generatedSequence,
-					true);
-		} catch (NoSuchTagException e) {
-			LogSerialiser.log("No such tag exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
-		}
-		LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);		
-	}
-
-
-	//TODO move to reporting helper etc
+	//TODO move to reporting helper or FileHandling, but cannot be static
 	protected void saveSequenceMetrics(String testSequenceName, boolean problems){
 		if (Grapher.GRAPHS_ACTIVATED){
 			try {
@@ -669,7 +467,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 						"abstract-states", // abstract states
 						"graph-actions", // graph actions
 						"test-actions", // test actions
-						"SUTRAM(KB)",	 // SUT RAM peak 
+						"SUTRAM(KB)",	 // SUT RAM peak
 						"SUTCPU(%)",	 // SUT CPU peak
 						"TestRAM(MB)",	 // TESTAR RAM peak
 						"TestCPU(s)",	 // TESTAR CPU peak
