@@ -102,8 +102,8 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public abstract class AbstractProtocol implements UnProc<Settings>,
-	//TODO move eventListener out of abstract
-	IEventListener {
+		//TODO move IEventListerener out of abstract protocol
+		IEventListener	{
 
 	public enum Modes{
 		Spy,
@@ -131,8 +131,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected int lastSequenceActionNumber;
 	double startTime;
 	protected List<ProcessInfo> contextRunningProcesses = null;
-
-	// TODO: DATE-FORMAT
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
 
@@ -189,7 +187,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE){
 			if (this.delay == Double.MIN_VALUE){
 				this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
-				settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);            	
+				settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
 			} else{
 				settings().set(ConfigTags.TimeToWaitAfterAction, this.delay);
 				delay = Double.MIN_VALUE;
@@ -217,11 +215,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 
 		// SHIFT + 1 --> toggle action visualization
 		else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));		
+			settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
 
 		// SHIFT + 2 --> toggle showing accessibility properties of the widget
 		else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
-			settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));		
+			settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
 
 		// SHIFT + 3 --> toggle basic or all accessibility properties of the widget
 		else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
@@ -353,13 +351,19 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 			nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
 	}
 
-	//TODO think about creating pre- and post- methods, for example preSelectAction(), postSelectAction()
-	//abstract methods for TESTAR flow:
 	protected final double timeElapsed(){ return Util.time() - startTime; }
 	protected Settings settings(){ return settings; }
 	protected final GraphDB graphDB(){ return graphDB; }
 	protected void beginSequence(SUT system, State state) {}
 	protected void finishSequence(File recordedSequence) {}
+	protected final int actionCount(){ return actionCount; }
+	protected final int sequenceCount(){ return sequenceCount; }
+	protected void initialize(Settings settings){}
+	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
+	protected final Action lastExecutedAction() {return lastExecutedAction;}
+
+	//TODO think about creating pre- and post- methods, for example preSelectAction(), postSelectAction()
+	//abstract methods for TESTAR flow:
 	protected abstract SUT startSystem() throws SystemStartException;
 	protected abstract void stopSystem(SUT system);
 	protected abstract State getState(SUT system) throws StateBuildException;
@@ -368,18 +372,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	protected abstract Canvas buildCanvas();
 	protected abstract boolean moreActions(State state);
 	protected abstract boolean moreSequences();
-	protected final int actionCount(){ return actionCount; }
-	protected final int sequenceCount(){ return sequenceCount; }
-	protected void initialize(Settings settings){}
-	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
-	protected final Action lastExecutedAction() {return lastExecutedAction;}
 	protected abstract void processListeners(SUT system);
-	
 	protected abstract void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus);
 	protected abstract boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus);
 	protected abstract boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus);
 	protected abstract Action mapUserEvent(State state);
-	
 	protected abstract boolean runAction(Canvas cv, SUT system, State state, Taggable fragment);
 	protected abstract void runGenerate(SUT system);
 	protected abstract void runSpy(SUT system);
@@ -403,40 +400,13 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 	 */
 	protected abstract void actionExecuted(SUT system, State state, Action action);
 
-	//TODO move to KeyControl or user action recording
-	protected boolean isESC(Action action){
-		Role r = action.get(Tags.Role, null);
-		if (r != null && r.isA(ActionRoles.HitKey)){
-			String desc = action.get(Tags.Desc, null);
-			if (desc != null && desc.contains("VK_ESCAPE"))
-				return true;
-		}
-		return false;
-	}
-
-	//TODO move to KeyControl or user action recording
-	protected boolean isNOP(Action action){
-		String as = action.toString();
-		if (as != null && as.equals(NOP.NOP_ID))
-			return true;
-		else
-			return false;
-	}
-
-	protected long stampLastExecutedAction = -1;
-	protected long[] lastCPU; // user x system x frame
-	protected int escAttempts = 0;
-	protected int nopAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
-	protected static final int MAX_NOP_ATTEMPTS = 99;
-	protected static final long NOP_WAIT_WINDOW = 100; // ms
-
 	//TODO move to SutProfiler, cannot be static as keeps the values
 	protected double sutRAMbase;
 	protected double sutRAMpeak;
 	protected double sutCPUpeak;
 	protected double testRAMpeak;
 	protected double testCPUpeak;
+
 	private void debugResources(){
 		long nowStamp = System.currentTimeMillis();
 		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;
@@ -529,6 +499,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>,
 		this.settings = settings;
 		mode = settings.get(ConfigTags.Mode);
 		initialize(settings);
+		//TODO move eventlistener out of abstract protocol - maybe a new protocol layer:
 		eventHandler = new EventHandler(this);
 
 		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),

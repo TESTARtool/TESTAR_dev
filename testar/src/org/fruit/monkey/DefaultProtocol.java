@@ -1034,6 +1034,9 @@ public class DefaultProtocol extends AbstractProtocol {
 		return false;
 	}
 
+
+	protected int escAttempts = 0;
+	protected static final int MAX_ESC_ATTEMPTS = 99;
 	/**
 	 * Waits for an automatically selected UI action.
 	 * @param system
@@ -1081,6 +1084,41 @@ public class DefaultProtocol extends AbstractProtocol {
 		return false;
 	}
 
+	protected boolean isNOP(Action action){
+		String as = action.toString();
+		if (as != null && as.equals(NOP.NOP_ID))
+			return true;
+		else
+			return false;
+	}
+
+	protected boolean isESC(Action action){
+		Role r = action.get(Tags.Role, null);
+		if (r != null && r.isA(ActionRoles.HitKey)){
+			String desc = action.get(Tags.Desc, null);
+			if (desc != null && desc.contains("VK_ESCAPE"))
+				return true;
+		}
+		return false;
+	}
+
+	//TODO move the variables into a separate class SutProfiler
+	// variables for SUT profiling in runAction():
+	protected long stampLastExecutedAction = -1;
+	protected long[] lastCPU; // user x system x frame
+	protected int nopAttempts = 0;
+	protected static final int MAX_NOP_ATTEMPTS = 99;
+	protected static final long NOP_WAIT_WINDOW = 100; // ms
+
+	/**
+	 * To be documented / refactored
+	 *
+	 * @param cv
+	 * @param system
+	 * @param state
+	 * @param fragment
+	 * @return
+	 */
 	protected boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
 		LOGGER.info("[RA} start runAction");
