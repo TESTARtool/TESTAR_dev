@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,10 +29,6 @@
  *******************************************************************************************************/
 
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import static org.fruit.alayer.Tags.ActionDelay;
@@ -60,19 +57,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.concurrent.Semaphore;
 
-import nl.ou.testar.FileHandling;
-import nl.ou.testar.SutVisualization;
-import nl.ou.testar.SystemProcessHandling;
+import es.upv.staq.testar.*;
+import es.upv.staq.testar.graph.IEnvironment;
+import nl.ou.testar.*;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -101,7 +96,9 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.*;
+import org.fruit.alayer.devices.AWTMouse;
 import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.ActionFailedException;
@@ -110,22 +107,21 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.monkey.AbstractProtocol.Modes;
-
-import es.upv.staq.testar.ActionStatus;
-import es.upv.staq.testar.AdhocServer;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.prolog.JIPrologWrapper;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
+import org.slf4j.LoggerFactory;
 
-public class DefaultProtocol extends AbstractProtocol {
+public class DefaultProtocol extends RuntimeControlsProtocol {
 
+	protected boolean faultySequence;
 
+	protected Mouse mouse = AWTMouse.build();
 	protected State state = null,
 			lastState = null;
 	protected int nonReactingActionNumber;
@@ -138,13 +134,119 @@ public class DefaultProtocol extends AbstractProtocol {
 		return this.processVerdict;
 	}
 	protected boolean processListenerEnabled;
-
+	protected String lastPrintParentsOf = "null-id";
+	protected int actionCount;
+	protected final int actionCount(){ return actionCount; }
+	protected int sequenceCount;
+	protected final int sequenceCount(){ return sequenceCount; }
+	protected int firstSequenceActionNumber;
+	protected int lastSequenceActionNumber;
+	double startTime;
+	protected final double timeElapsed(){ return Util.time() - startTime; }
+	protected List<ProcessInfo> contextRunningProcesses = null;
+	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected double passSeverity = Verdict.SEVERITY_OK;
+	protected int generatedSequenceNumber = -1;
+	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
+	protected Action lastExecutedAction = null;
+	protected final Action lastExecutedAction() {return lastExecutedAction;}
+	protected long lastStamp = -1;
+	protected ProtocolUtil protocolUtil = new ProtocolUtil();
+	protected EventHandler eventHandler;
+	protected Canvas cv;
+	protected Pattern clickFilterPattern = null;
+	protected Map<String,Matcher> clickFilterMatchers = new WeakHashMap<String,Matcher>();
+	protected Pattern suspiciousTitlesPattern = null;
+	protected Map<String,Matcher> suspiciousTitlesMatchers = new WeakHashMap<String,Matcher>();
 	private StateBuilder builder;
+	protected JIPrologWrapper jipWrapper;
+	protected String forceKillProcess = null;
+	protected boolean forceToForeground = false,
+			forceNextActionESC = false;
+	protected boolean forceToSequenceLengthAfterFail = false;
+	protected int testFailTimes = 0;
+	protected boolean nonSuitableAction = false;
+	protected final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
+	protected final GraphDB graphDB(){ return graphDB; }
+	protected GraphDB graphDB;
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+
+
+	protected void storeWidget(String stateID, Widget widget) {
+		graphDB.addWidget(stateID, widget);
+	}
+
+	/**
+	 * Initializing the TESTAR loop
+	 *
+	 * @param settings
+	 */
+	public final void run(final Settings settings) {
+		startTime = Util.time();
+		this.settings = settings;
+		mode = settings.get(ConfigTags.Mode);
+		initialize(settings);
+		//TODO move eventlistener out of abstract protocol - maybe a new protocol layer:
+		eventHandler = new EventHandler(this);
+
+		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+				settings.get(ConfigTags.GraphDBUrl),
+				settings.get(ConfigTags.GraphDBUser),
+				settings.get(ConfigTags.GraphDBPassword));
+
+		try {
+			if (!settings.get(ConfigTags.UnattendedTests)) {
+				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+				logger.setLevel(Level.OFF);
+				logger.setUseParentHandlers(false);
+
+				if (GlobalScreen.isNativeHookRegistered()) {
+					GlobalScreen.unregisterNativeHook();
+				}
+				GlobalScreen.registerNativeHook();
+				GlobalScreen.addNativeKeyListener(eventHandler);
+				GlobalScreen.addNativeMouseListener(eventHandler);
+				GlobalScreen.addNativeMouseMotionListener(eventHandler);
+				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
+			}
+
+			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
+
+			if(mode() == Modes.View){
+				new SequenceViewer(settings).run();
+			}else if(mode() == Modes.Replay || mode() == Modes.ReplayDebug){
+				replay();
+			}else {
+				SUT system = null;
+				detectLoopMode(system);
+			}
+
+		} catch (NativeHookException e) {
+			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
+			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
+		}finally{
+			try {
+				if (!settings.get(ConfigTags.UnattendedTests)) {
+					if (GlobalScreen.isNativeHookRegistered()) {
+						LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+						GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+						GlobalScreen.removeNativeMouseListener(eventHandler);
+						GlobalScreen.removeNativeKeyListener(eventHandler);
+						GlobalScreen.unregisterNativeHook();
+					}
+				}
+				AdhocServer.stopAdhocServer();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	protected void initialize(Settings settings){
 		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
@@ -161,7 +263,6 @@ public class DefaultProtocol extends AbstractProtocol {
 	}
 
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
 		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
@@ -508,7 +609,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state));
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
 		calculateZIndices(state);
@@ -527,7 +628,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){
 			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, super.protocolUtil.getStateshot(state));
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
 		calculateZIndices(state);
@@ -1705,6 +1806,96 @@ public class DefaultProtocol extends AbstractProtocol {
 		//If stopSystem did not really stop the system, we will do it for you ;-)
 		if (system != null)
 			system.stop();
+	}
+
+
+	//TODO move to SutProfiler, cannot be static as keeps the values
+	protected double sutRAMbase;
+	protected double sutRAMpeak;
+	protected double sutCPUpeak;
+	protected double testRAMpeak;
+	protected double testCPUpeak;
+
+	private void debugResources(){
+		long nowStamp = System.currentTimeMillis();
+		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;
+		if (testRAM > testRAMpeak)
+			testRAMpeak = testRAM;
+		double testCPU = (nowStamp - lastStamp)/1000.0;
+		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
+			testCPUpeak = testCPU;
+		//System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
+		//				 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
+		lastStamp = nowStamp;
+	}
+
+
+	//TODO move to reporting helper or FileHandling, but cannot be static
+	public void saveSequenceMetrics(String testSequenceName, boolean problems){
+		if (Grapher.GRAPHS_ACTIVATED){
+			try {
+				PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+						settings.get(OutputDir) + File.separator + "metrics" + File.separator + (problems ? "fail_" : "") + testSequenceName + ".csv"))));
+				String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
+						"verdict",	 // test verdict
+						"FAILS",	 // test FAIL count
+						"minCvg(%)", // min coverage
+						"maxCvg(%)", // max coverage
+						"maxpath",	 // longest path
+						"graph-states",	 // graph states
+						"abstract-states", // abstract states
+						"graph-actions", // graph actions
+						"test-actions", // test actions
+						"SUTRAM(KB)",	 // SUT RAM peak
+						"SUTCPU(%)",	 // SUT CPU peak
+						"TestRAM(MB)",	 // TESTAR RAM peak
+						"TestCPU(s)",	 // TESTAR CPU peak
+						"fitness"		 // fitness
+				);
+				ps.println(heading);
+				IEnvironment env = Grapher.getEnvironment();
+				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
+				final int VERDICT_WEIGHT = 	1000,
+						CVG_WEIGHT = 		  10,
+						PATH_WEIGHT = 	 100,
+						STATES_WEIGHT = 	  10,
+						ACTIONS_WEIGHT = 	1000,
+						SUT_WEIGHT = 		   1,
+						TEST_WEIGHT = 	1000;
+				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
+						((problems ? 1 : 0) * VERDICT_WEIGHT +
+								cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
+								env.getLongestPathLength() * PATH_WEIGHT +
+								(env.getGraphStates().size() - 2) * STATES_WEIGHT +
+								(1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
+								(sutRAMpeak + sutCPUpeak) * SUT_WEIGHT +
+								(1 / (1 + testRAMpeak + testCPUpeak*1000)) * TEST_WEIGHT // avoid division by 0
+						);
+				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
+						(problems ? "FAIL" : "PASS"),		  // verdict
+						this.testFailTimes,					  // test FAIL count
+						String.format("%.2f", cvgMetrics.getMinCoverage()),
+						String.format("%.2f", cvgMetrics.getMaxCoverage()),
+						env.getLongestPathLength(), 			  // longest path
+						env.getGraphStates().size() - 2,	  // graph states
+						env.getGraphStateClusters().size(),	  // abstract states
+						env.getGraphActions().size() - 2,	  // graph actions
+						this.actionCount - 1,                 // test actions
+						sutRAMpeak,						  	  // SUT RAM peak
+						String.format("%.2f",sutCPUpeak),	  // SUT CPU peak
+						testRAMpeak,						  // TESTAR RAM peak
+						String.format("%.3f",testCPUpeak), 	  // TESTAR CPU peak
+						fitness		  // fitness
+				);
+				ps.print(metrics);
+				ps.close();
+				//System.out.println(heading + "\n" + metrics);
+			} catch (NoSuchTagException | FileNotFoundException e) {
+				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+				//} catch (FileNotFoundException e) {
+				//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+			}
+		}
 	}
 
 }

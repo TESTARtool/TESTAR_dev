@@ -360,7 +360,7 @@ public class Main {
       defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
       defaults.add(Pair.from(FaultThreshold, 0.1));
       defaults.add(Pair.from(LogLevel, 1));
-      defaults.add(Pair.from(Mode, AbstractProtocol.Modes.Spy));
+      defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
