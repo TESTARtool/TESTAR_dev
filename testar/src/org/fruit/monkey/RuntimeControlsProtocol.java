@@ -6,7 +6,6 @@ import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.Set;
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
 
+    //TODO create a settings to turn off all the runtime controls (for "headless"-mode, for example in continuous integration)
 
     protected double delay = Double.MIN_VALUE;
     protected Object[] userEvent = null;
@@ -102,7 +102,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     private final static double SLOW_MOTION = 2.0;
     //TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
-    //TODO move to TestarControlKeyCommands
     //TODO: Investigate better shortcut combinations to control TESTAR that does not interfere with SUT
     // (e.g. SHIFT + 1 puts an ! in the notepad and hence interferes with SUT state, but the
     // event is not recorded as a user event).
@@ -192,13 +191,12 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             markParentWidget = !markParentWidget;
     }
 
-    //TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
+    //jnativehook is platform independent
     @Override
     public void keyUp(KBKeys key){
         pressed.remove(key);
     }
 
-    //TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
     /**
      * TESTAR does not listen to mouse down clicks in any mode
      * @param btn
@@ -208,7 +206,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     @Override
     public void mouseDown(MouseButtons btn, double x, double y){}
 
-    //TODO: jnativehook is platform independent, but move to TestarControlKeyCommands OR/AND recording user actions
     /**
      * In GenerateManual the user can add user events by clicking and the ecent is added when releasing the mouse
      * @param btn

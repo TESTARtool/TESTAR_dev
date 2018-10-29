@@ -1,9 +1,6 @@
 package nl.ou.testar;
 
 import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.graph.Grapher;
-import es.upv.staq.testar.graph.IEnvironment;
-import es.upv.staq.testar.graph.IGraphState;
 import es.upv.staq.testar.ProtocolUtil;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -155,14 +152,6 @@ public class SutVisualization {
                         canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
                         protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);
                     }
-                    if (settings.get(ConfigTags.GraphsActivated) && delay != Double.MIN_VALUE){ // slow motion?
-                        canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-                        IEnvironment env = Grapher.getEnvironment();
-                        IGraphState gs = env.get(state);
-                        String wid = cursorWidget.get(Tags.ConcreteID);
-                        String graphDebug = "Widget <" + wid + "> count = " + gs.getStateWidgetsExecCount().get(wid);
-                        canvas.text(Pen.PEN_WHITE_TEXT_12px, 10, 10, 0, graphDebug);
-                    }
                 }
             }
         }
@@ -179,7 +168,6 @@ public class SutVisualization {
         if((mode == RuntimeControlsProtocol.Modes.Spy ||
                 mode == RuntimeControlsProtocol.Modes.GenerateManual ||
                 mode == RuntimeControlsProtocol.Modes.GenerateDebug) && settings.get(ConfigTags.VisualizeActions)){
-            IEnvironment env = Grapher.getEnvironment();
             int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
             Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
             for(Action a : actions){
@@ -195,21 +183,6 @@ public class SutVisualization {
             for(Action a : actions){
                 zindex = 1; // default
                 Pen vp = Pen.PEN_IGNORE;
-                if (env != null){ // graphs enabled
-                    Integer widgetExeCount = env.get(state).getStateWidgetsExecCount().get(env.get(a).getTargetWidgetID());
-                    if (widgetExeCount != null && widgetExeCount.intValue() > 0)
-                        vp = Pen.newPen().setColor(Pen.darken(Color.from(0,0,255,255),1.0/(1 + (widgetExeCount.intValue()/10)))).build(); // mark executed widgets with a different color
-                    else{
-                        zindex = zindexes.get(a).intValue();
-                        if (minz == maxz || zindex == maxz)
-                            alfa = 255;
-                        else if (zindex == minz)
-                            alfa = 64;
-                        else
-                            alfa = 128;
-                        vp = Pen.newPen().setColor(Pen.darken(Color.from(0,255,0,alfa),1.0)).build(); // color depends on widgets zindex
-                    }
-                }
                 a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
             }
         }

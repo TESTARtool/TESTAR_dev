@@ -34,7 +34,6 @@
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
@@ -329,7 +328,6 @@ public class Main {
       TestSerialiser.exit();
       ScreenshotSerialiser.exit();
       LogSerialiser.exit();
-      Grapher.exit();
       if (loader != null) {
         try {
           loader.close();

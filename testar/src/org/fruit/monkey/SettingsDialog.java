@@ -81,7 +81,6 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnView;
 
   private GeneralPanel generalPanel;
-  private WalkerPanel walkerPanel;
   private FilterPanel filterPanel;
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
@@ -229,7 +228,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void populateInformation(Settings settings) {
     generalPanel.populateFrom(settings);
-    walkerPanel.populateFrom(settings);
     filterPanel.populateFrom(settings);
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
@@ -239,7 +237,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void extractInformation(Settings settings) {
     generalPanel.extractInformation(settings);
-    walkerPanel.extractInformation(settings);
     filterPanel.extractInformation(settings);
     oraclePanel.extractInformation(settings);
     timingPanel.extractInformation(settings);
@@ -258,8 +255,6 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("About", new AboutPanel());
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
-    walkerPanel = new WalkerPanel();
-    jTabsPane.addTab("Action Selection", walkerPanel);
     filterPanel = new FilterPanel();
     jTabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
