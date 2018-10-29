@@ -81,33 +81,34 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		else if (sutPath.contains("firefox"))
 			webText = NativeLinker.getNativeRole("UIAText");
 	}
-	
+
 	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 *      out what executable to run)
+	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 *      seconds until they have finished loading)
+	 * @return  a started SUT, ready to be tested.
+	 */
+	protected SUT startSystem() throws SystemStartException{
+
+		SUT sut = super.startSystem();
+
+		return sut;
+
+	}
+
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
 	 */
 	protected void beginSequence(SUT system, State state){
 		
 		super.beginSequence(system, state);
 
-	}
-	
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 *      the SUT's configuratio files etc.)
-	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
-	 */
-	protected SUT startSystem() throws SystemStartException{
-		
-        SUT sut = super.startSystem();
-
-        return sut;
-        
 	}
 
 	/**

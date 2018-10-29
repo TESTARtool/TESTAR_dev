@@ -257,16 +257,28 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				);
 	}
 
+	@Override
+	protected void initTestSession() {
+
+	}
+
+	@Override
+	protected void preSequencePreparations() {
+
+	}
+
 	protected Canvas buildCanvas() {
 		//return GDIScreenCanvas.fromPrimaryMonitor(Pen.DefaultPen);
 		return NativeLinker.getNativeCanvas(Pen.PEN_DEFAULT);
 	}
 
+	@Override
 	protected void beginSequence(SUT system, State state){
 		faultySequence = false;
 		nonReactingActionNumber = 0;
 	}
 
+	@Override
 	protected void finishSequence(File recordedSequence){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
@@ -991,7 +1003,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param state
 	 * @param action
 	 */
-	@Override
 	protected void actionExecuted(SUT system, State state, Action action){
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
@@ -1016,6 +1027,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (ac != null)
 				ac.releaseCachedAutomationElements();
 		}
+	}
+
+	@Override
+	protected void PostSequenceProcessing() {
+
+	}
+
+	@Override
+	protected void CloseTestSession() {
+
 	}
 
 	//TODO move to ManualRecording helper class??
