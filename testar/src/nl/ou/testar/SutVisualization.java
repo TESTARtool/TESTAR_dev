@@ -11,6 +11,7 @@ import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.AbstractProtocol;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol;
 import org.fruit.monkey.Settings;
 
 import java.util.HashMap;
@@ -29,10 +30,10 @@ public class SutVisualization {
      * @param state
      * @param system
      */
-    public static synchronized void visualizeState(AbstractProtocol.Modes mode, Settings settings, boolean markParentWidget, Mouse mouse, ProtocolUtil protocolUtil,String lastPrintParentsOf, double delay, Canvas canvas, State state, SUT system){
-        if((mode == AbstractProtocol.Modes.Spy
-                || mode == AbstractProtocol.Modes.GenerateManual
-                || mode == AbstractProtocol.Modes.ReplayDebug) && settings.get(ConfigTags.DrawWidgetUnderCursor)){
+    public static synchronized void visualizeState(RuntimeControlsProtocol.Modes mode, Settings settings, boolean markParentWidget, Mouse mouse, ProtocolUtil protocolUtil,String lastPrintParentsOf, double delay, Canvas canvas, State state, SUT system){
+        if((mode == RuntimeControlsProtocol.Modes.Spy
+                || mode == RuntimeControlsProtocol.Modes.GenerateManual
+                || mode == RuntimeControlsProtocol.Modes.ReplayDebug) && settings.get(ConfigTags.DrawWidgetUnderCursor)){
             Point cursor = mouse.cursor();
             Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
 
@@ -174,10 +175,10 @@ public class SutVisualization {
      * @param state
      * @param actions
      */
-    public static void visualizeActions(AbstractProtocol.Modes mode,Settings settings,  Canvas canvas, State state, Set<Action> actions){
-        if((mode == AbstractProtocol.Modes.Spy ||
-                mode == AbstractProtocol.Modes.GenerateManual ||
-                mode == AbstractProtocol.Modes.GenerateDebug) && settings.get(ConfigTags.VisualizeActions)){
+    public static void visualizeActions(RuntimeControlsProtocol.Modes mode, Settings settings, Canvas canvas, State state, Set<Action> actions){
+        if((mode == RuntimeControlsProtocol.Modes.Spy ||
+                mode == RuntimeControlsProtocol.Modes.GenerateManual ||
+                mode == RuntimeControlsProtocol.Modes.GenerateDebug) && settings.get(ConfigTags.VisualizeActions)){
             IEnvironment env = Grapher.getEnvironment();
             int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
             Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
@@ -254,8 +255,8 @@ public class SutVisualization {
      * @param state
      * @param action
      */
-    public static void visualizeSelectedAction(AbstractProtocol.Modes mode,Settings settings, Canvas canvas, State state, Action action){
-        if(mode == AbstractProtocol.Modes.GenerateDebug || mode == AbstractProtocol.Modes.ReplayDebug){
+    public static void visualizeSelectedAction(RuntimeControlsProtocol.Modes mode,Settings settings, Canvas canvas, State state, Action action){
+        if(mode == RuntimeControlsProtocol.Modes.GenerateDebug || mode == RuntimeControlsProtocol.Modes.ReplayDebug){
             Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
             Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
             //final int BLINK_COUNT = 3;

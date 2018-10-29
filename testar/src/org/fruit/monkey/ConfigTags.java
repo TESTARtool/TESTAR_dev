@@ -57,7 +57,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> DrawWidgetInfo = Tag.from("DrawWidgetInfo", Boolean.class);
   public static final Tag<Boolean> ExecuteActions = Tag.from("ExecuteActions", Boolean.class);
   public static final Tag<String> PathToReplaySequence = Tag.from("PathToReplaySequence", String.class);
-  public static final Tag<AbstractProtocol.Modes> Mode = Tag.from("Mode", AbstractProtocol.Modes.class);
+  public static final Tag<RuntimeControlsProtocol.Modes> Mode = Tag.from("Mode", RuntimeControlsProtocol.Modes.class);
   public static final Tag<String> SUTConnectorValue = Tag.from("SUTConnectorValue", String.class);
   public static final Tag<Integer> SequenceLength = Tag.from("SequenceLength", Integer.class);
   public static final Tag<Integer> Sequences = Tag.from("Sequences", Integer.class);

@@ -115,9 +115,9 @@ public class Settings extends TaggableBase implements Serializable {
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		}else if(tag.type().equals(AbstractProtocol.Modes.class)){
+		}else if(tag.type().equals(RuntimeControlsProtocol.Modes.class)){
 			try{
-				return (T)AbstractProtocol.Modes.valueOf(stringValue);
+				return (T)RuntimeControlsProtocol.Modes.valueOf(stringValue);
 			}catch(IllegalArgumentException iae){
 				throw new ConfigParseException("Unknown Mode!");
 			}
