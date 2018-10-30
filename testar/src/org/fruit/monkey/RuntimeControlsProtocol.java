@@ -19,13 +19,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected double delay = Double.MIN_VALUE;
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
-    private boolean saveStateSnapshot = false;
-    public void setSaveStateSnapshot(boolean saveStateSnapshot) {
-        this.saveStateSnapshot = saveStateSnapshot;
-    }
-    public boolean isSaveStateSnapshot() {
-        return saveStateSnapshot;
-    }
 
     public enum Modes{
         Spy,
@@ -130,10 +123,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
                 delay = Double.MIN_VALUE;
             }
         }
-
-        //  SHIFT + ARROW-UP are pressed --> set variable to make a state snapshot
-        if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT))
-            setSaveStateSnapshot(true);
 
             // SHIFT + ARROW-RIGHT --> go to the next mode
         else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT))

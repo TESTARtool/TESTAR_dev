@@ -277,147 +277,130 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      */
     protected void detectModeLoop(SUT system) {
         if(mode() == Modes.Spy ){
-            runSpy(system);
+            runSpyLoop(system);
         }else if(mode() == Modes.Generate || mode() == Modes.GenerateDebug || mode() == Modes.GenerateManual){
-            runGenerate(system);
+            runGenerateOuterLoop(system);
         }else if(mode() == Modes.Quit) {
-            quitSUT(system);
+            stopSystem(system);
         }
     }
 
     /**
-     * This method is called
+     * This method is called from runGenerate() to initialize stuff needed
      */
-    private void initSequence(){
-
-    }
-
-    /**
-     * Method to run TESTAR on Generate mode
-     * @param system
-     */
-    protected void runGenerate(SUT system){
-        //method for defining other init actions, like setup of external environment
-        initTestSession();
-
+    private void initGenerateMode(){
         //TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
         LogSerialiser.finish();
         LogSerialiser.exit();
         sequenceCount = 1;
         lastStamp = System.currentTimeMillis();
         escAttempts = 0; nopAttempts = 0;
-        boolean problems;
-
         //TODO move this into SutProfiling or something:
         sutRAMbase = Double.MAX_VALUE; sutRAMpeak = 0.0; sutCPUpeak = 0.0; testRAMpeak = 0.0; testCPUpeak = 0.0;
 
-        /*
-        ***** OUTER LOOP - STARTING A NEW SEQUENCE
-         */
-        preSequencePreparations();
-        while(mode() != Modes.Quit && moreSequences()){
-            //for measuring the time of one sequence:
-            long tStart = System.currentTimeMillis();
-            LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
+    }
 
-            //Generating the sequence file that can be replayed:
-            //TODO refactor replayable sequences with something better (model perhaps?)
-            String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
-            generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
-            try {
-                LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-                                settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
-                        settings.get(LogLevel));
-            } catch (NoSuchTagException e3) {
-                // TODO Auto-generated catch block
-                e3.printStackTrace();
-            } catch (FileNotFoundException e3) {
-                // TODO Auto-generated catch block
-                e3.printStackTrace();
-            }
-            ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
+    private String getAndStoreGeneratedSequence(){
+        //TODO refactor replayable sequences with something better (model perhaps?)
+        String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
+        generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+        try {
+            LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+                            settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
+                    settings.get(LogLevel));
+        } catch (NoSuchTagException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        } catch (FileNotFoundException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        }
+        ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
+        return generatedSequence;
+    }
 
-            problems = false;
-            if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;
+    private File getAndStoreSequenceFile(){
+        LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
+        final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
+        try {
+            Util.delete(currentSeq);
+        } catch (IOException e2) {
+            LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+        }
+        try {
+            TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
+            LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
+        } catch (IOException e) {
+            LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+        }
+        return currentSeq;
+    }
+
+    private String startDateString;
+    private SUT startSutIfNotRunning(SUT system){
+        //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode, the system is running already)
+        if(system == null || !system.isRunning()) {
+            startDateString = Util.dateString(DATE_FORMAT);
+            LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
+            system = startSystem();
+            LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
+            LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+            this.cv = buildCanvas();
+        }
+        processListeners(system);
+        lastCPU = NativeLinker.getCPUsage(system);
+        return system;
+    }
+
+
+    private boolean problems = false;
+    private Taggable fragment;
+    private Verdict verdict;
+    private long tStart;
+
+    private void startTestSequence(SUT system){
+        //for measuring the time of one sequence:
+        tStart = System.currentTimeMillis();
+        LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
+
+        actionCount = 1;
+        this.testFailTimes = 0;
+        lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
+        firstSequenceActionNumber = actionCount;
+        passSeverity = Verdict.SEVERITY_OK;
+
+            /*
+            if (!forceToSequenceLengthAfterFail)
             if (this.forceToSequenceLengthAfterFail){
                 this.forceToSequenceLengthAfterFail = false;
                 this.testFailTimes++;
                 this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
             } else{
-                    actionCount = 1;
-                this.testFailTimes = 0;
-                lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
+            */
+
+    }
+
+    private void runGenerateInnerLoop(SUT system){
+        long spyTime;
+        /*
+         ***** INNER LOOP:
+         */
+        //We begin to make the number of actions indicated in our sequence
+        while(mode() != Modes.Quit && moreActions(state)){
+
+            //User wants to move to Spy mode, after that we will continue the actions
+            if(mode() == Modes.Spy) {
+                spyTime = System.currentTimeMillis();
+                runSpyLoop(system);
+                LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
             }
-            firstSequenceActionNumber = actionCount;
 
-            LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
-            final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
-            try {
-                Util.delete(currentSeq);
-            } catch (IOException e2) {
-                LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
-            }
-            try {
-                TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
-                LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
-            } catch (IOException e) {
-                LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-            }
-            LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+            if (problems)
+                faultySequence = true;
+            else{
+                problems = runAction(cv,system,state,fragment);
 
-            String startDateString = Util.dateString(DATE_FORMAT);
-            LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
-
-            try{
-                //If system it's null means that we have started TESTAR from the Generate mode
-                if(system == null || !system.isRunning()) {
-                    system = null;
-                    system = startSystem();
-                    this.cv = buildCanvas();
-                }
-                processListeners(system);
-
-                lastCPU = NativeLinker.getCPUsage(system);
-
-                LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
-                LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-                State state = getState(system);
-                LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
-                beginSequence(system, state);
-                LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
-                state = getState(system);
-                graphDB.addState(state,true);
-                LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-                if(isSaveStateSnapshot()) {
-                    File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
-                    FileHandling.saveStateSnapshot(state, file);
-                    setSaveStateSnapshot(false);
-                }
-                Taggable fragment = new TaggableBase();
-                fragment.set(SystemState, state);
-
-                Verdict verdict = state.get(OracleVerdict, Verdict.OK);
-                Verdict processVerdict =  getProcessVerdict();
-                if (faultySequence) problems = true;
-                fragment.set(OracleVerdict, verdict);
-
-                long spyTime;
-                //We begin to make the number of actions indicated in our sequence
-                while(mode() != Modes.Quit && moreActions(state)){
-
-                    //User wants to move to Spy mode, after that we will continue the actions
-                    if(mode() == Modes.Spy) {
-                        spyTime = System.currentTimeMillis();
-                        runSpy(system);
-                        LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
-                    }
-
-                    if (problems)
-                        faultySequence = true;
-                    else{
-                        problems = runAction(cv,system,state,fragment);
-
-                        LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
+                LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
 
 						/*try {
 							semaphore.acquire();
@@ -426,32 +409,85 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							e.printStackTrace();
 						}*/
 
-                        state = getState(system);
-                        graphDB.addState(state);
-                        if (faultySequence) problems = true;
-                        LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-                        if (mode() != Modes.Spy){
-                            if(isSaveStateSnapshot()) {
-                                File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
-                                FileHandling.saveStateSnapshot(state, file);
-                                setSaveStateSnapshot(false);
-                            }
-                            processVerdict = getProcessVerdict();
-                            verdict = state.get(OracleVerdict, Verdict.OK);
-                            fragment.set(OracleVerdict, verdict.join(processVerdict));
-                            fragment = new TaggableBase();
-                            fragment.set(SystemState, state);
-                        }
-
-                        //semaphore.release();
-                    }
+                state = getState(system);
+                graphDB.addState(state);
+                if (faultySequence) problems = true;
+                LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
+                if (mode() != Modes.Spy){
+                    processVerdict = getProcessVerdict();
+                    verdict = state.get(OracleVerdict, Verdict.OK);
+                    fragment.set(OracleVerdict, verdict.join(processVerdict));
+                    fragment = new TaggableBase();
+                    fragment.set(SystemState, state);
                 }
+
+                //semaphore.release();
+            }
+        }
+    }
+
+    /**
+     * Method to run TESTAR on Generate mode
+     * @param system
+     */
+    protected void runGenerateOuterLoop(SUT system){
+        //method for defining other init actions, like setup of external environment
+        initTestSession();
+
+        //initializing TESTAR for generate mode:
+        initGenerateMode();
+
+        //empty method in defaultProtocol - allowing implementation in application specific protocols:
+        preSequencePreparations();
+
+        //starting system if it's not running yet (TESTAR could be started in SPY-mode):
+        system = startSutIfNotRunning(system);
+
+        /*
+         ***** OUTER LOOP - STARTING A NEW SEQUENCE
+         */
+        while(mode() != Modes.Quit && moreSequences()){
+
+            //Generating the sequence file that can be replayed:
+            String generatedSequence = getAndStoreGeneratedSequence();
+            File currentSeq = getAndStoreSequenceFile();
+
+            //initializing TESTAR for a new sequence:
+            startTestSequence(system);
+
+            try{
+                // getState() called before beginSequence:
+                LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+                State state = getState(system);
+
+                // beginSequence() - a script to interact with GUI, for example login screen
+                LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
+                beginSequence(system, state);
+
+                // getState() called after beginSequence:
+                LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
+                state = getState(system);
+
+                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+                // add SUT state into the graphDB:
+                LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
+                graphDB.addState(state,true);
+
+                fragment = new TaggableBase();
+                fragment.set(SystemState, state);
+
+                verdict = state.get(OracleVerdict, Verdict.OK);
+                Verdict processVerdict =  getProcessVerdict();
+                if (faultySequence) problems = true;
+                fragment.set(OracleVerdict, verdict);
+
+                /*
+                 ***** starting the INNER LOOP:
+                 */
+                runGenerateInnerLoop(system);
 
                 LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
                 stopSystem(system);
-                //If stopSystem did not really stop the system, we will do it for you ;-)
-                if (system != null && system.isRunning())
-                    system.stop();
                 LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
                 ScreenshotSerialiser.finish();
@@ -515,20 +551,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     trace.append("\n\t[" + i++ + "] " + t.toString());
                 System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
                 stopSystem(system);
-                if (system != null && system.isRunning())
-                    system.stop();
                 TestSerialiser.exit();
                 LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
                 this.mode = Modes.Quit;
             }
-            LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
+
         }
+        LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
+
         if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
                 this.actionCount <= settings().get(ConfigTags.SequenceLength) &&
                 mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
             this.forceToSequenceLengthAfterFail = true;
             System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
-            runGenerate(system); // continue testing
+            runGenerateOuterLoop(system); // continue testing
         } else
             this.forceToSequenceLengthAfterFail = false;
     }
@@ -537,7 +573,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * Method to run TESTAR on Spy Mode.
      * @param system
      */
-    protected void runSpy(SUT system) {
+    protected void runSpyLoop(SUT system) {
         boolean startedSpy = false;
 
         //If system it's null means that we have started TESTAR from the Spy mode
@@ -687,22 +723,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.finish();
     }
 
-    //close SUT because we're on Quit mode
-    protected void quitSUT(SUT system) {
-
-        SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-        stopSystem(system);
-        //If stopSystem did not really stop the system, we will do it for you ;-)
-        if (system != null)
-            system.stop();
-    }
-
-
+    /**
+     * This method is called before the first test sequence, allowing for example setting up the test environment
+     */
     @Override
 	protected void initTestSession() {
 
 	}
 
+    /**
+     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+     */
 	@Override
 	protected void preSequencePreparations() {
 
@@ -1465,6 +1496,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (ac != null)
 				ac.releaseCachedAutomationElements();
 		}
+		if(system !=null){
+		    system.stop();
+        }
 	}
 
 	@Override

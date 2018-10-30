@@ -81,7 +81,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected abstract void initTestSession();
 
 	/**
-	 * This methods is called before each test sequence, allowing for example profiling of the SUT
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
 	protected abstract void preSequencePreparations();
 
