@@ -234,8 +234,9 @@ public class Main {
   /**
    * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
    * @param sett
+ * @throws IOException 
    */
-  public static void protocolFromCmd(String sett) {
+  public static void protocolFromCmd(String sett) throws IOException {
 	  String sseName = sett.substring(sett.indexOf("=")+1);
 	  boolean existSSE = false;
 
@@ -264,7 +265,7 @@ public class Main {
 		  String sseDir = getSettingsDir()+sseName+".sse";
 		  File f = new File(sseDir);
 		  if(!f.exists())
-			  f.mkdirs();
+			  f.createNewFile();
 
 		  System.out.println("Protocol changed from command line to: "+sseName);
 
