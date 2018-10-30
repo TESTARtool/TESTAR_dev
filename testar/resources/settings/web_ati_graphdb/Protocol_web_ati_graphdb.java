@@ -221,7 +221,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     }
 
     // Check if forced actions are needed to stay within allowed domains
-    Set<Action> forcedActions = detectForcedActions();
+    Set<Action> forcedActions = detectForcedActions(state);
     if (forcedActions != null && forcedActions.size() > 0) {
       return forcedActions;
     }
@@ -254,7 +254,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
         }
 
         // slides
-        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,state);
       }
     }
 
@@ -351,8 +351,8 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   /*
    * Check the state if we need to force an action
    */
-  private Set<Action> detectForcedActions() {
-    extractAddressWidgets();
+  private Set<Action> detectForcedActions(State state) {
+    extractAddressWidgets(state);
 
     // SUT is probably in the background, let Testar handle it
     if (currentAddress == null) {
@@ -395,7 +395,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   /*
    * Get current address and the action-widgets
    */
-  private void extractAddressWidgets() {
+  private void extractAddressWidgets(State state) {
     currentAddress = null;
 
     for (Widget widget : getTopWidgets(state)) {

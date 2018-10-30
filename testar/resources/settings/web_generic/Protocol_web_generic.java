@@ -30,24 +30,19 @@
 
 import java.io.File;
 import java.util.Set;
-import org.fruit.alayer.Action;
+
+import org.fruit.Drag;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 import es.upv.staq.testar.NativeLinker;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -175,32 +170,54 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
-			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						
-						// left clicks
-						if(whiteListed(w) || isClickable(w))
-							actions.add(ac.leftClickAt(w));
-		
-						// type into text boxes
-						if(whiteListed(w) || isTypeable(w))
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+		// iterate through all widgets
+		for(Widget w : getTopWidgets(state)){
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+				if (!blackListed(w)){  // do not build actions for tabu widgets
 
-						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					// left clicks
+					if(whiteListed(w) || isClickable(w))
+						actions.add(ac.leftClickAt(w));
 
-					}
+					// type into text boxes
+					if(whiteListed(w) || isTypeable(w))
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+
+					// slides
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
+
 				}
-			}			
-			
+			}
 		}
-		
+
 		return actions;
-		
+
+	}
+
+	/**
+	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+	 * @param actions
+	 * @param ac
+	 * @param scrollArrowSize
+	 * @param scrollThick
+	 * @param w
+	 */
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
+		Drag[] drags = null;
+		//If there are scroll (drags/drops) actions possible
+		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+			//For each possible drag, create an action and add it to the derived actions
+			for (Drag drag : drags){
+				//Store the widget in the Graphdatabase
+				storeWidget(state.get(Tags.ConcreteID), w);
+				//Create a slide action with the Action Compiler, and add it to the set of derived actions
+				actions.add(ac.slideFromTo(
+						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+				));
+
+			}
+		}
 	}
 
 	@Override

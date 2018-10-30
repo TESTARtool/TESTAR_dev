@@ -215,38 +215,12 @@ public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProt
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 				}
 			}
 		}
 		//return the set of derived actions
 		return actions;
-	}
-
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Store the widget in the Graphdatabase
-				storeWidget(state.get(Tags.ConcreteID), w);
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
-
-			}
-		}
 	}
 
 	/**

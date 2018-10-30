@@ -299,7 +299,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 					}
 					
 					// slides
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 	                
 				}
 				

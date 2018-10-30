@@ -249,7 +249,7 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	private void writeOnTheFlyEvaluationResults(EvaluationResults results) {
-		html.writeHeading(2, "State: " + state.get(Tags.ConcreteID))
+		html.writeHeading(2, "State: " + getStateForClickFilterLayerProtocol().get(Tags.ConcreteID))
 		.writeTableStart()
 		.writeTableHeadings("Type", "Count")
 		.writeTableRow("Error", Integer.toString(results.getErrorCount()))

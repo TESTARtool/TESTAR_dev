@@ -102,7 +102,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    	} else if (key == KBKeys.VK_ALT){
 	    		altPressed = true;
 	    		if (!ctrlPressed && !shiftPressed)
-	    			filteringManager.setWidgetFilter(this.state,this.mouse,preciseCoding);
+	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
 	    	}
         }
     }
@@ -117,7 +117,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
-	    		filteringManager.manageWhiteTabuLists(this.state,this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
+	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
 	    	} else if (key == KBKeys.VK_ALT)
 	    		altPressed = false;
         }

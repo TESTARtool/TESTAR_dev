@@ -115,10 +115,18 @@ import org.slf4j.LoggerFactory;
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected boolean faultySequence;
+	private State stateForClickFilterLayerProtocol;
 
-	protected Mouse mouse = AWTMouse.build();
-	protected State state = null,
-			lastState = null;
+    public State getStateForClickFilterLayerProtocol() {
+        return stateForClickFilterLayerProtocol;
+    }
+
+    public void setStateForClickFilterLayerProtocol(State stateForClickFilterLayerProtocol) {
+        this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
+    }
+
+    protected Mouse mouse = AWTMouse.build();
+	protected State lastState = null;
 	protected int nonReactingActionNumber;
 	private Verdict processVerdict= Verdict.OK;
 	protected void setProcessVerdict(Verdict processVerdict) {
@@ -168,10 +176,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			BluePen = Pen.newPen().setColor(Color.Blue).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
-
-	protected void storeWidget(String stateID, Widget widget) {
-		graphDB.addWidget(stateID, widget);
-	}
 
 /**
  * This is the abstract flow of TESTAR (generate mode):
@@ -356,7 +360,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private SUT startSutIfNotRunning(SUT system){
         //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode, the system is running already)
         if(system == null || !system.isRunning()) {
-            startOfSutDateString = Util.dateString(DATE_FORMAT);
             LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             system = startSystem();
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
@@ -382,6 +385,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private void startTestSequence(SUT system){
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
+        startOfSutDateString = Util.dateString(DATE_FORMAT);
         LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
 
         actionCount = 1;
@@ -390,63 +394,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         firstSequenceActionNumber = actionCount;
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
-    }
-
-    /**
-     * This is the inner loop of TESTAR Generate-mode:
-     *  * 			GetState
-     *  * 			GetVerdict
-     *  * 			StopCriteria (moreActions/moreSequences/time?)
-     *  * 			DeriveActions
-     *  * 			SelectAction
-     *  * 			ExecuteAction
-     *
-     * @param system
-     */
-    private void runGenerateInnerLoop(SUT system){
-        long spyTime;
-        /*
-         ***** INNER LOOP:
-         */
-        //We begin to make the number of actions indicated in our sequence
-        while(mode() != Modes.Quit && moreActions(state)){
-
-            //User wants to move to Spy mode, after that we will continue the actions
-            if(mode() == Modes.Spy) {
-                spyTime = System.currentTimeMillis();
-                runSpyLoop(system);
-                LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
-            }
-
-            if (problems)
-                faultySequence = true;
-            else{
-                problems = runAction(cv,system,state,fragment);
-
-                LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
-
-						/*try {
-							semaphore.acquire();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}*/
-
-                state = getState(system);
-                graphDB.addState(state);
-                if (faultySequence) problems = true;
-                LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-                if (mode() != Modes.Spy){
-                    processVerdict = getProcessVerdict();
-                    verdict = state.get(OracleVerdict, Verdict.OK);
-                    fragment.set(OracleVerdict, verdict.join(processVerdict));
-                    fragment = new TaggableBase();
-                    fragment.set(SystemState, state);
-                }
-
-                //semaphore.release();
-            }
-        }
     }
 
     /**
@@ -483,18 +430,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
+                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
-
-                // getState() called after beginSequence:
-                LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
-                state = getState(system);
-
-                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-                // add SUT state into the graphDB:
-                LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
-                graphDB.addState(state,true);
 
                 // Fragment is used for saving a replayable sequence:
                 fragment = new TaggableBase();
@@ -506,7 +446,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 /*
                  ***** starting the INNER LOOP:
                  */
-                runGenerateInnerLoop(system);
+                runGenerateInnerLoop(system, state);
 
                 LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
                 stopSystem(system);
@@ -551,8 +491,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 cv.release();
                 ScreenshotSerialiser.exit();
                 TestSerialiser.exit();
-                String stopDateString =  Util.dateString(DATE_FORMAT),
-                        durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
+                String stopDateString =  Util.dateString(DATE_FORMAT);
+                System.out.println("DEBUG: date format="+DATE_FORMAT+", start="+startOfSutDateString+", stop="+stopDateString);
+                String durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
                 LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
@@ -578,15 +519,71 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         }
         LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
+    }
 
-//        if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
-//                this.actionCount <= settings().get(ConfigTags.SequenceLength) &&
-//                mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
-//            this.forceToSequenceLengthAfterFail = true;
-//            System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
-//            runGenerateOuterLoop(system); // continue testing
-//        } else
-//            this.forceToSequenceLengthAfterFail = false;
+    /**
+     * This is the inner loop of TESTAR Generate-mode:
+     *  * 			GetState
+     *  * 			GetVerdict
+     *  * 			StopCriteria (moreActions/moreSequences/time?)
+     *  * 			DeriveActions
+     *  * 			SelectAction
+     *  * 			ExecuteAction
+     *
+     * @param system
+     */
+    private void runGenerateInnerLoop(SUT system, State state){
+        long spyTime; //for recording the time the user spent in SPY-mode if TESTAR mode is changed into SPY-mode
+        /*
+         ***** INNER LOOP:
+         */
+        while(mode() != Modes.Quit && moreActions(state)){
+
+            // getState():
+            LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
+            state = getState(system);
+
+            //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+            // add SUT state into the graphDB:
+            LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
+            graphDB.addState(state,true);
+
+            //User wants to move to Spy mode, after that we will continue the actions
+            if(mode() == Modes.Spy) {
+                spyTime = System.currentTimeMillis();
+                runSpyLoop(system);
+                LOGGER.info("[RA] User spent {} ms in Spy Mode",System.currentTimeMillis()-spyTime);
+            }
+
+            if (problems)
+                faultySequence = true;
+            else{
+                problems = runAction(cv,system,state,fragment);
+
+                LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
+
+						/*try {
+							semaphore.acquire();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}*/
+
+                state = getState(system);
+                graphDB.addState(state);
+                if (faultySequence) problems = true;
+                LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
+                if (mode() != Modes.Spy){
+                    processVerdict = getProcessVerdict();
+                    verdict = state.get(OracleVerdict, Verdict.OK);
+                    fragment.set(OracleVerdict, verdict.join(processVerdict));
+                    fragment = new TaggableBase();
+                    fragment.set(SystemState, state);
+                }
+
+                //semaphore.release();
+            }
+        }
     }
 
     /**
@@ -1105,8 +1102,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	
 	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
 		Assert.notNull(system);
-		//State state = builder.apply(system);
-		state = builder.apply(system);
+		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
 
@@ -1121,11 +1117,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return state;
 	}
 
+    /**
+     * This method gets the state of the SUT
+     * It also call getVerdict() and saves it into the state
+     *
+     * @param system
+     * @return
+     * @throws StateBuildException
+     */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		Assert.notNull(system);
-		//State state = builder.apply(system);
-		state = builder.apply(system);
+		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
 
@@ -1151,6 +1154,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
+		setStateForClickFilterLayerProtocol(state);
 		return state;
 	}
 
@@ -1386,26 +1390,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return topWidgets;
 	}
 
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
-		Drag[] drags = null;
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			for (Drag drag : drags){
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
-				storeWidget(state.get(Tags.ConcreteID), w);
-			}
-		}
-	}
+    protected void storeWidget(String stateID, Widget widget) {
+        graphDB.addWidget(stateID, widget);
+    }
 
 	/**
 	 * Check whether widget w should be filtered based on
@@ -1884,6 +1871,31 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return actionStatus.isProblems();
 	}
 
+    /**
+     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+     * @param actions
+     * @param ac
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @param w
+     */
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
+        Drag[] drags = null;
+        //If there are scroll (drags/drops) actions possible
+        if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Store the widget in the Graphdatabase
+                storeWidget(state.get(Tags.ConcreteID), w);
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                actions.add(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+                ));
+
+            }
+        }
+    }
 
 	//TODO move to SutProfiler, cannot be static as keeps the values
 	protected double sutRAMbase;

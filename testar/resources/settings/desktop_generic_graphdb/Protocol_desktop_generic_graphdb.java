@@ -188,7 +188,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 
 					}
 				}

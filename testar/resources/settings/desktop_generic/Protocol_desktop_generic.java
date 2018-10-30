@@ -187,7 +187,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * @param scrollThick
 	 * @param w
 	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
 		Drag[] drags = null;
 		//If there are scroll (drags/drops) actions possible
 		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
