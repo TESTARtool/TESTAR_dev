@@ -335,27 +335,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 // TODO Auto-generated catch block
                 e3.printStackTrace();
             }
-            /**
-            //Create a new Grapher for a new sequence
-            jipWrapper = new JIPrologWrapper();
-            Grapher.grapher(generatedSequence,
-                    settings.get(ConfigTags.SequenceLength),
-                    settings.get(ConfigTags.AlgorithmFormsFilling),
-                    settings.get(ConfigTags.TypingTextsForExecutedAction).intValue(),
-                    settings.get(ConfigTags.TestGenerator),
-                    settings.get(ConfigTags.MaxReward),
-                    settings.get(ConfigTags.Discount),
-                    settings.get(ConfigTags.ExplorationSampleInterval),
-                    settings.get(ConfigTags.GraphsActivated),
-                    settings.get(ConfigTags.PrologActivated),
-                    settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-                            true : settings.get(ConfigTags.GraphResuming),
-                    settings.get(ConfigTags.OfflineGraphConversion),
-                    settings.get(ConfigTags.OutputDir),
-                    jipWrapper);
-
-            Grapher.waitEnvironment();
-             */
             ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
 
             problems = false;
@@ -365,10 +344,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 this.testFailTimes++;
                 this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
             } else{
-                /*
-                if (settings.get(ConfigTags.GraphsActivated) && settings.get(ConfigTags.GraphResuming))
-                    actionCount = Grapher.getEnvironment().getGraphActions().size() + 1;
-                else*/
                     actionCount = 1;
                 this.testFailTimes = 0;
                 lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
@@ -484,13 +459,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 TestSerialiser.write(fragment);
                 TestSerialiser.finish();
                 LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-
-                /*
-                Grapher.walkFinished(!problems,
-                        mode() == Modes.Spy ? null : state,
-                        protocolUtil.getStateshot(state));
-*/
-
                 LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
                 if(problems)
                     LogSerialiser.log("Sequence contained problems!\n", LogSerialiser.LogLevel.Critical);
@@ -525,26 +493,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                 LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
                 cv.release();
-/*
-                saveSequenceMetrics(generatedSequence,problems);
-*/
                 ScreenshotSerialiser.exit();
-                /*
-                final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
-                if (reportPages == null)
-                    LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
-                    */
                 TestSerialiser.exit();
                 String stopDateString =  Util.dateString(DATE_FORMAT),
                         durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
                 LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-
-                /*
-                if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence, settings.get(OutputDir), settings.get(LogLevel));; // save report
-*/
-
                 sequenceCount++;
 
             } catch(Exception e){
@@ -553,16 +508,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
                 ScreenshotSerialiser.finish();
                 TestSerialiser.finish();
-                /*
-                Grapher.walkFinished(false, null, null);
-                */
                 ScreenshotSerialiser.exit();
-                /*
-                final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber);  // screenshots must be serialised
-
-                if (reportPages == null)
-                    LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
-                    */
                 LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
                 int i=1; StringBuffer trace = new StringBuffer();
                 for(StackTraceElement t : e.getStackTrace())
@@ -573,10 +519,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     system.stop();
                 TestSerialiser.exit();
                 LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-                /*
-                if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence,settings.get(OutputDir), settings.get(LogLevel));; // save report
-                */
-                this.mode = Modes.Quit; // System.exit(1);
+                this.mode = Modes.Quit;
             }
             LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
         }
@@ -603,9 +546,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             system = startSystem();
             //processListeners(system);
             startedSpy = true;
-            /*
-            Grapher.GRAPHS_ACTIVATED = false;
-            */
             this.cv = buildCanvas();
         }
         //else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
@@ -630,10 +570,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     protected void replay(){
-        /*
-        boolean graphsActivated = Grapher.GRAPHS_ACTIVATED;
-        Grapher.GRAPHS_ACTIVATED = false;
-        */
         actionCount = 1;
         boolean success = true;
         FileInputStream fis = null;
@@ -749,9 +685,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
         }
         LogSerialiser.finish();
-        /*
-        Grapher.GRAPHS_ACTIVATED = graphsActivated;
-        */
     }
 
     //close SUT because we're on Quit mode
@@ -1167,11 +1100,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-
-		/*
-		Grapher.notify(state, state.get(Tags.ScreenshotPath, null));
-*/
-
 		return state;
 	}
 
@@ -1368,7 +1296,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return a;
 		} else
 			return RandomActionSelector.selectAction(actions);
-                    //Grapher.selectAction(state,actions);
 	}
 
 	protected String getRandomText(Widget w){
@@ -1828,12 +1755,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					sysms = currentCPU[1] - lastCPU[1],
 					cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
 			lastCPU = currentCPU;
-			/*
-			if (isTestAction)
-				Grapher.notify(state,state.get(Tags.ScreenshotPath, null),
-						actionStatus.getAction(),protocolUtil.getActionshot(state,actionStatus.getAction()),actionRepresentation[1],
-						memUsage, cpuUsage);
-						*/
 			LogSerialiser.log(String.format("Executing (%d): %s...", actionCount,
 					actionStatus.getAction().get(Desc, actionStatus.getAction().toString())) + "\n", LogSerialiser.LogLevel.Debug);
 
@@ -1928,75 +1849,5 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//				 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
 		lastStamp = nowStamp;
 	}
-
-/*
-	//TODO move to reporting helper or FileHandling, but cannot be static
-	public void saveSequenceMetrics(String testSequenceName, boolean problems){
-		if (Grapher.GRAPHS_ACTIVATED){
-			try {
-				PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-						settings.get(OutputDir) + File.separator + "metrics" + File.separator + (problems ? "fail_" : "") + testSequenceName + ".csv"))));
-				String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
-						"verdict",	 // test verdict
-						"FAILS",	 // test FAIL count
-						"minCvg(%)", // min coverage
-						"maxCvg(%)", // max coverage
-						"maxpath",	 // longest path
-						"graph-states",	 // graph states
-						"abstract-states", // abstract states
-						"graph-actions", // graph actions
-						"test-actions", // test actions
-						"SUTRAM(KB)",	 // SUT RAM peak
-						"SUTCPU(%)",	 // SUT CPU peak
-						"TestRAM(MB)",	 // TESTAR RAM peak
-						"TestCPU(s)",	 // TESTAR CPU peak
-						"fitness"		 // fitness
-				);
-				ps.println(heading);
-				IEnvironment env = Grapher.getEnvironment();
-				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
-				final int VERDICT_WEIGHT = 	1000,
-						CVG_WEIGHT = 		  10,
-						PATH_WEIGHT = 	 100,
-						STATES_WEIGHT = 	  10,
-						ACTIONS_WEIGHT = 	1000,
-						SUT_WEIGHT = 		   1,
-						TEST_WEIGHT = 	1000;
-				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
-						((problems ? 1 : 0) * VERDICT_WEIGHT +
-								cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
-								env.getLongestPathLength() * PATH_WEIGHT +
-								(env.getGraphStates().size() - 2) * STATES_WEIGHT +
-								(1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
-								(sutRAMpeak + sutCPUpeak) * SUT_WEIGHT +
-								(1 / (1 + testRAMpeak + testCPUpeak*1000)) * TEST_WEIGHT // avoid division by 0
-						);
-				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
-						(problems ? "FAIL" : "PASS"),		  // verdict
-						this.testFailTimes,					  // test FAIL count
-						String.format("%.2f", cvgMetrics.getMinCoverage()),
-						String.format("%.2f", cvgMetrics.getMaxCoverage()),
-						env.getLongestPathLength(), 			  // longest path
-						env.getGraphStates().size() - 2,	  // graph states
-						env.getGraphStateClusters().size(),	  // abstract states
-						env.getGraphActions().size() - 2,	  // graph actions
-						this.actionCount - 1,                 // test actions
-						sutRAMpeak,						  	  // SUT RAM peak
-						String.format("%.2f",sutCPUpeak),	  // SUT CPU peak
-						testRAMpeak,						  // TESTAR RAM peak
-						String.format("%.3f",testCPUpeak), 	  // TESTAR CPU peak
-						fitness		  // fitness
-				);
-				ps.print(metrics);
-				ps.close();
-				//System.out.println(heading + "\n" + metrics);
-			} catch (NoSuchTagException | FileNotFoundException e) {
-				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-				//} catch (FileNotFoundException e) {
-				//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-			}
-		}
-	}
-	*/
 
 }
