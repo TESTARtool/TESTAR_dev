@@ -62,7 +62,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import java.util.concurrent.Semaphore;
+
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import org.fruit.Assert;
@@ -120,7 +120,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected State state = null,
 			lastState = null;
 	protected int nonReactingActionNumber;
-	protected Semaphore semaphore = new Semaphore(1, true);
 	private Verdict processVerdict= Verdict.OK;
 	protected void setProcessVerdict(Verdict processVerdict) {
 		this.processVerdict = processVerdict;
@@ -158,12 +157,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected String forceKillProcess = null;
 	protected boolean forceToForeground = false,
 			forceNextActionESC = false;
-	protected boolean forceToSequenceLengthAfterFail = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
-	protected final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
 	protected final GraphDB graphDB(){ return graphDB; }
 	protected GraphDB graphDB;
+    private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
@@ -199,7 +197,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
  */
 
 	/**
-	 * Initializing the TESTAR loop
+	 * Starting the TESTAR loops
 	 *
 	 * @param settings
 	 */
@@ -220,7 +218,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
     /**
-     * TESTAR initialization
+     * Initialize TESTAR with the given settings:
      *
      * @param settings
      */
@@ -286,7 +284,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     /**
-     * This method is called from runGenerate() to initialize stuff needed
+     * This method is called from runGenerate() to initialize TESTAR for Generate-mode
      */
     private void initGenerateMode(){
         //TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
@@ -300,6 +298,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     }
 
+    /**
+     * This method creates the name for generated sequence that can be replayed
+     * and starts the LogSerialiser for outputting the test sequence
+     *
+     * @return name of the generated sequence file
+     */
     private String getAndStoreGeneratedSequence(){
         //TODO refactor replayable sequences with something better (model perhaps?)
         String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
@@ -319,6 +323,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         return generatedSequence;
     }
 
+    /**
+     * This method creates a temporary file for saving the test sequence (that can be replayed)
+     * The name of the temporary file is changed in the end of the test sequence (not in this function)
+     *
+     * @return temporary file for saving the test sequence
+     */
     private File getAndStoreSequenceFile(){
         LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
         final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
@@ -336,12 +346,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         return currentSeq;
     }
 
-    private String startDateString;
+
+    /**
+     * This method calls the startSystem() if the system is not yet running
+     *
+     * @param system
+     * @return SUT system
+     */
     private SUT startSutIfNotRunning(SUT system){
         //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode, the system is running already)
         if(system == null || !system.isRunning()) {
-            startDateString = Util.dateString(DATE_FORMAT);
-            LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
+            startOfSutDateString = Util.dateString(DATE_FORMAT);
+            LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             system = startSystem();
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
@@ -358,6 +374,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private Verdict verdict;
     private long tStart;
 
+    /**
+     * This method is initializing TESTAR for the start of test sequence
+     *
+     * @param system
+     */
     private void startTestSequence(SUT system){
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
@@ -369,18 +390,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         firstSequenceActionNumber = actionCount;
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
-
-            /*
-            if (!forceToSequenceLengthAfterFail)
-            if (this.forceToSequenceLengthAfterFail){
-                this.forceToSequenceLengthAfterFail = false;
-                this.testFailTimes++;
-                this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
-            } else{
-            */
-
     }
 
+    /**
+     * This is the inner loop of TESTAR Generate-mode:
+     *  * 			GetState
+     *  * 			GetVerdict
+     *  * 			StopCriteria (moreActions/moreSequences/time?)
+     *  * 			DeriveActions
+     *  * 			SelectAction
+     *  * 			ExecuteAction
+     *
+     * @param system
+     */
     private void runGenerateInnerLoop(SUT system){
         long spyTime;
         /*
@@ -448,7 +470,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //starting system if it's not running yet (TESTAR could be started in SPY-mode):
             system = startSutIfNotRunning(system);
-            
+
             //Generating the sequence file that can be replayed:
             String generatedSequence = getAndStoreGeneratedSequence();
             File currentSeq = getAndStoreSequenceFile();
@@ -524,15 +546,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     }
                     FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict,settings.get(ConfigTags.OutputDir));
                 }
-                if(!problems)
-                    this.forceToSequenceLengthAfterFail = false;
 
                 LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
                 cv.release();
                 ScreenshotSerialiser.exit();
                 TestSerialiser.exit();
                 String stopDateString =  Util.dateString(DATE_FORMAT),
-                        durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
+                        durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
                 LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
                 LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
@@ -1459,10 +1479,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * STOP criteria deciding whether more sequences are required in a test run
 	 * @return
 	 */
-	protected boolean moreSequences() {	
-		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
-        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
+	protected boolean moreSequences() {
+//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
+//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
