@@ -368,6 +368,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
         firstSequenceActionNumber = actionCount;
         passSeverity = Verdict.SEVERITY_OK;
+        setProcessVerdict(Verdict.OK);
 
             /*
             if (!forceToSequenceLengthAfterFail)
@@ -437,17 +438,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //initializing TESTAR for generate mode:
         initGenerateMode();
 
-        //empty method in defaultProtocol - allowing implementation in application specific protocols:
-        preSequencePreparations();
-
-        //starting system if it's not running yet (TESTAR could be started in SPY-mode):
-        system = startSutIfNotRunning(system);
-
         /*
          ***** OUTER LOOP - STARTING A NEW SEQUENCE
          */
         while(mode() != Modes.Quit && moreSequences()){
 
+            //empty method in defaultProtocol - allowing implementation in application specific protocols:
+            preSequencePreparations();
+
+            //starting system if it's not running yet (TESTAR could be started in SPY-mode):
+            system = startSutIfNotRunning(system);
+            
             //Generating the sequence file that can be replayed:
             String generatedSequence = getAndStoreGeneratedSequence();
             File currentSeq = getAndStoreSequenceFile();
@@ -473,11 +474,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
                 graphDB.addState(state,true);
 
+                // Fragment is used for saving a replayable sequence:
                 fragment = new TaggableBase();
                 fragment.set(SystemState, state);
-
                 verdict = state.get(OracleVerdict, Verdict.OK);
-                Verdict processVerdict =  getProcessVerdict();
                 if (faultySequence) problems = true;
                 fragment.set(OracleVerdict, verdict);
 
@@ -486,7 +486,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                  */
                 runGenerateInnerLoop(system);
 
-                LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
+                LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
                 stopSystem(system);
                 LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
 
@@ -559,14 +559,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
         LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
 
-        if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
-                this.actionCount <= settings().get(ConfigTags.SequenceLength) &&
-                mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
-            this.forceToSequenceLengthAfterFail = true;
-            System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
-            runGenerateOuterLoop(system); // continue testing
-        } else
-            this.forceToSequenceLengthAfterFail = false;
+//        if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
+//                this.actionCount <= settings().get(ConfigTags.SequenceLength) &&
+//                mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
+//            this.forceToSequenceLengthAfterFail = true;
+//            System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
+//            runGenerateOuterLoop(system); // continue testing
+//        } else
+//            this.forceToSequenceLengthAfterFail = false;
     }
 
     /**
@@ -1461,6 +1461,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected boolean moreSequences() {	
 		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
+        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
+                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
@@ -1870,18 +1872,5 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected double sutCPUpeak;
 	protected double testRAMpeak;
 	protected double testCPUpeak;
-
-	private void debugResources(){
-		long nowStamp = System.currentTimeMillis();
-		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;
-		if (testRAM > testRAMpeak)
-			testRAMpeak = testRAM;
-		double testCPU = (nowStamp - lastStamp)/1000.0;
-		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
-			testCPUpeak = testCPU;
-		//System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
-		//				 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
-		lastStamp = nowStamp;
-	}
 
 }
