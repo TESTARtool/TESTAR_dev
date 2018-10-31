@@ -677,6 +677,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         ScreenshotSerialiser.finish();
         LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
         TestSerialiser.write(fragment);
+        
+        //Wait since TestSerialiser write all fragments on sequence File
+        while(!TestSerialiser.isSavingQueueEmpty()) {
+        	//System.out.println("Saving sequences...");
+        	synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+        }
         TestSerialiser.finish();
         LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
         LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
