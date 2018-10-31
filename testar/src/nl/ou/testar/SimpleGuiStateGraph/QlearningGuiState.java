@@ -47,6 +47,8 @@ public class QlearningGuiState {
     }
 
     public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState){
+        //updating reward and Q value for the executed action:
+        updateRMaxAndQValues(newTransition.getActionConcreteId(), gammaDiscount, maxRMaxOfTheNewState);
         if(stateTransitions.size()>0){
             //if existing transitions, checking for identical ones:
             for(GuiStateTransition guiStateTransition:stateTransitions){
@@ -71,7 +73,6 @@ public class QlearningGuiState {
         // otherwise adding the new state transition:
 //        System.out.println(this.getClass()+": addStateTransition: adding the new state transition");
         stateTransitions.add(newTransition);
-        updateRMaxAndQValues(newTransition.getActionConcreteId(), gammaDiscount, maxRMaxOfTheNewState);
     }
 
     private void updateRMaxAndQValues(String actionConcreteId, double gammaDiscount, double maxQValueOfTheNewState){
