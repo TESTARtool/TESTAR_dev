@@ -578,6 +578,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             // getState() including getVerdict() that is saved into the state:
             LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
             state = getState(system);
+            cv.begin(); Util.clear(cv);
             SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
 
             //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
@@ -607,6 +608,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Selecting one of the available actions:
             Action action = selectAction(state, actions);
+            SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
 
             //Executing the selected action:
             executeAction(system, state, action);
