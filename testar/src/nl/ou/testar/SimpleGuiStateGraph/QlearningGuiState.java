@@ -96,7 +96,7 @@ public class QlearningGuiState {
         }else{
             System.out.println("DEBUG: executionCounter="+executionCounter);
             int divider = executionCounter+1;
-            reward = 1/divider;
+            reward = 1.0/(double)divider;
             System.out.println("DEBUG: reward="+reward);
         }
         return reward;
