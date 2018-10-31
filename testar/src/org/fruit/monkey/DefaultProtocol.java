@@ -396,7 +396,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             system = startSystem();
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
-            this.cv = buildCanvas();
         }
         processListeners(system);
 //        lastCPU = NativeLinker.getCPUsage(system);
@@ -416,7 +415,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
         startOfSutDateString = Util.dateString(DATE_FORMAT);
-        LOGGER.info("[RT] Runtest started for sequence {}", sequenceCount());
+        LOGGER.info("Starting test sequence {}", sequenceCount());
 
         actionCount = 1;
         this.testFailTimes = 0;
@@ -424,6 +423,50 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         firstSequenceActionNumber = actionCount;
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
+        this.cv = buildCanvas();
+    }
+
+    /**
+     * Closing test sequence of TESTAR in normal operation
+     */
+    private void endTestSequence(){
+        LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
+        cv.release();
+        ScreenshotSerialiser.exit();
+        TestSerialiser.exit();
+//        String stopDateString = Util.dateString(DATE_FORMAT);
+//        String durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
+//        LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
+//        LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
+        LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+    }
+
+    /**
+     * Shutting down TESTAR in case of exception during Generate-mode outer loop (test sequence generation)
+     *
+     * @param system
+     * @param e
+     */
+    private void emergencyTerminateTestSequence(SUT system, Exception e){
+        SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+        ScreenshotSerialiser.finish();
+        TestSerialiser.finish();
+        ScreenshotSerialiser.exit();
+        LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
+        int i = 1;
+        StringBuffer trace = new StringBuffer();
+        for (StackTraceElement t : e.getStackTrace())
+            trace.append("\n\t[" + i++ + "] " + t.toString());
+        System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
+        stopSystem(system);
+        TestSerialiser.exit();
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
+        this.mode = Modes.Quit;
     }
 
     /**
@@ -490,34 +533,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                 setProcessVerdict(Verdict.OK);
 
-                if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
-                        finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-                    LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
-                    try {
-                        Util.copyToDirectory(currentSeq.getAbsolutePath(),
-                                settings.get(ConfigTags.OutputDir) + File.separator + "sequences",
-                                generatedSequence,
-                                true);
-                        LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
-                    } catch (NoSuchTagException e) {
-                        LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-                    } catch (IOException e) {
-                        LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-                    }
-                    FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
-                }
+                //Copy sequence file into proper directory:
+                classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
 
-                LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
-                cv.release();
-                ScreenshotSerialiser.exit();
-                TestSerialiser.exit();
-                String stopDateString = Util.dateString(DATE_FORMAT);
-                String durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
-                LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
-                LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
-                LogSerialiser.flush();
-                LogSerialiser.finish();
-                LogSerialiser.exit();
+                //Ending test sequence of TESTAR:
+                endTestSequence();
 
                 LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
                 stopSystem(system);
@@ -526,28 +546,30 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 sequenceCount++;
 
             } catch (Exception e) {
-                System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", SUT throws exception");
+                System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
                 e.printStackTrace();
-                SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-                ScreenshotSerialiser.finish();
-                TestSerialiser.finish();
-                ScreenshotSerialiser.exit();
-                LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
-                int i = 1;
-                StringBuffer trace = new StringBuffer();
-                for (StackTraceElement t : e.getStackTrace())
-                    trace.append("\n\t[" + i++ + "] " + t.toString());
-                System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
-                stopSystem(system);
-                TestSerialiser.exit();
-                LogSerialiser.flush();
-                LogSerialiser.finish();
-                LogSerialiser.exit();
-                this.mode = Modes.Quit;
+                emergencyTerminateTestSequence(system, e);
             }
-
         }
-        LOGGER.info("[RT] Runtest finished for sequence {} in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+    }
+
+    private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
+        if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
+                finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
+            LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
+            try {
+                Util.copyToDirectory(currentSeq.getAbsolutePath(),
+                        settings.get(ConfigTags.OutputDir) + File.separator + "sequences",
+                        generatedSequence,
+                        true);
+                LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
+            } catch (NoSuchTagException e) {
+                LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+            } catch (IOException e) {
+                LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+            }
+            FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
+        }
     }
 
     /**
@@ -884,6 +906,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return true;
 	}
+
+    //TODO: Move out of DefaultProtocol?
 	/**
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
@@ -1569,13 +1593,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
-	// TODO: Is this method really used......??
-	/**
-	 *
-	 * @param system
-	 * @param state
-	 * @param action
-	 */
+
+//	/**
+//	 *
+//	 * @param system
+//	 * @param state
+//	 * @param action
+//	 */
+	/*
 	protected void actionExecuted(SUT system, State state, Action action){
 		if (this.lastState == null && state == null)
 			this.nonReactingActionNumber++;
@@ -1589,9 +1614,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);
 		}
 	}
+	*/
 
-	@Override
-	public void mouseMoved(double x, double y) {}
+    @Override
+    public void mouseMoved(double x, double y) {} //for iEventListener
 
 	@Override
 	protected void stopSystem(SUT system) {
