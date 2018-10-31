@@ -33,12 +33,16 @@ public class GuiStateGraphForQlearning {
      * @return
      */
     protected Action getActionWithConcreteId(Set<Action> actions, String concreteActionId){
+        System.out.println("DEBUG: trying to find action with a matching ID:");
         for(Action action:actions){
+            System.out.println("DEBUG: action.ConcreteID="+action.get(Tags.ConcreteID)+", idToMatch="+concreteActionId);
             // find the action with concreteId:
             if(action.get(Tags.ConcreteID).equals(concreteActionId)){
+                System.out.println("DEBUG: match found!");
                 return action;
             }
         }
+        System.out.println("ERROR: matching action ID not found!");
         return null;
     }
 
