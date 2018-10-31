@@ -594,7 +594,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             if (mode() == Modes.Spy) {
                 spyTime = System.currentTimeMillis();
                 runSpyLoop(system);
-                LOGGER.info("[RA] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
+                LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
             }
 
             // getState() including getVerdict() that is saved into the state:
