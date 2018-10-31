@@ -44,6 +44,7 @@ public class QlearningGuiState {
                 actionIdsWithMaxQvalue.add(actionId);
             }
         }
+        System.out.println("DEBUG: max Q value of the state was "+maxQValue+", and "+actionIdsWithMaxQvalue.size()+" action with that value");
         return actionIdsWithMaxQvalue;
     }
 
@@ -81,8 +82,11 @@ public class QlearningGuiState {
         System.out.println("DEBUG: execution counter for action "+actionConcreteId+" is now "+executionCounter);
         concreteActionIdsAndExecutionCounters.put(actionConcreteId,executionCounter);
         double reward = calculateReward(executionCounter);
+        System.out.println("DEBUG: new reward for action "+actionConcreteId+" is "+reward);
         concreteActionIdsAndRewards.put(actionConcreteId,reward);
-        concreteActionIdsAndQValues.put(actionConcreteId,calculateQValue(reward,gammaDiscount,maxQValueOfTheNewState));
+        double qValue = calculateQValue(reward,gammaDiscount,maxQValueOfTheNewState);
+        System.out.println("DEBUG: new Q value for action "+actionConcreteId+" is "+qValue);
+        concreteActionIdsAndQValues.put(actionConcreteId,qValue);
     }
 
     private double calculateReward(int executionCounter){

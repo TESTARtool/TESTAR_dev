@@ -16,6 +16,7 @@ public class QLearningActionSelector {
     private GuiStateGraphForQlearning graph;
 
     public QLearningActionSelector(double R_MAX, double gammaDiscount){
+        System.out.println("DEBUG: creating Q-learning action selector, R-MAX="+R_MAX+", gammaDiscount="+gammaDiscount);
         this.R_MAX = R_MAX;
         this.gammaDiscount=gammaDiscount;
         graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
