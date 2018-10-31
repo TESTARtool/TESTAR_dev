@@ -37,6 +37,7 @@ public class QLearningActionSelector {
 //            System.out.println(this.getClass()+": selectAction(): new state");
             currentQlearningGuiState = graph.createQlearningGuiState(state, actions);
         }
+        System.out.println("DEBUG: state ID ="+currentQlearningGuiState.getConcreteStateId());
        for(String id:currentQlearningGuiState.concreteActionIdsAndQValues.keySet()){
             System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.concreteActionIdsAndQValues.get(id));
        }
@@ -78,7 +79,6 @@ public class QLearningActionSelector {
         }
         //updating the list of states:
         graph.qlearningGuiStates.remove(currentQlearningGuiState); // should not be a problem if state not there (new state)?
-        currentQlearningGuiState.addVisitedAction(returnAction.get(Tags.ConcreteID));
         graph.qlearningGuiStates.add(currentQlearningGuiState);
         // saving the state and action for state transition after knowing the target state:
         graph.previousActionConcreteId = returnAction.get(Tags.ConcreteID);

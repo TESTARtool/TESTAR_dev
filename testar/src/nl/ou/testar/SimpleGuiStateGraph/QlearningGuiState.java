@@ -12,14 +12,12 @@ public class QlearningGuiState {
     protected HashMap<String, Double> concreteActionIdsAndRewards;
     protected HashMap<String, Double> concreteActionIdsAndQValues;
     protected HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
-    protected Set<String> unvisitedActionIds;
     protected Set<GuiStateTransition> stateTransitions;
 
     public QlearningGuiState(String concreteStateId, HashMap<String, Double> concreteActionIdsAndRewards) {
         this.concreteStateId = concreteStateId;
         this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
         this.concreteActionIdsAndQValues = concreteActionIdsAndRewards; // all Q values are the same as R Max in the beginning
-        this.unvisitedActionIds = concreteActionIdsAndRewards.keySet(); // all are unvisited when creating
         //creating execution counters for each action:
         concreteActionIdsAndExecutionCounters = new HashMap<String, Integer>();
         for(String id:concreteActionIdsAndRewards.keySet()){
@@ -106,15 +104,6 @@ public class QlearningGuiState {
         return reward + gammaDiscount * maxQValueOfTheNewState;
     }
 
-    public void addVisitedAction(String concreteActionId){
-        if(unvisitedActionIds.contains(concreteActionId)){
-            System.out.println(this.getClass()+": addVisitedAction: action removed from the unvisited actions");
-            unvisitedActionIds.remove(concreteActionId);
-        }else{
-            System.out.println(this.getClass()+": addVisitedAction: action not found from the unvisited actions");
-        }
-    }
-
     public Set<GuiStateTransition> getStateTransitions() {
         return stateTransitions;
     }
@@ -133,13 +122,5 @@ public class QlearningGuiState {
 
     public void setConcreteActionIdsAndRewards(HashMap<String, Double>  concreteActionIdsAndRewards) {
         this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
-    }
-
-    public Set<String> getUnvisitedActionIds() {
-        return unvisitedActionIds;
-    }
-
-    public void setUnvisitedActionIds(Set<String> unvisitedActionIds) {
-        this.unvisitedActionIds = unvisitedActionIds;
     }
 }

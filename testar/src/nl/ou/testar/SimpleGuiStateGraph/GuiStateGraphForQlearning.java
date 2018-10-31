@@ -21,10 +21,6 @@ public class GuiStateGraphForQlearning {
         qlearningGuiStates = new HashSet<QlearningGuiState>();
     }
 
-    public Set<String> getConcreteIdsOfUnvisitedActions(State state){
-        return getStateByConcreteId(state.get(Tags.ConcreteID)).getUnvisitedActionIds();
-    }
-
     /**
      * returns null if action with given ID is not found
      *
