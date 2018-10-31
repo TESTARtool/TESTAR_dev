@@ -60,9 +60,14 @@ public class QLearningActionSelector {
             returnAction = RandomActionSelector.selectAction(actions);
         }else{
             //selecting randomly of the actionIDs that have max Q value:
+            System.out.println("DEBUG: IDs of actions with max Q value:");
+            for(String id:actionIdsWithMaxQvalue){
+                System.out.println("DEBUG: id="+id);
+            }
             long graphTime = System.currentTimeMillis();
             Random rnd = new Random(graphTime);
             String concreteIdOfRandomAction = actionIdsWithMaxQvalue.get(rnd.nextInt(actionIdsWithMaxQvalue.size()));
+            System.out.println("DEBUG: randomly chosen id="+concreteIdOfRandomAction);
             returnAction = graph.getActionWithConcreteId(actions, concreteIdOfRandomAction);
         }
 
