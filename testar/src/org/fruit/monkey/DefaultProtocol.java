@@ -392,8 +392,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private SUT startSutIfNotRunning(SUT system) {
         //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode, the system is running already)
         if (system == null || !system.isRunning()) {
-            LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             system = startSystem();
+            startOfSutDateString = Util.dateString(DATE_FORMAT);
+            LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
         }
@@ -414,7 +415,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private void startTestSequence(SUT system) {
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
-        startOfSutDateString = Util.dateString(DATE_FORMAT);
         LOGGER.info("Starting test sequence {}", sequenceCount());
 
         actionCount = 1;
