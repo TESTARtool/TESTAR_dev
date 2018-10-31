@@ -22,6 +22,14 @@ public class GuiStateGraphForQlearning {
     }
 
     /**
+     * Resetting the last action and last state to null for a new test sequence
+     */
+    public void startANewTestSequence(){
+        previousActionConcreteId=null;
+        previousStateConcreteId=null;
+    }
+
+    /**
      * returns null if action with given ID is not found
      *
      * @param actions
@@ -54,6 +62,7 @@ public class GuiStateGraphForQlearning {
                 return state;
             }
         }
+        //System.out.println("DEBUG: state with ID="+concreteStateId+" was not found - a new state.");
         return null;
     }
 

@@ -22,6 +22,10 @@ public class QLearningActionSelector {
         graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
     }
 
+    public void resetGraphForNewTestSequence(){
+        graph.startANewTestSequence();
+    }
+
     public Action selectAction(State state, Set<Action> actions) {
         // saving the starting node of the graph:
         if(graph.startingStateConcreteId==null){
@@ -36,8 +40,13 @@ public class QLearningActionSelector {
             // new state:
 //            System.out.println(this.getClass()+": selectAction(): new state");
             currentQlearningGuiState = graph.createQlearningGuiState(state, actions);
+        }else{
+            //update the actions of the state - for some reason the action IDs are changing:
+
         }
-        System.out.println("DEBUG: state ID ="+currentQlearningGuiState.getConcreteStateId());
+
+
+        System.out.println("DEBUG: state ID from model="+currentQlearningGuiState.getConcreteStateId());
        for(String id:currentQlearningGuiState.concreteActionIdsAndQValues.keySet()){
             System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.concreteActionIdsAndQValues.get(id));
        }
@@ -69,6 +78,7 @@ public class QLearningActionSelector {
             Random rnd = new Random(graphTime);
             String concreteIdOfRandomAction = actionIdsWithMaxQvalue.get(rnd.nextInt(actionIdsWithMaxQvalue.size()));
             System.out.println("DEBUG: randomly chosen id="+concreteIdOfRandomAction);
+            System.out.println("DEBUG: stateID from state="+state.get(Tags.ConcreteID));
             returnAction = graph.getActionWithConcreteId(actions, concreteIdOfRandomAction);
         }
 
