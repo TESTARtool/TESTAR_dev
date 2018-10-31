@@ -4,10 +4,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class QlearningGuiState {
     protected String concreteStateId;
@@ -29,17 +26,28 @@ public class QlearningGuiState {
         stateTransitions = new HashSet<GuiStateTransition>();
     }
 
-    public double getMaxQValueOfTheState(){
+    /**
+     * Finding the highest Q value, that is also in the given set of available actions
+     * @param actions
+     * @return
+     */
+    public double getMaxQValueOfTheState(Set<Action> actions){
         double qValue = 0;
-        for(double q:concreteActionIdsAndQValues.values()){
-            if(q>qValue) qValue = q;
+        for(Map.Entry<String, Double> entry:concreteActionIdsAndQValues.entrySet()){
+            if(entry.getValue()>qValue){
+                for(Action action:actions){
+                    if(action.get(Tags.ConcreteID).equals(entry.getKey())){
+                        qValue = entry.getValue();
+                    }
+                }
+            }
         }
         return qValue;
     }
 
     public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions){
         ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
-        double maxQValue = getMaxQValueOfTheState();
+        double maxQValue = getMaxQValueOfTheState(actions);
         for(String actionId:concreteActionIdsAndQValues.keySet()){
             if(concreteActionIdsAndQValues.get(actionId).equals(maxQValue)){
                 //checking that the actionID from the model is also in the list of available actions of the state:

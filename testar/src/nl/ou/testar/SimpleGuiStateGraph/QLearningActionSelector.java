@@ -58,7 +58,7 @@ public class QLearningActionSelector {
             }else{
                 graph.qlearningGuiStates.remove(previousState);//removing the old version of the state
 //                System.out.println(this.getClass()+": new state transition: previousStateId="+previousStateConcreteId+", targetStateId="+state.get(Tags.ConcreteID)+", previousActionConcreteId="+previousActionConcreteId);
-                previousState.addStateTransition(new GuiStateTransition(graph.previousStateConcreteId,state.get(Tags.ConcreteID),graph.previousActionConcreteId),gammaDiscount,currentQlearningGuiState.getMaxQValueOfTheState());
+                previousState.addStateTransition(new GuiStateTransition(graph.previousStateConcreteId,state.get(Tags.ConcreteID),graph.previousActionConcreteId),gammaDiscount,currentQlearningGuiState.getMaxQValueOfTheState(actions));
                 graph.qlearningGuiStates.add(previousState);//adding the updated version of the state
             }
         }
