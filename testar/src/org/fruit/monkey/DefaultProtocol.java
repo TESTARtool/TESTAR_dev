@@ -1444,6 +1444,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
+
+			//Obtain action information
+			String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
+
+			//Output/logs folder
+			LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
+					actionCount,
+					"action = " + action.get(Tags.ConcreteID) +
+					" (" + action.get(Tags.AbstractID) + ") @state = " +
+					state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+					actionRepresentation[0]) + "\n",
+					LogSerialiser.LogLevel.Info);
+
+			//bin folder 
+			LOGGER.info("[EA] ExecutedAction number {} Widget {} finished in {} ms",
+					actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+
 			return true;
 		}catch(ActionFailedException afe){
 			return false;
