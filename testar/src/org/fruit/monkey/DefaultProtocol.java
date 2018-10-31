@@ -324,7 +324,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         sequenceCount = 1;
         lastStamp = System.currentTimeMillis();
         escAttempts = 0;
-        nopAttempts = 0;
+//        nopAttempts = 0;
         //TODO move this into SutProfiling or something:
         sutRAMbase = Double.MAX_VALUE;
         sutRAMpeak = 0.0;
@@ -399,7 +399,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             this.cv = buildCanvas();
         }
         processListeners(system);
-        lastCPU = NativeLinker.getCPUsage(system);
+//        lastCPU = NativeLinker.getCPUsage(system);
         return system;
     }
 
@@ -616,20 +616,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Saving the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state);
-            /*
-            //refactoring runAction out:
-            if (problems)
-                faultySequence = true;
-            else{
-                problems = runAction(cv,system,state,fragment);
 
-                LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
-
-                state = getState(system);
-                graphDB.addState(state);
-
-*/
-            LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
+            //Checking standard output for process oracles:
             if (mode() != Modes.Spy) {
                 processVerdict = getProcessVerdict();
                 verdict = state.get(OracleVerdict, Verdict.OK);
@@ -637,8 +625,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 fragment = new TaggableBase();
                 fragment.set(SystemState, state);
             }
-
-
         }
     }
 
@@ -1721,6 +1707,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param actionStatus
 	 * @return 'true' if problems were found.
 	 */
+	/*
 	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
 		AdhocServer.waitReaderWriter(this);
 		int adhocTestInterval = 10; // ms
@@ -1759,18 +1746,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		CodingManager.buildIDs(state, actionStatus.getAction());
 		return false;
 	}
-
+*/
 
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
-	/**
-	 * Waits for an automatically selected UI action.
-	 * @param system
-	 * @param state
-	 * @param fragment
-	 * @param actionStatus
-	 * @return
-	 */
+//	/**
+//	 * Waits for an automatically selected UI action.
+//	 * @param system
+//	 * @param state
+//	 * @param fragment
+//	 * @param actionStatus
+//	 * @return
+//	 */
+	/*
 	protected boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus){
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state,actions);
@@ -1809,6 +1797,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
+	*/
 
 	protected boolean isNOP(Action action){
 		String as = action.toString();
@@ -1828,6 +1817,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return false;
 	}
 
+	/*
 	//TODO move the variables into a separate class SutProfiler
 	// variables for SUT profiling in runAction():
 	protected long stampLastExecutedAction = -1;
@@ -1835,6 +1825,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected int nopAttempts = 0;
 	protected static final int MAX_NOP_ATTEMPTS = 99;
 	protected static final long NOP_WAIT_WINDOW = 100; // ms
+*/
 
 	/**
 	 * To be documented / refactored
@@ -1845,6 +1836,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param fragment
 	 * @return
 	 */
+	/*
 	protected boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
 		LOGGER.info("[RA} start runAction");
@@ -1980,6 +1972,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return actionStatus.isProblems();
 	}
+	*/
 
     /**
      * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
