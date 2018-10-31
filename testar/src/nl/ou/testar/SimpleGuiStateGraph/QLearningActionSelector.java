@@ -37,6 +37,7 @@ public class QLearningActionSelector {
 //            System.out.println(this.getClass()+": selectAction(): new state");
             currentQlearningGuiState = graph.createQlearningGuiState(state, actions);
         }
+        for(String id:currentQlearningGuiState.concreteActionIdsAndQValues.keySet()
 
         // adding state transition to the graph: previous state + previous action = current state
         if(graph.previousStateConcreteId!=null && graph.previousActionConcreteId != null){ //else the first action and there is no transition yet

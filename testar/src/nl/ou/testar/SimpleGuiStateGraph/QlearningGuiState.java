@@ -94,7 +94,10 @@ public class QlearningGuiState {
         if(executionCounter==0){
             System.out.println("ERROR - calculating Q value for unvisited action should not be needed!");
         }else{
-            reward = 1/(1+executionCounter);
+            System.out.println("DEBUG: executionCounter="+executionCounter);
+            int divider = executionCounter+1;
+            reward = 1/divider;
+            System.out.println("DEBUG: reward="+reward);
         }
         return reward;
     }
