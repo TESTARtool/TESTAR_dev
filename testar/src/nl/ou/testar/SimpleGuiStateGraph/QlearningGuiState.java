@@ -1,6 +1,8 @@
 package nl.ou.testar.SimpleGuiStateGraph;
 
 import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import java.util.Set;
 
 public class QlearningGuiState {
     protected String concreteStateId;
+    //TODO use QlearningValues instead and only 1 hash map
     protected HashMap<String, Double> concreteActionIdsAndRewards;
     protected HashMap<String, Double> concreteActionIdsAndQValues;
     protected HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
@@ -34,16 +37,38 @@ public class QlearningGuiState {
         return qValue;
     }
 
-    public ArrayList<String> getActionsIdsWithMaxQvalue(){
+    public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions){
         ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
         double maxQValue = getMaxQValueOfTheState();
         for(String actionId:concreteActionIdsAndQValues.keySet()){
             if(concreteActionIdsAndQValues.get(actionId).equals(maxQValue)){
-                actionIdsWithMaxQvalue.add(actionId);
+                //checking that the actionID from the model is also in the list of available actions of the state:
+                for(Action action:actions){
+                    if(action.get(Tags.ConcreteID).equals(actionId)){
+                        actionIdsWithMaxQvalue.add(actionId);
+                    }
+                }
             }
         }
         System.out.println("DEBUG: max Q value of the state was "+maxQValue+", and "+actionIdsWithMaxQvalue.size()+" action with that value");
         return actionIdsWithMaxQvalue;
+    }
+
+    /**
+     * For some reason, the actionIDs are changing even if the ConcreteStateID is the same
+     * So updating the actionIDs
+     *
+     */
+    public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX){
+        for(Action action:actions){
+            if(concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID))){
+                // model contains the action ID
+            }else{
+                concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID),R_MAX);
+                concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID),R_MAX);
+                concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID),0);
+            }
+        }
     }
 
     public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState){
@@ -89,7 +114,7 @@ public class QlearningGuiState {
     }
 
     private double calculateReward(int executionCounter){
-        double reward=0;
+        double reward=0.0;
         if(executionCounter==0){
             System.out.println("ERROR - calculating Q value for unvisited action should not be needed!");
         }else{

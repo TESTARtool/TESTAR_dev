@@ -6,7 +6,6 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class QLearningActionSelector {
             currentQlearningGuiState = graph.createQlearningGuiState(state, actions);
         }else{
             //update the actions of the state - for some reason the action IDs are changing:
-
+            currentQlearningGuiState.updateActionIdsOfTheStateIntoModel(actions, R_MAX);
         }
 
 
@@ -64,7 +63,7 @@ public class QLearningActionSelector {
             }
         }
         Action returnAction = null;
-        ArrayList<String> actionIdsWithMaxQvalue = currentQlearningGuiState.getActionsIdsWithMaxQvalue();
+        ArrayList<String> actionIdsWithMaxQvalue = currentQlearningGuiState.getActionsIdsWithMaxQvalue(actions);
         if(actionIdsWithMaxQvalue.size()==0){
             System.out.println("ERROR: Qlearning did not find actions with max Q value!");
             returnAction = RandomActionSelector.selectAction(actions);
