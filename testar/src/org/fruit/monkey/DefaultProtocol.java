@@ -311,7 +311,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected void detectModeLoop(SUT system) {
         if (mode() == Modes.Spy) {
             runSpyLoop(system);
-        } else if(mode() == Modes.GenerateManual) {
+        } else if(mode() == Modes.Refactor) {
         	runRecordLoop(system);
         }else if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
             runGenerateOuterLoop(system);
@@ -609,7 +609,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 runSpyLoop(system);
                 LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
             }
-            if (mode() == Modes.GenerateManual) {
+            if (mode() == Modes.Refactor) {
             	runRecordLoop(system);
             }
 
@@ -719,20 +719,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void runSpyLoop(SUT system) {
-        boolean startedSpy = false;
 
-        //If system it's null means that we have started TESTAR from the Spy mode
-        //We need to invoke the SUT & the canvas representation
-        if(system == null) {
-            system = startSystem();
-            //processListeners(system);
-            startedSpy = true;
-            this.cv = buildCanvas();
-        }
-        //else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
+    	system = startSystem();
 
-        while(mode() == Modes.Spy && system.isRunning()) {
-            State state = getState(system);
+    	this.cv = buildCanvas();
+
+    	while(mode() == Modes.Spy && system.isRunning()) {
+    		State state = getState(system);
             cv.begin(); Util.clear(cv);
             SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
             Set<Action> actions = deriveActions(system,state);
@@ -749,19 +742,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					e.printStackTrace();
 				}
 			}
-            
+
             cv.end();
-        }
+    	}
 
-        if(startedSpy){
-            //cv.release();
-            detectModeLoop(system);
-        }
-
-        //TODO add a wait into SPY mode, so that the state is not updated so fast
+    	detectModeLoop(system);
 
     }
-    
+
     /**
      * Method to run TESTAR on Record User Actions Mode.
      * @param system
@@ -793,7 +781,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         /**
          * Start Record User Action Loop
          */
-        while(mode() == Modes.GenerateManual && system.isRunning()) {
+        while(mode() == Modes.Refactor && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
             SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
@@ -1733,6 +1721,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(system !=null){
 		    system.stop();
         }
+		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+	        try {
+				if ((settings = new SettingsDialog().run(settings, Main.getSettingsFile())) == null) {
+				  return;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	      }
 	}
 
 	@Override
@@ -1813,7 +1811,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 //	 * Requirement: Mode must be GenerateManual.
 //	 */
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
+		while (mode() == Modes.Refactor && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
 				actionStatus.setAction(mapUserEvent(state));
 				actionStatus.setUserEventAction((actionStatus.getAction() != null));

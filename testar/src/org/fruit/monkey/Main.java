@@ -230,6 +230,10 @@ public class Main {
     });
   }
 
+  public static String getSettingsFile() {
+	  return getSettingsDir() + File.separator + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+  }
+  
   public static void main(String[] args) throws IOException {
     Settings settings = null;
     Locale.setDefault(Locale.ENGLISH);
@@ -257,7 +261,7 @@ public class Main {
       //Use the only file that was found
       SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
     }
-    String testSettings = getSettingsDir() + File.separator + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+    String testSettings = getSettingsFile();
     System.out.println("Test settings is <" + testSettings + ">");
     URLClassLoader loader = null;
     // TODO: put the above code into a seperate method/class that returns the testSettings String
