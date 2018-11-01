@@ -657,6 +657,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Saving the actions and the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
+
+            // Resetting the visualization:
+            Util.clear(cv);
+            cv.end();
         }
     }
 
@@ -856,6 +860,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     }
 
+    //TODO rename to replayLoop to be consistent:
     protected void replay(){
     	actionCount = 1;
         boolean success = true;
