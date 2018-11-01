@@ -374,6 +374,13 @@ public class Main {
 			startTestar(settings, testSettingsFileName);
 		}
 
+
+		TestSerialiser.exit();
+		ScreenshotSerialiser.exit();
+		LogSerialiser.exit();
+
+		System.exit(0);
+
 	}
 
 	// TODO: This methods should be part of the Settings class. It contains all the default values of the settings.
