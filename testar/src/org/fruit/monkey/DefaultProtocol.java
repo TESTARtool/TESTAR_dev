@@ -641,7 +641,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 escAttempts++;
             } else
                 escAttempts = 0;
-            fragment.set(ActionSet, actions);
             SutVisualization.visualizeActions(mode(), settings(), cv, state, actions);
 
             //Selecting one of the available actions:
@@ -652,8 +651,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             executeAction(system, state, action);
             actionCount++;
 
-            //Saving the executed action into replayable test sequence:
-            saveActionIntoFragmentForReplayableSequence(action, state);
+            //Saving the actions and the executed action into replayable test sequence:
+            saveActionIntoFragmentForReplayableSequence(action, state, actions);
         }
     }
 
@@ -675,11 +674,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      *
      * @param action
      */
-    private void saveActionIntoFragmentForReplayableSequence(Action action, State state) {
+    private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
     	processVerdict = getProcessVerdict();
     	verdict = state.get(OracleVerdict, Verdict.OK);
     	fragment.set(OracleVerdict, verdict.join(processVerdict));
     	fragment.set(ExecutedAction,action);
+        fragment.set(ActionSet, actions);
     	fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
     	fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
     	LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
