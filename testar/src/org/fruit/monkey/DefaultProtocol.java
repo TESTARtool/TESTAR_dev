@@ -651,7 +651,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             executeAction(system, state, action);
             actionCount++;
 
+<<<<<<< HEAD
             //Saving the actions and the executed action into replayable test sequence:
+=======
+            //Saving the executed action into replayable test sequence:
+>>>>>>> 2575a3f5502e070a7690438b0b6208c757ee059d
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
         }
     }
@@ -675,6 +679,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param action
      */
     private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+<<<<<<< HEAD
+=======
+        fragment.set(ActionSet, actions);
+>>>>>>> 2575a3f5502e070a7690438b0b6208c757ee059d
     	processVerdict = getProcessVerdict();
     	verdict = state.get(OracleVerdict, Verdict.OK);
     	fragment.set(OracleVerdict, verdict.join(processVerdict));
