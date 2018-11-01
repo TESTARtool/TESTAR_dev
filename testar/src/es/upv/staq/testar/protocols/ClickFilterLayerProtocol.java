@@ -131,11 +131,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+		SutVisualization.visualizeActions(canvas, state, actions);
     	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
     		filteringManager.visualizeActions(canvas,state);
 	}
-    
+
     protected boolean blackListed(Widget w){
     	return filteringManager.blackListed(w);
     }

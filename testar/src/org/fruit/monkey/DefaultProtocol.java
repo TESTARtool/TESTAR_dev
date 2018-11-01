@@ -243,7 +243,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         // If the mode is View or Replay, the mode cannot be changed by the user:
         if (mode() == Modes.View) {
             new SequenceViewer(settings).run();
-        } else if (mode() == Modes.Replay || mode() == Modes.ReplayDebug) {
+        } else if (mode() == Modes.Replay) {
             replay();
         } else {
             // Else we start the loop for checking the TESTAR Mode:
@@ -313,7 +313,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             runSpyLoop(system);
         } else if(mode() == Modes.Record) {
         	runRecordLoop(system);
-        }else if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
+        }else if (mode() == Modes.Generate) {
             runGenerateOuterLoop(system);
         } else if (mode() == Modes.Quit) {
             stopSystem(system);
@@ -626,6 +626,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
+
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
@@ -641,11 +642,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 escAttempts++;
             } else
                 escAttempts = 0;
-            SutVisualization.visualizeActions(mode(), settings(), cv, state, actions);
+            //Showing the green dots if visualization is on:
+            if(visualizationOn) visualizeActions(cv, state, actions);
 
             //Selecting one of the available actions:
             Action action = selectAction(state, actions);
-            SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
+            //Showing the red dot if visualization is on:
+            if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
             //Executing the selected action:
             executeAction(system, state, action);
@@ -749,6 +752,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}
 
     	}
+
+    	//If user closes the SUT while in Spy-mode, TESTAR will close (or go back to SettingsDialog):
+    	if(!system.isRunning()){
+    	    this.mode = Modes.Quit;
+        }
 
     	Util.clear(cv);
     	cv.end();
@@ -888,7 +896,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                     if(mode() == Modes.Quit) break;
                     Action action = fragment.get(ExecutedAction, new NOP());
-                    SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
+                    if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
                     if(mode() == Modes.Quit) break;
 
                     double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
@@ -1571,11 +1579,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+    /**
+     * This method is here, so that ClickFilterLayerProtocol can override it, and the behaviour is updated
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+		SutVisualization.visualizeActions(canvas, state, actions);
 	}
 
-	//TODO platform independent?
 	/**
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to

@@ -18,11 +18,15 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected double delay = Double.MIN_VALUE;
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
+    protected boolean visualizationOn = false;
 
     public enum Modes{
         Spy,
         Record,
-        Generate, GenerateDebug, Quit, View, Replay, ReplayDebug;
+        Generate,
+        Quit,
+        View,
+        Replay;
     }
 
     protected Modes mode;
@@ -38,25 +42,21 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     private synchronized void nextMode(boolean forward){
         if(forward){
             switch(mode){
-                //case Spy: mode = Modes.Generate; break;
-                case Spy: userEvent = null; mode = Modes.Record; break;
-                case Record: mode = Modes.Generate; break;
-                case Generate: mode = Modes.GenerateDebug; break;
-                case GenerateDebug: mode = Modes.Spy; break;
-                case Replay: mode = Modes.ReplayDebug; break;
-                case ReplayDebug: mode = Modes.Replay; break;
-                default: break;
+                case Record:
+                    mode = Modes.Generate; break;
+                case Generate:
+                    mode = Modes.Record; break;
+                default:
+                    break;
             }
         }else{
             switch(mode){
-                case Spy: mode = Modes.GenerateDebug; break;
-                //case Generate: mode = Modes.Spy; break;
-                case Record: mode = Modes.Spy; break;
-                case Generate: userEvent = null; mode = Modes.Record; break;
-                case GenerateDebug: mode = Modes.Generate; break;
-                case Replay: mode = Modes.ReplayDebug; break;
-                case ReplayDebug: mode = Modes.Replay; break;
-                default: break;
+                case Record:
+                    mode = Modes.Generate; break;
+                case Generate:
+                    mode = Modes.Record; break;
+                default:
+                    break;
             }
         }
 
@@ -88,11 +88,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
      * @return
      */
     public synchronized Modes mode(){ return mode; }
-    
-    public synchronized void setTestarMode(Modes mode) {
-    	this.mode = mode;
-    }
-
 
     private final static double SLOW_MOTION = 2.0;
     //TODO: key commands come through java.awt.event but are the key codes same for all OS? if they are the same, then move to platform independent protocol?
@@ -133,10 +128,19 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT))
             nextMode(false);
 
-            // SHIFT + ARROW-DOWN --> panic stop
+            // SHIFT + ARROW-DOWN --> stop TESTAR run
         else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
             LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
             mode = Modes.Quit;
+        }
+
+        // SHIFT + ARROW-UP --> toggle visualization on / off
+        else if(key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)){
+            if(visualizationOn){
+                visualizationOn = false;
+            }else{
+                visualizationOn = true;
+            }
         }
 
         // SHIFT + 1 --> toggle action visualization
