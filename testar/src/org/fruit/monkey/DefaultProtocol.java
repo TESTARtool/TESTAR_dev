@@ -805,8 +805,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         while(mode() == Modes.Record && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
-            //In Record-mode, we show the widget info under cursor:
-            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+            //In Record-mode, we DO NOT show any visualization:
+            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
            
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
@@ -825,7 +825,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } else
                 escAttempts = 0;
 
-            visualizeActions(cv, state, actions);
+            //In Record-mode, we DO NOT show any visualization:
+            //visualizeActions(cv, state, actions);
             ActionStatus actionStatus = new ActionStatus();
             
             //Start Wait User Action Loop to obtain the Action did by the User

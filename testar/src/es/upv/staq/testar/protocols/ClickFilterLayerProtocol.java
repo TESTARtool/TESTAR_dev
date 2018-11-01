@@ -99,10 +99,12 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
-	    	} else if (key == KBKeys.VK_ALT){
+	    	}
+	    	else if (key == KBKeys.VK_ALT){
 	    		altPressed = true;
-	    		if (!ctrlPressed && !shiftPressed)
-	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
+			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
+//	    		if (!ctrlPressed && !shiftPressed)
+//	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
 	    	}
         }
     }
