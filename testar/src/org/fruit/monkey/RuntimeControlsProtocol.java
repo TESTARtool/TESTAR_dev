@@ -1,6 +1,5 @@
 package org.fruit.monkey;
 
-import es.upv.staq.testar.AdhocServer;
 import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -44,7 +43,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
                 case GenerateManual: mode = Modes.Generate; break;
                 case Generate: mode = Modes.GenerateDebug; break;
                 case GenerateDebug: mode = Modes.Spy; break;
-                case AdhocTest: mode = Modes.Spy; AdhocServer.stopAdhocServer(); break;
                 case Replay: mode = Modes.ReplayDebug; break;
                 case ReplayDebug: mode = Modes.Replay; break;
                 default: break;
@@ -56,7 +54,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
                 case GenerateManual: mode = Modes.Spy; break;
                 case Generate: userEvent = null; mode = Modes.GenerateManual; break;
                 case GenerateDebug: mode = Modes.Generate; break;
-                case AdhocTest: mode = Modes.Spy; AdhocServer.stopAdhocServer(); break;
                 case Replay: mode = Modes.ReplayDebug; break;
                 case ReplayDebug: mode = Modes.Replay; break;
                 default: break;
@@ -136,7 +133,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
             LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
             mode = Modes.Quit;
-            AdhocServer.stopAdhocServer();
         }
 
         // SHIFT + 1 --> toggle action visualization

@@ -324,14 +324,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         sequenceCount = 1;
         lastStamp = System.currentTimeMillis();
         escAttempts = 0;
-//        nopAttempts = 0;
-        //TODO move this into SutProfiling or something:
-        sutRAMbase = Double.MAX_VALUE;
-        sutRAMpeak = 0.0;
-        sutCPUpeak = 0.0;
-        testRAMpeak = 0.0;
-        testCPUpeak = 0.0;
-
     }
 
     /**
@@ -1617,29 +1609,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
-
-//	/**
-//	 *
-//	 * @param system
-//	 * @param state
-//	 * @param action
-//	 */
-	/*
-	protected void actionExecuted(SUT system, State state, Action action){
-		if (this.lastState == null && state == null)
-			this.nonReactingActionNumber++;
-		else if (this.lastState != null && state != null &&
-				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
-			this.nonReactingActionNumber++;
-		this.lastState = state;
-		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
-			this.nonReactingActionNumber = 0;
-			this.forceNextActionESC = true;
-			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);
-		}
-	}
-	*/
-
     @Override
     public void mouseMoved(double x, double y) {} //for iEventListener
 
@@ -1675,7 +1644,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     GlobalScreen.unregisterNativeHook();
                 }
             }
-            AdhocServer.stopAdhocServer();
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -1687,174 +1655,78 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
 	//TODO move to ManualRecording helper class??
-	/**
-	 * Records user action (for example for Generate-Manual)
-	 *
-	 * @param state
-	 * @return
-	 */
-	protected Action mapUserEvent(State state){
-		Assert.notNull(userEvent);		
-		if (userEvent[0] instanceof MouseButtons){ // mouse events
-			double x = ((Double)userEvent[1]).doubleValue();
-			double y = ((Double)userEvent[2]).doubleValue();	
-			Widget w = null;
-			try {
-				w = Util.widgetFromPoint(state, x, y);
-				x = 0.5; y = 0.5;
-				if (userEvent[0] == MouseButtons.BUTTON1) // left click
-					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-				else if (userEvent[0] == MouseButtons.BUTTON3) // right click     
-					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
-			} catch (WidgetNotFoundException we){
-				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-				return null;
-			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
-			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
-		else if (userEvent[0] instanceof String){ // type events
-			if (lastExecutedAction == null)
-				return null;
-			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
-			if (targets == null || targets.size() != 1)
-				return null;
-			try {
-				Widget w = targets.get(0).apply(state);
-				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
-			} catch (WidgetNotFoundException we){
-				return null;
-			}
-		}
-
-		return null;
-	}
-
-	//TODO move to ManualRecording helper class??
-	/**
-	 * Waits for an user UI action.
-	 * Requirement: Mode must be GenerateManual.
-	 */
-	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
-			if (userEvent != null){
-				actionStatus.setAction(mapUserEvent(state));
-				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				userEvent = null;
-			}
-			synchronized(this){
-				try {
-					this.wait(100);
-				} catch (InterruptedException e) {}
-			}
-			cv.begin(); Util.clear(cv);
-
-			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
-			visualizeActions(cv, state, actions);
-
-			cv.end();
-		}		
-	}
+//	/**
+//	 * Records user action (for example for Generate-Manual)
+//	 *
+//	 * @param state
+//	 * @return
+//	 */
+//	protected Action mapUserEvent(State state){
+//		Assert.notNull(userEvent);
+//		if (userEvent[0] instanceof MouseButtons){ // mouse events
+//			double x = ((Double)userEvent[1]).doubleValue();
+//			double y = ((Double)userEvent[2]).doubleValue();
+//			Widget w = null;
+//			try {
+//				w = Util.widgetFromPoint(state, x, y);
+//				x = 0.5; y = 0.5;
+//				if (userEvent[0] == MouseButtons.BUTTON1) // left click
+//					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
+//				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
+//					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+//			} catch (WidgetNotFoundException we){
+//				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+//				return null;
+//			}
+//		} else if (userEvent[0] instanceof KBKeys) // key events
+//			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+//		else if (userEvent[0] instanceof String){ // type events
+//			if (lastExecutedAction == null)
+//				return null;
+//			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
+//			if (targets == null || targets.size() != 1)
+//				return null;
+//			try {
+//				Widget w = targets.get(0).apply(state);
+//				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
+//			} catch (WidgetNotFoundException we){
+//				return null;
+//			}
+//		}
+//
+//		return null;
+//	}
 
 	//TODO move to ManualRecording helper class??
-	/**
-	 * Waits for an event (UI action) from adhoc-test.
-	 * @param state
-	 * @param actionStatus
-	 * @return 'true' if problems were found.
-	 */
-	/*
-	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
-		AdhocServer.waitReaderWriter(this);
-		int adhocTestInterval = 10; // ms
-		while (System.currentTimeMillis() < stampLastExecutedAction + adhocTestInterval){
-			synchronized(this){
-				try {
-					this.wait(adhocTestInterval - System.currentTimeMillis() + stampLastExecutedAction + 1);
-				} catch (InterruptedException e) {}
-			}
-		}
-		do{
-			System.out.println("AdhocTest waiting for event ...");
-			try{
-				AdhocServer.adhocWrite("READY");
-			} catch (Exception e){
-				return true; // AdhocTest client disconnected?
-			}
-			try{
-				String socketData = AdhocServer.adhocRead(); // one event per line
-				System.out.println("\t... AdhocTest event = " + socketData);
-				userEvent = AdhocServer.compileAdhocTestServerEvent(socketData); // hack into userEvent
-				if (userEvent == null){
-					AdhocServer.adhocWrite("???");
-				}else{
-					actionStatus.setAction(mapUserEvent(state));
-					if (actionStatus.getAction() == null){
-						AdhocServer.adhocWrite("404");
-					}
-				}
-				userEvent = null;
-			} catch (Exception e){
-				userEvent = null;
-				return true; // AdhocTest client disconnected?
-			}
-		} while (actionStatus.getAction() == null);
-		CodingManager.buildIDs(state, actionStatus.getAction());
-		return false;
-	}
-*/
+//	/**
+//	 * Waits for an user UI action.
+//	 * Requirement: Mode must be GenerateManual.
+//	 */
+//	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
+//		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
+//			if (userEvent != null){
+//				actionStatus.setAction(mapUserEvent(state));
+//				actionStatus.setUserEventAction((actionStatus.getAction() != null));
+//				userEvent = null;
+//			}
+//			synchronized(this){
+//				try {
+//					this.wait(100);
+//				} catch (InterruptedException e) {}
+//			}
+//			cv.begin(); Util.clear(cv);
+//
+//			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+//			Set<Action> actions = deriveActions(system,state);
+//			CodingManager.buildIDs(state, actions);
+//			visualizeActions(cv, state, actions);
+//
+//			cv.end();
+//		}
+//	}
 
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
-//	/**
-//	 * Waits for an automatically selected UI action.
-//	 * @param system
-//	 * @param state
-//	 * @param fragment
-//	 * @param actionStatus
-//	 * @return
-//	 */
-	/*
-	protected boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus){
-		Set<Action> actions = deriveActions(system, state);
-		CodingManager.buildIDs(state,actions);
-
-		if(actions.isEmpty()){
-			if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-				LogSerialiser.log("No available actions to execute! Tryed ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				actionStatus.setProblems(true); // problems found
-			}
-			//----------------------------------
-			// THERE MUST ALMOST BE ONE ACTION!
-			//----------------------------------
-			// if we did not find any actions, then we just hit escape, maybe that works ;-)
-			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, escAction);
-			actions.add(escAction);
-			escAttempts++;
-		} else
-			escAttempts = 0;
-
-		fragment.set(ActionSet, actions);
-		LogSerialiser.log("Built action set!\n", LogSerialiser.LogLevel.Debug);
-		visualizeActions(cv, state, actions);
-
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-		LogSerialiser.log("Selecting action...\n", LogSerialiser.LogLevel.Debug);
-		if(mode() == Modes.Spy) return false;
-		actionStatus.setAction(selectAction(state, actions));
-
-		if (actionStatus.getAction() == null){ // (no suitable actions?)
-			nonSuitableAction = true;
-			return true; // force test sequence end
-		}
-
-		actionStatus.setUserEventAction(false);
-
-		return false;
-	}
-	*/
 
 	protected boolean isNOP(Action action){
 		String as = action.toString();
@@ -1873,163 +1745,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		return false;
 	}
-
-	/*
-	//TODO move the variables into a separate class SutProfiler
-	// variables for SUT profiling in runAction():
-	protected long stampLastExecutedAction = -1;
-	protected long[] lastCPU; // user x system x frame
-	protected int nopAttempts = 0;
-	protected static final int MAX_NOP_ATTEMPTS = 99;
-	protected static final long NOP_WAIT_WINDOW = 100; // ms
-*/
-
-	/**
-	 * To be documented / refactored
-	 *
-	 * @param cv
-	 * @param system
-	 * @param state
-	 * @param fragment
-	 * @return
-	 */
-	/*
-	protected boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
-		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA} start runAction");
-		ActionStatus actionStatus = new ActionStatus();
-
-		if (mode() == Modes.GenerateManual)
-			waitUserActionLoop(cv,system,state,actionStatus);
-
-		cv.begin(); Util.clear(cv);
-		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-		LogSerialiser.log("Building action set...\n", LogSerialiser.LogLevel.Debug);
-
-		if (actionStatus.isUserEventAction()){ // user action
-			CodingManager.buildIDs(state, actionStatus.getAction());
-		} else if (mode() == Modes.AdhocTest){ // adhoc-test action
-			if (waitAdhocTestEventLoop(state,actionStatus)){
-				cv.end();
-				return true; // problems
-			}
-		} else{ // automatically derived action
-			if (waitAutomaticAction(system,state,fragment,actionStatus)){
-				cv.end();
-				return true; // problems
-			} else if (actionStatus.getAction() == null && mode() == Modes.Spy){
-				cv.end();
-				return false;
-			}
-		}
-		cv.end();
-
-		if (actionStatus.getAction() == null)
-			return true; // problems
-
-		if (actionCount == firstSequenceActionNumber && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
-			System.out.println("First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
-			Util.pauseMs(NOP_WAIT_WINDOW); // hold-on for UI to react (e.g. scenario: SUT loading ... logo)
-			actionStatus.setAction(new NOP());
-			CodingManager.buildIDs(state, actionStatus.getAction());
-			nopAttempts++; escAttempts = 0;
-		} else
-			nopAttempts = 0;
-
-		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
-
-		SutVisualization.visualizeSelectedAction(mode, settings, cv, state, actionStatus.getAction());
-
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-
-		boolean isTestAction = nopAttempts >= MAX_NOP_ATTEMPTS || !isNOP(actionStatus.getAction());
-
-		if(mode() != Modes.Spy){
-			String[] actionRepresentation = Action.getActionRepresentation(state,actionStatus.getAction(),"\t");
-			int memUsage = NativeLinker.getMemUsage(system);
-			if (memUsage < sutRAMbase)
-				sutRAMbase = memUsage;
-			if (memUsage - sutRAMbase > sutRAMpeak)
-				sutRAMpeak = memUsage - sutRAMbase;
-			long currentCPU[] = NativeLinker.getCPUsage(system),
-					userms = currentCPU[0] - lastCPU[0],
-					sysms = currentCPU[1] - lastCPU[1],
-					cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
-			lastCPU = currentCPU;
-			LogSerialiser.log(String.format("Executing (%d): %s...", actionCount,
-					actionStatus.getAction().get(Desc, actionStatus.getAction().toString())) + "\n", LogSerialiser.LogLevel.Debug);
-
-			if (actionStatus.isUserEventAction() ||
-					(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){
-
-				cv.begin();
-				Util.clear(cv);
-				cv.end(); // (overlay is invalid until new state/actions scan)
-				stampLastExecutedAction = System.currentTimeMillis();
-				actionExecuted(system,state,actionStatus.getAction()); // notification
-				if (actionStatus.isUserEventAction())
-					Util.pause(settings.get(ConfigTags.TimeToWaitAfterAction)); // wait between actions
-				double sutCPU = ((cpuUsage[0] + cpuUsage[1]) / (double)cpuUsage[2] * 100);
-				if (sutCPU > sutCPUpeak)
-					sutCPUpeak = sutCPU;
-				String cpuPercent = String.format("%.2f", sutCPU) + "%";
-				LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
-						actionCount,
-						"action = " + actionStatus.getAction().get(Tags.ConcreteID) +
-						" (" + actionStatus.getAction().get(Tags.AbstractID) + ") @state = " +
-						state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n\tSUT_KB = " +
-						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
-						actionRepresentation[0]) + "\n",
-						LogSerialiser.LogLevel.Info);
-
-				if (mode() == Modes.AdhocTest){
-					try {
-						AdhocServer.adhocWrite("OK");
-					} catch (Exception e){} // AdhocTest client disconnected?
-				}
-
-				if (isTestAction && actionStatus.isActionSucceeded())
-					actionCount++;
-				fragment.set(ExecutedAction, actionStatus.getAction());
-				fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
-				fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
-				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-
-				TestSerialiser.write(fragment);
-
-				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-			}else{
-				LogSerialiser.log("Execution of action failed!\n");
-				try {
-					AdhocServer.adhocWrite("FAIL");
-				} catch (Exception e) {
-					LogSerialiser.log("protocolUtil Failed!\n");
-				} // AdhocTest client disconnected?
-			}				
-		}
-
-		lastExecutedAction = actionStatus.getAction();
-		lastExecutedAction.set(Tags.UsedResources, new UsedResources(lastCPU[0],lastCPU[1],sutRAMbase,sutRAMpeak).toString());
-		lastExecutedAction.set(Tags.Representation, Action.getActionRepresentation(state,lastExecutedAction,"\t")[1]);
-		State newState = getState(system);
-		graphDB.addState(newState);
-
-		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
-			//TODO this does not work in all cases check (the last executed action tag does not always have a description
-			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
-			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
-		} else {
-			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
-		}
-		LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-		if(!actionStatus.isActionSucceeded()){
-			return true;
-		}
-
-		return actionStatus.isProblems();
-	}
-	*/
 
     /**
      * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
@@ -2056,12 +1771,5 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             }
         }
     }
-
-	//TODO move to SutProfiler, cannot be static as keeps the values
-	protected double sutRAMbase;
-	protected double sutRAMpeak;
-	protected double sutCPUpeak;
-	protected double testRAMpeak;
-	protected double testCPUpeak;
 
 }
