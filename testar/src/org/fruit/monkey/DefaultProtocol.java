@@ -311,7 +311,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected void detectModeLoop(SUT system) {
         if (mode() == Modes.Spy) {
             runSpyLoop(system);
-        } else if(mode() == Modes.Refactor) {
+        } else if(mode() == Modes.Record) {
         	runRecordLoop(system);
         }else if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
             runGenerateOuterLoop(system);
@@ -609,7 +609,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 runSpyLoop(system);
                 LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
             }
-            if (mode() == Modes.Refactor) {
+            if (mode() == Modes.Record) {
             	runRecordLoop(system);
             }
 
@@ -742,7 +742,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					e.printStackTrace();
 				}
 			}
-
+            Util.clear(cv);
             cv.end();
     	}
 
@@ -781,7 +781,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         /**
          * Start Record User Action Loop
          */
-        while(mode() == Modes.Refactor && system.isRunning()) {
+        while(mode() == Modes.Record && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
             SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
@@ -1730,6 +1730,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	        setMode(settings().get(ConfigTags.Mode));
 	      }
 	}
 
@@ -1811,7 +1812,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 //	 * Requirement: Mode must be GenerateManual.
 //	 */
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.Refactor && !actionStatus.isUserEventAction()){
+		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
 				actionStatus.setAction(mapUserEvent(state));
 				actionStatus.setUserEventAction((actionStatus.getAction() != null));

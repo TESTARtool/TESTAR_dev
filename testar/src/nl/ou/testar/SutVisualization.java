@@ -29,7 +29,7 @@ public class SutVisualization {
      */
     public static synchronized void visualizeState(RuntimeControlsProtocol.Modes mode, Settings settings, boolean markParentWidget, Mouse mouse, ProtocolUtil protocolUtil,String lastPrintParentsOf, double delay, Canvas canvas, State state, SUT system){
         if((mode == RuntimeControlsProtocol.Modes.Spy
-                || mode == RuntimeControlsProtocol.Modes.Refactor
+                || mode == RuntimeControlsProtocol.Modes.Record
                 || mode == RuntimeControlsProtocol.Modes.ReplayDebug) && settings.get(ConfigTags.DrawWidgetUnderCursor)){
             Point cursor = mouse.cursor();
             Widget cursorWidget = Util.widgetFromPoint(state, cursor.x(), cursor.y(), null);
@@ -166,7 +166,7 @@ public class SutVisualization {
      */
     public static void visualizeActions(RuntimeControlsProtocol.Modes mode, Settings settings, Canvas canvas, State state, Set<Action> actions){
         if((mode == RuntimeControlsProtocol.Modes.Spy ||
-                mode == RuntimeControlsProtocol.Modes.Refactor ||
+                mode == RuntimeControlsProtocol.Modes.Record ||
                 mode == RuntimeControlsProtocol.Modes.GenerateDebug) && settings.get(ConfigTags.VisualizeActions)){
             int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
             Map<Action,Integer> zindexes = new HashMap<Action,Integer>();

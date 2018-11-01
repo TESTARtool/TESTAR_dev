@@ -21,7 +21,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     public enum Modes{
         Spy,
-        Refactor,
+        Record,
         Generate, GenerateDebug, Quit, View, Replay, ReplayDebug;
     }
 
@@ -39,8 +39,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         if(forward){
             switch(mode){
                 //case Spy: mode = Modes.Generate; break;
-                case Spy: userEvent = null; mode = Modes.Refactor; break;
-                case Refactor: mode = Modes.Generate; break;
+                case Spy: userEvent = null; mode = Modes.Record; break;
+                case Record: mode = Modes.Generate; break;
                 case Generate: mode = Modes.GenerateDebug; break;
                 case GenerateDebug: mode = Modes.Spy; break;
                 case Replay: mode = Modes.ReplayDebug; break;
@@ -51,8 +51,8 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             switch(mode){
                 case Spy: mode = Modes.GenerateDebug; break;
                 //case Generate: mode = Modes.Spy; break;
-                case Refactor: mode = Modes.Spy; break;
-                case Generate: userEvent = null; mode = Modes.Refactor; break;
+                case Record: mode = Modes.Spy; break;
+                case Generate: userEvent = null; mode = Modes.Record; break;
                 case GenerateDebug: mode = Modes.Generate; break;
                 case Replay: mode = Modes.ReplayDebug; break;
                 case ReplayDebug: mode = Modes.Replay; break;
@@ -63,7 +63,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         // Add some logging
         // Add the FlashFeedback about the mode you are in in the upper left corner.
         String modeParamS = "";
-        if (mode == Modes.Refactor)
+        if (mode == Modes.Record)
             modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
 
         String modeNfo = "'" + mode + "' mode active." + modeParamS;
@@ -166,7 +166,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             // This is because SHIFT is used for the TESTAR shortcuts
             // This is not ideal, because now special characters and capital letters and other events that needs SHIFT
             // cannot be recorded as an user event in GenerateManual....
-        else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Refactor && userEvent == null){
+        else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null){
             //System.out.println("USER_EVENT key_down! " + key.toString());
             userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
         }
@@ -200,7 +200,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     @Override
     public void mouseUp(MouseButtons btn, double x, double y){
         // In GenerateManual the user can add user events by clicking
-        if (mode() == Modes.Refactor && userEvent == null){
+        if (mode() == Modes.Record && userEvent == null){
             //System.out.println("USER_EVENT mouse_up!");
             userEvent = new Object[]{
                     btn,
