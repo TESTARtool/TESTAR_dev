@@ -391,7 +391,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
         }
         processListeners(system);
-//        lastCPU = NativeLinker.getCPUsage(system);
         return system;
     }
 
