@@ -719,35 +719,39 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void runSpyLoop(SUT system) {
-    	
-    	system = startSystem();
 
-    	this.cv = buildCanvas();
+    	//If system it's null means that we have started TESTAR from the Spy mode
+    	//We need to invoke the SUT & the canvas representation
+    	if(system == null) {
+    		system = startSystem();
+    		this.cv = buildCanvas();
+    	}
+    	//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
 
     	while(mode() == Modes.Spy && system.isRunning()) {
     		State state = getState(system);
-            cv.begin(); Util.clear(cv);
-            SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-            Set<Action> actions = deriveActions(system,state);
-            CodingManager.buildIDs(state, actions);
-            visualizeActions(cv, state, actions);
-            
-            //TODO: Prepare Spy Mode refresh time on settings file
-            //Wait 500ms to show the actions
-            synchronized (this) {
-				try {
-					this.wait(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-            
+    		cv.begin(); Util.clear(cv);
+    		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+    		Set<Action> actions = deriveActions(system,state);
+    		CodingManager.buildIDs(state, actions);
+    		visualizeActions(cv, state, actions);
+    		cv.end();
+
+    		//TODO: Prepare Spy Mode refresh time on settings file
+    		//Wait 500ms to show the actions
+    		synchronized (this) {
+    			try {
+    				this.wait(500);
+    			} catch (InterruptedException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    		}
+
     	}
 
     	Util.clear(cv);
-        cv.end();
-        
+    	cv.end();
     	detectModeLoop(system);
 
     }
