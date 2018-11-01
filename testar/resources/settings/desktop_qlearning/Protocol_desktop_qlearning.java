@@ -90,6 +90,11 @@ public class Protocol_desktop_qlearning extends ClickFilterLayerProtocol {
 		actionSelector.resetGraphForNewTestSequence();
 	}
 
+	@Override
+	protected void postSequenceProcessing() {
+		actionSelector.printReport();
+	}
+
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of 

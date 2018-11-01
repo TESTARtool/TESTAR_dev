@@ -536,6 +536,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //Copy sequence file into proper directory:
                 classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
 
+                //calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
+                postSequenceProcessing();
+
                 //Ending test sequence of TESTAR:
                 endTestSequence();
 
@@ -551,6 +554,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 emergencyTerminateTestSequence(system, e);
             }
         }
+        //allowing close-up in the end of test session:
+        closeTestSession();
+        //Closing TESTAR internal test session:
+        closeTestarTestSession();
     }
 
     private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
@@ -1649,13 +1656,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	@Override
-	protected void PostSequenceProcessing() {
+	protected void postSequenceProcessing() {
 
 	}
 
-	@Override
-    protected void CloseTestSession() {
-	    //cleaning the stuff started in initialize()
+    /**
+     * method for closing the internal TESTAR test session
+     */
+	private void closeTestarTestSession(){
+        //cleaning the variables started in initialize()
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
                 if (GlobalScreen.isNativeHookRegistered()) {
@@ -1670,6 +1679,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+	@Override
+    protected void closeTestSession() {
     }
 
 	//TODO move to ManualRecording helper class??

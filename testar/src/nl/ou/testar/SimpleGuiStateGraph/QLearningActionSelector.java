@@ -94,4 +94,26 @@ public class QLearningActionSelector {
         graph.previousStateConcreteId = state.get(Tags.ConcreteID);
         return returnAction;
     }
+
+    public void printReport(){
+        System.out.println("***************************");
+        System.out.println("*  Q learning report      *");
+        System.out.println("***************************");
+        System.out.println("Number of states in graph: "+graph.qlearningGuiStates.size());
+        int numberOfActions = 0;
+        int numberOfExecutedActions = 0;
+        int numberOfExecutionsSum = 0;
+        for(QlearningGuiState state:graph.qlearningGuiStates){
+            numberOfActions = numberOfActions+state.concreteActionIdsAndExecutionCounters.size();
+            for(int executionCounter:state.concreteActionIdsAndExecutionCounters.values()){
+                if(executionCounter>0){
+                    numberOfExecutedActions++;
+                }
+                numberOfExecutionsSum = numberOfExecutionsSum + executionCounter;
+            }
+        }
+        System.out.println("Sum of actions in all of the states: "+numberOfActions);
+        System.out.println("Sum of executed actions in all of the states: "+numberOfExecutedActions);
+        System.out.println("Sum of action execution counters in all of the actions: "+numberOfExecutionsSum);
+    }
 }
