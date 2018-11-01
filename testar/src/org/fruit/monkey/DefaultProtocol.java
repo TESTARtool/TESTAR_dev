@@ -1728,6 +1728,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		    system.stop();
         }
 		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			this.mode = settings().get(ConfigTags.Mode);
+			
 	        try {
 				if ((settings = new SettingsDialog().run(settings, Main.getSettingsFile())) == null) {
 				  return;
@@ -1736,7 +1738,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        setTestarMode(settings().get(ConfigTags.Mode));
 	      }
 	}
 
