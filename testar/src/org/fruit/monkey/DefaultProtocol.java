@@ -651,11 +651,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             executeAction(system, state, action);
             actionCount++;
 
-<<<<<<< HEAD
             //Saving the actions and the executed action into replayable test sequence:
-=======
-            //Saving the executed action into replayable test sequence:
->>>>>>> 2575a3f5502e070a7690438b0b6208c757ee059d
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
         }
     }
@@ -679,10 +675,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param action
      */
     private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
-<<<<<<< HEAD
-=======
-        fragment.set(ActionSet, actions);
->>>>>>> 2575a3f5502e070a7690438b0b6208c757ee059d
     	processVerdict = getProcessVerdict();
     	verdict = state.get(OracleVerdict, Verdict.OK);
     	fragment.set(OracleVerdict, verdict.join(processVerdict));
@@ -822,11 +814,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 escAttempts++;
             } else
                 escAttempts = 0;
-            
-            fragment.set(ActionSet, actions);
-            
+
             visualizeActions(cv, state, actions);
-            
             ActionStatus actionStatus = new ActionStatus();
             
             //Start Wait User Action Loop to obtain the Action did by the User
@@ -840,7 +829,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
              */
             if(actionStatus.getAction()!=null) {
             	//System.out.println("DEBUG: User action is not null");
-            	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state);
+            	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
             }else {
             	//System.out.println("DEBUG: User action ----- null");
             	}
