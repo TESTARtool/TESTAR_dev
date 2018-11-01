@@ -88,6 +88,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
      * @return
      */
     public synchronized Modes mode(){ return mode; }
+    
+    public synchronized void setTestarMode(Modes mode) {
+    	this.mode = mode;
+    }
 
 
     private final static double SLOW_MOTION = 2.0;

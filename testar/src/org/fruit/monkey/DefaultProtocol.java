@@ -1730,7 +1730,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        setMode(settings().get(ConfigTags.Mode));
+	        setTestarMode(settings().get(ConfigTags.Mode));
 	      }
 	}
 
