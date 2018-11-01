@@ -1729,18 +1729,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
 		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			this.mode = settings().get(ConfigTags.Mode);
-			
-			Main.startTestarDialog(settings, Main.getSettingsFile());
-			Main.startTestar(settings, Main.getSettingsFile());
-	        /*try {
-				if ((settings = new SettingsDialog().run(settings, Main.getSettingsFile())) == null) {
-				  return;
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-	      }
+
+
+			if(Main.startTestarDialog(settings, Main.getSettingsFile()))
+				Main.startTestar(settings, Main.getSettingsFile());
+
+		}
 	}
 
 	@Override

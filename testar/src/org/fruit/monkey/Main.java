@@ -41,6 +41,7 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import javax.swing.*;
 import java.io.*;
@@ -257,18 +258,19 @@ public class Main {
 		LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
 	}
 
-	public static void startTestarDialog(Settings settings, String testSettingsFileName) {
+	public static boolean startTestarDialog(Settings settings, String testSettingsFileName) {
 		// Start up the TESTAR Dialog
 		if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			try {
 				if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
-					return;
+					return false;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		return true;
 	}
 
 	public static void startTestar(Settings settings, String testSettings) {
@@ -365,12 +367,12 @@ public class Main {
 			System.setProperty("SCRSHOT_SIMILARITY_THRESHOLD", SST.toString());
 		}
 
-		startTestarDialog(settings, testSettingsFileName);
+		if(startTestarDialog(settings, testSettingsFileName)) {
 
-		startLogs(settings);
+			startLogs(settings);
 
-		startTestar(settings, testSettingsFileName);
-
+			startTestar(settings, testSettingsFileName);
+		}
 
 	}
 
