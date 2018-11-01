@@ -719,7 +719,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void runSpyLoop(SUT system) {
-
+    	
     	system = startSystem();
 
     	this.cv = buildCanvas();
@@ -742,10 +742,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					e.printStackTrace();
 				}
 			}
-            Util.clear(cv);
-            cv.end();
+            
     	}
 
+    	Util.clear(cv);
+        cv.end();
+        
     	detectModeLoop(system);
 
     }
