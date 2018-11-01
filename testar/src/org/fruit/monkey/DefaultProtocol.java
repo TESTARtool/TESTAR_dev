@@ -124,7 +124,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     public void setStateForClickFilterLayerProtocol(State stateForClickFilterLayerProtocol) {
         this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
     }
-
+    
+    private String generatedSequence;
+    
+    private File currentSeq;
+    
     protected Mouse mouse = AWTMouse.build();
     protected State lastState = null;
     protected int nonReactingActionNumber;
@@ -307,7 +311,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected void detectModeLoop(SUT system) {
         if (mode() == Modes.Spy) {
             runSpyLoop(system);
-        } else if (mode() == Modes.Generate || mode() == Modes.GenerateDebug || mode() == Modes.GenerateManual) {
+        } else if(mode() == Modes.GenerateManual) {
+        	runRecordLoop(system);
+        }else if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
             runGenerateOuterLoop(system);
         } else if (mode() == Modes.Quit) {
             stopSystem(system);
@@ -319,8 +325,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      */
     private void initGenerateMode() {
         //TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
-        LogSerialiser.finish();
-        LogSerialiser.exit();
         sequenceCount = 1;
         lastStamp = System.currentTimeMillis();
         escAttempts = 0;
@@ -336,6 +340,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //TODO refactor replayable sequences with something better (model perhaps?)
         String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
         generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+       
         try {
             LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
                             settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
@@ -360,6 +365,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private File getAndStoreSequenceFile() {
         LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
         final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
+        
         try {
             Util.delete(currentSeq);
         } catch (IOException e2) {
@@ -382,9 +388,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @return SUT system
      */
     private SUT startSutIfNotRunning(SUT system) {
-        //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode, the system is running already)
+        //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode or Record-mode, the system is running already)
         if (system == null || !system.isRunning()) {
             system = startSystem();
+            //Reset LogSerialiser
+            LogSerialiser.finish();
+            LogSerialiser.exit();
             startOfSutDateString = Util.dateString(DATE_FORMAT);
             LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
@@ -466,10 +475,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void runGenerateOuterLoop(SUT system) {
+    	boolean startFromGenerate = false;
+    	if(system==null)
+    		startFromGenerate = true;
         //method for defining other init actions, like setup of external environment
         initTestSession();
 
         //initializing TESTAR for generate mode:
+        
         initGenerateMode();
 
         /*
@@ -480,12 +493,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //empty method in defaultProtocol - allowing implementation in application specific protocols:
             preSequencePreparations();
 
-            //starting system if it's not running yet (TESTAR could be started in SPY-mode):
+            //starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
             system = startSutIfNotRunning(system);
-
-            //Generating the sequence file that can be replayed:
-            String generatedSequence = getAndStoreGeneratedSequence();
-            File currentSeq = getAndStoreSequenceFile();
+            
+            if(startFromGenerate) {
+            	//Generating the sequence file that can be replayed:
+            	generatedSequence = getAndStoreGeneratedSequence();
+            	currentSeq = getAndStoreSequenceFile();
+            }
 
             //initializing TESTAR for a new sequence:
             startTestSequence(system);
@@ -594,6 +609,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 runSpyLoop(system);
                 LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
             }
+            if (mode() == Modes.GenerateManual) {
+            	runRecordLoop(system);
+            }
 
             // getState() including getVerdict() that is saved into the state:
             LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
@@ -636,15 +654,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Saving the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state);
-
-            //Checking standard output for process oracles:
-            if (mode() != Modes.Spy) {
-                processVerdict = getProcessVerdict();
-                verdict = state.get(OracleVerdict, Verdict.OK);
-                fragment.set(OracleVerdict, verdict.join(processVerdict));
-                fragment = new TaggableBase();
-                fragment.set(SystemState, state);
-            }
         }
     }
 
@@ -667,10 +676,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param action
      */
     private void saveActionIntoFragmentForReplayableSequence(Action action, State state) {
-        fragment.set(ExecutedAction,action);
-        fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
-        fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
-        LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+    	processVerdict = getProcessVerdict();
+    	verdict = state.get(OracleVerdict, Verdict.OK);
+    	fragment.set(OracleVerdict, verdict.join(processVerdict));
+    	fragment.set(ExecutedAction,action);
+    	fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+    	fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+    	LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
         TestSerialiser.write(fragment);
         //resetting the fragment:
         fragment =new TaggableBase();
@@ -726,6 +738,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
             visualizeActions(cv, state, actions);
+            
+            //TODO: Prepare Spy Mode refresh time on settings file
+            //Wait 500ms to show the actions
+            synchronized (this) {
+				try {
+					this.wait(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+            
             cv.end();
         }
 
@@ -737,9 +761,100 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //TODO add a wait into SPY mode, so that the state is not updated so fast
 
     }
+    
+    /**
+     * Method to run TESTAR on Record User Actions Mode.
+     * @param system
+     */
+    protected void runRecordLoop(SUT system) {
+        boolean startedRecordMode = false;
+   
+        //If system it's null means that we have started TESTAR from the Record User Actions Mode
+        //We need to invoke the SUT & the canvas representation
+        if(system == null) {
+        	system = startSystem();
+        	startedRecordMode = true;
+        	this.cv = buildCanvas();
+
+        	//Reset LogSerialiser
+        	LogSerialiser.finish();
+        	LogSerialiser.exit();
+
+        	//Generating the sequence file that can be replayed:
+        	generatedSequence = getAndStoreGeneratedSequence();
+        	currentSeq = getAndStoreSequenceFile();
+
+        	//initializing fragment for recording replayable test sequence:
+        	initFragmentForReplayableSequence(getState(system));
+        }
+        //else, SUT & canvas exists (startSystem() & buildCanvas() created from other mode)
+
+        
+        /**
+         * Start Record User Action Loop
+         */
+        while(mode() == Modes.GenerateManual && system.isRunning()) {
+            State state = getState(system);
+            cv.begin(); Util.clear(cv);
+            SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+           
+            Set<Action> actions = deriveActions(system,state);
+            CodingManager.buildIDs(state, actions);
+            if(actions.isEmpty()){
+                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                    LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+                }
+                //----------------------------------
+                // THERE MUST ALMOST BE ONE ACTION!
+                //----------------------------------
+                // if we did not find any actions, then we just hit escape, maybe that works ;-)
+                Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+                CodingManager.buildIDs(state, escAction);
+                actions.add(escAction);
+                escAttempts++;
+            } else
+                escAttempts = 0;
+            
+            fragment.set(ActionSet, actions);
+            
+            visualizeActions(cv, state, actions);
+            
+            ActionStatus actionStatus = new ActionStatus();
+            
+            //Start Wait User Action Loop to obtain the Action did by the User
+            waitUserActionLoop(cv, system, state, actionStatus);
+            
+            if (actionStatus.isUserEventAction())
+    			CodingManager.buildIDs(state, actionStatus.getAction());
+    		
+            /**
+             * When we close TESTAR with Shift+down arrow, last actions is detected like null
+             */
+            if(actionStatus.getAction()!=null) {
+            	//System.out.println("DEBUG: User action is not null");
+            	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state);
+            }else {
+            	//System.out.println("DEBUG: User action ----- null");
+            	}
+            
+            cv.end();
+        }
+
+        if(startedRecordMode && mode() == Modes.Quit){
+        	//Closing fragment for recording replayable test sequence:
+        	writeAndCloseFragmentForReplayableSequence();
+
+        	//Copy sequence file into proper directory:
+        	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
+
+        	//cv.release();
+        	detectModeLoop(system);
+        }
+
+    }
 
     protected void replay(){
-        actionCount = 1;
+    	actionCount = 1;
         boolean success = true;
         FileInputStream fis = null;
         BufferedInputStream bis = null;
@@ -1660,69 +1775,68 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 //	 * @param state
 //	 * @return
 //	 */
-//	protected Action mapUserEvent(State state){
-//		Assert.notNull(userEvent);
-//		if (userEvent[0] instanceof MouseButtons){ // mouse events
-//			double x = ((Double)userEvent[1]).doubleValue();
-//			double y = ((Double)userEvent[2]).doubleValue();
-//			Widget w = null;
-//			try {
-//				w = Util.widgetFromPoint(state, x, y);
-//				x = 0.5; y = 0.5;
-//				if (userEvent[0] == MouseButtons.BUTTON1) // left click
-//					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-//				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
-//					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
-//			} catch (WidgetNotFoundException we){
-//				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
-//				return null;
-//			}
-//		} else if (userEvent[0] instanceof KBKeys) // key events
-//			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
-//		else if (userEvent[0] instanceof String){ // type events
-//			if (lastExecutedAction == null)
-//				return null;
-//			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
-//			if (targets == null || targets.size() != 1)
-//				return null;
-//			try {
-//				Widget w = targets.get(0).apply(state);
-//				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
-//			} catch (WidgetNotFoundException we){
-//				return null;
-//			}
-//		}
-//
-//		return null;
-//	}
+	protected Action mapUserEvent(State state){
+		Assert.notNull(userEvent);
+		if (userEvent[0] instanceof MouseButtons){ // mouse events
+			double x = ((Double)userEvent[1]).doubleValue();
+			double y = ((Double)userEvent[2]).doubleValue();
+			Widget w = null;
+			try {
+				w = Util.widgetFromPoint(state, x, y);
+				x = 0.5; y = 0.5;
+				if (userEvent[0] == MouseButtons.BUTTON1) // left click
+					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
+				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
+					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
+			} catch (WidgetNotFoundException we){
+				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+				return null;
+			}
+	} else if (userEvent[0] instanceof KBKeys) // key events
+			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
+		else if (userEvent[0] instanceof String){ // type events
+			if (lastExecutedAction == null)
+				return null;
+			List<Finder> targets = lastExecutedAction.get(Tags.Targets,null);
+			if (targets == null || targets.size() != 1)
+				return null;
+			try {
+				Widget w = targets.get(0).apply(state);
+				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
+		} catch (WidgetNotFoundException we){
+				return null;
+			}
+		}
+		return null;
+	}
 
 	//TODO move to ManualRecording helper class??
 //	/**
 //	 * Waits for an user UI action.
 //	 * Requirement: Mode must be GenerateManual.
 //	 */
-//	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-//		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
-//			if (userEvent != null){
-//				actionStatus.setAction(mapUserEvent(state));
-//				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-//				userEvent = null;
-//			}
-//			synchronized(this){
-//				try {
-//					this.wait(100);
-//				} catch (InterruptedException e) {}
-//			}
-//			cv.begin(); Util.clear(cv);
-//
-//			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-//			Set<Action> actions = deriveActions(system,state);
-//			CodingManager.buildIDs(state, actions);
-//			visualizeActions(cv, state, actions);
-//
-//			cv.end();
-//		}
-//	}
+	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
+		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
+			if (userEvent != null){
+				actionStatus.setAction(mapUserEvent(state));
+				actionStatus.setUserEventAction((actionStatus.getAction() != null));
+			userEvent = null;
+			}
+			synchronized(this){
+				try {
+					this.wait(100);
+				} catch (InterruptedException e) {}
+			}
+			cv.begin(); Util.clear(cv);
+
+			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+			Set<Action> actions = deriveActions(system,state);
+			CodingManager.buildIDs(state, actions);
+			visualizeActions(cv, state, actions);
+
+			cv.end();
+		}
+	}
 
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
