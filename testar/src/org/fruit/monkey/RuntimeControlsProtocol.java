@@ -143,21 +143,22 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             }
         }
 
-        // SHIFT + 1 --> toggle action visualization
-        else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
-            settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
-
-            // SHIFT + 2 --> toggle showing accessibility properties of the widget
-        else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
-            settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
-
-            // SHIFT + 3 --> toggle basic or all accessibility properties of the widget
-        else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
-            settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
-
-            // SHIFT + 4 --> toggle the widget tree
-        else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
-            settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
+        //Disabled and replaced with Shift + Arrow Up to toggle visualization on/off:
+//        // SHIFT + 1 --> toggle action visualization
+//        else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
+//            settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
+//
+//            // SHIFT + 2 --> toggle showing accessibility properties of the widget
+//        else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
+//            settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
+//
+//            // SHIFT + 3 --> toggle basic or all accessibility properties of the widget
+//        else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
+//            settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
+//
+//            // SHIFT + 4 --> toggle the widget tree
+//        else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
+//            settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
 
             // SHIFT + 0 --> undocumented feature
         else if (key == KBKeys.VK_0  && pressed.contains(KBKeys.VK_SHIFT))

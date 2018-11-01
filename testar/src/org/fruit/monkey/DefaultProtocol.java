@@ -906,6 +906,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                     if(mode() == Modes.Quit) break;
                     Action action = fragment.get(ExecutedAction, new NOP());
+                    // In Replay-mode, we only show the red dot if visualizationOn is true:
                     if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
                     if(mode() == Modes.Quit) break;
 
