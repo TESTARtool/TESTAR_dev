@@ -641,7 +641,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 escAttempts++;
             } else
                 escAttempts = 0;
-            fragment.set(ActionSet, actions);
             SutVisualization.visualizeActions(mode(), settings(), cv, state, actions);
 
             //Selecting one of the available actions:
@@ -653,7 +652,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             actionCount++;
 
             //Saving the executed action into replayable test sequence:
-            saveActionIntoFragmentForReplayableSequence(action, state);
+            saveActionIntoFragmentForReplayableSequence(action, state, actions);
         }
     }
 
@@ -675,7 +674,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      *
      * @param action
      */
-    private void saveActionIntoFragmentForReplayableSequence(Action action, State state) {
+    private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+        fragment.set(ActionSet, actions);
     	processVerdict = getProcessVerdict();
     	verdict = state.get(OracleVerdict, Verdict.OK);
     	fragment.set(OracleVerdict, verdict.join(processVerdict));
