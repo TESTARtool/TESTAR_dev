@@ -617,7 +617,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
             state = getState(system);
             cv.begin(); Util.clear(cv);
-            SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+            //Not visualizing the widget info under cursor while in Generate-mode:
+            //SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
             //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
             // add SUT state into the graphDB:
@@ -734,9 +735,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	while(mode() == Modes.Spy && system.isRunning()) {
     		State state = getState(system);
     		cv.begin(); Util.clear(cv);
-    		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+    		//in Spy-mode, always visualize the widget info under the mouse cursor:
+            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
     		Set<Action> actions = deriveActions(system,state);
     		CodingManager.buildIDs(state, actions);
+            //in Spy-mode, always visualize the green dots:
     		visualizeActions(cv, state, actions);
     		cv.end();
 
@@ -798,7 +801,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         while(mode() == Modes.Record && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
-            SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+            //In Record-mode, we show the widget info under cursor:
+            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
            
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
@@ -891,7 +895,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 while(!success && (Util.time() - start < rrt)){
                     tries++;
                     cv.begin(); Util.clear(cv);
-                    SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+                    //In Replay-mode, we DO NOT show the widget info under cursor:
+                    //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
                     cv.end();
 
                     if(mode() == Modes.Quit) break;
@@ -1842,9 +1847,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 			cv.begin(); Util.clear(cv);
 
-			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+			//In Record-mode, we show the widget info under the cursor:
+            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
+			//Show the green dots:
 			visualizeActions(cv, state, actions);
 
 			cv.end();
