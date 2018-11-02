@@ -844,7 +844,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             }else {
             	//System.out.println("DEBUG: User action ----- null");
             	}
-            
+
+
+            Util.clear(cv);
             cv.end();
         }
 
@@ -855,6 +857,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	//Copy sequence file into proper directory:
         	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
 
+            Util.clear(cv);
+            cv.end();
         	//cv.release();
         	detectModeLoop(system);
         }
@@ -1854,12 +1858,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 			cv.begin(); Util.clear(cv);
 
-			//In Record-mode, we show the widget info under the cursor:
-            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			//In Record-mode, we DO NOT show the widget info under the cursor:
+            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
-			//Show the green dots:
-			visualizeActions(cv, state, actions);
+			//In Record-mode, we DO NOT show the green dots:
+			//visualizeActions(cv, state, actions);
 
 			cv.end();
 		}
