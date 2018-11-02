@@ -1772,10 +1772,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
             this.mode = settings().get(ConfigTags.Mode);
 
-
-            if(Main.startTestarDialog(settings, Main.getSettingsFile()))
+            if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
+                try {
+                    Main.reloadSettings(Main.getSettingsFile());
+                } catch (ConfigException e) {
+                    e.printStackTrace();
+                }
                 Main.startTestar(settings, Main.getSettingsFile());
-
+            }
         }
     }
 
