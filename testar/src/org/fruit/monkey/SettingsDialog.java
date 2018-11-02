@@ -145,7 +145,7 @@ public class SettingsDialog extends JFrame implements Observer {
    * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
    * @param mode indicates the MODE button that was clicked.
    */
-  private void start(AbstractProtocol.Modes mode) {
+  private void start(RuntimeControlsProtocol.Modes mode) {
     try {
       extractInformation(settings);
       checkSettings(settings);
@@ -352,7 +352,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnGenerateActionPerformed(ActionEvent evt) {
-    start(AbstractProtocol.Modes.Generate);
+    start(RuntimeControlsProtocol.Modes.Generate);
   }
 
   private JButton getBtnSpy() throws IOException {
@@ -366,7 +366,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnSpyActionPerformed(ActionEvent evt) {
-    start(AbstractProtocol.Modes.Spy);
+    start(RuntimeControlsProtocol.Modes.Spy);
   }
 
   private JButton getBtnReplay() throws IOException {
@@ -387,7 +387,7 @@ public class SettingsDialog extends JFrame implements Observer {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
       settings.set(ConfigTags.PathToReplaySequence, file);
-      start(AbstractProtocol.Modes.Replay);
+      start(RuntimeControlsProtocol.Modes.Replay);
     }
   }
 
@@ -409,7 +409,7 @@ public class SettingsDialog extends JFrame implements Observer {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
       settings.set(ConfigTags.PathToReplaySequence, file);
-      start(AbstractProtocol.Modes.View);
+      start(RuntimeControlsProtocol.Modes.View);
     }
   }
 

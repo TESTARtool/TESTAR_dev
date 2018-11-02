@@ -230,6 +230,47 @@ public class Main {
       }
     });
   }
+  
+  /**
+   * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol
+   * @param sett
+ * @throws IOException 
+   */
+  public static void protocolFromCmd(String sett) throws IOException {
+	  String sseName = sett.substring(sett.indexOf("=")+1);
+	  boolean existSSE = false;
+
+	  //Check if choose protocol exist
+	  for (File f : new File(getSettingsDir()).listFiles()) {
+		  if (new File(getSettingsDir()+sseName + "/" + SETTINGS_FILE).exists()) {
+			  existSSE = true;
+			  break;
+		  }
+	  }
+
+	  //Command line protocol doesn't exist
+	  if(!existSSE) {System.out.println("Protocol: "+sseName+" doesn't exist");}
+
+	  else{
+		  //Obtain previous sse file and delete it (if exist)
+		  String[] files = getSSE();
+		  if (files != null) {
+			  for (String f : files) {
+				  //System.out.println("delete file: "+getSettingsDir()+f.toString());
+				  new File(getSettingsDir()+f).delete();
+			  }
+		  }
+
+		  //Create the new sse file
+		  String sseDir = getSettingsDir()+sseName+".sse";
+		  File f = new File(sseDir);
+		  if(!f.exists())
+			  f.createNewFile();
+
+		  System.out.println("Protocol changed from command line to: "+sseName);
+
+	  }
+  }
 
   public static void main(String[] args) throws IOException {
     Settings settings = null;
@@ -238,6 +279,15 @@ public class Main {
     // TODO: put the code below into seperate method/class
     // Get the files with SUT_SETTINGS_EXT extension and check whether it is not empty
     // and that there is exactly one.
+    
+    //Allow users to use command line to choose a protocol modifying sse file
+    for(String sett : args) {
+    	if(sett.toString().contains("sse="))
+    		try {
+    			protocolFromCmd(sett);
+    		}catch(Exception e) {System.out.println("Error trying to modify sse from command line");}
+    }
+
     String[] files = getSSE();
     // If there is more than 1, then delete them all
     if (files != null && files.length > 1) {
@@ -352,7 +402,7 @@ public class Main {
    * @throws ConfigException
    */
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-    Assert.notNull(file); // by urueda
+    Assert.notNull(file);
     try {
       List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
 
@@ -360,7 +410,7 @@ public class Main {
       defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
       defaults.add(Pair.from(FaultThreshold, 0.1));
       defaults.add(Pair.from(LogLevel, 1));
-      defaults.add(Pair.from(Mode, AbstractProtocol.Modes.Spy));
+      defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
@@ -389,7 +439,7 @@ public class Main {
       defaults.add(Pair.from(StopGenerationOnFault, true));
       defaults.add(Pair.from(TimeToFreeze, 10.0));
       defaults.add(Pair.from(ShowSettingsAfterTest, true));
-      // begin by urueda
+      
       defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
       defaults.add(Pair.from(TestGenerator, "random"));
       defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -408,7 +458,7 @@ public class Main {
       defaults.add(Pair.from(UnattendedTests, false)); // disabled
       defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
       defaults.add(Pair.from(SUTProcesses, ""));
-      // end by urueda
+      
       defaults.add(Pair.from(GraphDBEnabled, false));
       defaults.add(Pair.from(GraphDBUrl, ""));
       defaults.add(Pair.from(GraphDBUser, ""));
@@ -422,6 +472,20 @@ public class Main {
 
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
+
+      //If user use command line to input properties, mix file settings with cmd properties
+      if(argv.length>0) {
+    	  try {
+    		  settings = Settings.fromFileCmd(defaults, file, argv);
+    	  }catch(Exception e) {
+    		  System.out.println("Error with command line properties. Examples:");
+    		  System.out.println("testar SUTConnectorValue=\"C:\\\\Windows\\\\System32\\\\notepad.exe\" Sequences=11 SequenceLength=12 SuspiciousTitle=.*aaa.*");
+    		  System.out.println("SUTConnectorValue=\" \"\"C:\\\\Program Files\\\\Internet Explorer\\\\iexplore.exe\"\" \"\"https://www.google.es\"\" \"");
+    	  }
+    	  //SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
+    	  //SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
+      }
+
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
       //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
       //PrologActivated is ALWAYS false.
