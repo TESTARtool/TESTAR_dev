@@ -77,9 +77,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
      */
     protected synchronized void setMode(Modes mode){
         if (mode() == mode) return;
-        List<Modes> modesList = Arrays.asList(Modes.values());
-        while (mode() != mode)
-            nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
+        else this.mode = mode;
+//        List<Modes> modesList = Arrays.asList(Modes.values());
+//        while (mode() != mode)
+//            nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
     }
 
 

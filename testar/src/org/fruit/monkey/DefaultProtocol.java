@@ -317,6 +317,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             runGenerateOuterLoop(system);
         } else if (mode() == Modes.Quit) {
             stopSystem(system);
+            //start again the TESTAR Settings Dialog, if it was used to start TESTAR:
+            startTestarSettingsDialog();
         }
     }
 
@@ -1757,15 +1759,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(system !=null){
 		    system.stop();
         }
-		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			this.mode = settings().get(ConfigTags.Mode);
-
-
-			if(Main.startTestarDialog(settings, Main.getSettingsFile()))
-				Main.startTestar(settings, Main.getSettingsFile());
-
-		}
 	}
+
+	private void startTestarSettingsDialog(){
+        if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+            this.mode = settings().get(ConfigTags.Mode);
+
+
+            if(Main.startTestarDialog(settings, Main.getSettingsFile()))
+                Main.startTestar(settings, Main.getSettingsFile());
+
+        }
+    }
+
 
 	@Override
 	protected void postSequenceProcessing() {
