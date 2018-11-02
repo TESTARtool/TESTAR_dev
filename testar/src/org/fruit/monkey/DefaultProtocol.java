@@ -954,6 +954,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             if (system != null && system.isRunning())
                 system.stop();
 
+
         } catch(IOException ioe){
             throw new RuntimeException("Cannot read file.", ioe);
         } catch (ClassNotFoundException cnfe) {
@@ -988,6 +989,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
         }
         LogSerialiser.finish();
+
+        // Going back to TESTAR settings dialog if it was used to start replay:
+        mode = Modes.Quit;
+        detectModeLoop(system);
     }
 
     /**
