@@ -171,8 +171,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	@Override
-	protected void finishSequence(File recordedSequence) {
-		super.finishSequence(recordedSequence);
+	protected void finishSequence() {
+		super.finishSequence();
 		if (settings().get(ConfigTags.GraphDBEnabled)) {
 			writeGraphDBResults();
 			offlineEvaluation();
