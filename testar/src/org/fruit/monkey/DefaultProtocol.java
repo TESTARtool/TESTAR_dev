@@ -42,7 +42,6 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -63,10 +62,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import java.util.concurrent.Semaphore;
 
 import es.upv.staq.testar.*;
-import es.upv.staq.testar.graph.IEnvironment;
 import nl.ou.testar.*;
 import org.fruit.Assert;
 import org.fruit.Drag;
@@ -107,9 +104,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
-import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.managers.DataManager;
-import es.upv.staq.testar.prolog.JIPrologWrapper;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
@@ -119,149 +114,898 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
-	protected boolean faultySequence;
+    protected boolean faultySequence;
+    private State stateForClickFilterLayerProtocol;
 
-	protected Mouse mouse = AWTMouse.build();
-	protected State state = null,
-			lastState = null;
-	protected int nonReactingActionNumber;
-	protected Semaphore semaphore = new Semaphore(1, true);
-	private Verdict processVerdict= Verdict.OK;
-	protected void setProcessVerdict(Verdict processVerdict) {
-		this.processVerdict = processVerdict;
-	}
-	protected Verdict getProcessVerdict() {
-		return this.processVerdict;
-	}
-	protected boolean processListenerEnabled;
-	protected String lastPrintParentsOf = "null-id";
-	protected int actionCount;
-	protected final int actionCount(){ return actionCount; }
-	protected int sequenceCount;
-	protected final int sequenceCount(){ return sequenceCount; }
-	protected int firstSequenceActionNumber;
-	protected int lastSequenceActionNumber;
-	double startTime;
-	protected final double timeElapsed(){ return Util.time() - startTime; }
-	protected List<ProcessInfo> contextRunningProcesses = null;
-	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
-	protected double passSeverity = Verdict.SEVERITY_OK;
-	protected int generatedSequenceNumber = -1;
-	protected final int generatedSequenceCount() {return generatedSequenceNumber;}
-	protected Action lastExecutedAction = null;
-	protected final Action lastExecutedAction() {return lastExecutedAction;}
-	protected long lastStamp = -1;
-	protected ProtocolUtil protocolUtil = new ProtocolUtil();
-	protected EventHandler eventHandler;
-	protected Canvas cv;
-	protected Pattern clickFilterPattern = null;
-	protected Map<String,Matcher> clickFilterMatchers = new WeakHashMap<String,Matcher>();
-	protected Pattern suspiciousTitlesPattern = null;
-	protected Map<String,Matcher> suspiciousTitlesMatchers = new WeakHashMap<String,Matcher>();
-	private StateBuilder builder;
-	protected JIPrologWrapper jipWrapper;
-	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false,
-			forceNextActionESC = false;
-	protected boolean forceToSequenceLengthAfterFail = false;
-	protected int testFailTimes = 0;
-	protected boolean nonSuitableAction = false;
-	protected final int TEST_RETRY_THRESHOLD = 32; // prevent recursive overflow
-	protected final GraphDB graphDB(){ return graphDB; }
-	protected GraphDB graphDB;
+    public State getStateForClickFilterLayerProtocol() {
+        return stateForClickFilterLayerProtocol;
+    }
 
-	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
-			BluePen = Pen.newPen().setColor(Color.Blue).
-			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
+    public void setStateForClickFilterLayerProtocol(State stateForClickFilterLayerProtocol) {
+        this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
+    }
+    
+    private String generatedSequence;
+    
+    private File currentSeq;
+    
+    protected Mouse mouse = AWTMouse.build();
+    protected State lastState = null;
+    protected int nonReactingActionNumber;
+    private Verdict processVerdict = Verdict.OK;
+
+    protected void setProcessVerdict(Verdict processVerdict) {
+        this.processVerdict = processVerdict;
+    }
+
+    protected Verdict getProcessVerdict() {
+        return this.processVerdict;
+    }
+
+    protected boolean processListenerEnabled;
+    protected String lastPrintParentsOf = "null-id";
+    protected int actionCount;
+
+    protected final int actionCount() {
+        return actionCount;
+    }
+
+    protected int sequenceCount;
+
+    protected final int sequenceCount() {
+        return sequenceCount;
+    }
+
+    protected int firstSequenceActionNumber;
+    protected int lastSequenceActionNumber;
+    double startTime;
+
+    protected final double timeElapsed() {
+        return Util.time() - startTime;
+    }
+
+    protected List<ProcessInfo> contextRunningProcesses = null;
+    protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
+    protected double passSeverity = Verdict.SEVERITY_OK;
+    protected int generatedSequenceNumber = -1;
+
+    protected final int generatedSequenceCount() {
+        return generatedSequenceNumber;
+    }
+
+    protected Action lastExecutedAction = null;
+
+    protected final Action lastExecutedAction() {
+        return lastExecutedAction;
+    }
+
+    protected long lastStamp = -1;
+    protected ProtocolUtil protocolUtil = new ProtocolUtil();
+    protected EventHandler eventHandler;
+    protected Canvas cv;
+    protected Pattern clickFilterPattern = null;
+    protected Map<String, Matcher> clickFilterMatchers = new WeakHashMap<String, Matcher>();
+    protected Pattern suspiciousTitlesPattern = null;
+    protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
+    private StateBuilder builder;
+    protected String forceKillProcess = null;
+    protected boolean forceToForeground = false,
+            forceNextActionESC = false;
+    protected int testFailTimes = 0;
+    protected boolean nonSuitableAction = false;
+
+    protected final GraphDB graphDB() {
+        return graphDB;
+    }
+
+    protected GraphDB graphDB;
+    private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
+
+    protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
+            setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
+            BluePen = Pen.newPen().setColor(Color.Blue).
+                    setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
 
 
-	protected void storeWidget(String stateID, Widget widget) {
-		graphDB.addWidget(stateID, widget);
-	}
+/**
+ * This is the abstract flow of TESTAR (generate mode):
+ *
+ * - Initialize TESTAR settings
+ * - InitTestSession (before starting the first sequence)
+ * - OUTER LOOP:
+ * 		PreSequencePreparations (before each sequence, for example starting WebDriver, JaCoCo or another process for sequence)
+ * 		StartSUT
+ * 		BeginSequence (starting "script" on the GUI of the SUT, for example login)
+ * 		INNER LOOP
+ * 			GetState
+ * 			GetVerdict
+ * 			StopCriteria (moreActions/moreSequences/time?)
+ * 			DeriveActions
+ * 			SelectAction
+ * 			ExecuteAction
+ * 		FinishSequence (closing "script" on the GUI of the SUT, for example logout)
+ * 		StopSUT
+ * 		PostSequenceProcessing (after each sequence)
+ * - CloseTestSession (after finishing the last sequence)
+ *
+ */
 
-	/**
-	 * Initializing the TESTAR loop
-	 *
-	 * @param settings
-	 */
-	public final void run(final Settings settings) {
-		startTime = Util.time();
-		this.settings = settings;
-		mode = settings.get(ConfigTags.Mode);
-		initialize(settings);
-		//TODO move eventlistener out of abstract protocol - maybe a new protocol layer:
-		eventHandler = new EventHandler(this);
+    /**
+     * Starting the TESTAR loops
+     *
+     * @param settings
+     */
+    public final void run(final Settings settings) {
+        //initialize TESTAR with the given settings:
+        initialize(settings);
 
-		graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
-				settings.get(ConfigTags.GraphDBUrl),
-				settings.get(ConfigTags.GraphDBUser),
-				settings.get(ConfigTags.GraphDBPassword));
+        // If the mode is View or Replay, the mode cannot be changed by the user:
+        if (mode() == Modes.View) {
+            new SequenceViewer(settings).run();
+        } else if (mode() == Modes.Replay) {
+            replay();
+        } else {
+            // Else we start the loop for checking the TESTAR Mode:
+            SUT system = null;
+            detectModeLoop(system);
+        }
+    }
 
-		try {
-			if (!settings.get(ConfigTags.UnattendedTests)) {
-				LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-				Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-				logger.setLevel(Level.OFF);
-				logger.setUseParentHandlers(false);
+    /**
+     * Initialize TESTAR with the given settings:
+     *
+     * @param settings
+     */
+    protected void initialize(Settings settings) {
 
-				if (GlobalScreen.isNativeHookRegistered()) {
-					GlobalScreen.unregisterNativeHook();
+        startTime = Util.time();
+        this.settings = settings;
+        mode = settings.get(ConfigTags.Mode);
+
+        //EventHandler is implemented in RuntimeControlsProtocol (super class):
+        eventHandler = new EventHandler(this);
+        //Initializing Graph Database:
+        graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+                settings.get(ConfigTags.GraphDBUrl),
+                settings.get(ConfigTags.GraphDBUser),
+                settings.get(ConfigTags.GraphDBPassword));
+        //builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
+        builder = NativeLinker.getNativeStateBuilder(
+                settings.get(ConfigTags.TimeToFreeze),
+                settings.get(ConfigTags.AccessBridgeEnabled),
+                settings.get(ConfigTags.SUTProcesses)
+        );
+
+        try {
+            if (!settings.get(ConfigTags.UnattendedTests)) {
+                LogSerialiser.log("Registering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+                Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+                logger.setLevel(Level.OFF);
+                logger.setUseParentHandlers(false);
+
+                if (GlobalScreen.isNativeHookRegistered()) {
+                    GlobalScreen.unregisterNativeHook();
+                }
+                GlobalScreen.registerNativeHook();
+                GlobalScreen.addNativeKeyListener(eventHandler);
+                GlobalScreen.addNativeMouseListener(eventHandler);
+                GlobalScreen.addNativeMouseMotionListener(eventHandler);
+                LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
+            }
+
+            LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
+
+
+        } catch (NativeHookException e) {
+            LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
+            throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
+        }
+    }
+
+    /**
+     * Method to change between the different loops that represent the principal modes of execution on TESTAR
+     *
+     * @param system
+     */
+    protected void detectModeLoop(SUT system) {
+        if (mode() == Modes.Spy) {
+            runSpyLoop(system);
+        } else if(mode() == Modes.Record) {
+        	runRecordLoop(system);
+        }else if (mode() == Modes.Generate) {
+            runGenerateOuterLoop(system);
+        } else if (mode() == Modes.Quit) {
+            stopSystem(system);
+            //start again the TESTAR Settings Dialog, if it was used to start TESTAR:
+            startTestarSettingsDialog();
+        }
+    }
+
+    /**
+     * This method is called from runGenerate() to initialize TESTAR for Generate-mode
+     */
+    private void initGenerateMode() {
+        //TODO check why LogSerializer is closed and started again in the beginning of Generate-mode
+        sequenceCount = 1;
+        lastStamp = System.currentTimeMillis();
+        escAttempts = 0;
+    }
+
+    /**
+     * This method creates the name for generated sequence that can be replayed
+     * and starts the LogSerialiser for outputting the test sequence
+     *
+     * @return name of the generated sequence file
+     */
+    private String getAndStoreGeneratedSequence() {
+        //TODO refactor replayable sequences with something better (model perhaps?)
+        String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
+        generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+       
+        try {
+            LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+                            settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
+                    settings.get(LogLevel));
+        } catch (NoSuchTagException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        } catch (FileNotFoundException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        }
+        ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
+        return generatedSequence;
+    }
+
+    /**
+     * This method creates a temporary file for saving the test sequence (that can be replayed)
+     * The name of the temporary file is changed in the end of the test sequence (not in this function)
+     *
+     * @return temporary file for saving the test sequence
+     */
+    private File getAndStoreSequenceFile() {
+        LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
+        final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
+        
+        try {
+            Util.delete(currentSeq);
+        } catch (IOException e2) {
+            LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+        }
+        try {
+            TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
+            LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
+        } catch (IOException e) {
+            LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+        }
+        return currentSeq;
+    }
+
+
+    /**
+     * This method calls the startSystem() if the system is not yet running
+     *
+     * @param system
+     * @return SUT system
+     */
+    private SUT startSutIfNotRunning(SUT system) {
+        //If system==null, we have started TESTAR from the Generate mode and system has not been started yet (if started in SPY-mode or Record-mode, the system is running already)
+        if (system == null || !system.isRunning()) {
+            system = startSystem();
+            //Reset LogSerialiser
+            LogSerialiser.finish();
+            LogSerialiser.exit();
+            startOfSutDateString = Util.dateString(DATE_FORMAT);
+            LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
+            LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
+            LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+        }
+        processListeners(system);
+        return system;
+    }
+
+    private Taggable fragment; // Fragment is used for saving a replayable sequence:
+    private Verdict verdict;
+    private long tStart;
+
+    /**
+     * This method is initializing TESTAR for the start of test sequence
+     *
+     * @param system
+     */
+    private void startTestSequence(SUT system) {
+        //for measuring the time of one sequence:
+        tStart = System.currentTimeMillis();
+        LOGGER.info("Starting test sequence {}", sequenceCount());
+
+        actionCount = 1;
+        this.testFailTimes = 0;
+        lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
+        firstSequenceActionNumber = actionCount;
+        passSeverity = Verdict.SEVERITY_OK;
+        setProcessVerdict(Verdict.OK);
+        this.cv = buildCanvas();
+    }
+
+    /**
+     * Closing test sequence of TESTAR in normal operation
+     */
+    private void endTestSequence(){
+        LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
+        cv.release();
+        ScreenshotSerialiser.exit();
+        TestSerialiser.exit();
+//        String stopDateString = Util.dateString(DATE_FORMAT);
+//        String durationDateString = Util.diffDateString(DATE_FORMAT, startOfSutDateString, stopDateString);
+//        LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
+//        LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
+        LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+    }
+
+    /**
+     * Shutting down TESTAR in case of exception during Generate-mode outer loop (test sequence generation)
+     *
+     * @param system
+     * @param e
+     */
+    private void emergencyTerminateTestSequence(SUT system, Exception e){
+        SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
+        ScreenshotSerialiser.finish();
+        TestSerialiser.finish();
+        ScreenshotSerialiser.exit();
+        LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
+        int i = 1;
+        StringBuffer trace = new StringBuffer();
+        for (StackTraceElement t : e.getStackTrace())
+            trace.append("\n\t[" + i++ + "] " + t.toString());
+        System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
+        stopSystem(system);
+        TestSerialiser.exit();
+        LogSerialiser.flush();
+        LogSerialiser.finish();
+        LogSerialiser.exit();
+        this.mode = Modes.Quit;
+    }
+
+    /**
+     * Method to run TESTAR on Generate mode
+     *
+     * @param system
+     */
+    protected void runGenerateOuterLoop(SUT system) {
+    	boolean startFromGenerate = false;
+    	if(system==null)
+    		startFromGenerate = true;
+        //method for defining other init actions, like setup of external environment
+        initTestSession();
+
+        //initializing TESTAR for generate mode:
+        
+        initGenerateMode();
+
+        /*
+         ***** OUTER LOOP - STARTING A NEW SEQUENCE
+         */
+        while (mode() != Modes.Quit && moreSequences()) {
+
+            //empty method in defaultProtocol - allowing implementation in application specific protocols:
+            preSequencePreparations();
+
+            //starting system if it's not running yet (TESTAR could be started in SPY-mode or Record-mode):
+            system = startSutIfNotRunning(system);
+            
+            if(startFromGenerate) {
+            	//Generating the sequence file that can be replayed:
+            	generatedSequence = getAndStoreGeneratedSequence();
+            	currentSeq = getAndStoreSequenceFile();
+            }
+
+            //initializing TESTAR for a new sequence:
+            startTestSequence(system);
+
+            try {
+                // getState() called before beginSequence:
+                LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
+                State state = getState(system);
+
+                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+
+                // beginSequence() - a script to interact with GUI, for example login screen
+                LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
+                beginSequence(system, state);
+
+                //initializing fragment for recording replayable test sequence:
+                initFragmentForReplayableSequence(state);
+
+                /*
+                 ***** starting the INNER LOOP:
+                 */
+                runGenerateInnerLoop(system, state);
+
+                //calling finishSequence() to allow scripting GUI interactions to close the SUT:
+                finishSequence();
+
+                writeAndCloseFragmentForReplayableSequence();
+
+                if (faultySequence)
+                    LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
+
+                Verdict stateVerdict = verdict.join(new Verdict(passSeverity, "", Util.NullVisualizer));
+                Verdict finalVerdict;
+
+                finalVerdict = stateVerdict.join(processVerdict);
+
+                setProcessVerdict(Verdict.OK);
+
+                //Copy sequence file into proper directory:
+                classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
+
+                //calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
+                postSequenceProcessing();
+
+                //Ending test sequence of TESTAR:
+                endTestSequence();
+
+                LogSerialiser.log("End of test sequence - shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
+                stopSystem(system);
+                LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
+
+                sequenceCount++;
+
+            } catch (Exception e) {
+                System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
+                e.printStackTrace();
+                emergencyTerminateTestSequence(system, e);
+            }
+        }
+        //allowing close-up in the end of test session:
+        closeTestSession();
+        //Closing TESTAR internal test session:
+        closeTestarTestSession();
+        mode = Modes.Quit;
+        detectModeLoop(system);
+    }
+
+    private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
+        if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
+                finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
+            LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
+            try {
+                Util.copyToDirectory(currentSeq.getAbsolutePath(),
+                        settings.get(ConfigTags.OutputDir) + File.separator + "sequences",
+                        generatedSequence,
+                        true);
+                LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
+            } catch (NoSuchTagException e) {
+                LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+            } catch (IOException e) {
+                LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+            }
+            FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
+        }
+    }
+
+    /**
+     * This is the inner loop of TESTAR Generate-mode:
+     * * 			GetState
+     * * 			GetVerdict
+     * * 			StopCriteria (moreActions/moreSequences/time?)
+     * * 			DeriveActions
+     * * 			SelectAction
+     * * 			ExecuteAction
+     *
+     * @param system
+     */
+    private void runGenerateInnerLoop(SUT system, State state) {
+        long spyTime; //for recording the time the user spent in SPY-mode if TESTAR mode is changed into SPY-mode
+        /*
+         ***** INNER LOOP:
+         */
+        while (mode() != Modes.Quit && moreActions(state)) {
+
+            //User wants to move to Spy mode, after that we will continue the actions
+            if (mode() == Modes.Spy) {
+                spyTime = System.currentTimeMillis();
+                runSpyLoop(system);
+                LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
+            }
+            if (mode() == Modes.Record) {
+            	runRecordLoop(system);
+            }
+
+            // getState() including getVerdict() that is saved into the state:
+            LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
+            state = getState(system);
+            cv.begin(); Util.clear(cv);
+            //Not visualizing the widget info under cursor while in Generate-mode:
+            //SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
+
+            //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+            // add SUT state into the graphDB:
+            LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
+            graphDB.addState(state, true);
+
+            //Deriving actions from the state:
+            Set<Action> actions = deriveActions(system, state);
+
+            CodingManager.buildIDs(state, actions);
+            if(actions.isEmpty()){
+                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                    LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+                }
+                //----------------------------------
+                // THERE MUST ALMOST BE ONE ACTION!
+                //----------------------------------
+                // if we did not find any actions, then we just hit escape, maybe that works ;-)
+                Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+                CodingManager.buildIDs(state, escAction);
+                actions.add(escAction);
+                escAttempts++;
+            } else
+                escAttempts = 0;
+            //Showing the green dots if visualization is on:
+            if(visualizationOn) visualizeActions(cv, state, actions);
+
+            //Selecting one of the available actions:
+            Action action = selectAction(state, actions);
+            //Showing the red dot if visualization is on:
+            if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
+
+            //Executing the selected action:
+            executeAction(system, state, action);
+            actionCount++;
+
+            //Saving the actions and the executed action into replayable test sequence:
+            saveActionIntoFragmentForReplayableSequence(action, state, actions);
+
+            // Resetting the visualization:
+            Util.clear(cv);
+            cv.end();
+        }
+    }
+
+    /**
+     * This method initializes the fragment for replayable sequence
+     *
+     * @param state
+     */
+    private void initFragmentForReplayableSequence(State state){
+        // Fragment is used for saving a replayable sequence:
+        fragment = new TaggableBase();
+        fragment.set(SystemState, state);
+        verdict = state.get(OracleVerdict, Verdict.OK);
+        fragment.set(OracleVerdict, verdict);
+    }
+
+    /**
+     * Saving the action into the fragment for replayable sequence
+     *
+     * @param action
+     */
+    private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
+    	processVerdict = getProcessVerdict();
+    	verdict = state.get(OracleVerdict, Verdict.OK);
+    	fragment.set(OracleVerdict, verdict.join(processVerdict));
+    	fragment.set(ExecutedAction,action);
+        fragment.set(ActionSet, actions);
+    	fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+    	fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+    	LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+        TestSerialiser.write(fragment);
+        //resetting the fragment:
+        fragment =new TaggableBase();
+        fragment.set(SystemState, state);
+    }
+
+    /**
+     * Writing the fragment into file and closing the test serialiser
+     */
+    private void writeAndCloseFragmentForReplayableSequence() {
+        //closing ScreenshotSerialiser:
+        ScreenshotSerialiser.finish();
+        LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
+        TestSerialiser.write(fragment);
+        
+        //Wait since TestSerialiser write all fragments on sequence File
+        while(!TestSerialiser.isSavingQueueEmpty()) {
+        	//System.out.println("Saving sequences...");
+        	synchronized (this) {
+				try {
+					this.wait(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				GlobalScreen.registerNativeHook();
-				GlobalScreen.addNativeKeyListener(eventHandler);
-				GlobalScreen.addNativeMouseListener(eventHandler);
-				GlobalScreen.addNativeMouseMotionListener(eventHandler);
-				LogSerialiser.log("Successfully registered keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Debug);
 			}
+        }
+        TestSerialiser.finish();
+        LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
+        LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
+    }
 
-			LogSerialiser.log("'" + mode() + "' mode active.\n", LogSerialiser.LogLevel.Info);
+    /**
+     * Method to run TESTAR on Spy Mode.
+     * @param system
+     */
+    protected void runSpyLoop(SUT system) {
 
-			if(mode() == Modes.View){
-				new SequenceViewer(settings).run();
-			}else if(mode() == Modes.Replay || mode() == Modes.ReplayDebug){
-				replay();
-			}else {
-				SUT system = null;
-				detectLoopMode(system);
-			}
+    	//If system it's null means that we have started TESTAR from the Spy mode
+    	//We need to invoke the SUT & the canvas representation
+    	if(system == null) {
+    		system = startSystem();
+    		this.cv = buildCanvas();
+    	}
+    	//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
 
-		} catch (NativeHookException e) {
-			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
-			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
-		}finally{
-			try {
-				if (!settings.get(ConfigTags.UnattendedTests)) {
-					if (GlobalScreen.isNativeHookRegistered()) {
-						LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
-						GlobalScreen.removeNativeMouseMotionListener(eventHandler);
-						GlobalScreen.removeNativeMouseListener(eventHandler);
-						GlobalScreen.removeNativeKeyListener(eventHandler);
-						GlobalScreen.unregisterNativeHook();
-					}
-				}
-				AdhocServer.stopAdhocServer();
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    	while(mode() == Modes.Spy && system.isRunning()) {
+    		State state = getState(system);
+    		cv.begin(); Util.clear(cv);
+    		//in Spy-mode, always visualize the widget info under the mouse cursor:
+            SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+    		Set<Action> actions = deriveActions(system,state);
+    		CodingManager.buildIDs(state, actions);
+            //in Spy-mode, always visualize the green dots:
+    		visualizeActions(cv, state, actions);
+    		cv.end();
 
-	protected void initialize(Settings settings){
-		//builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
-		builder = NativeLinker.getNativeStateBuilder(
-				settings.get(ConfigTags.TimeToFreeze),
-				settings.get(ConfigTags.AccessBridgeEnabled),
-				settings.get(ConfigTags.SUTProcesses)
-				);
-	}
+    		//TODO: Prepare Spy Mode refresh time on settings file
+    		//Wait 500ms to show the actions
+    		synchronized (this) {
+    			try {
+    				this.wait(500);
+    			} catch (InterruptedException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    		}
 
-	@Override
+    	}
+
+    	//If user closes the SUT while in Spy-mode, TESTAR will close (or go back to SettingsDialog):
+    	if(!system.isRunning()){
+    	    this.mode = Modes.Quit;
+        }
+
+    	Util.clear(cv);
+    	cv.end();
+    	detectModeLoop(system);
+
+    }
+
+    /**
+     * Method to run TESTAR on Record User Actions Mode.
+     * @param system
+     */
+    protected void runRecordLoop(SUT system) {
+        boolean startedRecordMode = false;
+   
+        //If system it's null means that we have started TESTAR from the Record User Actions Mode
+        //We need to invoke the SUT & the canvas representation
+        if(system == null) {
+        	system = startSystem();
+        	startedRecordMode = true;
+        	this.cv = buildCanvas();
+
+        	//Reset LogSerialiser
+        	LogSerialiser.finish();
+        	LogSerialiser.exit();
+
+        	//Generating the sequence file that can be replayed:
+        	generatedSequence = getAndStoreGeneratedSequence();
+        	currentSeq = getAndStoreSequenceFile();
+
+        	//initializing fragment for recording replayable test sequence:
+        	initFragmentForReplayableSequence(getState(system));
+        }
+        //else, SUT & canvas exists (startSystem() & buildCanvas() created from other mode)
+
+        
+        /**
+         * Start Record User Action Loop
+         */
+        while(mode() == Modes.Record && system.isRunning()) {
+            State state = getState(system);
+            cv.begin(); Util.clear(cv);
+            //In Record-mode, we DO NOT show any visualization:
+            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+           
+            Set<Action> actions = deriveActions(system,state);
+            CodingManager.buildIDs(state, actions);
+            if(actions.isEmpty()){
+                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                    LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+                }
+                //----------------------------------
+                // THERE MUST ALMOST BE ONE ACTION!
+                //----------------------------------
+                // if we did not find any actions, then we just hit escape, maybe that works ;-)
+                Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+                CodingManager.buildIDs(state, escAction);
+                actions.add(escAction);
+                escAttempts++;
+            } else
+                escAttempts = 0;
+
+            //In Record-mode, we DO NOT show any visualization:
+            //visualizeActions(cv, state, actions);
+            ActionStatus actionStatus = new ActionStatus();
+            
+            //Start Wait User Action Loop to obtain the Action did by the User
+            waitUserActionLoop(cv, system, state, actionStatus);
+            
+            if (actionStatus.isUserEventAction())
+    			CodingManager.buildIDs(state, actionStatus.getAction());
+    		
+            /**
+             * When we close TESTAR with Shift+down arrow, last actions is detected like null
+             */
+            if(actionStatus.getAction()!=null) {
+            	//System.out.println("DEBUG: User action is not null");
+            	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
+            }else {
+            	//System.out.println("DEBUG: User action ----- null");
+            	}
+
+
+            Util.clear(cv);
+            cv.end();
+        }
+
+        if(startedRecordMode && mode() == Modes.Quit){
+        	//Closing fragment for recording replayable test sequence:
+        	writeAndCloseFragmentForReplayableSequence();
+
+        	//Copy sequence file into proper directory:
+        	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
+
+            Util.clear(cv);
+            cv.end();
+        	//cv.release();
+        	detectModeLoop(system);
+        }
+
+    }
+
+    //TODO rename to replayLoop to be consistent:
+    protected void replay(){
+    	actionCount = 1;
+        boolean success = true;
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        GZIPInputStream gis = null;
+        ObjectInputStream ois = null;
+        SUT system = startSystem();
+        try{
+            File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
+            //ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(seqFile)));
+            fis = new FileInputStream(seqFile);
+            bis = new BufferedInputStream(fis);
+            gis = new GZIPInputStream(bis);
+            ois = new ObjectInputStream(gis);
+
+            Canvas cv = buildCanvas();
+            State state = getState(system);
+
+            String replayMessage;
+
+            double rrt = settings.get(ConfigTags.ReplayRetryTime);
+
+            while(success && mode() != Modes.Quit){
+                Taggable fragment;
+                try{
+                    fragment = (Taggable) ois.readObject();
+                } catch(IOException ioe){
+                    success = true;
+                    break;
+                }
+
+                success = false;
+                int tries = 0;
+                double start = Util.time();
+
+                while(!success && (Util.time() - start < rrt)){
+                    tries++;
+                    cv.begin(); Util.clear(cv);
+                    //In Replay-mode, we DO NOT show the widget info under cursor:
+                    //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+                    cv.end();
+
+                    if(mode() == Modes.Quit) break;
+                    Action action = fragment.get(ExecutedAction, new NOP());
+                    // In Replay-mode, we only show the red dot if visualizationOn is true:
+                    if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
+                    if(mode() == Modes.Quit) break;
+
+                    double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
+                    double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
+
+                    try{
+                        if(tries < 2){
+                            replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
+                            //System.out.println(replayMessage);
+                            LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
+                        }else{
+                            if(tries % 50 == 0)
+                                LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
+                            else
+                                LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
+                        }
+
+                        action.run(system, state, actionDuration);
+                        success = true;
+                        actionCount++;
+                        LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
+                    } catch(ActionFailedException afe){}
+
+                    Util.pause(actionDelay);
+
+                    if(mode() == Modes.Quit) break;
+                    state = getState(system);
+                }
+
+            }
+
+            cv.release();
+            //ois.close();
+            stopSystem(system);
+            if (system != null && system.isRunning())
+                system.stop();
+
+
+        } catch(IOException ioe){
+            throw new RuntimeException("Cannot read file.", ioe);
+        } catch (ClassNotFoundException cnfe) {
+            throw new RuntimeException("Cannot read file.", cnfe);
+        } finally {
+            if (ois != null){
+                try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
+            }
+            if (gis != null){
+                try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
+            }
+            if (bis != null){
+                try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+            }
+            if (fis != null){
+                try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
+            }
+            if (cv != null)
+                cv.release();
+            if (system != null)
+                system.stop();
+        }
+
+        if(success){
+            String msg = "Sequence successfully replayed!\n";
+            System.out.println(msg);
+            LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
+
+        } else{
+            String msg = "Failed to replay sequence.\n";
+            System.out.println(msg);
+            LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
+        }
+        LogSerialiser.finish();
+
+        // Going back to TESTAR settings dialog if it was used to start replay:
+        mode = Modes.Quit;
+        detectModeLoop(system);
+    }
+
+    /**
+     * This method is called before the first test sequence, allowing for example setting up the test environment
+     */
+    @Override
 	protected void initTestSession() {
 
 	}
 
+    /**
+     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+     */
 	@Override
 	protected void preSequencePreparations() {
 
@@ -279,7 +1023,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	@Override
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 	
@@ -299,6 +1043,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return true;
 	}
+
+    //TODO: Move out of DefaultProtocol?
 	/**
 	 * If SUT process is invoked through COMMAND_LINE,
 	 * this method create threads to work with oracles at the process level.
@@ -613,8 +1359,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	
 	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
 		Assert.notNull(system);
-		//State state = builder.apply(system);
-		state = builder.apply(system);
+		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
 
@@ -629,11 +1374,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return state;
 	}
 
+    /**
+     * This method gets the state of the SUT
+     * It also call getVerdict() and saves it into the state
+     *
+     * @param system
+     * @return
+     * @throws StateBuildException
+     */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		Assert.notNull(system);
-		//State state = builder.apply(system);
-		state = builder.apply(system);
+		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
 
@@ -659,9 +1411,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-
-		Grapher.notify(state, state.get(Tags.ScreenshotPath, null));
-
+		setStateForClickFilterLayerProtocol(state);
 		return state;
 	}
 
@@ -773,7 +1523,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return null if no preSelected actions are needed.
 	 */
 	protected Action preSelectAction(State state, Set<Action> actions){
-		Assert.isTrue(actions != null && !actions.isEmpty());
+		//Assert.isTrue(actions != null && !actions.isEmpty());
 
 		//If deriveActions indicated that there are processes that need to be killed
 		//because they are in the process filters
@@ -831,17 +1581,40 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
+
+			//Obtain action information
+			String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
+
+			//Output/logs folder
+			LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
+					actionCount,
+					"action = " + action.get(Tags.ConcreteID) +
+					" (" + action.get(Tags.AbstractID) + ") @state = " +
+					state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+					actionRepresentation[0]) + "\n",
+					LogSerialiser.LogLevel.Info);
+
+			//bin folder 
+			LOGGER.info("[EA] ExecutedAction number {} Widget {} finished in {} ms",
+					actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+
 			return true;
 		}catch(ActionFailedException afe){
 			return false;
 		}
 	}
 
+    /**
+     * This method is here, so that ClickFilterLayerProtocol can override it, and the behaviour is updated
+     *
+     * @param canvas
+     * @param state
+     * @param actions
+     */
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+		SutVisualization.visualizeActions(canvas, state, actions);
 	}
 
-	//TODO platform independent?
 	/**
 	 * Returns the next action that will be selected. If unwanted processes need to be killed, the action kills them. If the SUT needs
 	 * to be put in the foreground, then the action is putting it in the foreground. Otherwise the action is selected according to
@@ -857,7 +1630,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if (a != null){
 			return a;
 		} else
-			return Grapher.selectAction(state,actions);
+			return RandomActionSelector.selectAction(actions);
 	}
 
 	protected String getRandomText(Widget w){
@@ -897,26 +1670,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return topWidgets;
 	}
 
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
-		Drag[] drags = null;
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			for (Drag drag : drags){
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
-				storeWidget(state.get(Tags.ConcreteID), w);
-			}
-		}
-	}
+    protected void storeWidget(String stateID, Widget widget) {
+        graphDB.addWidget(stateID, widget);
+    }
 
 	/**
 	 * Check whether widget w should be filtered based on
@@ -990,35 +1746,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * STOP criteria deciding whether more sequences are required in a test run
 	 * @return
 	 */
-	protected boolean moreSequences() {	
-		//return sequenceCount() < settings().get(ConfigTags.Sequences) &&
+	protected boolean moreSequences() {
+//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
+//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}
 
-	// TODO: Is this method really used......??
-	/**
-	 *
-	 * @param system
-	 * @param state
-	 * @param action
-	 */
-	protected void actionExecuted(SUT system, State state, Action action){
-		if (this.lastState == null && state == null)
-			this.nonReactingActionNumber++;
-		else if (this.lastState != null && state != null &&
-				this.lastState.get(Tags.ConcreteID).equals(state.get(Tags.ConcreteID)))
-			this.nonReactingActionNumber++;
-		this.lastState = state;
-		if (this.nonReactingActionNumber > this.settings().get(ConfigTags.NonReactingUIThreshold).intValue()){
-			this.nonReactingActionNumber = 0;
-			this.forceNextActionESC = true;
-			LogSerialiser.log("UI seems not reacting to actions ... should try ESC?\n", LogSerialiser.LogLevel.Info);
-		}
-	}
-
-	@Override
-	public void mouseMoved(double x, double y) {}
+    @Override
+    public void mouseMoved(double x, double y) {} //for iEventListener
 
 	@Override
 	protected void stopSystem(SUT system) {
@@ -1027,43 +1763,82 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (ac != null)
 				ac.releaseCachedAutomationElements();
 		}
+		if(system !=null){
+		    system.stop();
+        }
 	}
+
+	private void startTestarSettingsDialog(){
+        if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+            this.mode = settings().get(ConfigTags.Mode);
+
+            if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
+                try {
+                    Main.reloadSettings(Main.getSettingsFile());
+                } catch (ConfigException e) {
+                    e.printStackTrace();
+                }
+                Main.startTestar(settings, Main.getSettingsFile());
+            }
+        }
+    }
+
 
 	@Override
-	protected void PostSequenceProcessing() {
+	protected void postSequenceProcessing() {
 
 	}
+
+    /**
+     * method for closing the internal TESTAR test session
+     */
+	private void closeTestarTestSession(){
+        //cleaning the variables started in initialize()
+        try {
+            if (!settings.get(ConfigTags.UnattendedTests)) {
+                if (GlobalScreen.isNativeHookRegistered()) {
+                    LogSerialiser.log("Unregistering keyboard and mouse hooks\n", LogSerialiser.LogLevel.Debug);
+                    GlobalScreen.removeNativeMouseMotionListener(eventHandler);
+                    GlobalScreen.removeNativeMouseListener(eventHandler);
+                    GlobalScreen.removeNativeKeyListener(eventHandler);
+                    GlobalScreen.unregisterNativeHook();
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 	@Override
-	protected void CloseTestSession() {
-
-	}
+    protected void closeTestSession() {
+    }
 
 	//TODO move to ManualRecording helper class??
-	/**
-	 * Records user action (for example for Generate-Manual)
-	 *
-	 * @param state
-	 * @return
-	 */
+//	/**
+//	 * Records user action (for example for Generate-Manual)
+//	 *
+//	 * @param state
+//	 * @return
+//	 */
 	protected Action mapUserEvent(State state){
-		Assert.notNull(userEvent);		
+		Assert.notNull(userEvent);
 		if (userEvent[0] instanceof MouseButtons){ // mouse events
 			double x = ((Double)userEvent[1]).doubleValue();
-			double y = ((Double)userEvent[2]).doubleValue();	
+			double y = ((Double)userEvent[2]).doubleValue();
 			Widget w = null;
 			try {
 				w = Util.widgetFromPoint(state, x, y);
 				x = 0.5; y = 0.5;
 				if (userEvent[0] == MouseButtons.BUTTON1) // left click
 					return (new AnnotatingActionCompiler()).leftClickAt(w,x,y);
-				else if (userEvent[0] == MouseButtons.BUTTON3) // right click     
+				else if (userEvent[0] == MouseButtons.BUTTON3) // right click
 					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
 			} catch (WidgetNotFoundException we){
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
 				return null;
 			}
-		} else if (userEvent[0] instanceof KBKeys) // key events
+	} else if (userEvent[0] instanceof KBKeys) // key events
 			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
 		else if (userEvent[0] instanceof String){ // type events
 			if (lastExecutedAction == null)
@@ -1074,25 +1849,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			try {
 				Widget w = targets.get(0).apply(state);
 				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
-			} catch (WidgetNotFoundException we){
+		} catch (WidgetNotFoundException we){
 				return null;
 			}
 		}
-
 		return null;
 	}
 
 	//TODO move to ManualRecording helper class??
-	/**
-	 * Waits for an user UI action.
-	 * Requirement: Mode must be GenerateManual.
-	 */
+//	/**
+//	 * Waits for an user UI action.
+//	 * Requirement: Mode must be GenerateManual.
+//	 */
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
-		while (mode() == Modes.GenerateManual && !actionStatus.isUserEventAction()){
+		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
 				actionStatus.setAction(mapUserEvent(state));
 				actionStatus.setUserEventAction((actionStatus.getAction() != null));
-				userEvent = null;
+			userEvent = null;
 			}
 			synchronized(this){
 				try {
@@ -1101,110 +1875,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 			cv.begin(); Util.clear(cv);
 
-			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
+			//In Record-mode, we DO NOT show the widget info under the cursor:
+            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
-			visualizeActions(cv, state, actions);
+			//In Record-mode, we DO NOT show the green dots:
+			//visualizeActions(cv, state, actions);
 
 			cv.end();
-		}		
-	}
-
-	//TODO move to ManualRecording helper class??
-	/**
-	 * Waits for an event (UI action) from adhoc-test.
-	 * @param state
-	 * @param actionStatus
-	 * @return 'true' if problems were found.
-	 */
-	protected boolean waitAdhocTestEventLoop(State state, ActionStatus actionStatus){
-		AdhocServer.waitReaderWriter(this);
-		int adhocTestInterval = 10; // ms
-		while (System.currentTimeMillis() < stampLastExecutedAction + adhocTestInterval){
-			synchronized(this){
-				try {
-					this.wait(adhocTestInterval - System.currentTimeMillis() + stampLastExecutedAction + 1);
-				} catch (InterruptedException e) {}
-			}
 		}
-		do{
-			System.out.println("AdhocTest waiting for event ...");
-			try{
-				AdhocServer.adhocWrite("READY");
-			} catch (Exception e){
-				return true; // AdhocTest client disconnected?
-			}
-			try{
-				String socketData = AdhocServer.adhocRead(); // one event per line
-				System.out.println("\t... AdhocTest event = " + socketData);
-				userEvent = AdhocServer.compileAdhocTestServerEvent(socketData); // hack into userEvent
-				if (userEvent == null){
-					AdhocServer.adhocWrite("???");
-				}else{
-					actionStatus.setAction(mapUserEvent(state));
-					if (actionStatus.getAction() == null){
-						AdhocServer.adhocWrite("404");
-					}
-				}
-				userEvent = null;
-			} catch (Exception e){
-				userEvent = null;
-				return true; // AdhocTest client disconnected?
-			}
-		} while (actionStatus.getAction() == null);
-		CodingManager.buildIDs(state, actionStatus.getAction());
-		return false;
 	}
-
 
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 99;
-	/**
-	 * Waits for an automatically selected UI action.
-	 * @param system
-	 * @param state
-	 * @param fragment
-	 * @param actionStatus
-	 * @return
-	 */
-	protected boolean waitAutomaticAction(SUT system, State state, Taggable fragment, ActionStatus actionStatus){
-		Set<Action> actions = deriveActions(system, state);
-		CodingManager.buildIDs(state,actions);
-
-		if(actions.isEmpty()){
-			if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-				LogSerialiser.log("No available actions to execute! Tryed ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-				actionStatus.setProblems(true); // problems found
-			}
-			//----------------------------------
-			// THERE MUST ALMOST BE ONE ACTION!
-			//----------------------------------
-			// if we did not find any actions, then we just hit escape, maybe that works ;-)
-			Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, escAction);
-			actions.add(escAction);
-			escAttempts++;
-		} else
-			escAttempts = 0;
-
-		fragment.set(ActionSet, actions);
-		LogSerialiser.log("Built action set!\n", LogSerialiser.LogLevel.Debug);
-		visualizeActions(cv, state, actions);
-
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-		LogSerialiser.log("Selecting action...\n", LogSerialiser.LogLevel.Debug);
-		if(mode() == Modes.Spy) return false;
-		actionStatus.setAction(selectAction(state, actions));
-
-		if (actionStatus.getAction() == null){ // (no suitable actions?)
-			nonSuitableAction = true;
-			return true; // force test sequence end
-		}
-
-		actionStatus.setUserEventAction(false);
-
-		return false;
-	}
 
 	protected boolean isNOP(Action action){
 		String as = action.toString();
@@ -1224,699 +1907,30 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return false;
 	}
 
-	//TODO move the variables into a separate class SutProfiler
-	// variables for SUT profiling in runAction():
-	protected long stampLastExecutedAction = -1;
-	protected long[] lastCPU; // user x system x frame
-	protected int nopAttempts = 0;
-	protected static final int MAX_NOP_ATTEMPTS = 99;
-	protected static final long NOP_WAIT_WINDOW = 100; // ms
-
-	/**
-	 * To be documented / refactored
-	 *
-	 * @param cv
-	 * @param system
-	 * @param state
-	 * @param fragment
-	 * @return
-	 */
-	protected boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
-		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA} start runAction");
-		ActionStatus actionStatus = new ActionStatus();
-
-		if (mode() == Modes.GenerateManual)
-			waitUserActionLoop(cv,system,state,actionStatus);
-
-		cv.begin(); Util.clear(cv);
-		SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-		LogSerialiser.log("Building action set...\n", LogSerialiser.LogLevel.Debug);
-
-		if (actionStatus.isUserEventAction()){ // user action
-			CodingManager.buildIDs(state, actionStatus.getAction());
-		} else if (mode() == Modes.AdhocTest){ // adhoc-test action
-			if (waitAdhocTestEventLoop(state,actionStatus)){
-				cv.end();
-				return true; // problems
-			}
-		} else{ // automatically derived action
-			if (waitAutomaticAction(system,state,fragment,actionStatus)){
-				cv.end();
-				return true; // problems
-			} else if (actionStatus.getAction() == null && mode() == Modes.Spy){
-				cv.end();
-				return false;
-			}
-		}
-		cv.end();
-
-		if (actionStatus.getAction() == null)
-			return true; // problems
-
-		if (actionCount == firstSequenceActionNumber && isESC(actionStatus.getAction())){ // first action in the sequence an ESC?
-			System.out.println("First action ESC? Switching to NOP to wait for SUT UI ... " + this.timeElapsed());
-			Util.pauseMs(NOP_WAIT_WINDOW); // hold-on for UI to react (e.g. scenario: SUT loading ... logo)
-			actionStatus.setAction(new NOP());
-			CodingManager.buildIDs(state, actionStatus.getAction());
-			nopAttempts++; escAttempts = 0;
-		} else
-			nopAttempts = 0;
-
-		LogSerialiser.log("Selected action '" + actionStatus.getAction() + "'.\n", LogSerialiser.LogLevel.Debug);
-
-		SutVisualization.visualizeSelectedAction(mode, settings, cv, state, actionStatus.getAction());
-
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-
-		boolean isTestAction = nopAttempts >= MAX_NOP_ATTEMPTS || !isNOP(actionStatus.getAction());
-
-		if(mode() != Modes.Spy){
-			String[] actionRepresentation = Action.getActionRepresentation(state,actionStatus.getAction(),"\t");
-			int memUsage = NativeLinker.getMemUsage(system);
-			if (memUsage < sutRAMbase)
-				sutRAMbase = memUsage;
-			if (memUsage - sutRAMbase > sutRAMpeak)
-				sutRAMpeak = memUsage - sutRAMbase;
-			long currentCPU[] = NativeLinker.getCPUsage(system),
-					userms = currentCPU[0] - lastCPU[0],
-					sysms = currentCPU[1] - lastCPU[1],
-					cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
-			lastCPU = currentCPU;
-			if (isTestAction)
-				Grapher.notify(state,state.get(Tags.ScreenshotPath, null),
-						actionStatus.getAction(),protocolUtil.getActionshot(state,actionStatus.getAction()),actionRepresentation[1],
-						memUsage, cpuUsage);
-			LogSerialiser.log(String.format("Executing (%d): %s...", actionCount,
-					actionStatus.getAction().get(Desc, actionStatus.getAction().toString())) + "\n", LogSerialiser.LogLevel.Debug);
-
-			if (actionStatus.isUserEventAction() ||
-					(actionStatus.setActionSucceeded(executeAction(system, state, actionStatus.getAction())))){
-
-				cv.begin();
-				Util.clear(cv);
-				cv.end(); // (overlay is invalid until new state/actions scan)
-				stampLastExecutedAction = System.currentTimeMillis();
-				actionExecuted(system,state,actionStatus.getAction()); // notification
-				if (actionStatus.isUserEventAction())
-					Util.pause(settings.get(ConfigTags.TimeToWaitAfterAction)); // wait between actions
-				double sutCPU = ((cpuUsage[0] + cpuUsage[1]) / (double)cpuUsage[2] * 100);
-				if (sutCPU > sutCPUpeak)
-					sutCPUpeak = sutCPU;
-				String cpuPercent = String.format("%.2f", sutCPU) + "%";
-				LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
-						actionCount,
-						"action = " + actionStatus.getAction().get(Tags.ConcreteID) +
-						" (" + actionStatus.getAction().get(Tags.AbstractID) + ") @state = " +
-						state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n\tSUT_KB = " +
-						memUsage + ", SUT_ms = " + cpuUsage[0] + " x " + cpuUsage[1] + " x " + cpuPercent,
-						actionRepresentation[0]) + "\n",
-						LogSerialiser.LogLevel.Info);
-
-				if (mode() == Modes.AdhocTest){
-					try {
-						AdhocServer.adhocWrite("OK");
-					} catch (Exception e){} // AdhocTest client disconnected?
-				}
-
-				if (isTestAction && actionStatus.isActionSucceeded())
-					actionCount++;
-				fragment.set(ExecutedAction, actionStatus.getAction());
-				fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
-				fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
-				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-
-				TestSerialiser.write(fragment);
-
-				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-			}else{
-				LogSerialiser.log("Execution of action failed!\n");
-				try {
-					AdhocServer.adhocWrite("FAIL");
-				} catch (Exception e) {
-					LogSerialiser.log("protocolUtil Failed!\n");
-				} // AdhocTest client disconnected?
-			}				
-		}
-
-		lastExecutedAction = actionStatus.getAction();
-		lastExecutedAction.set(Tags.UsedResources, new UsedResources(lastCPU[0],lastCPU[1],sutRAMbase,sutRAMpeak).toString());
-		lastExecutedAction.set(Tags.Representation, Action.getActionRepresentation(state,lastExecutedAction,"\t")[1]);
-		State newState = getState(system);
-		graphDB.addState(newState);
-
-		if(lastExecutedAction.get(Tags.TargetID,"no_target").equals("no_target")) {
-			//TODO this does not work in all cases check (the last executed action tag does not always have a description
-			//System.out.println("No Target for Action: "+ lastExecutedAction.get(Tags.Desc, ""));
-			graphDB.addActionOnState(state.get(Tags.ConcreteID),lastExecutedAction, newState.get(Tags.ConcreteID));
-		} else {
-			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
-		}
-		LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
-		if(mode() == Modes.Quit) return actionStatus.isProblems();
-		if(!actionStatus.isActionSucceeded()){
-			return true;
-		}
-
-		return actionStatus.isProblems();
-	}
-
-	/**
-	 * Method to run TESTAR on Generate mode
-	 * @param system
-	 */
-	protected void runGenerate(SUT system){
-		LogSerialiser.finish(); LogSerialiser.exit();
-		sequenceCount = 1;
-		lastStamp = System.currentTimeMillis();
-		escAttempts = 0; nopAttempts = 0;
-		boolean problems;
-
-		//New sequence starts
-		while(mode() != Modes.Quit && moreSequences()){
-			long tStart = System.currentTimeMillis();
-			LOGGER.info("[RT] Runtest started for sequence {}",sequenceCount());
-
-			String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
-			generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
-
-			sutRAMbase = Double.MAX_VALUE; sutRAMpeak = 0.0; sutCPUpeak = 0.0; testRAMpeak = 0.0; testCPUpeak = 0.0;
-
-			try {
-				LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-						settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
-						settings.get(LogLevel));
-			} catch (NoSuchTagException e3) {
-				// TODO Auto-generated catch block
-				e3.printStackTrace();
-			} catch (FileNotFoundException e3) {
-				// TODO Auto-generated catch block
-				e3.printStackTrace();
-			}
-
-			//Create a new Grapher for a new sequence
-			jipWrapper = new JIPrologWrapper();
-			Grapher.grapher(generatedSequence,
-					settings.get(ConfigTags.SequenceLength),
-					settings.get(ConfigTags.AlgorithmFormsFilling),
-					settings.get(ConfigTags.TypingTextsForExecutedAction).intValue(),
-					settings.get(ConfigTags.TestGenerator),
-					settings.get(ConfigTags.MaxReward),
-					settings.get(ConfigTags.Discount),
-					settings.get(ConfigTags.ExplorationSampleInterval),
-					settings.get(ConfigTags.GraphsActivated),
-					settings.get(ConfigTags.PrologActivated),
-					settings.get(ConfigTags.ForceToSequenceLength) && this.forceToSequenceLengthAfterFail ?
-							true : settings.get(ConfigTags.GraphResuming),
-					settings.get(ConfigTags.OfflineGraphConversion),
-					settings.get(ConfigTags.OutputDir),
-					jipWrapper);
-
-			Grapher.waitEnvironment();
-			ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
-
-			problems = false;
-			if (!forceToSequenceLengthAfterFail) passSeverity = Verdict.SEVERITY_OK;
-			if (this.forceToSequenceLengthAfterFail){
-				this.forceToSequenceLengthAfterFail = false;
-				this.testFailTimes++;
-				this.lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength);
-			} else{
-				if (settings.get(ConfigTags.GraphsActivated) && settings.get(ConfigTags.GraphResuming))
-					actionCount = Grapher.getEnvironment().getGraphActions().size() + 1;
-				else
-					actionCount = 1;
-				this.testFailTimes = 0;
-				lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
-			}
-			firstSequenceActionNumber = actionCount;
-
-			LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
-			final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
-			try {
-				Util.delete(currentSeq);
-			} catch (IOException e2) {
-				LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
-			}
-			try {
-				TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
-				LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
-			} catch (IOException e) {
-				LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			}
-			LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
-
-			String startDateString = Util.dateString(DATE_FORMAT);
-			LogSerialiser.log(startDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
-
-			try{
-				//If system it's null means that we have started TESTAR from the Generate mode
-				if(system == null || !system.isRunning()) {
-					system = null;
-					system = startSystem();
-					this.cv = buildCanvas();
-				}
-				processListeners(system);
-
-				lastCPU = NativeLinker.getCPUsage(system);
-
-				LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
-				LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
-				State state = getState(system);
-				LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
-				beginSequence(system, state);
-				LogSerialiser.log("Obtaining system state after beginSequence...\n", LogSerialiser.LogLevel.Debug);
-				state = getState(system);
-				graphDB.addState(state,true);
-				LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-				if(isSaveStateSnapshot()) {
-					File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
-					FileHandling.saveStateSnapshot(state, file);
-					setSaveStateSnapshot(false);
-				}
-				Taggable fragment = new TaggableBase();
-				fragment.set(SystemState, state);
-
-				Verdict verdict = state.get(OracleVerdict, Verdict.OK);
-				Verdict processVerdict =  getProcessVerdict();
-				if (faultySequence) problems = true;
-				fragment.set(OracleVerdict, verdict);
-
-				long spyTime;
-				//We begin to make the number of actions indicated in our sequence
-				while(mode() != Modes.Quit && moreActions(state)){
-
-					//User wants to move to Spy mode, after that we will continue the actions
-					if(mode() == Modes.Spy) {
-						spyTime = System.currentTimeMillis();
-						runSpy(system);
-						LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
-					}
-
-					if (problems)
-						faultySequence = true;
-					else{
-						problems = runAction(cv,system,state,fragment);
-
-						LogSerialiser.log("Obtaining system state...\n", LogSerialiser.LogLevel.Debug);
-
-						/*try {
-							semaphore.acquire();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}*/
-						
-						state = getState(system);
-						graphDB.addState(state);
-						if (faultySequence) problems = true;
-						LogSerialiser.log("Successfully obtained system state!\n", LogSerialiser.LogLevel.Debug);
-						if (mode() != Modes.Spy){
-							if(isSaveStateSnapshot()) {
-								File file = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir), "state_snapshot");
-								FileHandling.saveStateSnapshot(state, file);
-								setSaveStateSnapshot(false);
-							}
-							processVerdict = getProcessVerdict();
-							verdict = state.get(OracleVerdict, Verdict.OK);
-							fragment.set(OracleVerdict, verdict.join(processVerdict));
-							fragment = new TaggableBase();
-							fragment.set(SystemState, state);
-						}
-						
-						//semaphore.release();
-					}
-				}
-				
-				LogSerialiser.log("Shutting down the SUT...\n", LogSerialiser.LogLevel.Info);
-				stopSystem(system);
-				//If stopSystem did not really stop the system, we will do it for you ;-)
-				if (system != null && system.isRunning())
-					system.stop();
-				LogSerialiser.log("... SUT has been shut down!\n", LogSerialiser.LogLevel.Debug);
-
-				ScreenshotSerialiser.finish();
-				LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
-				TestSerialiser.write(fragment);
-				TestSerialiser.finish();
-				LogSerialiser.log("Wrote fragment to sequence file!\n", LogSerialiser.LogLevel.Debug);
-
-				Grapher.walkFinished(!problems,
-						mode() == Modes.Spy ? null : state,
-								protocolUtil.getStateshot(state));
-
-				LogSerialiser.log("Sequence " + sequenceCount + " finished.\n", LogSerialiser.LogLevel.Info);
-				if(problems)
-					LogSerialiser.log("Sequence contained problems!\n", LogSerialiser.LogLevel.Critical);
-
-				finishSequence(currentSeq);
-
-				Verdict stateVerdict = verdict.join(new Verdict(passSeverity,"",Util.NullVisualizer));
-				Verdict finalVerdict;
-
-				finalVerdict = stateVerdict.join(processVerdict);
-				
-				setProcessVerdict(Verdict.OK);
-
-				if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
-						finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
-					LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
-					try {
-						Util.copyToDirectory(currentSeq.getAbsolutePath(),
-								settings.get(ConfigTags.OutputDir) + File.separator + "sequences", 
-								generatedSequence,
-								true);
-						LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);					
-					} catch (NoSuchTagException e) {
-						LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-					} catch (IOException e) {
-						LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-					}
-					FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict,settings.get(ConfigTags.OutputDir));
-				}
-				if(!problems)
-					this.forceToSequenceLengthAfterFail = false;
-
-				LogSerialiser.log("Releasing canvas...\n", LogSerialiser.LogLevel.Debug);
-				cv.release();
-
-				saveSequenceMetrics(generatedSequence,problems);
-
-				ScreenshotSerialiser.exit();
-				final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber); // screenshots must be serialised
-				if (reportPages == null)
-					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
-				TestSerialiser.exit();
-				String stopDateString =  Util.dateString(DATE_FORMAT),
-						durationDateString = Util.diffDateString(DATE_FORMAT, startDateString, stopDateString);
-				LogSerialiser.log("TESTAR stopped execution at " + stopDateString + "\n", LogSerialiser.LogLevel.Critical);
-				LogSerialiser.log("Test duration was " + durationDateString + "\n", LogSerialiser.LogLevel.Critical);
-				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-
-				if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence, settings.get(OutputDir), settings.get(LogLevel));; // save report
-
-				sequenceCount++;
-
-			} catch(Exception e){
-				System.out.println("Thread: name="+Thread.currentThread().getName()+",id="+Thread.currentThread().getId()+", SUT throws exception");
-				e.printStackTrace();
-				SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-				ScreenshotSerialiser.finish();
-				TestSerialiser.finish();				
-				Grapher.walkFinished(false, null, null);
-				ScreenshotSerialiser.exit(); final String[] reportPages = Grapher.getReport(this.firstSequenceActionNumber);  // screenshots must be serialised
-				if (reportPages == null)
-					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
-				LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
-				int i=1; StringBuffer trace = new StringBuffer();
-				for(StackTraceElement t : e.getStackTrace())
-					trace.append("\n\t[" + i++ + "] " + t.toString());
-				System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());
-				stopSystem(system);
-				if (system != null && system.isRunning())
-					system.stop();
-				TestSerialiser.exit();
-				LogSerialiser.flush(); LogSerialiser.finish(); LogSerialiser.exit();
-				if (reportPages != null) FileHandling.saveReport(reportPages, generatedSequence,settings.get(OutputDir), settings.get(LogLevel));; // save report
-				this.mode = Modes.Quit; // System.exit(1);
-			}
-			LOGGER.info("[RT] Runtest finished for sequence {} in {} ms",sequenceCount()-1,System.currentTimeMillis()-tStart);
-		}
-		if (settings().get(ConfigTags.ForceToSequenceLength).booleanValue() &&  // force a test sequence length in presence of FAIL
-				this.actionCount <= settings().get(ConfigTags.SequenceLength) && 
-				mode() != Modes.Quit && testFailTimes < TEST_RETRY_THRESHOLD){
-			this.forceToSequenceLengthAfterFail = true;
-			System.out.println("Resuming test after FAIL at action number <" + this.actionCount + ">");
-			runGenerate(system); // continue testing
-		} else
-			this.forceToSequenceLengthAfterFail = false;
-	}
-
-	/**
-	 * Method to run TESTAR on Spy Mode.
-	 * @param system
-	 */
-	protected void runSpy(SUT system) {
-		boolean startedSpy = false;
-
-		//If system it's null means that we have started TESTAR from the Spy mode
-		//We need to invoke the SUT & the canvas representation
-		if(system == null) {
-			system = startSystem();
-			//processListeners(system);
-			startedSpy = true;
-			Grapher.GRAPHS_ACTIVATED = false;
-			this.cv = buildCanvas();
-		}
-		//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
-
-		while(mode() == Modes.Spy && system.isRunning()) {
-			State state = getState(system);
-			cv.begin(); Util.clear(cv);
-			SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-			Set<Action> actions = deriveActions(system,state);
-			CodingManager.buildIDs(state, actions);
-			visualizeActions(cv, state, actions);
-			cv.end();
-		}
-
-		if(startedSpy){
-			//cv.release();
-			detectLoopMode(system);
-		}
-
-	}
-
-	protected void replay(){
-		boolean graphsActivated = Grapher.GRAPHS_ACTIVATED;
-		Grapher.GRAPHS_ACTIVATED = false;
-		actionCount = 1;
-		boolean success = true;
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		GZIPInputStream gis = null;
-		ObjectInputStream ois = null;
-		SUT system = startSystem();
-		try{
-			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-			//ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(seqFile)));
-			fis = new FileInputStream(seqFile);
-			bis = new BufferedInputStream(fis);
-			gis = new GZIPInputStream(bis);
-			ois = new ObjectInputStream(gis);
-
-			Canvas cv = buildCanvas();
-			State state = getState(system);
-
-			String replayMessage;
-
-			double rrt = settings.get(ConfigTags.ReplayRetryTime);
-
-			while(success && mode() != Modes.Quit){
-				Taggable fragment;
-				try{
-					fragment = (Taggable) ois.readObject();
-				} catch(IOException ioe){
-					success = true;
-					break;
-				}
-
-				success = false;
-				int tries = 0;
-				double start = Util.time();
-
-				while(!success && (Util.time() - start < rrt)){
-					tries++;
-					cv.begin(); Util.clear(cv);
-					SutVisualization.visualizeState(mode, settings, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv, state, system);
-					cv.end();
-
-					if(mode() == Modes.Quit) break;
-					Action action = fragment.get(ExecutedAction, new NOP());
-					SutVisualization.visualizeSelectedAction(mode, settings, cv, state, action);
-					if(mode() == Modes.Quit) break;
-
-					double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
-					double actionDelay = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDelay, 0.0) : settings.get(ConfigTags.TimeToWaitAfterAction);
-
-					try{
-						if(tries < 2){
-							replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]", actionCount, action.get(Desc, action.toString()));
-							//System.out.println(replayMessage);
-							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
-						}else{
-							if(tries % 50 == 0)
-								LogSerialiser.log(".\n", LogSerialiser.LogLevel.Info);
-							else
-								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
-						}
-
-						action.run(system, state, actionDuration);
-						success = true;
-						actionCount++;
-						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
-					} catch(ActionFailedException afe){}
-
-					Util.pause(actionDelay);
-
-					if(mode() == Modes.Quit) break;
-					state = getState(system);
-				}
-
-			}
-
-			cv.release();
-			//ois.close();
-			stopSystem(system);
-			if (system != null && system.isRunning())
-				system.stop();
-
-		} catch(IOException ioe){
-			throw new RuntimeException("Cannot read file.", ioe);
-		} catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException("Cannot read file.", cnfe);
-		} finally {
-			if (ois != null){
-				try { ois.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (gis != null){
-				try { gis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (bis != null){
-				try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (fis != null){
-				try { fis.close(); } catch (IOException e) { e.printStackTrace(); }
-			}
-			if (cv != null)
-				cv.release();
-			if (system != null)
-				system.stop();			
-		}
-
-		if(success){
-			String msg = "Sequence successfully replayed!\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
-
-		} else{
-			String msg = "Failed to replay sequence.\n";
-			System.out.println(msg);
-			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
-		}
-		LogSerialiser.finish();
-		Grapher.GRAPHS_ACTIVATED = graphsActivated;
-	}
-	
-	//Method to change between the different loops that represent the principal modes of execution on TESTAR
-	protected void detectLoopMode(SUT system) {
-		if(mode() == Modes.Spy ){
-			runSpy(system);
-		}else if(mode() == Modes.Generate || mode() == Modes.GenerateDebug || mode() == Modes.GenerateManual){
-			runGenerate(system);
-		}else if(mode() == Modes.Quit) {
-			quitSUT(system);
-		}
-	}
-
-	//close SUT because we're on Quit mode
-	protected void quitSUT(SUT system) {
-
-		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
-		stopSystem(system);
-		//If stopSystem did not really stop the system, we will do it for you ;-)
-		if (system != null)
-			system.stop();
-	}
-
-
-	//TODO move to SutProfiler, cannot be static as keeps the values
-	protected double sutRAMbase;
-	protected double sutRAMpeak;
-	protected double sutCPUpeak;
-	protected double testRAMpeak;
-	protected double testCPUpeak;
-
-	private void debugResources(){
-		long nowStamp = System.currentTimeMillis();
-		double testRAM =  Runtime.getRuntime().totalMemory()/1048576.0;
-		if (testRAM > testRAMpeak)
-			testRAMpeak = testRAM;
-		double testCPU = (nowStamp - lastStamp)/1000.0;
-		if (testCPU > testCPUpeak && actionCount != firstSequenceActionNumber)
-			testCPUpeak = testCPU;
-		//System.out.print("TC: " + String.format("%.3f", testCPU) + // TC = TESTAR_CPU
-		//				 " s / TR: " + testRAM + " MB"); // TR = TESTAR_RAM
-		lastStamp = nowStamp;
-	}
-
-
-	//TODO move to reporting helper or FileHandling, but cannot be static
-	public void saveSequenceMetrics(String testSequenceName, boolean problems){
-		if (Grapher.GRAPHS_ACTIVATED){
-			try {
-				PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-						settings.get(OutputDir) + File.separator + "metrics" + File.separator + (problems ? "fail_" : "") + testSequenceName + ".csv"))));
-				String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
-						"verdict",	 // test verdict
-						"FAILS",	 // test FAIL count
-						"minCvg(%)", // min coverage
-						"maxCvg(%)", // max coverage
-						"maxpath",	 // longest path
-						"graph-states",	 // graph states
-						"abstract-states", // abstract states
-						"graph-actions", // graph actions
-						"test-actions", // test actions
-						"SUTRAM(KB)",	 // SUT RAM peak
-						"SUTCPU(%)",	 // SUT CPU peak
-						"TestRAM(MB)",	 // TESTAR RAM peak
-						"TestCPU(s)",	 // TESTAR CPU peak
-						"fitness"		 // fitness
-				);
-				ps.println(heading);
-				IEnvironment env = Grapher.getEnvironment();
-				IEnvironment.CoverageMetrics cvgMetrics = env.getCoverageMetrics();
-				final int VERDICT_WEIGHT = 	1000,
-						CVG_WEIGHT = 		  10,
-						PATH_WEIGHT = 	 100,
-						STATES_WEIGHT = 	  10,
-						ACTIONS_WEIGHT = 	1000,
-						SUT_WEIGHT = 		   1,
-						TEST_WEIGHT = 	1000;
-				double fitness = 1 / // 0.0 (best) .. 1.0 (worse)
-						((problems ? 1 : 0) * VERDICT_WEIGHT +
-								cvgMetrics.getMinCoverage() + cvgMetrics.getMaxCoverage() * CVG_WEIGHT +
-								env.getLongestPathLength() * PATH_WEIGHT +
-								(env.getGraphStates().size() - 2) * STATES_WEIGHT +
-								(1 / (env.getGraphActions().size() + 1) * ACTIONS_WEIGHT) + // avoid division by 0
-								(sutRAMpeak + sutCPUpeak) * SUT_WEIGHT +
-								(1 / (1 + testRAMpeak + testCPUpeak*1000)) * TEST_WEIGHT // avoid division by 0
-						);
-				String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
-						(problems ? "FAIL" : "PASS"),		  // verdict
-						this.testFailTimes,					  // test FAIL count
-						String.format("%.2f", cvgMetrics.getMinCoverage()),
-						String.format("%.2f", cvgMetrics.getMaxCoverage()),
-						env.getLongestPathLength(), 			  // longest path
-						env.getGraphStates().size() - 2,	  // graph states
-						env.getGraphStateClusters().size(),	  // abstract states
-						env.getGraphActions().size() - 2,	  // graph actions
-						this.actionCount - 1,                 // test actions
-						sutRAMpeak,						  	  // SUT RAM peak
-						String.format("%.2f",sutCPUpeak),	  // SUT CPU peak
-						testRAMpeak,						  // TESTAR RAM peak
-						String.format("%.3f",testCPUpeak), 	  // TESTAR CPU peak
-						fitness		  // fitness
-				);
-				ps.print(metrics);
-				ps.close();
-				//System.out.println(heading + "\n" + metrics);
-			} catch (NoSuchTagException | FileNotFoundException e) {
-				LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-				//} catch (FileNotFoundException e) {
-				//	LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-			}
-		}
-	}
+    /**
+     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+     * @param actions
+     * @param ac
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @param w
+     */
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
+        Drag[] drags = null;
+        //If there are scroll (drags/drops) actions possible
+        if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Store the widget in the Graphdatabase
+                storeWidget(state.get(Tags.ConcreteID), w);
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                actions.add(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+                ));
+
+            }
+        }
+    }
 
 }

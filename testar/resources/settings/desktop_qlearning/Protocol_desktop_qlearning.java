@@ -29,16 +29,12 @@
 *******************************************************************************************************/
 
 
-import java.io.File;
 import java.util.Set;
 
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphForQlearning;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
+import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
@@ -51,19 +47,17 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-import org.sikuli.script.FindFailed;
-import org.sikuli.script.Screen;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayerProtocol {
+public class Protocol_desktop_qlearning extends ClickFilterLayerProtocol {
 
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
 	private HtmlSequenceReport htmlReport;
-	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
+	//private GuiStateGraphForQlearning stateGraph;
+	private QLearningActionSelector actionSelector;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -75,7 +69,8 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 		//initializing the HTML sequence report:
 		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph:
-		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
+		//stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
+		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 	}
 
@@ -85,6 +80,19 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 	 @Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		actionSelector.resetGraphForNewTestSequence();
+	}
+
+	@Override
+	protected void postSequenceProcessing() {
+		actionSelector.printReport();
 	}
 
 	/**
@@ -220,7 +228,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 	protected Action selectAction(State state, Set<Action> actions){
 		//adding state to the HTML sequence report:
 		try {
-			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+			htmlReport.addState(state, actions);
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null
 			htmlReport.addState(state, actions);
@@ -233,7 +241,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 		} else{
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = stateGraphWithVisitedActions.selectAction(state,actions);
+			a = actionSelector.selectAction(state,actions);
 			//a = RandomActionSelector.selectAction(actions);
 		}
 		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
@@ -249,53 +257,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
-		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
-		try{
-			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
-			//System.out.println("DEBUG: action: "+action.toString());
-			//System.out.println("DEBUG: action short: "+action.toShortString());
-			if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
-				Screen sikuliScreen = new Screen();
-				try {
-					//System.out.println("DEBUG: sikuli clicking ");
-					while(!new File(widgetScreenshotPath).exists()){
-						//System.out.println("Waiting for image file to exist");
-						Util.pause(halfWait);
-					}
-					Util.pause(1);
-					sikuliScreen.click(widgetScreenshotPath);
-				} catch (FindFailed findFailed) {
-					findFailed.printStackTrace();
-					return false;
-				}
-			}else if(action.toShortString().contains("ClickTypeInto(")){
-				String textToType = action.toShortString().substring(action.toShortString().indexOf("("), action.toShortString().indexOf(")"));
-				//System.out.println("parsed text:"+textToType);
-				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
-				Util.pause(halfWait);
-				Screen sikuliScreen = new Screen();
-				try {
-					//System.out.println("DEBUG: sikuli typing ");
-					while(!new File(widgetScreenshotPath).exists()){
-						//System.out.println("Waiting for image file to exist");
-						Util.pause(halfWait);
-					}
-					Util.pause(1);
-					sikuliScreen.type(widgetScreenshotPath,textToType);
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
-			}
-			else {
-				//System.out.println("DEBUG: TESTAR action");
-				//System.out.println("DEBUG: action desc: "+action.get(Tags.Desc));
-				action.run(system, state, settings().get(ConfigTags.ActionDuration));
-			}return true;
-		}catch(ActionFailedException afe){
-			return false;
-		}
+		return super.executeAction(system, state, action);
 	}
 
 	/**

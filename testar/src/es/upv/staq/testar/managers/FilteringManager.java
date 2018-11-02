@@ -356,6 +356,13 @@ public class FilteringManager
     saveFilters();
   }
 
+  /**
+   * Opens a Dialog asking for "Widget input value type" - not used at the moment
+   *
+   * @param state
+   * @param mouse
+   * @param preciseCoding
+   */
   public void setWidgetFilter (State state, Mouse mouse, boolean preciseCoding)
   {
     Widget cursorWidget = getWidgetUnderCursor(state, mouse);
