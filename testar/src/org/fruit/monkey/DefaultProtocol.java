@@ -525,7 +525,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 runGenerateInnerLoop(system, state);
 
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
-                finishSequence(currentSeq);
+                finishSequence();
 
                 writeAndCloseFragmentForReplayableSequence();
 
@@ -1010,7 +1010,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	@Override
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
 	
