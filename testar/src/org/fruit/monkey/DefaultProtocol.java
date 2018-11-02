@@ -566,6 +566,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         closeTestSession();
         //Closing TESTAR internal test session:
         closeTestarTestSession();
+        mode = Modes.Quit;
+        detectModeLoop(system);
     }
 
     private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
