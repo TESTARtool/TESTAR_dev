@@ -149,8 +149,8 @@ public class SettingsDialog extends JFrame implements Observer {
     try {
       extractInformation(settings);
       checkSettings(settings);
-      saveCurrentSettings();
       settings.set(ConfigTags.Mode, mode);
+      saveCurrentSettings();
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
