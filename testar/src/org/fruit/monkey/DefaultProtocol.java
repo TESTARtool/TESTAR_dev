@@ -1765,24 +1765,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		if(system !=null){
 		    system.stop();
-        }
+		}
 	}
 
 	private void startTestarSettingsDialog(){
-        if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-            this.mode = settings().get(ConfigTags.Mode);
+		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			this.mode = settings().get(ConfigTags.Mode);
 
-            if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
-                try {
-                    Main.reloadSettings(Main.getSettingsFile());
-                } catch (ConfigException e) {
-                    e.printStackTrace();
-                }
-                Main.startTestar(settings, Main.getSettingsFile());
-            }
-        }
-    }
+			if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
+				try {
+					this.settings = Main.loadSettings(new String[0], Main.getSettingsFile());
+				} catch (ConfigException e) {
+					e.printStackTrace();
+				}
+				Main.startTestar(settings, Main.getSettingsFile());
+			}
 
+		}
+	}
 
 	@Override
 	protected void postSequenceProcessing() {

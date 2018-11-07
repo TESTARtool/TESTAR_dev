@@ -233,7 +233,7 @@ public class Main {
 	}
 
 	public static String getSettingsFile() {
-		return getSettingsDir() + File.separator + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+		return getSettingsDir() + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
 	}
 
 	private static void startLogs(Settings settings) {
@@ -274,6 +274,7 @@ public class Main {
 	}
 
 	public static void startTestar(Settings settings, String testSettings) {
+		
 		URLClassLoader loader = null;
 		try {
 			List<String> cp = settings.get(MyClassPath);
@@ -297,7 +298,9 @@ public class Main {
 			LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
 			LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
+			
 			protocol.run(settings);
+			
 		}catch (Throwable t) {
 			LogSerialiser.log("An unexpected error occurred: " + t + "\n", LogSerialiser.LogLevel.Critical);
 			System.out.println("Main: Exception caught");
@@ -323,8 +326,9 @@ public class Main {
 	}
 
 	private static Settings initTestarSettings(String[] args){
-
+		
 		Settings settings = null;
+		
 		Locale.setDefault(Locale.ENGLISH);
 
 		// TODO: put the code below into seperate method/class
@@ -359,10 +363,11 @@ public class Main {
 			//Use the only file that was found
 			SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
 		}
+		
 		return settings;
 	}
 
-	private static Settings loadSettings(Settings settings, String[] args,String testSettingsFileName){
+	private static Settings loadSettings(Settings settings, String[] args, String testSettingsFileName){
 		try {
 			settings = loadSettings(args, testSettingsFileName);
 		} catch (ConfigException ce) {
@@ -383,13 +388,17 @@ public class Main {
 
 		String testSettingsFileName = getSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
-
-		settings = loadSettings(settings,args, testSettingsFileName);
+		
+		settings = loadSettings(settings, args, testSettingsFileName);
+		
 
 		if(startTestarDialog(settings, testSettingsFileName)) {
 
 			startLogs(settings);
-
+			
+			testSettingsFileName = getSettingsFile();
+			settings = loadSettings(settings, args, testSettingsFileName);
+			
 			startTestar(settings, testSettingsFileName);
 		}
 
@@ -491,85 +500,6 @@ public class Main {
 				//SUTConnectorValue=" ""C:\\Program Files\\Internet Explorer\\iexplore.exe"" ""https://www.google.es"" "
 				//SUTConnectorValue="C:\\Windows\\System32\\notepad.exe"
 			}
-
-			//Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
-			//Need this during refactoring process of getting Prolog code out. Refactoring will assume that
-			//PrologActivated is ALWAYS false.
-			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
-			settings.set(ConfigTags.PrologActivated, false);
-			return settings;
-		} catch (IOException ioe) {
-			throw new ConfigException("Unable to load configuration file!", ioe);
-		}
-	}
-
-	public static Settings reloadSettings(String file) throws ConfigException {
-		Assert.notNull(file);
-		try {
-			List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
-
-			defaults.add(Pair.from(ProcessesToKillDuringTest, "(?!x)x"));
-			defaults.add(Pair.from(ShowVisualSettingsDialogOnStartup, true));
-			defaults.add(Pair.from(FaultThreshold, 0.1));
-			defaults.add(Pair.from(LogLevel, 1));
-			defaults.add(Pair.from(Mode, RuntimeControlsProtocol.Modes.Spy));
-			defaults.add(Pair.from(OutputDir, "."));
-			defaults.add(Pair.from(TempDir, "."));
-			defaults.add(Pair.from(OnlySaveFaultySequences, false));
-			defaults.add(Pair.from(PathToReplaySequence, "./output/temp"));
-			defaults.add(Pair.from(ActionDuration, 0.1));
-			defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
-			defaults.add(Pair.from(ExecuteActions, true));
-			defaults.add(Pair.from(DrawWidgetUnderCursor, false));
-			defaults.add(Pair.from(DrawWidgetInfo, true));
-			defaults.add(Pair.from(VisualizeActions, false));
-			defaults.add(Pair.from(VisualizeSelectedAction, false));
-			defaults.add(Pair.from(SequenceLength, 10));
-			defaults.add(Pair.from(ReplayRetryTime, 30.0));
-			defaults.add(Pair.from(Sequences, 1));
-			defaults.add(Pair.from(MaxTime, 31536000.0));
-			defaults.add(Pair.from(StartupTime, 8.0));
-			defaults.add(Pair.from(SUTConnectorValue, ""));
-			defaults.add(Pair.from(Delete, new ArrayList<String>()));
-			defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
-			defaults.add(Pair.from(SuspiciousTitles, "(?!x)x"));
-			defaults.add(Pair.from(ClickFilter, "(?!x)x"));
-			defaults.add(Pair.from(MyClassPath, Arrays.asList(".")));
-			defaults.add(Pair.from(ProtocolClass, "org.fruit.monkey.DefaultProtocol"));
-			defaults.add(Pair.from(ForceForeground, true));
-			defaults.add(Pair.from(UseRecordedActionDurationAndWaitTimeDuringReplay, true));
-			defaults.add(Pair.from(StopGenerationOnFault, true));
-			defaults.add(Pair.from(TimeToFreeze, 10.0));
-			defaults.add(Pair.from(ShowSettingsAfterTest, true));
-			defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
-			defaults.add(Pair.from(TestGenerator, "random"));
-			defaults.add(Pair.from(MaxReward, 9999999.0));
-			defaults.add(Pair.from(Discount, .95));
-			defaults.add(Pair.from(AlgorithmFormsFilling, false));
-			defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
-			defaults.add(Pair.from(DrawWidgetTree, false));
-			defaults.add(Pair.from(ExplorationSampleInterval, 1));
-			defaults.add(Pair.from(GraphsActivated, true));
-			defaults.add(Pair.from(PrologActivated, false));
-			defaults.add(Pair.from(GraphResuming, true));
-			defaults.add(Pair.from(ForceToSequenceLength, true));
-			defaults.add(Pair.from(NonReactingUIThreshold, 100)); // number of executed actions
-			defaults.add(Pair.from(OfflineGraphConversion, true));
-			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
-			defaults.add(Pair.from(UnattendedTests, false)); // disabled
-			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
-			defaults.add(Pair.from(SUTProcesses, ""));
-			defaults.add(Pair.from(GraphDBEnabled, false));
-			defaults.add(Pair.from(GraphDBUrl, ""));
-			defaults.add(Pair.from(GraphDBUser, ""));
-			defaults.add(Pair.from(GraphDBPassword, ""));
-			defaults.add(Pair.from(AlwaysCompile, true));
-			defaults.add(Pair.from(ProcessListenerEnabled, false));
-			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
-			defaults.add(Pair.from(ProcessLogs, ".*.*"));
-
-			//Overwrite the default settings with those from the file
-			Settings settings = Settings.fromFile(defaults, file);
 
 			//Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
 			//Need this during refactoring process of getting Prolog code out. Refactoring will assume that

@@ -142,15 +142,15 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(RuntimeControlsProtocol.Modes mode) {
     try {
       extractInformation(settings);
       checkSettings(settings);
-      saveCurrentSettings();
       settings.set(ConfigTags.Mode, mode);
+      saveCurrentSettings();
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
@@ -222,6 +222,8 @@ public class SettingsDialog extends JFrame implements Observer {
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
+      Main.SSE_ACTIVATED = sutSettings;
+      
     } catch (ConfigException cfe) {
       LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
     }
