@@ -246,9 +246,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         } else if (mode() == Modes.Replay) {
             replay();
         } else {
-            // Else we start the loop for checking the TESTAR Mode:
-            SUT system = null;
-            detectModeLoop(system);
+        	// Else we start the loop for checking the TESTAR Mode:
+        	SUT system = null;
+        	
+        	try {
+        		detectModeLoop(system);
+        		
+        	// If we catch some Exception trying to Start the SUT, we show the information to the user
+        	// and we restart TESTAR (Quit-mode)
+        	}catch(SystemStartException SystemStartException) {
+        		System.out.println(SystemStartException);
+        		this.mode = Modes.Quit;
+        		system = null;
+        		detectModeLoop(system);
+        	}
         }
     }
 
