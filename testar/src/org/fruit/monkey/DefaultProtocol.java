@@ -727,6 +727,34 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     /**
+     * Saving the action information into the logs
+     * 
+     * @param state
+     * @param action
+     * @param actionMode
+     */
+    private void saveActionInfoInLogs(State state, Action action, String actionMode) {
+    	
+		//Obtain action information
+		String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
+
+		//Output/logs folder
+		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
+				actionCount,
+				"action = " + action.get(Tags.ConcreteID) +
+				" (" + action.get(Tags.AbstractID) + ") @state = " +
+				state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+				actionRepresentation[0]) + "\n",
+				LogSerialiser.LogLevel.Info);
+
+		//bin folder 
+		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
+				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+
+    	
+    }
+
+    /**
      * Method to run TESTAR on Spy Mode.
      * @param system
      */
@@ -788,6 +816,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	system = startSystem();
         	startedRecordMode = true;
         	this.cv = buildCanvas();
+        	actionCount = 1;
 
         	//Reset LogSerialiser
         	LogSerialiser.finish();
@@ -836,8 +865,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Start Wait User Action Loop to obtain the Action did by the User
             waitUserActionLoop(cv, system, state, actionStatus);
             
-            if (actionStatus.isUserEventAction())
+            //Save the user action information into the logs
+            if (actionStatus.isUserEventAction()) {
     			CodingManager.buildIDs(state, actionStatus.getAction());
+    			saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
+    			actionCount++;
+            }
     		
             /**
              * When we close TESTAR with Shift+down arrow, last actions is detected like null
@@ -847,11 +880,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
             }else {
             	//System.out.println("DEBUG: User action ----- null");
-            	}
+            }
 
 
             Util.clear(cv);
             cv.end();
+        }
+
+        //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
+        if(!system.isRunning()){
+        	this.mode = Modes.Quit;
         }
 
         if(startedRecordMode && mode() == Modes.Quit){
@@ -1582,22 +1620,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
 
-			//Obtain action information
-			String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
-
-			//Output/logs folder
-			LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
-					actionCount,
-					"action = " + action.get(Tags.ConcreteID) +
-					" (" + action.get(Tags.AbstractID) + ") @state = " +
-					state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
-					actionRepresentation[0]) + "\n",
-					LogSerialiser.LogLevel.Info);
-
-			//bin folder 
-			LOGGER.info("[EA] ExecutedAction number {} Widget {} finished in {} ms",
-					actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
-
+			//Save the executed action information into the logs
+			saveActionInfoInLogs(state, action, "ExecutedAction");
+			
 			return true;
 		}catch(ActionFailedException afe){
 			return false;
