@@ -81,7 +81,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected abstract void initTestSession();
 
 	/**
-	 * This methods is called before each test sequence, allowing for example profiling of the SUT
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
 	protected abstract void preSequencePreparations();
 
@@ -190,11 +190,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	/**
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
-	 * or
-	 *
-	 * @param recordedSequence
 	 */
-	protected abstract void finishSequence(File recordedSequence);
+	protected abstract void finishSequence();
 
 	/**
 	 * This methods stops the SUT
@@ -206,11 +203,11 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	/**
 	 * This method is called after each sequence, to allow for example checking the coverage of the sequence
 	 */
-	protected abstract void PostSequenceProcessing();
+	protected abstract void postSequenceProcessing();
 
 	/**
 	 * This method is called after the last sequence, to allow for example handling the reporting of the session
 	 */
-	protected abstract void CloseTestSession();
+	protected abstract void closeTestSession();
 
 }

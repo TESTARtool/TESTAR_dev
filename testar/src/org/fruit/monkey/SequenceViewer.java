@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -419,6 +420,11 @@ public class SequenceViewer extends javax.swing.JFrame{
 	public void run() {
 		while(isShowing()){
 			Util.pause(1);
+		}
+		//Starting up the TESTAR dialog again if it was the previous screen:
+		if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			if(Main.startTestarDialog(settings, Main.getSettingsFile()))
+				Main.startTestar(settings, Main.getSettingsFile());
 		}
 	}
 
