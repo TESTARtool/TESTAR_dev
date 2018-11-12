@@ -601,18 +601,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     private void runGenerateInnerLoop(SUT system, State state) {
-        long spyTime; //for recording the time the user spent in SPY-mode if TESTAR mode is changed into SPY-mode
         /*
          ***** INNER LOOP:
          */
         while (mode() != Modes.Quit && moreActions(state)) {
 
-            //User wants to move to Spy mode, after that we will continue the actions
-            if (mode() == Modes.Spy) {
-                spyTime = System.currentTimeMillis();
-                runSpyLoop(system);
-                LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
-            }
             if (mode() == Modes.Record) {
             	runRecordLoop(system);
             }
@@ -1898,6 +1891,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					this.wait(100);
 				} catch (InterruptedException e) {}
 			}
+			state = getState(system);
 			cv.begin(); Util.clear(cv);
 
 			//In Record-mode, we DO NOT show the widget info under the cursor:
