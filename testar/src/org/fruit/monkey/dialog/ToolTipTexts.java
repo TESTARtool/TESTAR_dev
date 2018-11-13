@@ -70,6 +70,9 @@ public class ToolTipTexts {
       "If TESTAR detects and error, it will immediately stop sequence generation. </html>";
   public static String lblCompileTTT = "Always compile protocol on action start";
   public static String btnEditProtocolTTT = "Open the protocol editor to edit, save and compile the Java Protocol";
+  public static String intervalTTT = "Set the sampling interval";
+  public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
+  public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
