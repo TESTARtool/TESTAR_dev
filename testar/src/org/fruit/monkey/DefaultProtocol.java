@@ -237,19 +237,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param settings
      */
     public final void run(final Settings settings) {
-        //initialize TESTAR with the given settings:
-        initialize(settings);
+    	//initialize TESTAR with the given settings:
+    	initialize(settings);
 
-        // If the mode is View or Replay, the mode cannot be changed by the user:
-        if (mode() == Modes.View) {
-            new SequenceViewer(settings).run();
-        } else if (mode() == Modes.Replay) {
-            replay();
-        } else {
-            // Else we start the loop for checking the TESTAR Mode:
-            SUT system = null;
-            detectModeLoop(system);
-        }
+    	SUT system = null;
+
+    	// If the mode is View or Replay, the mode cannot be changed by the user:
+    	if (mode() == Modes.View) {
+    			new SequenceViewer(settings).run();
+    	} 
+    	else if (mode() == Modes.Replay) {
+    		try {
+    			replay();
+    		}
+    		// If we catch some Exception trying to read the replayable file, we show the information to the user
+    		// and we restart TESTAR (Quit-mode)
+    		catch(Exception e) {
+    			System.out.println(e);
+    			this.mode = Modes.Quit;
+    			system = null;
+    			detectModeLoop(system);
+    		}
+    	} 
+
+    	else {
+    		// Else we start the loop for checking the TESTAR Mode:
+
+    		try {
+    			detectModeLoop(system);}
+    		// If we catch some Exception trying to Start the SUT, we show the information to the user
+    		// and we restart TESTAR (Quit-mode)
+    		catch(SystemStartException SystemStartException) {
+    			System.out.println(SystemStartException);
+    			this.mode = Modes.Quit;
+    			system = null;
+    			detectModeLoop(system);
+    		}
+    	}
     }
 
     /**
