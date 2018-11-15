@@ -855,9 +855,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         while(mode() == Modes.Record && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
-            //In Record-mode, we DO NOT show any visualization:
-            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-           
+            
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
@@ -875,8 +873,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } else
                 escAttempts = 0;
 
-            //In Record-mode, we DO NOT show any visualization:
-            //visualizeActions(cv, state, actions);
             ActionStatus actionStatus = new ActionStatus();
             
             //Start Wait User Action Loop to obtain the Action did by the User
@@ -902,6 +898,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             Util.clear(cv);
             cv.end();
+        }
+        
+        //If user change to Generate mode & we start TESTAR on Record mode, detect the new mode
+        if(mode() == Modes.Generate && startedRecordMode){
+        	Util.clear(cv);
+        	cv.end();
+
+        	detectModeLoop(system);
         }
 
         //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
@@ -1918,12 +1922,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			//In Record-mode, we DO NOT show the widget info under the cursor:
-            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
-			//In Record-mode, we DO NOT show the green dots:
-			//visualizeActions(cv, state, actions);
+			
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) visualizeActions(cv, state, actions);
 
 			cv.end();
 		}
