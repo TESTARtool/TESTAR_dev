@@ -57,7 +57,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     	String modeNfo = "'" + mode + "' mode active." + modeParamS;
     	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-    	FlashFeedback.flash(modeNfo);
+    	FlashFeedback.flash(modeNfo, 1000);
     	
     }
     
