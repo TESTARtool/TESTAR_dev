@@ -347,7 +347,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnGenerate() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/engine.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_generate.jpg")));
     btn.setToolTipText(btnGenerateTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnGenerateActionPerformed);
@@ -361,7 +361,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnSpy() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/magnifier.png")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_spy.jpg")));
     btn.setToolTipText(btnSpyTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnSpyActionPerformed);
@@ -375,7 +375,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnReplay() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/replay.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.jpg")));
     btn.setToolTipText(btnReplayTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnReplayActionPerformed);
@@ -397,7 +397,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnView() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/view.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.jpg")));
     btn.setToolTipText(btnViewTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnViewActionPerformed);
@@ -419,7 +419,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnRecord() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/record.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.jpg")));
     btn.setToolTipText(btnRecordTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnRecordActionPerformed);
