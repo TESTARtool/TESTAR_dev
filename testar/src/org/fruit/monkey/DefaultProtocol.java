@@ -316,11 +316,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     				new SequenceViewer(settings).run();
     			} else if (mode() == Modes.Replay) {
     				replay();
-    			}else if (mode() == Modes.Spy) {
+    			} else if (mode() == Modes.Spy) {
     				runSpyLoop(system);
     			} else if(mode() == Modes.Record) {
-    				system = runRecordLoop(system);
-    			}else if (mode() == Modes.Generate) {
+    				runRecordLoop(system);
+    			} else if (mode() == Modes.Generate) {
     				runGenerateOuterLoop(system);
     			}
     			
@@ -341,7 +341,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
     	}
     	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-    	while(mode()!=Modes.Quit || startTestarSettingsDialog());
+    	while(startTestarSettingsDialog());
 
     }
 
@@ -823,7 +823,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * Method to run TESTAR on Record User Actions Mode.
      * @param system
      */
-    protected SUT runRecordLoop(SUT system) {
+    protected void runRecordLoop(SUT system) {
         boolean startedRecordMode = false;
    
         //If system it's null means that we have started TESTAR from the Record User Actions Mode
@@ -858,7 +858,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
-                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                if (escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
                 }
                 //----------------------------------
@@ -903,6 +903,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         if(mode() == Modes.Generate && startedRecordMode){
         	Util.clear(cv);
         	cv.end();
+        	
+        	runGenerateOuterLoop(system);
         }
 
         //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
@@ -920,12 +922,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.clear(cv);
             cv.end();
             
-            //If we want to Quit the current execution, we stop the system and create a null one for the future loop
+            //If we want to Quit the current execution we stop the system
             stopSystem(system);
-            system = null;
         }
-        
-        return system;
     }
 
     //TODO rename to replayLoop to be consistent:
