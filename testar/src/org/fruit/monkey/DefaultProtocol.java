@@ -319,7 +319,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			}else if (mode() == Modes.Spy) {
     				runSpyLoop(system);
     			} else if(mode() == Modes.Record) {
-    				runRecordLoop(system);
+    				system = runRecordLoop(system);
     			}else if (mode() == Modes.Generate) {
     				runGenerateOuterLoop(system);
     			}
@@ -338,11 +338,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		
     		if (mode() == Modes.Quit) {
 				stopSystem(system);
-				system = null;
 			}
     	}
     	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-    	while(startTestarSettingsDialog());
+    	while(mode()!=Modes.Quit || startTestarSettingsDialog());
 
     }
 
@@ -812,9 +811,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	if(!system.isRunning()){
     	    this.mode = Modes.Quit;
         }
-
+    	
     	Util.clear(cv);
     	cv.end();
+    	
+    	stopSystem(system);
 
     }
 
@@ -822,7 +823,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * Method to run TESTAR on Record User Actions Mode.
      * @param system
      */
-    protected void runRecordLoop(SUT system) {
+    protected SUT runRecordLoop(SUT system) {
         boolean startedRecordMode = false;
    
         //If system it's null means that we have started TESTAR from the Record User Actions Mode
@@ -918,8 +919,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             Util.clear(cv);
             cv.end();
+            
+            //If we want to Quit the current execution, we stop the system and create a null one for the future loop
+            stopSystem(system);
+            system = null;
         }
-
+        
+        return system;
     }
 
     //TODO rename to replayLoop to be consistent:
@@ -1324,6 +1330,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			String printSutInfo = "Waiting SUT to be accessible ...";
 			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
 			int timeFlash = (int)startupTime;
+	    	FlashFeedback.flash(printSutInfo, timeFlash);
 	    	
 	    	//FlashFeedback uses the wait method, we don't need to keep using pause.
 			//Util.pause(settings().get(ConfigTags.StartupTime));
@@ -1333,7 +1340,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					State state;
 					do{
 						if (sut.isRunning()){
-							
+							//Print info to the user to know that TESTAR is READY for its use :-)
+							printSutInfo = "SUT is READY! to be accessible";
+					    	FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
 							if (state != null && state.childCount() > 0){
@@ -1342,6 +1351,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 								return sut;
 							}
 						}else {
+							//Print info to the user to know that TESTAR is NOT READY for its use :-(
+							printSutInfo = "Waiting SUT to be accessible ...";
+					    	FlashFeedback.flash(printSutInfo, 500);
 						}
 						Util.pauseMs(500);				
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
@@ -1807,6 +1819,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void stopSystem(SUT system) {
+
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
 			if (ac != null)
