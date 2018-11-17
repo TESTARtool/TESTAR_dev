@@ -50,6 +50,9 @@ public class ToolTipTexts {
       "but only show you the screenshots that were recorded during sequence<br>\n" +
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
 
+  public static String btnRecordTTT = "<html>\nStart inRecord-Mode:<br>\n" +
+          "For recording sequences\n</html>";
+
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
   public static String sutPathTTT = "Write the argument for the selected SUT connector";

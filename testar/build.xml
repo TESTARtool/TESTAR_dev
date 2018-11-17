@@ -8,8 +8,7 @@
 	<property name="target" 	   		location="target/"/>
 	<property name="resources" 	   		location="resources/"/>
 	<property name="coreJarFile"   		location="../core/target/core.jar"/>
-	<property name="nativeJarFile" 		location="../native/target/native.jar"/> <!-- by urueda -->
-	<property name="graphJarFile"  		location="../graph/target/graph.jar"/>
+	<property name="nativeJarFile" 		location="../native/target/native.jar"/>
     <property name="jarfile" 	   		value="testar.jar"/>
 
 	<!-- begin by wcoux -->
@@ -25,17 +24,16 @@
 
     <!-- dependencies -->	
 	<target name="dependencies">
-		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${nativeJarFile};${graphJarFile}" />
+		<depend srcdir="${src}" destdir="${bin}" closure="yes" classpath = "${coreJarFile};${nativeJarFile}" />
 	</target>
 	
 	<!-- compile -->
     <target name="compile" depends="dependencies">
         <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>
         <ant antfile="build.xml" dir="../native" target="jar" inheritAll="false"/>
-    	<ant antfile="build.xml" dir="../graph" target="jar" inheritAll="false"/>
         <ant antfile="build.xml" dir="../suts/swtcalc" target="jar" inheritAll="false"/>
         <mkdir dir="${bin}"/>
-        <javac classpath="${lib}/jsyntaxpane-0.9.5-b29.jar;${coreJarFile};${prologJarFile};${nativeJarFile};${graphJarFile};${jnativehookJarFile}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+        <javac classpath="${lib}/jsyntaxpane-1.1.5.jar;${coreJarFile};${nativeJarFile};${jnativehookJarFile}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no" includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
     	<mkdir dir="${bin}/resources/icons"/>
 		<copy todir="${bin}/icons" >
 	   		<fileset dir="resources/icons/"/>
@@ -71,13 +69,8 @@
     	<zip destfile="${target}/${jarfile}">
     	    <zipfileset src="${coreJarFile}"/>
     	    <zipfileset src="${nativeJarFile}"/>
-    		<zipfileset src="${graphJarFile}"/>
-    		<zipfileset src="../graph/lib/com.alexmerz.graphviz.jar"/>
-    		<zipfileset src="../graph/lib/jgrapht-ext-1.0.1-uber.jar"/>
-    		<zipfileset src="../graph/lib/jiprolog-4.1.3.1.jar"/>
-    		<zipfileset src="../graph/lib/json-simple-1.1.1.jar"/>
     		<zipfileset src = "${jnativehookJarFile}"/>
-    		<zipfileset src = "${lib}/jsyntaxpane-0.9.5-b29.jar"/>
+    		<zipfileset src = "${lib}/jsyntaxpane-1.1.5.jar"/>
     	    <zipfileset src="${target}/intermediate.jar"/>
 		</zip>
     	<delete file="${target}/intermediate.jar"/>
@@ -339,7 +332,6 @@
 	<target name="cleanall" depends="clean">
         <ant antfile="build.xml" dir="../core" target="clean" inheritAll="false"/>
         <ant antfile="build.xml" dir="../native" target="clean" inheritAll="false"/>
-    	<ant antfile="build.xml" dir="../graph" target="clean" inheritAll="false"/>
     	<ant antfile="build.xml" dir="../windows" target="clean" inheritAll="false"/>
     	<ant antfile="build.xml" dir="../linux" target="clean" inheritAll="false"/>
     	<ant antfile="build.xml" dir="../suts/swtcalc" target="clean" inheritAll="false"/>

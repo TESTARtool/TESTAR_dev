@@ -74,6 +74,12 @@ public class TestSerialiser extends Thread {
 		alive = false;
 	}
 	
+	public static boolean isSavingQueueEmpty() {
+		if(testSavingQueue.isEmpty())
+			return true;
+		return false;
+	}
+	
 	@Override
 	public void run(){
 		while (alive || !testSavingQueue.isEmpty()){

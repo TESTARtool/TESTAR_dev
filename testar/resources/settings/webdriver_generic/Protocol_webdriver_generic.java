@@ -40,7 +40,6 @@ import org.fruit.monkey.Settings;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.*;
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -78,15 +77,9 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * @param settings the current TESTAR settings as specified by the user.
    */
   protected void initialize(Settings settings) {
+    NativeLinker.addWdDriverOS();
     super.initialize(settings);
     ensureDomainsAllowed();
-  }
-
-  /**
-   * This method is invoked each time TESTAR starts to generate a new sequence
-   */
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
   }
 
   /**
@@ -98,8 +91,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    *      the SUT's configuratio files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
-   *
-   * @return a started SUT, ready to be tested.
+   * @return  a started SUT, ready to be tested.
    */
   protected SUT startSystem() throws SystemStartException {
     SUT sut = super.startSystem();
@@ -114,6 +106,16 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     WdDriver.followLinks = followLinks;
 
     return sut;
+  }
+
+  /**
+   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+   * This can be used for example for bypassing a login screen by filling the username and password
+   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+   * the SUT's configuration files etc.)
+   */
+  protected void beginSequence(SUT system, State state) {
+    super.beginSequence(system, state);
   }
 
   /**
@@ -192,7 +194,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       }
 
       // slides can happen, even though the widget might be blocked
-      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget);
+      addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget, state);
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
@@ -424,8 +426,8 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
-  protected void finishSequence(File recordedSequence) {
-    super.finishSequence(recordedSequence);
+  protected void finishSequence() {
+    super.finishSequence();
   }
 
   /**

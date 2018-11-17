@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class IdBasedGuiState {
-    private String concreteStateId;
-    private Set<String> concreteActionIds;
-    private Set<String> unvisitedActionIds;
-    private Set<GuiStateTransition> stateTransitions;
+    protected String concreteStateId;
+    protected Set<String> concreteActionIds;
+    protected Set<String> unvisitedActionIds;
+    protected Set<GuiStateTransition> stateTransitions;
 
     public IdBasedGuiState(String concreteStateId, Set<String> concreteActionIds) {
         this.concreteStateId = concreteStateId;

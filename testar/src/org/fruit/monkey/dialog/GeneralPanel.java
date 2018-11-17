@@ -54,10 +54,7 @@ public class GeneralPanel extends JPanel {
   private JSpinner spnSequenceLength;
   private JSpinner esiSpinner;
   private JComboBox<String> comboboxVerbosity;
-  private JCheckBox f2slCheckBox;
   private JCheckBox checkStopOnFault;
-  private JCheckBox paCheckbox;
-  private JCheckBox offlineGraphConversionCheckBox;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
 
@@ -132,22 +129,11 @@ public class GeneralPanel extends JPanel {
     compileCheckBox.setToolTipText(lblCompileTTT);
     add(compileCheckBox);
 
-    f2slCheckBox = new JCheckBox("Force to sequence length");
-    f2slCheckBox.setBounds(10, 235, 192, 20);
-    add(f2slCheckBox);
-
     checkStopOnFault = new JCheckBox("Stop Test on Fault");
     checkStopOnFault.setBounds(10, 258, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);
 
-   // paCheckbox = new JCheckBox("Prolog activated");
-   // paCheckbox.setBounds(10, 282, 192, 21);
-   // add(paCheckbox);
-
-    offlineGraphConversionCheckBox = new JCheckBox("Offline graph conversion");
-    offlineGraphConversionCheckBox.setBounds(10, 282, 192, 23);
-    add(offlineGraphConversionCheckBox);
   }
 
   private void addGeneralControlsLocal() {
@@ -233,9 +219,6 @@ public class GeneralPanel extends JPanel {
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
-    offlineGraphConversionCheckBox.setSelected(settings.get(ConfigTags.OfflineGraphConversion));
-    f2slCheckBox.setSelected(settings.get(ConfigTags.ForceToSequenceLength));
-    //paCheckbox.setSelected(settings.get(ConfigTags.PrologActivated));
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
     comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
@@ -253,9 +236,6 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
-    settings.set(ConfigTags.ForceToSequenceLength, f2slCheckBox.isSelected());
-   // settings.set(ConfigTags.PrologActivated, paCheckbox.isSelected());
-    settings.set(ConfigTags.OfflineGraphConversion, offlineGraphConversionCheckBox.isSelected());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
     settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());

@@ -79,9 +79,9 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnSpy;
   private JButton btnReplay;
   private JButton btnView;
+  private JButton btnRecord;
 
   private GeneralPanel generalPanel;
-  private WalkerPanel walkerPanel;
   private FilterPanel filterPanel;
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
@@ -142,15 +142,15 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the methos that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog
    * @param mode indicates the MODE button that was clicked.
    */
-  private void start(AbstractProtocol.Modes mode) {
+  private void start(RuntimeControlsProtocol.Modes mode) {
     try {
       extractInformation(settings);
       checkSettings(settings);
-      saveCurrentSettings();
       settings.set(ConfigTags.Mode, mode);
+      saveCurrentSettings();
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
@@ -222,6 +222,8 @@ public class SettingsDialog extends JFrame implements Observer {
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
+      Main.SSE_ACTIVATED = sutSettings;
+      
     } catch (ConfigException cfe) {
       LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
     }
@@ -229,7 +231,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void populateInformation(Settings settings) {
     generalPanel.populateFrom(settings);
-    walkerPanel.populateFrom(settings);
     filterPanel.populateFrom(settings);
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
@@ -239,7 +240,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void extractInformation(Settings settings) {
     generalPanel.extractInformation(settings);
-    walkerPanel.extractInformation(settings);
     filterPanel.extractInformation(settings);
     oraclePanel.extractInformation(settings);
     timingPanel.extractInformation(settings);
@@ -253,13 +253,13 @@ public class SettingsDialog extends JFrame implements Observer {
     btnSpy = getBtnSpy();
     btnReplay = getBtnReplay();
     btnView = getBtnView();
+    btnRecord = getBtnRecord();
+
 
     JTabbedPane jTabsPane = new JTabbedPane();
     jTabsPane.addTab("About", new AboutPanel());
     generalPanel = new GeneralPanel(this);
     jTabsPane.addTab("General Settings", generalPanel);
-    walkerPanel = new WalkerPanel();
-    jTabsPane.addTab("Action Selection", walkerPanel);
     filterPanel = new FilterPanel();
     jTabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
@@ -307,7 +307,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 505, PREFERRED_SIZE)
+                    .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
                     .addGroup(getStartGroup(layout)))
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -315,11 +315,13 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                    .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                    .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                    .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                            .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                            .addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                    )
                 .addPreferredGap(RELATED)
                 .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
                 .addContainerGap())
@@ -333,10 +335,11 @@ public class SettingsDialog extends JFrame implements Observer {
     group.addGap(2, 2, 2);
     group.addComponent(btnGenerate, PREFERRED_SIZE, 123, PREFERRED_SIZE);
     group.addGap(2, 2, 2);
+    group.addComponent(btnRecord, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addGap(2, 2, 2);
     group.addComponent(btnReplay, PREFERRED_SIZE, 123, PREFERRED_SIZE);
-    group.addPreferredGap(RELATED);
+    group.addGap(2, 2, 2);
     group.addComponent(btnView, PREFERRED_SIZE, 123, PREFERRED_SIZE);
-    group.addGap(0, 0, Short.MAX_VALUE);
 
     return group;
   }
@@ -352,7 +355,7 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnGenerateActionPerformed(ActionEvent evt) {
-    start(AbstractProtocol.Modes.Generate);
+    start(RuntimeControlsProtocol.Modes.Generate);
   }
 
   private JButton getBtnSpy() throws IOException {
@@ -366,13 +369,13 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   private void btnSpyActionPerformed(ActionEvent evt) {
-    start(AbstractProtocol.Modes.Spy);
+    start(RuntimeControlsProtocol.Modes.Spy);
   }
 
   private JButton getBtnReplay() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/rewind.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/replay.jpg")));
     btn.setToolTipText(btnReplayTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnReplayActionPerformed);
@@ -387,7 +390,7 @@ public class SettingsDialog extends JFrame implements Observer {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
       settings.set(ConfigTags.PathToReplaySequence, file);
-      start(AbstractProtocol.Modes.Replay);
+      start(RuntimeControlsProtocol.Modes.Replay);
     }
   }
 
@@ -409,9 +412,23 @@ public class SettingsDialog extends JFrame implements Observer {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
       settings.set(ConfigTags.PathToReplaySequence, file);
-      start(AbstractProtocol.Modes.View);
+      start(RuntimeControlsProtocol.Modes.View);
     }
   }
+
+  private JButton getBtnRecord() throws IOException {
+    JButton btn = new JButton();
+    btn.setBackground(new Color(255, 255, 255));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/record.jpg")));
+    btn.setToolTipText(btnRecordTTT);
+    btn.setFocusPainted(false);
+    btn.addActionListener(this::btnRecordActionPerformed);
+    return btn;
+  }
+
+  private void btnRecordActionPerformed(ActionEvent evt) {
+      start(RuntimeControlsProtocol.Modes.Record);
+    }
 
   @Override
   public void update(Observable o, Object arg) {
