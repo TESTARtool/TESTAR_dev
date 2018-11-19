@@ -68,7 +68,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.0_#139";
+  static final String TESTAR_VERSION = "2.0.1";
 
   private String settingsFile;
   private Settings settings;
@@ -331,15 +331,15 @@ public class SettingsDialog extends JFrame implements Observer {
   private GroupLayout.SequentialGroup getStartGroup(GroupLayout layout) {
     GroupLayout.SequentialGroup group = layout.createSequentialGroup();
 
-    group.addComponent(btnSpy, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addComponent(btnSpy, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnGenerate, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addComponent(btnGenerate, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnRecord, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addComponent(btnRecord, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnReplay, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addComponent(btnReplay, 120, 120, 120);
     group.addGap(2, 2, 2);
-    group.addComponent(btnView, PREFERRED_SIZE, 123, PREFERRED_SIZE);
+    group.addComponent(btnView, 120, 120, 120);
 
     return group;
   }
@@ -347,7 +347,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnGenerate() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_generate.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_generate.png")));
     btn.setToolTipText(btnGenerateTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnGenerateActionPerformed);
@@ -361,7 +361,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnSpy() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_spy.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_spy.png")));
     btn.setToolTipText(btnSpyTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnSpyActionPerformed);
@@ -375,7 +375,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnReplay() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.png")));
     btn.setToolTipText(btnReplayTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnReplayActionPerformed);
@@ -397,7 +397,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnView() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.png")));
     btn.setToolTipText(btnViewTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnViewActionPerformed);
@@ -419,7 +419,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton getBtnRecord() throws IOException {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
-    btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.jpg")));
+    btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
     btn.setToolTipText(btnRecordTTT);
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnRecordActionPerformed);
