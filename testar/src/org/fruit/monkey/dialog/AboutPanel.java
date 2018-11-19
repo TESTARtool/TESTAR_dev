@@ -47,6 +47,9 @@ public class AboutPanel extends JPanel {
   private JLabel testarLogo = getLogo("/icons/logos/testar_logo.png");
   private JLabel prosLogo = getLogo("/icons/logos/pros.png");
   private JLabel ouLogo = getLogo("/icons/logos/ou.jpg");
+  private JLabel testomatLogo  = getLogo("/icons/logos/TESTOMAT_Logo.png");
+  private JLabel fittestLOGO = getLogo("/icons/logos/fittest_logo.png");
+
 
   public AboutPanel () throws IOException {
     setBackground(Color.WHITE);
@@ -58,23 +61,32 @@ public class AboutPanel extends JPanel {
             .addGroup(aboutPanelLayout.createSequentialGroup()
                 .addGroup(aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addContainerGap()
+                        .addContainerGap().addGap(45)
                         .addComponent(prosLogo, PREFERRED_SIZE, 144, PREFERRED_SIZE)
-                        .addGap(40)
+                        .addGap(75)
                         .addComponent(ouLogo, PREFERRED_SIZE, 90, PREFERRED_SIZE)
-                        .addPreferredGap(RELATED, 53, Short.MAX_VALUE)
+                        .addGap(75)
                         .addComponent(lblUPVLogo, PREFERRED_SIZE, 153, PREFERRED_SIZE))
                     .addGroup(aboutPanelLayout.createSequentialGroup()
-                        .addGap(144)
-                        .addComponent(testarLogo, PREFERRED_SIZE, 186, PREFERRED_SIZE)))
+                        .addGap(210)
+                        .addComponent(testarLogo, PREFERRED_SIZE, 186, PREFERRED_SIZE))
+                    .addGroup(aboutPanelLayout.createSequentialGroup()
+                            .addGap(144)
+                            .addComponent(testomatLogo, PREFERRED_SIZE, 150, PREFERRED_SIZE)
+                            .addGap(40)
+                            .addComponent(fittestLOGO, PREFERRED_SIZE, 150, PREFERRED_SIZE)))
                 .addContainerGap())
     );
     aboutPanelLayout.setVerticalGroup(
         aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
             .addGroup(aboutPanelLayout.createSequentialGroup()
-                .addGap(87)
+                .addGap(40)
                 .addComponent(testarLogo, PREFERRED_SIZE, 75, PREFERRED_SIZE)
-                .addPreferredGap(RELATED, 126, Short.MAX_VALUE)
+                .addGap(40)
+                .addGroup(aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(fittestLOGO, PREFERRED_SIZE, 75, PREFERRED_SIZE)
+                        .addComponent(testomatLogo, PREFERRED_SIZE, 75, PREFERRED_SIZE))
+                .addGap(40)
                 .addGroup(aboutPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                     .addComponent(lblUPVLogo, PREFERRED_SIZE, 53, PREFERRED_SIZE)
                     .addComponent(prosLogo, PREFERRED_SIZE, 56, PREFERRED_SIZE)

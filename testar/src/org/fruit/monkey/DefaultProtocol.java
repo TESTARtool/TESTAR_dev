@@ -905,12 +905,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             cv.end();
         }
         
+<<<<<<< HEAD
         //If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
         if(mode() == Modes.Generate && startedRecordMode){
         	Util.clear(cv);
         	cv.end();
         	
         	runGenerateOuterLoop(system);
+=======
+        //If user change to Generate mode & we start TESTAR on Record mode, detect the new mode
+        if(mode() == Modes.Generate && startedRecordMode){
+        	Util.clear(cv);
+        	cv.end();
+
+        	detectModeLoop(system);
+>>>>>>> master
         }
 
         //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
@@ -1332,7 +1341,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//sut.setNativeAutomationCache();
 			
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
+<<<<<<< HEAD
 			String printSutInfo = "Waiting SUT to be accessible ...";
+=======
+			String printSutInfo = "Waiting for the SUT to be accessible ...";
+>>>>>>> master
 			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
 			int timeFlash = (int)startupTime;
 	    	FlashFeedback.flash(printSutInfo, timeFlash);
@@ -1346,7 +1359,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					do{
 						if (sut.isRunning()){
 							//Print info to the user to know that TESTAR is READY for its use :-)
+<<<<<<< HEAD
 							printSutInfo = "SUT is READY! to be accessible";
+=======
+							printSutInfo = "SUT is READY";
+>>>>>>> master
 					    	FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
@@ -1357,7 +1374,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							}
 						}else {
 							//Print info to the user to know that TESTAR is NOT READY for its use :-(
+<<<<<<< HEAD
 							printSutInfo = "Waiting SUT to be accessible ...";
+=======
+							printSutInfo = "Waiting for the SUT to be accessible ...";
+>>>>>>> master
 					    	FlashFeedback.flash(printSutInfo, 500);
 						}
 						Util.pauseMs(500);				
