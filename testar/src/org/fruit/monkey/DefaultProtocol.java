@@ -423,8 +423,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+            
+            //Activate process Listeners if enabled in the test.settings
+            processListeners(system);
         }
-        processListeners(system);
+        
         return system;
     }
 
@@ -841,6 +844,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	//Generating the sequence file that can be replayed:
         	generatedSequence = getAndStoreGeneratedSequence();
         	currentSeq = getAndStoreSequenceFile();
+        	
+        	//Activate process Listeners if enabled in the test.settings
+        	processListeners(system);
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
@@ -899,7 +905,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             cv.end();
         }
         
-        //If user change to Generate mode & we start TESTAR on Record mode, detect the new mode
+        //If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
         if(mode() == Modes.Generate && startedRecordMode){
         	Util.clear(cv);
         	cv.end();
