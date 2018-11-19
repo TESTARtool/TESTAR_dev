@@ -33,25 +33,24 @@ package org.fruit.monkey.dialog;
 public class ToolTipTexts {
 
   // TTTs for the start buttons
-  public static String btnGenerateTTT = "<html>\nStart in Generation-Mode:<br>\n" +
-      "This mode will start the SUT and execute a full test.\n</html>";
-  public static String btnSpyTTT = "<html>\nStart in Spy-Mode:<br>\n" +
+  public static String btnGenerateTTT = "<html>\nStart in GENERATE Mode:<br>\n" +
+      "This mode will start up the SUT and generate test sequences.\n</html>";
+  public static String btnSpyTTT = "<html>\nStart in SPY Mode:<br>\n" +
       "This mode does allows you to inspect the GUI of the System under Test. <br>\n" +
       "Simply use the mouse cursor to point on a widget and TESTAR<br>\n" +
       "will display everything it knows about it. The Spy-Mode will also visualize<br>\n" +
       "the set of actions that TESTAR recognizes, so that you can see<br>\n" +
       "which ones will be executed during a test.\n</html>";
-  public static String btnReplayTTT = "<html>\nStart in Replay-Mode:<br>\n" +
+  public static String btnReplayTTT = "<html>\nStart in REPLAY Mode:<br>\n" +
       "This mode replays a previously recorded sequence.<br>\n" +
       "TESTAR will ask you for the sequence to replay.\n</html>";
-  public static String btnViewTTT = "<html>\nStart in View-Mode:<br>\n" +
+  public static String btnViewTTT = "<html>\nStart in VIEW Mode:<br>\n" +
       "The View-Mode allows you to inspect all steps of a previously recorded<br>\n" +
       "sequence. Contrary to the Replay-Mode, it will not execute any actions,<br>\n" +
       "but only show you the screenshots that were recorded during sequence<br>\n" +
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
-
-  public static String btnRecordTTT = "<html>\nStart inRecord-Mode:<br>\n" +
-          "For recording sequences\n</html>";
+  public static String btnRecordTTT = "<html>\nStart in RECORD Mode:<br>\n" +
+          "This modes enables the tester to manually record (part of) a sequence.\n</html>";
 
   // TTTs for the general tab
   public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
@@ -70,6 +69,9 @@ public class ToolTipTexts {
       "If TESTAR detects and error, it will immediately stop sequence generation. </html>";
   public static String lblCompileTTT = "Always compile protocol on action start";
   public static String btnEditProtocolTTT = "Open the protocol editor to edit, save and compile the Java Protocol";
+  public static String intervalTTT = "Set the sampling interval";
+  public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
+  public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
