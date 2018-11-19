@@ -1328,7 +1328,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//sut.setNativeAutomationCache();
 			
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
-			String printSutInfo = "Waiting SUT to be accessible ...";
+			String printSutInfo = "Waiting for the SUT to be accessible ...";
 			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
 			int timeFlash = (int)startupTime;
 	    	FlashFeedback.flash(printSutInfo, timeFlash);
@@ -1342,7 +1342,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					do{
 						if (sut.isRunning()){
 							//Print info to the user to know that TESTAR is READY for its use :-)
-							printSutInfo = "SUT is READY! to be accessible";
+							printSutInfo = "SUT is READY";
 					    	FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
@@ -1353,7 +1353,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							}
 						}else {
 							//Print info to the user to know that TESTAR is NOT READY for its use :-(
-							printSutInfo = "Waiting SUT to be accessible ...";
+							printSutInfo = "Waiting for the SUT to be accessible ...";
 					    	FlashFeedback.flash(printSutInfo, 500);
 						}
 						Util.pauseMs(500);				
