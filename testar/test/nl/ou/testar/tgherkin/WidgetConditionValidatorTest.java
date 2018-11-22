@@ -1,7 +1,6 @@
 /**
  * 
  */
-
 package nl.ou.testar.tgherkin;
 
 import static org.junit.Assert.*;
@@ -12,12 +11,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import nl.ou.testar.tgherkin.gen.WidgetConditionParser;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.TableCell;
 import nl.ou.testar.tgherkin.model.TableRow;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Test WidgetConditionValidator class.

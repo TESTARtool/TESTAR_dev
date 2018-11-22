@@ -13,8 +13,7 @@ import org.fruit.Assert;
 public class DataTable {
     private final List<TableRow> tableRows;
     private int index; 
-
-    /**
+	/**
      * DataTable constructor.
      * @param tableRows list of table rows
      */
@@ -39,7 +38,7 @@ public class DataTable {
     public TableRow getHead() {
         return tableRows.get(0);
     }
-    
+
     /**
      * Retrieve data table tail.
      * @return list of tail table rows
@@ -47,7 +46,7 @@ public class DataTable {
     public List<TableRow> getTail() {
         return tableRows.subList(1, tableRows.size());
     }
-    
+
     /**
      * Retrieve placeholder value of current table row.
      * @param columnName name of the table column involved
@@ -57,7 +56,7 @@ public class DataTable {
     	// retrieve column index based on column name 
     	return currentTableRow().getTableCells().get(getColumnIndex(columnName)).getValue();
     }
-    
+
     /**
      * Check whether a placeholder is a column name.
      * @param placeholderName to be checked placeholder name
@@ -81,21 +80,21 @@ public class DataTable {
 	public void beginSequence() {
 		nextTableRow();
 	}
-	
+
     /**
      * Reset data table.
      */
 	public void reset() {
 		index = 0;
 	}    
-	
+
     @Override
     public String toString() {
     	StringBuilder result = new StringBuilder();
     	for (TableRow tableRow : getTableRows()) {
     		result.append(tableRow.toString());
     	}
-    	return result.toString();    	
+    	return result.toString();
     }
     
     private int getColumnIndex(String placeholderName) {

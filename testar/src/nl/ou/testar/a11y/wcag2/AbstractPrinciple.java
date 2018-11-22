@@ -45,7 +45,7 @@ import nl.ou.testar.a11y.reporting.EvaluationResult;
 import nl.ou.testar.a11y.reporting.EvaluationResults;
 
 /**
- * A WCAG principle.
+ * A WCAG principle
  * @author Davy Kager
  *
  */
@@ -54,12 +54,12 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	private static final long serialVersionUID = 7735450322487421780L;
 	
 	/**
-	 * The list of all the guidelines in this principle.
+	 * The list of all the guidelines in this principle
 	 */
 	protected final List<AbstractGuideline> guidelines = new ArrayList<>();
 
 	/**
-	 * Constructs a new principle.
+	 * Constructs a new principle
 	 * @param nr The number of the principle.
 	 * @param name The name of the principle.
 	 */
@@ -68,7 +68,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	}
 
 	/**
-	 * Gets all guidelines in this principle.
+	 * Gets all guidelines in this principle
 	 * @return The list of guidelines.
 	 */
 	public List<AbstractGuideline> getGuidelines() {
@@ -76,7 +76,7 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	}
 	
 	/**
-	 * Evaluates the accessibility of the given state.
+	 * Evaluates the accessibility of the given state
 	 * This will collect evaluation results from all guidelines in this principle.
 	 * This method executes oracles in on-the-fly evaluation.
 	 * @param widgets The widgets to consider.
@@ -85,16 +85,14 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	@Override
 	public EvaluationResults evaluate(List<Widget> widgets) {
 		EvaluationResults results = new EvaluationResults();
-		for (AbstractGuideline g : guidelines) {
-			for (EvaluationResult result : g.evaluate(widgets).getResults()) {
+		for (AbstractGuideline g : guidelines)
+			for (EvaluationResult result : g.evaluate(widgets).getResults())
 				results.add(result);
-			}
-		}
 		return results;
 	}
 	
 	/**
-	 * Derives the possible actions from the given state.
+	 * Derives the possible actions from the given state
 	 * This will collect actions from all guidelines in this principle.
 	 * The actions are specific to accessibility.
 	 * This method derives actions in on-the-fly evaluation.
@@ -104,14 +102,13 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	@Override
 	public Set<Action> deriveActions(List<Widget> widgets) {
 		Set<Action> actions = new HashSet<>();
-		for (AbstractGuideline g : guidelines) {
+		for (AbstractGuideline g : guidelines)
 			actions.addAll(g.deriveActions(widgets));
-		}
 		return actions;
 	}
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database.
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This will collect evaluation results from all guidelines in this principle.
 	 * This method executes oracles in offline evaluation.
 	 * @param graphDB The graph database.
@@ -120,11 +117,9 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
 	@Override
 	public EvaluationResults query(GraphDB graphDB) {
 		EvaluationResults results = new EvaluationResults();
-		for (AbstractGuideline g : guidelines) {
-			for (EvaluationResult result : g.query(graphDB).getResults()) {
+		for (AbstractGuideline g : guidelines)
+			for (EvaluationResult result : g.query(graphDB).getResults())
 				results.add(result);
-			}
-		}
 		return results;
 	}
 	

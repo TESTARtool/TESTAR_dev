@@ -20,7 +20,7 @@ public class AnyGesture extends Gesture {
 	
     /**
      * AnyGesture constructor.
-     * @parameterBase container for parameters
+     * @param parameterBase container for parameters
      */
     public AnyGesture(ParameterBase parameterBase) {
     	super(parameterBase);    	

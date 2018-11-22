@@ -1,7 +1,6 @@
 /**
  * 
  */
-
 package nl.ou.testar.tgherkin.model;
 
 import static org.junit.Assert.*;

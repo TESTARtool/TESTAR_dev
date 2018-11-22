@@ -12,8 +12,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import nl.ou.testar.tgherkin.Utils;
+import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
+import nl.ou.testar.tgherkin.model.Examples;
+import nl.ou.testar.tgherkin.model.Feature;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
+import nl.ou.testar.tgherkin.model.ScenarioDefinition;
+import nl.ou.testar.tgherkin.model.ScenarioOutline;
+import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.utils.report.Reporter;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -23,6 +29,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.UrlActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -36,44 +43,44 @@ import org.fruit.monkey.Settings;
 
 public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implements ProtocolProxy {
 
-  /**
+  /*
    * The text of address- and search bar in the Dutch version (see ENUM Browser).
    */
   private static String addressTitle = Browser.chromeNL.getAddressTitle();
 
-  /**
+  /*
    *  Subroutine Document.
    */
-  private Document subroutine;
+  private Document subroutine = null;
 
-  /**
+  /*
    * String with the name of the file with the source code of the subroutine document.
    */
   private String sourceFile;
 
-  /**
+  /*
    * String with the contents of the source code of the subroutine document.
    */
   private String sourceCode;
 
-  /**
+  /*
    * Data set with different subroutine options.
    */
   private HashMap<Integer,String[]> subroutineData = new HashMap<Integer,String[]>();
 
-  /**
+  /*
    * Index of currently running subroutine.
    */
   private int actualIndexSubD = 0;
 
-  /**
+  /*
    *   Boolean for process step activity.
    *  true: do not process subroutine step
    *  false: otherwise
    */
   private boolean actionSwitchOn;
 
-  /**
+  /*
    * Only valid in subroutine Mode.
    * true: actionSwitchOn is true
    * false: searching for more actions
@@ -142,7 +149,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * Called once during the lifetime of TESTAR
    * @param settings the current TESTAR settings as specified by the user.
    */
-  protected void initialize(Settings settings){
+  protected void initialize(Settings settings) {
     super.initialize(settings);
     protocolFolder = settings.get(ConfigTags.MyClassPath).get(0) + "/"
         + settings.get(ConfigTags.ProtocolClass).split("/")[0];
@@ -219,9 +226,10 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @param state the SUT's current state
    */
   protected void startSubroutine(State state) {
-    getSubroutine().beginSequence();
+    subroutine.beginSequence();
   }
 
+ 
   /** Define a set of actions to be taken when switching from the subroutine to TESTAR.
    * @param state the SUT's current state
    * @return the available actions
@@ -239,7 +247,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     subroutine = null;
   }
 
-  /**
+  /*
    *  Process document step if actionSwitchOn is false.
    *  @return true if it is not possible to process a document step
    */
@@ -252,7 +260,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     return actionSwitchOn;
   }
   
-  /**
+  /*
    * Default derivation of action steps.
    * @param system the SUT
    * @param state the SUT's current state
@@ -427,11 +435,8 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
       Report.report(state, lastAction, graphDB, 
           settings().get(ConfigTags.GenerateTgherkinReport), 
           settings().get(ConfigTags.StoreTgherkinReport));
-      if (!subroutine.moreActions(this)) {
-        return false;
-      } else {
-        return true;
-      }
+      return subroutine.moreActions(this);
+      
     }
     return false;
   }
@@ -560,12 +565,12 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     return super.actionCount();
   }
   
+  //getters and setters
+
   /**
    * Retrieve addressTitle.
    * @return addressTitle
-   */
-  // getters and setters
-
+   */ 
   public static String getAddressTitle() {
     return addressTitle;
   }

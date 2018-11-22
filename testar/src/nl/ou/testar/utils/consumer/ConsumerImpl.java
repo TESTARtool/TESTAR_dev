@@ -10,9 +10,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Class that provides an implementation of a Consumer.
  */
-public class ConsumerImpl implements Consumer {
+public class ConsumerImpl implements Consumer{
 
-	private BlockingQueue< Item> itemQueue = new LinkedBlockingQueue<Item>();  
+	private BlockingQueue< Item > itemQueue = new LinkedBlockingQueue< Item >();  
 	private ExecutorService executorService = Executors.newCachedThreadPool();  
 	private List<ItemProcessor> jobList = new LinkedList<ItemProcessor>();  
 	private volatile boolean shutdownCalled = false;  
@@ -21,8 +21,8 @@ public class ConsumerImpl implements Consumer {
 	 * Constructor.
 	 * @param poolSize the number of processing threads to be created
 	 */
-	public ConsumerImpl(int poolSize) {  
-		for(int i = 0; i < poolSize; i++) {  
+	public ConsumerImpl(int poolSize){  
+		for(int i = 0; i < poolSize; i++){  
 			ItemProcessor jobThread = new ItemProcessor(itemQueue);  
 			jobList.add(jobThread);  
 			executorService.submit(jobThread);  
@@ -34,17 +34,17 @@ public class ConsumerImpl implements Consumer {
 	 * @param item to be consumed item
 	 * @return true if item consumed successfully, otherwise false.
 	 */
-	public boolean consume(Item item) {  
-		if (!shutdownCalled) {  
-			try {  
+	public boolean consume(Item item){  
+		if(!shutdownCalled){  
+			try{  
 				itemQueue.put(item);  
-			} catch(InterruptedException ie) {  
+			}catch(InterruptedException ie){  
 				Thread.currentThread().interrupt();  
 				return false;  
 			}  
 			return true;  
 		}  
-		else {  
+		else{  
 			return false;  
 		}  
 	}  
@@ -52,8 +52,8 @@ public class ConsumerImpl implements Consumer {
 	/**
 	 * Finish consumption. 
 	 */
-	public void finishConsumption() {  
-		for(ItemProcessor itemProcessor : jobList) {  
+	public void finishConsumption(){  
+		for(ItemProcessor itemProcessor : jobList){  
 			itemProcessor.cancelExecution();  
 		}  
 		executorService.shutdown();  

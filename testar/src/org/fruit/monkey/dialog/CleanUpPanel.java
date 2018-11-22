@@ -59,12 +59,10 @@ public class CleanUpPanel extends JPanel {
     this.rootSettingsFolderName = settings.get(ConfigTags.OutputDir) + "/";
     this.rootOutputFolderName = "./output/";
 
-    // instruction
     JLabel settingsLabel = new JLabel(rootSettingsFolderName);
     settingsLabel.setBounds(START_SETTINGS_X - GAP_X, START_Y - 2 * DELTA, BREEDTE, HOOGTE);
     add(settingsLabel);
 
-    // instruction
     JLabel outputLabel = new JLabel(rootOutputFolderName);
     outputLabel.setBounds(START_OUTPUT_X - 2 * GAP_X, START_Y - 2 * DELTA, BREEDTE, HOOGTE);
     add(outputLabel);
@@ -317,7 +315,7 @@ public class CleanUpPanel extends JPanel {
             return !name.contains("dummy");
           }
         });
-    if (files.length == 0) { 
+    if (files == null || files.length == 0) { 
       return true;
     }
     return false;

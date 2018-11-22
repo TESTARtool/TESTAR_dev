@@ -411,7 +411,7 @@ public class SubroutinePanel extends JPanel {
     showButtons(true, true, true, false, false);
   }
 
-  private void showSubroutineData(int index) {
+  private void showSubroutineData(Integer index) {
     String url = subroutineData.get(index)[0];
     String tgherkinDocument = subroutineData.get(index)[1];
     jtfN.setText(index + "");
@@ -453,7 +453,7 @@ public class SubroutinePanel extends JPanel {
       readSubroutineData(); // if exist, read data from input file
       maxIndexSubroutineData = subroutineData.size();
       if (maxIndexSubroutineData > 0) {
-        currentIndexSubroutineData++; // start with first record
+        currentIndexSubroutineData = 1; // start with first record
         showSubroutineData(currentIndexSubroutineData);
       }
       adjustRanges();
@@ -546,7 +546,7 @@ public class SubroutinePanel extends JPanel {
         classPath[i] = new File(myClassPath.get(i)).toURI().toURL();
       }
       
-      // URL[] classPath = {new File("bin/oracle/").toURI().toURL()};
+      //URL[] classPath = {new File("bin/oracle/").toURI().toURL()};
       loader = new URLClassLoader(classPath);
 
       @SuppressWarnings("unchecked")

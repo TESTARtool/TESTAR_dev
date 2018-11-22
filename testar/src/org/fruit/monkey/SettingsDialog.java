@@ -25,8 +25,7 @@
 * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-
+***************************************************************************************************/
 
 /**
  * @author Sebastian Bauersfeld
@@ -35,6 +34,7 @@
 package org.fruit.monkey;
 
 import static java.util.logging.Logger.getLogger;
+
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
@@ -43,16 +43,11 @@ import static org.fruit.Util.compileProtocol;
 import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDBPanel;
-import nl.ou.testar.TgherkinPanel;
-
-import org.fruit.Util;
-import org.fruit.monkey.dialog.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -62,6 +57,16 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.imageio.ImageIO;
+
+import javax.swing.*;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.GroupLayout.Alignment;
+import nl.ou.testar.GraphDBPanel;
+import nl.ou.testar.SubroutinePanel;
+import nl.ou.testar.TgherkinPanel;
+import org.fruit.Util;
+import org.fruit.monkey.dialog.*;
 
 /**
  * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
@@ -74,7 +79,6 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private String settingsFile;
   private Settings settings;
-  //TODO: what is this ret variable. Can´t you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -92,6 +96,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private CleanUpPanel cleanUpPanel;
   private GraphDBPanel graphDBPanel;
   private TgherkinPanel tgherkinPanel;
+  private SubroutinePanel subroutinePanel;
 
   /**
    * Starts the settings Dialog.
@@ -106,7 +111,8 @@ public class SettingsDialog extends JFrame implements Observer {
           break;
         }
       }
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+    } catch (ClassNotFoundException | InstantiationException 
+        | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
     this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
@@ -124,8 +130,8 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   *
-   * @param settings   content of settings	
+   * run dialog.
+   * @param settings   content of settings
    * @param settingsFile   filename of file containing settings
    * @return null
    */
@@ -147,8 +153,9 @@ public class SettingsDialog extends JFrame implements Observer {
     return ImageIO.read(SettingsDialog.class.getResourceAsStream(path));
   }
 
-  /**
-   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog.
+  /** start dialog.
+   * This is the method that is called when you click on one of the big mode buttons 
+   * in TESTAR dialog
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(AbstractProtocol.Modes mode) {
@@ -161,14 +168,13 @@ public class SettingsDialog extends JFrame implements Observer {
       if (settings.get(ConfigTags.AlwaysCompile)) {
         compileProtocol(settings.get(ConfigTags.ProtocolClass));
       }
- 
       this.dispose();
-
     } catch (IllegalStateException ise) {
-      JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, ise.getMessage(), 
+          "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
     }
   }
-  
+
   private void checkSettings(Settings settings) throws IllegalStateException {
     String userInputPattern = settings.get(ConfigTags.ProcessesToKillDuringTest);
     try {
@@ -190,7 +196,6 @@ public class SettingsDialog extends JFrame implements Observer {
     } catch (PatternSyntaxException exception) {
       throw new IllegalStateException("Your Oracle is not a valid regular expression!");
     }
-
     if (!new File(settings.get(ConfigTags.OutputDir)).exists()) {
       throw new IllegalStateException("Output Directory does not exist!");
     }
@@ -203,26 +208,30 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void saveCurrentSettings() {
     extractInformation(settings);
+    
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
-      System.out.println("[" + getClass().getSimpleName() + "] Saved current settings to <" + settingsFile + ">");
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings") - 1));
+      System.out.println("Saved current settings to <" + settingsFile + ">");
     } catch (IOException e1) {
-      LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
+      LogSerialiser.log("Unable to save current settings to <" 
+          + settingsFile + ">: " + e1.toString() + "\n");
     }
   }
 
   /**
    * This replaces the original test.settings file with a complete settings file
-   * @param sutSettings   settings of the SUT
+   * @param sutSettings  settings of the SUT
    */
   private void switchSettings(String sutSettings) {
-    String previousSSE = Main.getSSE()[0];
+    String previousSSE = Main.getSse()[0];
     String sse = sutSettings + Main.SUT_SETTINGS_EXT;
     if (previousSSE.equals(sse)) {
       return;
     }
     saveCurrentSettings();
-    new File("./resources/settings/" + previousSSE).renameTo(new File("./resources/settings/" + sse));
+    new File("./resources/settings/" + previousSSE)
+        .renameTo(new File("./resources/settings/" + sse));
     try {
       settingsFile = "./resources/settings/" + sutSettings + "/" + Main.SETTINGS_FILE;
       settings = Main.loadSettings(new String[0], settingsFile);
@@ -243,18 +252,33 @@ public class SettingsDialog extends JFrame implements Observer {
     cleanUpPanel.populateFrom(settings);
     graphDBPanel.populateFrom(settings);
     tgherkinPanel.populateFrom(settings);
+    subroutinePanel.populateFrom(settings);
+    
     // only show Tgherkin tab if the protocol is a DocumentProtocol
     if (tgherkinPanel.isDocumentProtocol()) {
-        if (!tgherkinPanel.isActive()) {
-        	jTabsPane.addTab("Tgherkin", tgherkinPanel);
-        	tgherkinPanel.setActive(true);
-        }
-    } else {
-        if (tgherkinPanel.isActive()) {
-        	jTabsPane.remove(tgherkinPanel);
-        	tgherkinPanel.setActive(false);
-        }
-    }
+      if (!tgherkinPanel.isActive()) { 
+        jTabsPane.addTab("Tgherkin", tgherkinPanel); 
+        tgherkinPanel.setActive(true); 
+      } 
+    } else { 
+      if (tgherkinPanel.isActive()) { 
+        jTabsPane.remove(tgherkinPanel); 
+        tgherkinPanel.setActive(false); 
+      } 
+    } 
+       
+    // only show subroutine tab if the protocol is a SubroutineProtocol 
+    if (subroutinePanel.isSubroutineProtocol()) { 
+      if (!subroutinePanel.isActive()) { 
+        jTabsPane.addTab("Subroutine Data", subroutinePanel); 
+        tgherkinPanel.setActive(true); 
+      } 
+    } else { 
+      if (subroutinePanel.isActive()) { 
+        jTabsPane.remove(subroutinePanel); 
+        subroutinePanel.setActive(false); 
+      } 
+    } 
   }
 
   private void extractInformation(Settings settings) {
@@ -266,6 +290,7 @@ public class SettingsDialog extends JFrame implements Observer {
     miscPanel.extractInformation(settings);
     graphDBPanel.extractInformation(settings);
     tgherkinPanel.extractInformation(settings);
+    subroutinePanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -291,9 +316,10 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jTabsPane.addTab("GraphDB", graphDBPanel);
+    subroutinePanel = new SubroutinePanel();
+    tgherkinPanel = new TgherkinPanel();
     cleanUpPanel = new CleanUpPanel();
     jTabsPane.addTab("Clean Up", cleanUpPanel);
-    tgherkinPanel = new TgherkinPanel();
 
     setLayout(jTabsPane);
     pack();
@@ -315,8 +341,8 @@ public class SettingsDialog extends JFrame implements Observer {
     setBounds(bounds);
   }
 
-  private void setLayout(JTabbedPane jTabsPane) {
-    jTabsPane.setSelectedComponent(generalPanel);
+  private void setLayout(JTabbedPane jtabsPane) {
+    jtabsPane.setSelectedComponent(generalPanel);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("TESTAR " + TESTAR_VERSION);
@@ -331,7 +357,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 505, PREFERRED_SIZE)
+                    .addComponent(jtabsPane, PREFERRED_SIZE, 505, PREFERRED_SIZE)
                     .addGroup(getStartGroup(layout)))
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -345,7 +371,7 @@ public class SettingsDialog extends JFrame implements Observer {
                     .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                     .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE))
                 .addPreferredGap(RELATED)
-                .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
+                .addComponent(jtabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
                 .addContainerGap())
     );
   }

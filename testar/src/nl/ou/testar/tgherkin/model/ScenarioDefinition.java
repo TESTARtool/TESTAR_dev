@@ -25,7 +25,7 @@ public abstract class ScenarioDefinition {
 	private final WidgetTreeCondition oracle;
     private final List<Step> steps;
     private int index;
-    
+    private boolean print = false; // print step lines
 	/**
      * ScenarioDefinition constructor. 
      * @param title given title
@@ -97,7 +97,7 @@ public abstract class ScenarioDefinition {
 	 * Set step index.
 	 * @param index step index
 	 */
-	protected void setIndex(int index) {
+	public void setIndex(int index) {
 		this.index = index;
 	}
    
@@ -108,13 +108,23 @@ public abstract class ScenarioDefinition {
 	 */
 	public boolean moreActions(ProtocolProxy proxy) {
 		if (currentStep() != null && currentStep().hasNextAction(proxy, null)) {
-			return true;
+		  if (print) {
+			System.out.println("[ScenarioDefinition] gaat over tot actie " + index + "\n"
+					   + steps.get(index).getTitle() + "\n"
+					   + steps.get(index).getWhenClause() + "\n");
+		  }
+		  return true;
 		} else {
 			// search for next step with actions
 			int savedIndex = index;
 			while (hasNextStep()) {
 				nextStep();
 				if (currentStep().hasNextAction(proxy, null)) {
+				  if (print) {
+					System.out.println("[ScenarioDefinition] volgende actie " + index + " \n"
+						+ steps.get(index).getTitle() + "\n"
+						+ steps.get(index).getWhenClause() + "\n");
+				    }
 					index = savedIndex;
 					return true;
 				}
@@ -137,8 +147,7 @@ public abstract class ScenarioDefinition {
 	 */
 	public void beginSequence() {
 		for (Step step : getSteps()) {
-			//  Randomize in advance, so moreActions can be determined: StepRange number of actions could be zero actions
-			step.beginSequence();
+			step.reset();
 		}
 		index = -1;
 	}
@@ -157,7 +166,12 @@ public abstract class ScenarioDefinition {
 			while (hasNextStep()) {
 				nextStep();
 				if (currentStep().hasNextAction(proxy, null)) {
-					currentStep().nextAction();
+					if (print) {
+					  System.out.println("[ScenarioDefinition] gaat iets evalueren actie " + index + " \n"
+					      + steps.get(index).getTitle() + "\n"
+					      + steps.get(index).getWhenClause() + "\n");
+					}
+				currentStep().nextAction();
 					break;
 				}
 			}
@@ -177,7 +191,6 @@ public abstract class ScenarioDefinition {
 		// apply step level selection		
 		return currentStep().evaluateWhenCondition(proxy, map, null, mismatchOccurred());
 	}
-	
 
 	/**	  
 	 * Get verdict.
@@ -186,12 +199,11 @@ public abstract class ScenarioDefinition {
 	 */
 	public Verdict getVerdict(ProtocolProxy proxy) {
 		// scenario level
-		if (oracle != null && !oracle.evaluate(proxy, null)) {
+		if (oracle != null && !oracle.evaluate(proxy, null)){
 			setFailed();
 			Report.appendReportDetail(Report.BooleanColumn.THEN,false);
 			return new Verdict(Step.TGHERKIN_FAILURE, "Tgherkin scenario oracle failure!");
 		}
-		// step level
 		return currentStep().getVerdict(proxy, null, mismatchOccurred());
 	}
 
@@ -200,7 +212,7 @@ public abstract class ScenarioDefinition {
      * @return true if current action failed otherwise false 
      */
 	public boolean hasFailed() {
-		if (currentStep() != null) {
+		if(currentStep() != null) {
 			return currentStep().getStatus() == Step.Status.FAILED;
 		}
 		return false;
@@ -241,7 +253,7 @@ public abstract class ScenarioDefinition {
      */
 	public boolean mismatchOccurred() {
 		// search steps until current index 
-		for (int idx = 0; idx <= index; idx++) {
+		for (int idx = 0 ; idx <= index; idx++) {
 			if (steps.get(idx).isMismatch()) {
 				return true;
 			}
@@ -280,10 +292,9 @@ public abstract class ScenarioDefinition {
      * @return current step, returns null if no current step exists
      */
     protected Step currentStep() {
-    	if (index < 0 || index >= steps.size()) {
-    		return null;
+     	if (index < 0 || index >= steps.size()) {
+    		return null; 
     	}
-    	return steps.get(index);
+   	return steps.get(index);
     }   
-    
 }

@@ -73,9 +73,9 @@ public abstract class Gesture {
 	public List<String> check(DataTable dataTable) {
 		List<String> list = new ArrayList<String>();
 		for (String placeholder : getParameterBase().getPlaceholders()) {
-			if (dataTable == null) {
+			if (dataTable == null){
 				list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + placeholder + System.getProperty("line.separator"));
-			} else {	
+			}else{	
 				// check whether the placeholder is a column name of the data table
 				if (!dataTable.isColumnName(placeholder)) {
 					list.add(getClass().getSimpleName() + " validation error - invalid parameter placeholder : " + placeholder + "\n");
@@ -108,7 +108,7 @@ public abstract class Gesture {
      * @return hash code
      */
     @Override
-    public int hashCode() {
+    public int hashCode(){
         return getClass().hashCode();
       }
 

@@ -14,7 +14,6 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.linux.AtSpiTags;
 import org.fruit.alayer.windows.UIATags;
 
-
 /**
  * Class responsible for handling key board key presses.
  *
@@ -83,13 +82,13 @@ public class HitKeyGesture extends Gesture {
 		List<String> list = new ArrayList<String>();
 		List<KBKeys> keys = new ArrayList<KBKeys>();
 		for (String name : getParameterBase().getPlaceholders()) {
-				if (dataTable == null) {
+				if (dataTable == null){
 					list.add(getClass().getSimpleName() + " validation error - no data table found for string placeholder : " + name + System.getProperty("line.separator"));
-				} else {	
+				}else{	
 					// check whether the placeholder is a column name of the data table
 					if (!dataTable.isColumnName(name)) {
 						list.add(getClass().getSimpleName() + " validation error - invalid argument placeholder : " + name + "\n");
-					} else {
+					}else {
 						// check whether data table cells contain valid entries
 						list.addAll(checkTableContent(dataTable, name));
 					}
@@ -100,13 +99,13 @@ public class HitKeyGesture extends Gesture {
 				KBKeys key = null;
 				try {
 					key = KBKeys.valueOf(value);
-				} catch(IllegalArgumentException e) {
+				}catch(IllegalArgumentException e) {
 					list.add(getClass().getSimpleName() +  " validation error - key value " + value + " does not exist" + System.getProperty("line.separator"));					
 				}
 				if (key != null) {
 					if (keys.contains(key)) {
 						list.add(getClass().getSimpleName() +  " validation error - key value " + value + " occurs multiple times" + System.getProperty("line.separator"));							
-					} else {
+					}else {
 						keys.add(key);
 					}
 				}
@@ -116,7 +115,7 @@ public class HitKeyGesture extends Gesture {
 
 	private List<String> checkTableContent(DataTable dataTable, String columnName) {
 		List<String> list = new ArrayList<String>();
-		if (dataTable == null) {
+		if (dataTable == null){
 			return list;
 		}	
 		int rows = 0;
@@ -131,11 +130,11 @@ public class HitKeyGesture extends Gesture {
 				for (String element : elements) {
 					try {
 						KBKeys.valueOf(element);
-					} catch(IllegalArgumentException e) {
+					}catch(IllegalArgumentException e) {
 						list.add(getClass().getSimpleName() +  " validation error - key value element " + element + " does not exist at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
 					}
 				}
-			} catch(Exception e) {
+			}catch(Exception e) {
 				list.add(getClass().getSimpleName() +  " validation error - invalid table value at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));					
 			}
 		}

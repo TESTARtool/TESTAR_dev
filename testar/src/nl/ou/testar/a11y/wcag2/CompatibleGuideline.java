@@ -40,7 +40,7 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 import nl.ou.testar.a11y.windows.AccessibilityUtil;
 
 /**
- * A WCAG 2.0 guideline.
+ * A WCAG 2.0 guideline
  * @author Davy Kager
  *
  */
@@ -71,8 +71,11 @@ public final class CompatibleGuideline extends AbstractGuideline {
 			}
 			if (AccessibilityUtil.isRoleUnknown(w)) {
 				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-						"Unknown widget role \"" + w.get(Tags.Role).name()
-						+ "\" for \"" + w.get(Tags.Title) + "\"", w));
+						"Unknown widget role \"" + w.get(Tags.Role).name() +
+						"\" for \"" + w.get(Tags.Title) + "\"", w));
+			}
+			else {
+				results.add(evaluationPassed(sc));
 			}
 		}
 		return results;

@@ -20,7 +20,7 @@ public class TableRow {
      */
     public TableRow(List<TableCell> tableCells) {
     	Assert.notNull(tableCells);
-    	this.tableCells = Collections.unmodifiableList(tableCells);
+    	this.tableCells = tableCells;
     }
 
     /**

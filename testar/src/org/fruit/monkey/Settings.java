@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.monkey;
 
 import java.io.BufferedReader;
@@ -57,42 +56,49 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE";
-	public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
-	public static final String SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
+	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
+			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
+			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
 	
-	public static class ConfigParseException extends FruitException {
+	private static String settingsPath;
+	
+	public static String getSettingsPath() {
+		return settingsPath;
+	}
+
+	public static void setSettingsPath(String path) {
+		settingsPath = path;
+	}
+	
+	public static class ConfigParseException extends FruitException{
 		private static final long serialVersionUID = -245853379631399673L;
-		
 		public ConfigParseException(String message) {
 			super(message);
 		}
 	}
 
-	public static <T> String print(Tag<T> tag, T value) {
-		if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
+	public static <T> String print(Tag<T> tag, T value){
+		if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
 			StringBuilder sb = new StringBuilder();
 			List<?> l = (List<?>) value;
 			
 			int i = 0;
-			for(Object o : l) {
-				if (i > 0) {
+			for(Object o : l){
+				if(i > 0)
 					sb.append(';');
-				}
 				sb.append(Util.toString(o));
 				i++;
 			}
 			return sb.toString();
-		} else if (tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)) {
+		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
 			StringBuilder sb = new StringBuilder();
 			@SuppressWarnings("unchecked")
 			List<Pair<String, String>> l = (List<Pair<String, String>>) value;
 			
 			int i = 0;
-			for(Pair<String, String> p : l) {
-				if (i > 0) {
+			for(Pair<String, String> p : l){
+				if(i > 0)
 					sb.append(';');
-				}
 				sb.append(p.left()).append(';').append(p.right());
 				i++;
 			}
@@ -102,68 +108,64 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> T parse(String stringValue, Tag<T> tag) throws ConfigParseException {
-		if (tag.type().equals(Double.class)) {
-			try {
+	public static <T> T parse(String stringValue, Tag<T> tag) throws ConfigParseException{
+		if(tag.type().equals(Double.class)){
+			try{
 				return (T)(Double)Double.parseDouble(stringValue);
-			} catch(NumberFormatException nfe) {
+			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		} else if (tag.type().equals(AbstractProtocol.Modes.class)) {
-			try {
+		}else if(tag.type().equals(AbstractProtocol.Modes.class)){
+			try{
 				return (T)AbstractProtocol.Modes.valueOf(stringValue);
-			} catch(IllegalArgumentException iae) {
+			}catch(IllegalArgumentException iae){
 				throw new ConfigParseException("Unknown Mode!");
 			}
-		} else if (tag.type().equals(Integer.class)) {
-			try {
+		}else if(tag.type().equals(Integer.class)){
+			try{
 				return (T)(Integer)Integer.parseInt(stringValue);
-			} catch(NumberFormatException nfe) {
+			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
 		// begin by urueda
-		} else if (tag.type().equals(Float.class)) {
-			try {
+		}else if(tag.type().equals(Float.class)){
+			try{
 				return (T)(Float)Float.parseFloat(stringValue);
-			} catch(NumberFormatException nfe) {
+			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			} // end by urueda
-		} else if (tag.type().equals(Boolean.class)) {
-			try {
+		}else if(tag.type().equals(Boolean.class)){
+			try{
 				return (T)(Boolean)Boolean.parseBoolean(stringValue);
-			} catch(NumberFormatException nfe) {
+			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		} else if (tag.type().equals(String.class)) {
+		}else if(tag.type().equals(String.class)){
 			return (T)stringValue;
-		} else if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
-			if (stringValue.trim().length() == 0) {
+		}else if(tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)){
+			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<String>();
-			}
 			return (T)Arrays.asList(stringValue.split(";"));
-		} else if (tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)) {
-			if (stringValue.trim().length() == 0) {
+		}else if(tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)){
+			if(stringValue.trim().length() == 0)
 				return (T) new ArrayList<Pair<String, String>>();
-			}
 			List<String> pathList = Arrays.asList(stringValue.split(";"));
-			if (pathList.size() % 2 != 0) {
+			if(pathList.size() % 2 != 0)
 				throw new ConfigParseException("The number of paths must be even!");
-			}
 			List<Pair<String, String>> ret = new ArrayList<Pair<String, String>>();
-			for(int i = 0; i < pathList.size(); i += 2) {
+			for(int i = 0; i < pathList.size(); i += 2)
 				ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
-			}
 			return (T)ret;
 		}
 		throw new ConfigParseException("");
 	}
 	
 	
-	public static Settings FromFile(String path) throws IOException {
+	public static Settings FromFile(String path) throws IOException{
 		return fromFile(new ArrayList<Pair<?, ?>>(), path);
 	}
 
-	public static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException {
+	public static Settings fromFile(List<Pair<?, ?>> defaults, String path) throws IOException{
 		Assert.notNull(path);
 		Properties props = new Properties();
 		FileInputStream fis = new FileInputStream(path);
@@ -171,28 +173,21 @@ public class Settings extends TaggableBase implements Serializable {
 		Reader in = new BufferedReader(isw);
 		props.load(in);
 		in.close();			
-		if (isw != null) {
-			isw.close();
-		}
-		if (fis != null) {
-			fis.close();
-		}
+		if (isw != null) isw.close();
+		if (fis != null) fis.close();
+
 		return new Settings(defaults, new Properties(props));
 	}
 
-	public Settings() { 
-		this(new Properties()); 
-	}
+	public Settings(){ this(new Properties()); }
 
-	public Settings(Properties props) { 
-		this(new ArrayList<Pair<?, ?>>(), props); 
-	}
+	public Settings(Properties props){ this(new ArrayList<Pair<?, ?>>(), props); }
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Settings(List<Pair<?, ?>> defaults, Properties props) {
+	public Settings(List<Pair<?, ?>> defaults, Properties props){
 		Assert.notNull(props, defaults);
 
-		for(Pair<?, ?> p : defaults) {
+		for(Pair<?, ?> p : defaults){
 			Assert.notNull(p.left(), p.right());
 			Assert.isTrue(p.left() instanceof Tag);			
 			Tag<Object> t = (Tag<Object>)p.left();
@@ -201,32 +196,34 @@ public class Settings extends TaggableBase implements Serializable {
 			set(t, v);			
 		}
 
-		for(String key : props.stringPropertyNames()) {
+		for(String key : props.stringPropertyNames()){
 			String value = props.getProperty(key);
 			
 			Tag<?> defTag = null;
 			
-			for(Pair<?, ?> p : defaults) {
+			for(Pair<?, ?> p : defaults){
 				Tag<?> t = (Tag<?>)p.left();
-				if (t.name().equals(key)) {
+				if(t.name().equals(key)){
 					defTag = t;
 					break;
 				}
 			}
 
-			if (defTag == null) {
+			if(defTag == null){
 				set(Tag.from(key, String.class), value);
-			} else {
+			}else{
 				set((Tag)defTag, parse(value, defTag));
 			}
+
+
 
 		}
 	}
 
-	public String toString() {
+	public String toString(){
 		StringBuilder sb = new StringBuilder();
 
-		for(Tag<?> t : tags()) {
+		for(Tag<?> t : tags()){
 			sb.append(t.name()).append("<")
 			.append(t.type().getSimpleName()).append("> : ")
 			.append(get(t)).append(Util.lineSep());
@@ -235,7 +232,10 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String toFileString() throws IOException {
+	/**
+	 * Make the default file Structure for the test.settings file
+	 */
+	public String toFileString() throws IOException{
 		StringBuilder sb = new StringBuilder();
 
 		try {
@@ -296,6 +296,29 @@ public class Settings extends TaggableBase implements Serializable {
 					+"SuspiciousTitles = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Oracles based on Suspicious Outputs detected by Process Listeners\n"
+					+"#\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Regular expression defines the suspicious outputs\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessListenerEnabled = " + Util.lineSep()
+					+"SuspiciousProcessOutput = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Process Logs\n"
+					+"#\n"
+					+"# Required ProcessListenerEnabled\n"
+					+"# (Only available for desktop applications through COMMAND_LINE)\n"
+					+"#\n"
+					+"# Allow TESTAR to store in its logs other possible matches found in the process\n"
+					+"# Use the regular expression .*.* if you want to store all the possible outputs of the process\n"
+					+"#################################################################\n"
+					+"\n"
+					+"ProcessLogs = " + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# Actionfilter\n"
 					+"#\n"
 					+"# Regular expression. More filters can be added in Spy mode,\n"
@@ -334,30 +357,31 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n");
 
 
-			for(Tag<?> t : tags()) {
+			for(Tag<?> t : tags()){
 				
-				int ini = sb.indexOf(t.name() + " =");
+				int ini = sb.indexOf(t.name()+" =");
 				int end = sb.indexOf(System.lineSeparator(), ini);
 
-				if (ini != -1) { // Overwrite default tags with the new value
+				//Forced the hiding of prolog config option
+				//TODO: Take out entirely after prolog has been eradicated from TESTAR
+				if (!t.name().equals("PrologActivated")) {
+					if (ini != -1) { // Overwrite default tags with the new value
 
-					sb = sb.delete(ini, end);
-					sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>)t, get(t))));
+						sb = sb.delete(ini, end);
+						sb.insert(ini, t.name() + " = " + escapeBackslash(print((Tag<Object>) t, get(t))));
 
-				} else { // This tag is new a variable
+					} else { // This tag is new a variable
 
-					sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>)t, get(t)))).append(Util.lineSep());
+						sb.append(t.name()).append(" = ").append(escapeBackslash(print((Tag<Object>) t, get(t)))).append(Util.lineSep());
+					}
 				}
 			}
 			
-		} catch(Exception e) {
-			System.out.println("Error trying to save current settings " + e);
-		}
+		}catch(Exception e){System.out.println("Error trying to save current settings "+e);}
 
 		return sb.toString();
 	}
 	
-	private String escapeBackslash(String string) {
-		return string.replace("\\", "\\\\");	
-	}
+	
+	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 }

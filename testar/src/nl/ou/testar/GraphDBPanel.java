@@ -52,7 +52,7 @@ public class GraphDBPanel extends JPanel {
     private JTextField userTextField = new JTextField();
     private JPasswordField passwordField = new JPasswordField();
 
-    private GraphDBPanel() {
+    private GraphDBPanel(){
         super();
     }
 
@@ -116,7 +116,7 @@ public class GraphDBPanel extends JPanel {
      * @return password as String.
      */
     private String getPassword() {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result= new StringBuilder();
         for(char c : passwordField.getPassword()) {
             result.append(c);
         }

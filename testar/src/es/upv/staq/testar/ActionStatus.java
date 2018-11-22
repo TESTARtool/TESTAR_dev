@@ -40,53 +40,53 @@ import org.fruit.alayer.Action;
  */
 public class ActionStatus {
 
-	private Action action;
-	
-	private boolean actionSucceeded;
-	private boolean problems;
-	private boolean userEventAction;
-	
-	/**
-	 * Constructor.
-	 */
-	public ActionStatus() {
-		this.action = null;
-		this.actionSucceeded = true;
-		this.problems = false;
-		this.userEventAction = false;		
-	}
+  private Action action;
+  
+  private boolean actionSucceeded;  
+  private boolean problems;
+  private boolean userEventAction;
+  
+  /**
+   * Constructor.
+   */
+  public ActionStatus() {
+    this.action = null;
+    this.actionSucceeded = true;
+    this.problems = false;
+    this.userEventAction = false;    
+  }
 
-	public Action getAction() {
-		return action;
-	}
+  public Action getAction() {
+    return action;
+  }
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
+  public void setAction(Action action) {
+    this.action = action;
+  }
 
-	public boolean isActionSucceeded() {
-		return actionSucceeded;
-	}
+  public boolean isActionSucceeded() {
+    return actionSucceeded;
+  }
 
-	public boolean setActionSucceeded(boolean actionSucceeded) {
-		this.actionSucceeded = actionSucceeded;
-		return actionSucceeded;
-	}
+  public boolean setActionSucceeded(boolean actionSucceeded) {
+    this.actionSucceeded = actionSucceeded;
+    return actionSucceeded;
+  }
 
-	public boolean isProblems() {
-		return problems;
-	}
+  public boolean isProblems() {
+    return problems;
+  }
 
-	public void setProblems(boolean problems) {
-		this.problems = problems;
-	}
+  public void setProblems(boolean problems) {
+    this.problems = problems;
+  }
 
-	public boolean isUserEventAction() {
-		return userEventAction;
-	}
+  public boolean isUserEventAction() {
+    return userEventAction;
+  }
 
-	public void setUserEventAction(boolean userEventAction) {
-		this.userEventAction = userEventAction;
-	}
-					
+  public void setUserEventAction(boolean userEventAction) {
+    this.userEventAction = userEventAction;
+  }
+          
 }

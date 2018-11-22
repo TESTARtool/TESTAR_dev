@@ -31,7 +31,6 @@
 /**
  *  @author Sebastian Bauersfeld
  */
-
 package org.fruit.monkey;
 
 import java.awt.event.ActionEvent;
@@ -140,12 +139,10 @@ public class ProtocolEditor extends javax.swing.JDialog {
             // begin by urueda
             Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java");
             File compileDir = new File("./resources/settings/" + new StringTokenizer(this.protocolClass,"/").nextToken());
-            List<File> fileList = new ArrayList<File>(1);
-            fileList.add(compileDir);
-
+			List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
             Util.compileJava(fileList,
-                 System.getProperty("java.class.path")); //";./monkey.jar");
-
+            				 System.getProperty("java.class.path")); //";./monkey.jar");
+            // end bu urueda     
             console.setText(console.getText() + "OK");
         } catch (Throwable t) {
             console.setText(console.getText() + "\n" + t.getMessage());
@@ -157,35 +154,33 @@ public class ProtocolEditor extends javax.swing.JDialog {
         compile();
     }                                          
 
-    private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {
+    private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {                                      
         if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
             if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                 compile();
             }
-        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        }else if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
             this.dispose();
         }
     }                                     
 
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
         try {
             //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
-            Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java");
+            Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java"); // by urueda
         } catch (IOException ioe) {
-            System.out.println("[" + getClass().getSimpleName() + "]  " +  ioe);
+            System.out.println(ioe);
         }
     }                                 
 
-    private void consoleKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+    private void consoleKeyPressed(java.awt.event.KeyEvent evt) {                                   
+        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
             this.dispose();
-        }
     }                                  
 
     private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {                                      
-        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
             this.dispose();
-        }
     }                                     
 
     private javax.swing.JButton btnCompile;

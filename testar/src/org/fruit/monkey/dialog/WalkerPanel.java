@@ -27,18 +27,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+
 package org.fruit.monkey.dialog;
+
+import es.upv.staq.testar.graph.Grapher;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
+import javax.swing.*;
 
 import static org.fruit.monkey.dialog.ToolTipTexts.checkForceForegroundTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.testGeneratorTTT;
 
-import es.upv.staq.testar.graph.Grapher;
-import javax.swing.*;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
 public class WalkerPanel extends JPanel {
+
   private static final long serialVersionUID = -6483480772900247792L;
+
   private JComboBox<String> comboBoxTestGenerator;
   private JCheckBox checkForceForeground;
   private JCheckBox checkFormsFilling;

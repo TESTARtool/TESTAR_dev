@@ -48,7 +48,7 @@ public class Examples {
     public DataTable getDataTable() {
         return dataTable;
     }
-    
+
 	/**
 	 * Check whether more sequences exist.
 	 * @return true if more sequences exist, otherwise false

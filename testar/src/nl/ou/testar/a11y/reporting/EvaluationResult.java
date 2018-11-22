@@ -37,17 +37,17 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 
 /**
- * The result of evaluating an accessibility rule.
+ * The result of evaluating an accessibility rule
  * @author Davy Kager
  *
  */
 public class EvaluationResult implements Serializable {
-
+	
 	private static final long serialVersionUID = -51527046346987231L;
 
 	public enum Type {
 		/**
-		 * No problem found.
+		 * No problem found
 		 */
 		OK,
 		
@@ -63,22 +63,22 @@ public class EvaluationResult implements Serializable {
 		 */
 		ERROR;
 	}
-
+	
 	private final Type type;
 	private final String message;
 	private final Widget widget;
-
+	
 	/**
-	 * Constructs a new evaluation result that does not apply to a single widget.
+	 * Constructs a new evaluation result that does not apply to a single widget
 	 * @param type The problem type.
 	 * @param message The problem description.
 	 */
 	public EvaluationResult(Type type, String message) {
 		this(type, message, null);
 	}
-
+	
 	/**
-	 * Constructs a new evaluation result that applies to a single widget.
+	 * Constructs a new evaluation result that applies to a single widget
 	 * @param type The problem type.
 	 * @param message The problem description.
 	 * @param widget The widget this evaluation result applies to.
@@ -88,9 +88,9 @@ public class EvaluationResult implements Serializable {
 		this.message = message;
 		this.widget = widget;
 	}
-
+	
 	/**
-	 * Gets the problem type.
+	 * Gets the problem type
 	 * @return The problem type.
 	 */
 	public Type getType() {
@@ -98,15 +98,15 @@ public class EvaluationResult implements Serializable {
 	}
 	
 	/**
-	 * Gets the problem message.
+	 * Gets the problem message
 	 * @return The problem message.
 	 */
 	public String getMessage() {
 		return message;
 	}
-
+	
 	/**
-	 * Gets the widget that this evaluation result applies to.
+	 * Gets the widget that this evaluation result applies to
 	 * @return The widget.
 	 */
 	public Widget getWidget() {
@@ -114,19 +114,19 @@ public class EvaluationResult implements Serializable {
 	}
 	
 	/**
-	 * Computes the Verdict severity for the result.
+	 * Computes the Verdict severity for the result
 	 * @return The severity.
 	 */
 	public double getVerdictSeverity() {
 		return type.equals(Type.OK) ? Verdict.SEVERITY_OK : Verdict.SEVERITY_FAIL;
 	}
-
+	
 	@Override
 	public String toString() {
 		String ret = type.name() + ": " + message;
-		if (widget != null) {
+		if (widget != null)
 			ret += " [Widget: \"" + widget.get(Tags.Title, "") + "\" (" + widget.get(Tags.Role) + ")]";
-		}
 		return ret;
 	}
+
 }

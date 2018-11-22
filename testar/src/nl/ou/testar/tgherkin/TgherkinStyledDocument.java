@@ -98,7 +98,7 @@ public class TgherkinStyledDocument extends DefaultStyledDocument  {
 		return new TgherkinTokenAnalyzer().visitDocument(parser.document());
 	}
 
-	private Style getTokenStyle(Token token) {
+	private Style getTokenStyle(Token token){
 		switch (token.getType()) {
 		case TgherkinLexer.ANY_NAME:
 		case TgherkinLexer.CLICK_NAME:

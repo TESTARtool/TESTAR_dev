@@ -235,7 +235,7 @@
 
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
-    return _.map(obj, function(value) { return value[key]; });
+    return _.map(obj, function(value){ return value[key]; });
   };
 
   // Convenience version of a common use case of `filter`: selecting only objects
@@ -295,7 +295,7 @@
 
   // An internal function to generate lookup iterators.
   var lookupIterator = function(value) {
-    return _.isFunction(value) ? value : function(obj) { return obj[value]; };
+    return _.isFunction(value) ? value : function(obj){ return obj[value]; };
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -410,7 +410,7 @@
 
   // Trim out all falsy values from an array.
   _.compact = function(array) {
-    return _.filter(array, function(value) { return !!value; });
+    return _.filter(array, function(value){ return !!value; });
   };
 
   // Internal implementation of a recursive `flatten` function.
@@ -472,7 +472,7 @@
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
     var rest = concat.apply(ArrayProto, slice.call(arguments, 1));
-    return _.filter(array, function(value) { return !_.contains(rest, value); });
+    return _.filter(array, function(value){ return !_.contains(rest, value); });
   };
 
   // Zip together multiple lists into a single array -- elements that share
@@ -550,7 +550,7 @@
     var idx = 0;
     var range = new Array(len);
 
-    while (idx < len) {
+    while(idx < len) {
       range[idx++] = start;
       start += step;
     }
@@ -562,7 +562,7 @@
   // ------------------
 
   // Reusable constructor function for prototype setting.
-  var ctor = function() {};
+  var ctor = function(){};
 
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Binding with arguments is also known as `curry`.
@@ -606,7 +606,7 @@
   // it with the arguments supplied.
   _.delay = function(func, wait) {
     var args = slice.call(arguments, 2);
-    return setTimeout(function() { return func.apply(null, args); }, wait);
+    return setTimeout(function(){ return func.apply(null, args); }, wait);
   };
 
   // Defers a function, scheduling it to run after the current call stack has
@@ -619,7 +619,7 @@
   // during a given window of time.
   _.throttle = function(func, wait) {
     var context, args, timeout, throttling, more, result;
-    var whenDone = _.debounce(function() { more = throttling = false; }, wait);
+    var whenDone = _.debounce(function(){ more = throttling = false; }, wait);
     return function() {
       context = this; args = arguments;
       var later = function() {
@@ -1047,7 +1047,7 @@
 
   // Add your own custom functions to the Underscore object.
   _.mixin = function(obj) {
-    each(_.functions(obj), function(name) {
+    each(_.functions(obj), function(name){
       var func = _[name] = obj[name];
       _.prototype[name] = function() {
         var args = [this._wrapped];
@@ -1120,10 +1120,10 @@
     source += "';\n";
 
     // If a variable is not specified, place data values in local scope.
-    if (!settings.variable) source = 'with(obj || {}) {\n' + source + '}\n';
+    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
 
     source = "var __t,__p='',__j=Array.prototype.join," +
-      "print=function() {__p+=__j.call(arguments,'');};\n" +
+      "print=function(){__p+=__j.call(arguments,'');};\n" +
       source + "return __p;\n";
 
     try {
@@ -1139,7 +1139,7 @@
     };
 
     // Provide the compiled function source as a convenience for precompilation.
-    template.source = 'function(' + (settings.variable || 'obj') + ') {\n' + source + '}';
+    template.source = 'function(' + (settings.variable || 'obj') + '){\n' + source + '}';
 
     return template;
   };

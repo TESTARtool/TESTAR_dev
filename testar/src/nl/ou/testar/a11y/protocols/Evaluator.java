@@ -53,7 +53,7 @@ public interface Evaluator {
 	 * @param widgets The widgets to consider.
 	 * @return The results of the evaluation.
 	 */
-	EvaluationResults evaluate(List<Widget> widgets);
+	public EvaluationResults evaluate(List<Widget> widgets);
 	
 	/**
 	 * Derives the possible actions from the given state
@@ -62,20 +62,20 @@ public interface Evaluator {
 	 * @param widgets The widgets to consider.
 	 * @return The set of actions.
 	 */
-	Set<Action> deriveActions(List<Widget> widgets);
+	public Set<Action> deriveActions(List<Widget> widgets);
 	
 	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database.
+	 * Evaluates the overall accessibility of the SUT by querying the given graph database
 	 * This method executes oracles in offline evaluation.
 	 * @param graphDB The graph database.
 	 * @return The results of the evaluation.
 	 */
-	EvaluationResults query(GraphDB graphDB);
+	public EvaluationResults query(GraphDB graphDB);
 	
 	/**
-	 * Gets the unique version of the implementation for the guidelines being used.
+	 * Gets the unique version of the implementation for the guidelines being used
 	 * @return The version as a String.
 	 */
-	String getImplementationVersion();
+	public String getImplementationVersion();
 
 }
