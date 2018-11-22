@@ -47,7 +47,7 @@ public class FlashFeedback  extends JDialog implements Runnable {
 
 	private static final long serialVersionUID = -3851564540655407657L;
 
-	private static final int FLASH_DURATION = 1000; // ms	
+	private static int FLASH_DURATION = 1000; // ms	
 	
 	/**
 	 * @param title Non-null and non empty text.
@@ -66,7 +66,8 @@ public class FlashFeedback  extends JDialog implements Runnable {
 		this.setOpacity(0.75f);
 	}
 	
-	public static void flash(String title){
+	public static void flash(String title, int duration){
+		if(duration>1000) FLASH_DURATION = duration;
 		new FlashFeedback(title).run();
 	}
 	

@@ -78,13 +78,13 @@ public class MiscPanel extends JPanel {
     JLabel jLabel20 = new JLabel("Delete Files on SUT Startup:");
     jLabel20.setToolTipText(deleteFiles);
 
-    JButton btnSetOutputDir = new JButton("...");
+    JButton btnSetOutputDir = new JButton("Select");
     btnSetOutputDir.addActionListener(this::btnSetOutputDirActionPerformed);
-    btnSetOutputDir.setEnabled(false);
+    btnSetOutputDir.setEnabled(true);
 
-    JButton btnSetTempDir = new JButton("...");
+    JButton btnSetTempDir = new JButton("Select");
     btnSetTempDir.addActionListener(this::btnSetTempDirActionPerformed);
-    btnSetTempDir.setEnabled(false);
+    btnSetTempDir.setEnabled(true);
 
     GroupLayout gl_jPanelMisc = new GroupLayout(this);
     this.setLayout(gl_jPanelMisc);
@@ -110,8 +110,8 @@ public class MiscPanel extends JPanel {
                                     .addComponent(jLabel16, PREFERRED_SIZE, 393, PREFERRED_SIZE))
                                 .addPreferredGap(RELATED)
                                 .addGroup(gl_jPanelMisc.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnSetOutputDir, PREFERRED_SIZE, 24, PREFERRED_SIZE)
-                                    .addComponent(btnSetTempDir, PREFERRED_SIZE, 24, PREFERRED_SIZE)))
+                                    .addComponent(btnSetOutputDir, PREFERRED_SIZE, 90, PREFERRED_SIZE)
+                                    .addComponent(btnSetTempDir, PREFERRED_SIZE, 90, PREFERRED_SIZE)))
                             .addComponent(jLabel20, PREFERRED_SIZE, 393, PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())

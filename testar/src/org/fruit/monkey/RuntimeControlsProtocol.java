@@ -39,7 +39,30 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
      * Show the flashfeedback in the upperleft corner of the screen
      * @param forward is set in keyDown method
      */
-    private synchronized void nextMode(boolean forward){
+    private synchronized void nextMode() {
+    	switch(mode){
+    	case Record:
+    		mode = Modes.Generate; break;
+    	case Generate:
+    		mode = Modes.Record; break;
+    	default:
+    		break;
+    	}
+
+    	// Add some logging
+    	// Add the FlashFeedback about the mode you are in in the upper left corner.
+    	String modeParamS = "";
+    	if (mode == Modes.Record)
+    		modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
+
+    	String modeNfo = "'" + mode + "' mode active." + modeParamS;
+    	LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
+    	FlashFeedback.flash(modeNfo, 1000);
+    	
+    }
+    
+    //Old code to switch between modes
+    /*private synchronized void nextMode(boolean forward){
         if(forward){
             switch(mode){
                 case Record:
@@ -69,7 +92,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         String modeNfo = "'" + mode + "' mode active." + modeParamS;
         LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
         FlashFeedback.flash(modeNfo);
-    }
+    }*/
 
     /**
      * Set the mode with the given parameter value
@@ -122,12 +145,16 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         }
 
             // SHIFT + ARROW-RIGHT --> go to the next mode
-        else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT))
-            nextMode(true);
+        else if(key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT)) {
+            if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
+            	nextMode();
+        }
 
             // SHIFT + ARROW-LEFT --> go to the previous mode
-        else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT))
-            nextMode(false);
+        else if(key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT)) {
+            if(mode.equals(Modes.Record) || mode.equals(Modes.Generate))
+            	nextMode();
+        }
 
             // SHIFT + ARROW-DOWN --> stop TESTAR run
         else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
