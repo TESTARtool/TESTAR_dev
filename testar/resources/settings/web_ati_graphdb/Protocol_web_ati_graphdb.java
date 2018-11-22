@@ -231,7 +231,6 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 				if (blackListed(widget)) {
 					continue;
 				}
-				System.out.println("Prot => " + title);
 				// left clicks
 				if (whiteListed(widget) || isClickable(widget)) {
 					// Don't allow Testar to test outside domains
@@ -297,8 +296,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 	protected Action selectAction(State state, Set<Action> actions) {
 		Action ac = super.selectAction(state, actions);
 		String[] actekst = Action.getActionRepresentation(ac, "");
-		System.out.println("Prot => Huidige aktie " + actekst[0]);
-
+		
 		// probeer de submit actie te selecteren en te voorkomen;
 		// pilot: zodra login knop wordt gedrukt dan exit(0)
 		// instanceof CompoundAction

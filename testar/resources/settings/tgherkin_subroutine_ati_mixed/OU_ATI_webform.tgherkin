@@ -1,0 +1,24 @@
+  Feature: Open University - A user applies for a master program.
+  
+  Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+
+  Scenario Outline: A user changes his account details again.
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change Voorvoegsel_geboortenaam
+    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+    Step: Change Geboortenaam
+    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Change Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
+   
+    Step: Focus on Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" click(true)
+    Step:  scroll down
+    When  hitKey(VK_PAGE_DOWN)
+    Step: Save entered data
+    When  $Role="UIAButton" and $Title="OPSLAAN" click()
+    
+ Examples: Account data
+|Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
+|TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|

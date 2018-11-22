@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 5
 SequenceLength = 10
 
 #################################################################
@@ -62,7 +62,7 @@ SuspiciousTitles =
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = 
+SuspiciousProcessOutput = (?!x)x
 
 #################################################################
 # Process Logs
@@ -106,31 +106,31 @@ ProtocolClass = tgherkin_subroutine_dtg/Protocol_subroutine_dtg
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl = 
-GraphDBUser = 
-GraphDBPassword = 
+GraphDBUrl = remote:/localhost/TestarDemo2
+GraphDBUser = root
+GraphDBPassword = testar
 
 #################################################################
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
-ReportDerivedGestures = false
+ReportDerivedGestures = true
 Reportstate = false
 SubroutineData = ./resources/settings/tgherkin_subroutine_dtg/subroutineData.csv
 TgherkinDocument = 
 Discount = 0.95
-TgherkinNrOfNOPRetries = 0
-TempDir = resources/output/temp
-MaxTime = 0.0
+TgherkinNrOfNOPRetries = 100
+TempDir = ./resources/output/temp
+MaxTime = 3.1536E7
 StopGenerationOnFault = true
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
-ApplyDefaultOnMismatch = false
+ApplyDefaultOnMismatch = true
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
-ForceForeground = false
+ForceForeground = true
 AlgorithmFormsFilling = false
-GenerateTgherkinReport = false
+GenerateTgherkinReport = true
 FaultThreshold = 1.0E-9
 DrawWidgetInfo = false
 MaxReward = 9999999.0
@@ -144,28 +144,28 @@ ReplayRetryTime = 30.0
 ProcessesToKillDuringTest = 
 ShowSettingsAfterTest = true
 ForceToSequenceLength = false
-OutputDir = resources/output
+OutputDir = ./resources/output
 UnattendedTests = false
 TestGenerator = random
-StartupTime = 0.0
-ActionDuration = 0.0
+StartupTime = 3.0
+ActionDuration = 0.2
 NonReactingUIThreshold = 100
 ContinueToApplyDefault = false
-ConfidenceThreshold = 0.0
-GraphsActivated = false
+ConfidenceThreshold = 0.7
+GraphsActivated = true
 GraphResuming = false
 CopyFromTo = 
-TimeToFreeze = 1.0
+TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 TgherkinExecutionMode = sequential
-TimeToWaitAfterAction = 0.0
+TimeToWaitAfterAction = 0.2
 DrawWidgetUnderCursor = true
-AlwaysCompile = false
-PathToReplaySequence = D:\\testar\\bin\\output\\sequences\\sequence1
+AlwaysCompile = true
+PathToReplaySequence = bin/output/sequences/sequence1
 VisualizeActions = false
-ExplorationSampleInterval = 10
+ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
-RepeatTgherkinScenarios = false
-MinimumPercentageForImageRecognition = 0.0
+RepeatTgherkinScenarios = true
+MinimumPercentageForImageRecognition = 95.0
 OfflineGraphConversion = false

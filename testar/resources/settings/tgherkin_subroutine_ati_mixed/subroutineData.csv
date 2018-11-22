@@ -1,0 +1,3 @@
+https://login.awo.ou.nl/SSO/login|OU_ATI_webform_login.tgherkin|mijn.awo.ou.nl/web/ou/profiel
+mijn.awo.ou.nl/web/ou/profiel|OU_ATI_webform.tgherkin|mijn.awo.ou.nl/web/ou/home
+https://mijn.awo.ou.nl/web/ou/home|OU_ATI_webform_studieaanbod.tgherkin|https://mijn.awo.ou.nl/web/ou/studieaanbod

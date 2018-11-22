@@ -1,4 +1,4 @@
-package tgherkin_subroutine_ati;
+package tgherkin_subroutine_ati_mixed;
 
 import java.io.File;
 import java.util.HashSet;
@@ -8,9 +8,7 @@ import nl.ou.testar.tgherkin.model.SubroutineProxy;
 import nl.ou.testar.tgherkin.protocol.Report;
 import nl.ou.testar.tgherkin.protocol.SubroutineProtocol;
 
-import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Position;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -29,7 +27,7 @@ import org.fruit.monkey.Settings;
  * @author Conny Hageluken
  * @Date October 2018
  */
-public class Protocol_subroutine_ati 
+public class Protocol_subroutine_ati_mixed 
     extends SubroutineProtocol 
     implements SubroutineProxy {
 
@@ -41,17 +39,17 @@ public class Protocol_subroutine_ati
   /**
    * Default constructor.
    */
-  public Protocol_subroutine_ati() {
+  public Protocol_subroutine_ati_mixed() {
     //default constructor
   }
 
   /**
    * State is fulfilling criterion for running a subroutine.
    * Important to define in this method
-     * - setSourceFile: a valid Tgherkin subroutine filename
-     * - setActualIndexSD: index of the actual subroutine
+   * - setSourceFile: a valid Tgherkin subroutine filename
+   * - setActualIndexSD: index of the actual subroutine
    * @param state the SUT's current state
-     * @return state is ready for subroutine action
+   * @return state is ready for subroutine action
    */
   @Override
   public boolean startState(State state) {
@@ -68,9 +66,6 @@ public class Protocol_subroutine_ati
             } catch (Exception e) {
               e.printStackTrace();
             }
-            // report header
-            Report.report(
-                null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
             return true;
           }
         }
@@ -89,7 +84,6 @@ public class Protocol_subroutine_ati
   @Override
   public void startSubroutine(State state) {
     super.initializeDocument();
-//    super.printstartSubroutine(state);
     super.startSubroutine(state);
   }
 
@@ -108,18 +102,11 @@ public class Protocol_subroutine_ati
       for (Widget widget : getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
         if (title.equalsIgnoreCase(getAddressTitle())) {
-          System.out.println("[Protocol_subroutine_ati] widget title: " + title);
-          System.out.println("[Protocol_subroutine_ati] preferred widget shape: Rect [x:439.0 y:58.0 w:856.0 h:37.0]");
-          System.out.println("[Protocol_subroutine_ati] widget shape: " + widget.get(Tags.Shape).toString());
-          action = ac.clickTypeInto(widget, exitUrl);
-          Position p = new AbsolutePosition(867, 76.5);
-          action = ac.clickTypeUrl(p, exitUrl, 54);
+          action = ac.clickTypeUrl(widget, exitUrl);
           action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
           action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-          
           System.out.println("[" + getClass().getSimpleName() 
               + "] Url will be activated (" + title + " " + exitUrl + ")");
-          break;
         }
       }
     } else { 
@@ -130,7 +117,7 @@ public class Protocol_subroutine_ati
           action = ac.leftClickAt(widget);
         }
       } 
-    }   
+    }
     actions.add(action);
     return actions;
   }

@@ -91,10 +91,10 @@ public class Protocol_subroutine_dtg
     super.startSubroutine(state);
   }
 
-  /** Define a set of actions to be taken when switching from the subroutine to TESTAR.
-   * @param state the SUT's current state
-   * @return the available actions
-   */
+  /** Define action to be taken when switching from subroutine to .
+     * @param state the SUT's current state
+   * @return the action to be taken
+    */
   @Override
   public Set<Action> finishState(State state) {
     Set<Action> actions = new HashSet<Action>();
@@ -113,7 +113,7 @@ public class Protocol_subroutine_dtg
   }
 
   /** 
-   * This method is invoked each time after TESTAR finished the generation of a subroutine.
+   * This method is invoked each time after TESTAR finishes the generation of a subroutine.
    */
   @Override
   public void finishSubroutine(State state) {
@@ -121,7 +121,7 @@ public class Protocol_subroutine_dtg
   }
 
   /** 
-   * Called once during the lifetime of TESTAR.
+   * Called once during the life time of TESTAR.
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
    */

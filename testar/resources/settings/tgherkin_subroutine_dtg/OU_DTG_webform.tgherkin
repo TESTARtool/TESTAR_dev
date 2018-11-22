@@ -1,4 +1,4 @@
-  Feature: De Telefoongids
+  Feature: De telefoongids
 
   Scenario Outline: Retrieve phone number of a person.
     Step: Focus on page
@@ -14,4 +14,3 @@
   Examples: Account data
 |naam|adres|
 |Paping|Veldhoven|
- 

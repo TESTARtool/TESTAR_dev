@@ -42,7 +42,7 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
+Sequences = 2
 SequenceLength = 100
 
 #################################################################
@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = testOU/Protocol_testOU
+ProtocolClass = tgherkin_subroutine_ati_mixed/Protocol_subroutine_ati_mixed
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -116,8 +116,8 @@ GraphDBPassword = testar
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = true
 Reportstate = false
-SubroutineData = 
-TgherkinDocument = ./resources/settings/testOU/OU_ATI.tgherkin
+SubroutineData = ./resources/settings/tgherkin_subroutine_ati_mixed/subroutineData.csv
+TgherkinDocument = 
 Discount = 0.95
 TgherkinNrOfNOPRetries = 100
 TempDir = ./resources/output/temp

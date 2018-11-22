@@ -1,22 +1,8 @@
   Feature: Open University - A user applies for a master program.
-
+  
   Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 
-  Background: A user successfully logs on the system.
-    Step: Press log on button
-    When  $Title="Inloggen" and $Role="UIAButton" click()
-    Step: Check whether user is logged on
-    Given $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ATI\Expand.png")
-    When NOP
-
   Scenario Outline: A user changes his account details again.
-    Step: Focus op pagina krijgen
-    When  $Role="UIAText" and $Title="mijnOU" click(true)
-    Step: Scroll down
-    While !state($Role="UIAImage" and ocr() = "LOCI EVIE")
-    When  hitKey(VK_DOWN)
-    Step: Select Mijn Gegevens tile
-    When  $Role="UIAImage" and ocr() = "LOCI EVIE" click(true)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
