@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://www.google.com/"
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "http://1255.vims-alm.com:8081/qcbin/start_a.jsp"
 
 #################################################################
 # Sequences
@@ -49,7 +49,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[cC]lose.*|.*[cC]errar.*|.*[mM]aximi[sz]e.*|.*[mM]aximizar.*|.*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[aA]rchivo.*|.*[mM]inimi[sz]e.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*[lL]ogout.*|.*[tT]ab.*|.*[hH]elp.*
 
 #################################################################
 # Processfilter
@@ -92,6 +92,7 @@ FaultThreshold = 0.000000001
 DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
+ForceToSequenceLength = false
 ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
