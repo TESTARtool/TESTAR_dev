@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "http://1255.vims-alm.com:8081/qcbin/start_a.jsp"
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" ""
 
 #################################################################
 # Sequences
