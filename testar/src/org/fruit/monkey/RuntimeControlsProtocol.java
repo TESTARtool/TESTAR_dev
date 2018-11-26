@@ -31,6 +31,7 @@
 
 package org.fruit.monkey;
 
+import es.upv.staq.testar.EventHandler;
 import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -62,6 +63,10 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
     protected Modes mode;
     private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+
+    public EventHandler initializeEventHandler() {
+    	return new EventHandler(this);
+    }
 
 
     //TODO think how the modes should be implemented

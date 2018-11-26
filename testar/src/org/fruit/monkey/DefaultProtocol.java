@@ -260,7 +260,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         mode = settings.get(ConfigTags.Mode);
 
         //EventHandler is implemented in RuntimeControlsProtocol (super class):
-        eventHandler = new EventHandler(this);
+        eventHandler = initializeEventHandler();
+
         //Initializing Graph Database:
         graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
                 settings.get(ConfigTags.GraphDBUrl),
@@ -336,9 +337,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			system = null;
     		}
     		
+    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+    		    System.out.println(ste);
+    		}*/
+    		
     		if (mode() == Modes.Quit) {
 				stopSystem(system);
 			}
+    		
+    		//Closing TESTAR EventHandler
+            closeTestarTestSession();
     	}
     	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
     	while(startTestarSettingsDialog());
