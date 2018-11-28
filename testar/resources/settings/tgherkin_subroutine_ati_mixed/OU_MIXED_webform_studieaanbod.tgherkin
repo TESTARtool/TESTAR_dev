@@ -3,29 +3,40 @@
   Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 
   Scenario Outline: A user successfully applies for a master program.
+  
+  Step: Remove products from shopping cart (if applicable)
+  While $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\GarbageCan.png")
+  When  $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\GarbageCan.png") click(true)
+  Step: Click close shopping cart button (if applicable)
+  While $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\CloseShoppingCart.png")
+  When  $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\CloseShoppingCart.png") click(true)
+  
   Step: Select Studieaanbod
   When  $Role="UIAText" and $Title="Studieaanbod" click(true)
+  
   Step: Select master mark
   When  $Role="UIACustomControl" and
         $Shape.y = xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.y") and
         $Shape.x < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.x") - 1 and
         $Shape.width < xpathNumber("//widget[Role='UIAText' and starts-with(Title,'Master (')]/Shape.width")
         click(true)
+        
   Step: Search for  a selectable master program
   While !state($Role="UIAButton" and $Title="KIEZEN" and $Enabled)
-  When  !state($Role="UIAText" and $Title="TOON ALLES") hitKey(VK_PAGE_DOWN)
-        !state($UIAHasKeyboardFocus) and
-        !state($Role="UIAText" and $Title="TOON ALLES") and
-        $Role="UIAGroup" and
-        $Shape.y = xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height")
-        click(true)
-        $Role="UIAText" and $Title="TOON ALLES" click(true)
+  When  hitKey(VK_PAGE_DOWN)
+        $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
+        
   Step: Select a master program
   When  $Role="UIAButton" and $Title="KIEZEN" click()
   Step: Select Register (Aanmelden)
+  When  $Role="UIAButton" and $Title="AANMELDEN?" click()
+        NOP !state($Role="UIAButton" and $Title="AANMELDEN?")
+    
+  Step: Search for  a selectable master program
   While !state($Role="UIAComboBox" and $ValuePattern="Maak een keuze")
-  When  $Role="UIAButton" and $Title="AANMELDEN" click()
-        NOP !state($Role="UIAButton" and $Title="AANMELDEN")
+  When  hitKey(VK_DOWN)
+        $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)    
+        
   Step: Visualize country of residence Netherlands list
   When  $Role="UIAComboBox" and $ValuePattern="Maak een keuze" click(true)
   Step: Select yes/no option

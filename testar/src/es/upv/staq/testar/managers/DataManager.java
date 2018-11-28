@@ -62,25 +62,25 @@ public class DataManager {
   public static final String DATA_FILE = "input_values.xml";  
   
   // Widget filter types / data types
-  public static final int WIDGET_ACTION_TABU_FILTER =    Integer.MIN_VALUE;
-  public static final int             WIDGET_ACTION_WHITE_FILTER =   Integer.MIN_VALUE + 1;
-  public static final int             PRIMITIVE_DATA_TYPE_TEXT =    -1;
-  public static final int             PRIMITIVE_DATA_TYPE_NUMBER =  -2;
-  public static final int            ANY_DATA_TYPE =          -427;
-  public static final int            BASIC_DATA_TYPE_DATE =       -13451473;
-  public static final int            BASIC_DATA_TYPE_WEBURL =    -134513313;
-  public static final int             BASIC_DATA_TYPE_EMAIL =      -1345133417;
+  public static final int WIDGET_ACTION_TABU_FILTER  = Integer.MIN_VALUE;
+  public static final int WIDGET_ACTION_WHITE_FILTER = Integer.MIN_VALUE + 1;
+  public static final int PRIMITIVE_DATA_TYPE_TEXT   = -1;
+  public static final int PRIMITIVE_DATA_TYPE_NUMBER = -2;
+  public static final int ANY_DATA_TYPE              = -427;
+  public static final int BASIC_DATA_TYPE_DATE       = -13451473;
+  public static final int BASIC_DATA_TYPE_WEBURL     = -134513313;
+  public static final int BASIC_DATA_TYPE_EMAIL      = -1345133417;
   
   public static LinkedHashMap<String,Integer> DATA_TYPES;
   public static HashMap<Integer,Set<String>> INPUT_VALUES;
   private static Integer[] INPUT_VALUES_ARRAY;
         
-  private static final String XML_TAG_DATA =       "data";
-  private static final String XML_TAG_INPUT =     "input";
-  private static final String XML_ATTRIBUTE_TYPE =   "type";
-  private static final String XML_ATTRIBUTE_DESC =   "desc";
+  private static final String XML_TAG_DATA          = "data";
+  private static final String XML_TAG_INPUT         = "input";
+  private static final String XML_ATTRIBUTE_TYPE    = "type";
+  private static final String XML_ATTRIBUTE_DESC    = "desc";
   private static final String XML_ATTRIBUTE_EXAMPLE = "example";
-  private static final String XML_ATTRIBUTE_VALUE =   "value";
+  private static final String XML_ATTRIBUTE_VALUE   = "value";
     
   private DocumentBuilderFactory docFactory;
   private DocumentBuilder docBuilder;  

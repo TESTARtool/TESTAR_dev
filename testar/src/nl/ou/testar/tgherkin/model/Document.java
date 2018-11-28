@@ -28,7 +28,7 @@ public class Document {
    */
   public Document(List<Feature> features) {
     Assert.notNull(features);
-    this.features = Collections.unmodifiableList(features);
+    this.features = features;
     index = -1;
   }
 
@@ -41,6 +41,14 @@ public class Document {
   }
 
   /**
+   * Retrieve index of current Feature.
+   * @return index of current Feature
+   */  
+  public int getIndex() {
+	return index;
+}
+
+/**
    * Set features.
    * @param features list of features
    */

@@ -550,9 +550,9 @@ public class SubroutinePanel extends JPanel {
       loader = new URLClassLoader(classPath);
 
       @SuppressWarnings("unchecked")
+      Class claszz = loader.loadClass(protocolClass.replace("/", "."));
       UnProc<Settings> protocol = 
-          (UnProc<Settings>) loader.loadClass(protocolClass.replace("/", "."))
-          .getConstructor().newInstance();
+          (UnProc<Settings>) claszz.getConstructor().newInstance();
       if (SubroutineProtocol.class.isAssignableFrom(protocol.getClass())) {
         subroutineProtocol = true;
       }

@@ -42,7 +42,9 @@ import org.fruit.FruitException;
 import org.fruit.alayer.Point;
 
 public final class AWTMouse implements Mouse {
-	public static AWTMouse build() throws FruitException{ return new AWTMouse(); }
+	public static AWTMouse build() throws FruitException{ 
+		return new AWTMouse(); 
+	}
 	private final Robot robot;
 
 	private AWTMouse() throws FruitException{
@@ -53,11 +55,14 @@ public final class AWTMouse implements Mouse {
 		}
 	}
 
-	public String toString() { return "AWT Mouse"; }
+	public String toString() { 
+		return "AWT Mouse"; 
+	}
 
 	public void press(MouseButtons k) { 
 		//System.out.println("lc down [AWTMouse]");
-		robot.mousePress(k.code());}
+		robot.mousePress(k.code());
+	}
 
 	public void release(MouseButtons k) { 
 		//System.out.println("lc up [AWTMouse]");

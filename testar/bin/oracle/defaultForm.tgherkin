@@ -27,7 +27,6 @@
     When  hitKey(VK_DOWN)
     Step: Select Mijn Gegevens tile
     When  $Role="UIAImage" and ocr() = "LOCI EVIE" click(true)
-    
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
@@ -47,19 +46,19 @@
     While !state($Role="UIAComboBox" and $ValuePattern="Achternaam - Partnernaam")
     When  hitKey(VK_A)    
     Step: Select Naamweergave
-    When  hitKey()
+    When  hitKey(<Naamweergave>)
     Step: Remove list elements from screen
     When  hitKey(VK_ESCAPE)
       
     Step: Scroll to OPSLAAN button
     While !state($Role="UIAButton" and $Title="OPSLAAN")
-    When  $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
-          hitKey(VK_DOWN)
-
+    When  hitKey(VK_DOWN)
+          $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
+    
     Step: Change Geboortedatum
     When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Change Geboorteplaats
-    When  $Title="Geboorteplaats" and $Role="UIAEdit" type()
+    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
     Step: Visualize geslacht list
     When  $Role="UIAComboBox" and xpath("//widget[Title='Geslacht']//widget") click(true)
     Step: Select Geslacht
@@ -74,7 +73,6 @@
     When  hitKey(VK_ESCAPE)
     Step: Save entered data
     When  $Role="UIAButton" and $Title="OPSLAAN" click()
-          $Role="UIAButton" and $Title="SAVE" click()
     
     Step: Expand user
     When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
@@ -85,6 +83,4 @@
     
  Examples: Account data
 |Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
-|AREM || Weijling|Adri || |VK_A|02-07-1963|Druten|VK_M|VK_N|
 |TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|
-|CCM || Paping|Conny || |VK_A|27-11-1961|Valkenswaard|VK_V|VK_E|

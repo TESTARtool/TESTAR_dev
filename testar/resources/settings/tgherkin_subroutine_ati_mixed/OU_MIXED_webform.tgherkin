@@ -26,11 +26,10 @@
     Step: Remove list elements from screen
     When  hitKey(VK_ESCAPE)
       
-    Step: Focus on Naamweergave titel
-    When  $Role="UIAText" and $Title="Naamweergave" click(true)
-    Step: Scroll down naar Taal titel
-    While !state($Role="UIAText" and ocr() = "Taal")
-    When  hitKey(VK_DOWN) 
+    Step: Scroll to OPSLAAN button
+    While !state($Role="UIAButton" and $Title="OPSLAAN")
+    When  hitKey(VK_DOWN)
+          $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
     
     Step: Change Geboortedatum
     When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
@@ -48,11 +47,6 @@
     When  hitKey(<Taal>)
     Step: Remove list elements from screen
     When  hitKey(VK_ESCAPE)
-    
-    Step: Focus on Roepnaam
-    When  $Title="Roepnaam" and $Role="UIAEdit" click(true)
-    Step:  scroll down
-    When  hitKey(VK_PAGE_DOWN)
     Step: Save entered data
     When  $Role="UIAButton" and $Title="OPSLAAN" click()
     

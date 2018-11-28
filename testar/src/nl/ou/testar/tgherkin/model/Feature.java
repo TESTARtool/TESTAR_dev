@@ -28,7 +28,7 @@ public class Feature {
   private final List<ConditionalGesture> selection; 
   private final WidgetTreeCondition oracle; 
   private final Background background;
-  private final List<ScenarioDefinition> scenarioDefinitions;
+  private List<ScenarioDefinition> scenarioDefinitions;
   private int index;
   
   private boolean backgroundRun;
@@ -57,7 +57,7 @@ public class Feature {
     this.selection = Collections.unmodifiableList(selection);
     this.oracle = oracle;
     this.background = background; 
-    this.scenarioDefinitions = Collections.unmodifiableList(scenarioDefinitions);
+    this.scenarioDefinitions = scenarioDefinitions;
     index = -1;
   }
 
@@ -115,6 +115,31 @@ public class Feature {
    */
   public List<ScenarioDefinition> getScenarioDefinitions() {
     return scenarioDefinitions;
+  }
+
+  /**
+   * Set scenario definitions.
+   * @param scenarioDefinitions list of scenario definitions 
+   */
+ 
+  public void setScenarioDefinitions(List<ScenarioDefinition> scenarioDefinitions) {
+    this.scenarioDefinitions = scenarioDefinitions;
+  }
+
+  /**
+   * Retrieve index of current ScenarioDefinition.
+   * @return index of current ScenarioDefinition 
+   */
+  public int getIndex() {
+    return index;
+  }
+
+  /**
+   * Set index of current ScenarioDefinition.
+   * @param index of current ScenarioDefinition 
+   */
+  public void setIndex(int index) {
+    this.index = index;
   }
 
   /**

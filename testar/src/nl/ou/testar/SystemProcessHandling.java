@@ -21,7 +21,8 @@ public class SystemProcessHandling {
      */
     public static List<ProcessInfo> getRunningProcesses(String debugTag){
         List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
-        long pid, handle; String desc;
+        long pid, handle; 
+        String desc;
         List<SUT> runningP = NativeLinker.getNativeProcesses();
         System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
         int i = 1;

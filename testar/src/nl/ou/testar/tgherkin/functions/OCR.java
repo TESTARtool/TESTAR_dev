@@ -37,7 +37,7 @@ import org.fruit.alayer.Widget;
 public class OCR {
 
   private int teller = 0;
-  
+  private boolean print = false;
   /**
    * Tesseract OCR data path.
    */
@@ -150,13 +150,15 @@ public class OCR {
           widgetShot.image().getColorModel().getColorSpace(),
           grayImage.getColorModel().getColorSpace(),null);
       op.filter(widgetShot.image(),grayImage);
-      try {        
-     //   teller++;
-     //   File f = new File("ocr_res" + teller + ".png");
-     //   ImageIO.write(grayImage, "png", f);
-        result = getOCR(grayImage);
-     //   System.out.println("[OCR temp " + teller + "] " + result);
-
+      try { 
+    	result = getOCR(grayImage);
+        if (print) {   
+          teller++;
+          File f = new File("ocr_res" + teller + ".png");
+          ImageIO.write(grayImage, "png", f);
+          
+          System.out.println("[OCR temp " + teller + "] " + result);
+        }
       } catch (Throwable t) {
         LogSerialiser.log(t.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
       }

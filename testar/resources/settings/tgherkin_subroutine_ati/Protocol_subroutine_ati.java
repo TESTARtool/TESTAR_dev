@@ -88,8 +88,6 @@ public class Protocol_subroutine_ati
    */
   @Override
   public void startSubroutine(State state) {
-    super.initializeDocument();
-//    super.printstartSubroutine(state);
     super.startSubroutine(state);
   }
 

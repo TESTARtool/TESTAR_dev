@@ -27,10 +27,11 @@ Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widg
     When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
     Step: Focus on Roepnaam
     When  $Title="Roepnaam" and $Role="UIAEdit" click(true)
-    Step:  scroll down
+    Step: scroll down
     When  hitKey(VK_PAGE_DOWN)
     Step: Save entered data
     When  $Role="UIAButton" and $Title="OPSLAAN" click()
+          $Role="UIAButton" and $Title="SAVE" click()
     Step: Expand user
     Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen."
     When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)

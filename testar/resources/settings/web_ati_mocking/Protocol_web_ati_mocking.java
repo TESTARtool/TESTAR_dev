@@ -259,8 +259,8 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
         action = ac.clickTypeUrl(widget, mockUrl);
         action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
         action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-        System.out.println("[" + getClass().getSimpleName() 
-            + "] Url wordt geactiveerd (" + title + "; " + mockUrl + ")");
+        // temp System.out.println("[" + getClass().getSimpleName() 
+        // temp     + "] Url wordt geactiveerd (" + title + "; " + mockUrl + ")");
         toBeMocked = false;
       }
     }
@@ -294,23 +294,24 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
     }
 
     // iterate through all (top) widgets
-    StdActionCompiler ac = new UrlActionCompiler();
+    UrlActionCompiler ac = new UrlActionCompiler();
     
     for (Widget widget : getTopWidgets(state)) {
-      String title = widget.get(Tags.Title, null);
+      String title = widget.get(Tags.Title, null).toString();
       String role = widget.get(Tags.Role).toString();
-
+      System.out.println("[mocking] hier komen we wel " + title);
+      
       // only consider enabled and non-blocked widgets
       if (widget.get(Enabled, true) && !widget.get(Blocked, false)
-        && ((MOCK_ACTION_TITLE.equalsIgnoreCase(title) && !toBeMocked)
-          || ("UIAButton".equals(role) 
-            && PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) 
-            && toBeMocked))) {
+    	  && ((PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) 
+    		   && "UIAButton".equals(role) && toBeMocked) 
+              ||(MOCK_ACTION_TITLE.equalsIgnoreCase(title) && !toBeMocked))) {
 
         // do not build actions for tabu widget
         if (blackListed(widget)) {
           continue;
         }
+        System.out.println("[mocking] " + title);
 
         // left clicks
         if (whiteListed(widget) || isClickable(widget)) {
@@ -379,15 +380,15 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
        // optional mock actions
     if (toBeMocked) {
       if (preventByMock(state, action, PREVENT_BY_MOCK_TITLE)) {
-        System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
+        // temp System.out.println("[" + getClass().getSimpleName() + "] Mock actie wordt uitgevoerd");
         action = rerouteByUrl(state, MOCK_URL);
       }
     } else {
       if (preventByMock(state, action, MOCK_ACTION_TITLE)) {
-        System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
+        // temp System.out.println("[" + getClass().getSimpleName() + "] Return actie wordt geactiveerd");
       }
     }
-    System.out.println(action.toShortString());
+    // temp System.out.println(action.toShortString());
     return action;
   }
 

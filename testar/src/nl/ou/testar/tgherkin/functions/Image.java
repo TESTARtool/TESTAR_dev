@@ -31,7 +31,8 @@ import nl.ou.testar.tgherkin.model.ProtocolProxy;
  */
 public class Image {
 	private int teller = 0;
-
+    private boolean print = false;
+    
 	private static final double TOLERANCE = 5E-16;
 	private static Image image = new Image();
 	private boolean invalidSikuliXInstallation;
@@ -74,7 +75,9 @@ public class Image {
 	 * @return true if recognized, otherwise false
 	 */
 	public boolean isRecognized(ProtocolProxy proxy, Widget widget, String imageFile){
-		return (imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+      boolean test =
+		(imageRecognition(proxy, widget, imageFile) - proxy.getSettings().get(ConfigTags.ConfidenceThreshold) >= - TOLERANCE);
+        return test;
 	}
 
 	/**
@@ -110,6 +113,10 @@ public class Image {
 			if (!actionArea.isEmpty()) {
 				AWTCanvas widgetShot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),
 						 AWTCanvas.StorageFormat.PNG, 1);
+				if (print) {
+				  File f = new File("image_" + (teller++) + ".png");
+				  ImageIO.write(widgetShot.image(), "png", f);
+				}
 				if (!invalidSikuliXInstallation) {
 					// SikuliX image recognition 
 					confidence = imageRecognition(proxy, refShot.image(), widgetShot.image());

@@ -454,7 +454,9 @@ public class DefaultProtocol extends AbstractProtocol {
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
 		Assert.hasText(windowTitle);
 		List<SUT> suts = null;
-		State state; Role role; String title;
+		State state; 
+		Role role; 
+		String title;
 		long now = System.currentTimeMillis();
 		final double MAX_ENGAGE_TIME = Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
 		do{
@@ -977,7 +979,7 @@ public class DefaultProtocol extends AbstractProtocol {
 
 	protected boolean runAction(Canvas cv, SUT system, State state, Taggable fragment){
 		long tStart = System.currentTimeMillis();
-		LOGGER.info("[RA] start runAction");
+		// temp LOGGER.info("[RA] start runAction");
 		ActionStatus actionStatus = new ActionStatus();
 
 		if (mode() == Modes.GenerateManual)
@@ -1032,10 +1034,10 @@ public class DefaultProtocol extends AbstractProtocol {
 				sutRAMbase = memUsage;
 			if (memUsage - sutRAMbase > sutRAMpeak)
 				sutRAMpeak = memUsage - sutRAMbase;
-			long currentCPU[] = NativeLinker.getCPUsage(system),
-					userms = currentCPU[0] - lastCPU[0],
-					sysms = currentCPU[1] - lastCPU[1],
-					cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
+			long currentCPU[] = NativeLinker.getCPUsage(system);
+			long userms = currentCPU[0] - lastCPU[0];
+			long sysms = currentCPU[1] - lastCPU[1];
+			long cpuUsage[] = new long[]{ userms, sysms, currentCPU[2]}; // [2] = CPU frame
 			lastCPU = currentCPU;
 			if (isTestAction)
 				Grapher.notify(state,state.get(Tags.ScreenshotPath, null),
@@ -1108,7 +1110,7 @@ public class DefaultProtocol extends AbstractProtocol {
 		} else {
 			graphDB.addAction( lastExecutedAction, newState.get(Tags.ConcreteID));
 		}
-		LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
+		// temp LOGGER.info("[RA] runAction finished in {} ms",System.currentTimeMillis()-tStart);
 		if(mode() == Modes.Quit) return actionStatus.isProblems();
 		if(!actionStatus.isActionSucceeded()){
 			return true;
@@ -1242,7 +1244,7 @@ public class DefaultProtocol extends AbstractProtocol {
 					if(mode() == Modes.Spy) {
 						spyTime = System.currentTimeMillis();
 						runSpy(system);
-						LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
+						// temp LOGGER.info("[RA] User swap to Spy Mode {} ms",System.currentTimeMillis()-spyTime);
 					}
 
 					if (problems)
@@ -1348,7 +1350,8 @@ public class DefaultProtocol extends AbstractProtocol {
 				if (reportPages == null)
 					LogSerialiser.log("NULL report pages\n", LogSerialiser.LogLevel.Critical);
 				LogSerialiser.log("Exception <" + e.getMessage() + "> has been caught\n", LogSerialiser.LogLevel.Critical); // screenshots must be serialised
-				int i=1; StringBuffer trace = new StringBuffer();
+				int i=1; 
+				StringBuffer trace = new StringBuffer();
 				for(StackTraceElement t : e.getStackTrace())
 					trace.append("\n\t[" + i++ + "] " + t.toString());
 				System.out.println("Exception <" + e.getMessage() + "> has been caught; Stack trace:" + trace.toString());

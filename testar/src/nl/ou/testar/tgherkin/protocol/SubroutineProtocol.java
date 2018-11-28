@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
@@ -19,7 +20,6 @@ import nl.ou.testar.tgherkin.model.Feature;
 import nl.ou.testar.tgherkin.model.ProtocolProxy;
 import nl.ou.testar.tgherkin.model.ScenarioDefinition;
 import nl.ou.testar.tgherkin.model.ScenarioOutline;
-import nl.ou.testar.tgherkin.model.TableRow;
 import nl.ou.testar.utils.report.Reporter;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -96,6 +96,12 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   private String protocolFolder = "";
 
   /*
+  * Reference to the folder of the actual protocol Class
+  * Tags MyClassPath + ProtocolClass
+  */
+  private String defaultFolder = "";
+
+  /*
    *  ActiveMode is Generate/GenerateDebug when in TESTAR Mode
    */
   private Modes activeMode;
@@ -153,6 +159,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     super.initialize(settings);
     protocolFolder = settings.get(ConfigTags.MyClassPath).get(0) + "/"
         + settings.get(ConfigTags.ProtocolClass).split("/")[0];
+    defaultFolder = settings.get(ConfigTags.MyClassPath).get(0);
     activeMode = mode();
   }
 
@@ -193,12 +200,16 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    *
    */
   protected void initializeDocument() {
+    if (sourceFile == null) {
+      setSourceFile(defaultFolder + "/defaultForm.tgherkin");
+    }
     try {
       sourceCode = Utils.readTgherkinSourceFile(sourceFile);
       subroutine = Utils.getDocument(sourceCode);
     } catch (Exception e) {
       e.printStackTrace();
-    }
+    } 
+
     // report header
     Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
   }
@@ -211,21 +222,74 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     return (activeMode == Modes.Generate || activeMode == Modes.GenerateDebug)
         && subroutine != null;
   }
-
+  
   /**
    * State is fulfilling criterion for running a subroutine.
    * @param state the SUT's current state
    * @return state is ready for subroutine action
    */
   protected boolean startState(State state) {
-    return false;
+    int tekstboxes = 0;
+    for (Widget widget : getTopWidgets(state)) {
+      String role = widget.get(Tags.Role, null).toString();
+      if (role.equalsIgnoreCase("UIAEdit")) {
+        tekstboxes++;
+      }
+    }
+    System.out.println("[" + getClass().getSimpleName() + "]  " + (tekstboxes > 5));
+    return tekstboxes > 5;
   }
 
+  /**
+   * This method is invoked each time TESTAR starts with a Feature.
+   * The used data line is randomly picked.
+   * @param state the SUT's current state
+   */
+  protected void shuffleSubroutine(State state) {
+    // Document           => List<Feature>            => index fiI 
+    // Feature            => List<ScenarioDefinition> => index siI
+    // ScenarioDefinition => List<Step>               =>            
+    // ScenarioOutline    => Examples                 => DataTable
+    // DataTable          => list<tableRows>          => index = 1
+      
+    List<Feature> features = subroutine.getFeatures();
+    int fiI = 0;
+    System.out.println("[SubroutineProtocol temp] index Feature list: " + fiI);
+    Feature currentFeature = features.get(0);
+    
+    List<ScenarioDefinition> scenarios = currentFeature.getScenarioDefinitions();
+    int siI = 0;
+    System.out.println("[SubroutineProtocol temp] index ScenarioDefinition list: " + siI);
+    ScenarioDefinition currentScenario = scenarios.get(0);
+    if (currentScenario instanceof ScenarioOutline) {
+      Examples currentExamples = ((ScenarioOutline) currentScenario).getExamples();
+      DataTable currentDataTable = currentExamples.getDataTable();
+      
+      // Set indices to initial values
+      // DataTable <= list<tableRows>
+      currentDataTable.shuffle();
+      
+      // ScenarioOutline <= Examples <= DataTable
+      currentExamples.setDataTable(currentDataTable);
+      ((ScenarioOutline) currentScenario).setExamples(currentExamples);
+      
+      // Feature <= List<ScenarioDefinition>
+      scenarios.set(siI, currentScenario);
+      currentFeature.setScenarioDefinitions(scenarios);
+      
+      // Document <= List<Feature>
+      features.set(fiI, currentFeature);
+      subroutine.setFeatures(features);
+    }
+  }
+ 
   /**
    * This method is invoked each time TESTAR starts to generate a new subroutine.
    * @param state the SUT's current state
    */
   protected void startSubroutine(State state) {
+    initializeDocument();
+    shuffleSubroutine(state);
     subroutine.beginSequence();
   }
 
@@ -235,7 +299,20 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @return the available actions
   */
   protected Set<Action> finishState(State state) {
-    return null;
+    Set<Action> actions = new HashSet<Action>();
+    Action action = null;
+    UrlActionCompiler ac = new UrlActionCompiler();
+    for (Widget widget : getTopWidgets(state)) {
+      String title = widget.get(Tags.Title, null);
+      if (title.equalsIgnoreCase(getAddressTitle())) {
+        action = ac.clickTypeUrl(widget, "google.nl");
+        action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
+        action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
+        System.out.println("[" + getClass().getSimpleName() 
+            + "] Url will be activated (" + title + " " + "google.nl" + ")");
+      }
+    }
+    return actions;
   }
 
   /**

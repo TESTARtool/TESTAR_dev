@@ -53,6 +53,8 @@ public class Protocol_subroutine_ati_mixed
    */
   @Override
   public boolean startState(State state) {
+    boolean startState = super.startState(state);
+    /*
     for (Widget widget : getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null).toString();
       if (title.equalsIgnoreCase(getAddressTitle())) {
@@ -70,9 +72,10 @@ public class Protocol_subroutine_ati_mixed
           }
         }
         break;
-      }
+      }    
     }
-    return false;
+    */
+    return startState;
   }
 
   /**
@@ -83,7 +86,6 @@ public class Protocol_subroutine_ati_mixed
    */
   @Override
   public void startSubroutine(State state) {
-    super.initializeDocument();
     super.startSubroutine(state);
   }
 
