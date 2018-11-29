@@ -11,9 +11,9 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -401,9 +401,13 @@ public class WdDriver extends SUTBase
         waitCanvasReady(true);
         return webDriver.executeScript(script, args);
       }
+      // At the end of the sequence the browser is already closed
+      if (wde.getMessage().contains("target window already closed")) {
+        return null;
+      }
 
       // Unknown error occurred
-      return null;
+      throw wde;
     }
   }
 

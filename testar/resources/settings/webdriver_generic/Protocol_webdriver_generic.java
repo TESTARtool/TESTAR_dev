@@ -21,13 +21,17 @@
  *  @author Govert Buijs
  */
 
+import actions.WdAttributeAction;
+import actions.WdSubmitAction;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
+import org.fruit.Pair;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
@@ -40,10 +44,8 @@ import org.fruit.monkey.Settings;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -54,7 +56,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollThick;
 public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
-      "list__item__title");
+      "v-menubar-menuitem", "v-menubar-menuitem-caption");
 
   // Disallow links and pages with these extensions
   private static List<String> deniedExtensions = Arrays.asList(
@@ -63,12 +65,18 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
   // To ignore this feature, set to null.
-  private static List<String> domainsAllowed = Arrays.asList(
-      "www.ou.nl");
+  private static List<String> domainsAllowed =
+      Arrays.asList("mijn.awo.ou.nl", "login.awo.ou.nl");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
   private static boolean followLinks = true;
+
+  // URL + form name, username input id + value, password input id + value
+  Pair<String, String> login = Pair.from(
+      "https://login.awo.ou.nl/SSO/login", "OUinloggen");
+  Pair<String, String> username = Pair.from("username", "");
+  Pair<String, String> password = Pair.from("password", "");
 
   /**
    * Called once during the life time of TESTAR
@@ -178,7 +186,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     }
 
     // Check if forced actions are needed to stay within allowed domains
-    Set<Action> forcedActions = detectForcedActions();
+    Set<Action> forcedActions = detectForcedActions(state);
     if (forcedActions != null && forcedActions.size() > 0) {
       return forcedActions;
     }
@@ -220,7 +228,52 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /*
    * Check the state if we need to force an action
    */
-  private Set<Action> detectForcedActions() {
+  private Set<Action> detectForcedActions(State state) {
+    Set<Action> actions = detectForcedActionsUrl();
+    if (actions != null && actions.size() > 0) {
+      return actions;
+    }
+
+    actions = detectForcedLogin(state);
+    if (actions != null && actions.size() > 0) {
+      return actions;
+    }
+
+    return null;
+  }
+
+  /*
+   * Detect and perform login if defined
+   */
+  private Set<Action> detectForcedLogin(State state) {
+    // Check if the current page is a login page
+    String currentUrl = WdDriver.getCurrentUrl();
+    if (currentUrl.startsWith(login.left())) {
+      CompoundAction.Builder builder = new CompoundAction.Builder();
+      // Set username and password
+      for (Widget widget : state) {
+        WdWidget wdWidget = (WdWidget) widget;
+        if (username.left().equals(wdWidget.getAttribute("id"))) {
+          builder.add(new WdAttributeAction(
+              username.left(), "value", username.right()), 1);
+        }
+        else if (password.left().equals(wdWidget.getAttribute("id"))) {
+          builder.add(new WdAttributeAction(
+              password.left(), "value", password.right()), 1);
+        }
+      }
+      // Submit form
+      builder.add(new WdSubmitAction(login.right()), 1);
+      return new HashSet<>(Collections.singletonList(builder.build()));
+    }
+
+    return null;
+  }
+
+  /*
+   * Force back action due to disallowed domain or extension
+   */
+  private Set<Action> detectForcedActionsUrl() {
     String currentUrl = WdDriver.getCurrentUrl();
 
     // Don't get caught in a PDFs etc. and non-whitelisted domains
