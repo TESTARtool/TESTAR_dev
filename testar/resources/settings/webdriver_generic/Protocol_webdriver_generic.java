@@ -66,7 +66,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   // An empty list will be filled with the domain from the sut connector
   // To ignore this feature, set to null.
   private static List<String> domainsAllowed =
-      Arrays.asList("mijn.awo.ou.nl", "login.awo.ou.nl");
+      Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
