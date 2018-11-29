@@ -31,6 +31,10 @@ public class WdWidget implements Widget, Serializable {
     }
   }
 
+  public String getAttribute (String key) {
+    return element.attributeMap.get(key);
+  }
+
   final public void moveTo(Widget p, int idx) {
     root.setParent(this, p, idx);
   }

@@ -221,11 +221,11 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions() {
-    String currentURL = WdDriver.getCurrentUrl();
+    String currentUrl = WdDriver.getCurrentUrl();
 
     // Don't get caught in a PDFs etc. and non-whitelisted domains
     Set<Action> actions = new HashSet<>();
-    if (isUrlDenied(currentURL) || isExtensionDenied(currentURL)) {
+    if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
       // If opened in new tab, close it, else go back
       if (WdDriver.getWindowHandles().size() > 1) {
         actions.add(NativeLinker.getWdCloseTabAction());
@@ -241,14 +241,14 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /*
    * Check if the current address has a denied extension (PDF etc.)
    */
-  private boolean isExtensionDenied(String currentURL) {
+  private boolean isExtensionDenied(String currentUrl) {
     // If the current page doesn't have an extension, always allow
-    if (!currentURL.contains(".")) {
+    if (!currentUrl.contains(".")) {
       return false;
     }
 
     // Deny if the extension is in the list
-    String ext = currentURL.substring(currentURL.lastIndexOf(".") + 1);
+    String ext = currentUrl.substring(currentUrl.lastIndexOf(".") + 1);
     ext = ext.replace("/", "").toLowerCase();
     return deniedExtensions.contains(ext);
   }
@@ -352,12 +352,12 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
            shape.y() > 0 && shape.y() + shape.height() < CanvasDimensions.getInnerHeight();
   }
 
-  protected boolean isClickable(Widget w) {
-    Role role = w.get(Tags.Role, Roles.Widget);
+  protected boolean isClickable(Widget widget) {
+    Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
       // Input type are special...
       if (!role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) w).element.type;
+        String type = ((WdWidget) widget).element.type;
         if (WdRoles.clickableInputTypes().contains(type)) {
           return true;
         }
@@ -365,7 +365,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return true;
     }
 
-    WdElement element = ((WdWidget) w).element;
+    WdElement element = ((WdWidget) widget).element;
     if (element.isClickable) {
       return true;
     }
@@ -375,12 +375,12 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     return clickSet.size() > 0;
   }
 
-  protected boolean isTypeable(Widget w) {
-    Role role = w.get(Tags.Role, Roles.Widget);
+  protected boolean isTypeable(Widget widget) {
+    Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
       // Input type are special...
       if (role.equals(WdRoles.WdINPUT)) {
-        String type = ((WdWidget) w).element.type;
+        String type = ((WdWidget) widget).element.type;
         return WdRoles.typeableInputTypes().contains(type);
       }
       return true;

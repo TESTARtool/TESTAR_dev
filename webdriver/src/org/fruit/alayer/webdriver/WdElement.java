@@ -19,13 +19,11 @@ public class WdElement implements Serializable {
   private static final List<String> focusableTags = Arrays.asList(
       "input", "select", "textarea", "a", "button", "area");
 
-  // TODO Access
   List<WdElement> children = new ArrayList<>();
   WdElement parent;
   WdRootElement root;
   WdWidget backRef;
 
-  // TODO These might need to be fetched
   public boolean blocked;
   long culture = 0L;
   boolean isModal = false; // i.c.w. access key
@@ -54,29 +52,33 @@ public class WdElement implements Serializable {
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
 
+  public Map<String, String> attributeMap;
+
   @SuppressWarnings("unchecked")
   public WdElement(Map<String, Object> packedElement,
                    WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
-    id = (String) packedElement.get("id");
+    attributeMap = (Map<String, String>) packedElement.get("attributeMap");
+
+    id = attributeMap.getOrDefault("id", "");
     name = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
     textContent = ((String) packedElement.get("textContent"))
           .replaceAll("\\s+", " ").trim();
-    helpText = (String) packedElement.get("title");
-    valuePattern = (String) packedElement.getOrDefault("href", "");
+    helpText = attributeMap.get("title");
+    valuePattern = attributeMap.getOrDefault("href", "");
     if (valuePattern == null || valuePattern.equals("")) {
       valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
     }
 
-    String tmp = (String) packedElement.getOrDefault("cssClasses", "");
-    if (tmp != null) {
-      cssClasses.addAll(Arrays.asList(tmp.split(" ")));
+    String classesString = attributeMap.getOrDefault("class", "");
+    if (classesString != null) {
+      cssClasses = Arrays.asList(classesString.split(" "));
     }
     display = (String) packedElement.get("display");
-    type = (String) packedElement.get("type");
+    type = attributeMap.get("type");
 
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
@@ -85,10 +87,8 @@ public class WdElement implements Serializable {
     blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");
     isKeyboardFocusable = getIsFocusable();
-    // TODO Check if this works
     hasKeyboardFocus = (Boolean) packedElement.get("hasKeyboardFocus");
 
-    // TODO Also check for clickable / writeable
     enabled = !Constants.hiddenTags.contains(tagName);
     if (display != null && display.toLowerCase().equals("none")) {
       enabled = false;
@@ -124,7 +124,7 @@ public class WdElement implements Serializable {
   }
 
   public boolean getIsFocusable() {
-    // TODO It's much more complex than this
+    // It's much more complex than this
     // https://allyjs.io/data-tables/focusable.html#document-elements
     // https://allyjs.io/tests/focusable/test.html
     // https://gist.github.com/jamiewilson/c3043f8c818b6b0ccffd

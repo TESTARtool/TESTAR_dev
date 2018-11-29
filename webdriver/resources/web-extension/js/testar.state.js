@@ -76,16 +76,13 @@ function wrapElementTestar(element) {
     return {
         element: element,
 
-        id: element.getAttribute("id"),
+        attributeMap: getAttributeMapTestar(element),
+
         name: getNameTestar(element),
         tagName: element.tagName.toLowerCase(),
         textContent: "",
-        title: element.getAttribute("title"),
         value: element.value,
-        href: element.getAttribute("href"),
-        cssClasses: element.getAttribute("class"),
         display: computedStyle.getPropertyValue('display'),
-        type: element.getAttribute("type"),
 
         zIndex: getZIndexTestar(element),
         rect: getRectTestar(element),
@@ -162,8 +159,8 @@ function getDimensionsTestar(element) {
         overflowY: style.getPropertyValue('overflow-y'),
         clientWidth: element.clientWidth,
         clientHeight: element.clientHeight,
-        offsetWidth: element.offsetWidth,
-        offsetHeight: element.offsetHeight,
+        offsetWidth: element.offsetWidth || 0,
+        offsetHeight: element.offsetHeight || 0,
         scrollWidth: element.scrollWidth,
         scrollHeight: element.scrollHeight,
         scrollLeft: scrollLeft,
@@ -207,4 +204,11 @@ function getLabelMapTestar() {
             labelMap[item.getAttribute("for")] = item.textContent;
         }
     }
+}
+
+function getAttributeMapTestar(element) {
+    return Array.from(element.attributes).reduce(function(map, att) {
+        map[att.name] = att.nodeValue;
+        return map;
+    }, {});
 }
