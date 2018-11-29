@@ -229,7 +229,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		System.out.println("Adding missing actions with SikuliX image recognition");
-		if(textExistsOnScreen("Operator")&&(textExistsOnScreen("Machine")&&(textExistsOnScreen("Stand"){
+		if(textExistsOnScreen("Operator")&&(textExistsOnScreen("Machine")&&(textExistsOnScreen("Stand")))){
 			actions.add(new SikulixClickOnText("Operator"));
 			actions.add(new SikulixClickOnText("Machine"));
 			actions.add(new SikulixClickOnText("Stand"));
@@ -294,7 +294,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 						//TODO skip following actions: drag action
 						else{
 							//Store the widget in the Graphdatabase
-							storeWidget(state.get(Tags.ConcreteID), w);
+//							storeWidget(state.get(Tags.ConcreteID), w);
 							//Create a left click action with the Action Compiler, and add it to the set of derived actions
 							return(ac.leftClickAt(w));
 						}
@@ -309,7 +309,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 				// We want to create actions that consist of typing into them
 				if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 					//Store the widget in the Graphdatabase
-					storeWidget(state.get(Tags.ConcreteID), w);
+//					storeWidget(state.get(Tags.ConcreteID), w);
 					//Create a type action with the Action Compiler, and add it to the set of derived actions
 					return(ac.clickTypeInto(w, this.getRandomText(w)));
 				}
@@ -349,7 +349,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			//For each possible drag, create an action and add it to the derived actions
 			for (Drag drag : drags){
 				//Store the widget in the Graphdatabase
-				storeWidget(state.get(Tags.ConcreteID), w);
+//				storeWidget(state.get(Tags.ConcreteID), w);
 				//Create a slide action with the Action Compiler, and add it to the set of derived actions
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
