@@ -2,21 +2,18 @@ LIBS= ole32.lib user32.lib comsuppw.lib oleaut32.lib comctl32.lib gdi32.lib Msim
 
 INCLUDES= /I "$(JAVA_HOME)\include"\
 		  /I "$(JAVA_HOME)\include\win32"\
-# by ferpasri & urueda
 		  /I AccessBridge
 # /I "C:\Program Files\Microsoft SDKs\Windows\v7.1\Include"
           
 # DLLFILE="..\bin\org\fruit\alayer\windows\windows.dll"
 
-# by urueda
-DLLFILE="..\bin\windows.dll"
+DLLFILE="..\target\resources\main\windows.dll"
 
-JAVA_CLASSFILE = "..\bin\org\fruit\alayer\windows\Windows.class"
+JAVA_CLASSFILE = "..\target\classes\java\main\org\fruit\alayer\windows\Windows.class"
 
 JAVA_CLASS = org.fruit.alayer.windows.Windows
 
 OBJFILES= main_w7.obj\
-# by ferpasri
 		  AccessBridgeCalls.obj
 
 HPPFILES= windows.h\
@@ -27,13 +24,12 @@ CPPFLAGS= /EHsc /O2 /MD /w # /Wall
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-	javah -jni -force -o windows.h -classpath ..\bin $(JAVA_CLASS)
+	javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
 
 $(OBJFILES): windows.h
 
 .cpp.obj:
 # cl $(CPPFLAGS) /c $*.cpp $(INCLUDES)
-# by ferpasri & urueda
 	cl $(CPPFLAGS) /c "AccessBridge\AccessBridgeCalls.c" $*.cpp $(INCLUDES)
 
 $(DLLFILE): $(OBJFILES)
