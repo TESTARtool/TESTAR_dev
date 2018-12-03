@@ -125,16 +125,23 @@ public class NativeLinker {
 	 * @param SUTProcesses A regex of the set of processes that conform the SUT.
 	 * @return A StateBuilder instance.
 	 */
-	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
-													 boolean accessBridgeEnabled,
-													 String SUTProcesses){
+	public static StateBuilder getNativeStateBuilder(Double timeToFreeze, boolean accessBridgeEnabled, String SUTProcesses){
+		
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+			
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				// TODO: a win10 state builder might make use of the new CUI8 Automation object.
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
 			}
+			
+			//Run with others Windows OS, like Server 2012
+			else {
+				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
+			}
+			
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new AtSpiStateBuilder(timeToFreeze);
 		throw new UnsupportedPlatformException();
@@ -165,15 +172,24 @@ public class NativeLinker {
 	 * @return A handle to the process in a SUT object.
 	 */
 	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
+		
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
+			
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+			
 			else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
 				if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
 					return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
 				else
 					return WinProcess.fromExecutableUwp(executableCommand);
 			}
+			
+			//Run with others Windows OS, like Server 2012
+			else {
+				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
+			}
+			
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return LinuxProcess.fromExecutable(executableCommand);
 		throw new UnsupportedPlatformException();
