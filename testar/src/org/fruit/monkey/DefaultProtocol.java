@@ -116,6 +116,7 @@ import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import org.fruit.alayer.windows.WinProcess;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
@@ -1373,69 +1374,84 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	    	//FlashFeedback uses the wait method, we don't need to keep using pause.
 			//Util.pause(settings().get(ConfigTags.StartupTime));
 
-			final long now = System.currentTimeMillis(),
-					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
-					State state;
-					do{
-						if (sut.isRunning()){
-							//Print info to the user to know that TESTAR is READY for its use :-)
-							printSutInfo = "SUT is READY";
-					    	FlashFeedback.flash(printSutInfo,2000);
-							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
-							state = builder.apply(sut,sutWindows);
-							if (state != null && state.childCount() > 0){
-								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
-								return sut;
-							}else if(state == null){
+            final long now = System.currentTimeMillis(),
+                    ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
+            State state;
+            do{
+                if (sut.isRunning()){
+                    //Print info to the user to know that TESTAR is READY for its use :-)
+                    printSutInfo = "SUT is READY";
+                    FlashFeedback.flash(printSutInfo,2000);
+                    System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
+                    state = builder.apply(sut,sutWindows);
+                    if (state != null && state.childCount() > 0){
+                        long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
+                        System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+                        return sut;
+                    }else if(state == null){
 //								System.out.println("DEBUG: state == null");
-							}else if(state.childCount()==0){
+                    }else if(state.childCount()==0){
 //								System.out.println("DEBUG: state.childCount() == 0");
 //								for(Tag t:state.tags()){
 //									System.out.println("DEBUG: "+t+"="+state.get(t));
 //								}
-							}
-						}else{
+                    }
+                }else{
 //							System.out.println("DEBUG: system not running, status="+sut.getStatus());
 //							for(Tag t:sut.tags()){
 //								System.out.println("DEBUG: "+t+"="+sut.get(t));
 //							}
-							sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
-							for(ProcessInfo pi:sutProcesses) {
-								sut = pi.sut;
-								if (sut.isRunning()) {
+                    //Print info to the user to know that TESTAR is NOT READY for its use :-(
+                    printSutInfo = "Waiting for the SUT to be accessible ...";
+                    FlashFeedback.flash(printSutInfo, 500);
+                    return findRunningForegroundSut(sut);
+                }
+                //pause before looping:
+                Util.pauseMs(500);
+            } while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
+            if (sut.isRunning())
+                sut.stop();
+            // issue starting the SUT
+            if (tryToKillIfRunning){
+                System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
+                return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
+            } else
+                throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
+        }
+    }
+
+    /**
+     * Returns null if such a process is not found
+     *
+     * @return
+     */
+    protected SUT findRunningForegroundSut(SUT previousSut){
+        sutProcesses = SystemProcessHandling.getNewProcesses(processesBeforeSUT);
+        //Long previousPID = ((WinProcess) previousSut).getPid(); //FIXME windows specific casting
+        SUT sut = null;
+        for(ProcessInfo pi:sutProcesses) {
+            sut = pi.sut;
+            if (sut.isRunning()) {
 //									System.out.println("DEBUG: system is running - trying to build state, status=" + sut.getStatus());
-									state = builder.apply(sut,sutWindows);
-									if (state != null && state.childCount() > 0) {
-										long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-										System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms, SUT process: "+ sut.getStatus());
-										return sut;
-									}else if(state == null){
+                State state = builder.apply(sut,sutWindows);
+                if (state != null && state.childCount() > 0) {
+                    if(state.get(Tags.Foreground)){ // && previousPID!=pi.pid){
+                        //not having the same PID than the previous project
+                        System.out.println("SUT accessible and foreground, SUT process: "+ sut.getStatus());
+                        return sut;
+                    }
+                }else if(state == null){
 //										System.out.println("DEBUG: state == null");
-									}else if(state.childCount()==0){
+                }else if(state.childCount()==0){
 //										System.out.println("DEBUG: state.childCount() == 0");
 //								for(Tag t:state.tags()){
 //									System.out.println("DEBUG: "+t+"="+state.get(t));
 //								}
-									}
-								}
-							}
-						}
-                        //Print info to the user to know that TESTAR is NOT READY for its use :-(
-                        printSutInfo = "Waiting for the SUT to be accessible ...";
-                        FlashFeedback.flash(printSutInfo, 500);
-						Util.pauseMs(500);				
-					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
-					if (sut.isRunning())
-						sut.stop();
-					// issue starting the SUT
-					if (tryToKillIfRunning){
-						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
-						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
-					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
-		}
-	}
+                }
+            }
+        }
+        return sut;
+    }
 
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
@@ -1534,13 +1550,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         // Updating SUT processes and windows:
         updateSutProcessesAndWindows();
 
-        state = builder.apply(system); // TODO why is state a class variable? especially since this function returns state
+        state = builder.apply(system);
         CodingManager.buildIDs(state);
-
-        if(!state.get(Tags.Foreground)){
-            System.out.println("DefaultProtocol.getState(): SUT process is not foreground! Returning null state!");
-            return null;
-        }
 
 		Shape viewPort = state.get(Tags.Shape, null);
 		if(viewPort != null){

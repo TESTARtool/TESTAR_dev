@@ -35,7 +35,6 @@ import java.util.Set;
 
 import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.SikulixClickOnText;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
 import org.fruit.Drag;
@@ -52,7 +51,6 @@ import org.sikuli.script.FindFailed;
 import org.sikuli.script.Match;
 import org.sikuli.script.Screen;
 
-import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 /**
@@ -71,6 +69,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 
 	private HtmlSequenceReport htmlReport;
 	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
+	private SUT updatedSUTprocess = null;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -161,8 +160,23 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-
-		return super.getState(system);
+		if(updatedSUTprocess != null){
+			system = updatedSUTprocess;
+		}
+		State state = state = super.getState(system);
+		if(!state.get(Tags.Foreground)){
+			System.out.println("SUT process is not foreground, trying to find foreground SUT process.");
+			updatedSUTprocess = findRunningForegroundSut(system);
+			state = super.getState(updatedSUTprocess);
+			if(!state.get(Tags.Foreground)){
+				System.out.println("ERROR: SUT process is still NOT in foreground!");
+			}else{
+				System.out.println("SUT process is now in foreground!");
+			}
+		}else{
+			System.out.println("SUT process is foreground.");
+		}
+		return state;
 	}
 
 	/**
@@ -197,6 +211,9 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+		if(updatedSUTprocess != null){
+			system = updatedSUTprocess;
+		}
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
@@ -456,7 +473,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds
-			System.out.println("Executing action: "+action.get(Tags.Desc));
+			System.out.println("Executing action: "+action.get(Tags.Desc, "No desc available"));
 //			for(Tag t:action.tags()){
 //				System.out.println("Debug: "+t+"="+action.get(t));
 //			}

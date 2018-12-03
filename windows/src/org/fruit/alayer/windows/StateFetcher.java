@@ -172,7 +172,7 @@ public class StateFetcher implements Callable<UIAState>{
 				}
 			}else if(sutWindows!=null && sutWindows.size()>0){
 				//setting SUT as foreground - otherwise TESTAR will try to bring it foreground:
-				uiaRoot.isForeground = true;
+				//uiaRoot.isForeground = true;
 //				System.out.println("DEBUG: checking SUT windows, hwnd="+hwnd+", hwndPID="+hwndPID);
 //				printVisibleWindows(sutWindows);
 				for(Long sutWindowHwnd:sutWindows) {

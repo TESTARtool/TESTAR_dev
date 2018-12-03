@@ -59,9 +59,19 @@ import org.fruit.alayer.exceptions.SystemStopException;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public final class WinProcess extends SUTBase {
+	long hProcess;
+	final boolean stopProcess;
+	final Keyboard kbd = AWTKeyboard.build();
+	final Mouse mouse = AWTMouse.build();
+	final long pid;
+	transient static long pApplicationActivationManager;
+	private static final String EMPTY_STRING = "";
 
-	private static final String EMPTY_STRING = ""; // by wcoux
+	public long getPid() {
+		return pid;
+	}
 
+	//FIXME bring to foreground does not always work - maybe better having smaller maxTries
 	public static void toForeground(long pid) throws WinApiException{
 		toForeground(pid, 0.3, 100);
 	}
@@ -226,8 +236,6 @@ public final class WinProcess extends SUTBase {
 		}
 	}
 
-	// end by wcoux
-
 	public static boolean isForeground(long pid){
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
@@ -294,12 +302,7 @@ public final class WinProcess extends SUTBase {
 		return Windows.GetProcessTimes(pid);
 	}
 	
-	long hProcess;
-	final boolean stopProcess;
-	final Keyboard kbd = AWTKeyboard.build();
-	final Mouse mouse = AWTMouse.build();
-	final long pid;
-	transient static long pApplicationActivationManager; // by wcoux
+
 
 	private WinProcess(long hProcess, boolean stopProcess){
 		this.hProcess = hProcess;
@@ -313,9 +316,6 @@ public final class WinProcess extends SUTBase {
 	}
 
 
-	/**
-	 * @author: wcoux
-	 */
 	public void release(){
 		if(pApplicationActivationManager != 0){
 			Windows.IUnknown_Release(pApplicationActivationManager);
