@@ -5,7 +5,9 @@ The software can be build with both ant and gradle.
 
 ### Required tools to build the software
 
-In order to build the native code, a view manual steps need to be executed;
+#### Windows 10
+
+In order to setup the build environment for the native Windows code, the following installation steps have to be executed:
 
 1. In order to build the windows native code, Nmake and the compile for Microsoft visual studio are required.
 These tools can be downloaded using the following [link](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15#).
@@ -17,6 +19,15 @@ and [clean_w10.bat](https://github.com/florendg/testar_floren/releases/download/
 CALL "C:<*PATH*>\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -arch=x64
 
 It should be possible to build the project using the instructions provided in the next section
+
+#### Windows 7
+
+Windows 7 is supported but requires additional steps compared to Windows 10:
+
+1. First you have to install .NET Framework 4.0 (you might have to remove the existing version, if you have a more recent version) (https://www.microsoft.com/en-us/download/details.aspx?id=17851)
+2. Install Microsoft SDK 7.1 (you might have to remove all C++ redistributables before installation succeeds) (https://www.microsoft.com/en-us/download/details.aspx?id=8279)
+3. Install Java SDK and set JAVA_HOME and PATH (to javah.exe) variables in Windows advanced settings
+Then follow the instructions for Win 10
 
 ### Gradle build
 
