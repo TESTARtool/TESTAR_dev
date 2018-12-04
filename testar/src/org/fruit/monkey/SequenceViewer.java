@@ -401,19 +401,6 @@ public class SequenceViewer extends javax.swing.JFrame{
 		while(isShowing()){
 			Util.pause(1);
 		}
-		//Starting up the TESTAR dialog again if it was the previous screen:
-		if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-
-			if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
-				try {
-					this.settings = Main.loadSettings(new String[0], Main.getSettingsFile());
-				} catch (ConfigException e) {
-					e.printStackTrace();
-				}
-				Main.startTestar(settings, Main.getSettingsFile());
-			}
-
-		}
 	}
 
 	private java.awt.Button btnBegin;

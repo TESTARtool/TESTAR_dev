@@ -237,43 +237,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param settings
      */
     public final void run(final Settings settings) {
-    	//initialize TESTAR with the given settings:
-    	initialize(settings);
+    	
+    	//Associate start settings of the first TESTAR dialog
+    	this.settings = settings;
 
     	SUT system = null;
+    	
+    	//Call the principal loop to work with different loop-modes
+    	detectModeLoop(system);
 
-    	// If the mode is View or Replay, the mode cannot be changed by the user:
-    	if (mode() == Modes.View) {
-    			new SequenceViewer(settings).run();
-    	} 
-    	else if (mode() == Modes.Replay) {
-    		try {
-    			replay();
-    		}
-    		// If we catch some Exception trying to read the replayable file, we show the information to the user
-    		// and we restart TESTAR (Quit-mode)
-    		catch(Exception e) {
-    			System.out.println(e);
-    			this.mode = Modes.Quit;
-    			system = null;
-    			detectModeLoop(system);
-    		}
-    	} 
-
-    	else {
-    		// Else we start the loop for checking the TESTAR Mode:
-
-    		try {
-    			detectModeLoop(system);}
-    		// If we catch some Exception trying to Start the SUT, we show the information to the user
-    		// and we restart TESTAR (Quit-mode)
-    		catch(SystemStartException SystemStartException) {
-    			System.out.println(SystemStartException);
-    			this.mode = Modes.Quit;
-    			system = null;
-    			detectModeLoop(system);
-    		}
-    	}
     }
 
     /**
@@ -288,7 +260,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         mode = settings.get(ConfigTags.Mode);
 
         //EventHandler is implemented in RuntimeControlsProtocol (super class):
-        eventHandler = new EventHandler(this);
+        eventHandler = initializeEventHandler();
+
         //Initializing Graph Database:
         graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
                 settings.get(ConfigTags.GraphDBUrl),
@@ -333,17 +306,51 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void detectModeLoop(SUT system) {
-        if (mode() == Modes.Spy) {
-            runSpyLoop(system);
-        } else if(mode() == Modes.Record) {
-        	runRecordLoop(system);
-        }else if (mode() == Modes.Generate) {
-            runGenerateOuterLoop(system);
-        } else if (mode() == Modes.Quit) {
-            stopSystem(system);
-            //start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-            startTestarSettingsDialog();
-        }
+
+    	do {
+    		//initialize TESTAR with the given settings:
+    		initialize(settings);
+
+    		try {
+    			
+    			if (mode() == Modes.View) {
+    				new SequenceViewer(settings).run();
+    			} else if (mode() == Modes.Replay) {
+    				replay();
+    			} else if (mode() == Modes.Spy) {
+    				runSpyLoop(system);
+    			} else if(mode() == Modes.Record) {
+    				runRecordLoop(system);
+    			} else if (mode() == Modes.Generate) {
+    				runGenerateOuterLoop(system);
+    			}
+    			
+    		}catch(SystemStartException SystemStartException) {
+    			System.out.println(SystemStartException);
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		} catch (Exception e) {
+    			System.out.println(e);
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		}
+    		
+    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+    		    System.out.println(ste);
+    		}*/
+    		
+    		if (mode() == Modes.Quit) {
+				stopSystem(system);
+			}
+    		
+    		//Closing TESTAR EventHandler
+            closeTestarTestSession();
+    	}
+    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
+    	while(startTestarSettingsDialog());
+
     }
 
     /**
@@ -424,8 +431,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+            
+            //Activate process Listeners if enabled in the test.settings
+            processListeners(system);
         }
-        processListeners(system);
+        
         return system;
     }
 
@@ -591,7 +601,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //Closing TESTAR internal test session:
         closeTestarTestSession();
         mode = Modes.Quit;
-        detectModeLoop(system);
     }
 
     private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
@@ -813,10 +822,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	if(!system.isRunning()){
     	    this.mode = Modes.Quit;
         }
-
+    	
     	Util.clear(cv);
     	cv.end();
-    	detectModeLoop(system);
+    	
+    	stopSystem(system);
 
     }
 
@@ -842,6 +852,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	//Generating the sequence file that can be replayed:
         	generatedSequence = getAndStoreGeneratedSequence();
         	currentSeq = getAndStoreSequenceFile();
+        	
+        	//Activate process Listeners if enabled in the test.settings
+        	processListeners(system);
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
@@ -859,7 +872,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
-                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                if (escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
                 }
                 //----------------------------------
@@ -900,12 +913,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             cv.end();
         }
         
-        //If user change to Generate mode & we start TESTAR on Record mode, detect the new mode
+        //If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
         if(mode() == Modes.Generate && startedRecordMode){
         	Util.clear(cv);
         	cv.end();
-
-        	detectModeLoop(system);
+        	
+        	runGenerateOuterLoop(system);
         }
 
         //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
@@ -922,10 +935,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             Util.clear(cv);
             cv.end();
-        	//cv.release();
-        	detectModeLoop(system);
+            
+            //If we want to Quit the current execution we stop the system
+            stopSystem(system);
         }
-
     }
 
     //TODO rename to replayLoop to be consistent:
@@ -1051,7 +1064,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         // Going back to TESTAR settings dialog if it was used to start replay:
         mode = Modes.Quit;
-        detectModeLoop(system);
     }
 
     /**
@@ -1820,6 +1832,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void stopSystem(SUT system) {
+
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
 			if (ac != null)
@@ -1830,7 +1843,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
-	private void startTestarSettingsDialog(){
+	private boolean startTestarSettingsDialog(){
 		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			this.mode = settings().get(ConfigTags.Mode);
 
@@ -1840,10 +1853,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				} catch (ConfigException e) {
 					e.printStackTrace();
 				}
-				Main.startTestar(settings, Main.getSettingsFile());
+				return true;
 			}
-
 		}
+		return false;
 	}
 
 	@Override
