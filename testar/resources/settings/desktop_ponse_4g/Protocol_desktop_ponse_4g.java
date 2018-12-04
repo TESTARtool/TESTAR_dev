@@ -85,11 +85,187 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 	}
 
+	private boolean isSutStartedFirstTime(State state){
+		for(Widget w : state){
+			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
+			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
+				// Assuming UIAAutomationId is static and unique:
+				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private void executeScriptForSutSetup(SUT system, State state){
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+		for(Widget w : state){
+			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
+			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
+				// Assuming UIAAutomationId is static and unique:
+				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
+					Action a = ac.clickTypeInto(w, "0510001");
+					//creating ConcreteID tag for the action:
+					CodingManager.buildIDs(state,a);
+					executeAction(system,state,a);
+					//waiting for the GUI to load:
+					Util.pause(1);
+					break;
+				}
+			}
+		}
+		//no need to update state after typing into text field:
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("OK")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("New operator")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(UIATags.UIAAutomationId, "no id").equals("31")){
+				Action a = ac.clickTypeInto(w, "test");
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("29")){
+				Action a = ac.clickTypeInto(w, "test");
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("30")){
+				Action a = ac.clickTypeInto(w, "test");
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("26")){
+				Action a = ac.clickTypeInto(w, "test@test.test");
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+			}
+		}
+		//no new state after text inputs:
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("Next")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+		state = getState(system);
+		for(Widget w : state){
+			if(w.get(Tags.Title, "no title").equals("OK")){
+				Action a = ac.leftClickAt(w);
+				//creating ConcreteID tag for the action:
+				CodingManager.buildIDs(state,a);
+				executeAction(system,state,a);
+				//waiting for the GUI to load:
+				Util.pause(1);
+				break;
+			}
+		}
+	}
+
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
+	 	if(isSutStartedFirstTime(state)){
+	 		executeScriptForSutSetup(system,state);
+		 }
+
 		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		 StdActionCompiler ac = new AnnotatingActionCompiler();
 	 	// driving the GUI into a state to start testing
