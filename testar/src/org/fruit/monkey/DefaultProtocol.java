@@ -692,6 +692,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Showing the red dot if visualization is on:
             if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
+            //before action execution, pass it to the state model manager
+            stateModelManager.notifyActionExecution(action);
+
             //Executing the selected action:
             executeAction(system, state, action);
             actionCount++;
