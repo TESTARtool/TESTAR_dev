@@ -65,6 +65,8 @@ import java.util.zip.GZIPInputStream;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.StateModel.StateModelManager;
+import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -200,6 +202,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     protected GraphDB graphDB;
+    protected StateModelManager stateModelManager;
     private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
     protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -263,7 +266,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         eventHandler = initializeEventHandler();
 
         //Initializing Graph Database:
-        graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+        graphDB = new GraphDB(false,
                 settings.get(ConfigTags.GraphDBUrl),
                 settings.get(ConfigTags.GraphDBUser),
                 settings.get(ConfigTags.GraphDBPassword));
@@ -273,6 +276,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 settings.get(ConfigTags.AccessBridgeEnabled),
                 settings.get(ConfigTags.SUTProcesses)
         );
+        // new state model manager
+        stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -547,6 +552,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 State state = getState(system);
 
                 //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+                // notify the state model manager of the newly reached state
+                Set<Action> actions = deriveActions(system, state);
+                CodingManager.buildIDs(state, actions);
+                stateModelManager.notifyNewStateReached(state, actions);
 
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
@@ -655,10 +664,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
             graphDB.addState(state, true);
 
-            //Deriving actions from the state:
+            // notify the state model manager of the newly reached state
             Set<Action> actions = deriveActions(system, state);
-
             CodingManager.buildIDs(state, actions);
+            stateModelManager.notifyNewStateReached(state, actions);
+
+            //Deriving actions from the state:
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);

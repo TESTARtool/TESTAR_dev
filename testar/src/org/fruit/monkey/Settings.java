@@ -154,7 +154,7 @@ public class Settings extends TaggableBase implements Serializable {
 			List<String> pathList = Arrays.asList(stringValue.split(";"));
 			if(pathList.size() % 2 != 0)
 				throw new ConfigParseException("The number of paths must be even!");
-			List<Pair<String, String>> ret = new ArrayList<Pair<String, String>>();
+			List<Pair<String, String>> ret = new ArrayList<>();
 			for(int i = 0; i < pathList.size(); i += 2)
 				ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
 			return (T)ret;
