@@ -551,12 +551,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
-                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-                // notify the state model manager of the newly reached state
-                Set<Action> actions = deriveActions(system, state);
-                CodingManager.buildIDs(state, actions);
-                stateModelManager.notifyNewStateReached(state, actions);
-
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
