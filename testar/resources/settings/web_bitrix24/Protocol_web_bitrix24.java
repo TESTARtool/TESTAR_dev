@@ -222,7 +222,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	
 	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title){
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty())
-			return new Verdict(SEVERITY_WARNING, "Not all images have an alternate textual description",
+			return new Verdict(Verdict.SEVERITY_WARNING, "Not all images have an alternate textual description",
 							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
 		else
 			return Verdict.OK;
@@ -231,7 +231,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape){
 		final int MINIMUM_FONT_SIZE = 8; // px
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
-			return new Verdict(SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
+			return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
 							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
 		else
 			return Verdict.OK;	
@@ -242,10 +242,10 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		try {
 			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
-					return new Verdict(SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
+					return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
 									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
-					return new Verdict(SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
+					return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
 									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
 			}
 		} catch (NoSuchTagException nste) { return Verdict.OK; }
@@ -299,7 +299,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 					}
 					
 					// slides
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 	                
 				}
 				
@@ -403,9 +403,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(){
 		
-		super.finishSequence(recordedSequence);
+		super.finishSequence();
 		
 	}
 
