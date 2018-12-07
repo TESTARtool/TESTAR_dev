@@ -237,43 +237,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param settings
      */
     public final void run(final Settings settings) {
-    	//initialize TESTAR with the given settings:
-    	initialize(settings);
+    	
+    	//Associate start settings of the first TESTAR dialog
+    	this.settings = settings;
 
     	SUT system = null;
+    	
+    	//Call the principal loop to work with different loop-modes
+    	detectModeLoop(system);
 
-    	// If the mode is View or Replay, the mode cannot be changed by the user:
-    	if (mode() == Modes.View) {
-    			new SequenceViewer(settings).run();
-    	} 
-    	else if (mode() == Modes.Replay) {
-    		try {
-    			replay();
-    		}
-    		// If we catch some Exception trying to read the replayable file, we show the information to the user
-    		// and we restart TESTAR (Quit-mode)
-    		catch(Exception e) {
-    			System.out.println(e);
-    			this.mode = Modes.Quit;
-    			system = null;
-    			detectModeLoop(system);
-    		}
-    	} 
-
-    	else {
-    		// Else we start the loop for checking the TESTAR Mode:
-
-    		try {
-    			detectModeLoop(system);}
-    		// If we catch some Exception trying to Start the SUT, we show the information to the user
-    		// and we restart TESTAR (Quit-mode)
-    		catch(SystemStartException SystemStartException) {
-    			System.out.println(SystemStartException);
-    			this.mode = Modes.Quit;
-    			system = null;
-    			detectModeLoop(system);
-    		}
-    	}
     }
 
     /**
@@ -288,7 +260,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         mode = settings.get(ConfigTags.Mode);
 
         //EventHandler is implemented in RuntimeControlsProtocol (super class):
-        eventHandler = new EventHandler(this);
+        eventHandler = initializeEventHandler();
+
         //Initializing Graph Database:
         graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
                 settings.get(ConfigTags.GraphDBUrl),
@@ -333,17 +306,51 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     protected void detectModeLoop(SUT system) {
-        if (mode() == Modes.Spy) {
-            runSpyLoop(system);
-        } else if(mode() == Modes.Record) {
-        	runRecordLoop(system);
-        }else if (mode() == Modes.Generate) {
-            runGenerateOuterLoop(system);
-        } else if (mode() == Modes.Quit) {
-            stopSystem(system);
-            //start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-            startTestarSettingsDialog();
-        }
+
+    	do {
+    		//initialize TESTAR with the given settings:
+    		initialize(settings);
+
+    		try {
+    			
+    			if (mode() == Modes.View) {
+    				new SequenceViewer(settings).run();
+    			} else if (mode() == Modes.Replay) {
+    				replay();
+    			} else if (mode() == Modes.Spy) {
+    				runSpyLoop(system);
+    			} else if(mode() == Modes.Record) {
+    				runRecordLoop(system);
+    			} else if (mode() == Modes.Generate) {
+    				runGenerateOuterLoop(system);
+    			}
+    			
+    		}catch(SystemStartException SystemStartException) {
+    			System.out.println(SystemStartException);
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		} catch (Exception e) {
+    			System.out.println(e);
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		}
+    		
+    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+    		    System.out.println(ste);
+    		}*/
+    		
+    		if (mode() == Modes.Quit) {
+				stopSystem(system);
+			}
+    		
+    		//Closing TESTAR EventHandler
+            closeTestarTestSession();
+    	}
+    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
+    	while(startTestarSettingsDialog());
+
     }
 
     /**
@@ -424,8 +431,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log(startOfSutDateString + " Starting SUT ...\n", LogSerialiser.LogLevel.Info);
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
+            
+            //Activate process Listeners if enabled in the test.settings
+            processListeners(system);
         }
-        processListeners(system);
+        
         return system;
     }
 
@@ -591,7 +601,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //Closing TESTAR internal test session:
         closeTestarTestSession();
         mode = Modes.Quit;
-        detectModeLoop(system);
     }
 
     private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
@@ -625,18 +634,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param system
      */
     private void runGenerateInnerLoop(SUT system, State state) {
-        long spyTime; //for recording the time the user spent in SPY-mode if TESTAR mode is changed into SPY-mode
         /*
          ***** INNER LOOP:
          */
         while (mode() != Modes.Quit && moreActions(state)) {
 
-            //User wants to move to Spy mode, after that we will continue the actions
-            if (mode() == Modes.Spy) {
-                spyTime = System.currentTimeMillis();
-                runSpyLoop(system);
-                LOGGER.info("[Innerloop] User spent {} ms in Spy Mode", System.currentTimeMillis() - spyTime);
-            }
             if (mode() == Modes.Record) {
             	runRecordLoop(system);
             }
@@ -751,6 +753,34 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     /**
+     * Saving the action information into the logs
+     * 
+     * @param state
+     * @param action
+     * @param actionMode
+     */
+    private void saveActionInfoInLogs(State state, Action action, String actionMode) {
+    	
+		//Obtain action information
+		String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
+
+		//Output/logs folder
+		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
+				actionCount,
+				"action = " + action.get(Tags.ConcreteID) +
+				" (" + action.get(Tags.AbstractID) + ") @state = " +
+				state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+				actionRepresentation[0]) + "\n",
+				LogSerialiser.LogLevel.Info);
+
+		//bin folder 
+		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
+				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+
+    	
+    }
+
+    /**
      * Method to run TESTAR on Spy Mode.
      * @param system
      */
@@ -792,10 +822,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	if(!system.isRunning()){
     	    this.mode = Modes.Quit;
         }
-
+    	
     	Util.clear(cv);
     	cv.end();
-    	detectModeLoop(system);
+    	
+    	stopSystem(system);
 
     }
 
@@ -812,6 +843,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	system = startSystem();
         	startedRecordMode = true;
         	this.cv = buildCanvas();
+        	actionCount = 1;
 
         	//Reset LogSerialiser
         	LogSerialiser.finish();
@@ -820,6 +852,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	//Generating the sequence file that can be replayed:
         	generatedSequence = getAndStoreGeneratedSequence();
         	currentSeq = getAndStoreSequenceFile();
+        	
+        	//Activate process Listeners if enabled in the test.settings
+        	processListeners(system);
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
@@ -833,13 +868,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         while(mode() == Modes.Record && system.isRunning()) {
             State state = getState(system);
             cv.begin(); Util.clear(cv);
-            //In Record-mode, we DO NOT show any visualization:
-            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-           
+            
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
-                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+                if (escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
                 }
                 //----------------------------------
@@ -853,15 +886,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } else
                 escAttempts = 0;
 
-            //In Record-mode, we DO NOT show any visualization:
-            //visualizeActions(cv, state, actions);
             ActionStatus actionStatus = new ActionStatus();
             
             //Start Wait User Action Loop to obtain the Action did by the User
             waitUserActionLoop(cv, system, state, actionStatus);
             
-            if (actionStatus.isUserEventAction())
+            //Save the user action information into the logs
+            if (actionStatus.isUserEventAction()) {
     			CodingManager.buildIDs(state, actionStatus.getAction());
+    			saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
+    			actionCount++;
+            }
     		
             /**
              * When we close TESTAR with Shift+down arrow, last actions is detected like null
@@ -871,11 +906,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             	saveActionIntoFragmentForReplayableSequence(actionStatus.getAction(), state, actions);
             }else {
             	//System.out.println("DEBUG: User action ----- null");
-            	}
+            }
 
 
             Util.clear(cv);
             cv.end();
+        }
+        
+        //If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
+        if(mode() == Modes.Generate && startedRecordMode){
+        	Util.clear(cv);
+        	cv.end();
+        	
+        	runGenerateOuterLoop(system);
+        }
+
+        //If user closes the SUT while in Record-mode, TESTAR will close (or go back to SettingsDialog):
+        if(!system.isRunning()){
+        	this.mode = Modes.Quit;
         }
 
         if(startedRecordMode && mode() == Modes.Quit){
@@ -887,10 +935,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             Util.clear(cv);
             cv.end();
-        	//cv.release();
-        	detectModeLoop(system);
+            
+            //If we want to Quit the current execution we stop the system
+            stopSystem(system);
         }
-
     }
 
     //TODO rename to replayLoop to be consistent:
@@ -1016,7 +1064,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         // Going back to TESTAR settings dialog if it was used to start replay:
         mode = Modes.Quit;
-        detectModeLoop(system);
     }
 
     /**
@@ -1291,12 +1338,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			processListenerEnabled = enableProcessListeners();
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), processListenerEnabled);
 			//sut.setNativeAutomationCache();
-			Util.pause(settings().get(ConfigTags.StartupTime));
+			
+			//Print info to the user to know that TESTAR is NOT READY for its use :-(
+			String printSutInfo = "Waiting for the SUT to be accessible ...";
+			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
+			int timeFlash = (int)startupTime;
+	    	FlashFeedback.flash(printSutInfo, timeFlash);
+	    	
+	    	//FlashFeedback uses the wait method, we don't need to keep using pause.
+			//Util.pause(settings().get(ConfigTags.StartupTime));
+	    	
 			final long now = System.currentTimeMillis(),
 					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
 					State state;
 					do{
 						if (sut.isRunning()){
+							//Print info to the user to know that TESTAR is READY for its use :-)
+							printSutInfo = "SUT is READY";
+					    	FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
 							if (state != null && state.childCount() > 0){
@@ -1304,6 +1363,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 								return sut;
 							}
+						}else {
+							//Print info to the user to know that TESTAR is NOT READY for its use :-(
+							printSutInfo = "Waiting for the SUT to be accessible ...";
+					    	FlashFeedback.flash(printSutInfo, 500);
 						}
 						Util.pauseMs(500);				
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
@@ -1606,22 +1669,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
 
-			//Obtain action information
-			String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
-
-			//Output/logs folder
-			LogSerialiser.log(String.format("Executed [%d]: %s\n%s",
-					actionCount,
-					"action = " + action.get(Tags.ConcreteID) +
-					" (" + action.get(Tags.AbstractID) + ") @state = " +
-					state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
-					actionRepresentation[0]) + "\n",
-					LogSerialiser.LogLevel.Info);
-
-			//bin folder 
-			LOGGER.info("[EA] ExecutedAction number {} Widget {} finished in {} ms",
-					actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
-
+			//Save the executed action information into the logs
+			saveActionInfoInLogs(state, action, "ExecutedAction");
+			
 			return true;
 		}catch(ActionFailedException afe){
 			return false;
@@ -1782,6 +1832,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void stopSystem(SUT system) {
+
 		if (system != null){
 			AutomationCache ac = system.getNativeAutomationCache();
 			if (ac != null)
@@ -1792,7 +1843,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
-	private void startTestarSettingsDialog(){
+	private boolean startTestarSettingsDialog(){
 		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
 			this.mode = settings().get(ConfigTags.Mode);
 
@@ -1802,10 +1853,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				} catch (ConfigException e) {
 					e.printStackTrace();
 				}
-				Main.startTestar(settings, Main.getSettingsFile());
+				return true;
 			}
-
 		}
+		return false;
 	}
 
 	@Override
@@ -1897,14 +1948,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					this.wait(100);
 				} catch (InterruptedException e) {}
 			}
+			state = getState(system);
 			cv.begin(); Util.clear(cv);
 
-			//In Record-mode, we DO NOT show the widget info under the cursor:
-            //SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
+			
 			Set<Action> actions = deriveActions(system,state);
 			CodingManager.buildIDs(state, actions);
-			//In Record-mode, we DO NOT show the green dots:
-			//visualizeActions(cv, state, actions);
+			
+			//In Record-mode, we activate the visualization with Shift+ArrowUP:
+			if(visualizationOn) visualizeActions(cv, state, actions);
 
 			cv.end();
 		}
