@@ -46,6 +46,7 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Match;
@@ -303,6 +304,26 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			 }
 		 }
 		super.beginSequence(system, state);
+	}
+
+	@Override
+	protected void finishSequence(){
+	 	//not killing the processes, pressing Close button on GUI instead
+		System.out.println("DEBUG: finish sequence");
+		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+//		System.out.println("DEBUG: filePath="+filePath);
+		File file = new File(filePath+"open_main_menu.jpg");
+		if(file.exists()){
+//			System.out.println("DEBUG: file exists");
+			executeClickOnImage(filePath+"open_main_menu.jpg");
+		}else
+			System.out.println("DEBUG: file does not exist");
+
+		Util.pause(1);
+		executeClickOnText(filePath+"end_shift.jpg");
+		Util.pause(1);
+		executeClickOnText(filePath+"close_button.jpg");
+
 	}
 
 	/**
@@ -596,6 +617,16 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		try {
 			System.out.println("DEBUG: sikuli clicking on text: "+textToFind);
 			sikuliScreen.click(textToFind);
+		} catch (FindFailed findFailed) {
+			findFailed.printStackTrace();
+		}
+	}
+
+	private void executeClickOnImage(String imageFilePath){
+		Screen sikuliScreen = new Screen();
+		try {
+			System.out.println("DEBUG: sikuli clicking on image: "+imageFilePath);
+			sikuliScreen.click(imageFilePath);
 		} catch (FindFailed findFailed) {
 			findFailed.printStackTrace();
 		}
