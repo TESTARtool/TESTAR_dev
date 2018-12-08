@@ -44,7 +44,7 @@ public class AbstractStateModel {
      * constructor
      * @param abstractionLevelIdentifier
      */
-    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags, StateModelEventListener ...eventListener) {
+    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags, StateModelEventListener ...eventListeners) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
         this.tags = tags;
         // sets are empty when the model is just created
@@ -54,9 +54,9 @@ public class AbstractStateModel {
         states = new HashMap<>();
         initialStates = new HashMap<>();
         executedActions = new HashMap<>();
-        eventListeners = new HashSet<>();
-        for (int i = 0; i < eventListener.length;i++) {
-            eventListeners.add(eventListener[i]);
+        this.eventListeners = new HashSet<>();
+        for (int i = 0; i < eventListeners.length;i++) {
+            this.eventListeners.add(eventListeners[i]);
         }
         initStateModel();
     }
