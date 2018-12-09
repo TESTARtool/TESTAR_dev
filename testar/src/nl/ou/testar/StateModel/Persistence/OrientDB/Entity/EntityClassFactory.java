@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.Widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -32,6 +33,14 @@ public class EntityClassFactory {
             case AbstractStateModel:
                 return entityClasses.containsKey(EntityClassName.AbstractStateModel) ? entityClasses.get(EntityClassName.AbstractStateModel)
                             : createAbstractStateModelClass();
+
+            case ConcreteState:
+                return entityClasses.containsKey(EntityClassName.ConcreteState) ? entityClasses.get(EntityClassName.ConcreteState)
+                            : createConcreteStateClass();
+
+            case Widget:
+                return entityClasses.containsKey(EntityClassName.Widget) ? entityClasses.get(EntityClassName.Widget)
+                            : createWidgetClass();
 
             default:
                 return null;
@@ -99,6 +108,23 @@ public class EntityClassFactory {
         return abstractStateModelClass;
     }
 
+    private static EntityClass createConcreteStateClass() {
+        EntityClass concreteStateClass = new EntityClass("ConcreteState", EntityClass.EntityType.Vertex);
+        Property stateId = new Property("stateId", OType.STRING);
+        stateId.setMandatory(true);
+        stateId.setNullable(false);
+        stateId.setIdentifier(true);
+        concreteStateClass.addProperty(stateId);
+        concreteStateClass.setSuperClassName("Widget");
+        entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
+        return concreteStateClass;
+    }
+
+    private static EntityClass createWidgetClass() {
+        EntityClass widgetClass = new EntityClass("Widget", EntityClass.EntityType.Vertex);
+        entityClasses.put(EntityClassName.Widget, widgetClass);
+        return widgetClass;
+    }
 
 
 }

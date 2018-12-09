@@ -420,6 +420,9 @@ public class Settings extends TaggableBase implements Serializable {
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
+	/**
+	 * This method will check if the provided settings for the concrete and abstract state models are valid.
+	 */
 	private void verifySettings() {
 		// verify the concrete and abstract state settings
 		// the values provided should be allowed by the Coding Manager

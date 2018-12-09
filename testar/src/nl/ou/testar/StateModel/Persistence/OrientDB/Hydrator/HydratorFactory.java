@@ -10,6 +10,8 @@ public abstract class HydratorFactory {
 
     public static final int HYDRATOR_ABSTRACT_STATE_MODEL = 3;
 
+    public static final int HYDRATOR_CONCRETE_STATE = 4;
+
     public static EntityHydrator getHydrator(int hydratorType) throws HydrationException {
         switch (hydratorType) {
             case HYDRATOR_ABSTRACT_STATE:
@@ -20,6 +22,9 @@ public abstract class HydratorFactory {
 
             case HYDRATOR_ABSTRACT_STATE_MODEL:
                 return new AbstractStateModelHydrator();
+
+            case HYDRATOR_CONCRETE_STATE:
+                return new ConcreteStateHydrator();
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");

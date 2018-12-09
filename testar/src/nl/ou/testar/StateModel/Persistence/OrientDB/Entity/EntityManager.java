@@ -88,6 +88,7 @@ public class EntityManager {
      * @param entityClass
      */
     private void createVertexClass(EntityClass entityClass) {
+        System.out.println("classname: " + entityClass.getClassName());
         OrientGraphNoTx graph = graphFactory.getNoTx();
         try {
             OrientVertexType vertexType = graph.getVertexType(entityClass.getClassName());
@@ -111,8 +112,10 @@ public class EntityManager {
                 //@todo ideally, this should be a composite key with a unique restraint
                 // however, this is complex to do with the java api, so we'll look at it later
                 Property identifier = entityClass.getIdentifier();
-                String indexFieldName = identifier.getPropertyName();
-                graph.createKeyIndex(indexFieldName, Vertex.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
+                if (identifier != null) {
+                    String indexFieldName = identifier.getPropertyName();
+                    graph.createKeyIndex(indexFieldName, Vertex.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
+                }
             }
         } finally {
             graph.shutdown();
@@ -145,8 +148,10 @@ public class EntityManager {
                 }
                 // we add an index for the identifier fields for fast lookup
                 Property identifier = entityClass.getIdentifier();
-                String indexFieldName = identifier.getPropertyName();
-                graph.createKeyIndex(indexFieldName, Edge.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
+                if (identifier != null) {
+                    String indexFieldName = identifier.getPropertyName();
+                    graph.createKeyIndex(indexFieldName, Edge.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
+                }
             }
         } finally {
             graph.shutdown();
@@ -168,6 +173,11 @@ public class EntityManager {
                 saveEdgeEntity((EdgeEntity) entity, graph);
             }
         } finally {
+            if (entity instanceof VertexEntity) {
+                for (String propertyName : entity.getPropertyNames()) {
+                    System.out.println(propertyName + ":" + entity.getPropertyValue(propertyName).right());
+                }
+            }
             graph.shutdown();
         }
     }
@@ -182,9 +192,14 @@ public class EntityManager {
         try {
             vertex = retrieveVertex(entity, graph);
             // add the properties
+//            for (String propertyName : entity.getPropertyNames()) {
+//                vertex.setProperty(propertyName, entity.getPropertyValue(propertyName).right());
+//            }
+            HashMap<String, Object> props = new HashMap<>();
             for (String propertyName : entity.getPropertyNames()) {
-                vertex.setProperty(propertyName, entity.getPropertyValue(propertyName).right());
+                setProperty(props, propertyName, entity.getPropertyValue(propertyName).right());
             }
+            ((OrientVertex)vertex).setProperties(props);
         }
         catch (EntityNotFoundException ex) {
             // we have to create a map containing the properties and pass it to the vertex
