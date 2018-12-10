@@ -66,8 +66,6 @@ public class Protocol_desktop_qlearning extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph:
 		//stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
@@ -87,6 +85,8 @@ public class Protocol_desktop_qlearning extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(sequenceCount);
 		actionSelector.resetGraphForNewTestSequence();
 	}
 

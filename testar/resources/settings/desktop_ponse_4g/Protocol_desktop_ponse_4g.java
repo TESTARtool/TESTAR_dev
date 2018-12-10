@@ -79,8 +79,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
@@ -259,6 +257,15 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //	}
 
 	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(sequenceCount);
+	}
+
+	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
 	 @Override
@@ -311,13 +318,18 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 	//not killing the processes, pressing Close button on GUI instead
 		System.out.println("DEBUG: finish sequence");
 		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
-//		System.out.println("DEBUG: filePath="+filePath);
+		try{
+			executeClickOnImage(filePath+"close_dialog.jpg");
+			Util.pause(1);
+		}catch (Exception e){
+			// no dialog
+		}
 		File file = new File(filePath+"open_main_menu.jpg");
 		if(file.exists()){
 //			System.out.println("DEBUG: file exists");
 			executeClickOnImage(filePath+"open_main_menu.jpg");
 		}else
-			System.out.println("DEBUG: file does not exist");
+			System.out.println("ERROR: file does not exist");
 
 		Util.pause(1);
 		executeClickOnText(filePath+"end_shift.jpg");

@@ -85,11 +85,18 @@ public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProt
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(sequenceCount);
 	}
 
 	/**
