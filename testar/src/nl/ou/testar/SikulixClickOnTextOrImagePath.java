@@ -8,24 +8,24 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.sikuli.script.Screen;
 import org.sikuli.script.FindFailed;
 
-public class SikulixClickOnText extends TaggableBase implements Action {
+public class SikulixClickOnTextOrImagePath extends TaggableBase implements Action {
 
-    private String text;
+    private String textOrImagePath;
 
-    public SikulixClickOnText(String text){
-        Assert.notNull(text);
-        this.text = text;
+    public SikulixClickOnTextOrImagePath(String textOrImagePath){
+        Assert.notNull(textOrImagePath);
+        this.textOrImagePath = textOrImagePath;
     }
 
-    public String toString() { return "SikuliX Click on Text: " + text; }
+    public String toString() { return "SikuliX Click on Text (or image path): " + textOrImagePath; }
 
     public void run(SUT system, State state, double duration){
         try{
             Util.pause(duration);
             Screen sikuliScreen = new Screen();
             try {
-                System.out.println("DEBUG: sikuli clicking on text: "+text);
-                sikuliScreen.click(text);
+                System.out.println("DEBUG: sikuli clicking on text (or image path): "+textOrImagePath);
+                sikuliScreen.click(textOrImagePath);
             } catch (FindFailed findFailed) {
                 findFailed.printStackTrace();
             }
@@ -37,7 +37,7 @@ public class SikulixClickOnText extends TaggableBase implements Action {
 
     @Override
     public String toShortString() {
-        return "SikulixClickOnText";
+        return "SikulixClickOnTextOrImage";
     }
 
 

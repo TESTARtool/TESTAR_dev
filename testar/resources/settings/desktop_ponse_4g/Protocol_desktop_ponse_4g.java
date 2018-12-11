@@ -30,13 +30,12 @@
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-
 import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.SikulixClickOnText;
+import nl.ou.testar.SikulixClickOnTextOrImagePath;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Drag;
 import org.fruit.Util;
 import org.fruit.alayer.*;
@@ -49,8 +48,6 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.sikuli.script.FindFailed;
-import org.sikuli.script.Match;
-import org.sikuli.script.Screen;
 
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -275,67 +272,87 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //		 }
 
 		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		 StdActionCompiler ac = new AnnotatingActionCompiler();
-	 	// driving the GUI into a state to start testing
-		 for(Widget w : state){
-		 	// the test users name is "test"
-			 if(w.get(Tags.Title, "no title").equalsIgnoreCase("test")){
-			 	Action a = ac.leftClickAt(w);
-			 	//creating ConcreteID tag for the action:
-				CodingManager.buildIDs(state,a);
-			 	executeAction(system,state,a);
-			 	//waiting for the GUI to load:
-			 	Util.pause(10);
-			 }
+//		 StdActionCompiler ac = new AnnotatingActionCompiler();
+//	 	// driving the GUI into a state to start testing
+//		 for(Widget w : state){
+//		 	// the test users name is "test"
+//			 if(w.get(Tags.Title, "no title").equalsIgnoreCase("test")){
+//			 	Action a = ac.leftClickAt(w);
+//			 	//creating ConcreteID tag for the action:
+//				CodingManager.buildIDs(state,a);
+//			 	executeAction(system,state,a);
+//			 	//waiting for the GUI to load:
+//			 	Util.pause(10);
+//			 }
+//		 }
+//		 state = getState(system);
+//		 for(Widget w : state){
+//			 if(w.get(Tags.Title, "no title").equals("REPORTING")){
+//				 Action a = ac.leftClickAt(w);
+//				 //creating ConcreteID tag for the action:
+//				 CodingManager.buildIDs(state,a);
+//				 executeAction(system,state,a);
+//				 //waiting for the GUI to load:
+//				 Util.pause(1);
+//			 }
+//		 }
+//		 state = getState(system);
+//		 for(Widget w : state){
+//			 if(w.get(Tags.Title, "no title").equals("Reporting")){
+//				 Action a = ac.leftClickAt(w);
+//				 //creating ConcreteID tag for the action:
+//				 CodingManager.buildIDs(state,a);
+//				 executeAction(system,state,a);
+//				 //waiting for the GUI to load:
+//				 Util.pause(4);
+//			 }
+//		 }
+
+
+		 String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		 //login to open main menu:
+		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"login.jpg");
+		 //wait until main menu is visible:
+		 while(!nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"reporting1.jpg")){
+			 Util.pause(1);
 		 }
-		 state = getState(system);
-		 for(Widget w : state){
-			 if(w.get(Tags.Title, "no title").equals("REPORTING")){
-				 Action a = ac.leftClickAt(w);
-				 //creating ConcreteID tag for the action:
-				 CodingManager.buildIDs(state,a);
-				 executeAction(system,state,a);
-				 //waiting for the GUI to load:
-				 Util.pause(1);
-			 }
-		 }
-		 state = getState(system);
-		 for(Widget w : state){
-			 if(w.get(Tags.Title, "no title").equals("Reporting")){
-				 Action a = ac.leftClickAt(w);
-				 //creating ConcreteID tag for the action:
-				 CodingManager.buildIDs(state,a);
-				 executeAction(system,state,a);
-				 //waiting for the GUI to load:
-				 Util.pause(4);
-			 }
-		 }
+		 //end shift:
+		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting1.jpg");
+		 Util.pause(1);
+		 //press close button:
+		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting2.jpg");
 		super.beginSequence(system, state);
 	}
 
 	@Override
 	protected void finishSequence(){
 	 	//not killing the processes, pressing Close button on GUI instead
-		System.out.println("DEBUG: finish sequence");
-		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
-		try{
-			executeClickOnImage(filePath+"close_dialog.jpg");
-			Util.pause(1);
-		}catch (Exception e){
-			// no dialog
+		//closing dialog if it is open:
+		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 		}
-		File file = new File(filePath+"open_main_menu.jpg");
-		if(file.exists()){
-//			System.out.println("DEBUG: file exists");
-			executeClickOnImage(filePath+"open_main_menu.jpg");
-		}else
-			System.out.println("ERROR: file does not exist");
-
+		// Check whether acrobat reader open and close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_acrobat.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			Util.pause(1);
+		}
+		// Check whether file system open and press cancel to close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"file_cancel_button.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			Util.pause(1);
+		}
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		//open main menu:
+		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"open_main_menu.jpg");
 		Util.pause(1);
-		executeClickOnText(filePath+"end_shift.jpg");
+		//end shift:
+		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"end_shift.jpg");
 		Util.pause(1);
-		executeClickOnText(filePath+"close_button.jpg");
-
+		//press close button:
+		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"close_button.jpg");
 	}
 
 	/**
@@ -420,13 +437,40 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+		// TESTAR does not support changing SUT yet - this is a work around to change SUT process in protocol:
 		if(updatedSUTprocess != null){
 			system = updatedSUTprocess;
 		}
 
+		Set<Action> actions = new HashSet<Action>();
+
+		// Check whether dialogs open and close it:
+		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath));
+			return actions;
+		}
+
+		// Check whether acrobat reader open and close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_acrobat.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath));
+			return actions;
+		}
+
+		// Check whether file system open and press cancel to close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"filename.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"file_cancel_button.jpg";
+			if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+				actions.add(new SikulixClickOnTextOrImagePath(filePath));
+				return actions;
+			}
+		}
+
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
-		Set<Action> actions = super.deriveActions(system,state);
+		//Set<Action> actions = super.deriveActions(system,state);
 
 
 		Set<Widget> widgets = deriveModalWidgets(state);
@@ -455,11 +499,20 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		System.out.println("Adding missing actions with SikuliX image recognition");
-		if(textExistsOnScreen("Operator")&&(textExistsOnScreen("Machine")&&(textExistsOnScreen("Stand")))){
-			actions.add(new SikulixClickOnText("Operator"));
-			actions.add(new SikulixClickOnText("Machine"));
-			actions.add(new SikulixClickOnText("Stand"));
+//		if(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Operator")&&
+//				(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Machine")&&
+//						(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Stand")))){
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"operator_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"operator_div.jpg"));
 		}
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"machine_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"machine_div.jpg"));
+		}
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"stand_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"stand_div.jpg"));
+		}
+		//TODO drop down menus
 
 		System.out.println("Ponsse protocol: found "+actions.size()+" actions (after filtering):");
 		for(Action a:actions){
@@ -621,66 +674,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	}
 
 	/**
-	 * Using SikuliX library to click on text on screen
-	 * @param textToFind
-	 */
-	private void executeClickOnText(String textToFind){
-		Screen sikuliScreen = new Screen();
-		try {
-			System.out.println("DEBUG: sikuli clicking on text: "+textToFind);
-			sikuliScreen.click(textToFind);
-		} catch (FindFailed findFailed) {
-			findFailed.printStackTrace();
-		}
-	}
-
-	private void executeClickOnImage(String imageFilePath){
-		Screen sikuliScreen = new Screen();
-		try {
-			System.out.println("DEBUG: sikuli clicking on image: "+imageFilePath);
-			sikuliScreen.click(imageFilePath);
-		} catch (FindFailed findFailed) {
-			findFailed.printStackTrace();
-		}
-	}
-
-	private boolean textExistsOnScreen(String textToFind){
-		Screen sikuliScreen = new Screen();
-		try {
-			System.out.println("DEBUG: sikuli trying to find text: "+textToFind);
-			sikuliScreen.findText(textToFind);
-			return true;
-		} catch (FindFailed findFailed) {
-			return false;
-		}
-	}
-
-	/**
-	 * Trying to use SikuliX library to check whether the given text is only once on the screen
-	 *
-	 * Does not seem to work, freezes with heavy computing...
-	 *
-	 * @param textToFind
-	 * @return
-	 */
-	private boolean textExistsExactlyOnceOnScreen(String textToFind){
-		Screen sikuliScreen = new Screen();
-		try {
-			System.out.println("DEBUG: sikuli trying to find text: "+textToFind);
-			int numberOfMatches = 0;
-			Iterator<Match> it = sikuliScreen.findAllText(textToFind);
-			while(it.hasNext()){
-				numberOfMatches++;
-			}
-			if(numberOfMatches==1)
-				return true;
-		} catch (FindFailed findFailed) {
-			return false;
-		}
-		return false;
-	}
-
-	/**
 	 * Execute the selected action.
 	 * @param system the SUT
 	 * @param state the SUT's current state
@@ -701,7 +694,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			}
 			else if(action.toShortString().equalsIgnoreCase("LeftClickAt")){
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
-				Screen sikuliScreen = new Screen();
+				org.sikuli.script.Screen sikuliScreen = new org.sikuli.script.Screen();
 				try {
 					//System.out.println("DEBUG: sikuli clicking ");
 					while(!new File(widgetScreenshotPath).exists()){
@@ -719,7 +712,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 				//System.out.println("parsed text:"+textToType);
 				String widgetScreenshotPath = protocolUtil.getActionshot(state,action);
 				Util.pause(halfWait);
-				Screen sikuliScreen = new Screen();
+				org.sikuli.script.Screen sikuliScreen = new org.sikuli.script.Screen();
 				try {
 					//System.out.println("DEBUG: sikuli typing ");
 					while(!new File(widgetScreenshotPath).exists()){
@@ -774,6 +767,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	@Override
 	protected void stopSystem(SUT system) {
 		htmlReport.close();
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 		super.stopSystem(system);
 	}
 
