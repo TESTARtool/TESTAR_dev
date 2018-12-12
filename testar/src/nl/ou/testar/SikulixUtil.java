@@ -35,7 +35,7 @@ public class SikulixUtil {
      */
     public static Region getRegionOfTextOrImage(String textOrImagePath){
         Screen sikuliScreen = new Screen();
-        Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.95));
+        Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.90));
         Region region = sikuliScreen.exists(pattern);
         return region;
     }

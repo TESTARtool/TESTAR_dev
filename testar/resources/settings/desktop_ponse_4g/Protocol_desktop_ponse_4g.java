@@ -332,6 +332,20 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 		}
+
+		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_start_cancel.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+		}
+
+		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"windows_screen_close.jpg";
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+		}
+
 		// Check whether acrobat reader open and close it:
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_acrobat.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
@@ -451,14 +465,12 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			return actions;
 		}
 
-		// Ponsse environment: Check whether Windows dialog with cancel is visible and press cancel to close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"windows_screen_close.jpg";
+		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_start_cancel.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
-			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"acroread_cancel.jpg";
-			if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
-				actions.add(new SikulixClickOnTextOrImagePath(filePath));
-				return actions;
-			}
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
+			actions.add(new SikulixClickOnTextOrImagePath(filePath));
+			return actions;
 		}
 
 		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
@@ -467,7 +479,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			actions.add(new SikulixClickOnTextOrImagePath(filePath));
 			return actions;
 		}
-		
+
 		// Development environment: Check whether file system open and press cancel to close it:
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"filename.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
