@@ -88,7 +88,6 @@ import org.fruit.alayer.StrokePattern;
 import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.UsedResources;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
@@ -314,11 +313,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		try {
     			
     			if (mode() == Modes.View && isValidFile()) {
-    				new SequenceViewer(settings).run();
+    				new SequenceViewer(settings);
     			} else if (mode() == Modes.Replay && isValidFile()) {
     				runReplayLoop();
     			} else if (mode() == Modes.Spy) {
-    				runSpyLoop(system);
+    				runSpyLoop();
     			} else if(mode() == Modes.Record) {
     				runRecordLoop(system);
     			} else if (mode() == Modes.Generate) {
@@ -328,23 +327,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		}catch(SystemStartException SystemStartException) {
     			System.out.println(SystemStartException);
     			this.mode = Modes.Quit;
-    			stopSystem(system);
-    			system = null;
     		} catch (Exception e) {
     			System.out.println(e);
     			this.mode = Modes.Quit;
-    			stopSystem(system);
-    			system = null;
     		}
-    		
-    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-    		    System.out.println(ste);
-    		}*/
-    		
-    		if (mode() == Modes.Quit) {
-				stopSystem(system);
-			}
-    		
+
     		//Closing TESTAR EventHandler
             closeTestarTestSession();
     	}
@@ -357,27 +344,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * Check if the selected file to Replay or View contains a valid fragment object
      */
     public boolean isValidFile(){
-
-    	try {
-
+    	
+     	try {
+     		
     		File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-
-    		FileInputStream fis = new FileInputStream(seqFile);
+    		
+     		FileInputStream fis = new FileInputStream(seqFile);
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		GZIPInputStream gis = new GZIPInputStream(bis);
     		ObjectInputStream ois = new ObjectInputStream(gis);
-
-    		ois.readObject();
+    		
+     		ois.readObject();
     		ois.close();
-
-    	} catch (ClassNotFoundException | IOException e) {
-
+    		
+     	} catch (ClassNotFoundException | IOException e) {
+     		
     		System.out.println("ERROR: File is not a readable, please select a correct file");
-    		return false;	
+     		return false;	
     	}
-
-    	return true;
-    }
+     	
+     	return true;
+     }
 
     /**
      * This method is called from runGenerate() to initialize TESTAR for Generate-mode
@@ -827,23 +814,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * Method to run TESTAR on Spy Mode.
      * @param system
      */
-    protected void runSpyLoop(SUT system) {
+    protected void runSpyLoop() {
 
-    	//If system it's null means that we have started TESTAR from the Spy mode
-    	//We need to invoke the SUT & the canvas representation
-    	if(system == null) {
-    		system = startSystem();
-    		this.cv = buildCanvas();
-    	}
-    	//else, SUT & canvas exists (startSystem() & buildCanvas() created from runGenerate)
+    	//Create or detect the SUT & build canvas representation
+    	SUT system = startSystem();
+    	this.cv = buildCanvas();
 
     	while(mode() == Modes.Spy && system.isRunning()) {
+    		
     		State state = getState(system);
     		cv.begin(); Util.clear(cv);
+    		
     		//in Spy-mode, always visualize the widget info under the mouse cursor:
             SutVisualization.visualizeState(visualizationOn, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, cv,state);
-    		Set<Action> actions = deriveActions(system,state);
+    		
+            Set<Action> actions = deriveActions(system,state);
     		CodingManager.buildIDs(state, actions);
+    		
             //in Spy-mode, always visualize the green dots:
     		visualizeActions(cv, state, actions);
     		cv.end();
@@ -863,12 +850,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     	//If user closes the SUT while in Spy-mode, TESTAR will close (or go back to SettingsDialog):
     	if(!system.isRunning()){
-    	    this.mode = Modes.Quit;
-        }
-    	
+    		this.mode = Modes.Quit;
+    	}
+
     	Util.clear(cv);
     	cv.end();
-    	
+
+    	//Stop and close the SUT before return to the detectModeLoop
     	stopSystem(system);
 
     }
@@ -902,7 +890,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
         }
-        //else, SUT & canvas exists (startSystem() & buildCanvas() created from other mode)
+        //else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
 
         
         /**
@@ -1471,10 +1459,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			String printSutInfo = "Waiting for the SUT to be accessible ...";
 			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
 			int timeFlash = (int)startupTime;
-	    	FlashFeedback.flash(printSutInfo, timeFlash);
-	    	
-	    	//FlashFeedback uses the wait method, we don't need to keep using pause.
-			//Util.pause(settings().get(ConfigTags.StartupTime));
+			
+			//Refresh the flash information, to avoid that SUT hide the information
+			int countTimeFlash = 0;
+			while(countTimeFlash<timeFlash) {
+				FlashFeedback.flash(printSutInfo, 2000);
+				countTimeFlash += 2000;
+			}
 	    	
 			final long now = System.currentTimeMillis(),
 					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
