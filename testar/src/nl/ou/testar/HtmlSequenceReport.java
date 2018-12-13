@@ -25,15 +25,26 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_PRE = "output/TESTAR_sequence_";
+    private static final String REPORT_FILENAME_PRE = "output/TESTAR_scenario_";
+    private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
 
     public HtmlSequenceReport(int sequenceNumber) {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
-            String filename = "output/TESTAR_sequence.txt"; // will be replaced
-            filename = REPORT_FILENAME_PRE+sequenceNumber+REPORT_FILENAME_AFT;
+            String filename = "output/TESTAR_scenario_1_sequence_1.html"; // will be replaced
+            int i = 1;
+            boolean newFilenameFound = false;
+            while(!newFilenameFound){
+                filename = REPORT_FILENAME_PRE+i+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
+                File file = new File(filename);
+                if(file.exists()){
+                    i++;
+                }else{
+                    newFilenameFound = true;
+                }
+            }
 //            System.out.println("Starting sequence report into file: "+filename);
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
