@@ -267,6 +267,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
+		 htmlReport.addTitle(2,"Begin sequence (scripted)");
 //	 	if(isSutStartedFirstTime(state)){
 //	 		executeScriptForSutSetup(system,state);
 //		 }
@@ -307,30 +308,48 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //				 Util.pause(4);
 //			 }
 //		 }
-
-
 		 String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
 		 //login to open main menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"login.jpg");
+		 htmlReport.addSequenceStep(state, "."+filePath+"login.jpg");
 		 //wait until main menu is visible:
 		 while(!nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"reporting1.jpg")){
 			 Util.pause(1);
 		 }
-		 //end shift:
+		 //updating state for report:
+		 state.set(Tags.ConcreteID, "login");
+		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 //open reporting menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting1.jpg");
 		 Util.pause(1);
-		 //press close button:
+		 htmlReport.addSequenceStep(state, "."+filePath+"reporting1.jpg");
+
+		 //updating state for report:
+		 state.set(Tags.ConcreteID, "reporting1");
+		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 //press reporting sub-menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting2.jpg");
+		 htmlReport.addSequenceStep(state, "."+filePath+"reporting2.jpg");
 		super.beginSequence(system, state);
 	}
 
 	@Override
-	protected void finishSequence(){
+	protected void finishSequence(SUT system, State state){
+		//updating state for report:
+		state.set(Tags.ConcreteID, "end_of_sequence");
+		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		//adding the end state to the HTML report
+	 	htmlReport.addState(state);
+
+		htmlReport.addTitle(2,"Finish sequence (scripted)");
 	 	//not killing the processes, pressing Close button on GUI instead
 		//closing dialog if it is open:
 		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			htmlReport.addSequenceStep(state, "."+filePath);
+			state.set(Tags.ConcreteID, "close_dialog");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
 		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
@@ -338,12 +357,18 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			htmlReport.addSequenceStep(state, "."+filePath);
+			state.set(Tags.ConcreteID, "ponsse_acroread_cancel");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
 		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"windows_screen_close.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			htmlReport.addSequenceStep(state, "."+filePath);
+			state.set(Tags.ConcreteID, "windows_screen_close");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
 		// Check whether acrobat reader open and close it:
@@ -351,22 +376,37 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
+			htmlReport.addSequenceStep(state, "."+filePath);
+			state.set(Tags.ConcreteID, "close_acrobat");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 		// Check whether file system open and press cancel to close it:
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"file_cancel_button.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
+			htmlReport.addSequenceStep(state, "."+filePath);
+			state.set(Tags.ConcreteID, "file_cancel_button");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
 		//open main menu:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"open_main_menu.jpg");
 		Util.pause(1);
+		htmlReport.addSequenceStep(state, "."+filePath+"open_main_menu.jpg");
+		state.set(Tags.ConcreteID, "open_main_menu");
+		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		//end shift:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"end_shift.jpg");
 		Util.pause(1);
+		htmlReport.addSequenceStep(state, "."+filePath+"end_shift.jpg");
+		state.set(Tags.ConcreteID, "end_shift");
+		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		//press close button:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"close_button.jpg");
+		htmlReport.addSequenceStep(state, "."+filePath+"close_button.jpg");
+		state.set(Tags.ConcreteID, "close_button");
+		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 	}
 
 	/**
@@ -451,6 +491,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+		System.out.println("Sequence: "+sequenceCount()+", Action: "+actionCount());
 		// TESTAR does not support changing SUT yet - this is a work around to change SUT process in protocol:
 		if(updatedSUTprocess != null){
 			system = updatedSUTprocess;
@@ -544,9 +585,9 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		//TODO drop down menus
 
 		System.out.println("Ponsse protocol: found "+actions.size()+" actions (after filtering):");
-		for(Action a:actions){
-			System.out.println(a.get(Tags.Desc, "Desc not available"));
-		}
+//		for(Action a:actions){
+//			System.out.println(a.get(Tags.Desc, "Desc not available"));
+//		}
 
 		//return the set of derived actions
 		return actions;

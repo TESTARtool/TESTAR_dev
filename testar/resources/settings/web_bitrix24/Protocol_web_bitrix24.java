@@ -403,9 +403,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(){
+	protected void finishSequence(SUT system, State state){
 		
-		super.finishSequence();
+		super.finishSequence( system,  state);
 		
 	}
 

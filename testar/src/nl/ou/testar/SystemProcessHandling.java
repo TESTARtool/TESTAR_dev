@@ -86,7 +86,7 @@ public class SystemProcessHandling {
                 }
             }
             if(!existedBefore){
-                System.out.println("SUT process: ["+pi.pid+"] "+pi.Desc);
+//                System.out.println("SUT process: ["+pi.pid+"] "+pi.Desc);
                 newProcesses.add(pi);
             }
         }

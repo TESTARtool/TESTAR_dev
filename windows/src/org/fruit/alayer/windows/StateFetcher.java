@@ -177,7 +177,7 @@ public class StateFetcher implements Callable<UIAState>{
 //				printVisibleWindows(sutWindows);
 				for(Long sutWindowHwnd:sutWindows) {
 					if (hwnd == sutWindowHwnd.longValue()) {
-						System.out.println("DEBUG: matching windows that SUT started");
+//						System.out.println("DEBUG: matching windows that SUT started");
 						ownedWindows.add(hwnd);
 					}
 				}
@@ -285,7 +285,7 @@ public class StateFetcher implements Callable<UIAState>{
 //				}
 			}
 			if(!existedBefore){
-				System.out.println("SUT window: ["+currentHwnd+"]");
+//				System.out.println("SUT window: ["+currentHwnd+"]");
 				newWindows.add(currentHwnd);
 			}
 		}

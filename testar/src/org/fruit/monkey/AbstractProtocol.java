@@ -191,7 +191,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 * This method is invoked each time the TESTAR has reached the stop criteria for generating a sequence.
 	 * This can be used for example for graceful shutdown of the SUT, maybe pressing "Close" or "Exit" button
 	 */
-	protected abstract void finishSequence();
+	protected abstract void finishSequence(SUT system, State state);
 
 	/**
 	 * This methods stops the SUT

@@ -184,7 +184,7 @@ public final class UIAStateBuilder implements StateBuilder {
 
 
 	public UIAState apply(SUT system, List<Long> sutWindows) throws StateBuildException {
-		System.out.println("DEBUG: UIAStateBuilder.apply(SUT, sutWindows)");
+//		System.out.println("DEBUG: UIAStateBuilder.apply(SUT, sutWindows)");
 		try {
 			Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
 					this.accessBridgeEnabled, this.SUTProcesses, sutWindows));

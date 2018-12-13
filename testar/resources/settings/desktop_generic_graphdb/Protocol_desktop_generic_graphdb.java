@@ -252,9 +252,9 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void finishSequence(){
+	protected void finishSequence(SUT system, State state){
 		
-		super.finishSequence();
+		super.finishSequence( system,  state);
 		
 	}
 
