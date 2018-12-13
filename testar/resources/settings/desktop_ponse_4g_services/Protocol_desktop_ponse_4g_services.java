@@ -59,7 +59,7 @@ import static org.fruit.alayer.Tags.Enabled;
  * - Simple GUI state graph for steering the action selection
  *
  */
-public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
+public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol {
 
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows
@@ -81,178 +81,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 	}
 
-//	private boolean isSutStartedFirstTime(State state){
-//		for(Widget w : state){
-//			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
-//			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
-//				// Assuming UIAAutomationId is static and unique:
-//				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
-//					return true;
-//				}
-//			}
-//		}
-//		return false;
-//	}
-
-//	private void executeScriptForSutSetup(SUT system, State state){
-//		StdActionCompiler ac = new AnnotatingActionCompiler();
-//		for(Widget w : state){
-//			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
-//			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
-//				// Assuming UIAAutomationId is static and unique:
-//				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
-//					Action a = ac.clickTypeInto(w, "0510001");
-//					//creating ConcreteID tag for the action:
-//					CodingManager.buildIDs(state,a);
-//					executeAction(system,state,a);
-//					//waiting for the GUI to load:
-//					Util.pause(1);
-//					break;
-//				}
-//			}
-//		}
-//		//no need to update state after typing into text field:
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("OK")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("New operator")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(UIATags.UIAAutomationId, "no id").equals("31")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("29")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("30")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("26")){
-//				Action a = ac.clickTypeInto(w, "test@test.test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}
-//		}
-//		//no new state after text inputs:
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("OK")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//	}
-
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
@@ -268,68 +96,29 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 @Override
 	protected void beginSequence(SUT system, State state){
 		 htmlReport.addTitle(2,"Begin sequence (scripted)");
-//	 	if(isSutStartedFirstTime(state)){
-//	 		executeScriptForSutSetup(system,state);
-//		 }
 
-		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-//		 StdActionCompiler ac = new AnnotatingActionCompiler();
-//	 	// driving the GUI into a state to start testing
-//		 for(Widget w : state){
-//		 	// the test users name is "test"
-//			 if(w.get(Tags.Title, "no title").equalsIgnoreCase("test")){
-//			 	Action a = ac.leftClickAt(w);
-//			 	//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//			 	executeAction(system,state,a);
-//			 	//waiting for the GUI to load:
-//			 	Util.pause(10);
-//			 }
-//		 }
-//		 state = getState(system);
-//		 for(Widget w : state){
-//			 if(w.get(Tags.Title, "no title").equals("REPORTING")){
-//				 Action a = ac.leftClickAt(w);
-//				 //creating ConcreteID tag for the action:
-//				 CodingManager.buildIDs(state,a);
-//				 executeAction(system,state,a);
-//				 //waiting for the GUI to load:
-//				 Util.pause(1);
-//			 }
-//		 }
-//		 state = getState(system);
-//		 for(Widget w : state){
-//			 if(w.get(Tags.Title, "no title").equals("Reporting")){
-//				 Action a = ac.leftClickAt(w);
-//				 //creating ConcreteID tag for the action:
-//				 CodingManager.buildIDs(state,a);
-//				 executeAction(system,state,a);
-//				 //waiting for the GUI to load:
-//				 Util.pause(4);
-//			 }
-//		 }
-		 String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		 String filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/";
 		 //login to open main menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"login.jpg");
 		 htmlReport.addSequenceStep(state, "."+filePath+"login.jpg");
 		 //wait until main menu is visible:
-		 while(!nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"reporting1.jpg")){
+		 while(!nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"maintenance.jpg")){
 			 Util.pause(1);
 		 }
 		 //updating state for report:
 		 state.set(Tags.ConcreteID, "login");
 		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		 //open reporting menu:
-		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting1.jpg");
+		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"maintenance.jpg");
 		 Util.pause(1);
-		 htmlReport.addSequenceStep(state, "."+filePath+"reporting1.jpg");
+		 htmlReport.addSequenceStep(state, "."+filePath+"maintenance.jpg");
 
 		 //updating state for report:
-		 state.set(Tags.ConcreteID, "reporting1");
+		 state.set(Tags.ConcreteID, "maintenance");
 		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		 //press reporting sub-menu:
-		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting2.jpg");
-		 htmlReport.addSequenceStep(state, "."+filePath+"reporting2.jpg");
+		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"service.jpg");
+		 htmlReport.addSequenceStep(state, "."+filePath+"service.jpg");
 
 		super.beginSequence(system, state);
 	}
@@ -345,7 +134,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		htmlReport.addTitle(2,"Finish sequence (scripted)");
 	 	//not killing the processes, pressing Close button on GUI instead
 		//closing dialog if it is open:
-		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
+		String filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"close_dialog.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
@@ -354,9 +143,9 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_start_cancel.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"ponsse_acroread_start_cancel.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
-			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"ponsse_acroread_cancel.jpg";
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
 			state.set(Tags.ConcreteID, "ponsse_acroread_cancel");
@@ -364,7 +153,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"windows_screen_close.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"windows_screen_close.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
@@ -373,7 +162,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		// Check whether acrobat reader open and close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_acrobat.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"close_acrobat.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
@@ -382,7 +171,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 		// Check whether file system open and press cancel to close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"file_cancel_button.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"file_cancel_button.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
@@ -390,7 +179,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			state.set(Tags.ConcreteID, "file_cancel_button");
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/";
 		//open main menu:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"open_main_menu.jpg");
 		Util.pause(1);
@@ -501,31 +290,31 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		Set<Action> actions = new HashSet<Action>();
 
 		// Check whether Ponsse dialog open and close it:
-		String filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
+		String filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"close_dialog.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			actions.add(new SikulixClickOnTextOrImagePath(filePath));
 			return actions;
 		}
 
 		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_start_cancel.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"ponsse_acroread_start_cancel.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
-			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"ponsse_acroread_cancel.jpg";
 			actions.add(new SikulixClickOnTextOrImagePath(filePath));
 			return actions;
 		}
 
 		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"windows_screen_close.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"windows_screen_close.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			actions.add(new SikulixClickOnTextOrImagePath(filePath));
 			return actions;
 		}
 
 		// Development environment: Check whether file system open and press cancel to close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"filename.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"filename.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
-			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"file_cancel_button.jpg";
+			filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"file_cancel_button.jpg";
 			if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 				actions.add(new SikulixClickOnTextOrImagePath(filePath));
 				return actions;
@@ -533,7 +322,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		}
 
 		// Development environment: Check whether acrobat reader open and close it:
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_acrobat.jpg";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"close_acrobat.jpg";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			actions.add(new SikulixClickOnTextOrImagePath(filePath));
 			return actions;
@@ -573,7 +362,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 //		if(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Operator")&&
 //				(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Machine")&&
 //						(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Stand")))){
-		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
+		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/";
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"operator_div.jpg")){
 			actions.add(new SikulixClickOnTextOrImagePath(filePath+"operator_div.jpg"));
 		}
