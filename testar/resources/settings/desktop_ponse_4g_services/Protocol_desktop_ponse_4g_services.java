@@ -192,6 +192,16 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 		htmlReport.addSequenceStep(state, "."+filePath+"end_shift.jpg");
 		state.set(Tags.ConcreteID, "end_shift");
 		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+
+		//press no for "save changes in settings" if visible:
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"no.jpg");
+			Util.pause(1);
+			htmlReport.addSequenceStep(state, "."+filePath+"no.jpg");
+			state.set(Tags.ConcreteID, "no_saving");
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		}
+
 		//press close button:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"close_button.jpg");
 		htmlReport.addSequenceStep(state, "."+filePath+"close_button.jpg");
@@ -363,14 +373,17 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 //				(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Machine")&&
 //						(nl.ou.testar.SikulixUtil.textExistsExactlyOnceOnScreen("Stand")))){
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/";
-		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"operator_div.jpg")){
-			actions.add(new SikulixClickOnTextOrImagePath(filePath+"operator_div.jpg"));
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"connectors_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"connectors_div.jpg"));
 		}
-		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"machine_div.jpg")){
-			actions.add(new SikulixClickOnTextOrImagePath(filePath+"machine_div.jpg"));
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"testing_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"testing_div.jpg"));
 		}
-		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"stand_div.jpg")){
-			actions.add(new SikulixClickOnTextOrImagePath(filePath+"stand_div.jpg"));
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"programs_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"programs_div.jpg"));
+		}
+		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath+"settings_div.jpg")){
+			actions.add(new SikulixClickOnTextOrImagePath(filePath+"settings_div.jpg"));
 		}
 		//TODO drop down menus
 
