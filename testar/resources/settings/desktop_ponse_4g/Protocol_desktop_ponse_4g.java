@@ -330,6 +330,26 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		 //press reporting sub-menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting2.jpg");
 		 htmlReport.addSequenceStep(state, "."+filePath+"reporting2.jpg");
+
+		 //closing dialog if it is open:
+		 filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"close_dialog.jpg";
+		 if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			 htmlReport.addSequenceStep(state, "."+filePath);
+			 state.set(Tags.ConcreteID, "close_dialog");
+			 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 }
+
+
+		 //temporary action selection to press help and test acrobat reader:
+		 filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"help.jpg";
+		 if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
+			 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
+			 htmlReport.addSequenceStep(state, "."+filePath);
+			 state.set(Tags.ConcreteID, "help");
+			 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 }
+
 		super.beginSequence(system, state);
 	}
 
