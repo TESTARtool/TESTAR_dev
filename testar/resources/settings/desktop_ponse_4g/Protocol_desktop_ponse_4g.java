@@ -68,6 +68,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	private HtmlSequenceReport htmlReport;
 	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 	private SUT updatedSUTprocess = null;
+	private int scenarioCount = 1;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -81,185 +82,15 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 	}
 
-//	private boolean isSutStartedFirstTime(State state){
-//		for(Widget w : state){
-//			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
-//			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
-//				// Assuming UIAAutomationId is static and unique:
-//				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
-//					return true;
-//				}
-//			}
-//		}
-//		return false;
-//	}
-
-//	private void executeScriptForSutSetup(SUT system, State state){
-//		StdActionCompiler ac = new AnnotatingActionCompiler();
-//		for(Widget w : state){
-//			// If Ponsse 4G is started the first time, it opens a dialog asking "Enter machine number"
-//			if(w.get(Tags.Role).toString().equalsIgnoreCase("UIAEdit")){
-//				// Assuming UIAAutomationId is static and unique:
-//				if(w.get(UIATags.UIAAutomationId).equalsIgnoreCase("3")){
-//					Action a = ac.clickTypeInto(w, "0510001");
-//					//creating ConcreteID tag for the action:
-//					CodingManager.buildIDs(state,a);
-//					executeAction(system,state,a);
-//					//waiting for the GUI to load:
-//					Util.pause(1);
-//					break;
-//				}
-//			}
-//		}
-//		//no need to update state after typing into text field:
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("OK")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("New operator")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(UIATags.UIAAutomationId, "no id").equals("31")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("29")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("30")){
-//				Action a = ac.clickTypeInto(w, "test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}else if(w.get(UIATags.UIAAutomationId, "no id").equals("26")){
-//				Action a = ac.clickTypeInto(w, "test@test.test");
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//			}
-//		}
-//		//no new state after text inputs:
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("Next")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//		state = getState(system);
-//		for(Widget w : state){
-//			if(w.get(Tags.Title, "no title").equals("OK")){
-//				Action a = ac.leftClickAt(w);
-//				//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//				executeAction(system,state,a);
-//				//waiting for the GUI to load:
-//				Util.pause(1);
-//				break;
-//			}
-//		}
-//	}
-
 	/**
 	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
 	@Override
 	protected void preSequencePreparations() {
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(sequenceCount);
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
 	}
 
 	/**
@@ -268,46 +99,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 @Override
 	protected void beginSequence(SUT system, State state){
 		 htmlReport.addTitle(2,"Begin sequence (scripted)");
-//	 	if(isSutStartedFirstTime(state)){
-//	 		executeScriptForSutSetup(system,state);
-//		 }
-
-		 // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-//		 StdActionCompiler ac = new AnnotatingActionCompiler();
-//	 	// driving the GUI into a state to start testing
-//		 for(Widget w : state){
-//		 	// the test users name is "test"
-//			 if(w.get(Tags.Title, "no title").equalsIgnoreCase("test")){
-//			 	Action a = ac.leftClickAt(w);
-//			 	//creating ConcreteID tag for the action:
-//				CodingManager.buildIDs(state,a);
-//			 	executeAction(system,state,a);
-//			 	//waiting for the GUI to load:
-//			 	Util.pause(10);
-//			 }
-//		 }
-//		 state = getState(system);
-//		 for(Widget w : state){
-//			 if(w.get(Tags.Title, "no title").equals("REPORTING")){
-//				 Action a = ac.leftClickAt(w);
-//				 //creating ConcreteID tag for the action:
-//				 CodingManager.buildIDs(state,a);
-//				 executeAction(system,state,a);
-//				 //waiting for the GUI to load:
-//				 Util.pause(1);
-//			 }
-//		 }
-//		 state = getState(system);
-//		 for(Widget w : state){
-//			 if(w.get(Tags.Title, "no title").equals("Reporting")){
-//				 Action a = ac.leftClickAt(w);
-//				 //creating ConcreteID tag for the action:
-//				 CodingManager.buildIDs(state,a);
-//				 executeAction(system,state,a);
-//				 //waiting for the GUI to load:
-//				 Util.pause(4);
-//			 }
-//		 }
 		 String filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
 		 //login to open main menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"login.jpg");
@@ -317,7 +108,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			 Util.pause(1);
 		 }
 		 //updating state for report:
-		 state.set(Tags.ConcreteID, "login");
+		 state.set(Tags.ConcreteID, "login_"+sequenceCount());
 		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		 //open reporting menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting1.jpg");
@@ -325,7 +116,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		 htmlReport.addSequenceStep(state, "."+filePath+"reporting1.jpg");
 
 		 //updating state for report:
-		 state.set(Tags.ConcreteID, "reporting1");
+		 state.set(Tags.ConcreteID, "reporting1_"+sequenceCount());
 		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		 //press reporting sub-menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"reporting2.jpg");
@@ -337,7 +128,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	@Override
 	protected void finishSequence(SUT system, State state){
 		//updating state for report:
-		state.set(Tags.ConcreteID, "end_of_sequence");
+		state.set(Tags.ConcreteID, "end_of_sequence_"+sequenceCount());
 		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		//adding the end state to the HTML report
 	 	htmlReport.addState(state);
@@ -349,7 +140,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "close_dialog");
+			state.set(Tags.ConcreteID, "close_dialog_"+sequenceCount());
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
@@ -359,7 +150,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			filePath = Main.getSettingsDir()+"desktop_ponse_4g/"+"ponsse_acroread_cancel.jpg";
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "ponsse_acroread_cancel");
+			state.set(Tags.ConcreteID, "ponsse_acroread_cancel_"+sequenceCount());
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
@@ -368,7 +159,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "windows_screen_close");
+			state.set(Tags.ConcreteID, "windows_screen_close_"+sequenceCount());
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 
@@ -378,7 +169,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "close_acrobat");
+			state.set(Tags.ConcreteID, "close_acrobat_"+sequenceCount());
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 		// Check whether file system open and press cancel to close it:
@@ -387,7 +178,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "file_cancel_button");
+			state.set(Tags.ConcreteID, "file_cancel_button_"+sequenceCount());
 			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		}
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g/";
@@ -395,18 +186,18 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"open_main_menu.jpg");
 		Util.pause(1);
 		htmlReport.addSequenceStep(state, "."+filePath+"open_main_menu.jpg");
-		state.set(Tags.ConcreteID, "open_main_menu");
+		state.set(Tags.ConcreteID, "open_main_menu_"+sequenceCount());
 		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		//end shift:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"end_shift.jpg");
 		Util.pause(1);
 		htmlReport.addSequenceStep(state, "."+filePath+"end_shift.jpg");
-		state.set(Tags.ConcreteID, "end_shift");
+		state.set(Tags.ConcreteID, "end_shift_"+sequenceCount());
 		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 		//press close button:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"close_button.jpg");
 		htmlReport.addSequenceStep(state, "."+filePath+"close_button.jpg");
-		state.set(Tags.ConcreteID, "close_button");
+		state.set(Tags.ConcreteID, "close_button_"+sequenceCount());
 		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
 	}
 

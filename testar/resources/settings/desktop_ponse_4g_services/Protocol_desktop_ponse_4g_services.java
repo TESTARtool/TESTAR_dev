@@ -68,6 +68,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 	private HtmlSequenceReport htmlReport;
 	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 	private SUT updatedSUTprocess = null;
+	private int scenarioCount = 1;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -87,7 +88,9 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 	@Override
 	protected void preSequencePreparations() {
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(sequenceCount);
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
 	}
 
 	/**

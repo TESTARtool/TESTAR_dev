@@ -28,23 +28,56 @@ public class HtmlSequenceReport {
     private static final String REPORT_FILENAME_PRE = "output/TESTAR_scenario_";
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
+    private int scenarioCount = 1;
+    public int getScenarioCount() {
+        return scenarioCount;
+    }
 
     public HtmlSequenceReport(int sequenceNumber) {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
             String filename = "output/TESTAR_scenario_1_sequence_1.html"; // will be replaced
-            int i = 1;
+            // finding the first unused scenario number when sequence number is 1:
             boolean newFilenameFound = false;
             while(!newFilenameFound){
-                filename = REPORT_FILENAME_PRE+i+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
+                filename = REPORT_FILENAME_PRE+scenarioCount+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
                 File file = new File(filename);
                 if(file.exists()){
-                    i++;
+                    scenarioCount++;
                 }else{
                     newFilenameFound = true;
                 }
             }
+//            System.out.println("Starting sequence report into file: "+filename);
+            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            for(String s:HEADER){
+                write(s);
+            }
+            write("<h1>TESTAR execution sequence report for sequence "+sequenceNumber+"</h1>");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public HtmlSequenceReport(int scenarioCount, int sequenceNumber) {
+        try{
+            //TODO put filename into settings, name with sequence number
+            // creating a new file for the report:
+            String filename = "output/TESTAR_scenario_1_sequence_1.html"; // will be replaced
+            // finding the first unused scenario number when sequence number is 1:
+            boolean newFilenameFound = false;
+            while(!newFilenameFound){
+                filename = REPORT_FILENAME_PRE+scenarioCount+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
+                File file = new File(filename);
+                if(file.exists()){
+                    scenarioCount++;
+                }else{
+                    newFilenameFound = true;
+                }
+            }
+            //updating the scenarioCount:
+            this.scenarioCount = scenarioCount;
 //            System.out.println("Starting sequence report into file: "+filename);
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){

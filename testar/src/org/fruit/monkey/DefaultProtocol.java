@@ -683,12 +683,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } else
                 escAttempts = 0;
             //Showing the green dots if visualization is on:
-            if(visualizationOn) visualizeActions(cv, state, actions);
+            if(visualizationOn || settings.get(ConfigTags.VisualizeActions)) visualizeActions(cv, state, actions);
 
             //Selecting one of the available actions:
             Action action = selectAction(state, actions);
             //Showing the red dot if visualization is on:
-            if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
+            if(visualizationOn || settings.get(ConfigTags.VisualizeSelectedAction)) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
             //Executing the selected action:
             executeAction(system, state, action);
@@ -997,7 +997,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     if(mode() == Modes.Quit) break;
                     Action action = fragment.get(ExecutedAction, new NOP());
                     // In Replay-mode, we only show the red dot if visualizationOn is true:
-                    if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
+                    if(visualizationOn || settings.get(ConfigTags.VisualizeSelectedAction)) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
                     if(mode() == Modes.Quit) break;
 
                     double actionDuration = settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay) ? fragment.get(Tags.ActionDuration, 0.0) : settings.get(ConfigTags.ActionDuration);
@@ -2062,7 +2062,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state, actions);
 			
 			//In Record-mode, we activate the visualization with Shift+ArrowUP:
-			if(visualizationOn) visualizeActions(cv, state, actions);
+			if(visualizationOn || settings.get(ConfigTags.VisualizeActions)) visualizeActions(cv, state, actions);
 
 			cv.end();
 		}
