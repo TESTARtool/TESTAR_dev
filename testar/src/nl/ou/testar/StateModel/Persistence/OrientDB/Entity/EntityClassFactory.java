@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -41,6 +41,14 @@ public class EntityClassFactory {
             case Widget:
                 return entityClasses.containsKey(EntityClassName.Widget) ? entityClasses.get(EntityClassName.Widget)
                             : createWidgetClass();
+
+            case isParentOf:
+                return entityClasses.containsKey(EntityClassName.isParentOf) ? entityClasses.get(EntityClassName.isParentOf)
+                            : createIsParentOfClass();
+
+            case isChildOf:
+                    return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
+                            : createIsChildOfClass();
 
             default:
                 return null;
@@ -122,8 +130,35 @@ public class EntityClassFactory {
 
     private static EntityClass createWidgetClass() {
         EntityClass widgetClass = new EntityClass("Widget", EntityClass.EntityType.Vertex);
+        Property widgetId = new Property("widgetId", OType.STRING);
+        widgetId.setMandatory(true);
+        widgetId.setNullable(false);
+        widgetId.setIdentifier(true);
+        widgetClass.addProperty(widgetId);
         entityClasses.put(EntityClassName.Widget, widgetClass);
         return widgetClass;
+    }
+
+    private static EntityClass createIsParentOfClass() {
+        EntityClass parentClass = new EntityClass("isParentOf", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("edgeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        parentClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.isParentOf, parentClass);
+        return parentClass;
+    }
+
+    private static EntityClass createIsChildOfClass() {
+        EntityClass childClass = new EntityClass("isChildOf", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("edgeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        childClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.isChildOf, childClass);
+        return childClass;
     }
 
 

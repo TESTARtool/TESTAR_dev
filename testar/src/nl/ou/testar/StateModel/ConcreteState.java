@@ -13,6 +13,7 @@ public class ConcreteState extends Widget{
     public ConcreteState(String id, Set<Tag<?>> tags) {
         super(id);
         this.tags = tags;
+        this.setRootWidget(this);
     }
 
 }

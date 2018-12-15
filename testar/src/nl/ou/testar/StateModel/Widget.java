@@ -3,6 +3,9 @@ package nl.ou.testar.StateModel;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Widget {
 
     // a set of attributes and values
@@ -11,9 +14,20 @@ public class Widget {
     // a unique string identifier for this widget
     private String id;
 
+    // a list of child widgets for this widget
+    List<Widget> children;
+
+    // the widget's parent, if not the root element
+    Widget parent;
+
+    // for performance reasons, we store the root widget, so we do not have to climb up the widget tree
+    // each time we need to access it
+    ConcreteState rootWidget;
+
     public Widget(String id) {
         this.id = id;
         attributes = new TaggableBase();
+        children = new ArrayList<>();
     }
 
     /**
@@ -45,4 +59,52 @@ public class Widget {
         return attributes;
     }
 
+    /**
+     * This method adds a child to this widget
+     * @param child
+     */
+    public void addChild(Widget child) {
+        children.add(child);
+        child.setParent(this);
+    }
+
+    /**
+     * Returns the list of this widget's children.
+     * @return list of child widgets.
+     */
+    public List<Widget> getChildren() {
+        return children;
+    }
+
+    /**
+     * Method returns this widget's parent.
+     * @return
+     */
+    public Widget getParent() {
+        return parent;
+    }
+
+    /**
+     * Method sets this widget's parent.
+     * @param parent
+     */
+    public void setParent(Widget parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Method returns the root widget for this widget.
+     * @return
+     */
+    public ConcreteState getRootWidget() {
+        return rootWidget;
+    }
+
+    /**
+     * Method sets the root widget for this widget.
+     * @param rootWidget
+     */
+    public void setRootWidget(ConcreteState rootWidget) {
+        this.rootWidget = rootWidget;
+    }
 }

@@ -11,10 +11,11 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
-
+import nl.ou.testar.StateModel.Widget;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 
 public class OrientDBManager implements PersistenceManager, StateModelEventListener {
 
@@ -36,7 +37,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.AbstractState,
             EntityClassFactory.EntityClassName.AbstractStateModel,
             EntityClassFactory.EntityClassName.Widget,
-            EntityClassFactory.EntityClassName.ConcreteState));
+            EntityClassFactory.EntityClassName.ConcreteState,
+            EntityClassFactory.EntityClassName.isParentOf,
+            EntityClassFactory.EntityClassName.isChildOf));
 
     /**
      * Constructor
@@ -113,6 +116,66 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         // save the entity!
         entityManager.saveEntity(vertexEntity);
+
+        // store the widgettree attached to this concrete state
+        persistWidgetTree(concreteState, vertexEntity);
+    }
+
+    /**
+     * This method will store a widget tree to the orient database.
+     * @param widget
+     */
+    private void persistWidgetTree(Widget widget, VertexEntity widgetEntity) {
+        // we assume the root widget of the tree has already been stored, as this will be the concrete state
+        // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
+        for (Widget childWidget : widget.getChildren()) {
+            VertexEntity childWidgetEntity = persistWidget(childWidget);
+
+            // with the widget saved, we need to also store parent and child relationships between the two widgets
+            EntityClass isChildEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.isChildOf);
+            EntityClass isParentEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.isParentOf);
+            EdgeEntity isChildEntity = new EdgeEntity(isChildEntityClass, childWidgetEntity, widgetEntity);
+            EdgeEntity isParentEntity = new EdgeEntity(isParentEntityClass, widgetEntity, childWidgetEntity);
+
+            // hydrate the entities
+            try {
+                EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_WIDGET_RELATION);
+                hydrator.hydrate(isChildEntity, null);
+                hydrator.hydrate(isParentEntity, null);
+            }
+            catch (HydrationException e) {
+                e.printStackTrace();
+                System.out.println("Encountered a problem while saving the inter-widget relation to the orient database");
+                return;
+            }
+            entityManager.saveEntity(isChildEntity);
+            entityManager.saveEntity(isParentEntity);
+
+            // go down the widget tree and do it again
+            persistWidgetTree(childWidget, childWidgetEntity);
+        }
+
+    }
+
+    private VertexEntity persistWidget(Widget widget) {
+        // create an entity to persist to the database
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Widget);
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
+
+        // hydrate the widget entity
+        try {
+            EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_WIDGET);
+            hydrator.hydrate(vertexEntity, widget);
+        }
+        catch (HydrationException e) {
+            e.printStackTrace();
+            System.out.println("Encountered a problem while saving a widget to the orient database");
+            return null;
+        }
+
+        // save the widget
+        entityManager.saveEntity(vertexEntity);
+        return vertexEntity;
     }
 
     @Override
@@ -146,6 +209,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityManager.saveEntity(actionEntity);
     }
 
+    @Override
     public void initAbstractStateModel(AbstractStateModel abstractStateModel) {
         // there are two options here: either the abstract state model already exists in the database,
         // in which case we load it, or it doesn't exist yet, in which case we save it

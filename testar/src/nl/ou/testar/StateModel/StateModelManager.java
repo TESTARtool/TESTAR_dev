@@ -87,7 +87,7 @@ public class StateModelManager {
                 // it's not the first state, so we want to add a transition
                 if (actionUnderExecution == null) {
                     // this should never happen if the notification process is followed correctly
-                    System.exit(-1); //@todo this needs some proper error handling
+                    throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
                 }
                 abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
                 // we reset the executed action to await the next one.

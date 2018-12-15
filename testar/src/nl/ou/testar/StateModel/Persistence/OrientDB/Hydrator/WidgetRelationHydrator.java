@@ -1,0 +1,34 @@
+package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
+
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.Exception.HydrationException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
+
+public class WidgetRelationHydrator implements EntityHydrator<EdgeEntity> {
+
+    @Override
+    public void hydrate(EdgeEntity target, Object source) throws HydrationException {
+        // first make sure the identity property is set
+        Property identifier = target.getEntityClass().getIdentifier();
+        if (identifier == null) {
+            throw new HydrationException();
+        }
+
+        // the edge between two widgets needs an identifier to make sure we do not create unnecessary double edges
+        // we combine the widget id's from the source and target for this purpose
+        Property sourceIdentifier = target.getSourceEntity().getEntityClass().getIdentifier();
+        String sourceId = (String)target.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).right();
+        Property targetIdentifier = target.getTargetEntity().getEntityClass().getIdentifier();
+        String targetId = (String)target.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).right();
+
+        String edgeId = sourceId + "-" + targetId;
+        // make sure the java and orientdb property types are compatible
+        OType identifierType = TypeConvertor.getInstance().getOrientDBType(edgeId.getClass());
+        if (identifierType != identifier.getPropertyType()) {
+            throw new HydrationException();
+        }
+        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), edgeId);
+    }
+}

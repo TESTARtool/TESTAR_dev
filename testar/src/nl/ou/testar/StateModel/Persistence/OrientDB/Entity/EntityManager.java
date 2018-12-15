@@ -173,11 +173,11 @@ public class EntityManager {
                 saveEdgeEntity((EdgeEntity) entity, graph);
             }
         } finally {
-            if (entity instanceof VertexEntity) {
-                for (String propertyName : entity.getPropertyNames()) {
-                    System.out.println(propertyName + ":" + entity.getPropertyValue(propertyName).right());
-                }
-            }
+//            if (entity instanceof VertexEntity) {
+//                for (String propertyName : entity.getPropertyNames()) {
+//                    System.out.println(propertyName + ":" + entity.getPropertyValue(propertyName).right());
+//                }
+//            }
             graph.shutdown();
         }
     }
@@ -242,7 +242,7 @@ public class EntityManager {
             return;
         }
 
-        // we want to add an edge only if there is not yet a similar edge with the same id between the same two states
+        // we want to add an edge only if there is not yet a similar edge with the same id between the same two vertices
         Edge newEdge = null;
         for (Edge edge: sourceVertex.getEdges(Direction.OUT, entity.getEntityClass().getClassName())) {
 
