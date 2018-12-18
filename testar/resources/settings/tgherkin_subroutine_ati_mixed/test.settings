@@ -29,7 +29,7 @@ SUTConnectorValue = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrom
 # Java Swing applications & Access Bridge Enabled
 #
 # Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#    (Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
 #
 # Enable the variable Access Bridge Enabled in TESTAR as true
 #################################################################
@@ -43,7 +43,7 @@ AccessBridgeEnabled = false
 #################################################################
 
 Sequences = 2
-SequenceLength = 100
+SequenceLength = 150
 
 #################################################################
 # Oracles based on suspicious titles

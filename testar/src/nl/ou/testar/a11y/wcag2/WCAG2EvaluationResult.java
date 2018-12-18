@@ -40,44 +40,44 @@ import nl.ou.testar.a11y.reporting.EvaluationResult;
  *
  */
 public final class WCAG2EvaluationResult extends EvaluationResult {
-	
-	private static final long serialVersionUID = -3449985990033944575L;
-	
-	private final SuccessCriterion criterion;
-	
-	/**
-	 * Constructs a new evaluation result that does not apply to a single widget
-	 * @param criterion The success criterion associated with this evaluation result.
-	 * @param type The problem type.
-	 * @param message The problem description.
-	 */
-	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message) {
-		this(criterion, type, message, null);
-	}
 
-	/**
-	 * Constructs a new evaluation result that applies to a single widget
-	 * @param criterion The success criterion associated with this evaluation result.
-	 * @param type The problem type.
-	 * @param message The problem description.
-	 * @param widget The widget this evaluation result applies to.
-	 */
-	WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message, Widget widget) {
-		super(type, message, widget);
-		this.criterion = criterion;
-	}
-	
-	/**
-	 * Gets the success criterion associated with this evaluation result
-	 * @return The success criterion.
-	 */
-	public SuccessCriterion getSuccessCriterion() {
-		return criterion;
-	}
-	
-	@Override
-	public double getVerdictSeverity() {
-		return criterion.getVerdictSeverity();
-	}
-	
+  private static final long serialVersionUID = -3449985990033944575L;
+
+  private final SuccessCriterion criterion;
+
+  /**
+   * Constructs a new evaluation result that does not apply to a single widget
+   * @param criterion The success criterion associated with this evaluation result.
+   * @param type The problem type.
+   * @param message The problem description.
+   */
+  WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message) {
+    this(criterion, type, message, null);
+  }
+
+  /**
+   * Constructs a new evaluation result that applies to a single widget
+   * @param criterion The success criterion associated with this evaluation result.
+   * @param type The problem type.
+   * @param message The problem description.
+   * @param widget The widget this evaluation result applies to.
+   */
+  WCAG2EvaluationResult(SuccessCriterion criterion, Type type, String message, Widget widget) {
+    super(type, message, widget);
+    this.criterion = criterion;
+  }
+
+  /**
+   * Gets the success criterion associated with this evaluation result
+   * @return The success criterion.
+   */
+  public SuccessCriterion getSuccessCriterion() {
+    return criterion;
+  }
+
+  @Override
+  public double getVerdictSeverity() {
+    return criterion.getVerdictSeverity();
+  }
+
 }

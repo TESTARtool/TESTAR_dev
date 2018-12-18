@@ -6,8 +6,8 @@ package nl.ou.testar.utils.consumer;
  */
 public interface Item {
 
-	/**
-	 * Process item.
-	 */
-	void process();  	
+  /**
+   * Process item.
+   */
+  void process();
 }

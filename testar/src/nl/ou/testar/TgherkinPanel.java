@@ -31,7 +31,7 @@ import org.fruit.monkey.Settings;
  */
 public class TgherkinPanel extends JPanel {
   /**
-   * Serial version UID. 
+   * Serial version UID.
    */
   private static final long serialVersionUID = 9033457654990065279L;
   private JComboBox<String> tgComboBoxTgherkinDocument;
@@ -53,9 +53,9 @@ public class TgherkinPanel extends JPanel {
   private String protocolClass;
   private boolean documentProtocol;
   private boolean active;
-  
+
   private List<String> myClassPath;
-  
+
   /**
    * Retrieve document protocol indicator.
    * @return document protocol indicator
@@ -74,7 +74,7 @@ public class TgherkinPanel extends JPanel {
 
   /**
    * Set active indicator.
-   * @param active the active indicator      
+   * @param active the active indicator
    */
   public void setActive(boolean active) {
     this.active = active;
@@ -88,7 +88,7 @@ public class TgherkinPanel extends JPanel {
     addTgherkinControls();
     addTgherkinLabels();
   }
-  
+
   private void addTgherkinControls() {
     tgComboBoxTgherkinDocument = new JComboBox<String>();
     tgComboBoxTgherkinDocument.setBounds(286, 10, 200, 20);
@@ -96,7 +96,7 @@ public class TgherkinPanel extends JPanel {
         .setToolTipText("<html>\nSelect *.tgherkin document: specifications of "
         + "features and scenarios in Tgherkin grammar.\n</html>");
     add(tgComboBoxTgherkinDocument);
-      
+
     btnEditTgherkinDocument = new javax.swing.JButton("Edit Tgherkin Document");
     btnEditTgherkinDocument.setBounds(286, 34, 200, 20);
     btnEditTgherkinDocument.addActionListener(new java.awt.event.ActionListener() {
@@ -117,15 +117,15 @@ public class TgherkinPanel extends JPanel {
     tgComboBoxExecutionMode.setBounds(120, 34, 120, 20);
     tgComboBoxExecutionMode.setToolTipText("<html>\nSelect execution mode.\n</html>");
     add(tgComboBoxExecutionMode);
-      
+
     tgApplyDefaultOnMismatchCheckBox = new JCheckBox("Apply default on step mismatch");
     tgApplyDefaultOnMismatchCheckBox.setBounds(10, 58, 200, 23);
     tgApplyDefaultOnMismatchCheckBox
         .setToolTipText("<html>\nIncicates whether default should "
         + "be applied on step mismatches.\n</html>");
     add(tgApplyDefaultOnMismatchCheckBox);
-      
-    tgContinueToApplyDefaultCheckBox = 
+
+    tgContinueToApplyDefaultCheckBox =
         new JCheckBox("Continue to apply default after a step mismatch");
     tgContinueToApplyDefaultCheckBox.setBounds(30, 82, 300, 23);
     tgContinueToApplyDefaultCheckBox
@@ -135,7 +135,7 @@ public class TgherkinPanel extends JPanel {
 
     tgApplyDefaultOnMismatchCheckBox.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        if (!tgApplyDefaultOnMismatchCheckBox.isSelected() 
+        if (!tgApplyDefaultOnMismatchCheckBox.isSelected()
             && tgContinueToApplyDefaultCheckBox.isSelected()) {
           tgContinueToApplyDefaultCheckBox.setSelected(false);
         }
@@ -143,7 +143,7 @@ public class TgherkinPanel extends JPanel {
               .setEnabled(tgApplyDefaultOnMismatchCheckBox.isSelected());
         }
       });
-      
+
     tgRepeatTgherkinScenariosCheckBox = new JCheckBox("Repeat Tgherkin scenarios");
     tgRepeatTgherkinScenariosCheckBox.setBounds(10, 106, 300, 23);
     tgRepeatTgherkinScenariosCheckBox
@@ -177,7 +177,7 @@ public class TgherkinPanel extends JPanel {
     tgReportStateCheckBox
        .setToolTipText("<html>\nIndicates whether state should be reported.\n</html>");
     add(tgReportStateCheckBox);
-      
+
     tgTgherkinReportIncludeOCRCheckBox = new JCheckBox("Include OCR in Tgherkin state report");
     tgTgherkinReportIncludeOCRCheckBox.setBounds(30, 226, 300, 23);
     tgTgherkinReportIncludeOCRCheckBox
@@ -188,7 +188,7 @@ public class TgherkinPanel extends JPanel {
 
     tgReportStateCheckBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          if (!tgReportStateCheckBox.isSelected() 
+          if (!tgReportStateCheckBox.isSelected()
               && tgTgherkinReportIncludeOCRCheckBox.isSelected()) {
             tgTgherkinReportIncludeOCRCheckBox.setSelected(false);
           }
@@ -197,7 +197,7 @@ public class TgherkinPanel extends JPanel {
         }
       });
 
-    tgTgherkinReportIncludeImageRecognitionCheckBox 
+    tgTgherkinReportIncludeImageRecognitionCheckBox
         = new JCheckBox("Include Image recognition in Tgherkin state report");
     tgTgherkinReportIncludeImageRecognitionCheckBox.setBounds(30, 250, 300, 23);
     tgTgherkinReportIncludeImageRecognitionCheckBox
@@ -208,7 +208,7 @@ public class TgherkinPanel extends JPanel {
 
     tgReportStateCheckBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          if (!tgReportStateCheckBox.isSelected() 
+          if (!tgReportStateCheckBox.isSelected()
               && tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected()) {
             tgTgherkinReportIncludeImageRecognitionCheckBox.setSelected(false);
           }
@@ -216,7 +216,7 @@ public class TgherkinPanel extends JPanel {
               .setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
         }
       });
-      
+
     tgConfidenceThreshold = new JSpinner();
     tgConfidenceThreshold.setBounds(280, 274, 100, 25);
     tgConfidenceThreshold.setModel(new SpinnerNumberModel(0.0d, 0.0d, 1.0d, 0.01d));
@@ -247,25 +247,25 @@ public class TgherkinPanel extends JPanel {
   private void addTgherkinLabels() {
     JLabel tgTgherkinDocumentLabel = new JLabel("Tgherkin document:");
     tgTgherkinDocumentLabel.setBounds(10, 10, 120, 23);
-    add(tgTgherkinDocumentLabel);        
+    add(tgTgherkinDocumentLabel);
 
     JLabel tgExecutionModeLabel = new JLabel("Execution mode:");
     tgExecutionModeLabel.setBounds(10, 34, 100, 23);
-    add(tgExecutionModeLabel);        
+    add(tgExecutionModeLabel);
 
     JLabel tgConfidenceThresholdLabel = new JLabel("Confidence threshold for image recognition:");
     tgConfidenceThresholdLabel.setBounds(10, 274, 270, 23);
-    add(tgConfidenceThresholdLabel);        
+    add(tgConfidenceThresholdLabel);
 
     JLabel tgMinimumPercentageForImageRecognitionLabel =
         new JLabel("Minimum percentage for image recognition:");
     tgMinimumPercentageForImageRecognitionLabel.setBounds(10, 298, 270, 23);
-    add(tgMinimumPercentageForImageRecognitionLabel);        
+    add(tgMinimumPercentageForImageRecognitionLabel);
 
-    JLabel tgNumberOfNOPRetriesLabel = 
+    JLabel tgNumberOfNOPRetriesLabel =
         new JLabel("Number of NOP (no operation) action retries:");
     tgNumberOfNOPRetriesLabel.setBounds(10, 322, 270, 23);
-    add(tgNumberOfNOPRetriesLabel);        
+    add(tgNumberOfNOPRetriesLabel);
   }
 
   /**
@@ -273,6 +273,7 @@ public class TgherkinPanel extends JPanel {
    * @param settings The settings to load.
    */
   public void populateFrom(final Settings settings) {
+    tgComboBoxTgherkinDocument.setSelectedItem(settings.get(ConfigTags.TgherkinDocument));
     tgComboBoxExecutionMode.setSelectedItem(settings.get(ConfigTags.TgherkinExecutionMode));
     tgApplyDefaultOnMismatchCheckBox.setSelected(settings.get(ConfigTags.ApplyDefaultOnMismatch));
     tgContinueToApplyDefaultCheckBox.setSelected(settings.get(ConfigTags.ContinueToApplyDefault));
@@ -291,7 +292,7 @@ public class TgherkinPanel extends JPanel {
         .setValue(settings.get(ConfigTags.MinimumPercentageForImageRecognition));
     tgNumberOfNOPRetries.setValue(settings.get(ConfigTags.TgherkinNrOfNOPRetries));
     tgherkinDocument = settings.get(ConfigTags.TgherkinDocument);
-    protocolClass = settings.get(ConfigTags.ProtocolClass); 
+    protocolClass = settings.get(ConfigTags.ProtocolClass);
     myClassPath = settings.get(ConfigTags.MyClassPath);
     checkDocumentProtocol();
     if (documentProtocol) {
@@ -305,25 +306,25 @@ public class TgherkinPanel extends JPanel {
    */
   public void extractInformation(final Settings settings) {
     if (tgComboBoxTgherkinDocument.getSelectedItem() != null) {
-      settings.set(ConfigTags.TgherkinDocument, "./resources/settings/" 
+      settings.set(ConfigTags.TgherkinDocument, "./resources/settings/"
           + settings.get(ConfigTags.ProtocolClass).split("/")[0] + "/"
           + (String)tgComboBoxTgherkinDocument.getSelectedItem());
     } else {
       settings.set(ConfigTags.TgherkinDocument, "");
     }
-    settings.set(ConfigTags.TgherkinExecutionMode, 
+    settings.set(ConfigTags.TgherkinExecutionMode,
         (String) tgComboBoxExecutionMode.getSelectedItem());
     settings.set(ConfigTags.ApplyDefaultOnMismatch, tgApplyDefaultOnMismatchCheckBox.isSelected());
     settings.set(ConfigTags.ContinueToApplyDefault, tgContinueToApplyDefaultCheckBox.isSelected());
-    settings.set(ConfigTags.RepeatTgherkinScenarios, 
+    settings.set(ConfigTags.RepeatTgherkinScenarios,
         tgRepeatTgherkinScenariosCheckBox.isSelected());
-    settings.set(ConfigTags.GenerateTgherkinReport, 
-        tgGenerateTgherkinReportCheckBox.isSelected());    
-    settings.set(ConfigTags.TgherkinReportIncludeOCR, 
-        tgTgherkinReportIncludeOCRCheckBox.isSelected());    
+    settings.set(ConfigTags.GenerateTgherkinReport,
+        tgGenerateTgherkinReportCheckBox.isSelected());
+    settings.set(ConfigTags.TgherkinReportIncludeOCR,
+        tgTgherkinReportIncludeOCRCheckBox.isSelected());
     settings.set(ConfigTags.TgherkinReportIncludeImageRecognition,
-        tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected());    
-    settings.set(ConfigTags.StoreTgherkinReport, tgStoreTgherkinReportCheckBox.isSelected());    
+        tgTgherkinReportIncludeImageRecognitionCheckBox.isSelected());
+    settings.set(ConfigTags.StoreTgherkinReport, tgStoreTgherkinReportCheckBox.isSelected());
     settings.set(ConfigTags.ReportDerivedGestures, tgReportDerivedGesturesCheckBox.isSelected());
     settings.set(ConfigTags.ReportState, tgReportStateCheckBox.isSelected());
     settings.set(ConfigTags.ConfidenceThreshold, (Double) tgConfidenceThreshold.getValue());
@@ -334,8 +335,8 @@ public class TgherkinPanel extends JPanel {
 
   private void btnEditTgherkinDocumentActionPerformed(java.awt.event.ActionEvent evt) {
     if (tgComboBoxTgherkinDocument.getSelectedItem() != null) {
-      String fileName = 
-          "./resources/settings/" + protocolClass.split("/")[0] 
+      String fileName =
+          "./resources/settings/" + protocolClass.split("/")[0]
           + "/" + (String)tgComboBoxTgherkinDocument.getSelectedItem();
       JDialog dialog = new TgherkinEditor(fileName);
       dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
@@ -355,9 +356,9 @@ public class TgherkinPanel extends JPanel {
       */
       URL[] classPath = {new File("bin/oracle/").toURI().toURL()};
       loader = new URLClassLoader(classPath);
-        
+
       @SuppressWarnings("unchecked")
-      UnProc<Settings> protocol = 
+      UnProc<Settings> protocol =
           (UnProc<Settings>) loader.loadClass(protocolClass.replace("/", "."))
           .getConstructor().newInstance();
       if (DocumentProtocol.class.isAssignableFrom(protocol.getClass())) {
@@ -368,17 +369,17 @@ public class TgherkinPanel extends JPanel {
       e.printStackTrace();
     } finally {
       if (loader != null) {
-        try { 
-          loader.close(); 
+        try {
+          loader.close();
         } catch (IOException e) {
           e.printStackTrace();
         }
       }
-    }    
+    }
   }
 
   private void populateTgherkinDocuments() {
-    String[] tgherkinDocuments = 
+    String[] tgherkinDocuments =
         new File("./resources/settings/" + protocolClass.split("/")[0] + "/")
             .list(new FilenameFilter() {
                 @Override
@@ -400,17 +401,13 @@ public class TgherkinPanel extends JPanel {
       if (parts.length > 0) {
         String tgherkinDocumentName = parts[parts.length - 1];
         tgComboBoxTgherkinDocument.setSelectedItem(tgherkinDocumentName);
-      }                
+      }
     }
     // tgherkin documents available for selection?
     if (tgherkinDocuments.length > 0) {
-      btnEditTgherkinDocument.setEnabled(true);    
+      btnEditTgherkinDocument.setEnabled(true);
     } else {
       btnEditTgherkinDocument.setEnabled(false);
-    }   
+    }
   }
 }
-
-
-
-

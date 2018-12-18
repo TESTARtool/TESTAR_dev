@@ -33,35 +33,35 @@ package es.upv.staq.testar.graph;
 
 /**
  * Represents a movement in a test sequence as an executed action from a SUT state.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  */
 public class Movement {
-	
-	private IGraphState vertex;
-	private IGraphAction edge;
-	
-	/**
-	 * Constructor.
-	 * @param v Graph state before action execution.
-	 * @param e Executed graph action.
-	 */
-	public Movement(IGraphState v, IGraphAction e){
-		vertex=v;
-		edge=e;
-	}
 
-	public IGraphState getVertex() {
-		return vertex;
-	}
+  private IGraphState vertex;
+  private IGraphAction edge;
 
-	public IGraphAction getEdge() {
-		return edge;
-	}
-	
-	@Override
-	public String toString(){
-		return "Movement: edge_" + getEdge().toString() + " @vertex_" + getVertex().toString();
-	}
-	
+  /**
+   * Constructor.
+   * @param v Graph state before action execution.
+   * @param e Executed graph action.
+   */
+  public Movement(IGraphState v, IGraphAction e) {
+    vertex=v;
+    edge=e;
+  }
+
+  public IGraphState getVertex() {
+    return vertex;
+  }
+
+  public IGraphAction getEdge() {
+    return edge;
+  }
+
+  @Override
+  public String toString() {
+    return "Movement: edge_" + getEdge().toString() + " @vertex_" + getVertex().toString();
+  }
+
 }

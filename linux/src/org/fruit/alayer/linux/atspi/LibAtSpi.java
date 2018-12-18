@@ -67,8 +67,8 @@ public class LibAtSpi {
 
 
     /**
-     * Gets the virtual desktop indicated by index i . NOTE: currently multiple virtual desktops are not implemented; as
-     * a consequence, any i value different from 0 will not return a virtual desktop - instead it will return NULL.
+     * Gets the virtual desktop indicated by indexÃ¢â‚¬Â¯iÃ¢â‚¬Â¯. NOTE: currently multiple virtual desktops are not implemented; as
+     * a consequence, anyÃ¢â‚¬Â¯iÃ¢â‚¬Â¯value different from 0 will not return a virtual desktop - instead it will return NULL.
      * @param desktopIndex Index indicating which of the accessible desktops is to be returned.
      * @return Returns a pointer to the i -th virtual desktop's AtspiAccessible representation.
      */

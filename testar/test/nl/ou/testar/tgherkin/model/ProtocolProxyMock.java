@@ -12,38 +12,38 @@ import nl.ou.testar.tgherkin.protocol.DocumentProtocol;
  */
 public class ProtocolProxyMock extends DocumentProtocol implements ProtocolProxy {
 
-	private Settings settings;
-	private State state;
+  private Settings settings;
+  private State state;
 
-	/**
-	 * Constructor.
-	 * @param settings given configuration settings
-	 * @param state given state
-	 */
-	public ProtocolProxyMock(Settings settings, State state) {
-		super();
-		this.settings = settings;
-		this.state = state;
-	}
+  /**
+   * Constructor.
+   * @param settings given configuration settings
+   * @param state given state
+   */
+  public ProtocolProxyMock(Settings settings, State state) {
+    super();
+    this.settings = settings;
+    this.state = state;
+  }
 
-	@Override
-	public Settings getSettings() {
-		return settings;
-	}
+  @Override
+  public Settings getSettings() {
+    return settings;
+  }
 
-	@Override
-	public State getState() {
-		return state;
-	}
+  @Override
+  public State getState() {
+    return state;
+  }
 
-	@Override
-	public boolean isUnfiltered(Widget widget) {
-		return true;
-	}
+  @Override
+  public boolean isUnfiltered(Widget widget) {
+    return true;
+  }
 
-	@Override
-	public void storeWidget(String stateID, Widget widget) {
-		// no action
-	}
-	
+  @Override
+  public void storeWidget(String stateID, Widget widget) {
+    // no action
+  }
+
 }

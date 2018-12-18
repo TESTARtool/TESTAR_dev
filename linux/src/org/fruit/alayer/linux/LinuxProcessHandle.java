@@ -59,14 +59,14 @@ public class LinuxProcessHandle implements ProcessHandle {
         _process = lp;
     }
 
-	/**
+  /**
      * Creates a new Linux process representation from another Linux process representation.
      * @param pid The PID of the linux process to create a LinuxProcessHandle representation for.
      */
     public LinuxProcessHandle(long pid) {
         _process = LinuxProcess.fromPid(pid);
     }
-	
+
     //endregion
 
 

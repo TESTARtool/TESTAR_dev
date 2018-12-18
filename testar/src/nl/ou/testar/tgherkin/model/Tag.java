@@ -7,16 +7,16 @@ import org.fruit.Assert;
  *
  */
 public class Tag {
-    
-	private final String name;
+
+  private final String name;
 
     /**
      * Tag constructor.
      * @param name tag name
      */
     public Tag(String name) {
-    	Assert.notNull(name);
-    	this.name = name;
+      Assert.notNull(name);
+      this.name = name;
     }
 
     /**
@@ -29,8 +29,8 @@ public class Tag {
 
     @Override
     public String toString() {
-    	return getName();    	
+      return getName();
     }
-    
-    
+
+
 }

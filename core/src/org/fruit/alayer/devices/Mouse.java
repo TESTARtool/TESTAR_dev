@@ -36,9 +36,9 @@ package org.fruit.alayer.devices;
 import org.fruit.alayer.Point;
 
 public interface Mouse {
-	void press(MouseButtons k);
-	void release(MouseButtons k);
-	void isPressed(MouseButtons k);
-	void setCursor(double x, double y);
-	Point cursor();
+  void press(MouseButtons k);
+  void release(MouseButtons k);
+  void isPressed(MouseButtons k);
+  void setCursor(double x, double y);
+  Point cursor();
 }

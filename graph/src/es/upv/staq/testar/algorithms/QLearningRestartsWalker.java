@@ -42,36 +42,36 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * A Q-learning walker extension with periodic state restarts.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class QLearningRestartsWalker extends QLearningWalker {
-			
-	public QLearningRestartsWalker(double discount, double maxReward, int testSequenceLength){
-		super(discount,maxReward);
-		RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
-	}
 
-	@Override
-	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
-		RestartsWalkerUtil.notifyActionSelection(this,env, state);
-		return super.selectAction(env, state, actions, jipWrapper);
-	}
+  public QLearningRestartsWalker(double discount, double maxReward, int testSequenceLength) {
+    super(discount,maxReward);
+    RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
+  }
 
-	@Override
-	public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
-		RestartsWalkerUtil.notifyRewardCalculation(env, action);
-		return super.calculateRewardForAction(env, action);
-	}
+  @Override
+  public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
+    RestartsWalkerUtil.notifyActionSelection(this,env, state);
+    return super.selectAction(env, state, actions, jipWrapper);
+  }
 
-	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
-		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
-		if (r != Double.MIN_VALUE)
-			return r;
-		else
-			return super.calculateRewardForState(env, targetState);
-	}	
-	
+  @Override
+  public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
+    RestartsWalkerUtil.notifyRewardCalculation(env, action);
+    return super.calculateRewardForAction(env, action);
+  }
+
+  @Override
+  public double calculateRewardForState(IEnvironment env, IGraphState targetState) {
+    double r = RestartsWalkerUtil.getTargetReward(env, targetState);
+    if (r != Double.MIN_VALUE)
+      return r;
+    else
+      return super.calculateRewardForState(env, targetState);
+  }
+
 }

@@ -39,12 +39,12 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class SeizuresGuideline extends AbstractGuideline {
 
-	private static final long serialVersionUID = -3706235373844450955L;
+  private static final long serialVersionUID = -3706235373844450955L;
 
-	SeizuresGuideline(AbstractPrinciple parent) {
-		super(3, "Seizures", parent);
-		criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold",
-				this, Level.A, "seizure-does-not-violate"));
-	}
+  SeizuresGuideline(AbstractPrinciple parent) {
+    super(3, "Seizures", parent);
+    criteria.add(new SuccessCriterion(1, "Three Flashes or Below Threshold",
+        this, Level.A, "seizure-does-not-violate"));
+  }
 
 }

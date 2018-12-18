@@ -38,5 +38,5 @@ import java.io.Serializable;
 import org.fruit.alayer.exceptions.SystemStartException;
 
 public interface SystemBuilder extends Serializable {
-	SUT apply() throws SystemStartException;
+  SUT apply() throws SystemStartException;
 }

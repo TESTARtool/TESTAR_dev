@@ -36,8 +36,8 @@ package org.fruit.alayer.devices;
 import org.fruit.alayer.exceptions.SystemStopException;
 
 public interface ProcessHandle {
-	void kill() throws SystemStopException;
-	boolean isRunning();
-	String name();
-	long pid();
+  void kill() throws SystemStopException;
+  boolean isRunning();
+  String name();
+  long pid();
 }

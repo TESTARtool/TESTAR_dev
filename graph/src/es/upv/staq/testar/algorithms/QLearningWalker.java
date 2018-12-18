@@ -42,44 +42,44 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * Q-learning walker.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class QLearningWalker extends AbstractWalker { // Q = Reward
-	
-	protected double maxReward;
-	protected double discount;
-		
-	public QLearningWalker(double discount, double maxReward){
-		this.maxReward = maxReward;
-		this.discount = discount;
-	}
-	
-	@Override
-	public double getBaseReward(){
-		return this.maxReward;
-	}	
 
-	@Override
-	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
-		super.selectAction(env, state, actions, jipWrapper);
-		return super.selectProportional(env, state, actions);
-	}
-	
-	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState state){
-		double r = super.calculateRewardForState(env, state);
-		if (r == getBaseReward())
-			return r;
-		else
-			return r / Math.log(state.getCount() + Math.E - 1);
-	}
+  protected double maxReward;
+  protected double discount;
 
-	@Override
-	protected double calculateRewardForAction(IEnvironment env, IGraphAction action){
-		double r = super.calculateRewardForAction(env, action);
-		return discount * r;
-	}
-		
+  public QLearningWalker(double discount, double maxReward) {
+    this.maxReward = maxReward;
+    this.discount = discount;
+  }
+
+  @Override
+  public double getBaseReward() {
+    return this.maxReward;
+  }
+
+  @Override
+  public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
+    super.selectAction(env, state, actions, jipWrapper);
+    return super.selectProportional(env, state, actions);
+  }
+
+  @Override
+  public double calculateRewardForState(IEnvironment env, IGraphState state) {
+    double r = super.calculateRewardForState(env, state);
+    if (r == getBaseReward())
+      return r;
+    else
+      return r / Math.log(state.getCount() + Math.E - 1);
+  }
+
+  @Override
+  protected double calculateRewardForAction(IEnvironment env, IGraphAction action) {
+    double r = super.calculateRewardForAction(env, action);
+    return discount * r;
+  }
+
 }

@@ -33,42 +33,42 @@ package es.upv.staq.testar.graph;
 import org.fruit.alayer.State;
 
 /**
- * Graph test sequence stopping utility. 
- * 
+ * Graph test sequence stopping utility.
+ *
  * @author Urko Rueda Molina (alias: urueda)
  */
 public class WalkStopper {
 
-	private boolean alive = true; // is walk alive?
-	private boolean status = true; // test verdict?
-	private State endState = null; // test sequence ending state?
-	
-	/**
-	 * Is test sequence active? Is graph still being populated?
-	 * @return
-	 */
-	public boolean continueWalking(){
-		return alive;
-	}
-	
-	/**
-	 * Force walk to stop.
-	 * @param status Test verdict: 'true' test OK, 'false' test FAIL.
-	 * @param endState Ending state.
-	 */
-	public void stopWalk(boolean status, State endState){
-		//System.out.println("STOPPED WALK!");
-		alive = false;
-		this.status = status;
-		this.endState = endState;
-	}
-	
-	public boolean walkStatus(){
-		return status;
-	}
-	
-	public State walkEndState(){
-		return endState;
-	}
-	
+  private boolean alive = true; // is walk alive?
+  private boolean status = true; // test verdict?
+  private State endState = null; // test sequence ending state?
+
+  /**
+   * Is test sequence active? Is graph still being populated?
+   * @return
+   */
+  public boolean continueWalking() {
+    return alive;
+  }
+
+  /**
+   * Force walk to stop.
+   * @param status Test verdict: 'true' test OK, 'false' test FAIL.
+   * @param endState Ending state.
+   */
+  public void stopWalk(boolean status, State endState) {
+    //System.out.println("STOPPED WALK!");
+    alive = false;
+    this.status = status;
+    this.endState = endState;
+  }
+
+  public boolean walkStatus() {
+    return status;
+  }
+
+  public State walkEndState() {
+    return endState;
+  }
+
 }

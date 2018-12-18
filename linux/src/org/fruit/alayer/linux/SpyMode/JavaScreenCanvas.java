@@ -111,7 +111,7 @@ public class JavaScreenCanvas implements Canvas {
     @Override
     public void release() {
 
-        if(!_running)
+        if (!_running)
             return;
         _running = false;
 
@@ -287,7 +287,7 @@ public class JavaScreenCanvas implements Canvas {
      * @param defaultPen The default pen used to draw stuff.
      * @return An instance of a window to draw on in Spy- mode.
      */
-    public static JavaScreenCanvas fromPrimaryMonitor(Pen defaultPen){
+    public static JavaScreenCanvas fromPrimaryMonitor(Pen defaultPen) {
 
         // Get the primary monitor bounds and create a window covering the entire screen.
         Rectangle monitorBounds =  getPrimaryMonitorBounds();
@@ -301,7 +301,7 @@ public class JavaScreenCanvas implements Canvas {
      * Checks whether the Spy- window is showing. If not, it will throw an IllegalStateException.
      */
     private void runningCheck() {
-        if(!_running)
+        if (!_running)
             throw new IllegalStateException();
     }
 
@@ -330,7 +330,7 @@ public class JavaScreenCanvas implements Canvas {
         GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] devices = g.getScreenDevices();
 
-        for (GraphicsDevice device : devices) {
+        for (GraphicsDevice device: devices) {
 
             Rectangle monitorBounds = device.getDefaultConfiguration().getBounds();
 

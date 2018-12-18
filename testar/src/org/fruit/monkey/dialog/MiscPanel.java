@@ -254,7 +254,7 @@ public class MiscPanel extends JPanel {
     }
 
     int i = 0;
-    for (Pair<String, String> fromTo : settings.get(ConfigTags.CopyFromTo)) {
+    for (Pair<String, String> fromTo: settings.get(ConfigTags.CopyFromTo)) {
       tblCopyFromTo.setValueAt(fromTo.left(), i, 0);
       tblCopyFromTo.setValueAt(fromTo.right(), i, 1);
       i++;
@@ -265,7 +265,7 @@ public class MiscPanel extends JPanel {
     }
 
     i = 0;
-    for (String f : settings.get(ConfigTags.Delete)) {
+    for (String f: settings.get(ConfigTags.Delete)) {
       tblDelete.setValueAt(f, i, 0);
       i++;
     }

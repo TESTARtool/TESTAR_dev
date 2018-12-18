@@ -18,9 +18,9 @@ public class UrlActionCompiler extends StdActionCompiler {
   private Abstractor abstractor;
   private final Action LMouseDown = new MouseDown(MouseButtons.BUTTON1);
   private final Action LMouseUp = new MouseUp(MouseButtons.BUTTON1);
-    
-  public UrlActionCompiler() {  
-    this(new StdAbstractor()); 
+
+  public UrlActionCompiler() {
+    this(new StdAbstractor());
   }
 
   public UrlActionCompiler(Abstractor abstractor) {
@@ -47,12 +47,11 @@ public class UrlActionCompiler extends StdActionCompiler {
   public Action clickTypeUrl(Widget widget, String text) {
     return clickTypeUrl(widget, 0.5, 0.5, text);
   }
-  
+
   public Action clickTypeUrl(Widget widget, double relX, double relY, String text) {
     String value = widget.get(Tags.ValuePattern);
     int currentUrlLength = value.length();
     Finder wf = abstractor.apply(widget);
-    Position p = new WidgetPosition(wf, Tags.Shape, relX, relY, true);
     Action ret =
         clickTypeUrl(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text, currentUrlLength);
     ret.set(Tags.Targets, Util.newArrayList(wf));

@@ -37,79 +37,79 @@ import java.util.Set;
 
 /**
  * Utility methods for JIProlog.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class PrologUtil {
 
-    /*public static String normaliseQuotedAtoms(String atom){
-		if (atom.startsWith("[")){ // atoms with quotes are returned as an array: [int, ..., int]
-			StringTokenizer st = new StringTokenizer(atom.substring(1, atom.length()-1),",");
-			StringBuilder sb = new StringBuilder();
-			while (st.hasMoreTokens())
-				sb.append((char) new Integer(st.nextToken()).intValue());
-			return sb.toString();
-		}
-		else return atom;
-	}*/
-	
-	@SafeVarargs
-	public static String setToString(Set<String>... sets){
-		StringBuilder sb = new StringBuilder();
-		for (Set<String> set : sets){
-			if (set != null){
-				for (String s : set)
-					sb.append(s + "\n");
-			}
-		}
-		return sb.toString();
-	}
-	
-	public static List<String> getSolutions(String var, List<List<String>> solutions){
-		List<String> varSolutions = new ArrayList<String>();
-		boolean b, varSol;
-		for (List<String> solution : solutions){
-			b = true; // is variable?
-			varSol = false;
-			for (String s : solution){
-				if (b){
-					if (s.equals(var))
-						varSol = true;
-				} else if (varSol){
-					varSolutions.add(s);
-					varSol = false;
-				}
-				b = !b;
-			}			
-		}
-		return varSolutions;
-	}
-	
-	public static void printSolutions(List<List<String>> solutions){
-		if (solutions == null || solutions.isEmpty()){
-			System.out.println(">>> Prolog: no solutions <<<\n");
-			return;
-		}
-		Set<String> solSet = new HashSet<String>(); // fix equal solutions duplication
-		StringBuilder sol;
-		boolean b; // is variable?
-		for (List<String> solution : solutions){
-			sol = new StringBuilder();
-			b = true;
-			for (String s : solution){
-				if (b)
-					sol.append("\t" + s + " = ");
-				else
-					sol.append(s + "\n");
-				b = !b;
-			}
-			solSet.add(sol.toString());
-		}
-		int idx = 1;
-		for (String s : solSet)
-			System.out.println("Prolog-Solution (" + (idx++) + "):\n" + s);
-		System.out.println("");
-	}
+    /*public static String normaliseQuotedAtoms(String atom) {
+    if (atom.startsWith("[")) { // atoms with quotes are returned as an array: [int, ..., int]
+      StringTokenizer st = new StringTokenizer(atom.substring(1, atom.length()-1),",");
+      StringBuilder sb = new StringBuilder();
+      while (st.hasMoreTokens())
+        sb.append((char) new Integer(st.nextToken()).intValue());
+      return sb.toString();
+    }
+    else return atom;
+  }*/
+
+  @SafeVarargs
+  public static String setToString(Set<String>... sets) {
+    StringBuilder sb = new StringBuilder();
+    for (Set<String> set: sets) {
+      if (set != null) {
+        for (String s: set)
+          sb.append(s + "\n");
+      }
+    }
+    return sb.toString();
+  }
+
+  public static List<String> getSolutions(String var, List<List<String>> solutions) {
+    List<String> varSolutions = new ArrayList<String>();
+    boolean b, varSol;
+    for (List<String> solution: solutions) {
+      b = true; // is variable?
+      varSol = false;
+      for (String s: solution) {
+        if (b) {
+          if (s.equals(var))
+            varSol = true;
+        } else if (varSol) {
+          varSolutions.add(s);
+          varSol = false;
+        }
+        b = !b;
+      }
+    }
+    return varSolutions;
+  }
+
+  public static void printSolutions(List<List<String>> solutions) {
+    if (solutions == null || solutions.isEmpty()) {
+      System.out.println(">>> Prolog: no solutions <<<\n");
+      return;
+    }
+    Set<String> solSet = new HashSet<String>(); // fix equal solutions duplication
+    StringBuilder sol;
+    boolean b; // is variable?
+    for (List<String> solution: solutions) {
+      sol = new StringBuilder();
+      b = true;
+      for (String s: solution) {
+        if (b)
+          sol.append("\t" + s + " = ");
+        else
+          sol.append(s + "\n");
+        b = !b;
+      }
+      solSet.add(sol.toString());
+    }
+    int idx = 1;
+    for (String s: solSet)
+      System.out.println("Prolog-Solution (" + (idx++) + "):\n" + s);
+    System.out.println("");
+  }
 
 }

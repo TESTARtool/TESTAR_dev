@@ -1,31 +1,31 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-***************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ **************************************************************************************************/
 
 /**
  *  @author Sebastian Bauersfeld
@@ -39,11 +39,22 @@ import es.upv.staq.testar.graph.Grapher;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import nl.ou.testar.tgherkin.model.Document;
 import org.fruit.Assert;
 import org.fruit.Pair;
@@ -54,12 +65,13 @@ public class Main {
 
   // TODO: Understand what this exactly does?
   /**
-   * Overidde something. Not sure what
+   * Overide something. Not sure what
    * @param settings settings for this SUT
    */
   private static void overrideWithUserProperties(Settings settings) {
     String ps;
     String p;
+
     // headless mode
     ps = ConfigTags.ShowVisualSettingsDialogOnStartup.name();
     p = System.getProperty(ps, null);
@@ -68,7 +80,7 @@ public class Main {
     }
     if (p != null) {
       settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(new Boolean(p).booleanValue()));
-      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">", 
+      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">",
           LogSerialiser.LogLevel.Critical);
     }
     // TestGenerator
@@ -79,7 +91,7 @@ public class Main {
     }
     if (p != null) {
       settings.set(ConfigTags.TestGenerator, p);
-      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">", 
+      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">",
           LogSerialiser.LogLevel.Critical);
     }
     // SequenceLength
@@ -92,10 +104,10 @@ public class Main {
       try {
         Integer sl = new Integer(p);
         settings.set(ConfigTags.SequenceLength, sl);
-        LogSerialiser.log("Property <" + ps + "> overridden to <" + sl.toString() + ">", 
-            LogSerialiser.LogLevel.Critical);
+        LogSerialiser.log("Property <" + ps + "> overridden to <"
+            + sl.toString() + ">", LogSerialiser.LogLevel.Critical);
       } catch (NumberFormatException e) {
-        LogSerialiser.log("Property <" + ps + "> could not be set! (using default)", 
+        LogSerialiser.log("Property <" + ps + "> could not be set! (using default)",
             LogSerialiser.LogLevel.Critical);
       }
     }
@@ -107,7 +119,7 @@ public class Main {
     }
     if (p != null) {
       settings.set(ConfigTags.GraphResuming, new Boolean(p).booleanValue());
-      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">", 
+      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">",
           LogSerialiser.LogLevel.Critical);
     }
     // ForceToSequenceLength
@@ -131,7 +143,7 @@ public class Main {
       try {
         Integer tt = new Integer(p);
         settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-        LogSerialiser.log("Property <" + ps + "> overridden to <" + tt.toString() + ">", 
+        LogSerialiser.log("Property <" + ps + "> overridden to <" + tt.toString() + ">",
             LogSerialiser.LogLevel.Critical);
       } catch (NumberFormatException e) {
         LogSerialiser.log("Property <" + ps + "> could not be set! (using default)",
@@ -151,7 +163,7 @@ public class Main {
         LogSerialiser.log("Property <" + ps + "> overridden to <" + sst.toString() + ">",
             LogSerialiser.LogLevel.Critical);
       } catch (NumberFormatException e) {
-        LogSerialiser.log("Property <" + ps + "> could not be set! (using default)", 
+        LogSerialiser.log("Property <" + ps + "> could not be set! (using default)",
             LogSerialiser.LogLevel.Critical);
       }
     }
@@ -163,7 +175,7 @@ public class Main {
     }
     if (p != null) {
       settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
-      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">", 
+      LogSerialiser.log("Property <" + ps + "> overridden to <" + p + ">",
           LogSerialiser.LogLevel.Critical);
     }
   }
@@ -173,14 +185,14 @@ public class Main {
   public static String SSE_ACTIVATED = null;
 
   /**
-   *  This method creates the dropdown menu to select a protocol when TESTAR 
-   *  starts WITHOUT a .sse file
+   * This method creates the drop down menu to select a protocol
+   * when TESTAR starts WITHOUT a .sse file.
    */
-  //FIXME: This method throws a NullPointerException when you do not start 
+  //FIXME: This method throws a NullPointerException when you do not start
   //       TESTAR explicitly from the bin directory because it cannot find the settings files
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
-    for (File f : new File("./resources/settings/").listFiles()) {
+    for (File f: new File("./resources/settings/").listFiles()) {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
@@ -215,7 +227,7 @@ public class Main {
   }
 
   /**
-   * This method scans the settings directory of TESTAR for a file that ends 
+   * This method scans the settings directory of TESTAR for a file that ends
    * with extension SUT_SETTINGS_EXT.
    * @return A list of file names that have extension SUT_SETTINGS_EXT
    */
@@ -239,7 +251,7 @@ public class Main {
     // If there is more than 1, then delete them all
     if (files != null && files.length > 1) {
       System.out.println("Too many *.sse files - exactly one expected!");
-      for (String f : files) {
+      for (String f: files) {
         System.out.println("Delete file <" + f + "> = " + new File(f).delete());
       }
       files = null;
@@ -284,15 +296,15 @@ public class Main {
           logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
         }
         LogSerialiser.start(new PrintStream(new BufferedOutputStream(
-            new FileOutputStream(logFile))), settings.get(LogLevel)); 
+            new FileOutputStream(logFile))), settings.get(LogLevel));
       } catch (Throwable t) {
         System.out.println("Cannot initialize log file!");
         t.printStackTrace(System.out);
         System.exit(-1);
       }
       //TODO: DATE-FORMAT not consistent
-      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " 
-          + SettingsDialog.TESTAR_VERSION + " is running" + " with the next settings:\n", 
+      LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR "
+          + SettingsDialog.TESTAR_VERSION + " is running" + " with the next settings:\n",
           LogSerialiser.LogLevel.Critical);
       LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
       LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
@@ -305,21 +317,21 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       String protocolClass = settings.get(ProtocolClass).replace("/",".");
-      LogSerialiser.log("Trying to load TESTAR protocol in class '" 
-          + protocolClass + "' with class path '" + Util.toString(cp) 
+      LogSerialiser.log("Trying to load TESTAR protocol in class '"
+          + protocolClass + "' with class path '" + Util.toString(cp)
           + "'\n", LogSerialiser.LogLevel.Debug);
       @SuppressWarnings("unchecked")
-      UnProc<Settings> protocol = 
+      UnProc<Settings> protocol =
           (UnProc<Settings>) loader.loadClass(protocolClass).getConstructor().newInstance();
       LogSerialiser.log("TESTAR protocol loaded!\n", LogSerialiser.LogLevel.Debug);
 
       LogSerialiser.log("Starting TESTAR protocol ...\n", LogSerialiser.LogLevel.Debug);
       protocol.run(settings);
     } catch (ConfigException ce) {
-      LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n", 
+      LogSerialiser.log("There is an issue with the configuration file: " + ce.getMessage() + "\n",
           LogSerialiser.LogLevel.Critical);
     } catch (Throwable t) {
-      LogSerialiser.log("An unexpected error occurred: " + t + "\n", 
+      LogSerialiser.log("An unexpected error occurred: " + t + "\n",
           LogSerialiser.LogLevel.Critical);
       System.out.println("Main: Exception caught");
       t.printStackTrace();
@@ -342,11 +354,11 @@ public class Main {
     }
   }
 
-  // TODO: This methods should be part of the Settings class. It contains all 
+  // TODO: This methods should be part of the Settings class. It contains all
   //       the default values of the settings.
   /**
    * Load the default settings for all the configurable settings and add/overwrite
-   * with those from the file. This is needed because the user might not have set 
+   * with those from the file. This is needed because the user might not have set
    * all the possible settings in the test.settings file.
    * @param argv
    * @param file
@@ -354,7 +366,7 @@ public class Main {
    * @throws ConfigException
    */
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
-    Assert.notNull(file); // by urueda
+    Assert.notNull(file);
     try {
       List<Pair<?, ?>> defaults = new ArrayList<Pair<?, ?>>();
 
@@ -366,7 +378,7 @@ public class Main {
       defaults.add(Pair.from(OutputDir, "."));
       defaults.add(Pair.from(TempDir, "."));
       defaults.add(Pair.from(OnlySaveFaultySequences, false));
-      defaults.add(Pair.from(PathToReplaySequence, "./output/temp")); // by urueda
+      defaults.add(Pair.from(PathToReplaySequence, "./output/temp"));
       defaults.add(Pair.from(ActionDuration, 0.1));
       defaults.add(Pair.from(TimeToWaitAfterAction, 0.1));
       defaults.add(Pair.from(ExecuteActions, true));
@@ -391,7 +403,6 @@ public class Main {
       defaults.add(Pair.from(StopGenerationOnFault, true));
       defaults.add(Pair.from(TimeToFreeze, 10.0));
       defaults.add(Pair.from(ShowSettingsAfterTest, true));
-      // begin by urueda
       defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
       defaults.add(Pair.from(TestGenerator, "random"));
       defaults.add(Pair.from(MaxReward, 9999999.0));
@@ -410,18 +421,14 @@ public class Main {
       defaults.add(Pair.from(UnattendedTests, false)); // disabled
       defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
       defaults.add(Pair.from(SUTProcesses, ""));
-      // end by urueda
       defaults.add(Pair.from(GraphDBEnabled, false));
       defaults.add(Pair.from(GraphDBUrl, ""));
       defaults.add(Pair.from(GraphDBUser, ""));
       defaults.add(Pair.from(GraphDBPassword, ""));
-
       defaults.add(Pair.from(AlwaysCompile, true));
-      
       defaults.add(Pair.from(ProcessListenerEnabled, false));
       defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
       defaults.add(Pair.from(ProcessLogs, ".*.*"));
-
       defaults.add(Pair.from(TgherkinDocument, ""));
       defaults.add(Pair.from(SubroutineData, ""));
       defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
@@ -437,14 +444,14 @@ public class Main {
       defaults.add(Pair.from(TgherkinNrOfNOPRetries, 0));
       defaults.add(Pair.from(TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]));
       defaults.add(Pair.from(MinimumPercentageForImageRecognition, 95.0));
-      
+
       // Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
-      // Make sure that Prolog is ALWAYS false, even if someone puts it to true 
-      // in their test.settings file. Need this during re-factoring process of 
+      // Make sure that Prolog is ALWAYS false, even if someone puts it to true
+      // in their test.settings file. Need this during re-factoring process of
       // getting Prolog code out. Re-factoring will assume that
-      //PrologActivated is ALWAYS false.
-      //Evidently it will now be IMPOSSIBLE for it to be true 
+      // PrologActivated is ALWAYS false.
+      // Evidently it will now be IMPOSSIBLE for it to be true
       settings.set(ConfigTags.PrologActivated, false);
       return settings;
     } catch (IOException ioe) {

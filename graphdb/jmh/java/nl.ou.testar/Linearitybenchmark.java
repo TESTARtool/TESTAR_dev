@@ -68,7 +68,7 @@ public class Linearitybenchmark {
     @BenchmarkMode({Mode.SampleTime})
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testAddStateLiniairity() {
-        for(int i = 1; i<interations; i++)
+        for (int i = 1; i<interations; i++)
         graphFactory.addState(Util.createState("tagI"+i),false);
     }
 }

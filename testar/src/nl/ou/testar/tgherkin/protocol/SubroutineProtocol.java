@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-
 import nl.ou.testar.tgherkin.Utils;
 import nl.ou.testar.tgherkin.model.DataTable;
 import nl.ou.testar.tgherkin.model.Document;
@@ -43,44 +42,44 @@ import org.fruit.monkey.Settings;
 
 public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implements ProtocolProxy {
 
-  /*
+  /**
    * The text of address- and search bar in the Dutch version (see ENUM Browser).
    */
   private static String addressTitle = Browser.chromeNL.getAddressTitle();
 
-  /*
+  /**
    *  Subroutine Document.
    */
   private Document subroutine = null;
 
-  /*
+  /**
    * String with the name of the file with the source code of the subroutine document.
    */
   private String sourceFile;
 
-  /*
+  /**
    * String with the contents of the source code of the subroutine document.
    */
   private String sourceCode;
 
-  /*
+  /**
    * Data set with different subroutine options.
    */
   private HashMap<Integer,String[]> subroutineData = new HashMap<Integer,String[]>();
 
-  /*
+  /**
    * Index of currently running subroutine.
    */
   private int actualIndexSubD = 0;
 
-  /*
+  /**
    *   Boolean for process step activity.
    *  true: do not process subroutine step
    *  false: otherwise
    */
   private boolean actionSwitchOn;
 
-  /*
+  /**
    * Only valid in subroutine Mode.
    * true: actionSwitchOn is true
    * false: searching for more actions
@@ -208,7 +207,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
       subroutine = Utils.getDocument(sourceCode);
     } catch (Exception e) {
       e.printStackTrace();
-    } 
+    }
 
     // report header
     Report.report(null, null, null, settings().get(ConfigTags.GenerateTgherkinReport), false);
@@ -222,21 +221,24 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     return (activeMode == Modes.Generate || activeMode == Modes.GenerateDebug)
         && subroutine != null;
   }
-  
+
   /**
    * State is fulfilling criterion for running a subroutine.
    * @param state the SUT's current state
    * @return state is ready for subroutine action
    */
   protected boolean startState(State state) {
+    setActualIndexSD(1);
+
     int tekstboxes = 0;
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       String role = widget.get(Tags.Role, null).toString();
       if (role.equalsIgnoreCase("UIAEdit")) {
         tekstboxes++;
       }
     }
-    System.out.println("[" + getClass().getSimpleName() + "]  " + (tekstboxes > 5));
+    System.out.println("[" + getClass().getSimpleName()
+        + "]  aantal textboxes > 5 " + (tekstboxes > 5));
     return tekstboxes > 5;
   }
 
@@ -246,54 +248,56 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @param state the SUT's current state
    */
   protected void shuffleSubroutine(State state) {
-    // Document           => List<Feature>            => index fiI 
+    // Document           => List<Feature>            => index fiI
     // Feature            => List<ScenarioDefinition> => index siI
-    // ScenarioDefinition => List<Step>               =>            
+    // ScenarioDefinition => List<Step>               =>
     // ScenarioOutline    => Examples                 => DataTable
     // DataTable          => list<tableRows>          => index = 1
-      
+
     List<Feature> features = subroutine.getFeatures();
     int fiI = 0;
-    System.out.println("[SubroutineProtocol temp] index Feature list: " + fiI);
     Feature currentFeature = features.get(0);
-    
+
     List<ScenarioDefinition> scenarios = currentFeature.getScenarioDefinitions();
     int siI = 0;
-    System.out.println("[SubroutineProtocol temp] index ScenarioDefinition list: " + siI);
     ScenarioDefinition currentScenario = scenarios.get(0);
     if (currentScenario instanceof ScenarioOutline) {
       Examples currentExamples = ((ScenarioOutline) currentScenario).getExamples();
       DataTable currentDataTable = currentExamples.getDataTable();
-      
+
       // Set indices to initial values
       // DataTable <= list<tableRows>
       currentDataTable.shuffle();
-      
+
       // ScenarioOutline <= Examples <= DataTable
       currentExamples.setDataTable(currentDataTable);
       ((ScenarioOutline) currentScenario).setExamples(currentExamples);
-      
+
       // Feature <= List<ScenarioDefinition>
       scenarios.set(siI, currentScenario);
       currentFeature.setScenarioDefinitions(scenarios);
-      
+
       // Document <= List<Feature>
       features.set(fiI, currentFeature);
       subroutine.setFeatures(features);
     }
   }
- 
+
   /**
    * This method is invoked each time TESTAR starts to generate a new subroutine.
    * @param state the SUT's current state
    */
   protected void startSubroutine(State state) {
     initializeDocument();
-    shuffleSubroutine(state);
-    subroutine.beginSequence();
+    if (subroutine != null) {
+      shuffleSubroutine(state);
+      subroutine.beginSequence();
+    } else {
+      System.out.println("Subroutine can not be initialized");
+      System.exit(0);
+    }
   }
 
- 
   /** Define a set of actions to be taken when switching from the subroutine to TESTAR.
    * @param state the SUT's current state
    * @return the available actions
@@ -302,13 +306,13 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     Set<Action> actions = new HashSet<Action>();
     Action action = null;
     UrlActionCompiler ac = new UrlActionCompiler();
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null);
       if (title.equalsIgnoreCase(getAddressTitle())) {
         action = ac.clickTypeUrl(widget, "google.nl");
         action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
         action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-        System.out.println("[" + getClass().getSimpleName() 
+        System.out.println("[" + getClass().getSimpleName()
             + "] Url will be activated (" + title + " " + "google.nl" + ")");
       }
     }
@@ -324,7 +328,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     subroutine = null;
   }
 
-  /*
+  /**
    *  Process document step if actionSwitchOn is false.
    *  @return true if it is not possible to process a document step
    */
@@ -336,8 +340,8 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     }
     return actionSwitchOn;
   }
-  
-  /*
+
+  /**
    * Default derivation of action steps.
    * @param system the SUT
    * @param state the SUT's current state
@@ -349,7 +353,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     // iterate through all (top) widgets
     StdActionCompiler ac = new UrlActionCompiler();
 
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
 
       // only consider enabled and non-blocked widgets
       if (widget.get(Enabled, true) && !widget.get(Blocked, false)) {
@@ -384,14 +388,14 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   /**
    * This method is used by TESTAR to determine the set of
    * currently available actions.
-   * Derivation of actions: 
-   * 1 � subroutine is not running
+   * Derivation of actions:
+   * 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ subroutine is not running
    *   if startState() is true
    *   - initialize Document for subroutine (startState)
    *   - add action from subroutine
    *   if startState()  is false
    *   - TESTAR remains in control
-   * 2 � subroutine is running
+   * 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ subroutine is running
    *   if more subroutine actions available => continue subroutine
    *   if no more subroutine actions available =>
    *   - initialize finish state action set (finishState)
@@ -425,7 +429,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
           }
           Report.appendReportDetail(
               Report.IntegerColumn.PRE_GENERATED_DERIVED_ACTIONS, actions.size());
-      
+
         }
         // if an action switch is on then do not process document step
         if (!chkActionSwitch()) {
@@ -509,11 +513,11 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
       subActionExec = false;
       Report.appendReportDetail(Report.IntegerColumn.SEQUENCE_NR,sequenceCount());
       Report.appendReportDetail(Report.IntegerColumn.ACTION_NR,actionCount() - 1);
-      Report.report(state, lastAction, graphDB, 
-          settings().get(ConfigTags.GenerateTgherkinReport), 
+      Report.report(state, lastAction, graphDB,
+          settings().get(ConfigTags.GenerateTgherkinReport),
           settings().get(ConfigTags.StoreTgherkinReport));
       return subroutine.moreActions(this);
-      
+
     }
     return false;
   }
@@ -521,7 +525,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   @Override
   /**
    * This method is invoked each time after TESTAR finishes the generation of a sequence.
-   * In this case, the first action will be to finish the subroutine, 
+   * In this case, the first action will be to finish the subroutine,
    * and in a next step the sequence will be finished
    * @param recordedSequence the recorded sequence
    */
@@ -532,7 +536,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
       super.finishSequence(recordedSequence);
     }
   }
-  
+
   // Implement protocolProxy methods, needed when working with Document class
 
   /**
@@ -641,22 +645,21 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   public int getActionCount() {
     return super.actionCount();
   }
-  
-  //getters and setters
+
+  // getters and setters
 
   /**
    * Retrieve addressTitle.
    * @return addressTitle
-   */ 
+   */
   public static String getAddressTitle() {
     return addressTitle;
   }
-  
+
   /**
    * Retrieve subroutine.
    * @return subroutine
-   */  
-
+   */
   public Document getSubroutine() {
     return subroutine;
   }
@@ -664,35 +667,31 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   /**
    * Retrieve protocolFolder.
    * @return protocolFolder
-   */  
-
+   */
   public String getProtocolFolder() {
     return protocolFolder;
   }
-  
+
   /**
    * Retrieve subroutineData.
    * @return subroutineData
-   */  
-
+   */
   public HashMap<Integer, String[]> getSubData() {
     return subroutineData;
   }
-  
+
   /**
    * Retrieve actualIndexSD.
    * @return actualIndexSD
-   */  
-
+   */
   public Integer getActualIndexSubD() {
     return actualIndexSubD;
   }
- 
+
   /**
    * Set sourceCode.
-   * @param sourceCode String with contents of source code of the subroutine document 
+   * @param sourceCode String with contents of source code of the subroutine document
    */
-
   public void setSourceCode(String sourceCode) {
     this.sourceCode = sourceCode;
   }
@@ -701,7 +700,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * Set sourceFile.
    * @param sourceFile String with name of file with source code of the subroutine document
    */
-
   public void setSourceFile(String sourceFile) {
     this.sourceFile = sourceFile;
   }
@@ -710,8 +708,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * Set actualIndexSD.
    * @param actualIndexSD Index of currently running subroutine
    */
-
-
   public void setActualIndexSD(Integer actualIndexSD) {
     this.actualIndexSubD = actualIndexSD;
   }

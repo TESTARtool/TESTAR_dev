@@ -73,7 +73,7 @@ public enum OperatingSystems {
             return "Android";
         } else if (value == 5) {
             return "Windows 7";
-        } else if (value == 6){
+        } else if (value == 6) {
             return "Windows 10";
         } else {
             return super.toString();

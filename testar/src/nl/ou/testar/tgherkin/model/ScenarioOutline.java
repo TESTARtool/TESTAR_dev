@@ -20,17 +20,17 @@ public class ScenarioOutline extends ScenarioDefinition {
   private Examples examples;
 
   /**
-   * ScenarioOutline constructor. 
+   * ScenarioOutline constructor.
    * @param tags list of tags
    * @param title summary description
    * @param narrative detailed description
-   * @param selection list of conditional gestures that defines a filter on the 
+   * @param selection list of conditional gestures that defines a filter on the
    *     set of derivable gestures
    * @param oracle widget tree condition that serves as an oracle verdict
    * @param steps list of consecutive steps
      * @param examples container for a data table
      */
-  public ScenarioOutline(List<Tag> tags, String title, String narrative, 
+  public ScenarioOutline(List<Tag> tags, String title, String narrative,
       List<ConditionalGesture> selection, WidgetTreeCondition oracle,
       List<Step> steps, Examples examples) {
     super(title, narrative, selection, oracle, steps);
@@ -56,7 +56,7 @@ public class ScenarioOutline extends ScenarioDefinition {
   public Examples getExamples() {
     return examples;
   }
-    
+
   public void setExamples(Examples examples) {
     this.examples = examples;
   }
@@ -76,22 +76,22 @@ public class ScenarioOutline extends ScenarioDefinition {
         }
       }
       setIndex(savedIndex);
-      return false;      
+      return false;
     }
   }
-    
+
   @Override
   public boolean moreSequences() {
     return getExamples().moreSequences();
   }
-    
+
   @Override
   public void beginSequence() {
     super.beginSequence();
     super.reset();
     getExamples().beginSequence();
   }
-  
+
   @Override
   public boolean evaluateGivenCondition(ProtocolProxy proxy) {
     if (currentStep() != null && currentStep().hasNextAction(proxy,examples.getDataTable())) {
@@ -109,16 +109,16 @@ public class ScenarioOutline extends ScenarioDefinition {
     }
     return currentStep().evaluateGivenCondition(proxy, examples.getDataTable(), mismatchOccurred());
   }
-  
+
   @Override
   public Set<Action> evaluateWhenCondition(ProtocolProxy proxy, Map<Widget,List<Gesture>> map) {
     // apply scenario level selection
     Step.evaluateWhenCondition(proxy, map, getSelection(), examples.getDataTable());
     // apply step level selection
-    return currentStep().evaluateWhenCondition(proxy, map, examples.getDataTable(), 
+    return currentStep().evaluateWhenCondition(proxy, map, examples.getDataTable(),
         mismatchOccurred());
   }
-  
+
   @Override
   public Verdict getVerdict(ProtocolProxy proxy) {
     // scenario level
@@ -136,17 +136,17 @@ public class ScenarioOutline extends ScenarioDefinition {
     super.reset();
     getExamples().reset();
   }
-  
+
   @Override
   public List<String> check() {
     List<String> list = new ArrayList<String>();
-    for (ConditionalGesture conditionalGesture : getSelection()) {
+    for (ConditionalGesture conditionalGesture: getSelection()) {
       list.addAll(conditionalGesture.check(getExamples().getDataTable()));
     }
     if (getOracle() != null) {
       list.addAll(getOracle().check(getExamples().getDataTable()));
     }
-    for (Step step : getSteps()) {
+    for (Step step: getSteps()) {
       list.addAll(step.check(getExamples().getDataTable()));
     }
     return list;
@@ -155,7 +155,7 @@ public class ScenarioOutline extends ScenarioDefinition {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for (Tag tag : getTags()) {
+    for (Tag tag: getTags()) {
       result.append(tag.toString());
       result.append(System.getProperty("line.separator"));
     }
@@ -165,26 +165,26 @@ public class ScenarioOutline extends ScenarioDefinition {
       result.append(getTitle());
     }
     result.append(System.getProperty("line.separator"));
-    if (getNarrative() != null) {      
-      result.append(getNarrative());      
+    if (getNarrative() != null) {
+      result.append(getNarrative());
       result.append(System.getProperty("line.separator"));
     }
     if (getSelection().size() > 0) {
       result.append("Selection:");
     }
-    for (ConditionalGesture conditionalGesture : getSelection()) {
+    for (ConditionalGesture conditionalGesture: getSelection()) {
       result.append(conditionalGesture.toString());
     }
     if (getOracle() != null) {
       result.append("Oracle:");
       result.append(getOracle().toString());
-    }      
-    for (Step step : getSteps()) {
+    }
+    for (Step step: getSteps()) {
       result.append(step.toString());
     }
     if (getExamples() != null) {
       result.append(getExamples().toString());
     }
     return result.toString();
-  }  
+  }
 }

@@ -45,29 +45,29 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class ReadableGuideline extends AbstractGuideline {
 
-	private static final long serialVersionUID = -7061749135757191395L;
+  private static final long serialVersionUID = -7061749135757191395L;
 
-	ReadableGuideline(AbstractPrinciple parent) {
-		super(1, "Readable", parent);
-		criteria.add(new SuccessCriterion(1, "Language of Page",
-				this, Level.A, "meaning-doc-lang-id"));
-		criteria.add(new SuccessCriterion(2, "Language of Parts",
-				this, Level.AA, "meaning-other-lang-id"));
-	}
-	
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
-		for (Widget w : widgets)
-			if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0) {
-				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-						"Missing top-level language identifier", w));
-			}
-			else {
-				results.add(evaluationPassed(sc));
-			}
-		return results;
-	}
+  ReadableGuideline(AbstractPrinciple parent) {
+    super(1, "Readable", parent);
+    criteria.add(new SuccessCriterion(1, "Language of Page",
+        this, Level.A, "meaning-doc-lang-id"));
+    criteria.add(new SuccessCriterion(2, "Language of Parts",
+        this, Level.AA, "meaning-other-lang-id"));
+  }
+
+  @Override
+  public EvaluationResults evaluate(List<Widget> widgets) {
+    EvaluationResults results = new EvaluationResults();
+    SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
+    for (Widget w: widgets)
+      if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0) {
+        results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+            "Missing top-level language identifier", w));
+      }
+      else {
+        results.add(evaluationPassed(sc));
+      }
+    return results;
+  }
 
 }

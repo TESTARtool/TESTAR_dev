@@ -41,29 +41,29 @@ import es.upv.staq.testar.prolog.PrologUtil;
 
 /**
  * Predicates base implementation.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public abstract class PredicateBase implements IPredicate {
-			
-	protected String refuteQuery = null;
-	protected Object[] predicateContext = null;
 
-	@Override
-	public Verdict getVerdict(JIPrologWrapper jipWrapper){
-		Assert.notNull(this.refuteQuery); Assert.notNull(this.predicateContext);
-		Grapher.syncMovements(); // synchronize graph movements consumption			
-		jipWrapper.updatePrologFactsNrules();
-		// check predicate
-		List<List<String>> solutions = jipWrapper.setQuery(this.refuteQuery);
-		if (solutions != null && !solutions.isEmpty()){
-			String refuteMsg = ""; for (Object o : this.predicateContext) refuteMsg += o.toString() + " ";
-			refuteMsg += "predicate refuted!";
-			System.out.println(refuteMsg); PrologUtil.printSolutions(solutions);
-			return new Verdict(Verdict.SEVERITY_MAX, refuteMsg);
-		}
-		return Verdict.OK;  // cannot refute predicate
-	}
-	
+  protected String refuteQuery = null;
+  protected Object[] predicateContext = null;
+
+  @Override
+  public Verdict getVerdict(JIPrologWrapper jipWrapper) {
+    Assert.notNull(this.refuteQuery); Assert.notNull(this.predicateContext);
+    Grapher.syncMovements(); // synchronize graph movements consumption
+    jipWrapper.updatePrologFactsNrules();
+    // check predicate
+    List<List<String>> solutions = jipWrapper.setQuery(this.refuteQuery);
+    if (solutions != null && !solutions.isEmpty()) {
+      String refuteMsg = ""; for (Object o: this.predicateContext) refuteMsg += o.toString() + " ";
+      refuteMsg += "predicate refuted!";
+      System.out.println(refuteMsg); PrologUtil.printSolutions(solutions);
+      return new Verdict(Verdict.SEVERITY_MAX, refuteMsg);
+    }
+    return Verdict.OK;  // cannot refute predicate
+  }
+
 }

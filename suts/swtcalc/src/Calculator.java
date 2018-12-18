@@ -17,47 +17,47 @@ public class Calculator {
     private double operandReg;
     private String display;
 
-    public Calculator(){
+    public Calculator() {
         numReg = 0.0;
         display = "0";
         opReg = -1;
         operandReg = 0.0;
     }
 
-    private boolean isNum(Keys key) { 
-    	return key != null && key.ordinal() >= 0 && key.ordinal() < 10; 
+    private boolean isNum(Keys key) {
+      return key != null && key.ordinal() >= 0 && key.ordinal() < 10;
     }
 
     public void hitKey(Keys key) {
         if (key == null) {
-        	throw new IllegalArgumentException();
+          throw new IllegalArgumentException();
         }
 
         if (isNum(key)) {
             numReg = numReg *  10.0 + key.ordinal();
-        } else if(key == Keys.Plus || key == Keys.Minus || key == Keys.Times || key == Keys.Divide){
+        } else if (key == Keys.Plus || key == Keys.Minus || key == Keys.Times || key == Keys.Divide) {
             eval();
             operandReg = numReg;
             numReg = 0;
             opReg = key.ordinal();
-        } else if(key == Keys.Log) {
+        } else if (key == Keys.Log) {
             eval();
             numReg = Math.log(numReg);
-        } else if(key == Keys.Clear) {
+        } else if (key == Keys.Clear) {
             numReg = 0;
             opReg = 0;
             operandReg = 0;
-        } else if(key == Keys.Sqrt) {
+        } else if (key == Keys.Sqrt) {
             eval();
-            if(numReg < 0) throw new ArithmeticException("Root of negative number!");
+            if (numReg < 0) throw new ArithmeticException("Root of negative number!");
             numReg = Math.sqrt(numReg);
-        } else if(key == Keys.Negate) {
+        } else if (key == Keys.Negate) {
             eval();
             numReg = -numReg;
-        } else if(key == Keys.Reciproce) {
+        } else if (key == Keys.Reciproce) {
             eval();
             numReg = 1.0 / numReg;
-        } else if(key == Keys.Equals) {
+        } else if (key == Keys.Equals) {
             eval();
         }
         display = Double.toString(numReg);
@@ -79,9 +79,9 @@ public class Calculator {
             operandReg = 0;
             opReg = -1;
             display = Double.toString(numReg);
-        } else if(opReg == Keys.Divide.ordinal()) {
-            if(numReg == 0) {
-            	throw new ArithmeticException("Division by thero!");
+        } else if (opReg == Keys.Divide.ordinal()) {
+            if (numReg == 0) {
+              throw new ArithmeticException("Division by thero!");
             }
             numReg = operandReg / numReg;
             operandReg = 0;
@@ -92,11 +92,11 @@ public class Calculator {
         }
     }
 
-    public String getDisplay(){ 
-    	return display; 
+    public String getDisplay() {
+      return display;
     }
-    
-    public String toString(){ 
-    	return getDisplay(); 
+
+    public String toString() {
+      return getDisplay();
     }
 }

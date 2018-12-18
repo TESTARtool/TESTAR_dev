@@ -59,7 +59,7 @@ public class Main {
     /**
      * Tests launching a Linux application.
      */
-    private static void launchApplication(){
+    private static void launchApplication() {
 
 
         LinuxProcess lp = LinuxProcess.fromExecutable(ApplicationPath_GEdit);

@@ -39,7 +39,7 @@ package org.fruit.alayer;
  * properties like "Title", "Enabled", "Shape", ... which can be queried.
  * However, states are not restricted to visual entities and can contain
  * various kinds of additional data.
- * 
+ *
  * A state forms a so called widget tree with the root node of that tree representing
  * the system itself. For example
  *

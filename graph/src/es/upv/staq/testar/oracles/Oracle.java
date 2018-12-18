@@ -37,24 +37,24 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * An oracle implementation.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 
 public class Oracle {
 
-	private IPredicate predicate = null;
-	
-	public Oracle(IPredicate predicate){
-		this.predicate = predicate;
-	}
-	
-	public Verdict getVerdict(JIPrologWrapper jipWrapper){
-		if (predicate != null)
-			return predicate.getVerdict(jipWrapper);
-		else
-			return Verdict.OK;
-	}
-	
+  private IPredicate predicate = null;
+
+  public Oracle(IPredicate predicate) {
+    this.predicate = predicate;
+  }
+
+  public Verdict getVerdict(JIPrologWrapper jipWrapper) {
+    if (predicate != null)
+      return predicate.getVerdict(jipWrapper);
+    else
+      return Verdict.OK;
+  }
+
 }

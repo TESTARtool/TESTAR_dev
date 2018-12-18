@@ -19,22 +19,22 @@ public class RightClickGesture extends Gesture {
      * @param parameterBase container for parameters
      */
     public RightClickGesture(ParameterBase parameterBase) {
-    	super(parameterBase);    	
+      super(parameterBase);
     }
-	
+
     @Override
     public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-		Set<Action> actions = new HashSet<Action>();	
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	actions.add(ac.rightClickAt(widget));
-    	return actions;
+    Set<Action> actions = new HashSet<Action>();
+      StdActionCompiler ac = new AnnotatingActionCompiler();
+      actions.add(ac.rightClickAt(widget));
+      return actions;
     }
-    
+
     @Override
     public String toString() {
-    	StringBuilder result = new StringBuilder();
-   		result.append("rightClick");
-   		result.append(getParameterBase().toString());
-    	return result.toString();    	
+      StringBuilder result = new StringBuilder();
+       result.append("rightClick");
+       result.append(getParameterBase().toString());
+      return result.toString();
     }
 }

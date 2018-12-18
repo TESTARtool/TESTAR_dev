@@ -31,24 +31,25 @@ import org.fruit.alayer.Widget;
 
 /**
  * Singleton class responsible for Optical Character Recognition (OCR).
- * This class supports the Tgherkin ocr function. 
+ * This class supports the Tgherkin ocr function.
  *
  */
 public class OCR {
 
   private int teller = 0;
   private boolean print = false;
+
   /**
    * Tesseract OCR data path.
    */
-  public static final String TESSERACT_DATA_PATH = 
+  public static final String TESSERACT_DATA_PATH =
       "." + File.separator + "resources" + File.separator + "output" + File.separator + "temp";
 
   /**
    * Tesseract OCR language.
    */
   public static final String TESSERACT_LANGUAGE = "eng";
-  
+
   /**
    * Tesseract OCR language file suffix.
    */
@@ -56,7 +57,7 @@ public class OCR {
   /**
    * Tesseract OCR language file.
    */
-  public static final String TESSERACT_LANGUAGE_FILE = 
+  public static final String TESSERACT_LANGUAGE_FILE =
       TESSERACT_DATA_PATH + File.separator + TESSERACT_LANGUAGE + TESSERACT_LANGUAGE_SUFFIX;
 
   /**
@@ -66,25 +67,25 @@ public class OCR {
   private static final String TESS4J_JAR = "tess4j-4.0.0.jar";
 
   /**
-   * Jar entry name.  
+   * Jar entry name.
    */
-  public static final String JAR_ENTRY_NAME = 
+  public static final String JAR_ENTRY_NAME =
       "jar:file:./lib/" + TESS4J_JAR + "!/tessdata/" + TESSERACT_LANGUAGE
       + TESSERACT_LANGUAGE_SUFFIX;
 
   /**
-   * Target file for extraction of Jar entry. 
+   * Target file for extraction of Jar entry.
    */
-  public static final String TARGET_FILE = 
+  public static final String TARGET_FILE =
       "resources/output/Temp/" + TESSERACT_LANGUAGE + TESSERACT_LANGUAGE_SUFFIX;
-  
+
   private static OCR ocr = new OCR();
   private State state;
   private Map<Widget,String> ocrMap = new HashMap<Widget,String>();
-  
+
   // private Constructor prevents instantiation by other classes.
   private OCR() {
-    File file = new File(TESSERACT_LANGUAGE_FILE); 
+    File file = new File(TESSERACT_LANGUAGE_FILE);
     if (!file.exists() || file.isDirectory()) {
       // if tesseract data not available then extract tesseract data file from jar
       try {
@@ -95,7 +96,7 @@ public class OCR {
       }
     }
   }
-  
+
   /**
    * Retrieve singleton instance.
    * @return singleton instance
@@ -103,15 +104,15 @@ public class OCR {
   public static OCR getInstance() {
     return ocr;
   }
-  
+
   /**
    * Collect the OCR result for all top widgets of the state.
    * @param proxy document protocol proxy
    */
   public void updateAllWidgets(ProtocolProxy proxy) {
-    // process all widgets 
-    // any already retrieved ocr results for this state will be used 
-    for (Widget widget : proxy.getTopWidgets(state)) {
+    // process all widgets
+    // any already retrieved ocr results for this state will be used
+    for (Widget widget: proxy.getTopWidgets(state)) {
       getOCR(proxy, widget);
     }
   }
@@ -131,47 +132,46 @@ public class OCR {
       return ocrMap.get(widget);
     }
     String result = null;
-    Rectangle actionArea = 
+    Rectangle actionArea =
         new Rectangle(Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE);
     Shape shape = widget.get(Tags.Shape);
-    Rectangle r = 
+    Rectangle r =
         new Rectangle((int)shape.x(), (int)shape.y(), (int)shape.width(), (int)shape.height());
     actionArea = actionArea.union(r);
     if (!actionArea.isEmpty()) {
-      AWTCanvas widgetShot = 
+      AWTCanvas widgetShot =
           AWTCanvas.fromScreenshot(
               Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),
               AWTCanvas.StorageFormat.PNG, 1);
       // convert to a grayscale image of the same size
-      BufferedImage grayImage = 
+      BufferedImage grayImage =
           new BufferedImage(widgetShot.image().getWidth(),
               widgetShot.image().getHeight(), BufferedImage.TYPE_BYTE_GRAY);
       ColorConvertOp op = new ColorConvertOp(
           widgetShot.image().getColorModel().getColorSpace(),
           grayImage.getColorModel().getColorSpace(),null);
       op.filter(widgetShot.image(),grayImage);
-      try { 
-    	result = getOCR(grayImage);
-        if (print) {   
+      try {
+        result = getOCR(grayImage);
+        if (print) {
           teller++;
           File f = new File("ocr_res" + teller + ".png");
           ImageIO.write(grayImage, "png", f);
-          
           System.out.println("[OCR temp " + teller + "] " + result);
         }
       } catch (Throwable t) {
         LogSerialiser.log(t.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
       }
-    }  
+    }
     if (result != null) {
       result = result.trim();
     }
     ocrMap.putIfAbsent(widget, result);
     return result;
   }
-  
+
   private static String getOCR(java.awt.image.BufferedImage bi) {
-      
+
     String result = null;
     ITesseract instance = new Tesseract();  // JNA Interface Mapping
     instance.setDatapath(TESSERACT_DATA_PATH);
@@ -180,10 +180,10 @@ public class OCR {
       result = instance.doOCR(bi);
     } catch (TesseractException e) {
       LogSerialiser.log(e.getMessage().toString() + "\n", LogSerialiser.LogLevel.Info);
-    }  
+    }
     return result;
   }
-  
+
   private static void extractTesseractDataFromJar() throws Exception {
     InputStream in = null;
     OutputStream out = null;
@@ -199,12 +199,12 @@ public class OCR {
       byte[] buffer = new byte[bufferSize];
       for (;;)  {
         int nbytes = in.read(buffer);
-        if (nbytes <= 0) { 
+        if (nbytes <= 0) {
           break;
         }
         out.write(buffer, 0, nbytes);
       }
-      LogSerialiser.log("Tesseract OCR data file has been extracted.\n", 
+      LogSerialiser.log("Tesseract OCR data file has been extracted.\n",
           LogSerialiser.LogLevel.Info);
     } finally {
       if (in != null) {
@@ -215,5 +215,5 @@ public class OCR {
         out.close();
       }
     }
-  } 
+  }
 }

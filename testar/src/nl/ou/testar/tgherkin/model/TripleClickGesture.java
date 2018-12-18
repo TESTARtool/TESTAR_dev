@@ -20,32 +20,32 @@ public class TripleClickGesture extends Gesture {
      * @param parameterBase container for parameters
      */
     public TripleClickGesture(ParameterBase parameterBase) {
-    	super(parameterBase);
+      super(parameterBase);
     }
-	
-    
+
+
     @Override
     public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-    	if (getParameterBase().size() > 0 && getParameterBase().get(Parameters.UNCHECKED, dataTable)) {    		 
-    		// unchecked argument contains value true
-    		return super.gesturePossible(widget, proxy, dataTable);
-    	}    	
-   		return proxy.isClickable(widget);
+      if (getParameterBase().size() > 0 && getParameterBase().get(Parameters.UNCHECKED, dataTable)) {
+        // unchecked argument contains value true
+        return super.gesturePossible(widget, proxy, dataTable);
+      }
+       return proxy.isClickable(widget);
     }
-    
+
     @Override
     public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-		Set<Action> actions = new HashSet<Action>();	
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	actions.add(ac.leftTripleClickAt(widget));
-    	return actions;
+    Set<Action> actions = new HashSet<Action>();
+      StdActionCompiler ac = new AnnotatingActionCompiler();
+      actions.add(ac.leftTripleClickAt(widget));
+      return actions;
     }
-    
+
     @Override
     public String toString() {
-    	StringBuilder result = new StringBuilder();
-   		result.append("tripleClick");
-   		result.append(getParameterBase().toString());
-    	return result.toString();    	
+      StringBuilder result = new StringBuilder();
+       result.append("tripleClick");
+       result.append(getParameterBase().toString());
+      return result.toString();
     }
 }

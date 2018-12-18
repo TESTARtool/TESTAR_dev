@@ -35,78 +35,78 @@ package org.fruit.alayer.windows;
 
 public final class NativePeerPool {
 
-	public enum PeerType{ IUnknown; }
+  public enum PeerType{ IUnknown; }
 
-	public static final NativePeer InvalidPeer = new InvalidPeer();
-	
-	public interface NativePeer{
-		long access();
-		void release();
-		boolean valid();
-	}
-	
-	private final static class InvalidPeer implements NativePeer{
-		private InvalidPeer(){};
-		public long access() { throw new IllegalStateException(); }
-		public void release() { }
-		public boolean valid() { return false; }	
-	}
-	
-	public final class StdPeer implements NativePeer{
-		private long ptr;
-		private StdPeer pred, succ;
-		private final PeerType type;
+  public static final NativePeer InvalidPeer = new InvalidPeer();
 
-		private StdPeer(StdPeer predecessor, StdPeer successor, long ptr, PeerType type){ 
-			this.ptr = ptr;
-			succ = successor;
-			pred = predecessor;
-			this.type = type;
-		}
-		
-		public long access() throws IllegalStateException {
-			if(ptr == 0)
-				throw new IllegalStateException("Peer has already been released!");
-			return ptr;
-		}
+  public interface NativePeer{
+    long access();
+    void release();
+    boolean valid();
+  }
 
-		public boolean valid(){ return ptr != 0; }
+  private final static class InvalidPeer implements NativePeer{
+    private InvalidPeer() {};
+    public long access() { throw new IllegalStateException(); }
+    public void release() { }
+    public boolean valid() { return false; }
+  }
 
-		public void release(){
-			if(ptr == 0)
-				return;
+  public final class StdPeer implements NativePeer{
+    private long ptr;
+    private StdPeer pred, succ;
+    private final PeerType type;
 
-			switch(type){
-			case IUnknown: Windows.IUnknown_Release(ptr);
-			}
-			ptr = 0;
-			
-			if(pred != null)
-				pred.succ = succ;
-			if(succ != null)
-				succ.pred = pred;
-			if(this == NativePeerPool.this.first)	// we've been the first one, so make the second the new first
-				NativePeerPool.this.first = succ;
-		}
-	}
+    private StdPeer(StdPeer predecessor, StdPeer successor, long ptr, PeerType type) {
+      this.ptr = ptr;
+      succ = successor;
+      pred = predecessor;
+      this.type = type;
+    }
 
-	private StdPeer first = null;
+    public long access() throws IllegalStateException {
+      if (ptr == 0)
+        throw new IllegalStateException("Peer has already been released!");
+      return ptr;
+    }
 
-	public NativePeer register(long ptr, PeerType type){
-		if(ptr == 0)
-			return InvalidPeer;
-		
-		StdPeer ret = new StdPeer(null, first, ptr, type);
-		if(first != null)
-			first.pred = ret;
-		first = ret;
-		return ret;
-	}
+    public boolean valid() { return ptr != 0; }
 
-	public void release(){
-		while(first != null)
-			first.release();
-	}
+    public void release() {
+      if (ptr == 0)
+        return;
 
-	public void finalize(){ release(); }
+      switch(type) {
+      case IUnknown: Windows.IUnknown_Release(ptr);
+      }
+      ptr = 0;
+
+      if (pred != null)
+        pred.succ = succ;
+      if (succ != null)
+        succ.pred = pred;
+      if (this == NativePeerPool.this.first)  // we've been the first one, so make the second the new first
+        NativePeerPool.this.first = succ;
+    }
+  }
+
+  private StdPeer first = null;
+
+  public NativePeer register(long ptr, PeerType type) {
+    if (ptr == 0)
+      return InvalidPeer;
+
+    StdPeer ret = new StdPeer(null, first, ptr, type);
+    if (first != null)
+      first.pred = ret;
+    first = ret;
+    return ret;
+  }
+
+  public void release() {
+    while (first != null)
+      first.release();
+  }
+
+  public void finalize() { release(); }
 }

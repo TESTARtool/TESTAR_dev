@@ -64,29 +64,29 @@ public class ReportPages {
     report.append("STATES CLUSTERS:\n");
     HashMap<String, Set<String>> absStateGroups = env.getGraphStateClusters();
     int gi = 1, i, nlc;
-    for (String g : absStateGroups.keySet()) {
+    for (String g: absStateGroups.keySet()) {
       report.append("[" + gi++ + "] " + g + " contains:\n\t");
       i = 1;
       nlc = 0;
-      for (String s : absStateGroups.get(g)) {
+      for (String s: absStateGroups.get(g)) {
         nlc++;
-        report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t" : " "));
+        report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t": " "));
       }
-      report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n" : "");
+      report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n": "");
     }
 
     report.append("\nACTIONS CLUSTERS:\n");
     absStateGroups = env.getGraphActionClusters();
     gi = 1;
-    for (String g : absStateGroups.keySet()) {
+    for (String g: absStateGroups.keySet()) {
       report.append("[" + gi++ + "] " + g + " contains:\n\t");
       i = 1;
       nlc = 0;
-      for (String s : absStateGroups.get(g)) {
+      for (String s: absStateGroups.get(g)) {
         nlc++;
-        report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t" : " "));
+        report.append("(" + i++ + ") " + s + (nlc % CLUSTER_MEMBERS_PERLINE == 0 ? "\n\t": " "));
       }
-      report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n" : "");
+      report.append(nlc % CLUSTER_MEMBERS_PERLINE != 0 ? "\n": "");
     }
 
     return report.toString();
@@ -107,7 +107,7 @@ public class ReportPages {
 
     // Ordered test sequence actions list
     report.append("ACTION_TYPES:\n");
-    for (String actionRole : BriefActionRolesMap.map.keySet()) {
+    for (String actionRole: BriefActionRolesMap.map.keySet()) {
       report.append("\t" + BriefActionRolesMap.map.get(actionRole) + " = " + actionRole + "\n");
     }
     report.append("\n");
@@ -156,7 +156,7 @@ public class ReportPages {
     IGraphState from, to;
     IGraphAction ga;
     //List<Integer> movesSync = Grapher.getMovementsSync();
-    for (GraphEdge edge : orderedActions) {
+    for (GraphEdge edge: orderedActions) {
       ga = env.getAction(edge.getActionID());
       if (ga.knowledge()) {
         continue;
@@ -243,7 +243,7 @@ public class ReportPages {
     int idx = firstSequenceActionNumber - 1; //int idx = 1;
     String sampleS;
     List<IEnvironment.ResumingMetrics> explorationCurve = env.getExplorationCurve();
-    for (IEnvironment.ResumingMetrics sample : explorationCurve) {
+    for (IEnvironment.ResumingMetrics sample: explorationCurve) {
       sampleS = String.format("%1$" + SEQUENCE_LENGTH + "s, " +
               "%2$6d, %3$7d, %4$6d, %5$7d, %6$6d, %7$8d %8$18d %9$7d %10$6s %11$6s %12$7s",
           idx++,
@@ -282,7 +282,7 @@ public class ReportPages {
     int unxStates = 0, unxActions = 0,
         totalStates = -1; // discard start node
     String verdict = null;
-    for (IGraphState vertex : tGraph.vertexStates()) {
+    for (IGraphState vertex: tGraph.vertexStates()) {
       if (vertex.getUnexploredActionsSize() > 0) {
         unxStates++;
       }
@@ -334,8 +334,8 @@ public class ReportPages {
         verdict.equals(Grapher.GRAPH_NODE_PASS)) { // temporal fitness.txt patch for evolutionary algorithm
       try {
         java.io.Writer fitnessWriter = new java.io.FileWriter("output/fitness.txt");
-        //fitnessWriter.write(new Double(abstractStates == 0 ? 2.0 : 1.0/(double)abstractStates).toString()); // fitness = 0.0 .. 1.0 (0 is best)
-        fitnessWriter.write(new Double(abstractStates == 0 ? 0.0 : (double) abstractStates).toString()); // fitness = numero estados abstractos (higher is better)
+        //fitnessWriter.write(new Double(abstractStates == 0 ? 2.0: 1.0/(double)abstractStates).toString()); // fitness = 0.0 .. 1.0 (0 is best)
+        fitnessWriter.write(new Double(abstractStates == 0 ? 0.0: (double) abstractStates).toString()); // fitness = numero estados abstractos (higher is better)
         fitnessWriter.close();
       }
       catch (Exception e) {
@@ -361,7 +361,7 @@ public class ReportPages {
         minCvg + "%", // min coverage
         maxCvg + "%", // max coverage
         // end by fraalpe2
-        verdict == null ? "????" : verdict);
+        verdict == null ? "????": verdict);
     report.append(stats + "\n");
 
     int[] grm = env.getGraphResumingMetrics();
@@ -390,29 +390,29 @@ public class ReportPages {
           minCvg + "%", // min coverage
           maxCvg + "%"); // max coverage
       // end by fraalpe2
-      report.append("CALIB. : " + calibS + "\n");
-      report.append("format : discount x max_reward x unq_states x abs_states x unq_actions x abs_actions x exc_actions = unq_states_n_actions x abs_states_n_actions x longestPath x minCvg x maxCvg");
+      report.append("CALIB.: " + calibS + "\n");
+      report.append("format: discount x max_reward x unq_states x abs_states x unq_actions x abs_actions x exc_actions = unq_states_n_actions x abs_states_n_actions x longestPath x minCvg x maxCvg");
     }
-		
-		/*report.append("\n=== Stats report ===\n");
 
-		double sequenceLength = orderedActions.length;
-		int count;
-		double frac, idealFrac = 1.0 / tGraph.edgeSet().size();
-		double dist = 0;
-		IGraphAction ga;
-		for (String[] edge : tGraph.edgeSet()){
-			ga = env.getAction(edge[0]);
-			count = ga.getCount();;
-			frac = count / sequenceLength;
-			if (frac < idealFrac)
-				dist += (count > 0 ? idealFrac / frac : 100 * (idealFrac / (1.0 / sequenceLength))) - 1.0; 
-		}
-		dist = Math.sqrt(dist);
-		
-		double edgeRepetition = sequenceLength / tGraph.edgeSet().size();				
-		report.append("Edge repetition mean: " + edgeRepetition + "\n");
-		report.append("Distance: " + dist +"\n");*/
+    /*report.append("\n=== Stats report ===\n");
+
+    double sequenceLength = orderedActions.length;
+    int count;
+    double frac, idealFrac = 1.0 / tGraph.edgeSet().size();
+    double dist = 0;
+    IGraphAction ga;
+    for (String[] edge: tGraph.edgeSet()) {
+      ga = env.getAction(edge[0]);
+      count = ga.getCount();;
+      frac = count / sequenceLength;
+      if (frac < idealFrac)
+        dist += (count > 0 ? idealFrac / frac: 100 * (idealFrac / (1.0 / sequenceLength))) - 1.0;
+    }
+    dist = Math.sqrt(dist);
+
+    double edgeRepetition = sequenceLength / tGraph.edgeSet().size();
+    report.append("Edge repetition mean: " + edgeRepetition + "\n");
+    report.append("Distance: " + dist +"\n");*/
 
     return report.toString();
   }

@@ -10,29 +10,29 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
 /**
- * Simplified State representation that only defines an iterator over widgets. 
+ * Simplified State representation that only defines an iterator over widgets.
  *
  */
 public class StateMock extends StdState{
 
-	private static final long serialVersionUID = 7755367830576251631L;
-	private List<Widget> widgets = new ArrayList<Widget>();
-	
-	
-	/**
-	 * Constructor.
-	 * @param widgets given list of widgets
-	 */
-	public StateMock(List<Widget> widgets) {
-		super();
-		this.widgets = widgets;
-		// generate a random identifier
-		Random random = new Random();
-		int randomNumber  = random.nextInt(Integer.MAX_VALUE);
-		set(Tags.ConcreteID, "ConcreteID" + randomNumber);
-	}
-	
-	@Override
+  private static final long serialVersionUID = 7755367830576251631L;
+  private List<Widget> widgets = new ArrayList<Widget>();
+
+
+  /**
+   * Constructor.
+   * @param widgets given list of widgets
+   */
+  public StateMock(List<Widget> widgets) {
+    super();
+    this.widgets = widgets;
+    // generate a random identifier
+    Random random = new Random();
+    int randomNumber  = random.nextInt(Integer.MAX_VALUE);
+    set(Tags.ConcreteID, "ConcreteID" + randomNumber);
+  }
+
+  @Override
     public Iterator<Widget> iterator() {
         Iterator<Widget> it = new Iterator<Widget>() {
             private int currentIndex = 0;
@@ -51,5 +51,5 @@ public class StateMock extends StdState{
         };
         return it;
     }
-	
+
 }

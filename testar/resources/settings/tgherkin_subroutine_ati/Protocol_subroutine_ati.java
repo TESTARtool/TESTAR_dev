@@ -8,9 +8,7 @@ import nl.ou.testar.tgherkin.model.SubroutineProxy;
 import nl.ou.testar.tgherkin.protocol.Report;
 import nl.ou.testar.tgherkin.protocol.SubroutineProtocol;
 
-import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Position;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -29,8 +27,8 @@ import org.fruit.monkey.Settings;
  * @author Conny Hageluken
  * @Date October 2018
  */
-public class Protocol_subroutine_ati 
-    extends SubroutineProtocol 
+public class Protocol_subroutine_ati
+    extends SubroutineProtocol
     implements SubroutineProxy {
 
   /*
@@ -55,7 +53,7 @@ public class Protocol_subroutine_ati
    */
   @Override
   public boolean startState(State state) {
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null).toString();
       if (title.equalsIgnoreCase(getAddressTitle())) {
         String value = widget.get(Tags.ValuePattern, null);
@@ -99,41 +97,36 @@ public class Protocol_subroutine_ati
   public Set<Action> finishState(State state) {
     Set<Action> actions = new HashSet<Action>();
     Action action = null;
- 
+
     if (exitUrl != null && exitUrl.length() > 0) {
       UrlActionCompiler ac = new UrlActionCompiler();
 
-      for (Widget widget : getTopWidgets(state)) {
+      for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
         if (title.equalsIgnoreCase(getAddressTitle())) {
-          System.out.println("[Protocol_subroutine_ati] widget title: " + title);
-          System.out.println("[Protocol_subroutine_ati] preferred widget shape: Rect [x:439.0 y:58.0 w:856.0 h:37.0]");
-          System.out.println("[Protocol_subroutine_ati] widget shape: " + widget.get(Tags.Shape).toString());
-          action = ac.clickTypeInto(widget, exitUrl);
-          Position p = new AbsolutePosition(867, 76.5);
-          action = ac.clickTypeUrl(p, exitUrl, 54);
+          action = ac.clickTypeUrl(widget, exitUrl);
           action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
           action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-          
-          System.out.println("[" + getClass().getSimpleName() 
+
+          System.out.println("[" + getClass().getSimpleName()
               + "] Url will be activated (" + title + " " + exitUrl + ")");
           break;
         }
       }
-    } else { 
+    } else {
       StdActionCompiler ac = new StdActionCompiler();
-      for (Widget widget : getTopWidgets(state)) {
+      for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
         if (title.equalsIgnoreCase("bacheloropleidingen")) {
           action = ac.leftClickAt(widget);
         }
-      } 
-    }   
+      }
+    }
     actions.add(action);
     return actions;
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finished the generation of a subroutine.
    */
   @Override
@@ -143,7 +136,7 @@ public class Protocol_subroutine_ati
               .replace("https://", "").replace("http://", "");
   }
 
-  /** 
+  /**
    * Called once during the lifetime of TESTAR.
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
@@ -186,7 +179,7 @@ public class Protocol_subroutine_ati
    * @return  the selected action (non-null!)
    */
   @Override
-  protected Action selectAction(State state, Set<Action> actions) { 
+  protected Action selectAction(State state, Set<Action> actions) {
     return super.selectAction(state, actions);
   }
 
@@ -213,7 +206,7 @@ public class Protocol_subroutine_ati
     return super.moreActions(state);
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   @Override
@@ -225,7 +218,7 @@ public class Protocol_subroutine_ati
    * TESTAR uses this method to determine when to stop the entire test.
    * You could stop the test after a given amount of generated sequences or
    * after a specific time etc.
-   * @return  if <code>true</code> continue test, else stop  
+   * @return  if <code>true</code> continue test, else stop
    */
   @Override
   protected boolean moreSequences() {

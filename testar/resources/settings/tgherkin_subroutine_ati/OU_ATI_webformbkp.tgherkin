@@ -1,0 +1,85 @@
+Feature: Open University - A user applies for a master program.
+
+  Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+
+  Background: A user successfully logs on the system.
+    Step: Enter username
+    When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
+    Step: Enter password
+    When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
+    Step: Press log on button
+    When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Check whether user is logged on
+    Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
+    When NOP
+    Step: Remove products from shopping cart (if applicable)
+    While $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\RemoveCourse.png")
+    When  $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\RemoveCourse.png") click(true)
+    Step: Click close shopping cart button (if applicable) 
+    While $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\CloseShoppingCart.png")
+    When  $Role="UIAText" and image("resources\settings\tgherkin_subroutine_ati\CloseShoppingCart.png") click(true)
+
+  Scenario Outline: A user changes his account details again.
+    Step: Focus op pagina krijgen
+    When  $Role="UIAText" and $Title="mijnOU" click(true)
+    Step: Scroll down
+    While !state($Role="UIAImage" and ocr() = "LOCI EVIE")
+    When  hitKey(VK_DOWN)
+    Step: Select Mijn Gegevens tile
+    When  $Role="UIAImage" and ocr() = "LOCI EVIE" click(true)
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change Voorvoegsel_geboortenaam
+    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type("     ")
+    Step: Change Geboortenaam
+    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Change Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
+    Step: Change Voorvoegsel geboortenaam partner
+    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+    Step: Change Geboortenaam partner
+    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
+    Step: Visualize Naamweergave
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Naamweergave']//widget") click(true)
+    Step: Ensure Achternaam - Partnernaam is displayed  (effect hitKey depends on displayed selection)
+    While !state($Role="UIAComboBox" and $ValuePattern="Achternaam - Partnernaam")
+    When  hitKey(VK_A)    
+    Step: Select Naamweergave
+    When  hitKey(<Naamweergave>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+    Step: Scroll to OPSLAAN button
+    While !state($Role="UIAButton" and $Title="OPSLAAN")
+    When  $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
+          hitKey(VK_DOWN) 
+          state($Role="UIAButton" and $Title="OPSLAAN") hitKey(VK_DOWN) 
+    Step: Change Geboortedatum
+    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+    Step: Change Geboorteplaats
+    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+    Step: Visualize geslacht list
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Geslacht']//widget") click(true)
+    Step: Select Geslacht
+    When  hitKey(<Geslacht>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+    Step: Visualize Taal list
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Taal']//widget") click(true)
+    Step: Select Taal
+    When  hitKey(<Taal>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+    Step: Save entered data
+    When  $Role="UIAButton" and $Title="OPSLAAN" click()
+    Step: Expand user
+    Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen." 
+    When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+    Step: Signoff user
+    When  $Title="Afmelden" and $Role="UIAText" click(true)
+ Examples: Account data
+|Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
+|AREM||Weijling|Adri|||VK_A|02-07-1963|Druten|VK_M|VK_N|
+|TEST|van|User|Test||Partnernaam|VK_A|01-02-1990|Amsterdam|VK_V|VK_N|
+|CCM||Paping|Conny||Hageluken|VK_P|27-11-1961|Valkenswaard|VK_V|VK_N|

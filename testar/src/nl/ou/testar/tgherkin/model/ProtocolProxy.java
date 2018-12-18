@@ -68,7 +68,7 @@ public interface ProtocolProxy {
   /**
    * Store widget.
    * @param stateID state identifier
-   * @param widget to be stored widget 
+   * @param widget to be stored widget
    */
   void storeWidget(String stateID, Widget widget);
 

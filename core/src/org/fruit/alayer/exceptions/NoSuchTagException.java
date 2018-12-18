@@ -38,9 +38,9 @@ import org.fruit.alayer.Tag;
 
 public class NoSuchTagException extends FruitException {
 
-	private static final long serialVersionUID = 4053535487924085555L;
+  private static final long serialVersionUID = 4053535487924085555L;
 
-	public NoSuchTagException(Tag<?> tag){
-		super("Tag '" + tag.name() + "' unavailable!");
-	}
+  public NoSuchTagException(Tag<?> tag) {
+    super("Tag '" + tag.name() + "' unavailable!");
+  }
 }

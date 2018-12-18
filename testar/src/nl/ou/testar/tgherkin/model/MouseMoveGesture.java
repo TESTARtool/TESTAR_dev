@@ -25,28 +25,28 @@ public class MouseMoveGesture extends Gesture {
      * @param parameterBase container for parameters
      */
     public MouseMoveGesture(ParameterBase parameterBase) {
-    	super(parameterBase);    	
+      super(parameterBase);
     }
-	
+
     @Override
     public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-		Set<Action> actions = new HashSet<Action>();	
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-		Action action = ac.mouseMove(widget);
-		// add action target
-    	action.set(Tags.TargetID, widget.get(Tags.ConcreteID));
-		Abstractor abstractor = new StdAbstractor();
-		Finder wf = abstractor.apply(widget);	
-		action.set(Tags.Targets, Util.newArrayList(wf));				
-		actions.add(action);
-    	return actions;
+    Set<Action> actions = new HashSet<Action>();
+      StdActionCompiler ac = new AnnotatingActionCompiler();
+    Action action = ac.mouseMove(widget);
+    // add action target
+      action.set(Tags.TargetID, widget.get(Tags.ConcreteID));
+    Abstractor abstractor = new StdAbstractor();
+    Finder wf = abstractor.apply(widget);
+    action.set(Tags.Targets, Util.newArrayList(wf));
+    actions.add(action);
+      return actions;
     }
-    
+
     @Override
     public String toString() {
-    	StringBuilder result = new StringBuilder();
-   		result.append("mouseMove");
-   		result.append(getParameterBase().toString());
-    	return result.toString();    	
+      StringBuilder result = new StringBuilder();
+       result.append("mouseMove");
+       result.append(getParameterBase().toString());
+      return result.toString();
     }
 }

@@ -56,26 +56,26 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
-  
+
   private static final String PREVENT_BY_MOCK_TITLE = "INLOGGEN";
   private static final String MOCK_URL = "www.google.nl";
   private static final String MOCK_ACTION_TITLE = "Adres- en zoekbalk";
   private static final String RETURN_URL = "www.youtube.com";
-  
+
   // If we encounter a login URL, determine the 'login button'and force click
   private static String loginTitle = "inloggen"; // lower case
   private static String loginUrl = "https://login.awo.ou.nl/sso/login";
-  
+
   private static boolean toBeMocked = true;
   // Each browser (and locale!) uses different names for standard elements
- 
+
   private enum Browser {
     // Dutch version
-    explorerNL("address", "UIAEdit", "back", "close"), 
-    firefoxNL("voer zoekterm of adres in", "UIAEdit", "terug",null), 
+    explorerNL("address", "UIAEdit", "back", "close"),
+    firefoxNL("voer zoekterm of adres in", "UIAEdit", "terug",null),
     chromeNL("Adres- en zoekbalk", "UIAEdit", "vorige", "sluiten"),
     // English version
-    explorerEN("address", "UIAEdit", "back", "close"), 
+    explorerEN("address", "UIAEdit", "back", "close"),
     firefoxEN("voer zoekterm of adres in", "UIAEdit", "terug",null),
     chromeEN("address and search bar", "UIAEdit", "back", "close");
 
@@ -100,10 +100,10 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
   private static final double SCROLLTHICK = 16; // scroll thickness (iexplorer)
 
   // Go back once we encounter certain files
-  private static String[] deniedExtensions 
+  private static String[] deniedExtensions
      = new String[] { "pdf" };
   // If set to NULL, only the SUT connector domain will be used
-  private static String[] domainsAllowed 
+  private static String[] domainsAllowed
       = new String[] { "mijn.awo.ou.nl", "cws.awo.ou.nl", "ati.awo.ou.nl" };
 
   private String oldAddress = null;
@@ -183,7 +183,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
   protected State getState(SUT system) throws StateBuildException {
     State state = super.getState(system);
 
-    for (Widget w : state) {
+    for (Widget w: state) {
 
       Role role = w.get(Tags.Role, Roles.Widget);
       if (Role.isOneOf(role, NativeLinker.getNativeRole("UIAToolBar"))) {
@@ -225,7 +225,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 
   protected boolean blackListed(Widget w) {
     String desc = w.get(Tags.Desc, null);
-    boolean loginParm = desc.equalsIgnoreCase("Wachtwoord") 
+    boolean loginParm = desc.equalsIgnoreCase("Wachtwoord")
         || desc.equalsIgnoreCase("Gebruikersnaam");
     boolean blacklisted = super.blackListed(w) || loginParm;
     return blacklisted;
@@ -238,7 +238,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
         for (Widget widget: targets) {
           if (widget != null) {
             String title = widget.get(Tags.Desc, null);
-            if (title != null 
+            if (title != null
                 && title.equalsIgnoreCase(preventByMockActionTitle)) {
               return true;
             }
@@ -252,14 +252,14 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
   private Action rerouteByUrl(State state, String mockUrl) {
     Action action = null;
     UrlActionCompiler ac = new UrlActionCompiler();
-    
-    for (Widget widget : getTopWidgets(state)) {
+
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null);
       if (title.equalsIgnoreCase(browser.addressTitle)) {
         action = ac.clickTypeUrl(widget, mockUrl);
         action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
         action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-        // temp System.out.println("[" + getClass().getSimpleName() 
+        // temp System.out.println("[" + getClass().getSimpleName()
         // temp     + "] Url wordt geactiveerd (" + title + "; " + mockUrl + ")");
         toBeMocked = false;
       }
@@ -295,16 +295,16 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
 
     // iterate through all (top) widgets
     UrlActionCompiler ac = new UrlActionCompiler();
-    
-    for (Widget widget : getTopWidgets(state)) {
+
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null).toString();
       String role = widget.get(Tags.Role).toString();
       System.out.println("[mocking] hier komen we wel " + title);
-      
+
       // only consider enabled and non-blocked widgets
       if (widget.get(Enabled, true) && !widget.get(Blocked, false)
-    	  && ((PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title) 
-    		   && "UIAButton".equals(role) && toBeMocked) 
+        && ((PREVENT_BY_MOCK_TITLE.equalsIgnoreCase(title)
+           && "UIAButton".equals(role) && toBeMocked)
               ||(MOCK_ACTION_TITLE.equalsIgnoreCase(title) && !toBeMocked))) {
 
         // do not build actions for tabu widget
@@ -486,7 +486,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
   private void extractAddressWidgets() {
     currentAddress = null;
 
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       Shape shape = widget.get(Tags.Shape, null);
       String title = widget.get(Tags.Title, "").toLowerCase().trim();
       String value = widget.get(Tags.ValuePattern, "").toLowerCase().trim();
@@ -501,7 +501,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
       }
 
       // Application / language setting specific
-      if (title.equalsIgnoreCase(browser.addressTitle) 
+      if (title.equalsIgnoreCase(browser.addressTitle)
           && role.equalsIgnoreCase(browser.addressRole)) {
         currentAddress = value;
       } else if ((browser == Browser.explorerNL || browser == Browser.chromeNL)

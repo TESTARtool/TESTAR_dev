@@ -127,7 +127,7 @@ public class TreeWalkerTests {
 
         // Did not find calculator 2 yet from active applications.
         // Activate each application through AT-SPI and find the PID for each active application through xprop.
-        for (AtSpiAccessible application : applicationNodes) {
+        for (AtSpiAccessible application: applicationNodes) {
 
 
             // Activate application.
@@ -206,7 +206,7 @@ public class TreeWalkerTests {
         assertEquals(true, applicationNodes.size() > 0);
 
 
-        for (AtSpiAccessible a : applicationNodes) {
+        for (AtSpiAccessible a: applicationNodes) {
             a.retrieveAccessibleInfoTree();
         }
 
@@ -235,14 +235,14 @@ public class TreeWalkerTests {
         assertEquals(true, applicationNodes.size() > 0);
 
 
-        for (AtSpiAccessible a : applicationNodes) {
+        for (AtSpiAccessible a: applicationNodes) {
             a.retrieveAccessibleInfoTree();
         }
 
 
         List<AtSpiAccessible> scrollbars = TreeWalker.findNodesWithRole(applicationNodes.get(0), AtSpiRoles.ScrollBar);
 
-        for (AtSpiAccessible s : scrollbars) {
+        for (AtSpiAccessible s: scrollbars) {
             s.retrieveAccessibleInfoTree();
         }
 
@@ -250,7 +250,7 @@ public class TreeWalkerTests {
         List<AtSpiAccessible> relationNodes = getRelationNodes(applicationNodes.get(0));
 
 
-        for (AtSpiAccessible s : relationNodes) {
+        for (AtSpiAccessible s: relationNodes) {
             s.retrieveAccessibleInfoTree();
         }
 
@@ -279,7 +279,7 @@ public class TreeWalkerTests {
         List<AtSpiAccessible> nonModals = TreeWalker.getNonModalApplicationChildNodes(applicationNodes.get(0));
 
 
-        for (AtSpiAccessible a : nonModals) {
+        for (AtSpiAccessible a: nonModals) {
             a.retrieveAccessibleInfo();
         }
         System.out.println("NonModals: " + nonModals.size());
@@ -313,7 +313,7 @@ public class TreeWalkerTests {
         List<AtSpiAccessible> nonModals = TreeWalker.getNonModalApplicationChildNodes(applicationNodes.get(0));
 
 
-        for (AtSpiAccessible a : nonModals) {
+        for (AtSpiAccessible a: nonModals) {
             a.retrieveAccessibleInfo();
         }
         System.out.println("NonModals: " + nonModals.size());
@@ -322,7 +322,7 @@ public class TreeWalkerTests {
         List<AtSpiAccessible> modals = TreeWalker.getModalApplicationChildNodes(applicationNodes.get(0));
 
 
-        for (AtSpiAccessible a : modals) {
+        for (AtSpiAccessible a: modals) {
             a.retrieveAccessibleInfo();
         }
         System.out.println("Modals: " + modals.size());
@@ -359,8 +359,8 @@ public class TreeWalkerTests {
             relationNodes.add(node);
         }
 
-        for (AtSpiAccessible a : node.children()) {
-            for (AtSpiAccessible as : getRelationNodes(a)) {
+        for (AtSpiAccessible a: node.children()) {
+            for (AtSpiAccessible as: getRelationNodes(a)) {
                 relationNodes.add(as);
             }
         }

@@ -34,6 +34,6 @@
 package org.fruit.alayer.windows;
 
 public class UIAException extends WinApiException {
-	private static final long serialVersionUID = 5815790395961162690L;
-	public UIAException(String message) { super(message); }
+  private static final long serialVersionUID = 5815790395961162690L;
+  public UIAException(String message) { super(message); }
 }

@@ -149,7 +149,7 @@ public class TESTAREnvironment implements IEnvironment {
     Set<Action> actions = discoveredStateActions.get(graphState.getConcreteID());
     if (actions != null) {
       Set<String> exploredActions = new HashSet<String>();
-      for (Object aid : g.outgoingEdgesOf(graphState.getConcreteID()).toArray()) {
+      for (Object aid: g.outgoingEdgesOf(graphState.getConcreteID()).toArray()) {
         exploredActions.add(this.getAction(((GraphEdge) aid).getActionID()).getAbstractID());
       }
       graphState.updateUnexploredActions(this, actions, exploredActions);
@@ -205,7 +205,7 @@ public class TESTAREnvironment implements IEnvironment {
     }
     Set<IGraphState> graphStates = new HashSet<IGraphState>();
     IGraphState gs;
-    for (String ts : targetStates) {
+    for (String ts: targetStates) {
       gs = this.g.getState(ts);
       if (gs != null) {
         graphStates.add(gs);
@@ -245,7 +245,7 @@ public class TESTAREnvironment implements IEnvironment {
     String absID = graphAction.getAbstractID();
     IGraphAction outGA;
     int c = 0;
-    for (GraphEdge edge : this.getOutgoingActions(graphState)) {
+    for (GraphEdge edge: this.getOutgoingActions(graphState)) {
       outGA = g.getAction(edge.getActionID());
       if (absID.equals(outGA.getAbstractID())) {
         c++;
@@ -269,7 +269,7 @@ public class TESTAREnvironment implements IEnvironment {
   private int getActionsNumber (Set<String> actionTypes, IGraphState state) {
     int an = 0;
     if (g.containsVertex(state.getConcreteID())) {
-      for (GraphEdge edge : this.getOutgoingActions(state)) {
+      for (GraphEdge edge: this.getOutgoingActions(state)) {
         if (actionTypes.contains(this.getAction(edge.getActionID()).getRole())) {
           an++;
         }
@@ -349,7 +349,7 @@ public class TESTAREnvironment implements IEnvironment {
     if (!this.stateAtGraph(weState)) {
       g.addVertex(this, weState);
     }
-    IGraphState v = new GraphState(walkStatus ? Grapher.GRAPH_NODE_PASS : Grapher.GRAPH_NODE_FAIL);
+    IGraphState v = new GraphState(walkStatus ? Grapher.GRAPH_NODE_PASS: Grapher.GRAPH_NODE_FAIL);
     g.addVertex(this, v);
     g.addEdge(this, weState, v, new GraphAction(Grapher.GRAPH_ACTION_STOP));
   }
@@ -367,7 +367,7 @@ public class TESTAREnvironment implements IEnvironment {
     double sumActions, // by urueda
         coverage = 0.0, minCoverage = MAXCVG_UNKNOWN_SPACE, maxCoverage = 0.0;
     int totalKnownActions = 0, totalKnownExecutedActions = 0, totalKnownUnexploredActions = 0; // by urueda
-    for (IGraphState v : g.vertexStates()) {
+    for (IGraphState v: g.vertexStates()) {
       if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) ||
           v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) ||
           v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
@@ -402,7 +402,7 @@ public class TESTAREnvironment implements IEnvironment {
   @Override
   public int[] getGraphResumingMetrics () {
     int knownStates = 0, revisitedStates = 0;
-    for (IGraphState v : g.vertexStates()) {
+    for (IGraphState v: g.vertexStates()) {
       if (v.getConcreteID().equals(Grapher.GRAPH_NODE_ENTRY) ||
           v.getConcreteID().equals(Grapher.GRAPH_NODE_PASS) ||
           v.getConcreteID().equals(Grapher.GRAPH_NODE_FAIL)) {
@@ -537,7 +537,7 @@ public class TESTAREnvironment implements IEnvironment {
       List<GraphEdge> path = new ArrayList<GraphEdge>();
       IGraphState cs = from;
       while (cs != to) {
-        for (GraphEdge edge : this.g.outgoingEdgesOf(cs.getConcreteID())) {
+        for (GraphEdge edge: this.g.outgoingEdgesOf(cs.getConcreteID())) {
           if (edges.contains(edge)) {
             path.add(edge);
             edges.remove(edge);
@@ -547,7 +547,7 @@ public class TESTAREnvironment implements IEnvironment {
         }
       }
       List<IGraphState> pathStates = new ArrayList<IGraphState>();
-      for (GraphEdge p : path) {
+      for (GraphEdge p: path) {
         pathStates.add(g.getState(g.getEdgeTarget(p)));
       }
       return pathStates;
@@ -562,7 +562,7 @@ public class TESTAREnvironment implements IEnvironment {
     Collection<GraphEdge> inActions = this.getIncomingActions(graphState);
     String lastOrder, maxOrder = "0";
     IGraphAction lastAction = null, ga;
-    for (GraphEdge edge : inActions) {
+    for (GraphEdge edge: inActions) {
       ga = g.getAction(edge.getActionID());
       lastOrder = ga.getLastOrder(edge.getTargetStateID());
       if (lastOrder != null) {

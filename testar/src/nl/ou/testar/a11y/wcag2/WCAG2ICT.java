@@ -51,93 +51,93 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  *
  */
 public final class WCAG2ICT implements Evaluator {
-	
-	/**
-	 * The implementation version
-	 */
-	static final String VERSION = "20171121";
-	
-	/**
-	 * The base part for anchor links, e.g. to success criteria
-	 */
-	
-	private final List<AbstractPrinciple> principles = new ArrayList<>();
-	
-	/**
-	 * Constructs the WCAG 2.0 specification
-	 */
-	public WCAG2ICT() {
-		principles.add(new PerceivablePrinciple());
-		principles.add(new OperablePrinciple());
-		principles.add(new UnderstandablePrinciple());
-		principles.add(new RobustPrinciple());
-		setActionTags();
-	}
-	
-	/**
-	 * Gets all principles in WCAG2ICT
-	 * @return The list of principles.
-	 */
-	public List<AbstractPrinciple> getPrinciples() {
-		return Collections.unmodifiableList(principles);
-	}
-	
-	/**
-	 * Evaluates the accessibility of the given state
-	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * This method executes oracles in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The results of the evaluation.
-	 */
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.evaluate(widgets).getResults())
-				results.add(result);
-		return results;
-	}
-	
-	/**
-	 * Derives the possible actions from the given state
-	 * This will collect actions from all principles in WCAG2ICT.
-	 * The actions are specific to accessibility.
-	 * This method derives actions in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The set of actions.
-	 */
-	@Override
-	public Set<Action> deriveActions(List<Widget> widgets) {
-		Set<Action> actions = new HashSet<>();
-		for (AbstractPrinciple p : principles)
-			actions.addAll(p.deriveActions(widgets));
-		return actions;
-	}
-	
-	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database
-	 * This will collect evaluation results from all principles in WCAG2ICT.
-	 * This method executes oracles in offline evaluation.
-	 * @param graphDB The graph database.
-	 * @return The results of the evaluation.
-	 */
-	@Override
-	public EvaluationResults query(GraphDB graphDB) {
-		EvaluationResults results = new EvaluationResults();
-		for (AbstractPrinciple p : principles)
-			for (EvaluationResult result : p.query(graphDB).getResults())
-				results.add(result);
-		return results;
-	}
-	
-	@Override
-	public String getImplementationVersion() {
-		return "WCAG2ICT-" + VERSION;
-	}
-	
-	private void setActionTags() {
-		AccessibilityUtil.AC_NAVIGATE_PREVIOUS_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
-		AccessibilityUtil.AC_NAVIGATE_NEXT_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
-	}
-	
+
+  /**
+   * The implementation version
+   */
+  static final String VERSION = "20171121";
+
+  /**
+   * The base part for anchor links, e.g. to success criteria
+   */
+
+  private final List<AbstractPrinciple> principles = new ArrayList<>();
+
+  /**
+   * Constructs the WCAG 2.0 specification
+   */
+  public WCAG2ICT() {
+    principles.add(new PerceivablePrinciple());
+    principles.add(new OperablePrinciple());
+    principles.add(new UnderstandablePrinciple());
+    principles.add(new RobustPrinciple());
+    setActionTags();
+  }
+
+  /**
+   * Gets all principles in WCAG2ICT
+   * @return The list of principles.
+   */
+  public List<AbstractPrinciple> getPrinciples() {
+    return Collections.unmodifiableList(principles);
+  }
+
+  /**
+   * Evaluates the accessibility of the given state
+   * This will collect evaluation results from all principles in WCAG2ICT.
+   * This method executes oracles in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The results of the evaluation.
+   */
+  @Override
+  public EvaluationResults evaluate(List<Widget> widgets) {
+    EvaluationResults results = new EvaluationResults();
+    for (AbstractPrinciple p: principles)
+      for (EvaluationResult result: p.evaluate(widgets).getResults())
+        results.add(result);
+    return results;
+  }
+
+  /**
+   * Derives the possible actions from the given state
+   * This will collect actions from all principles in WCAG2ICT.
+   * The actions are specific to accessibility.
+   * This method derives actions in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The set of actions.
+   */
+  @Override
+  public Set<Action> deriveActions(List<Widget> widgets) {
+    Set<Action> actions = new HashSet<>();
+    for (AbstractPrinciple p: principles)
+      actions.addAll(p.deriveActions(widgets));
+    return actions;
+  }
+
+  /**
+   * Evaluates the overall accessibility of the SUT by querying the given graph database
+   * This will collect evaluation results from all principles in WCAG2ICT.
+   * This method executes oracles in offline evaluation.
+   * @param graphDB The graph database.
+   * @return The results of the evaluation.
+   */
+  @Override
+  public EvaluationResults query(GraphDB graphDB) {
+    EvaluationResults results = new EvaluationResults();
+    for (AbstractPrinciple p: principles)
+      for (EvaluationResult result: p.query(graphDB).getResults())
+        results.add(result);
+    return results;
+  }
+
+  @Override
+  public String getImplementationVersion() {
+    return "WCAG2ICT-" + VERSION;
+  }
+
+  private void setActionTags() {
+    AccessibilityUtil.AC_NAVIGATE_PREVIOUS_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
+    AccessibilityUtil.AC_NAVIGATE_NEXT_WIDGET.set(WCAG2Tags.WCAG2IsInWindowNavigation, true);
+  }
+
 }

@@ -1,4 +1,4 @@
 /**
- * Provides a general consumer utility. 
+ * Provides a general consumer utility.
  */
 package nl.ou.testar.utils.consumer;

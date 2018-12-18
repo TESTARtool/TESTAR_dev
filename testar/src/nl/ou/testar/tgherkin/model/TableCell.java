@@ -8,15 +8,15 @@ import org.fruit.Assert;
  */
 public class TableCell{
 
-	private final String value;
+  private final String value;
 
     /**
      * TableCell constructor.
      * @param value value contained in the table cell
      */
     public TableCell(String value) {
-    	Assert.notNull(value);
-    	this.value = value;
+      Assert.notNull(value);
+      this.value = value;
     }
 
     /**
@@ -29,7 +29,7 @@ public class TableCell{
 
     @Override
     public String toString() {
-    	return getValue();    	
+      return getValue();
     }
-    
+
 }

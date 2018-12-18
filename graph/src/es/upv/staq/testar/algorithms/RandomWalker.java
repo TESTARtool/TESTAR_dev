@@ -42,21 +42,21 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * A random walker.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class RandomWalker extends AbstractWalker {
 
-	protected Random rnd;
-	
-	public RandomWalker(Random rnd){
-		this.rnd = rnd;
-	}
+  protected Random rnd;
 
-	@Override
-	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
-		return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
-	}
+  public RandomWalker(Random rnd) {
+    this.rnd = rnd;
+  }
+
+  @Override
+  public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
+    return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+  }
 
 }

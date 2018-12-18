@@ -1,0 +1,53 @@
+<project name="core" default="jar">
+    
+    <!-- properties -->
+    <property name="src" 	   location="src/"/>
+    <property name="doc" 	   location="doc/"/>
+    <property name="bin" 	   location="bin/"/>
+	<property name="target"    location="target/"/>
+    <property name="jarfile"   value="core.jar"/>
+
+    <target name="all" depends="jar, doc"/>
+
+    <!-- compile -->
+    <target name="compile">
+        <mkdir dir="${bin}"/>
+        <javac sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+    <!-- jar -->
+    <target name="jar" depends="compile">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/${jarfile}"/>
+    </target>
+
+	<!-- doc -->
+	<target name="doc">
+        <javadoc destdir= "${doc}"
+                 access="public"
+                 windowtitle="Core"
+                 >
+
+            <fileset dir="src" defaultexcludes="yes">
+                <include name="**/*.java"/>
+            </fileset>
+        </javadoc>
+    </target>
+
+	<!-- run -->
+    <target name="run" depends="jar">
+        <java classname="${arg0}" dir="${bin}" classpath="${target}/${jarfile}" failonerror="true" fork="true">
+            <arg line="${args}"/>
+        	<jvmarg value="-server"/>
+        	<jvmarg value="-ea"/>
+        </java>
+    </target>
+	
+    <!-- clean -->	
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${doc}"/>
+        <delete dir="${target}"/>
+    </target>
+</project>

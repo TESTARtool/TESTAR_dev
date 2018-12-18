@@ -26,8 +26,8 @@ import org.fruit.monkey.Settings;
  * @author Conny Hageluken
  * @Date October 2018
  */
-public class Protocol_subroutine_dtg 
-    extends SubroutineProtocol 
+public class Protocol_subroutine_dtg
+    extends SubroutineProtocol
     implements SubroutineProxy {
 
   /**
@@ -36,7 +36,7 @@ public class Protocol_subroutine_dtg
   public Protocol_subroutine_dtg() {
     //default constructor
   }
-  
+
   /**
    * Start up the subroutine only once.
    */
@@ -53,7 +53,7 @@ public class Protocol_subroutine_dtg
   @Override
   public boolean startState(State state) {
     if (onlyOnce == 1) {
-      for (Widget widget : getTopWidgets(state)) {
+      for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null).toString();
         if (title.equalsIgnoreCase(getAddressTitle())) {
           String value = widget.get(Tags.ValuePattern, null);
@@ -102,17 +102,17 @@ public class Protocol_subroutine_dtg
     Action action = null;
     StdActionCompiler ac = new StdActionCompiler();
 
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null);
       if ("feedback".equalsIgnoreCase(title)) {
         action = ac.leftClickAt(widget);
       }
-    } 
+    }
     actions.add(action);
     return actions;
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finishes the generation of a subroutine.
    */
   @Override
@@ -120,7 +120,7 @@ public class Protocol_subroutine_dtg
     super.finishSubroutine(state);
   }
 
-  /** 
+  /**
    * Called once during the life time of TESTAR.
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
@@ -163,7 +163,7 @@ public class Protocol_subroutine_dtg
    * @return  the selected action (non-null!)
    */
   @Override
-  protected Action selectAction(State state, Set<Action> actions) { 
+  protected Action selectAction(State state, Set<Action> actions) {
     return super.selectAction(state, actions);
   }
 
@@ -190,7 +190,7 @@ public class Protocol_subroutine_dtg
     return super.moreActions(state);
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   @Override

@@ -125,8 +125,8 @@ public class LibAtSpiTests {
 
 
         // Test gedit children's state.
-        for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")){
+        for (AtSpiAccessible a: childrenExt) {
+            if (a.name().equals("gedit")) {
 
                 geditChildren = AtSpiAccessible.getAccessibleChildren(a);
                 assertEquals("frame", geditChildren.get(0).roleName());
@@ -143,7 +143,7 @@ public class LibAtSpiTests {
         assertNotNull(desktopTree);
 
         List<AtSpiAccessible> ch = desktopTree.children();
-        for (AtSpiAccessible a : ch) {
+        for (AtSpiAccessible a: ch) {
             a.retrieveAccessibleInfo();
         }
 
@@ -198,8 +198,8 @@ public class LibAtSpiTests {
         AtSpiAccessible geditAcc = null;
 
 
-        for (AtSpiAccessible a : childrenExt) {
-            if (a.name().equals("gedit")){
+        for (AtSpiAccessible a: childrenExt) {
+            if (a.name().equals("gedit")) {
                 geditAcc = a;
             }
         }
@@ -289,7 +289,7 @@ public class LibAtSpiTests {
         }
 
 
-        for (AtSpiAccessible a : root.children()) {
+        for (AtSpiAccessible a: root.children()) {
 
             if (a.role() == buttonType) {
                 return a;

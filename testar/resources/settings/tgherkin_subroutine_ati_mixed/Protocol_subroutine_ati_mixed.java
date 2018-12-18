@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.ou.testar.tgherkin.model.SubroutineProxy;
-import nl.ou.testar.tgherkin.protocol.Report;
 import nl.ou.testar.tgherkin.protocol.SubroutineProtocol;
 
 import org.fruit.alayer.Action;
@@ -17,7 +16,6 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.UrlActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 /**
@@ -27,8 +25,8 @@ import org.fruit.monkey.Settings;
  * @author Conny Hageluken
  * @Date October 2018
  */
-public class Protocol_subroutine_ati_mixed 
-    extends SubroutineProtocol 
+public class Protocol_subroutine_ati_mixed
+    extends SubroutineProtocol
     implements SubroutineProxy {
 
   /*
@@ -53,15 +51,15 @@ public class Protocol_subroutine_ati_mixed
    */
   @Override
   public boolean startState(State state) {
-    boolean startState = super.startState(state);
-    /*
-    for (Widget widget : getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null).toString();
       if (title.equalsIgnoreCase(getAddressTitle())) {
         String value = widget.get(Tags.ValuePattern, null);
         for (Integer index: getSubData().keySet()) {
           String subStr = getSubData().get(index)[0];
+          System.out.println("[Protocol_ati_mixed temp data] " + subStr);
           if (value != null && value.contains(subStr)) {
+            System.out.println("[Protocol_ati_mixed temp value] " + value);
             setActualIndexSD(index);
             try {
               setSourceFile("./" + getProtocolFolder() + "/" + getSubData().get(index)[1]);
@@ -72,10 +70,9 @@ public class Protocol_subroutine_ati_mixed
           }
         }
         break;
-      }    
+      }
     }
-    */
-    return startState;
+    return false;
   }
 
   /**
@@ -97,44 +94,44 @@ public class Protocol_subroutine_ati_mixed
   public Set<Action> finishState(State state) {
     Set<Action> actions = new HashSet<Action>();
     Action action = null;
- 
+
     if (exitUrl != null && exitUrl.length() > 0) {
       UrlActionCompiler ac = new UrlActionCompiler();
 
-      for (Widget widget : getTopWidgets(state)) {
+      for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
         if (title.equalsIgnoreCase(getAddressTitle())) {
           action = ac.clickTypeUrl(widget, exitUrl);
           action.set(Tags.ConcreteID, widget.get(Tags.ConcreteID));
           action.set(Tags.AbstractID, widget.get(Tags.Abstract_R_ID));
-          System.out.println("[" + getClass().getSimpleName() 
+          System.out.println("[" + getClass().getSimpleName()
               + "] Url will be activated (" + title + " " + exitUrl + ")");
         }
       }
-    } else { 
+    } else {
       StdActionCompiler ac = new StdActionCompiler();
-      for (Widget widget : getTopWidgets(state)) {
+      for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
         if (title.equalsIgnoreCase("bacheloropleidingen")) {
           action = ac.leftClickAt(widget);
         }
-      } 
+      }
     }
     actions.add(action);
     return actions;
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finished the generation of a subroutine.
    */
   @Override
   public void finishSubroutine(State state) {
     super.finishSubroutine(state);
-    exitUrl = getSubData().get(getActualIndexSubD())[2]
-              .replace("https://", "").replace("http://", "");
+    int index = getActualIndexSubD();
+    exitUrl = getSubData().get(index)[2].replace("https://", "").replace("http://", "");
   }
 
-  /** 
+  /**
    * Called once during the lifetime of TESTAR.
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
@@ -177,7 +174,7 @@ public class Protocol_subroutine_ati_mixed
    * @return  the selected action (non-null!)
    */
   @Override
-  protected Action selectAction(State state, Set<Action> actions) { 
+  protected Action selectAction(State state, Set<Action> actions) {
     return super.selectAction(state, actions);
   }
 
@@ -204,7 +201,7 @@ public class Protocol_subroutine_ati_mixed
     return super.moreActions(state);
   }
 
-  /** 
+  /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   @Override
@@ -216,7 +213,7 @@ public class Protocol_subroutine_ati_mixed
    * TESTAR uses this method to determine when to stop the entire test.
    * You could stop the test after a given amount of generated sequences or
    * after a specific time etc.
-   * @return  if <code>true</code> continue test, else stop  
+   * @return  if <code>true</code> continue test, else stop
    */
   @Override
   protected boolean moreSequences() {

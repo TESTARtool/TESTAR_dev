@@ -3,19 +3,23 @@
   Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
 
   Scenario Outline: A user changes his account details again.
+    Step: Focus op pagina krijgen
+    When  $Title="Accountgegevens" and $Role="UIAText" click(true)
+          $Title="Voornamen" and $Role="UIAText" click(true)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
     When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Change Geboortenaam
     When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Roepnaam
     When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
     Step: Change Voorvoegsel geboortenaam partner
     When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
     Step: Change Geboortenaam partner
     When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
-    
     Step: Visualize Naamweergave
     When  $Role="UIAComboBox" and xpath("//widget[Title='Naamweergave']//widget") click(true)
     Step: Ensure Achternaam - Partnernaam is displayed  (effect hitKey depends on displayed selection)
@@ -25,12 +29,10 @@
     When  hitKey(<Naamweergave>)
     Step: Remove list elements from screen
     When  hitKey(VK_ESCAPE)
-      
     Step: Scroll to OPSLAAN button
     While !state($Role="UIAButton" and $Title="OPSLAAN")
-    When  hitKey(VK_DOWN)
-          $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
-    
+    When  $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
+          hitKey(VK_DOWN)
     Step: Change Geboortedatum
     When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Change Geboorteplaats
@@ -49,7 +51,8 @@
     When  hitKey(VK_ESCAPE)
     Step: Save entered data
     When  $Role="UIAButton" and $Title="OPSLAAN" click()
-    
  Examples: Account data
 |Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
-|TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|
+|AREM||Weijling|Adri|||VK_A|02-07-1963|Druten|VK_M|VK_N|
+|TEST|van|User|Test||Partnernaam|VK_A|01-02-1990|Amsterdam|VK_V|VK_N|
+|CCM||Paping|Conny||Hageluken|VK_P|27-11-1961|Valkenswaard|VK_V|VK_N|

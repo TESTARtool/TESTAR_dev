@@ -185,13 +185,13 @@ class OrientDBRepository implements GraphDBRepository {
       OrientGraph graph = graphFactory.getTx();
       try {
          Vertex source = getVertexByTypeAndId(sourceType, Tags.ConcreteID.toString(), sourceId, graph);
-         if(source == null) {
+         if (source == null) {
             throw new IllegalArgumentException("Source action not found in database");
          }
          Vertex target = createVertex(instance.getType(),Tags.ConcreteID.toString(),instance.getId(),graph);
          instance.tags().forEach(tag -> setProperty(tag, instance.get(tag), target));
 
-         if( !source.getEdges(Direction.OUT,relation).iterator().hasNext() ) {
+         if ( !source.getEdges(Direction.OUT,relation).iterator().hasNext() ) {
             Edge edge = graph.addEdge(null, source, target, relation);
          }
 
@@ -215,7 +215,7 @@ class OrientDBRepository implements GraphDBRepository {
          else
             pipe.setStarts(graph.getEdges());
          List<Object> ret = new ArrayList<>();
-         for (Object o : pipe)
+         for (Object o: pipe)
             ret.add(o);
          graph.shutdown();
          return ret;
@@ -233,9 +233,9 @@ class OrientDBRepository implements GraphDBRepository {
     */
    private void createStateVertex(final State state, final OrientGraph graph,final boolean isInitial) {
       Vertex vertex = graph.addVertex("class:State");
-      for (Tag<?> t : state.tags())
+      for (Tag<?> t: state.tags())
          setProperty(t, state.get(t), vertex);
-      if(isInitial) {
+      if (isInitial) {
          vertex.setProperty("IsInitial", true);
       } else {
          vertex.setProperty("IsInitial",false);
@@ -248,7 +248,7 @@ class OrientDBRepository implements GraphDBRepository {
 
    private Vertex createWidgetVertex(final String widgetId, final Widget w, final OrientGraph graph) {
       Vertex vertex = graph.addVertex("class:Widget");
-      for (Tag<?> t : w.tags())
+      for (Tag<?> t: w.tags())
          setProperty(t, w.get(t), vertex);
       Vertex state = getStateVertex(widgetId, graph);
       Edge edge = graph.addEdge(null, state, vertex, "has");
@@ -282,7 +282,7 @@ class OrientDBRepository implements GraphDBRepository {
    /**
     * Lookup state vertex in the database.
     * @param type       type of the Vertex
-    * @param idField    field used for identification.    
+    * @param idField    field used for identification.
     * @param concreteID unique identification of the state
     * @param graph      handle to the graph database
     * @return the vertex of for the State object or null if the state is not found.
@@ -318,7 +318,7 @@ class OrientDBRepository implements GraphDBRepository {
 
       Edge isA = graph.addEdge(null, a, abstractAction,"isA");
 
-      for (Tag<?> t : action.tags()) {
+      for (Tag<?> t: action.tags()) {
          setProperty(t, action.get(t), a);
       }
    }

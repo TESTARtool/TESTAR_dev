@@ -39,11 +39,11 @@ import java.util.Set;
 import org.fruit.UnFunc;
 
 public final class YieldAll implements UnFunc<Widget, SearchFlag> {
-	private final Set<Widget> widgets = new HashSet<Widget>();
+  private final Set<Widget> widgets = new HashSet<Widget>();
 
-	public SearchFlag apply(Widget widget) {
-		widgets.add(widget);
-		return SearchFlag.OK;
-	}
-	public Set<Widget> result(){ return widgets; }
+  public SearchFlag apply(Widget widget) {
+    widgets.add(widget);
+    return SearchFlag.OK;
+  }
+  public Set<Widget> result() { return widgets; }
 }

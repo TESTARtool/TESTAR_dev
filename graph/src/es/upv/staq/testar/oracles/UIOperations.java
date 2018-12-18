@@ -32,14 +32,14 @@ package es.upv.staq.testar.oracles;
 
 /**
  * UI operations classification.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class UIOperations {
-	
-	public static enum W_PROPERTIES { TITLE }; // widget properties
-	
-	public static enum OP_TYPES { CREATE, UPDATE, DELETE }; // operation types
-	
+
+  public static enum W_PROPERTIES { TITLE }; // widget properties
+
+  public static enum OP_TYPES { CREATE, UPDATE, DELETE }; // operation types
+
 }

@@ -87,7 +87,7 @@ public class TreeWalker {
 
             // Each child of the desktop should be an application - still check to be sure.
             // All nodes with the name corresponding to the requested name will be returned.
-            for (AtSpiAccessible child : desktopNode.children()) {
+            for (AtSpiAccessible child: desktopNode.children()) {
 
                 if (child.role() == AtSpiRoles.Application && Objects.equals(child.name().toLowerCase(), applicationName.toLowerCase())) {
                     applicationNodes.add(child);
@@ -100,7 +100,7 @@ public class TreeWalker {
 
         // Get all children for each application node - making it the root of a tree.
         if (createTree) {
-            for (AtSpiAccessible appplicationNode : applicationNodes) {
+            for (AtSpiAccessible appplicationNode: applicationNodes) {
                 appplicationNode.retrieveAccessibleInfoTree();
             }
         }
@@ -151,7 +151,7 @@ public class TreeWalker {
 
         // Activate each application through AT-SPI and find the PID for each active application through xdotool.
         // Once verified that the node activated the instance of the application launched by us - stop.
-        for (AtSpiAccessible application : applicationNodes) {
+        for (AtSpiAccessible application: applicationNodes) {
 
 
             // Activate application.
@@ -203,7 +203,7 @@ public class TreeWalker {
         }
 
 
-        for (AtSpiAccessible application : applicationNodes) {
+        for (AtSpiAccessible application: applicationNodes) {
             if (isApplicationActive(application)) {
                 // There can only be one active application at the same time...
                 return application;
@@ -267,7 +267,7 @@ public class TreeWalker {
 
 
         // Check the children - Check all for the frame role and active state.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
             if (child.role() == AtSpiRoles.Frame && child.states().isActive()) {
                 return true;
             }
@@ -293,7 +293,7 @@ public class TreeWalker {
 
 
         // Check the children - this could be frames, windows or modal dialogs - check if one is of them is modal.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
 
             AtSpiStateSet childState = child.states();
 
@@ -328,7 +328,7 @@ public class TreeWalker {
 
 
         // Check the children - this could be frames, windows or modal dialogs - add the non-modals to the list.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
 
             AtSpiStateSet childState = child.states();
 
@@ -363,7 +363,7 @@ public class TreeWalker {
 
 
         // Check the children - this could be frames, windows or modal dialogs - add the non-modals to the list.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
 
             AtSpiStateSet childState = child.states();
 
@@ -399,7 +399,7 @@ public class TreeWalker {
 
         // Check the children - this could be frames, windows or modal dialogs - add the windows, frames,dialogs
         // to the list. This could be optimized by filtering unwanted stuff by role if there is any.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
 
             AtSpiStateSet childState = child.states();
 
@@ -430,7 +430,7 @@ public class TreeWalker {
 
 
         // Check the children - should be only one? Check all for the frame role and active state in any case to be sure.
-        for (AtSpiAccessible child : applicationNode.children()) {
+        for (AtSpiAccessible child: applicationNode.children()) {
             if (child.role() == AtSpiRoles.Frame && child.component() != null) {
                 return child.component().extentsOnScreen();
             }
@@ -461,8 +461,8 @@ public class TreeWalker {
 
 
         if (node.childCount() > 0) {
-            for (AtSpiAccessible a : node.children()) {
-                for (AtSpiAccessible ac : findNodesWithRole(a, role)) {
+            for (AtSpiAccessible a: node.children()) {
+                for (AtSpiAccessible ac: findNodesWithRole(a, role)) {
                     nodesWithRole.add(ac);
                 }
             }
@@ -520,7 +520,7 @@ public class TreeWalker {
         }
 
 
-        for (AtSpiAccessible a : root.children()) {
+        for (AtSpiAccessible a: root.children()) {
 
             if (a.states().isFocusable() && a.component() != null) {
                 return a;

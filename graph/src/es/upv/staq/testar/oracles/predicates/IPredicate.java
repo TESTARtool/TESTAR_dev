@@ -36,17 +36,17 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * An oracle predicate that verifies correct SUT behavior.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public interface IPredicate {
-		
-	/**
-	 * Compute the predicate verdict.
-	 * @param jipWrapper Prolog base. 
-	 * @return The verdict.
-	 */
-	public abstract Verdict getVerdict(JIPrologWrapper jipWrapper);
-	
+
+  /**
+   * Compute the predicate verdict.
+   * @param jipWrapper Prolog base.
+   * @return The verdict.
+   */
+  public abstract Verdict getVerdict(JIPrologWrapper jipWrapper);
+
 }

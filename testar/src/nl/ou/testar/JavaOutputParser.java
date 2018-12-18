@@ -55,7 +55,7 @@ public class JavaOutputParser extends PrintStream{
             setStringToLookFound(true);
         }
         //if constructor with filename was used, writing all the content of the OutputStream into the file:
-        if(fileOut!=null){
+        if (fileOut!=null) {
             fileOut.println(s);
             fileOut.flush();
         }
@@ -64,7 +64,7 @@ public class JavaOutputParser extends PrintStream{
     /**
      * Closes the output file, if constructor with filename has been used
      */
-    public void close(){
+    public void close() {
         fileOut.close();
     }
 

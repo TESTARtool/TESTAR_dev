@@ -10,11 +10,11 @@ import org.fruit.Assert;
  *
  */
 public class Scenario extends ScenarioDefinition {
-    
-	private final List<Tag> tags;
+
+  private final List<Tag> tags;
 
     /**
-     * Scenario constructor. 
+     * Scenario constructor.
      * @param tags list of tags
      * @param title summary description
      * @param narrative detailed description
@@ -23,7 +23,7 @@ public class Scenario extends ScenarioDefinition {
      * @param steps list of consecutive steps
      */
     public Scenario(List<Tag> tags, String title, String narrative, List<ConditionalGesture> selection, WidgetTreeCondition oracle,List<Step> steps) {
-    	super(title, narrative, selection, oracle, steps);
+      super(title, narrative, selection, oracle, steps);
         Assert.notNull(title);
         Assert.notNull(tags);
         this.tags = Collections.unmodifiableList(tags);
@@ -36,39 +36,39 @@ public class Scenario extends ScenarioDefinition {
     public List<Tag> getTags() {
         return tags;
     }
-    
+
     @Override
     public String toString() {
-    	StringBuilder result = new StringBuilder();
-    	for (Tag tag : getTags()) {
-    		result.append(tag.toString());
-    		result.append(System.getProperty("line.separator"));
-    	}
-    	// keyword
-    	result.append(getClass().getSimpleName());    	
-    	result.append(":");
-    	if (getTitle() != null) {    	
-	    	result.append(getTitle());    	
-    	}
-		result.append(System.getProperty("line.separator"));
-    	if (getNarrative() != null) {    	
-	    	result.append(getNarrative());    	
-	    	result.append(System.getProperty("line.separator"));
-    	}
-    	if (getSelection().size() > 0) {
-        	result.append("Selection:");
-    	}
-   		for (ConditionalGesture conditionalGesture : getSelection()) {
-   			result.append(conditionalGesture.toString());
-   		}
-    	if (getOracle() != null) {    	
-    		result.append("Oracle:");
-    		result.append(getOracle().toString());    	
-    	} 	
-    	for (Step step : getSteps()) {
-    		result.append(step.toString());
-    	}
-    	return result.toString();    	
+      StringBuilder result = new StringBuilder();
+      for (Tag tag: getTags()) {
+        result.append(tag.toString());
+        result.append(System.getProperty("line.separator"));
+      }
+      // keyword
+      result.append(getClass().getSimpleName());
+      result.append(":");
+      if (getTitle() != null) {
+        result.append(getTitle());
+      }
+    result.append(System.getProperty("line.separator"));
+      if (getNarrative() != null) {
+        result.append(getNarrative());
+        result.append(System.getProperty("line.separator"));
+      }
+      if (getSelection().size() > 0) {
+          result.append("Selection:");
+      }
+       for (ConditionalGesture conditionalGesture: getSelection()) {
+         result.append(conditionalGesture.toString());
+       }
+      if (getOracle() != null) {
+        result.append("Oracle:");
+        result.append(getOracle().toString());
+      }
+      for (Step step: getSteps()) {
+        result.append(step.toString());
+      }
+      return result.toString();
     }
 
 }

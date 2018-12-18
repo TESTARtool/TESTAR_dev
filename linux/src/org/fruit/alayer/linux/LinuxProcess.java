@@ -165,7 +165,7 @@ public class LinuxProcess extends SUTBase {
                 throw new SystemStartException(new FruitException(e.getMessage()));
             }
 
-        }catch(FruitException fe){
+        }catch(FruitException fe) {
             throw new SystemStartException(fe);
         }
 
@@ -191,11 +191,11 @@ public class LinuxProcess extends SUTBase {
         }
 
 
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lp = parseProcess(pi);
 
-            if (lp != null){
+            if (lp != null) {
                 suts.add(lp);
             }
 
@@ -314,7 +314,7 @@ public class LinuxProcess extends SUTBase {
 
         // Activate each application through AT-SPI and find the PID for each active application through xdotool.
         // Once verified that the node activated the instance of the application launched by us - stop.
-        for (AtSpiAccessible application : applicationNodes) {
+        for (AtSpiAccessible application: applicationNodes) {
 
 
             // Activate application.
@@ -359,10 +359,10 @@ public class LinuxProcess extends SUTBase {
      * @param lp The Linux process to retrieve the memory usage for.
      * @return The memory the Linux process uses; 0 otherwise.
      */
-    public static long getMemUsage(LinuxProcess lp){
+    public static long getMemUsage(LinuxProcess lp) {
 
 
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("SUT is not running - cannot retrieve RAM usage!");
             return 0;
         }
@@ -378,11 +378,11 @@ public class LinuxProcess extends SUTBase {
 
 
         // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the memory usage.
                 if (JavaHelper.tryParseInt(pi[SizeIndex])) {
@@ -409,10 +409,10 @@ public class LinuxProcess extends SUTBase {
      * @param lp The Linux process to retrieve the cpu usage for.
      * @return The cpu the Linux process uses; 0 otherwise.
      */
-    public static double getCpuUsage(LinuxProcess lp){
+    public static double getCpuUsage(LinuxProcess lp) {
 
 
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("SUT is not running - cannot retrieve CPU usage!");
             return 0;
         }
@@ -428,11 +428,11 @@ public class LinuxProcess extends SUTBase {
 
 
         // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the cpu usage.
                 if (JavaHelper.tryParseDouble(pi[CpuIndex])) {
@@ -503,7 +503,7 @@ public class LinuxProcess extends SUTBase {
     private void retrievePid(Process p) {
 
 
-        if(p.getClass().getName().equals("java.lang.UNIXProcess")) {
+        if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
 
             try {
                 Field f = p.getClass().getDeclaredField("pid");
@@ -607,7 +607,7 @@ public class LinuxProcess extends SUTBase {
      * Creates a list of running Linux processes in a different kind of representation.
      * @return A list of Linux process representations of type LinuxProcessHandle.
      */
-    private static List<LinuxProcessHandle> runningProcesses(){
+    private static List<LinuxProcessHandle> runningProcesses() {
 
 
         // Retrieve a list of LinuxProcesses.
@@ -621,7 +621,7 @@ public class LinuxProcess extends SUTBase {
 
 
         // Convert the list to a list of LinuxProcessHandles.
-        for (SUT lp : linuxProcesses) {
+        for (SUT lp: linuxProcesses) {
             linuxProcessHandles.add(new LinuxProcessHandle((LinuxProcess)lp));
         }
 
@@ -675,7 +675,7 @@ public class LinuxProcess extends SUTBase {
 
 
             // Parse the process infos - find the pid and get the name.
-            for (String[] pi : processInfos) {
+            for (String[] pi: processInfos) {
 
 
                 // Ignore all items that don't have the right length.
@@ -777,11 +777,11 @@ public class LinuxProcess extends SUTBase {
 
 
             // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-            for(String[] pi : processInfos) {
+            for (String[] pi: processInfos) {
 
                 LinuxProcess lp = parseProcess(pi);
 
-                if (lp != null && lp.get_pid() == _pid){
+                if (lp != null && lp.get_pid() == _pid) {
                     return true;
                 }
 
@@ -823,16 +823,16 @@ public class LinuxProcess extends SUTBase {
      * @return The value of the tag to retrieve.
      */
     @SuppressWarnings("unchecked")
-    protected <T> T fetch(Tag<T> tag){
-        if(tag.equals(Tags.StandardKeyboard))
+    protected <T> T fetch(Tag<T> tag) {
+        if (tag.equals(Tags.StandardKeyboard))
             return (T)_kbd;
-        else if(tag.equals(Tags.StandardMouse))
+        else if (tag.equals(Tags.StandardMouse))
             return (T)_mouse;
-        else if(tag.equals(Tags.PID))
+        else if (tag.equals(Tags.PID))
             return (T)(Long)_pid;
-        else if(tag.equals(Tags.ProcessHandles))
+        else if (tag.equals(Tags.ProcessHandles))
             return (T)runningProcesses().iterator();
-        else if(tag.equals(Tags.SystemActivator))
+        else if (tag.equals(Tags.SystemActivator))
             return (T) new LinuxProcessActivator(_pid);
         return null;
     }
@@ -843,7 +843,7 @@ public class LinuxProcess extends SUTBase {
      * @return A new set of tags to be added to instances of this class.
      */
     @SuppressWarnings("Duplicates")
-    protected Set<Tag<?>> tagDomain(){
+    protected Set<Tag<?>> tagDomain() {
         Set<Tag<?>> ret = Util.newHashSet();
         ret.add(Tags.StandardKeyboard);
         ret.add(Tags.StandardMouse);
@@ -859,6 +859,6 @@ public class LinuxProcess extends SUTBase {
     /**
      * @author: urueda
      */
-	@Override public void setNativeAutomationCache() {}
+  @Override public void setNativeAutomationCache() {}
 
 }

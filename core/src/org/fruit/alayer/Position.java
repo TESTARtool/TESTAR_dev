@@ -46,9 +46,9 @@ import org.fruit.alayer.exceptions.PositionException;
  */
 public interface Position extends Serializable {
 
-	
-	Point apply(State state) throws PositionException;
 
-	public void obscuredByChildFeature(boolean enable); // by urueda
+  Point apply(State state) throws PositionException;
+
+  public void obscuredByChildFeature(boolean enable); // by urueda
 
 }

@@ -84,7 +84,7 @@ public class LibWnckTests {
 
 
         assert windows != null;
-        for (Long w : windows.elements()) {
+        for (Long w: windows.elements()) {
 
             WnckWindow win = WnckWindow.CreateInstance(w);
 
@@ -132,7 +132,7 @@ public class LibWnckTests {
 
 
         assert windows2 != null;
-        for (Long w : windows2.elements()) {
+        for (Long w: windows2.elements()) {
 
             WnckWindow win = WnckWindow.CreateInstance(w);
 

@@ -43,38 +43,38 @@ import es.upv.staq.testar.prolog.JIPrologWrapper;
 
 /**
  * A random walker with periodic state restarts.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class RandomRestartsWalker extends RandomWalker {
-	
-	public RandomRestartsWalker(Random rnd, int testSequenceLength){
-		super(rnd);
-		RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
-	}
 
-	@Override
-	public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
-		if (RestartsWalkerUtil.notifyActionSelection(this,env, state))
-			return super.selectProportional(env, state, actions);
-		else
-			return super.selectAction(env, state, actions, jipWrapper);
-	}
+  public RandomRestartsWalker(Random rnd, int testSequenceLength) {
+    super(rnd);
+    RestartsWalkerUtil.setTestSequenceLength(testSequenceLength);
+  }
 
-	@Override
-	public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
-		RestartsWalkerUtil.notifyRewardCalculation(env, action);
-		return super.calculateRewardForAction(env, action);
-	}
-	
-	@Override
-	public double calculateRewardForState(IEnvironment env, IGraphState targetState){
-		double r = RestartsWalkerUtil.getTargetReward(env, targetState);
-		if (r != Double.MIN_VALUE)
-			return r;
-		else
-			return super.calculateRewardForState(env, targetState);
-	}	
+  @Override
+  public Action selectAction(IEnvironment env, State state, Set<Action> actions, JIPrologWrapper jipWrapper) {
+    if (RestartsWalkerUtil.notifyActionSelection(this,env, state))
+      return super.selectProportional(env, state, actions);
+    else
+      return super.selectAction(env, state, actions, jipWrapper);
+  }
+
+  @Override
+  public double calculateRewardForAction(IEnvironment env, IGraphAction action) {
+    RestartsWalkerUtil.notifyRewardCalculation(env, action);
+    return super.calculateRewardForAction(env, action);
+  }
+
+  @Override
+  public double calculateRewardForState(IEnvironment env, IGraphState targetState) {
+    double r = RestartsWalkerUtil.getTargetReward(env, targetState);
+    if (r != Double.MIN_VALUE)
+      return r;
+    else
+      return super.calculateRewardForState(env, targetState);
+  }
 
 }

@@ -11,21 +11,17 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import nl.ou.testar.tgherkin.protocol.SubroutineProtocol;
-
 import org.fruit.UnProc;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -96,7 +92,7 @@ public class SubroutinePanel extends JPanel {
   }
 
   private void showButtons(
-      boolean nnew, boolean ddelete, boolean eedit, 
+      boolean nnew, boolean ddelete, boolean eedit,
       boolean ccancel, boolean ssave) {
     btnNew.setEnabled(nnew);
     btnDelete.setEnabled(ddelete);
@@ -112,24 +108,24 @@ public class SubroutinePanel extends JPanel {
 
     JLabel jlabelIntro = new JLabel(SUBROUTINE_DATA);
     jlabelIntro.setBounds(
-        START_X, 
-        TITLE_Y, 
-        TEXT_WIDTH, 
+        START_X,
+        TITLE_Y,
+        TEXT_WIDTH,
         LABEL_HEIGHT);
     add(jlabelIntro);
 
     // Record number selection
     JLabel jlabelN = new JLabel(N_TEXT);
     jlabelN.setBounds(
-        START_X, 
-        START_Y + lineNumber * GAP_Y_H, 
-        LABEL_WIDTH, 
+        START_X,
+        START_Y + lineNumber * GAP_Y_H,
+        LABEL_WIDTH,
         LABEL_HEIGHT);
     add(jlabelN);
 
     btnNext.setBounds(
-        START_X + GAP_X_L + BUTTON_WIDTH + GAP_X + N_WIDTH + GAP_X, 
-        START_Y + lineNumber * GAP_Y_H, 
+        START_X + GAP_X_L + BUTTON_WIDTH + GAP_X + N_WIDTH + GAP_X,
+        START_Y + lineNumber * GAP_Y_H,
         BUTTON_WIDTH,
         LABEL_HEIGHT);
     btnNext.addActionListener(new ActionListener() {
@@ -141,15 +137,15 @@ public class SubroutinePanel extends JPanel {
 
     jtfN = new JTextField();
     jtfN.setBounds(
-        START_X + GAP_X_L + BUTTON_WIDTH + GAP_X, 
-        START_Y + lineNumber * GAP_Y_H, N_WIDTH, 
+        START_X + GAP_X_L + BUTTON_WIDTH + GAP_X,
+        START_Y + lineNumber * GAP_Y_H, N_WIDTH,
         LABEL_HEIGHT);
     add(jtfN);
 
     btnPrevious.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        BUTTON_WIDTH, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        BUTTON_WIDTH,
         LABEL_HEIGHT);
     btnPrevious.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
@@ -163,18 +159,18 @@ public class SubroutinePanel extends JPanel {
     // Url component
     JLabel jlabelUrl = new JLabel(URL_TEXT);
     jlabelUrl.setBounds(
-        START_X, 
-        START_Y + lineNumber * GAP_Y_H, 
-        LABEL_WIDTH, 
+        START_X,
+        START_Y + lineNumber * GAP_Y_H,
+        LABEL_WIDTH,
         LABEL_HEIGHT);
     jlabelUrl.setToolTipText(urlTTT);
     add(jlabelUrl);
 
     jtfUrl = new JTextField();
     jtfUrl.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        TEXT_WIDTH, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        TEXT_WIDTH,
         LABEL_HEIGHT);
     jtfUrl.setEditable(false);
     add(jtfUrl);
@@ -184,17 +180,17 @@ public class SubroutinePanel extends JPanel {
     // Tgherkin file
     JLabel jlabelFilename = new JLabel(FILE_TEXT);
     jlabelFilename.setBounds(
-        START_X, 
-        START_Y + lineNumber * GAP_Y_H, 
-        LABEL_WIDTH, 
+        START_X,
+        START_Y + lineNumber * GAP_Y_H,
+        LABEL_WIDTH,
         LABEL_HEIGHT);
     add(jlabelFilename);
 
     jtfFilename = new JTextField();
     jtfFilename.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        TEXT_WIDTH, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        TEXT_WIDTH,
         LABEL_HEIGHT);
     jtfFilename.setVisible(true);
     jtfFilename.setEditable(false);
@@ -203,9 +199,9 @@ public class SubroutinePanel extends JPanel {
     // select available Tgherkin file
     jcbFilename = new JComboBox<String>();
     jcbFilename.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        TEXT_WIDTH, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        TEXT_WIDTH,
         LABEL_HEIGHT);
     jcbFilename.setVisible(false);
     add(jcbFilename);
@@ -215,17 +211,17 @@ public class SubroutinePanel extends JPanel {
     // Exit URL
     JLabel jlabelExit = new JLabel(EXIT_TEXT);
     jlabelExit.setBounds(
-        START_X, 
+        START_X,
         START_Y + lineNumber * GAP_Y_H,
-        LABEL_WIDTH, 
+        LABEL_WIDTH,
         LABEL_HEIGHT);
     add(jlabelExit);
 
     jtfExit = new JTextField();
     jtfExit.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        TEXT_WIDTH, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        TEXT_WIDTH,
         LABEL_HEIGHT);
     jtfExit.setVisible(true);
     jtfExit.setEditable(false);
@@ -235,9 +231,9 @@ public class SubroutinePanel extends JPanel {
 
     //Action buttons
     btnNew.setBounds(
-        START_X + GAP_X_L, 
-        START_Y + lineNumber * GAP_Y_H, 
-        BUTTON_WIDTH2, 
+        START_X + GAP_X_L,
+        START_Y + lineNumber * GAP_Y_H,
+        BUTTON_WIDTH2,
         LABEL_HEIGHT);
     btnNew.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
@@ -247,9 +243,9 @@ public class SubroutinePanel extends JPanel {
     add(btnNew);
 
     btnDelete.setBounds(
-        START_X + GAP_X_L + GAP_X_B, 
+        START_X + GAP_X_L + GAP_X_B,
         START_Y + lineNumber * GAP_Y_H,
-        BUTTON_WIDTH2, 
+        BUTTON_WIDTH2,
         LABEL_HEIGHT);
     btnDelete.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
@@ -259,9 +255,9 @@ public class SubroutinePanel extends JPanel {
     add(btnDelete);
 
     btnEdit.setBounds(
-        START_X + GAP_X_L + 2 * GAP_X_B, 
-        START_Y + lineNumber * GAP_Y_H, 
-        BUTTON_WIDTH2, 
+        START_X + GAP_X_L + 2 * GAP_X_B,
+        START_Y + lineNumber * GAP_Y_H,
+        BUTTON_WIDTH2,
         LABEL_HEIGHT);
     btnEdit.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
@@ -271,9 +267,9 @@ public class SubroutinePanel extends JPanel {
     add(btnEdit);
 
     btnCancel.setBounds(
-        START_X + GAP_X_L + 2 * GAP_X_B, 
-        START_Y + lineNumber * GAP_Y_H, 
-        BUTTON_WIDTH2, 
+        START_X + GAP_X_L + 2 * GAP_X_B,
+        START_Y + lineNumber * GAP_Y_H,
+        BUTTON_WIDTH2,
         LABEL_HEIGHT);
 
     btnCancel.addActionListener(new ActionListener() {
@@ -284,9 +280,9 @@ public class SubroutinePanel extends JPanel {
     add(btnCancel);
 
     btnSave.setBounds(
-        START_X + GAP_X_L + 3 * GAP_X_B, 
-        START_Y + lineNumber * GAP_Y_H, 
-        BUTTON_WIDTH2, 
+        START_X + GAP_X_L + 3 * GAP_X_B,
+        START_Y + lineNumber * GAP_Y_H,
+        BUTTON_WIDTH2,
         LABEL_HEIGHT);
     btnSave.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
@@ -349,7 +345,7 @@ public class SubroutinePanel extends JPanel {
 
     } else {
 
-      for (Integer index : subroutineData.keySet()) {
+      for (Integer index: subroutineData.keySet()) {
         if (currentIndexSubroutineData <= index && index < maxIndexSubroutineData) {
 
           dummy = subroutineData.get(index + 1);
@@ -375,7 +371,7 @@ public class SubroutinePanel extends JPanel {
     jtfFilename.setVisible(false);
     jcbFilename.setVisible(true);
     String selected = subroutineData.get(currentIndexSubroutineData)[1];
-    jcbFilename.setSelectedItem(selected); 
+    jcbFilename.setSelectedItem(selected);
 
     showButtons(false, false, false, true, true);
   }
@@ -411,13 +407,12 @@ public class SubroutinePanel extends JPanel {
     showButtons(true, true, true, false, false);
   }
 
-  private void showSubroutineData(Integer index) {
+  private void showSubroutineData(int index) {
     String url = subroutineData.get(index)[0];
     String tgherkinDocument = subroutineData.get(index)[1];
     jtfN.setText(index + "");
     jtfUrl.setText(url);
     jtfFilename.setText(tgherkinDocument);
-
     String exitUrl = subroutineData.get(index)[2];
     jtfExit.setText(exitUrl);
   }
@@ -464,7 +459,7 @@ public class SubroutinePanel extends JPanel {
    * List available Tgherkin documents in protocol specific settings folder.
    */
   private void listTgherkinDocuments() {
-    String[] tgherkinDocuments = 
+    String[] tgherkinDocuments =
         new File("./resources/settings/" + protocolClass.split("/")[0] + "/")
         .list(new FilenameFilter() {
           @Override
@@ -477,7 +472,7 @@ public class SubroutinePanel extends JPanel {
   }
 
   /**
-   * Read data from the subroutine input file. 
+   * Read data from the subroutine input file.
    * Name of the input file is stored in ConfigTag SubroutineData (see settings)
    * Data format (.csv) number|url|tgherkinfile (subroutine)|exit url
    * Contents of the file will be stored in subroutineData
@@ -507,7 +502,7 @@ public class SubroutinePanel extends JPanel {
   }
 
   /**
-   * Write data from the subroutine to the input file. 
+   * Write data from the subroutine to the input file.
    * Name of the input file is stored in ConfigTag SubroutineData (see settings)
    * Data format (.csv) number|url|subroutineAction|exit url
    * Contents of the file will be stored in subroutineData
@@ -540,19 +535,19 @@ public class SubroutinePanel extends JPanel {
     subroutineProtocol = false;
     URLClassLoader loader = null;
     try {
-     
+
       URL[] classPath = new URL[myClassPath.size()];
       for (int i = 0; i < myClassPath.size(); i++) {
         classPath[i] = new File(myClassPath.get(i)).toURI().toURL();
       }
-      
+
       //URL[] classPath = {new File("bin/oracle/").toURI().toURL()};
       loader = new URLClassLoader(classPath);
 
       @SuppressWarnings("unchecked")
-      Class claszz = loader.loadClass(protocolClass.replace("/", "."));
-      UnProc<Settings> protocol = 
-          (UnProc<Settings>) claszz.getConstructor().newInstance();
+      UnProc<Settings> protocol =
+          (UnProc<Settings>) loader.loadClass(protocolClass.replace("/", "."))
+          .getConstructor().newInstance();
       if (SubroutineProtocol.class.isAssignableFrom(protocol.getClass())) {
         subroutineProtocol = true;
       }
@@ -561,8 +556,8 @@ public class SubroutinePanel extends JPanel {
       e.printStackTrace();
     } finally {
       if (loader != null) {
-        try { 
-          loader.close(); 
+        try {
+          loader.close();
         } catch (IOException e) {
           e.printStackTrace();
         }

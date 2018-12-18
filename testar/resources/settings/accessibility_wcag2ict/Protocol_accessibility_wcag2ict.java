@@ -51,86 +51,86 @@ import nl.ou.testar.a11y.wcag2.WCAG2Tags;
  */
 public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
 
-	/**
-	 * Constructs a new protocol.
-	 */
-	public Protocol_accessibility_wcag2ict() {
-		super(new WCAG2ICT());
-	}
-	
-	@Override
-	protected Verdict getVerdict(State state) {
-		Verdict verdict = super.getVerdict(state);
-		EvaluationResults results = state.get(A11yTags.A11yEvaluationResults);
-		String s = "";
-		for (EvaluationResult r : results.getResults()) {
-			WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
-			if (!result.getType().equals(EvaluationResult.Type.OK)) {
-				SuccessCriterion sc = result.getSuccessCriterion();
-				Widget w = result.getWidget();
-				s += (!s.isEmpty() ? ";" : "") + result.getType().name()
-					+ ":" + sc.toString()
-					+ ":" + sc.getLevel().name()
-					+ ":" + sc.getURLSuffix()
-					+ ":" + (w != null ? w.get(Tags.ConcreteID) : "N/A")
-					+ ":" + result.getMessage();
-			}
-		}
-		state.set(WCAG2Tags.WCAG2Violations, s);
-		return verdict;
-	}
-	
-	@Override
-	protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {
-		html.writeHeading(4, "Violations")
-		.writeTableStart()
-		.writeTableHeadings("Type", "Criterion", "Level", "Widget", "Message");
-		String[] violations = ((String)stateProps.get(WCAG2Tags.WCAG2Violations.name()))
-				.split(";");
-		for (String violation : violations) {
-			String[] violationInfo = violation.split(":");
-			String violationType = violationInfo[0],
-					criterion = violationInfo[1],
-					level = violationInfo[2],
-					url = SuccessCriterion.URL_BASE + violationInfo[3],
-					widgetTitle = !violationInfo[4].equals("N/A") 
-						? getWidgetTitleFromGraphDB(violationInfo[4]) : violationInfo[4],
-					message = violationInfo[5];
-			html.writeTableRowStart()
-			.writeTableCell(violationType)
-			.writeTableCellStart().writeLink(criterion, url, true).writeTableCellEnd()
-			.writeTableCell(level)
-			.writeTableCell(widgetTitle)
-			.writeTableCell(message)
-			.writeTableRowEnd();
-		}
-		html.writeTableEnd();
-	}
-	
-	@Override
-	protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {
-		html.writeHeading(3, "Violations");
-		if (!results.hasViolations()) {
-			html.writeParagraph("None");
-			return;
-		}
-		html.writeTableStart()
-		.writeTableHeadings("Type", "Criterion", "Level", "Message");
-		for (EvaluationResult r : results.getResults()) {
-			if (r.getType().equals(EvaluationResult.Type.OK)) {
-				continue;
-			}
-			WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
-			SuccessCriterion sc = result.getSuccessCriterion();
-			String url = SuccessCriterion.URL_BASE + sc.getURLSuffix();
-			html.writeTableRowStart()
-			.writeTableCell(result.getType().name())
-			.writeTableCellStart().writeLink(sc.toString(), url, true).writeTableCellEnd()
-			.writeTableCell(sc.getLevel().name())
-			.writeTableCell(result.getMessage())
-			.writeTableRowEnd();
-		}
-		html.writeTableEnd();
-	}
+  /**
+   * Constructs a new protocol.
+   */
+  public Protocol_accessibility_wcag2ict() {
+    super(new WCAG2ICT());
+  }
+
+  @Override
+  protected Verdict getVerdict(State state) {
+    Verdict verdict = super.getVerdict(state);
+    EvaluationResults results = state.get(A11yTags.A11yEvaluationResults);
+    String s = "";
+    for (EvaluationResult r: results.getResults()) {
+      WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
+      if (!result.getType().equals(EvaluationResult.Type.OK)) {
+        SuccessCriterion sc = result.getSuccessCriterion();
+        Widget w = result.getWidget();
+        s += (!s.isEmpty() ? ";": "") + result.getType().name()
+          + ":" + sc.toString()
+          + ":" + sc.getLevel().name()
+          + ":" + sc.getURLSuffix()
+          + ":" + (w != null ? w.get(Tags.ConcreteID): "N/A")
+          + ":" + result.getMessage();
+      }
+    }
+    state.set(WCAG2Tags.WCAG2Violations, s);
+    return verdict;
+  }
+
+  @Override
+  protected void writeGraphDBResultsDetails(Map<String, Object> stateProps) {
+    html.writeHeading(4, "Violations")
+    .writeTableStart()
+    .writeTableHeadings("Type", "Criterion", "Level", "Widget", "Message");
+    String[] violations = ((String)stateProps.get(WCAG2Tags.WCAG2Violations.name()))
+        .split(";");
+    for (String violation: violations) {
+      String[] violationInfo = violation.split(":");
+      String violationType = violationInfo[0],
+          criterion = violationInfo[1],
+          level = violationInfo[2],
+          url = SuccessCriterion.URL_BASE + violationInfo[3],
+          widgetTitle = !violationInfo[4].equals("N/A")
+            ? getWidgetTitleFromGraphDB(violationInfo[4]): violationInfo[4],
+          message = violationInfo[5];
+      html.writeTableRowStart()
+      .writeTableCell(violationType)
+      .writeTableCellStart().writeLink(criterion, url, true).writeTableCellEnd()
+      .writeTableCell(level)
+      .writeTableCell(widgetTitle)
+      .writeTableCell(message)
+      .writeTableRowEnd();
+    }
+    html.writeTableEnd();
+  }
+
+  @Override
+  protected void writeOfflineEvaluationResultsDetails(EvaluationResults results) {
+    html.writeHeading(3, "Violations");
+    if (!results.hasViolations()) {
+      html.writeParagraph("None");
+      return;
+    }
+    html.writeTableStart()
+    .writeTableHeadings("Type", "Criterion", "Level", "Message");
+    for (EvaluationResult r: results.getResults()) {
+      if (r.getType().equals(EvaluationResult.Type.OK)) {
+        continue;
+      }
+      WCAG2EvaluationResult result = (WCAG2EvaluationResult)r;
+      SuccessCriterion sc = result.getSuccessCriterion();
+      String url = SuccessCriterion.URL_BASE + sc.getURLSuffix();
+      html.writeTableRowStart()
+      .writeTableCell(result.getType().name())
+      .writeTableCellStart().writeLink(sc.toString(), url, true).writeTableCellEnd()
+      .writeTableCell(sc.getLevel().name())
+      .writeTableCell(result.getMessage())
+      .writeTableRowEnd();
+    }
+    html.writeTableEnd();
+  }
 
 }
