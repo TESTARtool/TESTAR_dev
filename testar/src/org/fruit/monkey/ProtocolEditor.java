@@ -37,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -48,16 +49,18 @@ import org.fruit.Util;
 public class ProtocolEditor extends javax.swing.JDialog {
     private static final long serialVersionUID = 5922037291232012481L;
 
+    private String settingsDir;
     private String protocolClass; // by urueda
     
     //public ProtocolEditor() {
-    public ProtocolEditor(String protocolClass) { // by urueda
+    public ProtocolEditor(String settingsDir, String protocolClass) { // by urueda
+        this.settingsDir = settingsDir;
     	this.protocolClass = protocolClass;
         DefaultSyntaxKit.initKit();
         initComponents();
         codeEditor.setContentType("text/java");
         //codeEditor.setText(Util.readFile(new File("./CustomProtocol.java")));
-        codeEditor.setText(Util.readFile(new File("./settings/" + protocolClass + ".java"))); // by urueda
+        codeEditor.setText(Util.readFile(getProtocolFile()));
     }
 
     private void initComponents() {
@@ -137,10 +140,11 @@ public class ProtocolEditor extends javax.swing.JDialog {
             console.update(console.getGraphics());
             //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
             // begin by urueda
-            Util.saveToFile(codeEditor.getText(), "./settings/" + this.protocolClass + ".java");
-            File compileDir = new File("./settings/" + new StringTokenizer(this.protocolClass,"/").nextToken());
+            File protocolFile = getProtocolFile();
+            Util.saveToFile(codeEditor.getText(), protocolFile.getPath());
+            File compileDir = protocolFile.getParentFile();
 			List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
-            Util.compileJava(fileList,
+            Util.compileJava(settingsDir, fileList,
             				 System.getProperty("java.class.path")); //";./monkey.jar");
             // end bu urueda     
             console.setText(console.getText() + "OK");
@@ -149,8 +153,18 @@ public class ProtocolEditor extends javax.swing.JDialog {
         }
     }
 
+    private File getProtocolFile() {
+        File protocolFile ;
+        if (Paths.get(protocolClass).isAbsolute()) {
+            protocolFile = new File(protocolClass + ".java");
+        }
+        else {
+            protocolFile = new File(settingsDir + protocolClass + ".java");
+        }
+        return protocolFile;
+    }
 
-    private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {
         compile();
     }                                          
 
@@ -167,7 +181,7 @@ public class ProtocolEditor extends javax.swing.JDialog {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
         try {
             //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
-            Util.saveToFile(codeEditor.getText(), "./settings/" + this.protocolClass + ".java"); // by urueda
+            Util.saveToFile(codeEditor.getText(), getProtocolFile().getPath()); // by urueda
         } catch (IOException ioe) {
             System.out.println(ioe);
         }

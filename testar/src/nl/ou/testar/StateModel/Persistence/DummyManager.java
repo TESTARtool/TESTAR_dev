@@ -1,10 +1,7 @@
 package nl.ou.testar.StateModel.Persistence;
 
 
-import nl.ou.testar.StateModel.AbstractAction;
-import nl.ou.testar.StateModel.AbstractState;
-import nl.ou.testar.StateModel.AbstractStateModel;
-import nl.ou.testar.StateModel.AbstractStateTransition;
+import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 
@@ -40,6 +37,11 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void initAbstractStateModel(AbstractStateModel abstractStateModel) {
+
+    }
+
+    @Override
+    public void persistConcreteState(ConcreteState concreteState) {
 
     }
 }

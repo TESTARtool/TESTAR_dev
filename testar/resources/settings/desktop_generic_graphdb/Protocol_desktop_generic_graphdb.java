@@ -188,7 +188,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 
 					}
 				}
@@ -252,9 +252,9 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void finishSequence(File recordedSequence){
+	protected void finishSequence(){
 		
-		super.finishSequence(recordedSequence);
+		super.finishSequence();
 		
 	}
 

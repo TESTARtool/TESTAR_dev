@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.Widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -32,6 +33,22 @@ public class EntityClassFactory {
             case AbstractStateModel:
                 return entityClasses.containsKey(EntityClassName.AbstractStateModel) ? entityClasses.get(EntityClassName.AbstractStateModel)
                             : createAbstractStateModelClass();
+
+            case ConcreteState:
+                return entityClasses.containsKey(EntityClassName.ConcreteState) ? entityClasses.get(EntityClassName.ConcreteState)
+                            : createConcreteStateClass();
+
+            case Widget:
+                return entityClasses.containsKey(EntityClassName.Widget) ? entityClasses.get(EntityClassName.Widget)
+                            : createWidgetClass();
+
+            case isParentOf:
+                return entityClasses.containsKey(EntityClassName.isParentOf) ? entityClasses.get(EntityClassName.isParentOf)
+                            : createIsParentOfClass();
+
+            case isChildOf:
+                    return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
+                            : createIsChildOfClass();
 
             default:
                 return null;
@@ -99,6 +116,50 @@ public class EntityClassFactory {
         return abstractStateModelClass;
     }
 
+    private static EntityClass createConcreteStateClass() {
+        EntityClass concreteStateClass = new EntityClass("ConcreteState", EntityClass.EntityType.Vertex);
+        Property stateId = new Property("stateId", OType.STRING);
+        stateId.setMandatory(true);
+        stateId.setNullable(false);
+        stateId.setIdentifier(true);
+        concreteStateClass.addProperty(stateId);
+        concreteStateClass.setSuperClassName("Widget");
+        entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
+        return concreteStateClass;
+    }
+
+    private static EntityClass createWidgetClass() {
+        EntityClass widgetClass = new EntityClass("Widget", EntityClass.EntityType.Vertex);
+        Property widgetId = new Property("widgetId", OType.STRING);
+        widgetId.setMandatory(true);
+        widgetId.setNullable(false);
+        widgetId.setIdentifier(true);
+        widgetClass.addProperty(widgetId);
+        entityClasses.put(EntityClassName.Widget, widgetClass);
+        return widgetClass;
+    }
+
+    private static EntityClass createIsParentOfClass() {
+        EntityClass parentClass = new EntityClass("isParentOf", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("edgeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        parentClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.isParentOf, parentClass);
+        return parentClass;
+    }
+
+    private static EntityClass createIsChildOfClass() {
+        EntityClass childClass = new EntityClass("isChildOf", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("edgeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        childClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.isChildOf, childClass);
+        return childClass;
+    }
 
 
 }

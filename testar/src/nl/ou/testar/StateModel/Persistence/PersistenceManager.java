@@ -1,9 +1,6 @@
 package nl.ou.testar.StateModel.Persistence;
 
-import nl.ou.testar.StateModel.AbstractAction;
-import nl.ou.testar.StateModel.AbstractState;
-import nl.ou.testar.StateModel.AbstractStateModel;
-import nl.ou.testar.StateModel.AbstractStateTransition;
+import nl.ou.testar.StateModel.*;
 
 public interface PersistenceManager {
 
@@ -32,9 +29,15 @@ public interface PersistenceManager {
     void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition);
 
     /**
+     * This method persists a concrete state.
+     * @param concreteState
+     */
+    void persistConcreteState(ConcreteState concreteState);
+
+    /**
      * This method initializes and abstract state model before use in Testar.
      * @param abstractStateModel
      */
-    public void initAbstractStateModel(AbstractStateModel abstractStateModel);
+    void initAbstractStateModel(AbstractStateModel abstractStateModel);
 
 }

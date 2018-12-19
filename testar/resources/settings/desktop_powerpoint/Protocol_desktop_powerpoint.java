@@ -244,8 +244,8 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
-	protected void finishSequence(File recordedSequence){
-		super.finishSequence(recordedSequence);
+	protected void finishSequence(){
+		super.finishSequence();
 	}
 
 

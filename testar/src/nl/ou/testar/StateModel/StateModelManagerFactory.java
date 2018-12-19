@@ -28,15 +28,25 @@ public class StateModelManagerFactory {
             abstractTags.add(CodingManager.allowedStateTags.get(abstractStateAttribute));
         }
 
+        // and then check the attributes for the concrete state id
+        if (settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+            throw new RuntimeException("No concrete State Attributes were provided in the settings file");
+        }
+
+        Set<Tag<?>> concreteStateTags = new HashSet<>();
+        for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+            concreteStateTags.add(CodingManager.allowedStateTags.get(concreteStateAttribute));
+        }
+
         // get an orientdb persistence manager
         PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(PersistenceManagerFactoryBuilder.ManagerType.ORIENTDB);
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
 
         // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), abstractTags, (OrientDBManager)persistenceManager);
+        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), concreteStateTags, (OrientDBManager)persistenceManager);
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector();
 
-        return new StateModelManager(abstractStateModel, actionSelector, persistenceManager);
+        return new StateModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags);
     }
 
 }

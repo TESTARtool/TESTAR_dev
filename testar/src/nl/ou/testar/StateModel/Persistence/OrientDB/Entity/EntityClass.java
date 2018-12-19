@@ -70,4 +70,20 @@ public class EntityClass {
         }
         return returnProperty;
     }
+
+    /**
+     * Method returns true if the entityclass represents a vertex.
+     * @return
+     */
+    public boolean isVertex() {
+        return this.entityType == EntityType.Vertex;
+    }
+
+    /**
+     * Method returns true if the entityclass represents an edge.
+     * @return
+     */
+    public boolean isEdge() {
+        return this.entityType == EntityType.Edge;
+    }
 }

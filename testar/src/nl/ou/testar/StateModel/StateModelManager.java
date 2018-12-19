@@ -8,6 +8,7 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.ActionHelper;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.HashSet;
@@ -30,15 +31,19 @@ public class StateModelManager {
     // persistence manager interface for persisting our model entities
     private PersistenceManager persistenceManager;
 
+    // tags containing the attributes that were used in creating the concrete state ID
+    private Set<Tag<?>> concreteStateTags;
+
     /**
      * Constructor
      * @param abstractStateModel
      * @param actionSelector
      */
-    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager) {
+    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
+        this.concreteStateTags = concreteStateTags;
         init();
     }
 
@@ -68,24 +73,31 @@ public class StateModelManager {
         // we want to provide the abstract state with the identifier of the concrete state
         newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
 
-        // add the abstract state to the model
+        // get the concrete state
+        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
+
+        // add the abstract state to the model and persist the concrete state
         try {
             abstractStateModel.addState(newAbstractState);
             if (currentAbstractState == null) {
-                // it's apparantly the first state in our run
+                // it's apparently the first state in our run
                 abstractStateModel.addInitialState(newAbstractState);
             }
             else {
                 // it's not the first state, so we want to add a transition
                 if (actionUnderExecution == null) {
                     // this should never happen if the notification process is followed correctly
-                    System.exit(-1); //@todo this needs some proper error handling
+                    throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
                 }
                 abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
+                // we reset the executed action to await the next one.
                 actionUnderExecution = null;
             }
+
+            // we simply persist the concrete state
+            persistenceManager.persistConcreteState(concreteState);
         } catch (StateModelException e) {
-            System.out.println(this.getClass() + " : Could not add state due to invalid identifier");
+            System.out.println(this.getClass() + " : Could not add state: " + e.getMessage());
         }
 
         currentAbstractState = newAbstractState;

@@ -99,10 +99,12 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
-	    	} else if (key == KBKeys.VK_ALT){
+	    	}
+	    	else if (key == KBKeys.VK_ALT){
 	    		altPressed = true;
-	    		if (!ctrlPressed && !shiftPressed)
-	    			filteringManager.setWidgetFilter(this.state,this.mouse,preciseCoding);
+			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
+//	    		if (!ctrlPressed && !shiftPressed)
+//	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
 	    	}
         }
     }
@@ -117,7 +119,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
-	    		filteringManager.manageWhiteTabuLists(this.state,this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
+	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
 	    	} else if (key == KBKeys.VK_ALT)
 	    		altPressed = false;
         }
@@ -131,11 +133,11 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 
     @Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
-		SutVisualization.visualizeActions(mode(), settings(), canvas, state, actions);
+		SutVisualization.visualizeActions(canvas, state, actions);
     	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
     		filteringManager.visualizeActions(canvas,state);
 	}
-    
+
     protected boolean blackListed(Widget w){
     	return filteringManager.blackListed(w);
     }

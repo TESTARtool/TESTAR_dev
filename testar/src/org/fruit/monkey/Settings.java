@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.*;
 
 import es.upv.staq.testar.CodingManager;
@@ -117,9 +118,9 @@ public class Settings extends TaggableBase implements Serializable {
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		}else if(tag.type().equals(AbstractProtocol.Modes.class)){
+		}else if(tag.type().equals(RuntimeControlsProtocol.Modes.class)){
 			try{
-				return (T)AbstractProtocol.Modes.valueOf(stringValue);
+				return (T)RuntimeControlsProtocol.Modes.valueOf(stringValue);
 			}catch(IllegalArgumentException iae){
 				throw new ConfigParseException("Unknown Mode!");
 			}
@@ -129,13 +130,12 @@ public class Settings extends TaggableBase implements Serializable {
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
 			}
-		// begin by urueda
 		}else if(tag.type().equals(Float.class)){
 			try{
 				return (T)(Float)Float.parseFloat(stringValue);
 			}catch(NumberFormatException nfe){
 				throw new ConfigParseException("Unable to parse value for tag " + tag);
-			} // end by urueda
+			}
 		}else if(tag.type().equals(Boolean.class)){
 			try{
 				return (T)(Boolean)Boolean.parseBoolean(stringValue);
@@ -154,7 +154,7 @@ public class Settings extends TaggableBase implements Serializable {
 			List<String> pathList = Arrays.asList(stringValue.split(";"));
 			if(pathList.size() % 2 != 0)
 				throw new ConfigParseException("The number of paths must be even!");
-			List<Pair<String, String>> ret = new ArrayList<Pair<String, String>>();
+			List<Pair<String, String>> ret = new ArrayList<>();
 			for(int i = 0; i < pathList.size(); i += 2)
 				ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
 			return (T)ret;
@@ -174,6 +174,30 @@ public class Settings extends TaggableBase implements Serializable {
 		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
 		Reader in = new BufferedReader(isw);
 		props.load(in);
+		in.close();			
+		if (isw != null) isw.close();
+		if (fis != null) fis.close();
+
+		return new Settings(defaults, new Properties(props));
+	}
+
+	public static Settings fromFileCmd(List<Pair<?, ?>> defaults, String path, String[] argv) throws IOException{
+		Assert.notNull(path);
+		Properties props = new Properties();
+		FileInputStream fis = new FileInputStream(path);
+		InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
+		Reader in = new BufferedReader(isw);
+		props.load(in);
+		
+		for(String sett : argv) {
+			//Ignore sse value
+			if(sett.toString().contains("sse=")) continue;
+			
+			System.out.println(sett.toString());
+			StringReader sr = new StringReader(sett);
+			props.load(sr);
+		}
+		
 		in.close();			
 		if (isw != null) isw.close();
 		if (fis != null) fis.close();
@@ -396,6 +420,9 @@ public class Settings extends TaggableBase implements Serializable {
 	
 	private String escapeBackslash(String string){ return string.replace("\\", "\\\\");	}
 
+	/**
+	 * This method will check if the provided settings for the concrete and abstract state models are valid.
+	 */
 	private void verifySettings() {
 		// verify the concrete and abstract state settings
 		// the values provided should be allowed by the Coding Manager
