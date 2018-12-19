@@ -1,22 +1,27 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
-import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.tinkerpop.blueprints.*;
+import com.orientechnologies.orient.core.record.OEdge;
+import com.orientechnologies.orient.core.record.OElement;
+import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.tinkerpop.blueprints.impls.orient.*;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Visualizer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 public class EntityManager {
 
     // factory that will create graphs
     private final OrientGraphFactory graphFactory;
+
+    // orient db instance that will create database sessions
+    private OrientDB orientDB;
 
     /**
      * Constructor
@@ -26,296 +31,271 @@ public class EntityManager {
      */
     public EntityManager(final String connectionString, final String username, final String password) {
         graphFactory = new OrientGraphFactory(connectionString, username, password);
+        orientDB = new OrientDB("remote:/localhost/", OrientDBConfig.defaultConfig());
     }
 
-    /**
-     * This method checks if the database already contains a given vertex.
-     * @param vertexEntity
-     * @param graph
-     * @return
-     */
-    private boolean hasVertex (VertexEntity vertexEntity, OrientGraph graph) {
+
+    private boolean hasVertex(VertexEntity vertexEntity, ODatabaseSession db) {
         boolean hasVertex = true;
         try {
-            retrieveVertex(vertexEntity, graph);
+            retrieveVertex(vertexEntity, db);
         }
-        catch (EntityNotFoundException ex) {
+        catch (EntityNotFoundException e) {
             hasVertex = false;
         }
         return hasVertex;
     }
 
-    /**
-     * This method attempts to retrieve a vertex from the graph database
-     * @param vertexEntity
-     * @param graph
-     * @return
-     * @throws EntityNotFoundException
-     */
-    private Vertex retrieveVertex(VertexEntity vertexEntity, OrientGraph graph) throws EntityNotFoundException {
+    private OVertex retrieveVertex(VertexEntity vertexEntity, ODatabaseSession db) throws EntityNotFoundException {
         Property identifier = vertexEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
             // cannot retrieve a vertex without identifier
+            // technically we should use a different kind of exception for this
             throw new EntityNotFoundException();
         }
 
-        String searchKey = vertexEntity.getEntityClass().getClassName() + "." + identifier.getPropertyName();
-        Object searchValue = vertexEntity.getPropertyValue(identifier.getPropertyName()).right();
+        // first we prepare the statement to execute
+        String className = vertexEntity.getEntityClass().getClassName();
+        String idField = identifier.getPropertyName();
+        String stmt = "SELECT FROM " + className + " WHERE " + idField + " = :" + idField;
+        // get the id parameter ready
+        Map<String, Object> params = new HashMap<>();
+        params.put(idField, vertexEntity.getPropertyValue(idField).right());
+        //execute the query using statement and parameters
+        OResultSet rs = db.query(stmt, params);
 
-        // query the graph database for the vertex based on these identifier values
-        Iterable<Vertex> vertices = graph.getVertices(searchKey, searchValue);
-        if (!vertices.iterator().hasNext()) {
+        // process the results
+        if (!rs.hasNext()) {
             throw new EntityNotFoundException();
         }
-        return vertices.iterator().next();
+
+        Optional<OVertex> op = rs.next().getVertex();
+        if (op.isPresent()) {
+            return op.get();
+        }
+
+        // if we made it here, no vertex was found
+        throw new EntityNotFoundException();
     }
+
+    private OEdge retrieveEdge(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
+        // when looking for an edge, there are 2 options.
+        // an edge can have an Id field, in which case we will just look for the id, as it will be indexed and unique.
+        // If an edge does not have an Id field, we will attempt to look for an edge between the source and target vertices.
+        Property identifier = edgeEntity.getEntityClass().getIdentifier();
+        OResultSet rs;
+        if (identifier != null) {
+            rs = retrieveEdgeWithId(edgeEntity, db);
+        }
+        else {
+            rs = retrieveEdgeWithoutId(edgeEntity, db);
+        }
+
+        // process the results
+        if (!rs.hasNext()) {
+            throw new EntityNotFoundException();
+        }
+
+        Optional<OEdge> op = rs.next().getEdge();
+        if (op.isPresent()) {
+            return op.get();
+        }
+
+        // if we made it here, no edge was found
+        throw new EntityNotFoundException();
+    }
+
+    private OResultSet retrieveEdgeWithId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
+        Property identifier = edgeEntity.getEntityClass().getIdentifier();
+        if (identifier == null) {
+            throw  new EntityNotFoundException();
+        }
+        // first we prepare the statement to execute
+        String className = edgeEntity.getEntityClass().getClassName();
+        String idField = identifier.getPropertyName();
+        String stmt = "SELECT FROM " + className + " WHERE " + idField + " = :" + idField;
+        // get the id parameter ready
+        Map<String, Object> params = new HashMap<>();
+        params.put(idField, edgeEntity.getPropertyValue(idField).right());
+        //execute the query using statement and parameters
+        OResultSet rs = db.query(stmt, params);
+        return rs;
+    }
+
+    private OResultSet retrieveEdgeWithoutId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
+        // for this one we need a more tricky query using specific graph query capabilities
+        // first, we need to make sure we have been provided the source and target vertices, otherwise there is nothing to search
+        if (edgeEntity.getSourceEntity() == null || edgeEntity.getTargetEntity() == null) {
+            throw new EntityNotFoundException();
+        }
+
+        Property sourceIdentifier = edgeEntity.getSourceEntity().getEntityClass().getIdentifier();
+        Property targetIdentifier = edgeEntity.getTargetEntity().getEntityClass().getIdentifier();
+        if (sourceIdentifier == null || targetIdentifier == null) {
+            throw new EntityNotFoundException();
+        }
+
+        // extract the necessary variables needed in query execution
+        String sourceIdName = sourceIdentifier.getPropertyName();
+        String targetIdName = targetIdentifier.getPropertyName();
+        String sourceId = (String)edgeEntity.getPropertyValue(sourceIdName).right();
+        String targetId = (String)edgeEntity.getPropertyValue(targetIdName).right();
+
+        String sourceClass = edgeEntity.getSourceEntity().getEntityClass().getClassName();
+        String targetClass = edgeEntity.getTargetEntity().getEntityClass().getClassName();
+        String edgeClass = edgeEntity.getEntityClass().getClassName();
+
+        // prepare the statement we need to execute
+        String stmt = "SELECT transition FROM (MATCH {class: " + sourceClass + ", as: source, where: (" + sourceIdName + " = :" + sourceIdName + ")}" +
+                ".outE('" + edgeClass + "') {as: transition}.outV('" + targetClass + "') {as: target, where: (" + targetIdName + " = :" + targetIdName + ")} RETURN action)";
+        // provide a map with the values
+        Map<String, Object> params = new HashMap<>();
+        params.put(sourceIdName, sourceId);
+        params.put(targetIdName, targetId);
+        OResultSet rs = db.query(stmt, params);
+        return rs;
+    }
+
 
     /**
      * This method will attempt to create a new class if it is not already present in the database
      * @param entityClass
      */
     public void createClass(EntityClass entityClass) {
-        if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
-            createVertexClass(entityClass);
-        }
-        else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
-            createEdgeClass(entityClass);
-        }
-    }
-
-    /**
-     * This private method attempts to create a new vertex class in the orient database
-     * @param entityClass
-     */
-    private void createVertexClass(EntityClass entityClass) {
         System.out.println("classname: " + entityClass.getClassName());
-        OrientGraphNoTx graph = graphFactory.getNoTx();
-        try {
-            OrientVertexType vertexType = graph.getVertexType(entityClass.getClassName());
-            if (vertexType == null) {
-                // no vertex class with this name exists yet. Let's make one!
-                vertexType = graph.createVertexType(entityClass.getClassName(), entityClass.getSuperClassName());
-                // add the classes properties
-                for (Property property : entityClass.getProperties()) {
-                    OrientVertexType.OrientVertexProperty vertexProperty = null;
-                    if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
-                        vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
-                    }
-                    else {
-                        vertexProperty = vertexType.createProperty(property.getPropertyName(), property.getPropertyType());
-                    }
-                    vertexProperty.setReadonly(property.isReadOnly());
-                    vertexProperty.setMandatory(property.isMandatory());
-                    vertexProperty.setNotNull(!property.isNullable());
+        try (ODatabaseSession db = orientDB.open("testar", "testar", "testar")) {
+            // check if the class already exists
+            OClass oClass = db.getClass(entityClass.getClassName());
+            if (oClass != null) return;
+
+            // no class yet, let's create it
+            String entitySuperClass = entityClass.isVertex() ? "V" : entityClass.isEdge() ? "E" : "";
+            String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName() : entitySuperClass;
+            oClass = db.createClass(entityClass.getClassName(), superClassName);
+
+            // set the properties
+            for (Property property : entityClass.getProperties()) {
+                OProperty dbProperty = null;
+                // for linked and embedded type a childtype needs to be specified
+                if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                    dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
                 }
-                // we add an index for the identifier fields for fast lookup
-                //@todo ideally, this should be a composite key with a unique restraint
-                // however, this is complex to do with the java api, so we'll look at it later
-                Property identifier = entityClass.getIdentifier();
-                if (identifier != null) {
-                    String indexFieldName = identifier.getPropertyName();
-                    graph.createKeyIndex(indexFieldName, Vertex.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
+                else {
+                    dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType());
                 }
+
+                dbProperty.setReadonly(property.isReadOnly());
+                dbProperty.setMandatory(property.isMandatory());
+                dbProperty.setNotNull(!property.isNullable());
             }
-        } finally {
-            graph.shutdown();
+
+            // we add an index for the identifier fields for fast lookup
+            Property identifier = entityClass.getIdentifier();
+            if (identifier != null) {
+                String indexField = entityClass.getClassName() + "." + identifier.getPropertyName() + "Idx";
+                oClass.createIndex(indexField, OClass.INDEX_TYPE.UNIQUE,identifier.getPropertyName());
+            }
         }
     }
 
-    /**
-     * This private method attempts to create a new edge class in the orient database
-     * @param entityClass
-     */
-    private void createEdgeClass(EntityClass entityClass) {
-        OrientGraphNoTx graph = graphFactory.getNoTx();
-        try {
-            OrientEdgeType edgeType = graph.getEdgeType(entityClass.getClassName());
-            if (edgeType == null) {
-                // no edge class with this name exists yet. Let's make one!
-                edgeType = graph.createEdgeType(entityClass.getClassName(), entityClass.getSuperClassName());
-                // add the classes properties
-                for (Property property : entityClass.getProperties()) {
-                    OProperty edgeProperty = null;
-                    if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
-                        edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
-                    }
-                    else {
-                        edgeProperty = edgeType.createProperty(property.getPropertyName(), property.getPropertyType());
-                    }
-                    edgeProperty.setReadonly(property.isReadOnly());
-                    edgeProperty.setMandatory(property.isMandatory());
-                    edgeProperty.setNotNull(!property.isNullable());
-                }
-                // we add an index for the identifier fields for fast lookup
-                Property identifier = entityClass.getIdentifier();
-                if (identifier != null) {
-                    String indexFieldName = identifier.getPropertyName();
-                    graph.createKeyIndex(indexFieldName, Edge.class, new Parameter("class", entityClass.getClassName()), new Parameter("type", "UNIQUE"), new Parameter("collate", "ci"));
-                }
-            }
-        } finally {
-            graph.shutdown();
-        }
-    }
-
-    /**
-     * This method will save a new or existing entity to the orient database
-     * @param entity
-     */
     public void saveEntity(DocumentEntity entity) {
-        OrientGraph graph = graphFactory.getTx();
-        // not a fan of an if/else if structure like this, as it can get out of hand quickly as the application grows
-        try {
+        try (ODatabaseSession db = orientDB.open("testar", "testar", "testar")) {
             if (entity instanceof VertexEntity) {
-                saveVertexEntity((VertexEntity) entity, graph);
+                saveVertexEntity((VertexEntity) entity, db);
             }
-            else if (entity instanceof EdgeEntity){
-                saveEdgeEntity((EdgeEntity) entity, graph);
+            else if (entity instanceof EdgeEntity) {
+                saveEdgeEntity((EdgeEntity) entity, db);
             }
-        } finally {
-//            if (entity instanceof VertexEntity) {
-//                for (String propertyName : entity.getPropertyNames()) {
-//                    System.out.println(propertyName + ":" + entity.getPropertyValue(propertyName).right());
-//                }
-//            }
-            graph.shutdown();
         }
     }
 
-    /**
-     * This method will save a vertex entity to the database
-     * @param entity
-     */
-    private void saveVertexEntity(VertexEntity entity, OrientGraph graph) {
-        Vertex vertex;
-        // check to see if the entity already exists in the database
+    private void saveVertexEntity(VertexEntity entity, ODatabaseSession db) {
+        OVertex oVertex;
+        // check to see if the vertex already exists in the database
         try {
-            vertex = retrieveVertex(entity, graph);
-            // add the properties
-//            for (String propertyName : entity.getPropertyNames()) {
-//                vertex.setProperty(propertyName, entity.getPropertyValue(propertyName).right());
-//            }
-            HashMap<String, Object> props = new HashMap<>();
-            for (String propertyName : entity.getPropertyNames()) {
-                setProperty(props, propertyName, entity.getPropertyValue(propertyName).right());
-            }
-            ((OrientVertex)vertex).setProperties(props);
+            oVertex = retrieveVertex(entity, db);
         }
-        catch (EntityNotFoundException ex) {
-            // we have to create a map containing the properties and pass it to the vertex
-            // creation method.
-            HashMap<String, Object> props = new HashMap<>();
-            for (String propertyName : entity.getPropertyNames()) {
-                setProperty(props, propertyName, entity.getPropertyValue(propertyName).right());
-            }
-            graph.addVertex("class:" + entity.getEntityClass().getClassName(), props);
+        catch (EntityNotFoundException e) {
+            // vertex doesn't exist yet. No problemo. We'll create one.
+            oVertex = db.newVertex(entity.getEntityClass().getClassName());
         }
 
+        // now we have to add or update properties!
+        for (String propertyName : entity.getPropertyNames()) {
+            setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).right());
+        }
+        oVertex.save();
     }
 
-    /**
-     * This method will save an edge entity to the database.
-     * @param entity
-     */
-    private void saveEdgeEntity(EdgeEntity entity, OrientGraph graph) {
+    private void saveEdgeEntity(EdgeEntity entity, ODatabaseSession db) {
+        // an edge always needs both a source and a target vertex
         // an edge has a source and target vertex
         if (entity.getSourceEntity() == null || entity.getTargetEntity() == null) {
             return;
             //@todo we could at some point implement some error handling here, but for now we simply do not store the edge
         }
-        Vertex sourceVertex;
-        Vertex targetVertex;
 
-        if (!hasVertex(entity.getSourceEntity(), graph)) {
-            saveVertexEntity(entity.getSourceEntity(), graph);
+        // make sure the edge's endpoints exist in the database
+        if (!hasVertex(entity.getSourceEntity(), db)) {
+            saveVertexEntity(entity.getSourceEntity(), db);
         }
-        if (!hasVertex(entity.getTargetEntity(), graph)) {
-            saveVertexEntity(entity.getTargetEntity(), graph);
+        if (!hasVertex(entity.getTargetEntity(), db)) {
+            saveVertexEntity(entity.getTargetEntity(), db);
         }
 
+        // check if the edge entity already exists
+        OEdge edge;
         try {
-            sourceVertex = retrieveVertex(entity.getSourceEntity(), graph);
-            targetVertex = retrieveVertex(entity.getTargetEntity(), graph);
+            edge = retrieveEdge(entity, db);
         } catch (EntityNotFoundException e) {
-            // should not happen at this point
-            e.printStackTrace();
-            return;
-        }
-
-        // we want to add an edge only if there is not yet a similar edge with the same id between the same two vertices
-        Edge newEdge = null;
-        for (Edge edge: sourceVertex.getEdges(Direction.OUT, entity.getEntityClass().getClassName())) {
-
-            Property identifier = entity.getEntityClass().getIdentifier();
-            String edgeId = edge.getProperty(identifier.getPropertyName());
-            String entityId = (String)entity.getPropertyValue(identifier.getPropertyName()).right();
-
-            if (!edgeId.equals(entityId)) {
-                continue;
-            }
-
-            // so this edge is already in the database based on its identifiers.
-            // however, it could be that it is connected to a different target state
-            // In that case we want to store the new edge
-            Vertex edgeTargetVertex = edge.getVertex(Direction.OUT);
-            Property targetIdentifier = entity.getTargetEntity().getEntityClass().getIdentifier();
-            String edgeTargetId = edgeTargetVertex.getProperty(targetIdentifier.getPropertyName());
-            String newTargetId = targetVertex.getProperty(targetIdentifier.getPropertyName());
-            if (edgeTargetId == null || newTargetId == null) {
-                continue;
-            }
-            if (edgeTargetId.equals(newTargetId)) {
-                newEdge = edge;
-                break;
+            // edge doesn't exist yet. Let's create a new one
+            try {
+                OVertex sourceVertex = retrieveVertex(entity.getSourceEntity(), db);
+                OVertex targetVertex = retrieveVertex(entity.getTargetEntity(), db);
+                edge = sourceVertex.addEdge(targetVertex, entity.getEntityClass().getClassName());
+            } catch (EntityNotFoundException e1) {
+                // should not happen at this point
+                e1.printStackTrace();
+                return;
             }
         }
 
-        // check if we need to create a new edge
-        if (newEdge == null) {
-            // we have to create a map containing the properties and pass it to the edge
-            // creation method.
-            HashMap<String, Object> props = new HashMap<>();
-            for (String propertyName : entity.getPropertyNames()) {
-                props.put(propertyName, entity.getPropertyValue(propertyName).right());
-            }
-            ((OrientVertex)sourceVertex).addEdge(entity.getEntityClass().getClassName(), (OrientVertex)targetVertex,
-                    entity.getEntityClass().getClassName(), null, props);
+        // now we have to add or update properties!
+        for (String propertyName : entity.getPropertyNames()) {
+            setProperty(edge, propertyName, entity.getPropertyValue(propertyName).right());
         }
-        else {
-            // add the properties
-            for (String propertyName : entity.getPropertyNames()) {
-                newEdge.setProperty(propertyName, entity.getPropertyValue(propertyName).right());
-            }
-        }
+        edge.save();
     }
 
     /**
      * Helper method to format a property before adding it to a map.
-     * @param map
+     * This is a bit of a dirty solution to prevent OrientDB from protesting to certain values that are
+     * stored. Will need to investigate further at some point in time.
+     * @param element
      * @param propertyName
      * @param propertyValue
      */
-    private void setProperty(HashMap<String, Object> map, String propertyName, Object propertyValue) {
+    private void setProperty(OElement element, String propertyName, Object propertyValue) {
         if (propertyValue instanceof Boolean)
-            map.put(propertyName, ((Boolean) propertyValue).booleanValue());
+            element.setProperty(propertyName, ((Boolean) propertyValue).booleanValue());
         else if (propertyValue instanceof Byte)
-            map.put(propertyName, ((Byte) propertyValue).byteValue());
+            element.setProperty(propertyName, ((Byte) propertyValue).byteValue());
         else if (propertyValue instanceof Character)
-            map.put(propertyName, ((Character) propertyValue).charValue());
+            element.setProperty(propertyName, ((Character) propertyValue).charValue());
         else if (propertyValue instanceof Double)
-            map.put(propertyName, ((Double) propertyValue).doubleValue());
+            element.setProperty(propertyName, ((Double) propertyValue).doubleValue());
         else if (propertyValue instanceof Float)
-            map.put(propertyName, ((Float) propertyValue).floatValue());
+            element.setProperty(propertyName, ((Float) propertyValue).floatValue());
         else if (propertyValue instanceof Integer)
-            map.put(propertyName, ((Integer) propertyValue).intValue());
+            element.setProperty(propertyName, ((Integer) propertyValue).intValue());
         else if (propertyValue instanceof Long)
-            map.put(propertyName, ((Long) propertyValue).longValue());
+            element.setProperty(propertyName, ((Long) propertyValue).longValue());
         else if (propertyValue instanceof Short)
-            map.put(propertyName, ((Short) propertyValue).shortValue());
+            element.setProperty(propertyName, ((Short) propertyValue).shortValue());
         else if (propertyValue instanceof Visualizer) {
             //skip Don't put visualizer in the graph since it has no meaning for graph.
             //It will get a meaning when we want to use the data for reply.
         } else
-            map.put(propertyName, propertyValue.toString());
+            element.setProperty(propertyName, propertyValue.toString());
     }
 }
