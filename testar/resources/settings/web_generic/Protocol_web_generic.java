@@ -147,7 +147,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 		//Enter password on .add(new Type(""),0.1)
 		new CompoundAction.Builder()   
-		.add(new Type(""),0.1)
+		.add(new Type("password"),0.1)
 		.build()
 		.run(sut,null, 0.1);   
 
@@ -189,7 +189,9 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 		for(Widget w : state){
 			Role role = w.get(Tags.Role, Roles.Widget);
-			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
+			//Qualitate
+			//w.get(Tags.Path).length()<15 is a temporal condition to filter only Web ToolBar and not all existing toolbar widgets
+			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}) && w.get(Tags.Path).length()<15)
 				browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
 		}
 
@@ -235,7 +237,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		//PopUp of IE SUT
-		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+		/*if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
 			LOGGER.warn("Ventana de alerta mostrada al usuario");
 			Keyboard kb = AWTKeyboard.build();
 
@@ -245,13 +247,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 			.run(system,null, 0.5);
 
 			kb.release(KBKeys.VK_ENTER);
-		}		
+		}*/	
 		// iterate through all widgets
 		for(Widget w : getTopWidgets(state)){
 
 			//Check current browser tab, to close possible undesired tabs
 			if(w.get(Tags.Title,"").toString().contains("Address and search")) {
-				if(!w.get(Tags.ValuePattern,"").toString().contains("vims-alm")) {
+				if(!w.get(Tags.ValuePattern,"").toString().contains("184.193")) {
 
 					Keyboard kb = AWTKeyboard.build();
 					CompoundAction cAction = new CompoundAction(new KeyDown(KBKeys.VK_CONTROL),new KeyDown(KBKeys.VK_W));
@@ -263,7 +265,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 				}
 			}
 			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){
+			
+			//Qualitate
+			//Instead of disable Enabled property, force actions into "disabled" buttons
+			if(/*w.get(Enabled, true) &&*/ !w.get(Blocked, false)){
 
 				// Do not build actions for widgets on the blacklist
 				// The blackListed widgets are those that have been filtered during the SPY mode with the
