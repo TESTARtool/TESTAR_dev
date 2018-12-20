@@ -759,7 +759,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param action
      * @param actionMode
      */
-    private void saveActionInfoInLogs(State state, Action action, String actionMode) {
+    protected void saveActionInfoInLogs(State state, Action action, String actionMode) {
     	
 		//Obtain action information
 		String[] actionRepresentation = Action.getActionRepresentation(state,action,"\t");
