@@ -95,7 +95,7 @@ public class StateModelManager {
             }
 
             // we simply persist the concrete state
-            persistenceManager.persistConcreteState(concreteState);
+            persistenceManager.persistConcreteState(concreteState, newAbstractState);
         } catch (StateModelException e) {
             System.out.println(this.getClass() + " : Could not add state: " + e.getMessage());
         }

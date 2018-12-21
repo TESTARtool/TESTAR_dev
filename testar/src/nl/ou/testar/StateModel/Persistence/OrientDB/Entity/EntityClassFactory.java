@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -49,6 +49,10 @@ public class EntityClassFactory {
             case isChildOf:
                     return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
                             : createIsChildOfClass();
+
+            case isAbstractedBy:
+                    return entityClasses.containsKey(EntityClassName.isAbstractedBy) ? entityClasses.get(EntityClassName.isAbstractedBy)
+                            : createIsAbstractedByClass();
 
             default:
                 return null;
@@ -141,7 +145,7 @@ public class EntityClassFactory {
 
     private static EntityClass createIsParentOfClass() {
         EntityClass parentClass = new EntityClass("isParentOf", EntityClass.EntityType.Edge);
-        Property edgeId = new Property("edgeId", OType.STRING);
+        Property edgeId = new Property("parentEdgeId", OType.STRING);
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
@@ -152,13 +156,24 @@ public class EntityClassFactory {
 
     private static EntityClass createIsChildOfClass() {
         EntityClass childClass = new EntityClass("isChildOf", EntityClass.EntityType.Edge);
-        Property edgeId = new Property("edgeId", OType.STRING);
+        Property edgeId = new Property("childEdgeId", OType.STRING);
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
         childClass.addProperty(edgeId);
         entityClasses.put(EntityClassName.isChildOf, childClass);
         return childClass;
+    }
+
+    private static EntityClass createIsAbstractedByClass() {
+        EntityClass entityClass = new EntityClass("isAbstractedBy", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("abstractedByEdgeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        entityClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.isAbstractedBy, entityClass);
+        return entityClass;
     }
 
 
