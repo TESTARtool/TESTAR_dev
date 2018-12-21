@@ -558,6 +558,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
 
+                // notify the state model manager of the initial state
+                Set<Action> actions = deriveActions(system, state);
+                CodingManager.buildIDs(state, actions);
+                stateModelManager.notifyNewStateReached(state, actions);
+
                 /*
                  ***** starting the INNER LOOP:
                  */
@@ -658,12 +663,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
             graphDB.addState(state, true);
 
-            // notify the state model manager of the newly reached state
+            //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
             CodingManager.buildIDs(state, actions);
-            stateModelManager.notifyNewStateReached(state, actions);
-
-            //Deriving actions from the state:
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -692,6 +694,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Executing the selected action:
             executeAction(system, state, action);
             actionCount++;
+
+            // notify the state model manager of the newly reached state
+            actions = deriveActions(system, state);
+            CodingManager.buildIDs(state, actions);
+            stateModelManager.notifyNewStateReached(state, actions);
 
             //Saving the actions and the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
