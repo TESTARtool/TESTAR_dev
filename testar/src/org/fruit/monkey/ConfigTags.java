@@ -103,13 +103,21 @@ public final class ConfigTags {
   public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
 
-  public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
-
+  // state model config tags
+  public static final Tag<Boolean> StateModelEnabled = Tag.from("StateModelEnabled", Boolean.class);
+  public static final Tag<String> DataStore = Tag.from("DataStore", String.class);
+  public static final Tag<String> DataStoreType = Tag.from("DataStoreType", String.class);
+  public static final Tag<String> DataStoreServer = Tag.from("DataStoreServer", String.class);
+  public static final Tag<String> DataStoreDB = Tag.from("DataStoreDB", String.class);
+  public static final Tag<String> DataStoreUser = Tag.from("DataStoreUser", String.class);
+  public static final Tag<String> DataStorePassword = Tag.from("DataStorePassword", String.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
-  
+
+  public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
+
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);

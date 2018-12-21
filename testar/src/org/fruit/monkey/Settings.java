@@ -378,6 +378,17 @@ public class Settings extends TaggableBase implements Serializable {
 					+"GraphDBPassword =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# State model inference settings\n"
+					+"#################################################################\n"
+					+"StateModelEnabled = false" + Util.lineSep()
+					+"DataStore = OrientDB" + Util.lineSep()
+					+"DataStoreType = remote" + Util.lineSep()
+					+"DataStoreServer = localhost" + Util.lineSep()
+					+"DataStoreDB =" + Util.lineSep()
+					+"DataStoreUser =" + Util.lineSep()
+					+"DataStorePassword =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"

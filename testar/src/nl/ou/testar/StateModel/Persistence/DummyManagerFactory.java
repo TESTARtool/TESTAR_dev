@@ -1,4 +1,4 @@
-package nl.ou.testar.StateModel.Persistence.OrientDB;
+package nl.ou.testar.StateModel.Persistence;
 
 import nl.ou.testar.StateModel.Persistence.DummyManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;

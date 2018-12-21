@@ -38,8 +38,15 @@ public class StateModelManagerFactory {
             concreteStateTags.add(CodingManager.allowedStateTags.get(concreteStateAttribute));
         }
 
-        // get an orientdb persistence manager
-        PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(PersistenceManagerFactoryBuilder.ManagerType.ORIENTDB);
+        // get a persistence manager
+        PersistenceManagerFactoryBuilder.ManagerType managerType;
+        if (!settings.get(ConfigTags.StateModelEnabled)) {
+            managerType = PersistenceManagerFactoryBuilder.ManagerType.DUMMY;
+        }
+        else {
+            managerType = PersistenceManagerFactoryBuilder.ManagerType.valueOf(settings.get(ConfigTags.DataStore).toUpperCase());
+        }
+        PersistenceManagerFactory persistenceManagerFactory = PersistenceManagerFactoryBuilder.createPersistenceManagerFactory(managerType);
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
 
         // create the abstract state model and then the state model manager

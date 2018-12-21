@@ -99,6 +99,17 @@ GraphDBUrl = remote:/localhost/testar
 GraphDBUser = testar
 GraphDBPassword = testar
 
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+
 #################################################################
 # State identifier attributes
 #

@@ -482,6 +482,13 @@ public class Main {
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
+			defaults.add(Pair.from(StateModelEnabled, false));
+			defaults.add(Pair.from(DataStore, ""));
+			defaults.add(Pair.from(DataStoreType, ""));
+			defaults.add(Pair.from(DataStoreServer, ""));
+			defaults.add(Pair.from(DataStoreDB, ""));
+			defaults.add(Pair.from(DataStoreUser, ""));
+			defaults.add(Pair.from(DataStorePassword, ""));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));

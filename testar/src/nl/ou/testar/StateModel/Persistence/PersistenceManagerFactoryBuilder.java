@@ -1,6 +1,5 @@
 package nl.ou.testar.StateModel.Persistence;
 
-import nl.ou.testar.StateModel.Persistence.OrientDB.DummyManagerFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManagerFactory;
 
 /**

@@ -10,7 +10,6 @@ import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.tinkerpop.blueprints.impls.orient.*;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
 import org.fruit.alayer.Visualizer;
 
@@ -18,21 +17,19 @@ import java.util.*;
 
 public class EntityManager {
 
-    // factory that will create graphs
-    private final OrientGraphFactory graphFactory;
-
     // orient db instance that will create database sessions
     private OrientDB orientDB;
 
+    private Config dbConfig;
+
     /**
      * Constructor
-     * @param connectionString
-     * @param username
-     * @param password
+     * @param config
      */
-    public EntityManager(final String connectionString, final String username, final String password) {
-        graphFactory = new OrientGraphFactory(connectionString, username, password);
-        orientDB = new OrientDB("remote:/localhost/", OrientDBConfig.defaultConfig());
+    public EntityManager(Config config) {
+        String connectionString = config.getConnectionType() + ":" +"/" + config.getServer() + "/";
+        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+        dbConfig = config;
     }
 
 
@@ -163,8 +160,7 @@ public class EntityManager {
      * @param entityClass
      */
     public void createClass(EntityClass entityClass) {
-        System.out.println("classname: " + entityClass.getClassName());
-        try (ODatabaseSession db = orientDB.open("testar", "testar", "testar")) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             // check if the class already exists
             OClass oClass = db.getClass(entityClass.getClassName());
             if (oClass != null) return;
@@ -200,7 +196,7 @@ public class EntityManager {
     }
 
     public void saveEntity(DocumentEntity entity) {
-        try (ODatabaseSession db = orientDB.open("testar", "testar", "testar")) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             if (entity instanceof VertexEntity) {
                 saveVertexEntity((VertexEntity) entity, db);
             }
