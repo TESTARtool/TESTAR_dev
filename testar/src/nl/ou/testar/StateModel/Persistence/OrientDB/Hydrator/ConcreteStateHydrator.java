@@ -36,6 +36,11 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
         String widgetId = ((ConcreteState) source).getId() + "-" + ((ConcreteState) source).getId();
         target.addPropertyValue("widgetId", OType.STRING, widgetId);
 
+        // add the screenshot
+        if (((ConcreteState) source).getScreenshot() != null) {
+            target.addPropertyValue("screenshot", OType.BINARY, ((ConcreteState) source).getScreenshot());
+        }
+
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((ConcreteState) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {

@@ -1,8 +1,13 @@
 package nl.ou.testar.StateModel;
 
+import es.upv.staq.testar.ProtocolUtil;
+import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Set;
 
 public abstract class ConcreteStateFactory {
@@ -20,6 +25,17 @@ public abstract class ConcreteStateFactory {
         // next we want to add all the attributes contained in the state, and then do the same thing for the child widgets
         setAttributes(concreteState, newState);
         copyWidgetTreeStructure(newState, concreteState, concreteState);
+
+        // get a screenshot for this concrete state
+        ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
+        ProtocolUtil protocolUtil = new ProtocolUtil();
+        AWTCanvas screenshot = protocolUtil.getStateshotBinary(newState);
+        try {
+            screenshot.saveAsPng(screenshotBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        concreteState.setScreenshot(screenshotBytes.toByteArray());
 
         return concreteState;
     }

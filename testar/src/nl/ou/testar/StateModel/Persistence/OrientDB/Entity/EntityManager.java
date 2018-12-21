@@ -8,6 +8,7 @@ import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.tinkerpop.blueprints.impls.orient.*;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
@@ -222,7 +223,7 @@ public class EntityManager {
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
-            setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).right());
+            setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).right(), db);
         }
         oVertex.save();
     }
@@ -262,7 +263,7 @@ public class EntityManager {
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
-            setProperty(edge, propertyName, entity.getPropertyValue(propertyName).right());
+            setProperty(edge, propertyName, entity.getPropertyValue(propertyName).right(), db);
         }
         edge.save();
     }
@@ -275,7 +276,7 @@ public class EntityManager {
      * @param propertyName
      * @param propertyValue
      */
-    private void setProperty(OElement element, String propertyName, Object propertyValue) {
+    private void setProperty(OElement element, String propertyName, Object propertyValue, ODatabaseSession db) {
         if (propertyValue instanceof Boolean)
             element.setProperty(propertyName, ((Boolean) propertyValue).booleanValue());
         else if (propertyValue instanceof Byte)
@@ -295,7 +296,13 @@ public class EntityManager {
         else if (propertyValue instanceof Visualizer) {
             //skip Don't put visualizer in the graph since it has no meaning for graph.
             //It will get a meaning when we want to use the data for reply.
-        } else
+        }
+        else if (propertyValue instanceof byte[]) {
+            // for binary data we add a separate record and connect it to the element
+            OBlob record = db.newBlob((byte[]) propertyValue);
+            element.setProperty(propertyName, record);
+        }
+        else
             element.setProperty(propertyName, propertyValue.toString());
     }
 }
