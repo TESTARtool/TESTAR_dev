@@ -109,6 +109,7 @@ DataStoreServer = localhost
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
+DataStoreMode = instant
 
 #################################################################
 # State identifier attributes

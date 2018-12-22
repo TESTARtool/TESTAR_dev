@@ -4,6 +4,10 @@ import nl.ou.testar.StateModel.*;
 
 public interface PersistenceManager {
 
+    static String DATA_STORE_MODE_INSTANT = "instant";
+
+    static String DATA_STORE_MODE_DELAYED = "delayed";
+
     /**
      * This method persists an entire state model.
      * @param abstractStateModel

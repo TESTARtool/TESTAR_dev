@@ -49,6 +49,7 @@ public class StateModelPanel extends JPanel {
     private JLabel label5 = new JLabel("DataStoreDB");
     private JLabel label6 = new JLabel("DataStoreUser");
     private JLabel label7 = new JLabel("DataStorePassword");
+    private JLabel label8 = new JLabel("DataStoreMode");
 
     private JTextField dataStoreTextfield = new JTextField();
     private JTextField dataStoreTypeTextfield = new JTextField();
@@ -56,6 +57,7 @@ public class StateModelPanel extends JPanel {
     private JTextField dataStoreDBTextfield = new JTextField();
     private JTextField dataStoreUserTextfield = new JTextField();
     private JPasswordField dataStorePasswordfield = new JPasswordField();
+    private JTextField dataStoreModefield = new JTextField();
 
     private StateModelPanel(){
         super();
@@ -104,6 +106,10 @@ public class StateModelPanel extends JPanel {
         add(label7);
         dataStorePasswordfield.setBounds(130,242,200,27);
         add(dataStorePasswordfield);
+        label8.setBounds(10,280,120,27);
+        add(label8);
+        dataStoreModefield.setBounds(130,280,200,27);
+        add(dataStoreModefield);
     }
 
     /**
@@ -118,6 +124,7 @@ public class StateModelPanel extends JPanel {
         dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
         dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
         dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
+        dataStoreModefield.setText(settings.get(ConfigTags.DataStoreMode));
     }
 
     /**
@@ -132,6 +139,7 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.DataStoreDB, dataStoreDBTextfield.getText());
         settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
         settings.set(ConfigTags.DataStorePassword, getPassword());
+        settings.set(ConfigTags.DataStoreMode, dataStoreModefield.getText());
     }
 
     /**

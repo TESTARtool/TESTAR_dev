@@ -387,6 +387,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStoreDB =" + Util.lineSep()
 					+"DataStoreUser =" + Util.lineSep()
 					+"DataStorePassword =" + Util.lineSep()
+					+"DataStoreMode = instant" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"

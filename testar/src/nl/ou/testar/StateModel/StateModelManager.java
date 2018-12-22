@@ -112,6 +112,10 @@ public class StateModelManager {
         this.actionUnderExecution.addConcreteActionId(actionUnderExecution.get(Tags.ConcreteID));
     }
 
+    public void notifySequenceEnded() {
+        persistenceManager.persistAbstractStateModel(abstractStateModel);
+    }
+
     /**
      * This method uses the abstract state model to return the abstract id of an action to execute
      * @return

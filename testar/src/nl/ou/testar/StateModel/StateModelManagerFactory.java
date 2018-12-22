@@ -3,6 +3,7 @@ package nl.ou.testar.StateModel;
 import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.ActionSelection.CompoundFactory;
+import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Persistence.OrientDB.OrientDBManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Persistence.PersistenceManagerFactory;
@@ -50,7 +51,7 @@ public class StateModelManagerFactory {
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
 
         // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), concreteStateTags, (OrientDBManager)persistenceManager);
+        AbstractStateModel abstractStateModel = new AbstractStateModel(CodingManager.getAbstractStateModelHash(), concreteStateTags, persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
         ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector();
 
         return new StateModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags);

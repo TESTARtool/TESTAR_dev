@@ -571,6 +571,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
 
+                // notify the state model manager of the sequence end
+                stateModelManager.notifySequenceEnded();
+
                 writeAndCloseFragmentForReplayableSequence();
 
                 if (faultySequence)
