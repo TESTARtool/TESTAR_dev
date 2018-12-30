@@ -36,9 +36,9 @@ package nl.ou.testar;
  */
 class GraphDBException extends RuntimeException {
 
-	private static final long serialVersionUID = -785144613921175647L;
+  private static final long serialVersionUID = -785144613921175647L;
 
-	GraphDBException(final String msg) {
+  GraphDBException(final String msg) {
         super(msg);
     }
 }

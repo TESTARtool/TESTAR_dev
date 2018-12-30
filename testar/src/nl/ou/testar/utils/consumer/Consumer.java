@@ -6,15 +6,15 @@ package nl.ou.testar.utils.consumer;
  */
 public interface Consumer {
 
-	/**
-	 * Consume item.
-	 * @param item to be consumed item
-	 * @return true if item consumed successfully, otherwise false.
-	 */
-	boolean consume(Item item);  
+  /**
+   * Consume item.
+   * @param item to be consumed item
+   * @return true if item consumed successfully, otherwise false.
+   */
+  boolean consume(Item item);
 
-	/**
-	 * Finish consumption. 
-	 */
-	void finishConsumption();  	
+  /**
+   * Finish consumption.
+   */
+  void finishConsumption();
 }

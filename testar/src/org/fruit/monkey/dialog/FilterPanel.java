@@ -43,20 +43,20 @@ import static org.fruit.monkey.dialog.ToolTipTexts.label2TTT;
 public class FilterPanel extends JPanel {
 
   private static final long serialVersionUID = 1572649050808020748L;
- 
+
   private JTextArea txtClickFilter;
   private JTextArea txtProcessFilter;
 
   public FilterPanel() {
-    JLabel jLabel11 = new JLabel(
-        "Disabled actions by widgets' TITLE property (regular expression):");
-    jLabel11.setToolTipText(label1TTT);
-    JLabel jLabel12 = new JLabel(
+    JLabel filterByTitleLabel = new JLabel(
+        "Filter actions by the widget its TITLE property (regular expression):");
+    filterByTitleLabel.setToolTipText(label1TTT);
+    JLabel killProcessByNameLabel = new JLabel(
         "Kill processes by name (regular expression):");
-    jLabel12.setToolTipText(label2TTT);
+    killProcessByNameLabel.setToolTipText(label2TTT);
 
-    JScrollPane scrollPane_2 = new JScrollPane();
-    JScrollPane scrollPane_3 = new JScrollPane();
+    JScrollPane filterByTitlePane = new JScrollPane();
+    JScrollPane killProcessByNamePane = new JScrollPane();
 
     GroupLayout gl_jPanelFilters = new GroupLayout(this);
     this.setLayout(gl_jPanelFilters);
@@ -65,39 +65,40 @@ public class FilterPanel extends JPanel {
             .addGroup(gl_jPanelFilters.createSequentialGroup()
                 .addGroup(gl_jPanelFilters.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(gl_jPanelFilters.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(scrollPane_3, PREFERRED_SIZE, 445, PREFERRED_SIZE))
+                        .addGap(24)
+                        .addComponent(killProcessByNamePane, PREFERRED_SIZE, 572, PREFERRED_SIZE))
                     .addGroup(gl_jPanelFilters.createSequentialGroup()
                         .addGap(24)
-                        .addComponent(scrollPane_2, PREFERRED_SIZE, 447, PREFERRED_SIZE))
+                        .addComponent(filterByTitlePane, PREFERRED_SIZE, 572, PREFERRED_SIZE))
                     .addGroup(gl_jPanelFilters.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(gl_jPanelFilters.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12, PREFERRED_SIZE, 357, PREFERRED_SIZE)
-                            .addComponent(jLabel11, PREFERRED_SIZE, 381, PREFERRED_SIZE))))
-                .addContainerGap(29, Short.MAX_VALUE))
+                            .addComponent(killProcessByNameLabel, PREFERRED_SIZE, 357, PREFERRED_SIZE)
+                            .addComponent(filterByTitleLabel, PREFERRED_SIZE, 381, PREFERRED_SIZE))))
+                .addContainerGap(24, Short.MAX_VALUE))
     );
     gl_jPanelFilters.setVerticalGroup(
         gl_jPanelFilters.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(gl_jPanelFilters.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel11)
+                .addComponent(filterByTitleLabel)
                 .addGap(18)
-                .addComponent(scrollPane_2, DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                .addComponent(filterByTitlePane, DEFAULT_SIZE, 108, Short.MAX_VALUE)
                 .addGap(18)
-                .addComponent(jLabel12)
+                .addComponent(killProcessByNameLabel)
                 .addGap(18)
-                .addComponent(scrollPane_3, PREFERRED_SIZE, 121, PREFERRED_SIZE)
+                .addComponent(killProcessByNamePane, PREFERRED_SIZE, 121, PREFERRED_SIZE)
                 .addGap(22))
     );
 
     txtProcessFilter = new JTextArea();
     txtProcessFilter.setLineWrap(true);
-    scrollPane_3.setViewportView(txtProcessFilter);
+    killProcessByNamePane.setViewportView(txtProcessFilter);
 
     txtClickFilter = new JTextArea();
     txtClickFilter.setLineWrap(true);
-    scrollPane_2.setViewportView(txtClickFilter);
+    filterByTitlePane.setViewportView(txtClickFilter);
+
   }
 
   /**

@@ -82,13 +82,15 @@ GraphDBPassword =
 
 ProcessesToKillDuringTest = .*firefox.exe.*|.*iexplore.exe.*|.*rundll.*
 OutputDir = ./resources/output
-PathToReplaySequence = ./output/tTempDir = ./resources/output/temp/temp
+PathToReplaySequence = ./resources/output/temp
+TempDir = ./resources/output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
 ExecuteActions = true
 FaultThreshold = 0.000000001
-DrawWidgetUnderCursoMyClassPath = resources/settings
+DrawWidgetUnderCursor = true
+MyClassPath = resources/settings
 OnlySaveFaultySequences = false
 ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true

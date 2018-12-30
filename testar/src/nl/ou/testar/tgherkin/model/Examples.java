@@ -13,10 +13,10 @@ public class Examples {
   private DataTable dataTable;
 
   /**
-  * Examples constructor. 
+  * Examples constructor.
   * @param title summary description
   * @param narrative detailed description
-  * @param dataTable data table that can be referenced by placeholders 
+  * @param dataTable data table that can be referenced by placeholders
   */
   public Examples(String title, String narrative, DataTable dataTable) {
     Assert.notNull(dataTable);
@@ -70,7 +70,7 @@ public class Examples {
   */
   public void beginSequence() {
     getDataTable().beginSequence();
-  }    
+  }
 
   /**
   * Reset examples.
@@ -83,19 +83,19 @@ public class Examples {
   public String toString() {
     StringBuilder result = new StringBuilder();
     // keyword
-    result.append(getClass().getSimpleName());      
+    result.append(getClass().getSimpleName());
     result.append(":");
-    if (getTitle() != null) {      
-      result.append(getTitle());      
+    if (getTitle() != null) {
+      result.append(getTitle());
     }
     result.append(System.getProperty("line.separator"));
-    if (getNarrative() != null) {      
-      result.append(getNarrative());      
+    if (getNarrative() != null) {
+      result.append(getNarrative());
       result.append(System.getProperty("line.separator"));
     }
-    if (getDataTable() != null) {      
-      result.append(getDataTable().toString());      
+    if (getDataTable() != null) {
+      result.append(getDataTable().toString());
     }
-    return result.toString();      
+    return result.toString();
   }
 }

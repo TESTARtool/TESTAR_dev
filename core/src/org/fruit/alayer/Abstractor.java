@@ -41,5 +41,5 @@ import org.fruit.alayer.exceptions.AbstractionException;
  * @see Finder
  */
 public interface Abstractor {
-	Finder apply(Widget widget) throws AbstractionException;
+  Finder apply(Widget widget) throws AbstractionException;
 }

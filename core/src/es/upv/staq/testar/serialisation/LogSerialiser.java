@@ -80,8 +80,7 @@ public class LogSerialiser extends Thread {
   }
 
   private static class LogRecord{
-    public String logS;
-    public LogLevel logL;
+    public String logS; public LogLevel logL;
     public LogRecord(String logS, LogLevel logL) { this.logS = logS; this.logL = logL;}
   }
 
@@ -163,4 +162,5 @@ public class LogSerialiser extends Thread {
   public static int queueLength() {
     return logSavingQueue.size();
   }
+
 }

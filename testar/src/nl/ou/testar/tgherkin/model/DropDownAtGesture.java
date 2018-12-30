@@ -19,22 +19,22 @@ public class DropDownAtGesture extends Gesture {
      * @param parameterBase container for parameters
      */
     public DropDownAtGesture(ParameterBase parameterBase) {
-    	super(parameterBase);    	
+      super(parameterBase);
     }
-	
+
     @Override
     public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
-		Set<Action> actions = new HashSet<Action>();	
-    	StdActionCompiler ac = new AnnotatingActionCompiler();
-    	actions.add(ac.dropDownAt(widget));
-    	return actions;
+    Set<Action> actions = new HashSet<Action>();
+      StdActionCompiler ac = new AnnotatingActionCompiler();
+      actions.add(ac.dropDownAt(widget));
+      return actions;
     }
-    
+
     @Override
     public String toString() {
-    	StringBuilder result = new StringBuilder();
-   		result.append("dropDownAt");
-   		result.append(getParameterBase().toString());
-    	return result.toString();    	
+      StringBuilder result = new StringBuilder();
+       result.append("dropDownAt");
+       result.append(getParameterBase().toString());
+      return result.toString();
     }
 }

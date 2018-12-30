@@ -34,20 +34,20 @@ import java.util.HashMap;
 
 /**
  * ActionRoles brief map.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class BriefActionRolesMap {
 
-	public static final HashMap<String,String> map = new HashMap<String,String>() {
-		private static final long serialVersionUID = 4653256125166285524L;
+  public static final HashMap<String,String> map = new HashMap<String,String>() {
+    private static final long serialVersionUID = 4653256125166285524L;
 
-		{
-			put("LeftClickAt","LC"); // ActionRoles.LeftClickAt
-			put("RightClickAt","RC"); // ActionRoles.RightClickAt
-			put("ClickTypeInto","T"); // ActionRoles.ClickTypeInto
-		}
-	};
-	
+    {
+      put("LeftClickAt","LC"); // ActionRoles.LeftClickAt
+      put("RightClickAt","RC"); // ActionRoles.RightClickAt
+      put("ClickTypeInto","T"); // ActionRoles.ClickTypeInto
+    }
+  };
+
 }

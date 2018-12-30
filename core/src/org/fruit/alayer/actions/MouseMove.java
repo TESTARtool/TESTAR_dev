@@ -86,13 +86,13 @@ public final class MouseMove extends TaggableBase implements Action {
   }
 
   public void run(SUT system, State state, double duration) {
-    try{
+    try {
       Assert.notNull(system, state);
       Point p = position.apply(state);
       Util.moveCursor(system.get(Tags.StandardMouse), p.x(), p.y(), Math.max(duration, minDuration));
-    }catch(NoSuchTagException tue) {
+    } catch(NoSuchTagException tue) {
       throw new ActionFailedException(tue);
-    }catch(PositionException pe) {
+    } catch(PositionException pe) {
       throw new ActionFailedException(pe);
     }
   }

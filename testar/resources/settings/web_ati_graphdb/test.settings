@@ -1,56 +1,111 @@
-TypingTextsForExecutedAction = 10
-SUTConnectorValue = C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe --force-renderer-accessibility "https://mijn.awo.ou.nl/"
-Discount = 0.95
-GraphDBEnabled = false
-ProtocolClass = web_ati_graphdb/Protocol_web_ati_graphdb
-TempDir = ./resources/output/temp
-ClickFilter = 
-MaxTime = 3.1536E7
-Sequences = 6
-GraphDBUrl = 
-StopGenerationOnFault = true
-PrologActivated = false
-GraphDBUser = 
-ExecuteActions = true
-DrawWidgetTree = false
-UseRecordedActionDurationAndWaitTimeDuringReplay = false
-SequenceLength = 10
-ForceForeground = true
+#################################################################
+# TESTAR mode
+#
+# Set the mode you want TESTAR to start in: Spy, Generate, Replay
+#################################################################
+
 Mode = Spy
-AlgorithmFormsFilling = false
-FaultThreshold = 1.0E-9
-DrawWidgetInfo = false
-MaxReward = 9999999.0
-LogLevel = 1
-VisualizeSelectedAction = true
-AccessBridgeEnabled = false
-Delete = 
-MyClassPath = resources/settings
-ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
-ShowSettingsAfterTest = true
-ForceToSequenceLength = true
-OutputDir = ./resources/output
-UnattendedTests = false
-TestGenerator = random
-StartupTime = 10.0
-ActionDuration = 0.0
-NonReactingUIThreshold = 100
-GraphsActivated = true
-GraphResuming = true
-GraphDBPassword = 
-CopyFromTo = 
-TimeToFreeze = 30.0
-StateScreenshotSimilarityThreshold = 1.4E-45
-ShowVisualSettingsDialogOnStartup = true
-SUTProcesses = 
-TimeToWaitAfterAction = 5.0
-DrawWidgetUnderCursor = true
+
+#################################################################
+# Connect to the System Under Test (SUT)
+#
+# Indicate how you want to connect to the SUT:
+#
+# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# starts the SUT.
+# It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
+# For web applications, follow the next format: web_browser_path SUT_URL.
+#
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# in the SUT main window. The SUT must be manually started and closed.
+#
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# The SUT must be manually started and closed.
+#################################################################
 SUTConnector = COMMAND_LINE
+SUTConnectorValue = C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe --force-renderer-accessibility "https://mijn.awo.ou.nl/"
+
+#################################################################
+# Sequences
+#
+# Number of sequences and the length of these sequences
+#################################################################
+
+Sequences = 1
+SequenceLength = 10
+
+#################################################################
+# Oracles based on suspicious titles
+#
+# Regular expression
+#################################################################
+
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
-AlwaysCompile = true
-PathToReplaySequence = ./output/temp
-VisualizeActions = false
-ExplorationSampleInterval = 1
+
+#################################################################
+# Actionfilter
+#
+# Regular expression. More filters can be added in Spy mode,
+# these will be added to the protocol_filter.xml file.
+#################################################################
+
+ClickFilter =
+
+#################################################################
+# Processfilter
+#
+# Regular expression. Kill the processes that your SUT can start up
+# but that you do not want to test.
+#################################################################
+
+SUTProcesses =
+
+#################################################################
+# Protocolclass
+#
+# Indicate the location of the protocol class for your specific SUT.
+#################################################################
+
+ProtocolClass = web_ati_graphdb/Protocol_web_ati_graphdb
+
+#################################################################
+# Graphdatabase settings (experimental)
+#################################################################
+GraphDBEnabled = false
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
+
+#################################################################
+# Other more advanced settings
+#################################################################
+
+ProcessesToKillDuringTest =
+OutputDir = ./resources/output
+PathToReplaySequence = ./resources/output/temp
+TempDir = ./resources/output/temp
+UseRecordedActionDurationAndWaitTimeDuringReplay = false
+ForceForeground = true
+LogLevel = 1
+ExecuteActions = true
+FaultThreshold = 1.0E-9
+DrawWidgetUnderCursor = true
+MyClassPath = resources/settings
 OnlySaveFaultySequences = false
-OfflineGraphConversion = true
+ActionDuration = 0.0
+ShowVisualSettingsDialogOnStartup = true
+ReplayRetryTime = 30.0
+Delete =
+MaxTime = 3.1536E7
+ShowSettingsAfterTest = true
+TimeToWaitAfterAction = 5.0
+StartupTime = 10.0
+DrawWidgetInfo = false
+TimeToFreeze = 30.0
+StopGenerationOnFault = true
+CopyFromTo =
+VisualizeActions = false
+VisualizeSelectedAction = true
+TestGenerator = random
+MaxReward = 9999999
+Discount = .95

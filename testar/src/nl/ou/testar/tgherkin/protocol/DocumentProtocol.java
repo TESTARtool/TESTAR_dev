@@ -24,23 +24,23 @@ import org.fruit.monkey.Settings;
  *
  */
 public class DocumentProtocol extends ClickFilterLayerProtocol implements ProtocolProxy {
-  
+
   private Document document;
   private boolean documentActionExecuted;
   private boolean actionSwitchOn;
   private Action lastAction;
   private String sourceCode;
   private Modes activeMode;
-  
+
   /**
      * Constructor.
      */
   public DocumentProtocol() {
     super();
   }
-  
+
   @Override
-  /** 
+  /**
    * Initialize document protocol.
    * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
@@ -48,12 +48,12 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    */
   protected void initialize(Settings settings) {
     super.initialize(settings);
-    if (mode() == Modes.Generate || mode() == Modes.GenerateDebug) {
+    if (mode() == Modes.Generate) {
       initializeDocument();
     }
     activeMode = mode();
   }
-  
+
   @Override
   /**
    * Begin sequence.
@@ -63,12 +63,12 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    */
   protected void beginSequence(SUT system, State state) {
     super.beginSequence(system, state);
-    
+
     if (documentExecutionMode()) {
       document.beginSequence();
     }
   }
-  
+
   @Override
   /**
    * Get verdict.
@@ -89,7 +89,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
       Report.appendReportDetail(Report.StringColumn.VERDICT, verdict.toString());
     }
     activeMode = mode();
-    return verdict;        
+    return verdict;
   }
 
   @Override
@@ -103,7 +103,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * @param system the SUT
    * @param state the SUT's current state
    * @return a set of actions
-   * @throws ActionBuildException 
+   * @throws ActionBuildException
    */
   protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -118,7 +118,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
         actions.addAll(document.deriveActions(this));
       }
     }
-    return actions;    
+    return actions;
   }
 
   @Override
@@ -128,11 +128,11 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * @param actions the set of available actions
    * @return the selected action (non-null!)
    */
-  protected Action selectAction(State state, Set<Action> actions) { 
+  protected Action selectAction(State state, Set<Action> actions) {
     Action action = super.selectAction(state, actions);
-    if (documentExecutionMode() && action != null) {    
+    if (documentExecutionMode() && action != null) {
       String data = Util.toString((Object)action.get(Tags.Desc, null));
-      Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION,data);      
+      Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION,data);
       data = action.toString();
       data = data.replaceAll("(\\r|\\n|\\t)", "");
       Report.appendReportDetail(Report.StringColumn.SELECTED_ACTION_DETAILS,data);
@@ -155,7 +155,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
     lastAction = action;
     return super.executeAction(system, state, action);
   }
-  
+
   @Override
   /**
    * Determine whether more actions should be executed.
@@ -170,7 +170,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
       documentActionExecuted = false;
       Report.appendReportDetail(Report.IntegerColumn.SEQUENCE_NR,sequenceCount());
       Report.appendReportDetail(Report.IntegerColumn.ACTION_NR,actionCount() - 1);
-      Report.report(state,lastAction, graphDB, 
+      Report.report(state,lastAction, graphDB,
           settings().get(ConfigTags.GenerateTgherkinReport),
           settings().get(ConfigTags.StoreTgherkinReport));
       return super.moreActions(state) && document.moreActions(this);
@@ -180,16 +180,16 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
   }
 
   @Override
-  /** 
+  /**
    * Finish sequence.
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    * @param recordedSequence the recorded sequence
    */
-  protected void finishSequence(File recordedSequence) {
-    super.finishSequence(recordedSequence);
-    if (documentExecutionMode()) {        
+  protected void finishSequence() {
+    super.finishSequence();
+    if (documentExecutionMode()) {
       // reset document if scenarios should be repeated until number of sequences has been reached
-      if (settings().get(ConfigTags.RepeatTgherkinScenarios) 
+      if (settings().get(ConfigTags.RepeatTgherkinScenarios)
           && super.moreSequences() && !document.moreSequences()) {
         document.reset();
       }
@@ -202,20 +202,20 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * TESTAR uses this method to determine when to stop the entire test.
    * You could stop the test after a given amount of generated sequences or
    * after a specific time etc.
-   * @return  if <code>true</code> continue test, else stop   
+   * @return  if <code>true</code> continue test, else stop
    */
   protected boolean moreSequences() {
     if (documentExecutionMode()) {
       boolean result = super.moreSequences() && document.moreSequences();
       if (!result && settings().get(ConfigTags.GenerateTgherkinReport)) {
-        // finish consumption 
-        Reporter.getInstance().finish();      
+        // finish consumption
+        Reporter.getInstance().finish();
       }
       return result;
     }
     return super.moreSequences();
   }
-  
+
   @Override
   // change visibility from protected to public
   public boolean isUnfiltered(Widget w) {
@@ -227,36 +227,36 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
   public boolean isClickable(Widget w) {
     return super.isClickable(w);
   }
-  
+
   @Override
   // change visibility from protected to public
   public boolean isTypeable(Widget w) {
     return super.isTypeable(w);
   }
-  
+
   @Override
   // change visibility from protected to public
   public String getRandomText(Widget w) {
     return super.getRandomText(w);
   }
-    
+
   @Override
   // change visibility from protected to public
   public List<Widget> getTopWidgets(State state) {
     return super.getTopWidgets(state);
   }
-    
+
   @Override
   // change visibility from protected to public
   public void storeWidget(String stateId, Widget widget) {
     super.storeWidget(stateId, widget);
-  }   
-    
+  }
+
   /**
    * Retrieve sequence count.
    * @return sequence count
    */
-  // change visibility from protected to public    
+  // change visibility from protected to public
   public int getSequenceCount() {
     return super.sequenceCount();
   }
@@ -265,16 +265,16 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * Retrieve action count.
    * @return action count
    */
-  // change visibility from protected to public    
+  // change visibility from protected to public
   public int getActionCount() {
     return super.actionCount();
   }
-  
+
   /**
    * Retrieve configuration settings.
    * @return settings
    */
-  // change visibility from protected to public    
+  // change visibility from protected to public
   public Settings getSettings() {
     return super.settings();
   }
@@ -284,7 +284,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * @return state
    */
   public State getState() {
-    return state;
+    return getStateForClickFilterLayerProtocol();
   }
 
   /**
@@ -296,7 +296,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
   }
 
   private boolean documentExecutionMode() {
-    boolean result = activeMode == Modes.Generate || activeMode == Modes.GenerateDebug;
+    boolean result = activeMode == Modes.Generate;
     if (result && document == null) {
       initializeDocument();
     }
@@ -309,7 +309,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
     } else {
       actionSwitchOn = false;
     }
-    return actionSwitchOn;    
+    return actionSwitchOn;
   }
 
   private void initializeDocument() {

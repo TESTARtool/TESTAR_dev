@@ -65,7 +65,7 @@ public class Utils {
     ANTLRInputStream inputStream;
     try {
       inputStream = new ANTLRInputStream(new FileInputStream(fileName));
-    }catch (IOException e) {
+    } catch (IOException e) {
       throw new TgherkinException("Unable to open character stream for Tgherkin file: " + fileName);
     }
     TgherkinLexer lexer = new TgherkinLexer(inputStream);
@@ -144,9 +144,9 @@ public class Utils {
    */
   public static String readTgherkinSourceFile(String fileName) {
     String sourceCode = null;
-      try{
+      try {
         sourceCode = new String (Files.readAllBytes(Paths.get(fileName)));
-      }catch (IOException e) {
+      } catch (IOException e) {
       throw new TgherkinException("Unable to read Tgherkin file: " + fileName);
       }
       return sourceCode;
@@ -261,7 +261,7 @@ public class Utils {
           XPathExpression expr = xpath.compile(xpathExprXML);
           //evaluate expression result on XML document
       result = expr.evaluate(document, resultType);
-    }catch(Exception e) {
+    } catch(Exception e) {
       throw new TgherkinException("XPath expression " + xpathExpr + " is invalid: " + e.getMessage());
     }
         return result;

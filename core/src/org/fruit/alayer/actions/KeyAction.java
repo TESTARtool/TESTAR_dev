@@ -59,7 +59,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
   public abstract String toString();
 
   public final void run(SUT system, State state, double duration) {
-    try{
+    try {
       Assert.notNull(system);
       Util.pause(duration);
       if (key.equals(KBKeys.VK_ARROBA) ||
@@ -68,7 +68,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
         altNumpad(system,new Integer(key.code()).toString());
       else
         performKeyAction(system,key);
-    }catch(NoSuchTagException tue) {
+    } catch(NoSuchTagException tue) {
       throw new ActionFailedException(tue);
     }
   }

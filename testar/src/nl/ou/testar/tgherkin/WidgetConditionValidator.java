@@ -108,7 +108,7 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
     String regex = ctx.STRING().getText().substring(1, ctx.STRING().getText().length()-1);
     try {
       Pattern.compile(regex);
-    }catch(PatternSyntaxException e) {
+    } catch(PatternSyntaxException e) {
       errorList.add("Widget condition validation error - invalid regular expression: " + regex + System.getProperty("line.separator"));
     }
     return visitChildren(ctx);
@@ -173,12 +173,12 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
             if (type instanceof Double) {
               try {
                 Double.valueOf(value);
-              }catch(Exception e) {
+              } catch(Exception e) {
                 errorList.add("Widget condition validation error - invalid double table value at row " + rows + " for placeholder " + columnName + ": " + value + System.getProperty("line.separator"));
               }
             }
           }
-        }catch(Exception e) {
+        } catch(Exception e) {
           errorList.add("Widget condition validation error - invalid table value at row " + rows + " for placeholder " + columnName + System.getProperty("line.separator"));
         }
       }
@@ -188,21 +188,21 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
 
   private void checkXPath(String xpathExpr, QName resultType) {
     String xpathExprXML = Utils.getXMLXpathExpression(xpathExpr);
-    try{
+    try {
       // Create XPathFactory object
       XPathFactory xpathFactory = XPathFactory.newInstance();
       // Create XPath object
       XPath xpath = xpathFactory.newXPath();
       //create XPathExpression object
       xpath.compile(xpathExprXML);
-    }catch(XPathExpressionException e) {
+    } catch(XPathExpressionException e) {
       errorList.add("Widget condition validation error - invalid xpath expression: " + xpathExpr + System.getProperty("line.separator"));
       return;
     }
     try {
       // check correctness of result type with dummy xml data
       Utils.evaluateXPathExpresion(Utils.XML_HEADER + Utils.toXMLElement("widget","test"), xpathExpr, resultType);
-    }catch (Exception e) {
+    } catch (Exception e) {
       errorList.add(e.getMessage());
       }
   }

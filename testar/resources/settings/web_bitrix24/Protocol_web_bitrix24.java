@@ -29,8 +29,6 @@ package web_bitrix24;
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 /**
  *  @author (base) Sebastian Bauersfeld
  *  @author (Bitrix24 adaptation, protocol refactor & cleanup) Urko Rueda (alias: urueda)
@@ -40,7 +38,7 @@ import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Enabled;
 
-import java.io.File;
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
@@ -54,30 +52,25 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
 import es.upv.staq.testar.NativeLinker;
 
 public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
   // platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-  private static final int BROWSER_IEXPLORER = 1;
-  private static final int BROWSER_FIREFOX = 2;
-  private static int browser; // BROWSER_*
-  private static Role webController; // browser dependent
-  private static Role webText; // browser dependent
-  private static double browser_toolbar_filter;
+  static final int BROWSER_IEXPLORER = 1;
+  static final int BROWSER_FIREFOX = 2;
+  static int browser; // BROWSER_*
+  static Role webController, webText; // browser dependent
+  static double browser_toolbar_filter;
 
-  private static final double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
-  private static final double SCROLLTHICK = 16; //scroll thickness (iexplorer)
+  static double scrollArrowSize = 36; // sliding arrows (iexplorer)
+  static double scrollThick = 16; //scroll thickness (iexplorer)
 
   /**
-   * Called once during the life time of TESTAR.
+   * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
    */
@@ -106,13 +99,11 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
   }
 
   /**
-   * This method is invoked each time TESTAR starts to generate a new sequence.
-   * @param sut SUT
-   * @param state State of SUT
+   * This method is invoked each time TESTAR starts to generate a new sequence
    */
-  protected void beginSequence(SUT sut, State state) {
+  protected void beginSequence(SUT system, State state) {
 
-    super.beginSequence(sut, state);
+    super.beginSequence(system, state);
 
   }
 
@@ -126,9 +117,8 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
-   * @throws SystemStartException if error occurs
    */
-  protected SUT startSystem() throws SystemStartException {
+  protected SUT startSystem() throws SystemStartException{
 
     SUT sut = super.startSystem();
 
@@ -142,19 +132,16 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
-   * @param   system  SUT
    * @return  the current state of the SUT with attached oracle.
-   * @throws StateBuildException if error occurs
    */
-  protected State getState(SUT system) throws StateBuildException {
+  protected State getState(SUT system) throws StateBuildException{
 
     State state = super.getState(system);
 
         for (Widget w: state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
               browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
-            }
         }
 
     return state;
@@ -165,7 +152,6 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
    * This is a helper method used by the default implementation of <code>buildState()</code>
    * It examines the SUT's current state and returns an oracle verdict.
    * @return oracle verdict, which determines whether the state is erroneous and why.
-   * @param state State of SUT
    */
   protected Verdict getVerdict(State state) {
 
@@ -203,40 +189,34 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
   }
 
   private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title) {
-    if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty()) {
-      return new Verdict(SEVERITY_WARNING, "Not all images have an alternate textual description",
+    if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty())
+      return new Verdict(Verdict.SEVERITY_WARNING, "Not all images have an alternate textual description",
                  new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
-    } else {
+    else
       return Verdict.OK;
-    }
   }
 
   private Verdict getSmallTextVerdict(State state, Widget w,  Role role, Shape shape) {
     final int MINIMUM_FONT_SIZE = 8; // px
-    if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE) {
-      return new Verdict(SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
+    if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
+      return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
                  new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
-    } else {
+    else
       return Verdict.OK;
-    }
   }
 
   private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape) {
     final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
     try {
       if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")) {
-        if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE) {
-          return new Verdict(SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
+        if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
+          return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
                      new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));
-        }
-        if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE) {
-          return new Verdict(SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
+        if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
+          return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
                      new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));
-        }
       }
-    } catch (NoSuchTagException nste) {
-      return Verdict.OK;
-    }
+    } catch (NoSuchTagException nste) { return Verdict.OK; }
     return Verdict.OK;
   }
 
@@ -249,9 +229,8 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
    * @param system the SUT
    * @param state the SUT's current state
    * @return  a set of actions
-   * @throws ActionBuildException if error occurs
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
     Set<Action> actions = super.deriveActions(system,state); // by urueda
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
@@ -271,18 +250,15 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
         if (!blackListed(w)) {  // do not build actions for tabu widgets
 
           // create left clicks
-          if (whiteListed(w) || isClickable(w)) {
+          if (whiteListed(w) || isClickable(w))
             actions.add(ac.leftClickAt(w));
-          }
 
           // create double left click
           if (whiteListed(w) || isDoubleClickable(w)) {
-            if (browser == BROWSER_FIREFOX) {
+            if (browser == BROWSER_FIREFOX)
               actions.add(ac.leftDoubleClickAt(w));
-            }
-            else if (browser == BROWSER_IEXPLORER) {
+            else if (browser == BROWSER_IEXPLORER)
               actions.add(ac.dropDownAt(w));
-            }
           }
 
           // type into text boxes
@@ -291,7 +267,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
           }
 
           // slides
-          addSlidingActions(actions,ac,SCROLLARROWSIZE,SCROLLTHICK,w);
+          addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 
         }
 
@@ -306,31 +282,27 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
   @Override
   protected boolean isClickable(Widget w) {
-    if (!isAtBrowserCanvas(w)) {
+    if (!isAtBrowserCanvas(w))
       return false;
-    }
 
         String title = w.get(Title, "");
         Role role = w.get(Tags.Role, Roles.Widget);
-    if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH) {
+    if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH)
       return super.isUnfiltered(w);
-    } else {
+    else
       return super.isClickable(w);
-    }
   }
 
   private boolean isDoubleClickable(Widget w) {
-    if (!isAtBrowserCanvas(w)) {
+    if (!isAtBrowserCanvas(w))
       return false;
-    }
 
     if (isClickable(w)) {
       Widget wParent = w.parent();
       if (wParent != null) {
         Role roleP = wParent.get(Tags.Role, null);
-        if (roleP != null && Role.isOneOf(roleP,webController)) {
+        if (roleP != null && Role.isOneOf(roleP,webController))
           return isUnfiltered(w);
-        }
       }
     }
 
@@ -339,14 +311,12 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
   @Override
   protected boolean isTypeable(Widget w) {
-    if (!isAtBrowserCanvas(w)) {
+    if (!isAtBrowserCanvas(w))
       return false;
-    }
 
     Role role = w.get(Tags.Role, null);
-    if (role != null && Role.isOneOf(role, webText)) {
+    if (role != null && Role.isOneOf(role, webText))
       return isUnfiltered(w);
-    }
 
     return false;
   }
@@ -354,7 +324,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
   // by urueda
   private boolean isAtBrowserCanvas(Widget w) {
     Shape shape = w.get(Tags.Shape,null);
-    return shape != null && shape.y() > browser_toolbar_filter;
+    return (shape != null && shape.y() > browser_toolbar_filter);
   }
 
   /**
@@ -387,7 +357,6 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
    * current sequence. You could stop the sequence's generation after a given amount of executed
    * actions or after a specific time etc.
    * @return  if <code>true</code> continue generation, else stop
-   * @param state State of SUT
    */
   protected boolean moreActions(State state) {
 
@@ -398,11 +367,10 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
-   * @param recordedSequence file containing recorded sequence
    */
-  protected void finishSequence(File recordedSequence) {
+  protected void finishSequence() {
 
-    super.finishSequence(recordedSequence);
+    super.finishSequence();
 
   }
 

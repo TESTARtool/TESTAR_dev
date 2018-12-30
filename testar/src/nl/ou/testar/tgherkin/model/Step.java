@@ -238,6 +238,7 @@ public class Step {
         .get(ConfigTags.ContinueToApplyDefault))) {
       Map<Widget,List<Gesture>> oldMap = copy(map);
       if (whenClause.getConditionalGestures().size() > 0) {
+        System.out.println("[Step] " + whenClause.toString());
         evaluateWhenCondition(proxy, map, whenClause.getConditionalGestures(), dataTable);
       } else {
         // no list of conditional gestures in when clause: only NOP action must have been specified

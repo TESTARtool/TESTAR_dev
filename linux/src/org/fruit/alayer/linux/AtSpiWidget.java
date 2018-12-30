@@ -83,7 +83,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param parent The parent of the AtSpiWidget.
      * @param element The element this AtSpiWidget links to.
      */
-    AtSpiWidget(AtSpiState root, AtSpiWidget parent, AtSpiElement element){
+    AtSpiWidget(AtSpiState root, AtSpiWidget parent, AtSpiElement element) {
 
 
         this.parent = parent;
@@ -91,7 +91,7 @@ public class AtSpiWidget implements Widget, Serializable {
         this.root = root;
 
 
-        if(parent != null) {
+        if (parent != null) {
             parent.children.add(this);
         }
 
@@ -154,7 +154,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param element The AtSpiElement that will be linked to the new AtSpiWidget.
      * @return The newly created AtSpiWidget that's linked with the AtSpiElement.
      */
-    AtSpiWidget addChild(AtSpiElement element){
+    AtSpiWidget addChild(AtSpiElement element) {
         return new AtSpiWidget(root, this, element);
     }
 
@@ -235,16 +235,16 @@ public class AtSpiWidget implements Widget, Serializable {
 
 
         boolean hScroll = get(AtSpiCanScrollHorizontally, Boolean.FALSE);
-        if (hScroll){
+        if (hScroll) {
 
             double hViewSize = get(AtSpiHorizontalScrollViewSizePercentage, Double.MIN_VALUE);
 
-            if (hViewSize > 0){
+            if (hViewSize > 0) {
 
                 double hScrollPercent = get(AtSpiHorizontalScrollPercentage, -1.0);
                 Shape shape = get(Tags.Shape, null);
 
-                if (shape != null){
+                if (shape != null) {
                     hDrags = getDrags(shape,true, hViewSize, hScrollPercent, scrollArrowSize, scrollThick);
                 }
 
@@ -254,16 +254,16 @@ public class AtSpiWidget implements Widget, Serializable {
 
 
         boolean vScroll = get(AtSpiCanScrollVertically, Boolean.FALSE);
-        if (vScroll){
+        if (vScroll) {
 
             double vViewSize = get(AtSpiVerticalScrollViewSizePercentage, Double.MIN_VALUE);
 
-            if (vViewSize > 0){
+            if (vViewSize > 0) {
 
                 double vScrollPercent = get(AtSpiVerticalScrollPercentage, -1.0);
                 Shape shape = get(Tags.Shape, null);
 
-                if (shape != null){
+                if (shape != null) {
                     vDrags = getDrags(shape,false, vViewSize, vScrollPercent, scrollArrowSize, scrollThick);
                 }
 
@@ -310,18 +310,18 @@ public class AtSpiWidget implements Widget, Serializable {
      * Disconnects a widget and its children from the State tree.
      * @param w The widget to disconnect.
      */
-    private void invalidate(AtSpiWidget w){
+    private void invalidate(AtSpiWidget w) {
 
 
         // Reset the connection for the current widget.
-        if(w.element != null) {
+        if (w.element != null) {
             w.element.backRef = null;
         }
         w.root = null;
 
 
         // Also reset the connections for its children.
-        for(AtSpiWidget c : w.children) {
+        for (AtSpiWidget c: w.children) {
             invalidate(c);
         }
 
@@ -335,7 +335,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @return Returns a string representation for the widget.
      */
     @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
-    private String getPropertiesRepresentation(String tab){
+    private String getPropertiesRepresentation(String tab) {
 
 
         StringBuilder pr = new StringBuilder();
@@ -386,15 +386,15 @@ public class AtSpiWidget implements Widget, Serializable {
     private Drag[] getDrags(Shape shape, boolean scrollOrientation, double viewSize, double scrollPercent,
                             double scrollArrowSize, double scrollThick) {
 
-        double scrollableSize = (scrollOrientation ? shape.width() : shape.height()) - scrollArrowSize * 2;
+        double scrollableSize = (scrollOrientation ? shape.width(): shape.height()) - scrollArrowSize * 2;
         double fixedH, fixedV;
 
-        if (scrollOrientation){
+        if (scrollOrientation) {
 
             // Horizontal.
             fixedH = shape.x() + scrollArrowSize +
                     scrollableSize*scrollPercent/100.0 +
-                    (scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
+                    (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
             fixedV = shape.y() + shape.height() - scrollThick/2;
 
         } else {
@@ -403,7 +403,7 @@ public class AtSpiWidget implements Widget, Serializable {
             fixedH = shape.x() + shape.width() - scrollThick/2;
             fixedV = shape.y() + scrollArrowSize +
                     scrollableSize*scrollPercent/100.0 +
-                    (scrollPercent < 50.0 ? scrollThick/2 : -3*scrollThick/2);
+                    (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
 
         }
 
@@ -415,15 +415,15 @@ public class AtSpiWidget implements Widget, Serializable {
 
 
         double[] emptyDragPoints = calculateScrollDragPoints(dragC,
-                scrollOrientation ? fixedH-shape.x() : fixedV-shape.y(),
+                scrollOrientation ? fixedH-shape.x(): fixedV-shape.y(),
                 scrollableSize/(double)dragC);
 
 
         Drag[] drags = new Drag[dragC];
-        for (int i=0; i<dragC; i++){
+        for (int i=0; i<dragC; i++) {
             drags[i] = new Drag(fixedH, fixedV,
-                    scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i] : fixedH,
-                    scrollOrientation ? fixedV : shape.y() + scrollArrowSize + emptyDragPoints[i]
+                    scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i]: fixedH,
+                    scrollOrientation ? fixedV: shape.y() + scrollArrowSize + emptyDragPoints[i]
             );
         }
 
@@ -449,7 +449,7 @@ public class AtSpiWidget implements Widget, Serializable {
         double[] dragPoints = new double[dragC];
 
 
-        for (int i=0; i<dragC; i++){
+        for (int i=0; i<dragC; i++) {
             if (Math.abs(fixedPoint - dragP) < fragment)
                 dragP += fragment;
             dragPoints[i] = dragP;
@@ -485,7 +485,7 @@ public class AtSpiWidget implements Widget, Serializable {
 
         T ret = get(tag, null);
 
-        if(ret == null) {
+        if (ret == null) {
             throw new NoSuchTagException(tag);
         }
 
@@ -511,10 +511,10 @@ public class AtSpiWidget implements Widget, Serializable {
 
         // Cached - return value.
         // No element to retrieve the value from or non-existing tag - return default value.
-        if(ret != null){
+        if (ret != null) {
             //noinspection unchecked
             return (T)ret;
-        }else if(element == null || tags.containsKey(tag)){
+        } else if (element == null || tags.containsKey(tag)) {
             return defaultValue;
         }
 
@@ -529,63 +529,63 @@ public class AtSpiWidget implements Widget, Serializable {
         //          + UIAHelpText
         //          + UIAClassName
         //      - UIAControlType = AtSpiRole.
-        if(tag.equals(Tags.Desc)){
+        if (tag.equals(Tags.Desc)) {
             ret = element.name;
-        }else if(tag.equals(Tags.Role)){
+        } else if (tag.equals(Tags.Role)) {
             ret = AtSpiRolesWrapper.fromTypeId(element.role.ordinal());
-        }else if(tag.equals(Tags.HitTester)){
+        } else if (tag.equals(Tags.HitTester)) {
             ret = new AtSpiHitTester(element);
-        }else if(tag.equals(Tags.Shape)){
+        } else if (tag.equals(Tags.Shape)) {
             ret = element.boundingBoxOnScreen;
-        }else if(tag.equals(Tags.Blocked)){
+        } else if (tag.equals(Tags.Blocked)) {
             ret = element.isBlocked;
-        }else if(tag.equals(Tags.Enabled)){
+        } else if (tag.equals(Tags.Enabled)) {
             ret = element.isEnabled;
-        }else if(tag.equals(Tags.Title)){
+        } else if (tag.equals(Tags.Title)) {
             ret = element.name;
-        }else if(tag.equals(Tags.PID)){
-            ret = this == root ? ((AtSpiRootElement)element).pid : null;
-        }else if(tag.equals(Tags.IsRunning)){
-            ret = this == root ? ((AtSpiRootElement)element).isRunning : null;
-        }else if(tag.equals(Tags.TimeStamp)){
-            ret = this == root ? ((AtSpiRootElement)element).timeStamp : null;
-        }else if(tag.equals(Tags.Foreground)){
-            ret = this == root ? ((AtSpiRootElement)element).isActive : null;
-        }else if(tag.equals(Tags.HasStandardKeyboard)){
-            ret = this == root ? ((AtSpiRootElement)element).hasStandardKeyboard : null;
-        }else if(tag.equals(Tags.HasStandardMouse)){
-            ret = this == root ? ((AtSpiRootElement)element).hasStandardMouse : null;
-        }else if(tag.equals(AtSpiTags.AtSpiName)){
+        } else if (tag.equals(Tags.PID)) {
+            ret = this == root ? ((AtSpiRootElement)element).pid: null;
+        } else if (tag.equals(Tags.IsRunning)) {
+            ret = this == root ? ((AtSpiRootElement)element).isRunning: null;
+        } else if (tag.equals(Tags.TimeStamp)) {
+            ret = this == root ? ((AtSpiRootElement)element).timeStamp: null;
+        } else if (tag.equals(Tags.Foreground)) {
+            ret = this == root ? ((AtSpiRootElement)element).isActive: null;
+        } else if (tag.equals(Tags.HasStandardKeyboard)) {
+            ret = this == root ? ((AtSpiRootElement)element).hasStandardKeyboard: null;
+        } else if (tag.equals(Tags.HasStandardMouse)) {
+            ret = this == root ? ((AtSpiRootElement)element).hasStandardMouse: null;
+        } else if (tag.equals(AtSpiTags.AtSpiName)) {
             ret = element.name;
-        }else if(tag.equals(AtSpiTags.AtSpiOrientation)){
+        } else if (tag.equals(AtSpiTags.AtSpiOrientation)) {
             ret = element.orientation;
-        }else if(tag.equals(Tags.ZIndex)){
+        } else if (tag.equals(Tags.ZIndex)) {
             ret = element.zIndex;
-        }else if(tag.equals(AtSpiTags.AtSpiIsModal)){
+        } else if (tag.equals(AtSpiTags.AtSpiIsModal)) {
             ret = element.isModal;
-        }else if(tag.equals(AtSpiTags.AtSpiCanScroll)){
+        } else if (tag.equals(AtSpiTags.AtSpiCanScroll)) {
             ret = element.canScroll;
-        }else if(tag.equals(AtSpiTags.AtSpiCanScrollHorizontally)){
+        } else if (tag.equals(AtSpiTags.AtSpiCanScrollHorizontally)) {
             ret = element.canScrollHorizontally;
-        }else if(tag.equals(AtSpiTags.AtSpiCanScrollVertically)){
+        } else if (tag.equals(AtSpiTags.AtSpiCanScrollVertically)) {
             ret = element.canScrollVertically;
-        }else if(tag.equals(AtSpiTags.AtSpiHorizontalScrollViewSizePercentage)){
+        } else if (tag.equals(AtSpiTags.AtSpiHorizontalScrollViewSizePercentage)) {
             ret = element.hScrollViewSizePercentage;
-        }else if(tag.equals(AtSpiTags.AtSpiVerticalScrollViewSizePercentage)){
+        } else if (tag.equals(AtSpiTags.AtSpiVerticalScrollViewSizePercentage)) {
             ret = element.vScrollViewSizePercentage;
-        }else if(tag.equals(AtSpiTags.AtSpiHorizontalScrollPercentage)){
+        } else if (tag.equals(AtSpiTags.AtSpiHorizontalScrollPercentage)) {
             ret = element.hScrollPercentage;
-        }else if(tag.equals(AtSpiTags.AtSpiVerticalScrollPercentage)){
+        } else if (tag.equals(AtSpiTags.AtSpiVerticalScrollPercentage)) {
             ret = element.vScrollPercentage;
-        }else if(tag.equals(AtSpiTags.AtSpiRole)){
+        } else if (tag.equals(AtSpiTags.AtSpiRole)) {
             ret = element.role;
-        }else if(tag.equals(AtSpiTags.AtSpiToolkitName)){
+        } else if (tag.equals(AtSpiTags.AtSpiToolkitName)) {
             ret = element.toolkitName;
-        }else if(tag.equals(AtSpiTags.AtSpiHasFocus)){
+        } else if (tag.equals(AtSpiTags.AtSpiHasFocus)) {
             ret = element.hasFocus;
-        }else if(tag.equals(AtSpiTags.AtSpiIsFocusable)){
+        } else if (tag.equals(AtSpiTags.AtSpiIsFocusable)) {
             ret = element.isFocusable;
-        }else if(tag.equals(AtSpiTags.AtSpiDescription)){
+        } else if (tag.equals(AtSpiTags.AtSpiDescription)) {
             ret = element.description;
         }
 
@@ -595,7 +595,7 @@ public class AtSpiWidget implements Widget, Serializable {
 
 
         //noinspection unchecked
-        return (ret == null) ? defaultValue : (T)ret;
+        return (ret == null) ? defaultValue: (T)ret;
 
 
     }
@@ -618,18 +618,18 @@ public class AtSpiWidget implements Widget, Serializable {
         queryTags.addAll(AtSpiTags.tagSet());
 
 
-        return () -> new Iterator<Tag<?>>(){
+        return () -> new Iterator<Tag<?>>() {
             Iterator<Tag<?>> i = queryTags.iterator();
             AtSpiWidget target = self;
             Tag<?> next;
 
 
             @SuppressWarnings("Duplicates")
-            private Tag<?> fetchNext(){
-                if(next == null){
-                    while(i.hasNext()){
+            private Tag<?> fetchNext() {
+                if (next == null) {
+                    while (i.hasNext()) {
                         next = i.next();
-                        if(target.get(next, null) != null)
+                        if (target.get(next, null) != null)
                             return next;
                     }
                     next = null;
@@ -645,7 +645,7 @@ public class AtSpiWidget implements Widget, Serializable {
 
             public Tag<?> next() {
                 Tag<?> ret1 = fetchNext();
-                if(ret1 == null)
+                if (ret1 == null)
                     throw new NoSuchElementException();
                 next = null;
                 return ret1;

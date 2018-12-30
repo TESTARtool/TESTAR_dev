@@ -41,8 +41,8 @@ import javax.swing.*;
  */
 public class GraphDBPanel extends JPanel {
 
-	private static final long serialVersionUID = -2815422165938356237L;
-	private JCheckBox graphDBEnabledChkBox = new JCheckBox();
+  private static final long serialVersionUID = -2815422165938356237L;
+  private JCheckBox graphDBEnabledChkBox = new JCheckBox();
     private JLabel label1 = new JLabel("Enabled");
     private JLabel label2 = new JLabel("url");
     private JLabel label3 = new JLabel("username");
@@ -52,7 +52,7 @@ public class GraphDBPanel extends JPanel {
     private JTextField userTextField = new JTextField();
     private JPasswordField passwordField = new JPasswordField();
 
-    private GraphDBPanel(){
+    private GraphDBPanel() {
         super();
     }
 
@@ -117,7 +117,7 @@ public class GraphDBPanel extends JPanel {
      */
     private String getPassword() {
         StringBuilder result= new StringBuilder();
-        for(char c : passwordField.getPassword()) {
+        for (char c: passwordField.getPassword()) {
             result.append(c);
         }
         return  result.toString();

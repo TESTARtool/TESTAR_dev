@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -29,7 +29,7 @@ SUTConnectorValue = C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe
 # Java Swing applications & Access Bridge Enabled
 #
 # Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#    (Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
 #
 # Enable the variable Access Bridge Enabled in TESTAR as true
 #################################################################
@@ -116,7 +116,6 @@ GraphDBPassword = admin
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = false
 Reportstate = false
-SubroutineData = 
 TgherkinDocument = 
 Discount = 0.95
 TgherkinNrOfNOPRetries = 0
@@ -126,7 +125,7 @@ StopGenerationOnFault = true
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
-ApplyDefaultOnMismatch = true
+ApplyDefaultOnMismatch = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 AlgorithmFormsFilling = false
@@ -150,8 +149,8 @@ TestGenerator = random
 StartupTime = 5.0
 ActionDuration = 0.1
 NonReactingUIThreshold = 100
-ContinueToApplyDefault = true
-ConfidenceThreshold = 0.7
+ContinueToApplyDefault = false
+ConfidenceThreshold = 0.0
 GraphsActivated = true
 GraphResuming = true
 CopyFromTo = 
@@ -162,10 +161,10 @@ TgherkinExecutionMode = sequential
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = false
 AlwaysCompile = true
-PathToReplaySequence = ./output/temp
+PathToReplaySequence = ./resources/output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
-RepeatTgherkinScenarios = true
-MinimumPercentageForImageRecognition = 95.0
+RepeatTgherkinScenarios = false
+MinimumPercentageForImageRecognition = 0.0
 OfflineGraphConversion = true

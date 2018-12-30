@@ -40,41 +40,41 @@ import org.fruit.UnFunc;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 public final class IndexFinder implements Searcher, Finder {
-	private static final long serialVersionUID = 2879822217515069377L;
-	final int indices[];
-	transient YieldFirst yf;
+  private static final long serialVersionUID = 2879822217515069377L;
+  final int indices[];
+  transient YieldFirst yf;
 
-	public IndexFinder(int indices[]){
-		Assert.notNull(indices);
-		this.indices = indices;		
-	}
+  public IndexFinder(int indices[]) {
+    Assert.notNull(indices);
+    this.indices = indices;
+  }
 
-	public SearchFlag apply(Widget start, UnFunc<Widget, SearchFlag> visitor) {
-		Assert.notNull(start, visitor);
-		Widget current = start;
-		for(int idx : indices){
-			if(idx >= 0 && idx < current.childCount())
-				current = current.child(idx);
-			else
-				return SearchFlag.OK;
-		}
-		return visitor.apply(current);
-	}
+  public SearchFlag apply(Widget start, UnFunc<Widget, SearchFlag> visitor) {
+    Assert.notNull(start, visitor);
+    Widget current = start;
+    for (int idx: indices) {
+      if (idx >= 0 && idx < current.childCount())
+        current = current.child(idx);
+      else
+        return SearchFlag.OK;
+    }
+    return visitor.apply(current);
+  }
 
-	public String toString(){
-		return "IndexSearcher: " + Arrays.toString(indices);
-	}
+  public String toString() {
+    return "IndexSearcher: " + Arrays.toString(indices);
+  }
 
-	public Widget apply(Widget start) throws WidgetNotFoundException {
-		if(yf == null)
-			yf = new YieldFirst();
-		apply(start, yf);
-		return yf.result();
-	}
+  public Widget apply(Widget start) throws WidgetNotFoundException {
+    if (yf == null)
+      yf = new YieldFirst();
+    apply(start, yf);
+    return yf.result();
+  }
 
-	@Override
-	public Widget getCachedWidget() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public Widget getCachedWidget() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

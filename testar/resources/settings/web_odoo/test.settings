@@ -82,7 +82,7 @@ GraphDBPassword =
 
 ProcessesToKillDuringTest =
 OutputDir = ./resources/output
-PathToReplaySequence = ./output/temp
+PathToReplaySequence = ./resources/output/temp
 TempDir = ./resources/output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true

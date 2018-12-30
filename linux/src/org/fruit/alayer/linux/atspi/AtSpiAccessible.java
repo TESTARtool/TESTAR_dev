@@ -280,7 +280,7 @@ public class AtSpiAccessible {
         aObj._relations = createRelationList(LibAtSpi.atspi_accessible_get_relation_set(accessiblePtr, 0));
 
         if (aObj._relations != null) {
-            for (AtSpiRelation r : aObj._relations) {
+            for (AtSpiRelation r: aObj._relations) {
                 // Don't get the tree since it will be way too heavy and might cause endless loops.
                 r.retrieveInformation(false);
             }
@@ -312,7 +312,7 @@ public class AtSpiAccessible {
         // Only create parent - child relations.
         _children = getAccessibleChildren(this);
 
-        for (AtSpiAccessible child : _children) {
+        for (AtSpiAccessible child: _children) {
             child.createTree(fillInfo);
         }
 
@@ -342,7 +342,7 @@ public class AtSpiAccessible {
 
         fillInstance(_accessiblePtr, this, null);
 
-        for (AtSpiAccessible child : _children) {
+        for (AtSpiAccessible child: _children) {
             child.retrieveAccessibleInfoTree();
         }
 
@@ -414,7 +414,7 @@ public class AtSpiAccessible {
 
 
         // For each pointer create a new instance of AtSpiAccessible.
-        for (long childPtr : childPtrs) {
+        for (long childPtr: childPtrs) {
 
             AtSpiAccessible childInstance = AtSpiAccessible.CreateInstance(childPtr, parent);
 
@@ -448,7 +448,7 @@ public class AtSpiAccessible {
 
         ArrayList<AtSpiRelation> rs = new ArrayList<>();
 
-        for (Long ptr : relationPtrs.elements()) {
+        for (Long ptr: relationPtrs.elements()) {
 
             AtSpiRelation r = AtSpiRelation.CreateInstance(ptr);
 

@@ -29,79 +29,51 @@ package web_generic;
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author (base) Sebastian Bauersfeld
- *  Web protocol (generic) authors: urueda, fraalpe2, mimarmu1
- *  @author Urko Rueda Molina (protocol refactor, cleanup and update to last TESTAR version)
- */
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.NativeLinker;
-import java.io.File;
 import java.util.Set;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.Shape;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
+import org.fruit.Drag;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
-  // platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-  private static Role webText; // browser dependent
-  private static double browser_toolbar_filter;
+  // This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
 
-  private static double SCROLLARROWSIZE = 36; // sliding arrows (iexplorer)
-  private static double SCROLLTHICK = 16; // scroll thickness (iexplorer)
+  static Role webText; // browser dependent
+  static double browser_toolbar_filter;
+
+  //Attributes for adding slide actions
+  static double scrollArrowSize = 36; // sliding arrows (iexplorer)
+  static double scrollThick = 16; // scroll thickness (iexplorer)
 
   /**
-   * Called once during the life time of TESTAR.
+   * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
    * @param   settings   the current TESTAR settings as specified by the user.
    */
   protected void initialize(Settings settings) {
-
     super.initialize(settings);
     initBrowser();
-
   }
 
   // check browser
   private void initBrowser() {
     webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
     String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-    if (sutPath.contains("iexplore.exe")) {
+    if (sutPath.contains("iexplore.exe"))
       webText = NativeLinker.getNativeRole("UIAEdit");
-    }
-    else if (sutPath.contains("firefox")) {
+    else if (sutPath.contains("firefox"))
       webText = NativeLinker.getNativeRole("UIAText");
-    }
-  }
-
-  /**
-   * This method is invoked each time TESTAR starts to generate a new sequence.
-   * @param sut   SUT
-   * @param state State of SUT
-   */
-  protected void beginSequence(SUT sut, State state) {
-
-    super.beginSequence(sut, state);
-
   }
 
   /**
@@ -109,18 +81,27 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * take care of
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
-   *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
-   *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+   *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
-   * @throws SystemStartException if error occurs
+   * @return  a started SUT, ready to be tested.
    */
-  protected SUT startSystem() throws SystemStartException {
+  protected SUT startSystem() throws SystemStartException{
 
-        SUT sut = super.startSystem();
+    SUT sut = super.startSystem();
 
-        return sut;
+    return sut;
+
+  }
+
+  /**
+   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+   * This can be used for example for bypassing a login screen by filling the username and password
+   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+   * the SUT's configuration files etc.)
+   */
+  protected void beginSequence(SUT system, State state) {
+
+    super.beginSequence(system, state);
 
   }
 
@@ -131,18 +112,15 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
    * @return  the current state of the SUT with attached oracle.
-   * @param system SUT
-   * @throws StateBuildException if error occurs
    */
-  protected State getState(SUT system) throws StateBuildException {
+  protected State getState(SUT system) throws StateBuildException{
 
     State state = super.getState(system);
 
         for (Widget w: state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
               browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
-            }
         }
 
     return state;
@@ -153,11 +131,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * This is a helper method used by the default implementation of <code>buildState()</code>
    * It examines the SUT's current state and returns an oracle verdict.
    * @return oracle verdict, which determines whether the state is erroneous and why.
-   * @param state State of SUT
    */
   protected Verdict getVerdict(State state) {
 
-    Verdict verdict = super.getVerdict(state); // by urueda
+    Verdict verdict = super.getVerdict(state);
     // system crashes, non-responsiveness and suspicious titles automatically detected!
 
     //-----------------------------------------------------------------------------
@@ -179,11 +156,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * @param system the SUT
    * @param state the SUT's current state
    * @return  a set of actions
-   * @throws ActionBuildException if error occurs
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(system,state);
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -193,64 +169,79 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
     // BUILD CUSTOM ACTIONS
     //----------------------
 
-    if (!settings().get(ConfigTags.PrologActivated)) { // is prolog deactivated?
+    // iterate through all widgets
+    for (Widget w: getTopWidgets(state)) {
+      if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
+        if (!blackListed(w)) {  // do not build actions for tabu widgets
 
-      // iterate through all widgets
-      for (Widget w: getTopWidgets(state)) {
-        if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
-          if (!blackListed(w)) {  // do not build actions for tabu widgets
+          // left clicks
+          if (whiteListed(w) || isClickable(w))
+            actions.add(ac.leftClickAt(w));
 
-            // left clicks
-            if (whiteListed(w) || isClickable(w)) {
-              actions.add(ac.leftClickAt(w));
-            }
+          // type into text boxes
+          if (whiteListed(w) || isTypeable(w))
+            actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 
-            // type into text boxes
-            if (whiteListed(w) || isTypeable(w)) {
-              actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-            }
+          // slides
+          addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 
-            // slides
-            addSlidingActions(actions,ac,SCROLLARROWSIZE,SCROLLTHICK,w);
-          }
         }
       }
-
     }
 
     return actions;
 
   }
 
-  // by urueda
-  @Override
-  protected boolean isClickable(Widget w) {
-    if (isAtBrowserCanvas(w)) {
-      return super.isClickable(w);
-    } else {
-      return false;
+  /**
+   * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+   * @param actions
+   * @param ac
+   * @param scrollArrowSize
+   * @param scrollThick
+   * @param w
+   */
+  protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state) {
+    Drag[] drags = null;
+    //If there are scroll (drags/drops) actions possible
+    if ((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null) {
+      //For each possible drag, create an action and add it to the derived actions
+      for (Drag drag: drags) {
+        //Store the widget in the Graphdatabase
+        storeWidget(state.get(Tags.ConcreteID), w);
+        //Create a slide action with the Action Compiler, and add it to the set of derived actions
+        actions.add(ac.slideFromTo(
+            new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+            new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+        ));
+
+      }
     }
   }
 
-  // by urueda
+  @Override
+  protected boolean isClickable(Widget w) {
+    if (isAtBrowserCanvas(w))
+      return super.isClickable(w);
+    else
+      return false;
+  }
+
   @Override
   protected boolean isTypeable(Widget w) {
-    if (!isAtBrowserCanvas(w)) {
+    if (!isAtBrowserCanvas(w))
       return false;
-    }
 
     Role role = w.get(Tags.Role, null);
-    if (role != null && Role.isOneOf(role, webText)) {
+    if (role != null && Role.isOneOf(role, webText))
       return isUnfiltered(w);
-    }
 
     return false;
   }
 
-  // by urueda
   private boolean isAtBrowserCanvas(Widget w) {
     Shape shape = w.get(Tags.Shape,null);
-    return shape != null && shape.y() > browser_toolbar_filter;
+    return (shape != null && shape.y() > browser_toolbar_filter);
   }
 
   /**
@@ -273,7 +264,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * @return whether or not the execution succeeded
    */
   protected boolean executeAction(SUT system, State state, Action action) {
-    System.out.println(action.toParametersString());
+
     return super.executeAction(system, state, action);
 
   }
@@ -283,7 +274,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * current sequence. You could stop the sequence's generation after a given amount of executed
    * actions or after a specific time etc.
    * @return  if <code>true</code> continue generation, else stop
-   * @param state State of SUT
    */
   protected boolean moreActions(State state) {
 
@@ -294,11 +284,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
-   * @param recordedSequence file containing recorded sequence
    */
-  protected void finishSequence(File recordedSequence) {
+  protected void finishSequence() {
 
-    super.finishSequence(recordedSequence);
+    super.finishSequence();
 
   }
 

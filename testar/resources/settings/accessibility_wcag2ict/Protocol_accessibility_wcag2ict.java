@@ -30,12 +30,6 @@ package accessibility_wcag2ict;
 *******************************************************************************************************/
 
 import java.util.Map;
-
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-
 import nl.ou.testar.a11y.protocols.AccessibilityProtocol;
 import nl.ou.testar.a11y.reporting.A11yTags;
 import nl.ou.testar.a11y.reporting.EvaluationResult;
@@ -44,6 +38,10 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion;
 import nl.ou.testar.a11y.wcag2.WCAG2EvaluationResult;
 import nl.ou.testar.a11y.wcag2.WCAG2ICT;
 import nl.ou.testar.a11y.wcag2.WCAG2Tags;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
 
 /**
  * An accessibility evaluation protocol based on WCAG2ICT.
@@ -69,11 +67,11 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
         SuccessCriterion sc = result.getSuccessCriterion();
         Widget w = result.getWidget();
         s += (!s.isEmpty() ? ";": "") + result.getType().name()
-          + ":" + sc.toString()
-          + ":" + sc.getLevel().name()
-          + ":" + sc.getURLSuffix()
-          + ":" + (w != null ? w.get(Tags.ConcreteID): "N/A")
-          + ":" + result.getMessage();
+            + ":" + sc.toString()
+            + ":" + sc.getLevel().name()
+            + ":" + sc.getURLSuffix()
+            + ":" + (w != null ? w.get(Tags.ConcreteID): "N/A")
+            + ":" + result.getMessage();
       }
     }
     state.set(WCAG2Tags.WCAG2Violations, s);
@@ -94,7 +92,7 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
           level = violationInfo[2],
           url = SuccessCriterion.URL_BASE + violationInfo[3],
           widgetTitle = !violationInfo[4].equals("N/A")
-            ? getWidgetTitleFromGraphDB(violationInfo[4]): violationInfo[4],
+              ? getWidgetTitleFromGraphDB(violationInfo[4]): violationInfo[4],
           message = violationInfo[5];
       html.writeTableRowStart()
       .writeTableCell(violationType)
@@ -132,5 +130,4 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
     }
     html.writeTableEnd();
   }
-
 }

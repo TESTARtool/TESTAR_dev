@@ -331,7 +331,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
         }
 
         // slides
-        addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget);
+        addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget, state);
       }
     }
     return actions;
@@ -422,8 +422,8 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
    * sequence.
    */
   @Override
-  protected void finishSequence(File recordedSequence) {
-    super.finishSequence(recordedSequence);
+  protected void finishSequence() {
+    super.finishSequence();
   }
 
   /**
@@ -442,6 +442,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions() {
+    State state = getStateForClickFilterLayerProtocol();
     extractAddressWidgets();
 
     // SUT is probably in the background, let Testar handle it
@@ -486,7 +487,7 @@ public class Protocol_web_ati_mocking extends ClickFilterLayerProtocol {
   private void extractAddressWidgets() {
     currentAddress = null;
 
-    for (Widget widget: getTopWidgets(state)) {
+    for (Widget widget: getTopWidgets(getStateForClickFilterLayerProtocol())) {
       Shape shape = widget.get(Tags.Shape, null);
       String title = widget.get(Tags.Title, "").toLowerCase().trim();
       String value = widget.get(Tags.ValuePattern, "").toLowerCase().trim();

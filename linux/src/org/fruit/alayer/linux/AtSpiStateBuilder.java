@@ -121,7 +121,7 @@ public class AtSpiStateBuilder implements StateBuilder {
             Future<AtSpiState> future = _executorService.submit(new AtSpiStateFetcher(system));
             return future.get((long)(_timeOut * _secondsToMilliseconds), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException e) {
-        	e.printStackTrace(); // by urueda
+          e.printStackTrace(); // by urueda
             throw new StateBuildException(e);
         } catch (TimeoutException e) {
 

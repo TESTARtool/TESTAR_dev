@@ -126,6 +126,7 @@
 		<module name="JavadocVariable">
 			<property name="scope" value="package"/>
 		</module>
+
 		<!-- No need for Javadoc -->
 		<module name="JavadocType">
 			<property name="severity" value="ignore"/>
@@ -136,7 +137,7 @@
 			<!--property name="scope" value="package"/-->
 		</module>
 		<module name="JavadocMethod">
-			<!--property name="scope" value="package"/-->
+			<property name="scope" value="public"/>
 			<property name="allowUndeclaredRTE" value="true"/>
 			<property name="suppressLoadErrors" value="true"/>
 		</module>

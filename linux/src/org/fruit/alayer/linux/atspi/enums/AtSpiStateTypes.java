@@ -338,7 +338,7 @@ public enum AtSpiStateTypes {
 
 
     /**
-     * Indicates this object has the potential to be checked, such as a checkbox or toggle-able table cell. Since : 2.12
+     * Indicates this object has the potential to be checked, such as a checkbox or toggle-able table cell. Since: 2.12
      */
     Checkable,
 
@@ -346,14 +346,14 @@ public enum AtSpiStateTypes {
     /**
      * Indicates that the object has a popup context menu or sub-level menu which may or may not be showing.
      * This means that activation renders conditional content. Note that ordinary tooltips are not
-     * considered popups in this context. Since : 2.12
+     * considered popups in this context. Since: 2.12
      */
     HasPopup,
 
 
     /**
      * Indicates that an object which is ENABLED and SENSITIVE has a value which can be read,
-     * but not modified, by the user. Since : 2.16
+     * but not modified, by the user. Since: 2.16
      */
     ReadOnly,
 

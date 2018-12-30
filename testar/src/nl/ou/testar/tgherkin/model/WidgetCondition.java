@@ -92,7 +92,7 @@ public class WidgetCondition {
     Boolean result = false;
     try {
       result = (Boolean)evaluator.visit(parser.widget_condition());
-    }catch (Exception e) {
+    } catch (Exception e) {
     }
     return result;
   }

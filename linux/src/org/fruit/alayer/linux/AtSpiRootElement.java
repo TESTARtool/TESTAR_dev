@@ -96,11 +96,11 @@ public class AtSpiRootElement extends AtSpiElement {
      * @param y The y-coordiante of the point.
      * @return True if the element encompasses the point on screen; False otherwise.
      */
-    boolean visibleAt(AtSpiElement element, double x, double y){
+    boolean visibleAt(AtSpiElement element, double x, double y) {
 
 
         // The element doesn't encompass the point on the screen.
-        if(element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
+        if (element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
             return false;
         }
 
@@ -125,11 +125,11 @@ public class AtSpiRootElement extends AtSpiElement {
      * @param obscuredByChildFeature A child obscures the (parent) element??
      * @return True if the element encompasses the point on screen; False otherwise.
      */
-    boolean visibleAt(AtSpiElement element, double x, double y, boolean obscuredByChildFeature){
+    boolean visibleAt(AtSpiElement element, double x, double y, boolean obscuredByChildFeature) {
 
 
         // The element doesn't encompass the point on the screen.
-        if(element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
+        if (element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
             return false;
         }
 
@@ -152,13 +152,13 @@ public class AtSpiRootElement extends AtSpiElement {
      * @param y The y-coordiante of the point.
      * @return True if a child element obscures the (parent) element at a certain point on the screen; False otherwise.
      */
-    private boolean obscuredByChildren(AtSpiElement element, double x, double y){
+    private boolean obscuredByChildren(AtSpiElement element, double x, double y) {
 
-        for(int i = 0; i < element.children.size(); i++){
+        for (int i = 0; i < element.children.size(); i++) {
 
             AtSpiElement child = element.children.get(i);
 
-            if(child.boundingBoxOnScreen != null && child.boundingBoxOnScreen.contains(x, y) && child.zIndex >= element.zIndex) {
+            if (child.boundingBoxOnScreen != null && child.boundingBoxOnScreen.contains(x, y) && child.zIndex >= element.zIndex) {
                 return true;
             }
 

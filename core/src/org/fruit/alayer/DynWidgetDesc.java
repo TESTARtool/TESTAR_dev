@@ -40,24 +40,24 @@ import org.fruit.UnFunc;
 
 public final class DynWidgetDesc implements UnFunc<SUT, String>, Serializable {
 
-	private static final long serialVersionUID = 3603695549691732394L;
-	Finder finder;
-	String formatString;
-	Tag<?>[] tags;
-	
-	public DynWidgetDesc(Finder finder, String formatString, Tag<?>... tags){
-		Assert.notNull(formatString, finder, tags);
-		this.formatString = formatString;
-		this.finder = finder;
-		this.tags = tags;
-	}
-	
-	public String apply(SUT s) {
-		Assert.notNull(s);
-		Widget w = finder.apply(s.get(Tags.SystemState));
-		Object[] tagValues = new Object[tags.length];
-		for(int i = 0; i < tags.length; i++)
-			tagValues[i] = w.get(tags[i], null);
-		return String.format(formatString, tagValues);
-	}
+  private static final long serialVersionUID = 3603695549691732394L;
+  Finder finder;
+  String formatString;
+  Tag<?>[] tags;
+
+  public DynWidgetDesc(Finder finder, String formatString, Tag<?>... tags) {
+    Assert.notNull(formatString, finder, tags);
+    this.formatString = formatString;
+    this.finder = finder;
+    this.tags = tags;
+  }
+
+  public String apply(SUT s) {
+    Assert.notNull(s);
+    Widget w = finder.apply(s.get(Tags.SystemState));
+    Object[] tagValues = new Object[tags.length];
+    for (int i = 0; i < tags.length; i++)
+      tagValues[i] = w.get(tags[i], null);
+    return String.format(formatString, tagValues);
+  }
 }

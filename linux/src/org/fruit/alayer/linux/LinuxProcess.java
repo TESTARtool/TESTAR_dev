@@ -147,7 +147,7 @@ public class LinuxProcess extends SUTBase {
      */
     public static LinuxProcess fromExecutable(String path) throws SystemStartException {
 
-        try{
+        try {
 
             Assert.notNull(path);
 
@@ -165,7 +165,7 @@ public class LinuxProcess extends SUTBase {
                 throw new SystemStartException(new FruitException(e.getMessage()));
             }
 
-        }catch(FruitException fe) {
+        } catch(FruitException fe) {
             throw new SystemStartException(fe);
         }
 

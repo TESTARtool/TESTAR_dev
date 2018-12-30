@@ -41,9 +41,9 @@ public final class WinProcHandle implements ProcessHandle {
   public void kill() { WinProcess.killProcess(pid); }
   public boolean isRunning() { return WinProcess.isRunning(pid); }
   public String name() {
-    try{
+    try {
       return WinProcess.procName(pid);
-    }catch(WinApiException wae) {
+    } catch(WinApiException wae) {
       return null;
     }
   }

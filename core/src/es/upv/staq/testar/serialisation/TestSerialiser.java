@@ -27,14 +27,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+
 package es.upv.staq.testar.serialisation;
 
-import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
+
 import org.fruit.Assert;
 import org.fruit.alayer.Taggable;
+
+import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 
 /**
  * Tests serialiser..
@@ -69,6 +72,12 @@ public class TestSerialiser extends Thread {
 
   public static void finish() {
     alive = false;
+  }
+
+  public static boolean isSavingQueueEmpty() {
+    if (testSavingQueue.isEmpty())
+      return true;
+    return false;
   }
 
   @Override
@@ -162,4 +171,5 @@ public class TestSerialiser extends Thread {
   public static int queueLength() {
     return testSavingQueue.size();
   }
+
 }

@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,9 +57,9 @@ public class Settings extends TaggableBase implements Serializable {
 
   private static final long serialVersionUID = -1579293663489327737L;
 
-  public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE";
-  public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
-  public static final String SUT_CONNECTOR_CMDLINE      = "COMMAND_LINE";
+  public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
+                  SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
+                  SUT_CONNECTOR_CMDLINE     = "COMMAND_LINE";
 
   private static String settingsPath;
 
@@ -110,33 +111,33 @@ public class Settings extends TaggableBase implements Serializable {
   @SuppressWarnings("unchecked")
   public static <T> T parse(String stringValue, Tag<T> tag) throws ConfigParseException{
     if (tag.type().equals(Double.class)) {
-      try{
+      try {
         return (T)(Double)Double.parseDouble(stringValue);
-      }catch(NumberFormatException nfe) {
+      } catch(NumberFormatException nfe) {
         throw new ConfigParseException("Unable to parse value for tag " + tag);
       }
-    } else if (tag.type().equals(AbstractProtocol.Modes.class)) {
-      try{
-        return (T)AbstractProtocol.Modes.valueOf(stringValue);
-      }catch(IllegalArgumentException iae) {
+    } else if (tag.type().equals(RuntimeControlsProtocol.Modes.class)) {
+      try {
+        return (T)RuntimeControlsProtocol.Modes.valueOf(stringValue);
+      } catch(IllegalArgumentException iae) {
         throw new ConfigParseException("Unknown Mode!");
       }
     } else if (tag.type().equals(Integer.class)) {
-      try{
+      try {
         return (T)(Integer)Integer.parseInt(stringValue);
-      }catch(NumberFormatException nfe) {
+      } catch(NumberFormatException nfe) {
         throw new ConfigParseException("Unable to parse value for tag " + tag);
       }
     } else if (tag.type().equals(Float.class)) {
-      try{
+      try {
         return (T)(Float)Float.parseFloat(stringValue);
-      }catch(NumberFormatException nfe) {
+      } catch(NumberFormatException nfe) {
         throw new ConfigParseException("Unable to parse value for tag " + tag);
       }
     } else if (tag.type().equals(Boolean.class)) {
-      try{
+      try {
         return (T)(Boolean)Boolean.parseBoolean(stringValue);
-      }catch(NumberFormatException nfe) {
+      } catch(NumberFormatException nfe) {
         throw new ConfigParseException("Unable to parse value for tag " + tag);
       }
     } else if (tag.type().equals(String.class)) {
@@ -159,6 +160,7 @@ public class Settings extends TaggableBase implements Serializable {
     throw new ConfigParseException("");
   }
 
+
   public static Settings FromFile(String path) throws IOException{
     return fromFile(new ArrayList<Pair<?, ?>>(), path);
   }
@@ -170,6 +172,30 @@ public class Settings extends TaggableBase implements Serializable {
     InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
     Reader in = new BufferedReader(isw);
     props.load(in);
+    in.close();
+    if (isw != null) isw.close();
+    if (fis != null) fis.close();
+
+    return new Settings(defaults, new Properties(props));
+  }
+
+  public static Settings fromFileCmd(List<Pair<?, ?>> defaults, String path, String[] argv) throws IOException{
+    Assert.notNull(path);
+    Properties props = new Properties();
+    FileInputStream fis = new FileInputStream(path);
+    InputStreamReader isw = new InputStreamReader(fis, "UTF-8");
+    Reader in = new BufferedReader(isw);
+    props.load(in);
+
+    for (String sett: argv) {
+      //Ignore sse value
+      if (sett.toString().contains("sse=")) continue;
+
+      System.out.println(sett.toString());
+      StringReader sr = new StringReader(sett);
+      props.load(sr);
+    }
+
     in.close();
     if (isw != null) isw.close();
     if (fis != null) fis.close();
@@ -196,7 +222,9 @@ public class Settings extends TaggableBase implements Serializable {
 
     for (String key: props.stringPropertyNames()) {
       String value = props.getProperty(key);
+
       Tag<?> defTag = null;
+
       for (Pair<?, ?> p: defaults) {
         Tag<?> t = (Tag<?>)p.left();
         if (t.name().equals(key)) {
@@ -210,6 +238,8 @@ public class Settings extends TaggableBase implements Serializable {
       } else {
         set((Tag)defTag, parse(value, defTag));
       }
+
+
 
     }
   }
@@ -350,6 +380,7 @@ public class Settings extends TaggableBase implements Serializable {
           +"# Other more advanced settings\n"
           +"#################################################################\n");
 
+
       for (Tag<?> t: tags()) {
 
         int ini = sb.indexOf(t.name()+" =");
@@ -370,10 +401,11 @@ public class Settings extends TaggableBase implements Serializable {
         }
       }
 
-    }catch(Exception e) {System.out.println("Error trying to save current settings "+e);}
+    } catch(Exception e) {System.out.println("Error trying to save current settings "+e);}
 
     return sb.toString();
   }
+
 
   private String escapeBackslash(String string) { return string.replace("\\", "\\\\");  }
 }

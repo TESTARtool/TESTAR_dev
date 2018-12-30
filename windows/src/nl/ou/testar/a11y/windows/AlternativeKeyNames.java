@@ -39,63 +39,63 @@ import java.util.Map;
  *
  */
 final class AlternativeKeyNames {
-	
-	/**
-	 * The map from alternative key names to standard key names
-	 * Based on the en-US (International) keyboard layout, all uppercase.
-	 */
-	static final Map<String,String> map = new HashMap<String,String>() {
-		private static final long serialVersionUID = 4670847371224012836L;
 
-		{
-			put("ESC", "ESCAPE");
-			put("CAPSLOCK", "CAPS_LOCK");
-			put("CTL", "CONTROL");
-			put("CTR", "CONTROL");
-			put("CTRL", "CONTROL");
-			put("WIN", "WINDOWS");
-			put("SPACEBAR", "SPACE");
-			put("CONTEXTMENU", "CONTEXT_MENU");
-			put("APPLICATION", "CONTEXT_MENU");
-			put("LEFT ARROW", "LEFT");
-			put("RIGHT ARROW", "RIGHT");
-			put("UP ARROW", "UP");
-			put("DOWN ARROW", "DOWN");
-			put("RETURN", "ENTER");
-			put("BACKSPACE", "BACK_SPACE");
-			put(",", "COMMA");
-			put("<", "COMMA");
-			put(".", "PERIOD");
-			put(">", "PERIOD");
-			put("/", "SLASH");
-			put("?", "SLASH");
-			put(";", "SEMICOLON");
-			put("SEMI", "SEMICOLON");
-			put(":", "SEMICOLON");
-			put("[", "OPEN_BRACKET");
-			put("{", "OPEN_BRACKET");
-			put("]", "CLOSE_BRACKET");
-			put("}", "CLOSE_BRACKET");
-			put("\\", "BACK_SLASH");
-			put("BACKSLASH", "BACK_SLASH");
-			put("|", "BACK_SLASH");
-			put("=", "EQUALS");
-			put("+", "EQUALS");
-			put("-", "MINUS");
-			put("_", "MINUS");
-			put("!", "1");
-			put("@", "2");
-			put("#", "3");
-			put("$", "4");
-			put("%", "5");
-			put("^", "6");
-			put("&", "7");
-			put("*", "8");
-			put("(", "9");
-			put(")", "0");
-		}
-	};
-	
-	private AlternativeKeyNames() {}
+  /**
+   * The map from alternative key names to standard key names
+   * Based on the en-US (International) keyboard layout, all uppercase.
+   */
+  static final Map<String,String> map = new HashMap<String,String>() {
+    private static final long serialVersionUID = 4670847371224012836L;
+
+    {
+      put("ESC", "ESCAPE");
+      put("CAPSLOCK", "CAPS_LOCK");
+      put("CTL", "CONTROL");
+      put("CTR", "CONTROL");
+      put("CTRL", "CONTROL");
+      put("WIN", "WINDOWS");
+      put("SPACEBAR", "SPACE");
+      put("CONTEXTMENU", "CONTEXT_MENU");
+      put("APPLICATION", "CONTEXT_MENU");
+      put("LEFT ARROW", "LEFT");
+      put("RIGHT ARROW", "RIGHT");
+      put("UP ARROW", "UP");
+      put("DOWN ARROW", "DOWN");
+      put("RETURN", "ENTER");
+      put("BACKSPACE", "BACK_SPACE");
+      put(",", "COMMA");
+      put("<", "COMMA");
+      put(".", "PERIOD");
+      put(">", "PERIOD");
+      put("/", "SLASH");
+      put("?", "SLASH");
+      put(";", "SEMICOLON");
+      put("SEMI", "SEMICOLON");
+      put(":", "SEMICOLON");
+      put("[", "OPEN_BRACKET");
+      put("{", "OPEN_BRACKET");
+      put("]", "CLOSE_BRACKET");
+      put("}", "CLOSE_BRACKET");
+      put("\\", "BACK_SLASH");
+      put("BACKSLASH", "BACK_SLASH");
+      put("|", "BACK_SLASH");
+      put("=", "EQUALS");
+      put("+", "EQUALS");
+      put("-", "MINUS");
+      put("_", "MINUS");
+      put("!", "1");
+      put("@", "2");
+      put("#", "3");
+      put("$", "4");
+      put("%", "5");
+      put("^", "6");
+      put("&", "7");
+      put("*", "8");
+      put("(", "9");
+      put(")", "0");
+    }
+  };
+
+  private AlternativeKeyNames() {}
 
 }

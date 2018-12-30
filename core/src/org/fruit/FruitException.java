@@ -34,8 +34,8 @@
 package org.fruit;
 
 public class FruitException extends RuntimeException {
-	private static final long serialVersionUID = 8410136592237418299L;
-	public FruitException(String message){ this(message, null); }
-	public FruitException(String message, Throwable cause){ super(message, cause); }
-	public FruitException(Throwable cause){ super(cause); }
+  private static final long serialVersionUID = 8410136592237418299L;
+  public FruitException(String message) { this(message, null); }
+  public FruitException(String message, Throwable cause) { super(message, cause); }
+  public FruitException(Throwable cause) { super(cause); }
 }

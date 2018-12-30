@@ -292,7 +292,7 @@ public class AtSpiStateSet {
 
 
         if (states != null) {
-            for (int e : states.elements()) {
+            for (int e: states.elements()) {
                 statesList.add(AtSpiStateTypes.values()[e]);
             }
         }

@@ -109,7 +109,7 @@ public enum AtSpiRoles {
     TreeTable,              //An object that presents both tabular and hierarchical info to the user.
     Unknown,                //The object contains some Accessible information, but its role is not known.
     Viewport,               //An object usually used in a scroll pane, or to otherwise clip a larger object or content renderer to a specific onscreen viewport.
-    Window,                 //A ¨top level window¨ with no title or border.
+    Window,                 //A top level window with no title or border.
     Extended,               //means that the role for this item is known, but not included in the core enumeration
     Header,                 //An object that serves as a document header.
     Footer,                 //An object that serves as a document footer.
@@ -144,23 +144,23 @@ public enum AtSpiRoles {
     Notification,           //A transitory object designed to present a message to the user, typically at the desktop level rather than inside a particular application.
     InfoBar,                //An object designed to present a message to the user within an existing window.
     LevelBar,               //A bar that serves as a level indicator to, for instance, show the strength of a password or the state of a battery. Since: 2.8
-    TitleBar,               //A bar that serves as the title of a window or a dialog. Since : 2.12
-    BlockQuote,             //An object which contains a text section that is quoted from another source. Since : 2.12
-    Audio,                  //An object which represents an audio element. Since : 2.1
-    Video,                  //An object which represents an video element. Since : 2.1
-    Definition,             //A definition of a term or concept. Since : 2.12
-    Article,                //A section of a page that consists of a composition that forms an independent part of a document, page, or site. Examples: A blog entry, a news story, a forum post. Since : 2.12
-    Landmark,               //A region of a web page intended as a navigational landmark. This is designed to allow Assistive Technologies to provide quick navigation among key regions within a document. Since : 2.12
-    Log,                    //A text widget or container holding log content, such as chat history and error logs. In this role there is a relationship between the arrival of new items in the log and the reading order. The log contains a meaningful sequence and new information is added only to the end of the log, not at arbitrary points. Since : 2.12
-    Marquee,                //A container where non-essential information changes frequently. Common usages of marquee include stock tickers and ad banners. The primary difference between a marquee and a log is that logs usually have a meaningful order or sequence of important content changes. Since : 2.12
-    Math,                   //A text widget or container that holds a mathematical expression. Since : 2.12
-    Rating,                 //A widget whose purpose is to display a rating, such as the number of stars associated with a song in a media player. Objects of this role should also implement AtspiValue. Since : 2.12
-    Timer,                  //An object containing a numerical counter which indicates an amount of elapsed time from a start point, or the time remaining until an end point. Since : 2.12
-    Static,                 //A generic non-container object whose purpose is to display a brief amount of information to the user and whose role is known by the implementor but lacks semantic value for the user. Examples in which ATSPI_ROLE_STATIC is appropriate include the message displayed in a message box and an image used as an alternative means to display text. ATSPI_ROLE_STATIC should not be applied to widgets which are traditionally interactive, objects which display a significant amount of content, or any object which has an accessible relation pointing to another object. The displayed information, as a general rule, should be exposed through the accessible name of the object. For labels which describe another widget, see ATSPI_ROLE_LABEL . For text views, see ATSPI_ROLE_TEXT . For generic containers, see ATSPI_ROLE_PANEL . For objects whose role is not known by the implementor, see ATSPI_ROLE_UNKNOWN . Since : 2.16.
+    TitleBar,               //A bar that serves as the title of a window or a dialog. Since: 2.12
+    BlockQuote,             //An object which contains a text section that is quoted from another source. Since: 2.12
+    Audio,                  //An object which represents an audio element. Since: 2.1
+    Video,                  //An object which represents an video element. Since: 2.1
+    Definition,             //A definition of a term or concept. Since: 2.12
+    Article,                //A section of a page that consists of a composition that forms an independent part of a document, page, or site. Examples: A blog entry, a news story, a forum post. Since: 2.12
+    Landmark,               //A region of a web page intended as a navigational landmark. This is designed to allow Assistive Technologies to provide quick navigation among key regions within a document. Since: 2.12
+    Log,                    //A text widget or container holding log content, such as chat history and error logs. In this role there is a relationship between the arrival of new items in the log and the reading order. The log contains a meaningful sequence and new information is added only to the end of the log, not at arbitrary points. Since: 2.12
+    Marquee,                //A container where non-essential information changes frequently. Common usages of marquee include stock tickers and ad banners. The primary difference between a marquee and a log is that logs usually have a meaningful order or sequence of important content changes. Since: 2.12
+    Math,                   //A text widget or container that holds a mathematical expression. Since: 2.12
+    Rating,                 //A widget whose purpose is to display a rating, such as the number of stars associated with a song in a media player. Objects of this role should also implement AtspiValue. Since: 2.12
+    Timer,                  //An object containing a numerical counter which indicates an amount of elapsed time from a start point, or the time remaining until an end point. Since: 2.12
+    Static,                 //A generic non-container object whose purpose is to display a brief amount of information to the user and whose role is known by the implementor but lacks semantic value for the user. Examples in which ATSPI_ROLE_STATIC is appropriate include the message displayed in a message box and an image used as an alternative means to display text. ATSPI_ROLE_STATIC should not be applied to widgets which are traditionally interactive, objects which display a significant amount of content, or any object which has an accessible relation pointing to another object. The displayed information, as a general rule, should be exposed through the accessible name of the object. For labels which describe another widget, see ATSPI_ROLE_LABEL . For text views, see ATSPI_ROLE_TEXT . For generic containers, see ATSPI_ROLE_PANEL . For objects whose role is not known by the implementor, see ATSPI_ROLE_UNKNOWN . Since: 2.16.
     MathFraction,           //An object that represents a mathematical fraction.
-    MathRoot,               //An object that represents a mathematical expression displayed with a radical. Since : 2.16.
-    Subscript,              //An object that contains text that is displayed as a subscript. Since : 2.16.
-    Superscript,            //An object that contains text that is displayed as a superscript. Since : 2.16.
+    MathRoot,               //An object that represents a mathematical expression displayed with a radical. Since: 2.16.
+    Subscript,              //An object that contains text that is displayed as a subscript. Since: 2.16.
+    Superscript,            //An object that contains text that is displayed as a superscript. Since: 2.16.
     LastDefined,            //Not a valid role, used for finding end of enumeration.
 
 

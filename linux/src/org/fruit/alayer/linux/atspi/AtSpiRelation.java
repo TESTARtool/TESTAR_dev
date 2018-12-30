@@ -136,7 +136,7 @@ public class AtSpiRelation {
         fillInstance(_relationPtr, this);
 
         if (fillTargetInfo) {
-            for (AtSpiAccessible a : _targets) {
+            for (AtSpiAccessible a: _targets) {
                 a.retrieveAccessibleInfoNoRelations();
             }
         }
@@ -152,7 +152,7 @@ public class AtSpiRelation {
 
         fillInstance(_relationPtr, this);
 
-        for (AtSpiAccessible a : _targets) {
+        for (AtSpiAccessible a: _targets) {
             a.retrieveAccessibleInfoNoRelations();
         }
 

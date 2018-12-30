@@ -65,7 +65,7 @@ public class AtSpiElementMap implements Serializable {
     /**
      * Default empty constructor.
      */
-    AtSpiElementMap(){
+    AtSpiElementMap() {
 
     }
 
@@ -111,9 +111,9 @@ public class AtSpiElementMap implements Serializable {
      * @param y The y-coordinate of the point to encompass.
      * @return The first top level container element that encompasses a certain point on the screen.
      */
-    public AtSpiElement at(double x, double y){
-        for(AtSpiElement element : elements){
-            if(element.boundingBoxOnScreen.contains(x, y))
+    public AtSpiElement at(double x, double y) {
+        for (AtSpiElement element: elements) {
+            if (element.boundingBoxOnScreen.contains(x, y))
                 return element;
         }
         return null;

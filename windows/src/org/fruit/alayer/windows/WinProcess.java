@@ -86,12 +86,12 @@ public final class WinProcess extends SUTBase {
   }
 
   public static WinProcess fromPID(long pid) throws SystemStartException{
-    try{
+    try {
       long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pid);
       WinProcess ret = new WinProcess(hProcess, false);
       ret.set(Tags.Desc, procName(pid)); // + " (pid: " + pid + ")");
       return ret;
-    }catch(FruitException fe) {
+    } catch(FruitException fe) {
       throw new SystemStartException(fe);
     }
   }
@@ -112,7 +112,7 @@ public final class WinProcess extends SUTBase {
       return null;
     List<SUT> suts = new ArrayList<SUT>();
     for (WinProcHandle wph: processes) {
-      try{
+      try {
         suts.add(fromPID(wph.pid()));
       } catch(Exception e) {} // non interesting process
     }
@@ -120,13 +120,12 @@ public final class WinProcess extends SUTBase {
   }
 
   public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
-    try{
+    try {
       Assert.notNull(path);
 
-      //TODO: With the new way of invoking the SUT, Chrome runs but remains "not responding" until TESTAR is closed,
-      //then loads (probably by the inclusion of --force-renderer-accessibility --incognito)
-      //It works with iexplore, but it's not necessary to spend resources. For browsers we need to interact with the ports.
-      if ( !ProcessListenerEnabled || path.contains("chrome.exe") || path.contains("iexplore.exe")) {
+      //Disabled with browsers, only allow it with desktop applications executed with command_line
+      if (!ProcessListenerEnabled) {
+
         long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
         long hProcess = handles[0];
         long hThread = handles[1];
@@ -160,11 +159,13 @@ public final class WinProcess extends SUTBase {
       ret.set(Tags.StdOut, p.getInputStream());
       ret.set(Tags.StdIn, p.getOutputStream());
 
-        Windows.CloseHandle(procHandle);
+      //Investigate why this cause issue with cpu
+        //Windows.CloseHandle(procHandle);
 
       ret.set(Tags.Path, path);
+      ret.set(Tags.Desc, path);
       return ret;
-    }catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe) {
+    } catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe) {
       throw new SystemStartException(fe);
     }
   }
@@ -172,7 +173,7 @@ public final class WinProcess extends SUTBase {
   // begin by wcoux
 
   public static WinProcess fromExecutableUwp(String appUserModelId) throws SystemStartException{
-    try{
+    try {
 
       Assert.notNull(appUserModelId);
 
@@ -217,7 +218,7 @@ public final class WinProcess extends SUTBase {
 
       return ret;
 
-    }catch(FruitException fe) {
+    } catch(FruitException fe) {
       LogSerialiser.log(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
       System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
       throw new SystemStartException(fe);
@@ -241,11 +242,11 @@ public final class WinProcess extends SUTBase {
   }
 
   public static void killProcess(long pid) throws SystemStopException{
-    try{
+    try {
       long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pid);
       Windows.TerminateProcess(hProcess, -1);
       Windows.CloseHandle(hProcess);
-    }catch(WinApiException wae) {
+    } catch(WinApiException wae) {
       throw new SystemStopException(wae);
     }
   }
@@ -275,7 +276,7 @@ public final class WinProcess extends SUTBase {
    */
   public static long getMemUsage(WinProcess wp) {
     long pid = -1;
-    try{
+    try {
       pid = wp.pid();
     } catch(IllegalStateException e) {
       System.out.println("SUT is not running - cannot retrieve RAM usage");
@@ -289,7 +290,7 @@ public final class WinProcess extends SUTBase {
    */
   public static long[] getCPUsage(WinProcess wp) {
     long pid = -1;
-    try{
+    try {
       pid = wp.pid();
     } catch(IllegalStateException e) {
       System.out.println("SUT is not running - cannot retrieve CPU usage");
@@ -334,14 +335,14 @@ public final class WinProcess extends SUTBase {
 
 
   public void stop() throws SystemStopException {
-    try{
+    try {
       if (hProcess != 0) {
         if (stopProcess)
           Windows.TerminateProcess(hProcess, 0);
         Windows.CloseHandle(hProcess);
         hProcess = 0;
       }
-    }catch(WinApiException wae) {
+    } catch(WinApiException wae) {
       throw new SystemStopException(wae);
     }
   }

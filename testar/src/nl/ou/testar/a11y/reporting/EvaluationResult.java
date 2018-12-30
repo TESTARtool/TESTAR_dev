@@ -42,91 +42,91 @@ import org.fruit.alayer.Widget;
  *
  */
 public class EvaluationResult implements Serializable {
-	
-	private static final long serialVersionUID = -51527046346987231L;
 
-	public enum Type {
-		/**
-		 * No problem found
-		 */
-		OK,
-		
-		/**
-		 * A warning
-		 * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
-		 */
-		WARNING,
-		
-		/**
-		 * An error
-		 * This is a definite problem that can be detected automatically.
-		 */
-		ERROR;
-	}
-	
-	private final Type type;
-	private final String message;
-	private final Widget widget;
-	
-	/**
-	 * Constructs a new evaluation result that does not apply to a single widget
-	 * @param type The problem type.
-	 * @param message The problem description.
-	 */
-	public EvaluationResult(Type type, String message) {
-		this(type, message, null);
-	}
-	
-	/**
-	 * Constructs a new evaluation result that applies to a single widget
-	 * @param type The problem type.
-	 * @param message The problem description.
-	 * @param widget The widget this evaluation result applies to.
-	 */
-	public EvaluationResult(Type type, String message, Widget widget) {
-		this.type = type;
-		this.message = message;
-		this.widget = widget;
-	}
-	
-	/**
-	 * Gets the problem type
-	 * @return The problem type.
-	 */
-	public Type getType() {
-		return type;
-	}
-	
-	/**
-	 * Gets the problem message
-	 * @return The problem message.
-	 */
-	public String getMessage() {
-		return message;
-	}
-	
-	/**
-	 * Gets the widget that this evaluation result applies to
-	 * @return The widget.
-	 */
-	public Widget getWidget() {
-		return widget;
-	}
-	
-	/**
-	 * Computes the Verdict severity for the result
-	 * @return The severity.
-	 */
-	public double getVerdictSeverity() {
-		return type.equals(Type.OK) ? Verdict.SEVERITY_OK : Verdict.SEVERITY_FAIL;
-	}
-	
-	@Override
-	public String toString() {
-		String ret = type.name() + ": " + message;
-		if (widget != null)
-			ret += " [Widget: \"" + widget.get(Tags.Title, "") + "\" (" + widget.get(Tags.Role) + ")]";
-		return ret;
-	}
+  private static final long serialVersionUID = -51527046346987231L;
+
+  public enum Type {
+    /**
+     * No problem found
+     */
+    OK,
+
+    /**
+     * A warning
+     * This is a potential problem that can only be detected semi-automatically and needs expert confirmation.
+     */
+    WARNING,
+
+    /**
+     * An error
+     * This is a definite problem that can be detected automatically.
+     */
+    ERROR;
+  }
+
+  private final Type type;
+  private final String message;
+  private final Widget widget;
+
+  /**
+   * Constructs a new evaluation result that does not apply to a single widget
+   * @param type The problem type.
+   * @param message The problem description.
+   */
+  public EvaluationResult(Type type, String message) {
+    this(type, message, null);
+  }
+
+  /**
+   * Constructs a new evaluation result that applies to a single widget
+   * @param type The problem type.
+   * @param message The problem description.
+   * @param widget The widget this evaluation result applies to.
+   */
+  public EvaluationResult(Type type, String message, Widget widget) {
+    this.type = type;
+    this.message = message;
+    this.widget = widget;
+  }
+
+  /**
+   * Gets the problem type
+   * @return The problem type.
+   */
+  public Type getType() {
+    return type;
+  }
+
+  /**
+   * Gets the problem message
+   * @return The problem message.
+   */
+  public String getMessage() {
+    return message;
+  }
+
+  /**
+   * Gets the widget that this evaluation result applies to
+   * @return The widget.
+   */
+  public Widget getWidget() {
+    return widget;
+  }
+
+  /**
+   * Computes the Verdict severity for the result
+   * @return The severity.
+   */
+  public double getVerdictSeverity() {
+    return type.equals(Type.OK) ? Verdict.SEVERITY_OK: Verdict.SEVERITY_FAIL;
+  }
+
+  @Override
+  public String toString() {
+    String ret = type.name() + ": " + message;
+    if (widget != null)
+      ret += " [Widget: \"" + widget.get(Tags.Title, "") + "\" (" + widget.get(Tags.Role) + ")]";
+    return ret;
+  }
 
 }

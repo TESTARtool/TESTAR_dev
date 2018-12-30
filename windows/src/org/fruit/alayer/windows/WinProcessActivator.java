@@ -42,9 +42,9 @@ public final class WinProcessActivator implements Proc {
   public WinProcessActivator(long pid) { this.pid = pid; }
 
   public void run() {
-    try{
+    try {
       WinProcess.toForeground(pid);
-    }catch(WinApiException wae) {
+    } catch(WinApiException wae) {
       throw new ActionFailedException(wae);
     }
   }

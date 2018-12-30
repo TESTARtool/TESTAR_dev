@@ -31,51 +31,51 @@ package org.fruit;
 
 /**
  * ActionRoles brief map.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class Drag {
-	
-	private double fromX, fromY, toX, toY;
-	
-	public Drag(double fromX, double fromY, double toX, double toY){
-		this.fromX = fromX;
-		this.fromY = fromY;
-		this.toX = toX;
-		this.toY = toY;
-	}
 
-	public double getFromX() {
-		return fromX;
-	}
+  private double fromX, fromY, toX, toY;
 
-	public void setFromX(double fromX) {
-		this.fromX = fromX;
-	}
+  public Drag(double fromX, double fromY, double toX, double toY) {
+    this.fromX = fromX;
+    this.fromY = fromY;
+    this.toX = toX;
+    this.toY = toY;
+  }
 
-	public double getFromY() {
-		return fromY;
-	}
+  public double getFromX() {
+    return fromX;
+  }
 
-	public void setFromY(double fromY) {
-		this.fromY = fromY;
-	}
+  public void setFromX(double fromX) {
+    this.fromX = fromX;
+  }
 
-	public double getToX() {
-		return toX;
-	}
+  public double getFromY() {
+    return fromY;
+  }
 
-	public void setToX(double toX) {
-		this.toX = toX;
-	}
+  public void setFromY(double fromY) {
+    this.fromY = fromY;
+  }
 
-	public double getToY() {
-		return toY;
-	}
+  public double getToX() {
+    return toX;
+  }
 
-	public void setToY(double toY) {
-		this.toY = toY;
-	}
+  public void setToX(double toX) {
+    this.toX = toX;
+  }
+
+  public double getToY() {
+    return toY;
+  }
+
+  public void setToY(double toY) {
+    this.toY = toY;
+  }
 
 }

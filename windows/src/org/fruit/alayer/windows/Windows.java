@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -39,7 +38,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 
 /**
  * Provides access to the classic native WinApi Functions.
@@ -75,7 +73,6 @@ public final class Windows{
   public static final long PixelFormat64bppPARGB     =  (14 | (64 << 8) | PixelFormatAlpha  | PixelFormatPAlpha | PixelFormatExtended);
   public static final long PixelFormatMax            =   15;
 
-
   /* UIA Orientation types */
   public static final long OrientationType_None = 0;
   public static final long OrientationType_Horizontal = 1;
@@ -93,11 +90,9 @@ public final class Windows{
   public static final long WindowVisualState_Maximized = 1;
   public static final long WindowVisualState_Minimized = 2;
 
-
   /* UIA element mode */
   public static final long AutomationElementMode_None = 0;
   public static final long AutomationElementMode_Full = 1;
-
 
   /* UIA tree scope */
   public static final long TreeScope_Element = 1;
@@ -112,7 +107,6 @@ public final class Windows{
   public static final long COINIT_MULTITHREADED      = 0x0;
   public static final long COINIT_DISABLE_OLE1DDE    = 0x4;
   public static final long COINIT_SPEED_OVER_MEMORY  = 0x8;
-
 
   /* UIA property ids */
   public static final long UIA_AcceleratorKeyPropertyId = 30006;
@@ -151,7 +145,6 @@ public final class Windows{
   public static final long UIA_ProcessIdPropertyId  = 30002;
   public static final long UIA_RuntimeIdPropertyId = 30000;
   public static final long UIA_ProviderDescriptionPropertyId = 30107;
-
 
   public static final long UIA_AnnotationAnnotationTypeIdPropertyId  = 30113;
   public static final long UIA_AnnotationAnnotationTypeNamePropertyId  = 30114;
@@ -266,8 +259,6 @@ public final class Windows{
   public static final long UIA_IsValuePatternAvailablePropertyId  = 30043;
   public static final long UIA_IsVirtualizedItemPatternAvailablePropertyId  = 30109;
   public static final long UIA_IsWindowPatternAvailablePropertyId  = 30044;
-
-
 
   /* UIA control patterns */
   public static final long UIA_AnnotationPatternId =  10023;
@@ -417,7 +408,6 @@ public final class Windows{
   public static final long StyleId_Emphasis = 70013;
   public static final long StyleId_Quote = 70014;
 
-
   public static final int MN_GETHMENU = 0x01E1;
   public static final int OBJID_CLIENT = 0xFFFFFFFC;
   public static final int OBJID_HSCROLL = -6;
@@ -442,9 +432,7 @@ public final class Windows{
   public static final int LVIR_LABEL = 2;
   public static final int LVIR_SELECTBOUNDS = 3;
 
-
   public static final long SC_CLOSE = 0xF060;
-
 
   /* GetWindowLong */
   public static final long GWL_EXSTYLE = -20;
@@ -455,14 +443,12 @@ public final class Windows{
   public static final long GWL_USERDATA = -21;
   public static final long GWL_WNDPROC = -4;
 
-
   /* Keycodes */
   public static final int VK_LCONTROL = 0xA2;
   public static final int VK_RCONTROL = 0xA3;
   public static final int VK_ESCAPE = 0x1B;
   public static final int SM_CYHSCROLL = 3;
   public static final int SM_CYVSCROLL = 20;
-
 
   /* Window Classes */
   public static final String ANIMATE_CLASS = "SysAnimate32";
@@ -492,13 +478,11 @@ public final class Windows{
   public static final String WC_TABCONTROL = "SysTabControl32";
   public static final String WC_TREEVIEW = "SysTreeView32";
 
-
   /* Window Messages */
   public static int WM_GETFONT = 0x0031;
   public static int WM_GETTEXT = 0x000D;
   public static int WM_GETTEXTLENGTH = 0x000E;
   public static int TB_GETITEMRECT;
-
 
   /* Gdiplus Constants */
   public static final int Gdiplus_FontStyleRegular      = 0;
@@ -539,7 +523,6 @@ public final class Windows{
   public static final int Gdiplus_PropertyNotSupported        = 20;
   public static final int Gdiplus_ProfileNotFound             = 21;
 
-
   /* Misc Constants */
   public static final long DELETE = 0x00010000L;
   public static final long READ_CONTROL = 0x00020000L;
@@ -572,8 +555,6 @@ public final class Windows{
 
   public static final long STILL_ACTIVE = 259;
 
-
-
   /* COM Constants */
   public static final long CLSCTX_INPROC_SERVER            = 0x1;
   public static final long CLSCTX_INPROC_HANDLER           = 0x2;
@@ -599,7 +580,6 @@ public final class Windows{
   public static final long CLSCTX_APPCONTAINER             = 0x400000;
   public static final long CLSCTX_ACTIVATE_AAA_AS_IU       = 0x800000;
   public static final long CLSCTX_PS_DLL                   = 0x80000000;
-
 
   /* Functions */
   public static native boolean IsIconic(long hWnd);
@@ -721,21 +701,17 @@ public final class Windows{
   public static native long Gdiplus_FontFamily_Create(String name) throws GDIException;
   public static native void Gdiplus_FontFamily_Destroy(long pFontFamily) throws GDIException;
 
-  // begin by urueda
-  public static native long   GetProcessMemoryInfo(long processID);
+   public static native long   GetProcessMemoryInfo(long processID);
   public static native long[] GetProcessTimes(long processID);
   public static native String  GetProcessNameFromHWND(long hwnd);
-  // end by urueda
-
+ 
   public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
-  // begin by urueda
   public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
   public static native long     GetHWNDFromAccessibleContext(long vmid, long ac);
   //public static native int    GetVisibleChildrenCount(long vmid, long ac);
   //public static native long[]   GetVisibleChildren(long vmid, long ac);
   public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);
   public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
-  // end by urueda
 
   public static String Gdiplus_Status2String(int statusCode) {
     switch(statusCode) {
@@ -765,7 +741,6 @@ public final class Windows{
     }
   }
 
-
   public static native long OpenProcess(long dwDesiredAccess, boolean bInheritHandle, long dwProcessId) throws WinApiException;
   public static native long WaitForSingleObject(long hHandle, long dwMilliseconds) throws WinApiException;
   public static native long WaitForInputIdle(long hProcess) throws WinApiException;
@@ -776,19 +751,15 @@ public final class Windows{
   public static native long CoCreateInstance(long pClsid, long pUnkOuter, long dwClsContext, long pIId);
   public static native long Get_CLSID_CUIAutomation_Ptr();
   public static native long Get_IID_IUIAutomation_Ptr();
-  // begin by wcoux
   public static native long Get_CLSID_ApplicationActivationManager_Ptr();
   public static native long Get_IID_IApplicationActivationManager_Ptr();
-  // end by wcoux
   public static native long IUnknown_QueryInterface(long pIUnknown, long pIID);
   public static native long IUnknown_AddRef(long pIUnknown);
   public static native long IUnknown_Release(long pIUnknown);
   public static native void CoUninitialize();
 
-
   /* ApplicationActivationManager */
   public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options) throws UIAException; // by wcoux
-
 
   /* UIAutomation */
   public static native long IUIAutomation_GetRootElement(long pAutomation) throws UIAException;
@@ -803,7 +774,6 @@ public final class Windows{
   public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, int value) throws UIAException;
   public static native long IUIAutomation_get_ControlViewCondition(long pAutomation) throws UIAException;
   public static native boolean IUIAutomation_CompareElements(long pAutomation, long pEl1, long pEl2) throws UIAException;
-
 
   public static native void IUIAutomationCacheRequest_AddProperty(long pRequest, long propertyId) throws UIAException;
   public static native void IUIAutomationCacheRequest_AddPattern(long pRequest, long patternId) throws UIAException;
@@ -848,10 +818,8 @@ public final class Windows{
   public static native long IUIAutomationWindowPattern_get_WindowInteractionState(long pElement, boolean fromCache);
   public static native long IUIAutomationWindowPattern_get_WindowVisualState(long pElement, boolean fromCache);
 
-
   public static native long IUIAutomationElementArray_get_Length(long pArray) throws UIAException;
   public static native long IUIAutomationElementArray_GetElement(long pArray, int idx) throws UIAException;
-
 
   public static native void SafeArrayDestroy(long pArray) throws WinApiException;
   public static native long SafeArrayGetIntElement(long pArray, long idx) throws WinApiException;        // This is only for 1-dimensional arrays yet! (UIA only uses 1-dimensional ones!)
@@ -861,7 +829,7 @@ public final class Windows{
   public static boolean hitTest(long pAutomation, long pExpected, long x, long y) {
     long pUnderCursor = 0;
 
-    try{
+    try {
       pUnderCursor = Windows.IUIAutomation_ElementFromPoint(pAutomation, x, y);
       if (pUnderCursor == 0) return false;
 
@@ -881,9 +849,10 @@ public final class Windows{
   }
 
   static{
-    try{
+    try {
       loadExternalLib("../windows/target/resources/main/windows.dll");
-    }catch(IOException ioe) {
+      // end by urueda
+    } catch(IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }

@@ -27,6 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,140 +37,169 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import jsyntaxpane.DefaultSyntaxKit;
+
 import org.fruit.Util;
 
 public class ProtocolEditor extends javax.swing.JDialog {
-  private static final long serialVersionUID = 5922037291232012481L;
-  private String protocolClass;
+    private static final long serialVersionUID = 5922037291232012481L;
 
-  public ProtocolEditor(String protocolClass) {
-    this.protocolClass = protocolClass;
-    DefaultSyntaxKit.initKit();
-    initComponents();
-    codeEditor.setContentType("text/java");
-    codeEditor.setText(Util.readFile(new File("./resources/settings/" + protocolClass + ".java")));
-  }
+    private String settingsDir;
+    private String protocolClass; // by urueda
 
-  private void initComponents() {
-    jScrollPane1 = new javax.swing.JScrollPane();
-    codeEditor = new javax.swing.JEditorPane();
-    btnCompile = new javax.swing.JButton();
-    jScrollPane2 = new javax.swing.JScrollPane();
-    console = new javax.swing.JTextArea();
-    setTitle("Protocol editor");
-    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-    setMinimumSize(new java.awt.Dimension(800, 400));
-    addWindowListener(new java.awt.event.WindowAdapter() {
-      public void windowClosed(java.awt.event.WindowEvent evt) {
-        formWindowClosed(evt);
-      }
-    });
+    //public ProtocolEditor() {
+    public ProtocolEditor(String settingsDir, String protocolClass) { // by urueda
+        this.settingsDir = settingsDir;
+      this.protocolClass = protocolClass;
+        DefaultSyntaxKit.initKit();
+        initComponents();
+        codeEditor.setContentType("text/java");
+        //codeEditor.setText(Util.readFile(new File("./CustomProtocol.java")));
+        codeEditor.setText(Util.readFile(getProtocolFile()));
+    }
 
-    codeEditor.addKeyListener(new java.awt.event.KeyAdapter() {
-      public void keyPressed(java.awt.event.KeyEvent evt) {
-        codeEditorKeyPressed(evt);
-      }
-    });
-    jScrollPane1.setViewportView(codeEditor);
-    jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
+    private void initComponents() {
+        jScrollPane1 = new javax.swing.JScrollPane();
+        codeEditor = new javax.swing.JEditorPane();
+        btnCompile = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        console = new javax.swing.JTextArea();
 
-    btnCompile.setText("Save and Compile");
-    btnCompile.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnCompileActionPerformed(evt);
-      }
-    });
-    btnCompile.addKeyListener(new java.awt.event.KeyAdapter() {
-      public void keyPressed(java.awt.event.KeyEvent evt) {
-        btnCompileKeyPressed(evt);
-      }
-    });
+        // by mimarmu1
+        setTitle("Protocol editor");
 
-    console.setColumns(20);
-    console.setLineWrap(true);
-    console.setRows(5);
-    console.addKeyListener(new java.awt.event.KeyAdapter() {
-      public void keyPressed(java.awt.event.KeyEvent evt) {
-        consoleKeyPressed(evt);
-      }
-    });
-    jScrollPane2.setViewportView(console);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(800, 400));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-    getContentPane().setLayout(layout);
-    layout.setHorizontalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(jScrollPane1)
-      .addComponent(jScrollPane2)
-      .addComponent(btnCompile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-    );
-    layout.setVerticalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(btnCompile)
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-    );
+        codeEditor.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                codeEditorKeyPressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(codeEditor);
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
 
-    pack();
-  }
 
-  private void compile() {
-    try {
-      console.setText("Compiling...");
-      console.update(console.getGraphics());
-      Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java");
-      File compileDir = new File("./resources/settings/" + new StringTokenizer(this.protocolClass,"/").nextToken());
+        btnCompile.setText("Save and Compile");
+        btnCompile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompileActionPerformed(evt);
+            }
+        });
+        btnCompile.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnCompileKeyPressed(evt);
+            }
+        });
+
+        console.setColumns(20);
+        console.setLineWrap(true);
+        console.setRows(5);
+        console.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                consoleKeyPressed(evt);
+            }
+        });
+        jScrollPane2.setViewportView(console);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane2)
+            .addComponent(btnCompile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCompile)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        pack();
+    }
+
+
+    private void compile() {
+        try {
+            console.setText("Compiling...");
+            console.update(console.getGraphics());
+            //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            // begin by urueda
+            File protocolFile = getProtocolFile();
+            Util.saveToFile(codeEditor.getText(), protocolFile.getPath());
+            File compileDir = protocolFile.getParentFile();
       List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
-      Util.compileJava(fileList,
-          System.getProperty("java.class.path")); //";./monkey.jar");
-      console.setText(console.getText() + "OK");
-    } catch (Throwable t) {
-      console.setText(console.getText() + "\n" + t.getMessage());
+            Util.compileJava(settingsDir, fileList,
+                     System.getProperty("java.class.path")); //";./monkey.jar");
+            // end bu urueda
+            console.setText(console.getText() + "OK");
+        } catch (Throwable t) {
+            console.setText(console.getText() + "\n" + t.getMessage());
+        }
     }
-  }
 
-  private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {
-    compile();
-  }
+    private File getProtocolFile() {
+        File protocolFile ;
+        if (Paths.get(protocolClass).isAbsolute()) {
+            protocolFile = new File(protocolClass + ".java");
+        }
+        else {
+            protocolFile = new File(settingsDir + protocolClass + ".java");
+        }
+        return protocolFile;
+    }
 
-  private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {
-    if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
-      if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+    private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {
         compile();
-      }
-    } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
-      this.dispose();
     }
-  }
 
-  private void formWindowClosed(java.awt.event.WindowEvent evt) {
-    try {
-      Util.saveToFile(codeEditor.getText(), "./resources/settings/" + this.protocolClass + ".java");
-    } catch (IOException ioe) {
-      System.out.println(ioe);
+    private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {
+        if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                compile();
+            }
+        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            this.dispose();
+        }
     }
-  }
 
-  private void consoleKeyPressed(java.awt.event.KeyEvent evt) {
-    if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
-      this.dispose();
-  }
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {
+        try {
+            //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
+            Util.saveToFile(codeEditor.getText(), getProtocolFile().getPath()); // by urueda
+        } catch (IOException ioe) {
+            System.out.println(ioe);
+        }
+    }
 
-  private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {
-    if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
-      this.dispose();
-  }
+    private void consoleKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+            this.dispose();
+    }
 
-  private javax.swing.JButton btnCompile;
-  private javax.swing.JEditorPane codeEditor;
-  private javax.swing.JTextArea console;
-  private javax.swing.JScrollPane jScrollPane1;
-  private javax.swing.JScrollPane jScrollPane2;
+    private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+            this.dispose();
+    }
+
+    private javax.swing.JButton btnCompile;
+    private javax.swing.JEditorPane codeEditor;
+    private javax.swing.JTextArea console;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
 }

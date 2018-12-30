@@ -29,7 +29,7 @@ SUTConnectorValue = java -jar "../suts/calc.jar"
 # Java Swing applications & Access Bridge Enabled
 #
 # Activate the Java Access Bridge in your Windows System:
-#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#    (Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
 #
 # Enable the variable Access Bridge Enabled in TESTAR as true
 #################################################################
@@ -126,7 +126,7 @@ StopGenerationOnFault = true
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
-ApplyDefaultOnMismatch = false
+ApplyDefaultOnMismatch = true
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 AlgorithmFormsFilling = false
@@ -150,8 +150,8 @@ TestGenerator = random
 StartupTime = 10.0
 ActionDuration = 0.0
 NonReactingUIThreshold = 100
-ContinueToApplyDefault = false
-ConfidenceThreshold = 0.0
+ContinueToApplyDefault = true
+ConfidenceThreshold = 0.7
 GraphsActivated = true
 GraphResuming = true
 CopyFromTo = 
@@ -162,10 +162,10 @@ TgherkinExecutionMode = sequential
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
-PathToReplaySequence = ./output/temp
+PathToReplaySequence = ./resources/output/temp
 VisualizeActions = false
 ExplorationSampleInterval = 1
 OnlySaveFaultySequences = false
-RepeatTgherkinScenarios = false
-MinimumPercentageForImageRecognition = 0.0
+RepeatTgherkinScenarios = true
+MinimumPercentageForImageRecognition = 95.0
 OfflineGraphConversion = true

@@ -37,28 +37,28 @@ import org.fruit.Assert;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 public final class FirstFinder implements Finder {
-	private static final long serialVersionUID = 4076359312733416905L;
-	final Searcher searcher;
-	transient YieldFirst yf;
-	
-	public FirstFinder(Searcher searcher){
-		Assert.notNull(searcher);
-		this.searcher = searcher;
-	}
-	
-	public Widget apply(Widget start) throws WidgetNotFoundException {
-		if(yf == null)
-			yf = new YieldFirst();
-		searcher.apply(start, yf);
-		return yf.result();
-	}
-	
-	public String toString(){ return "FirstFinder"; }
+  private static final long serialVersionUID = 4076359312733416905L;
+  final Searcher searcher;
+  transient YieldFirst yf;
 
-	@Override
-	public Widget getCachedWidget() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+  public FirstFinder(Searcher searcher) {
+    Assert.notNull(searcher);
+    this.searcher = searcher;
+  }
+
+  public Widget apply(Widget start) throws WidgetNotFoundException {
+    if (yf == null)
+      yf = new YieldFirst();
+    searcher.apply(start, yf);
+    return yf.result();
+  }
+
+  public String toString() { return "FirstFinder"; }
+
+  @Override
+  public Widget getCachedWidget() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

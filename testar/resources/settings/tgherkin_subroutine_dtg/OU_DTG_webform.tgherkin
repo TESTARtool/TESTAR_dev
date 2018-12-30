@@ -4,7 +4,7 @@
     Step: Focus on page
     When  $Role="UIAText" and $Title="Personen zoeken" click(true)
     Step: Focus on Wat Zoekt U
-    When  $Role="UIAEdit" and $Title="Wat Zoekt U?" click(true)
+    When  $Role="UIAEdit" and $Title="Wie Zoekt U?" click(true)
     Step: Change Wie Zoekt U
     When  $Role="UIAEdit" and $Title="Wie Zoekt U?" type(<naam>)
     Step: Change Address

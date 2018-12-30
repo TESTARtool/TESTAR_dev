@@ -41,11 +41,11 @@ import org.fruit.alayer.Action;
 public class ActionStatus {
 
   private Action action;
-  
-  private boolean actionSucceeded;  
-  private boolean problems;
-  private boolean userEventAction;
-  
+
+  private boolean actionSucceeded,
+          problems,
+          userEventAction;
+
   /**
    * Constructor.
    */
@@ -53,7 +53,7 @@ public class ActionStatus {
     this.action = null;
     this.actionSucceeded = true;
     this.problems = false;
-    this.userEventAction = false;    
+    this.userEventAction = false;
   }
 
   public Action getAction() {
@@ -88,5 +88,5 @@ public class ActionStatus {
   public void setUserEventAction(boolean userEventAction) {
     this.userEventAction = userEventAction;
   }
-          
+
 }

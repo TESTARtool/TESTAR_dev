@@ -99,7 +99,7 @@ public interface GraphDBRepository {
      * @param instance the custom object.
      */
     void addCustomType(final Widget widget, final String relation, final CustomType instance);
-    
+
     /**
      * Get all objects from a pipe specified by a Gremlin-Groovy expression
      * @param gremlin The Gremlin-Groovy expression.

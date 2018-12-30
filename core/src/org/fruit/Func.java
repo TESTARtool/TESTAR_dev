@@ -34,5 +34,5 @@
 package org.fruit;
 
 public interface Func<T> {
-	T apply();
+  T apply();
 }

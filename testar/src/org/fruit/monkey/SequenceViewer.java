@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
 * Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
+
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -48,6 +49,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.AWTCanvas;
@@ -69,6 +71,7 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
+
 public class SequenceViewer extends javax.swing.JFrame{
 
   private static final long serialVersionUID = -7545369239319448135L;
@@ -80,14 +83,21 @@ public class SequenceViewer extends javax.swing.JFrame{
   private int sequenceViewIndex;
   private static final int DIRECTION_NEXT = 1, DIRECTION_PREVIOUS = -1;
 
-  public SequenceViewer(Settings settings) {
+  public SequenceViewer(Settings settings) throws ClassNotFoundException, IOException{
     this.settings = settings;
     initComponents();
     this.setBounds(0, 0, 1024, 768);
+
     this.setTitle("Sequence viewer");
     cachedSequence = new ArrayList<Taggable>();
     sequenceViewIndex = -1; stateCount = -1;
     this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+    //Start with the first picture instead a black screen
+    nextPic();
+    postActionPerformed();
+
+    this.run();
   }
 
   private void initComponents() {
@@ -123,14 +133,24 @@ public class SequenceViewer extends javax.swing.JFrame{
     btnBegin.setName("");
     btnBegin.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnBeginActionPerformed(evt);
+        try {
+          btnBeginActionPerformed(evt);
+        } catch (ClassNotFoundException | IOException e) {
+          System.out.println(e+": Error reading selected sequence");
+          setVisible(false);
+        }
       }
     });
     btnPrev.setLabel("Previous");
     btnPrev.setName("");
     btnPrev.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnPrevActionPerformed(evt);
+        try {
+          btnPrevActionPerformed(evt);
+        } catch (ClassNotFoundException | IOException e) {
+          System.out.println(e+": Error reading selected sequence");
+          setVisible(false);
+        }
       }
     });
 
@@ -138,7 +158,12 @@ public class SequenceViewer extends javax.swing.JFrame{
     btnNext.setName("");
     btnNext.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnNextActionPerformed(evt);
+        try {
+          btnNextActionPerformed(evt);
+        } catch (ClassNotFoundException | IOException e) {
+          System.out.println(e+": Error reading selected sequence");
+          setVisible(false);
+        }
       }
     });
 
@@ -146,7 +171,12 @@ public class SequenceViewer extends javax.swing.JFrame{
     btnEnd.setName("");
     btnEnd.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnEndActionPerformed(evt);
+        try {
+          btnEndActionPerformed(evt);
+        } catch (ClassNotFoundException | IOException e) {
+          System.out.println(e+": Error reading selected sequence");
+          setVisible(false);
+        }
       }
     });
 
@@ -199,52 +229,30 @@ public class SequenceViewer extends javax.swing.JFrame{
     pack();
   }
 
-  private void btnBeginActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
+  private void btnBeginActionPerformed(java.awt.event.ActionEvent evt) throws ClassNotFoundException, IOException {
       beginPic();
       postActionPerformed();
-    } catch (IOException e1) {
-      throw new RuntimeException(e1);
-    } catch (ClassNotFoundException e1) {
-      throw new RuntimeException(e1);
-    }
   }
 
-  private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
+  private void btnPrevActionPerformed(java.awt.event.ActionEvent evt) throws ClassNotFoundException, IOException {
       prevPic();
       postActionPerformed();
-    } catch (IOException e1) {
-      throw new RuntimeException(e1);
-    } catch (ClassNotFoundException e1) {
-      throw new RuntimeException(e1);
-    }
   }
 
-  private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
+  private void btnNextActionPerformed(java.awt.event.ActionEvent evt) throws ClassNotFoundException, IOException {
       nextPic();
       postActionPerformed();
-    } catch (IOException e1) {
-      throw new RuntimeException(e1);
-    } catch (ClassNotFoundException e1) {
-      throw new RuntimeException(e1);
-    }
   }
 
-  private void btnEndActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
+  private void btnEndActionPerformed(java.awt.event.ActionEvent evt) throws ClassNotFoundException, IOException {
       endPic();
       postActionPerformed();
-    } catch (IOException e1) {
-      throw new RuntimeException(e1);
-    } catch (ClassNotFoundException e1) {
-      throw new RuntimeException(e1);
-    }
   }
 
   public void movePic(Taggable fragment, int direction) throws IOException, ClassNotFoundException{
     State state = fragment.get(Tags.SystemState, new StdState());
+
+    //Image img = state.get(Tags.Screenshot, null);
 
     String scrshotPath = state.get(Tags.ScreenshotPath, null);
     Image img = AWTCanvas.fromFile(scrshotPath);
@@ -270,7 +278,7 @@ public class SequenceViewer extends javax.swing.JFrame{
     Action a = fragment.get(Tags.ExecutedAction, new NOP());
     //Visualizer v = a.get(Tags.Visualizer, Util.NullVisualizer);
     //v.run(state, cv, Pen.startFrom(Pen.DefaultPen).setColor(Color.Red).setFillPattern(FillPattern.Solid).build());
-    // begin by urued
+
     if (state.childCount() > 0) {
       Shape sutShape = state.child(0).get(Tags.Shape);
       List<Finder> targets = a.get(Tags.Targets, null);
@@ -304,6 +312,7 @@ public class SequenceViewer extends javax.swing.JFrame{
           .build();
       verdict.visualizer().run(state, cv, penVerdict);
     }
+
     cv.end();
 
     stateCount += direction;
@@ -319,7 +328,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 
       int steps = sequenceViewIndex;
       sequenceViewIndex = 0;
-      movePic(cachedSequence.get(sequenceViewIndex),-steps); // refactor
+      movePic(cachedSequence.get(sequenceViewIndex),-steps);
     }
   }
 
@@ -329,7 +338,7 @@ public class SequenceViewer extends javax.swing.JFrame{
         return; // next must be invoked first!
 
       sequenceViewIndex--;
-      movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS); // refactor
+      movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS);
     }
   }
 
@@ -347,14 +356,15 @@ public class SequenceViewer extends javax.swing.JFrame{
       if (sequenceViewIndex < cachedSequence.size() - 1)
         fragment = cachedSequence.get(sequenceViewIndex + 1);
       else {
-        try{
+        //This try catch is used for the case of reaching the end of the fragment
+        try {
           fragment = (Taggable) stream.readObject();
           cachedSequence.add(fragment);
         } catch (IOException ioe) { return; }
       }
 
       sequenceViewIndex++;
-      movePic(fragment,DIRECTION_NEXT); // refactor
+      movePic(fragment,DIRECTION_NEXT);
     }
   }
 
@@ -371,7 +381,9 @@ public class SequenceViewer extends javax.swing.JFrame{
       sequenceViewIndex = cachedSequence.size() - 1;
 
       Taggable fragment = null;
-      try{
+
+      //This try catch is used for the case of reaching the end of the fragment
+      try {
         do {
           fragment = (Taggable) stream.readObject();
           cachedSequence.add(fragment);
@@ -379,7 +391,7 @@ public class SequenceViewer extends javax.swing.JFrame{
           sequenceViewIndex++;
         }while (true); // til end of file
       } catch (IOException ioe) { // end of file reached?
-        movePic(fragment == null ? cachedSequence.get(sequenceViewIndex): fragment, steps); // refactor
+        movePic(fragment == null ? cachedSequence.get(sequenceViewIndex): fragment, steps);
       }
     }
   }
@@ -391,7 +403,7 @@ public class SequenceViewer extends javax.swing.JFrame{
   Settings settings;
 
   // prevent thread finish while dialog is visible
-  public void run() {
+  private void run() {
     while (isShowing()) {
       Util.pause(1);
     }

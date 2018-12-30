@@ -31,6 +31,7 @@
 package org.fruit.alayer;
 
 import java.io.Serializable;
+
 import org.fruit.Assert;
 import org.fruit.Util;
 
@@ -43,12 +44,22 @@ public final class Verdict implements Serializable {
 
   //public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
 
+  // Verdict severities
+  // PASS
   public static final double SEVERITY_MIN = 0.0;
+  public static final double SEVERITY_WARNING =        0.00000001; // must be less than FAULT THRESHOLD @test.settings
+  public static final double SEVERITY_SUSPICIOUS_TITLE = 0.00000009; // suspicious title
+  // FAIL
+  public static final double SEVERITY_NOT_RESPONDING =   0.99999990; // unresponsive
+  public static final double SEVERITY_NOT_RUNNING =     0.99999999; // crash? unexpected close?
   public static final double SEVERITY_MAX = 1.0;
+
   public static final double SEVERITY_OK =          SEVERITY_MIN;
   public static final double SEVERITY_FAIL =            SEVERITY_MAX;
+
   public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
   public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
+
 
   private final String info;
   private final double severity;
@@ -71,17 +82,13 @@ public final class Verdict implements Serializable {
    * returns the likelihood of the state to be erroneous (value within interval [0, 1])
    * @return value within [0, 1]
    */
-  public double severity() {
-    return severity;
-  }
+  public double severity() { return severity; }
 
   /**
    * returns a short description about whether the state is erroneous and if so, what part of it
    * @return
    */
-  public String info() {
-    return info;
-  }
+  public String info() { return info; }
 
   /**
    * This visualizer should visualize the part of the state where the problem occurred.
@@ -89,13 +96,9 @@ public final class Verdict implements Serializable {
    * than this should be framed or pointed to with a big red arrow.
    * @return the visualizer which is guaranteed to be non-null
    */
-  public Visualizer visualizer() {
-    return visualizer;
-  }
+  public Visualizer visualizer() { return visualizer; }
 
-  public String toString() {
-    return "severity: " + severity + " info: " + info;
-  }
+  public String toString() { return "severity: " + severity + " info: " + info; }
 
   /**
    * Retrieves the verdict result of joining two verdicts.
@@ -104,8 +107,8 @@ public final class Verdict implements Serializable {
    */
   public Verdict join(Verdict verdict) {
     return new Verdict(Math.max(this.severity, verdict.severity()),
-        (this.info.contains(verdict.info) ? this.info:
-        (this.severity == SEVERITY_OK ? "": this.info + "\n") + verdict.info())
+               (this.info.contains(verdict.info) ? this.info:
+                (this.severity == SEVERITY_OK ? "": this.info + "\n") + verdict.info())
     );
   }
 
@@ -121,4 +124,5 @@ public final class Verdict implements Serializable {
     }
     return false;
   }
+
 }

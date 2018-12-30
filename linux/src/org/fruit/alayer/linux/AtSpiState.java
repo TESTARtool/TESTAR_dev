@@ -121,7 +121,7 @@ public class AtSpiState extends AtSpiWidget implements State {
 
 
     @Override
-    public String toString(){ return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }
+    public String toString() { return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }
 
 
     //endregion

@@ -49,9 +49,9 @@ public class CleanUpPanel extends JPanel {
     // instruction
     JLabel titel = new JLabel("Check the folder(s) you want to empty");
     titel.setBounds(
-        START_SETTINGS_X - GAP_X, 
-        START_Y - (int) (3.5  * DELTA), 
-        (int) (1.5 * BREEDTE), 
+        START_SETTINGS_X - GAP_X,
+        START_Y - (int) (3.5  * DELTA),
+        (int) (1.5 * BREEDTE),
         HOOGTE);
     add(titel);
 
@@ -86,15 +86,15 @@ public class CleanUpPanel extends JPanel {
     // delete button
     btnDelete = new JButton("Confirm deletion");
     btnDelete.setBounds(
-        START_SETTINGS_X + GAP_X + BREEDTE, 
-        START_Y + (numSettingsDirs - 1) * DELTA, 
-        BREEDTE, 
+        START_SETTINGS_X + GAP_X + BREEDTE,
+        START_Y + (numSettingsDirs - 1) * DELTA,
+        BREEDTE,
         2 * HOOGTE);
     btnEmpty = new JButton("No files to delete");
     btnEmpty.setBounds(
-        START_SETTINGS_X + GAP_X + BREEDTE, 
-        START_Y + (numSettingsDirs - 1) * DELTA, 
-        BREEDTE, 
+        START_SETTINGS_X + GAP_X + BREEDTE,
+        START_Y + (numSettingsDirs - 1) * DELTA,
+        BREEDTE,
         2 * HOOGTE);
 
     boolean settingsBool = setupSettingsDirs();
@@ -204,7 +204,7 @@ public class CleanUpPanel extends JPanel {
     outputBox[numOutputDirs + 1] = new JCheckBox("Select all");
     outputBox[numOutputDirs + 1]
         .setBounds(START_OUTPUT_X - GAP_X, START_Y - DELTA, BREEDTE, HOOGTE);
- 
+
     boolean empty = (emptyAll == numOutputDirs + 1);
     if (empty) {
       outputBox[numOutputDirs + 1].setEnabled(false);
@@ -294,7 +294,7 @@ public class CleanUpPanel extends JPanel {
     if (allOutputEmpty == numOutputDirs + 1) {
       outputBox[numOutputDirs + 1].setEnabled(false);
     }
-    if (allSettingsEmpty == numSettingsDirs + 1 
+    if (allSettingsEmpty == numSettingsDirs + 1
         && allOutputEmpty == numOutputDirs + 1) {
       btnDelete.setEnabled(false);
       btnEmpty.setEnabled(true);
@@ -308,14 +308,14 @@ public class CleanUpPanel extends JPanel {
     } else {
       folderName = rootSettingsFolderName + settingsDirs[i - 1];
     }
-    File[] files = 
+    File[] files =
         new File(folderName).listFiles(new FilenameFilter() {
           @Override
           public boolean accept(File current, String name) {
             return !name.contains("dummy");
           }
         });
-    if (files == null || files.length == 0) { 
+    if (files == null || files.length == 0) {
       return true;
     }
     return false;
@@ -328,21 +328,21 @@ public class CleanUpPanel extends JPanel {
     } else {
       folderName = rootOutputFolderName + outputDirs[i - 1];
     }
-    File[] files = 
+    File[] files =
         new File(folderName).listFiles(new FilenameFilter() {
           @Override
           public boolean accept(File current, String name) {
             return !name.contains("dummy");
           }
         });
-    if (files.length == 0) { 
+    if (files.length == 0) {
       return true;
     }
     return false;
   }
 
   private boolean isEmptySettingsRoot() {
-    File[] files = 
+    File[] files =
         new File(rootSettingsFolderName).listFiles(new FilenameFilter() {
           @Override
           public boolean accept(File current, String name) {
@@ -350,14 +350,14 @@ public class CleanUpPanel extends JPanel {
           }
         });
 
-    if (files.length == 0) { 
+    if (files.length == 0) {
       return true;
     }
     return false;
   }
 
   private boolean isEmptyOutputRoot() {
-    File[] files = 
+    File[] files =
         new File(rootOutputFolderName).listFiles(new FilenameFilter() {
           @Override
           public boolean accept(File current, String name) {
@@ -365,7 +365,7 @@ public class CleanUpPanel extends JPanel {
           }
         });
 
-    if (files.length == 0) { 
+    if (files.length == 0) {
       return true;
     }
     return false;
@@ -401,7 +401,7 @@ public class CleanUpPanel extends JPanel {
     if (files != null && files.length > 0) {
       printLine(folderName);
 
-      for (File f : files) {
+      for (File f: files) {
         if (!f.isDirectory() && !f.getName().toLowerCase().contains("dummy")) {
           printDelete(f);
         }
@@ -422,14 +422,14 @@ public class CleanUpPanel extends JPanel {
     if (files != null && files.length > 0) {
       printLine(folderName);
 
-      for (File f : files) {
+      for (File f: files) {
 
         if (f.isDirectory()) {
           String fname = f.getName();
           printLine(folderName + "/" + fname);
 
           File subfiles = new File(folderName + "/" + fname);
-          for (File g : subfiles.listFiles()) {
+          for (File g: subfiles.listFiles()) {
             printDelete(g);
           }
         }

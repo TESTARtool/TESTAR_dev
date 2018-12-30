@@ -72,7 +72,7 @@ public final class WidgetPosition extends AbstractPosition {
 
   @Override // by urueda
   public Point apply(State state) throws PositionException {
-    try{
+    try {
       Widget widget = finder.apply(state);
       //if (hitTest && !Util.hitTest(widget, relX, relY))
       if (hitTest && !Util.hitTest(widget, relX, relY,this.obscuredByChildEnabled))
@@ -82,9 +82,9 @@ public final class WidgetPosition extends AbstractPosition {
       cachedWidgetPoint = Util.relToAbs(widget.get(shapeTag), relX, relY);
       return cachedWidgetPoint;
       // end by uureda
-    }catch(WidgetNotFoundException wnfe) {
+    } catch(WidgetNotFoundException wnfe) {
       throw new PositionException(wnfe);
-    }catch(NoSuchTagException pue) {
+    } catch(NoSuchTagException pue) {
       throw new PositionException(pue);
     }
   }

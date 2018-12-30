@@ -36,9 +36,9 @@ package org.fruit.alayer;
 import java.io.Serializable;
 
 public interface HitTester extends Serializable {
-	
-	boolean apply(double x, double y);
-	
-	boolean apply(double x, double y, boolean obscuredByChildFeature); // by urueda
-	
+
+  boolean apply(double x, double y);
+
+  boolean apply(double x, double y, boolean obscuredByChildFeature); // by urueda
+
 }

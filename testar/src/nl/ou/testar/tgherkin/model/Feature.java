@@ -25,12 +25,12 @@ public class Feature {
   private final List<Tag> tags;
   private final String title;
   private final String narrative;
-  private final List<ConditionalGesture> selection; 
-  private final WidgetTreeCondition oracle; 
+  private final List<ConditionalGesture> selection;
+  private final WidgetTreeCondition oracle;
   private final Background background;
   private List<ScenarioDefinition> scenarioDefinitions;
   private int index;
-  
+
   private boolean backgroundRun;
 
   /**
@@ -38,14 +38,14 @@ public class Feature {
    * @param tags list of tags
    * @param title summary description
    * @param narrative detailed description
-   * @param selection list of conditional gestures that defines a filter on the set 
+   * @param selection list of conditional gestures that defines a filter on the set
    *     of derivable gestures
    * @param oracle widget tree condition that serves as an oracle verdict
    * @param background background that will be executed before execution of each scenario
-   * @param scenarioDefinitions list of scenario definitions 
+   * @param scenarioDefinitions list of scenario definitions
    */
-  public Feature(List<Tag> tags, String title, String narrative, 
-      List<ConditionalGesture> selection, WidgetTreeCondition oracle, 
+  public Feature(List<Tag> tags, String title, String narrative,
+      List<ConditionalGesture> selection, WidgetTreeCondition oracle,
       Background background, List<ScenarioDefinition> scenarioDefinitions) {
     Assert.notNull(tags);
     Assert.notNull(title);
@@ -56,7 +56,7 @@ public class Feature {
     this.narrative = narrative;
     this.selection = Collections.unmodifiableList(selection);
     this.oracle = oracle;
-    this.background = background; 
+    this.background = background;
     this.scenarioDefinitions = scenarioDefinitions;
     index = -1;
   }
@@ -111,7 +111,7 @@ public class Feature {
 
   /**
    * Retrieve scenario definitions.
-   * @return list of scenario definitions 
+   * @return list of scenario definitions
    */
   public List<ScenarioDefinition> getScenarioDefinitions() {
     return scenarioDefinitions;
@@ -119,16 +119,16 @@ public class Feature {
 
   /**
    * Set scenario definitions.
-   * @param scenarioDefinitions list of scenario definitions 
+   * @param scenarioDefinitions list of scenario definitions
    */
- 
+
   public void setScenarioDefinitions(List<ScenarioDefinition> scenarioDefinitions) {
     this.scenarioDefinitions = scenarioDefinitions;
   }
 
   /**
    * Retrieve index of current ScenarioDefinition.
-   * @return index of current ScenarioDefinition 
+   * @return index of current ScenarioDefinition
    */
   public int getIndex() {
     return index;
@@ -136,7 +136,7 @@ public class Feature {
 
   /**
    * Set index of current ScenarioDefinition.
-   * @param index of current ScenarioDefinition 
+   * @param index of current ScenarioDefinition
    */
   public void setIndex(int index) {
     this.index = index;
@@ -153,7 +153,7 @@ public class Feature {
     }
     return currentScenarioDefinition().moreActions(proxy);
   }
-  
+
   /**
    * Check whether more sequences exist.
    * @return true if more sequences exist, otherwise false
@@ -180,10 +180,10 @@ public class Feature {
     }
   }
 
-  /**    
+  /**
    * Evaluate given condition.
    * @param proxy document protocol proxy
-   * @return true if condition is applicable, otherwise false 
+   * @return true if condition is applicable, otherwise false
    */
   public boolean evaluateGivenCondition(ProtocolProxy proxy) {
     Report.appendReportDetail(Report.StringColumn.FEATURE,getTitle());
@@ -192,15 +192,15 @@ public class Feature {
       if (background.moreActions(proxy)) {
         Report.appendReportDetail(Report.StringColumn.TYPE,background.getClass().getSimpleName());
         return background.evaluateGivenCondition(proxy);
-      }  
+      }
       backgroundRun = false;
     }
     Report.appendReportDetail(Report.StringColumn.TYPE,
         currentScenarioDefinition().getClass().getSimpleName());
     return currentScenarioDefinition().evaluateGivenCondition(proxy);
   }
-  
-  /**    
+
+  /**
    * Evaluate when condition.
    * @param proxy document protocol proxy
    * @return set of derived actions, empty set if no actions were derived
@@ -209,14 +209,14 @@ public class Feature {
     Map<Widget,List<Gesture>> map = new HashMap<Widget, List<Gesture>>();
     List<Gesture> list;
     // for gestures only look at top widgets
-    for (Widget widget : proxy.getTopWidgets(proxy.getState())) {
+    for (Widget widget: proxy.getTopWidgets(proxy.getState())) {
       // always test whether enabled and not blocked
       if (widget.get(Enabled, true) && !widget.get(Blocked, false)) {
         list = new ArrayList<Gesture>();
         if (selection.size() == 0) {
           // no selection defined: all possible gestures are in scope
           Gesture gesture = new AnyGesture(new ParameterBase());
-          ConditionalGesture conditionalGesture = new ConditionalGesture(null, gesture); 
+          ConditionalGesture conditionalGesture = new ConditionalGesture(null, gesture);
           if (conditionalGesture.isCandidate(proxy, widget, null)) {
             list.add(gesture);
             map.put(widget, list);
@@ -233,21 +233,21 @@ public class Feature {
         }
       }
     }
-            
+
     if (backgroundRun) {
       return background.evaluateWhenCondition(proxy, map);
     }
-    
+
     Set<Action> testSet = new HashSet<Action>();
     ScenarioDefinition sd = currentScenarioDefinition();
     testSet = sd.evaluateWhenCondition(proxy, map);
     return testSet;
-  }  
+  }
 
-  /**    
+  /**
    * Get verdict.
    * @param proxy document protocol proxy
-   * @return oracle verdict, which determines whether the state is erroneous and why 
+   * @return oracle verdict, which determines whether the state is erroneous and why
    */
   public Verdict getVerdict(ProtocolProxy proxy) {
     // feature level
@@ -266,10 +266,10 @@ public class Feature {
     }
     return currentScenarioDefinition().getVerdict(proxy);
   }
-  
+
   /**
      * Retrieve whether current action resulted in a failure.
-     * @return true if current action failed, otherwise false 
+     * @return true if current action failed, otherwise false
      */
   public boolean hasFailed() {
     if (backgroundRun) {
@@ -289,8 +289,8 @@ public class Feature {
     if (getBackground() != null) {
       getBackground().reset();
     }
-    for (ScenarioDefinition scenarioDefinition : getScenarioDefinitions()) {
-      scenarioDefinition.reset(); 
+    for (ScenarioDefinition scenarioDefinition: getScenarioDefinitions()) {
+      scenarioDefinition.reset();
     }
   }
 
@@ -309,25 +309,25 @@ public class Feature {
     if (getBackground() != null) {
       list.addAll(getBackground().check());
     }
-    for (ScenarioDefinition scenarioDefinition : getScenarioDefinitions()) {
+    for (ScenarioDefinition scenarioDefinition: getScenarioDefinitions()) {
       list.addAll(scenarioDefinition.check());
     }
     return list;
   }
-  
-  
+
+
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for (Tag tag : getTags()) {
+    for (Tag tag: getTags()) {
       result.append(tag.toString());
       result.append(System.getProperty("line.separator"));
     }
     // keyword
-    result.append(getClass().getSimpleName());      
+    result.append(getClass().getSimpleName());
     result.append(":");
-    if (getTitle() != null) {      
-      result.append(getTitle());      
+    if (getTitle() != null) {
+      result.append(getTitle());
     }
     result.append(System.getProperty("line.separator"));
     if (getNarrative() != null) {
@@ -337,36 +337,36 @@ public class Feature {
     if (getSelection().size() > 0) {
       result.append("Selection:");
     }
-    for (ConditionalGesture conditionalGesture : getSelection()) {
+    for (ConditionalGesture conditionalGesture: getSelection()) {
       result.append(conditionalGesture.toString());
     }
     if (getOracle() != null) {
       result.append("Oracle:");
       result.append(getOracle().toString());
-    }      
+    }
     if (getBackground() != null) {
       result.append(getBackground().toString());
       result.append(System.getProperty("line.separator"));
     }
-    for (ScenarioDefinition scenarioDefinition : getScenarioDefinitions()) {
+    for (ScenarioDefinition scenarioDefinition: getScenarioDefinitions()) {
       result.append(scenarioDefinition.toString());
     }
     return result.toString();
   }
-    
+
   private boolean hasNextScenarioDefinition() {
     return index + 1 < scenarioDefinitions.size();
   }
 
   private ScenarioDefinition nextScenarioDefinition() {
-    index++; 
+    index++;
     return scenarioDefinitions.get(index);
   }
-  
+
   private ScenarioDefinition currentScenarioDefinition() {
     if (index < 0 || index >= scenarioDefinitions.size()) {
       return null;
     }
     return scenarioDefinitions.get(index);
-  }  
+  }
 }

@@ -65,7 +65,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * Creates a new instance of an object that retrieves the state of a supplied SUT.
      * @param system The SUT to fetch the current state for.
      */
-    AtSpiStateFetcher(SUT system){
+    AtSpiStateFetcher(SUT system) {
         this._system = system;
     }
 
@@ -101,7 +101,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Give each widget in the tree a tag describing the path to find it.
-        for (Widget w : widgetTree)
+        for (Widget w: widgetTree)
             w.set(Tags.Path, Util.indexString(w));
 
 
@@ -220,7 +220,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
             // Find the AtSpiElement representing the node and mark it and its children blocked.
-            for (AtSpiAccessible a : nonModalNodes) {
+            for (AtSpiAccessible a: nonModalNodes) {
 
                 boolean markingSuccess = findAndMarkBlocked(a, atSpiRootElement);
 
@@ -240,7 +240,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
             // Find the AtSpiElement representing the node and mark it and its children blocked.
-            for (AtSpiAccessible a : modalNodes) {
+            for (AtSpiAccessible a: modalNodes) {
 
                 boolean markingSuccess = findAndMarkBlocked(a, atSpiRootElement);
 
@@ -286,7 +286,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Process childs of the node to wrap.
-        for (AtSpiAccessible a : nodeToWrap.children()) {
+        for (AtSpiAccessible a: nodeToWrap.children()) {
             wrapAtSpiNodes(a, createdParent);
         }
 
@@ -297,7 +297,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
     /**
      * Creates and fills an AtSpiElement from an AtSpiAccessible node - also defines the parent AtSpiElement.
      * @param node The node that will provide the information for the AtSpiElement.
-     * @param parent The parent AtSpiElement of the newly created AtSpiElement in Testar´ś own implementation of
+     * @param parent The parent AtSpiElement of the newly created AtSpiElement in Testar's own implementation of
      *               the AtSpi tree.
      * @return Returns the newly created AtSpiElement.
      */
@@ -319,7 +319,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         // Notes:
         //      - HelpTest: not defined in AT-SPI - also used as ToolTipText in Testar, perhaps AT-SPI
         //                  does have such property somewhere?
-        //      - AutomationId: AT-SPI doesn´t use IDs to find elements - it uses pointers?
+        //      - AutomationId: AT-SPI doesnÃ‚Â´t use IDs to find elements - it uses pointers?
         //      - FrameworkId: called toolkit name in AT-SPI.
         //      - CtrlId: equal to the name of the Role enumeration in AT-SPI.
         //      - ClassName: perhaps under AtSpiAccessible's AtSpi-Relation?? - since it's not being
@@ -338,7 +338,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
             // AT-SPI elements often contain negative width and height values for some reason. Testar cannot handle these
             // values so make sure they're always non-negative.
-            nElement.boundingBoxOnScreen = Rect.from(bb.x, bb.y, (bb.width >= 0) ? bb.width : 0, (bb.height >= 0) ? bb.height : 0);
+            nElement.boundingBoxOnScreen = Rect.from(bb.x, bb.y, (bb.width >= 0) ? bb.width: 0, (bb.height >= 0) ? bb.height: 0);
 
 
         } else {
@@ -358,7 +358,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         //      - window (and it's children) is blocked or not - do a different block check.
         AtSpiStateSet nodeStates = node.states();
 
-        if(nodeStates != null) {
+        if (nodeStates != null) {
 
             nElement.isEnabled = nodeStates.isEnabled();
             nElement.hasFocus = nodeStates.isFocused();
@@ -473,7 +473,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Current node is not the node we're looking for - check the child elements.
-        for (AtSpiElement e : element.children) {
+        for (AtSpiElement e: element.children) {
 
             boolean result = findAndMarkBlocked(node, e);
 
@@ -503,7 +503,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // And its children.
-        for (AtSpiElement e : element.children) {
+        for (AtSpiElement e: element.children) {
             markBlocked(e);
         }
 
@@ -531,7 +531,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Current node is not the node we're looking for - check the child elements.
-        for (AtSpiElement e : element.children) {
+        for (AtSpiElement e: element.children) {
 
             boolean result = findAndSetZIndices(node, e, zIndex);
 
@@ -563,7 +563,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // And its children.
-        for (AtSpiElement e : element.children) {
+        for (AtSpiElement e: element.children) {
             setZIndex(e, zIndex);
         }
 
@@ -585,7 +585,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Process the children of the current element.
-        for (AtSpiElement e : element.children) {
+        for (AtSpiElement e: element.children) {
             createTopLevelContainerMap(root, e);
         }
 
@@ -611,7 +611,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * @param root The AtSpiRootElement to start the linking from.
      * @return A State (widget tree) object.
      */
-    private AtSpiState createWidgetTree(AtSpiRootElement root){
+    private AtSpiState createWidgetTree(AtSpiRootElement root) {
 
 
         // Create a new AtSpiState (root of widget tree) and link it to the supplied AtSpiRootElement.
@@ -621,7 +621,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Process each child of the AtSpiRootElement in the AT-SPI tree.
-        for(AtSpiElement childElement : root.children){
+        for (AtSpiElement childElement: root.children) {
             if (!childElement.ignore) {
                 createWidgetTree(state, childElement);
             } else {
@@ -629,7 +629,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
                 // The node should be ignored, but on Linux there will always be an Application node that needs to be
                 // ignored as first child - instead process its children.
                 if (childElement.role == AtSpiRoles.Application) {
-                    for (AtSpiElement appChild : childElement.children) {
+                    for (AtSpiElement appChild: childElement.children) {
                         if (!appChild.ignore) {
                             createWidgetTree(state, appChild);
                         }
@@ -653,7 +653,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
      * @param parent The parent widget.
      * @param element The AtSpiElement that will be the child of the AtSpiWidget parent.
      */
-    private void createWidgetTree(AtSpiWidget parent, AtSpiElement element){
+    private void createWidgetTree(AtSpiWidget parent, AtSpiElement element) {
 
 
         // Add the new AtSpiElement to the widget tree - it creates a new AtSpiWidget that links to the
@@ -665,7 +665,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
         // Process each child of the AtSpiElement in the AT-SPI tree.
-        for(AtSpiElement child : element.children) {
+        for (AtSpiElement child: element.children) {
             createWidgetTree(w, child);
         }
 

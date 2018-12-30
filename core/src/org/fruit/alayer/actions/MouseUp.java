@@ -70,11 +70,11 @@ public final class MouseUp extends TaggableBase implements Action {
   }
 
   public void run(SUT system, State state, double duration) {
-    try{
+    try {
       Assert.notNull(system);
       Util.pause(duration);
       system.get(Tags.StandardMouse).release(btn);
-    }catch(NoSuchTagException tue) {
+    } catch(NoSuchTagException tue) {
       throw new ActionFailedException(tue);
     }
   }

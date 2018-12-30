@@ -218,7 +218,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @return true if a subroutine is up and running
    */
   private boolean subroutineMode() {
-    return (activeMode == Modes.Generate || activeMode == Modes.GenerateDebug)
+    return (activeMode == Modes.Generate)
         && subroutine != null;
   }
 
@@ -379,7 +379,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
       }
 
       // slides
-      addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget);
+      addSlidingActions(actions, ac, SCROLLARROWSIZE, SCROLLTHICK, widget, state);
     }
     return actions;
   }
@@ -389,13 +389,13 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * This method is used by TESTAR to determine the set of
    * currently available actions.
    * Derivation of actions:
-   * 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ subroutine is not running
+   * 1 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ subroutine is not running
    *   if startState() is true
    *   - initialize Document for subroutine (startState)
    *   - add action from subroutine
    *   if startState()  is false
    *   - TESTAR remains in control
-   * 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ subroutine is running
+   * 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ subroutine is running
    *   if more subroutine actions available => continue subroutine
    *   if no more subroutine actions available =>
    *   - initialize finish state action set (finishState)
@@ -529,11 +529,11 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * and in a next step the sequence will be finished
    * @param recordedSequence the recorded sequence
    */
-  protected void finishSequence(File recordedSequence) {
+  protected void finishSequence() {
     if (subroutineMode()) {
-      finishSubroutine(state);
+      finishSubroutine(getStateForClickFilterLayerProtocol());
     } else {
-      super.finishSequence(recordedSequence);
+      super.finishSequence();
     }
   }
 
@@ -552,7 +552,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @return state
    */
   public State getState() {
-    return state;
+    return getStateForClickFilterLayerProtocol();
   }
 
   @Override

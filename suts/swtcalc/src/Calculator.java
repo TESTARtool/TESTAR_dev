@@ -1,11 +1,11 @@
-public class Calculator {
+public class Calculator{
 
     public static void hit(Calculator calc, Keys key) {
         calc.hitKey(key);
-        System.out.println("[" + getClass().getSimpleName() + "]  " +  calc);
+        System.out.println(calc);
     }
 
-    public enum Keys{
+    public static enum Keys{
         Zero, One, Two, Three, Four, Five,
         Six, Seven, Eight, Nine, Plus, Minus,
         Times, Divide, Equals, Cos, Tan, Sin,
@@ -24,14 +24,10 @@ public class Calculator {
         operandReg = 0.0;
     }
 
-    private boolean isNum(Keys key) {
-      return key != null && key.ordinal() >= 0 && key.ordinal() < 10;
-    }
+    private boolean isNum(Keys key) { return key != null && key.ordinal() >= 0 && key.ordinal() < 10; }
 
     public void hitKey(Keys key) {
-        if (key == null) {
-          throw new IllegalArgumentException();
-        }
+        if (key == null) throw new IllegalArgumentException();
 
         if (isNum(key)) {
             numReg = numReg *  10.0 + key.ordinal();
@@ -80,9 +76,7 @@ public class Calculator {
             opReg = -1;
             display = Double.toString(numReg);
         } else if (opReg == Keys.Divide.ordinal()) {
-            if (numReg == 0) {
-              throw new ArithmeticException("Division by thero!");
-            }
+            if (numReg == 0) throw new ArithmeticException("Division by zero!");
             numReg = operandReg / numReg;
             operandReg = 0;
             opReg = -1;
@@ -92,11 +86,6 @@ public class Calculator {
         }
     }
 
-    public String getDisplay() {
-      return display;
-    }
-
-    public String toString() {
-      return getDisplay();
-    }
+    public String getDisplay() { return display; }
+    public String toString() { return getDisplay(); }
 }

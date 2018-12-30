@@ -40,13 +40,13 @@ import org.fruit.alayer.TagsBase;
  */
 public final class A11yTags extends TagsBase {
 
-	private A11yTags() {}
-	
-	public static final Tag<EvaluationResults> A11yEvaluationResults = from("A11yEvaluationResults", EvaluationResults.class);
-	public static final Tag<Integer> A11yResultCount = from("A11yResultCount", Integer.class);
-	public static final Tag<Integer> A11yPassCount = from("A11yPassCount", Integer.class);
-	public static final Tag<Integer> A11yWarningCount = from("A11yWarningCount", Integer.class);
-	public static final Tag<Integer> A11yErrorCount = from("A11yErrorCount", Integer.class);
-	public static final Tag<Boolean> A11yHasViolations = from("A11yHasViolations", Boolean.class);
+  private A11yTags() {}
+
+  public static final Tag<EvaluationResults> A11yEvaluationResults = from("A11yEvaluationResults", EvaluationResults.class);
+  public static final Tag<Integer> A11yResultCount = from("A11yResultCount", Integer.class);
+  public static final Tag<Integer> A11yPassCount = from("A11yPassCount", Integer.class);
+  public static final Tag<Integer> A11yWarningCount = from("A11yWarningCount", Integer.class);
+  public static final Tag<Integer> A11yErrorCount = from("A11yErrorCount", Integer.class);
+  public static final Tag<Boolean> A11yHasViolations = from("A11yHasViolations", Boolean.class);
 
 }

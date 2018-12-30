@@ -35,8 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DrawingPane extends JPanel {
 
-	private static final long serialVersionUID = 5078094486379747059L;
-	private CopyOnWriteArrayList<DrawableObject> _content = new CopyOnWriteArrayList<>();
+  private static final long serialVersionUID = 5078094486379747059L;
+  private CopyOnWriteArrayList<DrawableObject> _content = new CopyOnWriteArrayList<>();
 
 
     /**

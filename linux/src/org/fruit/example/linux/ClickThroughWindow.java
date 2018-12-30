@@ -78,9 +78,9 @@ public class ClickThroughWindow {
 
     public class TestPane extends JPanel {
 
-		private static final long serialVersionUID = 4544911864979860310L;
+    private static final long serialVersionUID = 4544911864979860310L;
 
-		public TestPane() {
+    public TestPane() {
             setOpaque(false);
         }
 

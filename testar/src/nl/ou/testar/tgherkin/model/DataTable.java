@@ -1,10 +1,8 @@
 package nl.ou.testar.tgherkin.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.fruit.Assert;
 
 /**
@@ -14,8 +12,8 @@ import org.fruit.Assert;
  */
 public class DataTable {
   private List<TableRow> tableRows;
-  private int index; 
-  
+  private int index;
+
   /**
    * DataTable constructor.
    * @param tableRows list of table rows
@@ -29,7 +27,7 @@ public class DataTable {
   /**
    * Set index of current row in data table.
    * @param index current index of row in data table
-   */ 
+   */
   public void setIndex(int index) {
     this.index = index;
   }
@@ -57,21 +55,16 @@ public class DataTable {
   public List<TableRow> getTail() {
     return tableRows.subList(1, tableRows.size());
   }
-  
+
   /**
    * Shuffle data rows.
    * Random row as first data row
    */
   public void shuffle() {
-    System.out.println(toString());
-
     int maxdiI = tableRows.size();
-    System.out.println("random: " + maxdiI);
-    
     int diI = ThreadLocalRandom.current().nextInt(1, maxdiI);
-    System.out.println("random: " + diI);
     List<TableRow> dummyRows = new ArrayList<TableRow>();
-    dummyRows.add(getHead()); 
+    dummyRows.add(getHead());
     dummyRows.add(tableRows.get(diI));
     for (int i = 1; i < maxdiI; i++) {
       if (i != diI) {
@@ -87,7 +80,7 @@ public class DataTable {
    * @return placeholder value
    */
   public String getPlaceholderValue(String columnName) {
-    // retrieve column index based on column name 
+    // retrieve column index based on column name
     return currentTableRow().getTableCells().get(getColumnIndex(columnName)).getValue();
   }
 
@@ -107,7 +100,7 @@ public class DataTable {
   public boolean moreSequences() {
     return hasNextTableRow();
   }
-  
+
   /**
    * Begin sequence.
    */
@@ -120,24 +113,24 @@ public class DataTable {
    */
   public void reset() {
     index = 0;
-  }    
+  }
 
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for (TableRow tableRow : getTableRows()) {
+    for (TableRow tableRow: getTableRows()) {
       result.append(tableRow.toString());
     }
     return result.toString();
   }
-  
+
   private int getColumnIndex(String placeholderName) {
     int columnIndex = 0;
     for (TableCell cell: getHead().getTableCells()) {
       if (cell.getValue().equals(placeholderName)) {
         return columnIndex;
       }
-      columnIndex++; 
+      columnIndex++;
     }
     return -1;
   }
@@ -147,7 +140,7 @@ public class DataTable {
   }
 
   private TableRow nextTableRow() {
-    index++; 
+    index++;
     return tableRows.get(index);
   }
 
