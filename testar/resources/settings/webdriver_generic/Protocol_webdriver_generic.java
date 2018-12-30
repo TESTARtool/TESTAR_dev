@@ -69,10 +69,17 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private static boolean followLinks = true;
 
   // URL + form name, username input id + value, password input id + value
-  Pair<String, String> login = Pair.from(
+  private static Pair<String, String> login = Pair.from(
       "https://login.awo.ou.nl/SSO/login", "OUinloggen");
-  Pair<String, String> username = Pair.from("username", "");
-  Pair<String, String> password = Pair.from("password", "");
+  private static Pair<String, String> username = Pair.from("username", "");
+  private static Pair<String, String> password = Pair.from("password", "");
+
+  // List of atributes to identify and close policy popups
+  // TODO Check if this works with Eddies example
+  private static Map<String, String> policyAttributes =
+      new HashMap<String, String>() {{
+          put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+      }};
 
   /**
    * Called once during the life time of TESTAR
@@ -181,14 +188,15 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return actions;
     }
 
-    // Check if forced actions are needed to stay within allowed domains
-    Set<Action> forcedActions = detectForcedActions(state);
-    if (forcedActions != null && forcedActions.size() > 0) {
-      return forcedActions;
-    }
     // create an action compiler, which helps us create actions
     // such as clicks, drag&drop, typing ...
     StdActionCompiler ac = new AnnotatingActionCompiler();
+
+    // Check if forced actions are needed to stay within allowed domains
+    Set<Action> forcedActions = detectForcedActions(state, ac);
+    if (forcedActions != null && forcedActions.size() > 0) {
+      return forcedActions;
+    }
 
     // iterate through all widgets
     for (Widget widget: state) {
@@ -224,13 +232,18 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /*
    * Check the state if we need to force an action
    */
-  private Set<Action> detectForcedActions(State state) {
+  private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
     Set<Action> actions = detectForcedActionsUrl();
     if (actions != null && actions.size() > 0) {
       return actions;
     }
 
     actions = detectForcedLogin(state);
+    if (actions != null && actions.size() > 0) {
+      return actions;
+    }
+
+    actions = detectForcedActionsPopupPolicies(state, ac);
     if (actions != null && actions.size() > 0) {
       return actions;
     }
@@ -261,6 +274,30 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       // Submit form
       builder.add(new WdSubmitAction(login.right()), 1);
       return new HashSet<>(Collections.singletonList(builder.build()));
+    }
+
+    return null;
+  }
+
+  /*
+   * Force closing of Policies Popup
+   */
+  private Set<Action> detectForcedActionsPopupPolicies(State state,
+                                                       StdActionCompiler ac) {
+    for (Widget widget : state) {
+      if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+        continue;
+      }
+
+      WdElement element = ((WdWidget) widget).element;
+      boolean isPopup = true;
+      for (Map.Entry<String, String> entry : policyAttributes.entrySet()) {
+        String attribute = element.attributeMap.get(entry.getKey());
+        isPopup &= entry.getValue().equals(attribute);
+      }
+      if (isPopup) {
+        return new HashSet<>(Collections.singletonList(ac.leftClickAt(widget)));
+      }
     }
 
     return null;
