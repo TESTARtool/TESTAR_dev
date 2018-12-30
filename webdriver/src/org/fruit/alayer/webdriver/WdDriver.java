@@ -401,6 +401,14 @@ public class WdDriver extends SUTBase
         waitCanvasReady(true);
         return webDriver.executeScript(script, args);
       }
+      // Methods from the extension not available : no way to add them now
+      if (wde.getMessage().contains(" is not defined")) {
+        System.out.println();
+        System.out.println("TESTAR JS functions not available on this page!");
+        System.out.println("URL : " + webDriver.getCurrentUrl());
+        System.out.println();
+        System.exit(1);
+      }
       // At the end of the sequence the browser is already closed
       if (wde.getMessage().contains("target window already closed")) {
         return null;

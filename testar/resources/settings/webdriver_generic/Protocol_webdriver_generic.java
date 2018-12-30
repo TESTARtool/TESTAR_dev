@@ -21,8 +21,6 @@
  *  @author Govert Buijs
  */
 
-import actions.WdAttributeAction;
-import actions.WdSubmitAction;
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.ProtocolUtil;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
@@ -30,9 +28,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import org.fruit.Pair;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.*;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
@@ -281,10 +277,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
       // If opened in new tab, close it, else go back
       if (WdDriver.getWindowHandles().size() > 1) {
-        actions.add(NativeLinker.getWdCloseTabAction());
+        actions.add(new WdCloseTabAction());
       }
       else {
-        actions.add(NativeLinker.getWdBackAction());
+        actions.add(new WdHistoryBackAction());
       }
     }
 

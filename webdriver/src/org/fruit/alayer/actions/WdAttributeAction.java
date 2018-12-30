@@ -1,4 +1,4 @@
-package actions;
+package org.fruit.alayer.actions;
 
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.ActionFailedException;

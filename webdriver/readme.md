@@ -21,7 +21,7 @@ Next, download a webdriver for the browser to use, the browser itself also needs
 
 Place the driver in an accessible location.
 This location needs to be first argument in the SUTConnectorValue, either via the test.settings file,
-or edited via the TESTAR GUI. Adjust the other settings if needed, windows size comes to mind.
+or edited via the TESTAR GUI. Adjust the other settings if needed, window size comes to mind.
 
 #### Running
 
