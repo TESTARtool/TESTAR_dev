@@ -78,7 +78,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   // TODO Check if this works with Eddies example
   private static Map<String, String> policyAttributes =
       new HashMap<String, String>() {{
-          put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
+        put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
       }};
 
   /**
@@ -96,13 +96,14 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /**
    * This method is called when TESTAR starts the System Under Test (SUT). The method should
    * take care of
-   *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-   *      out what executable to run)
-   *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
-   *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-   *      seconds until they have finished loading)
-   * @return  a started SUT, ready to be tested.
+   * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+   * out what executable to run)
+   * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+   * the SUT's configuratio files etc.)
+   * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+   * seconds until they have finished loading)
+   *
+   * @return a started SUT, ready to be tested.
    */
   protected SUT startSystem() throws SystemStartException {
     SUT sut = super.startSystem();
@@ -175,18 +176,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * @param state  the SUT's current state
    * @return a set of actions
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-    Set<Action> actions = super.deriveActions(system, state); // by urueda
-    // unwanted processes, force SUT to foreground, ... actions automatically derived!
-
-    //----------------------
-    // BUILD CUSTOM ACTIONS
-    //----------------------
-
-    // Don't add actions if prolog is activated
-    if (settings().get(ConfigTags.PrologActivated)) {
-      return actions;
-    }
+  protected Set<Action> deriveActions(SUT system, State state)
+      throws ActionBuildException {
+    // Kill unwanted processes, force SUT to foreground
+    Set<Action> actions = super.deriveActions(system, state);
 
     // create an action compiler, which helps us create actions
     // such as clicks, drag&drop, typing ...
@@ -199,7 +192,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     }
 
     // iterate through all widgets
-    for (Widget widget: state) {
+    for (Widget widget : state) {
       // only consider enabled and non-tabu widgets
       if (!widget.get(Enabled, true) || blackListed(widget)) {
         continue;
@@ -530,7 +523,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   public class WdProtocolUtil extends ProtocolUtil {
     private RemoteWebDriver webDriver;
 
-    private WdProtocolUtil (SUT sut) { 
+    private WdProtocolUtil(SUT sut) {
       webDriver = ((WdDriver) sut).getRemoteWebDriver();
     }
 
@@ -554,7 +547,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
 
       Rectangle actionArea = new Rectangle(
           Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-      for (Finder f: targets) {
+      for (Finder f : targets) {
         Widget widget = f.apply(state);
         Shape shape = widget.get(Tags.Shape);
         Rectangle r = new Rectangle((int) shape.x(), (int) shape.y(), (int) shape.width(), (int) shape.height());
