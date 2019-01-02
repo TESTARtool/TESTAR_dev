@@ -7,16 +7,17 @@ import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractStateModelHydrator implements EntityHydrator {
+public class AbstractStateModelHydrator implements EntityHydrator<VertexEntity> {
 
     @Override
-    public void hydrate(DocumentEntity target, Object source) throws HydrationException {
+    public void hydrate(VertexEntity target, Object source) throws HydrationException {
         if (!(source instanceof AbstractStateModel)) {
             throw new HydrationException("Invalid source object was provided to AbstractStateModel hydrator");
         }

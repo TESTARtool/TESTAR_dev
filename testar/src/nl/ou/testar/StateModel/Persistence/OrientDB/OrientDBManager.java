@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.System.exit;
+
 
 public class OrientDBManager implements PersistenceManager, StateModelEventListener {
 
@@ -59,6 +61,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // we need to make sure before operation that the required classes exist.
         HashSet<EntityClass> entityClassSet = new HashSet<>();
         for (EntityClassFactory.EntityClassName className : entityClassNames) {
+            EntityClass entityClass = EntityClassFactory.createEntityClass(className);
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first

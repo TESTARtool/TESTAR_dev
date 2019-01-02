@@ -34,6 +34,16 @@
  */
 package org.fruit.monkey;
 
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ODirection;
+import com.orientechnologies.orient.core.record.OEdge;
+import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -52,6 +62,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
+import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -251,7 +262,7 @@ public class Main {
 		} catch (Throwable t) {
 			System.out.println("Cannot initialize log file!");
 			t.printStackTrace(System.out);
-			System.exit(-1);
+			exit(-1);
 		}
 		//TODO: DATE-FORMAT not consistent
 		LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
@@ -322,7 +333,7 @@ public class Main {
 				}
 			}
 
-			System.exit(0);
+			exit(0);
 		}
 
 	}
@@ -358,7 +369,7 @@ public class Main {
 		if (files == null || files.length == 0) {
 			settingsSelection();
 			if (SSE_ACTIVATED == null) {
-				System.exit(-1);
+				exit(-1);
 			}
 		}
 		else {
@@ -385,7 +396,6 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		Settings settings = initTestarSettings(args);
 
 		String testSettingsFileName = getSettingsFile();
@@ -409,7 +419,7 @@ public class Main {
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
 
-		System.exit(0);
+		exit(0);
 
 	}
 

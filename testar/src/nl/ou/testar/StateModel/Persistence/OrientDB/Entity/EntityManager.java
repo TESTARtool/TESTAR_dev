@@ -5,10 +5,13 @@ import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.OBlob;
+import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
 import org.fruit.alayer.Visualizer;
@@ -32,8 +35,13 @@ public class EntityManager {
         dbConfig = config;
     }
 
-
-    private boolean hasVertex(VertexEntity vertexEntity, ODatabaseSession db) {
+    /**
+     * Method returns true if the vertex is already present in the data store.
+     * @param vertexEntity
+     * @param db
+     * @return
+     */
+    private boolean vertexExists(VertexEntity vertexEntity, ODatabaseSession db) {
         boolean hasVertex = true;
         try {
             retrieveVertex(vertexEntity, db);
@@ -44,6 +52,13 @@ public class EntityManager {
         return hasVertex;
     }
 
+    /**
+     * Method retrieves a vertex from the data store.
+     * @param vertexEntity
+     * @param db
+     * @return
+     * @throws EntityNotFoundException
+     */
     private OVertex retrieveVertex(VertexEntity vertexEntity, ODatabaseSession db) throws EntityNotFoundException {
         Property identifier = vertexEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
@@ -76,6 +91,13 @@ public class EntityManager {
         throw new EntityNotFoundException();
     }
 
+    /**
+     * Method retrieves an edge from the data store.
+     * @param edgeEntity
+     * @param db
+     * @return
+     * @throws EntityNotFoundException
+     */
     private OEdge retrieveEdge(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
         // when looking for an edge, there are 2 options.
         // an edge can have an Id field, in which case we will just look for the id, as it will be indexed and unique.
@@ -103,6 +125,13 @@ public class EntityManager {
         throw new EntityNotFoundException();
     }
 
+    /**
+     * Method retrieves an edge from the data store based on the value of a unique id field.
+     * @param edgeEntity
+     * @param db
+     * @return
+     * @throws EntityNotFoundException
+     */
     private OResultSet retrieveEdgeWithId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
         Property identifier = edgeEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
@@ -120,6 +149,13 @@ public class EntityManager {
         return rs;
     }
 
+    /**
+     * Method retrieves an edge from the data store based on its endpoint vertices.
+     * @param edgeEntity
+     * @param db
+     * @return
+     * @throws EntityNotFoundException
+     */
     private OResultSet retrieveEdgeWithoutId(EdgeEntity edgeEntity, ODatabaseSession db) throws EntityNotFoundException {
         // for this one we need a more tricky query using specific graph query capabilities
         // first, we need to make sure we have been provided the source and target vertices, otherwise there is nothing to search
@@ -173,8 +209,12 @@ public class EntityManager {
             // set the properties
             for (Property property : entityClass.getProperties()) {
                 OProperty dbProperty = null;
+                // binary types we do not create, as they will be stored as separate binary records
+                if (property.getPropertyType() == OType.BINARY) {
+                    continue;
+                }
                 // for linked and embedded type a childtype needs to be specified
-                if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
+                else if (property.getPropertyType().isEmbedded() || property.getPropertyType().isLink()) {
                     dbProperty = oClass.createProperty(property.getPropertyName(), property.getPropertyType(), property.getChildType());
                 }
                 else {
@@ -195,17 +235,26 @@ public class EntityManager {
         }
     }
 
+    /**
+     * This method saves an entity to the data store.
+     * @param entity
+     */
     public void saveEntity(DocumentEntity entity) {
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
-            if (entity instanceof VertexEntity) {
+            if (entity.getEntityClass().isVertex()) {
                 saveVertexEntity((VertexEntity) entity, db);
             }
-            else if (entity instanceof EdgeEntity) {
+            else if (entity.getEntityClass().isEdge()) {
                 saveEdgeEntity((EdgeEntity) entity, db);
             }
         }
     }
 
+    /**
+     * This method saves a vertex entity to the data store.
+     * @param entity
+     * @param db
+     */
     private void saveVertexEntity(VertexEntity entity, ODatabaseSession db) {
         OVertex oVertex;
         // check to see if the vertex already exists in the database
@@ -224,6 +273,11 @@ public class EntityManager {
         oVertex.save();
     }
 
+    /**
+     * This method saves an edge entity to the data store.
+     * @param entity
+     * @param db
+     */
     private void saveEdgeEntity(EdgeEntity entity, ODatabaseSession db) {
         // an edge always needs both a source and a target vertex
         // an edge has a source and target vertex
@@ -233,10 +287,10 @@ public class EntityManager {
         }
 
         // make sure the edge's endpoints exist in the database
-        if (!hasVertex(entity.getSourceEntity(), db)) {
+        if (!vertexExists(entity.getSourceEntity(), db)) {
             saveVertexEntity(entity.getSourceEntity(), db);
         }
-        if (!hasVertex(entity.getTargetEntity(), db)) {
+        if (!vertexExists(entity.getTargetEntity(), db)) {
             saveVertexEntity(entity.getTargetEntity(), db);
         }
 
@@ -298,7 +352,189 @@ public class EntityManager {
             OBlob record = db.newBlob((byte[]) propertyValue);
             element.setProperty(propertyName, record);
         }
+        else if (propertyValue instanceof Set) {
+            element.setProperty(propertyName, propertyValue);
+        }
         else
             element.setProperty(propertyName, propertyValue.toString());
+        //@todo need to make the linked and set types right here
+    }
+
+    private void setProperties(DocumentEntity entity, OElement oElement) {
+        for (String propertyName : oElement.getPropertyNames()) {
+            Object property = oElement.getProperty(propertyName);
+            OType oType = OType.getTypeByValue(property);
+            Object convertedProperty = getConvertedValue(oType, property);
+            if (convertedProperty != null) {
+                entity.addPropertyValue(propertyName, oType, convertedProperty);
+            }
+        }
+    }
+
+    private Object getConvertedValue(OType oType, Object valueToConvert) {
+        Object convertedValue = null;
+        switch (oType) {
+            case BOOLEAN:
+                convertedValue = OType.convert(valueToConvert, Boolean.class);
+                break;
+
+            case STRING:
+                convertedValue = OType.convert(valueToConvert, String.class);
+                break;
+
+            case LINKBAG:
+                // we don't process these as a separate attribute
+                break;
+
+            case EMBEDDEDSET:
+                convertedValue = OType.convert(valueToConvert, Set.class);
+                break;
+        }
+        return  convertedValue;
+    }
+
+    /**
+     * This method retrieves all stored instances of a given class.
+     * @param entityClass
+     * @return
+     */
+    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass) {
+        HashSet<DocumentEntity> documents = new HashSet<>();
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            String stmt = "SELECT FROM " + entityClass.getClassName();
+            OResultSet rs = db.query(stmt);
+            while (rs.hasNext()) {
+                OResult result = rs.next();
+                if (result.isVertex()) {
+                    documents.add(extractVertexEntity(result, entityClass));
+                }
+                else if (result.isEdge()) {
+                    documents.add(extractEdgeEntity(result, entityClass));
+                }
+                // should not happen, but we just ignore the result
+            }
+        }
+        return documents;
+    }
+
+    public DocumentEntity retrieveEntity(EntityClass entityClass, Object idValue) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            // first we have to retrieve the identifying field
+            Property identifier = entityClass.getIdentifier();
+            if (identifier == null) return null; // cannot search without an id field
+
+            String idField = identifier.getPropertyName();
+            // convert the id value to the correct type to use in the database query
+            idValue = getConvertedValue(identifier.getPropertyType(), idValue);
+
+            // prepare a statement and execute it
+            String stmt = "SELECT FROM " + entityClass.getClassName() + " WHERE " + idField + " = :" + idField;
+            // get the id parameter ready
+            Map<String, Object> params = new HashMap<>();
+            params.put(idField, idValue);
+            //execute the query using statement and parameters
+            OResultSet rs = db.query(stmt, params);
+
+            // process the results
+            if (!rs.hasNext()) {
+                return null;
+            }
+
+            OResult oResult = rs.next();
+            if (oResult.isVertex()) {
+                return extractVertexEntity(oResult, entityClass);
+            }
+            else if (oResult.isEdge()) {
+                return extractEdgeEntity(oResult, entityClass);
+            }
+            else {
+                return null;
+            }
+
+        }
+    }
+
+    private VertexEntity extractVertexEntity(OResult result, EntityClass entityClass) {
+        Optional<OVertex> op = result.getVertex();
+        if (!op.isPresent()) return null;
+        OVertex oVertex = op.get();
+        // first we set the attributes
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
+        setProperties(vertexEntity, oVertex);
+
+        // next, we want to set the incoming and outgoing edges
+        for (OEdge edge : oVertex.getEdges(ODirection.OUT)) {
+            // look up the entity class for the edge entity
+            EdgeEntity edgeEntity = processEdgeEntity(vertexEntity, edge, true);
+            if (edgeEntity == null) continue;
+            vertexEntity.addOutgoingEdge(edgeEntity);
+        }
+
+        for (OEdge edge : oVertex.getEdges(ODirection.IN)) {
+            // look up the entity class for the edge entity
+            EdgeEntity edgeEntity = processEdgeEntity(vertexEntity, edge, false);
+            if (edgeEntity == null) continue;
+            vertexEntity.addIncomingEdge(edgeEntity);
+        }
+
+        return vertexEntity;
+    }
+
+    private EdgeEntity processEdgeEntity(VertexEntity vertexEntity, OEdge edge, boolean vertexIsSource) {
+        Optional<OClass> opClass = edge.getSchemaType();
+        // if the edge does not have a class for some reason, we cannot process it
+        if (!opClass.isPresent()) return null;
+        OClass oEdgeClass = opClass.get();
+        EntityClassFactory.EntityClassName edgeClassName = EntityClassFactory.getEntityClassName(oEdgeClass.getName());
+        EntityClass edgeEntityClass = EntityClassFactory.createEntityClass(edgeClassName);
+        if (edgeEntityClass == null) return null;
+
+        //@todo ideally the target entity would have a lazy loading implementation
+        // get the vertex endpoint that we do not have yet
+        OVertex targetVertex = vertexIsSource ? edge.getTo() : edge.getFrom();
+        //get the class of the target
+        if (!targetVertex.getSchemaType().isPresent()) return null;
+        OClass oTargetClass = targetVertex.getSchemaType().get();
+        EntityClassFactory.EntityClassName targetClassName = EntityClassFactory.getEntityClassName(oTargetClass.getName());
+        EntityClass targetEntityClass = EntityClassFactory.createEntityClass(targetClassName);
+        VertexEntity targetEntity = new VertexEntity(targetEntityClass);
+        // set the attributes on the target vertex
+        setProperties(targetEntity, targetVertex);
+
+        EdgeEntity edgeEntity;
+        if (vertexIsSource) {
+            edgeEntity = new EdgeEntity(edgeEntityClass, vertexEntity, targetEntity);
+        }
+        else {
+            edgeEntity = new EdgeEntity(edgeEntityClass, targetEntity, vertexEntity);
+        }
+        // set the attributes on the edge
+        setProperties(edgeEntity, edge);
+        return edgeEntity;
+    }
+
+
+    private EdgeEntity extractEdgeEntity(OResult result, EntityClass entityClass) {
+        // check if the result contains an edge
+        if (!result.getEdge().isPresent()) return null;
+        OEdge oEdge = result.getEdge().get();
+
+        // get the source vertex
+        OVertex sourceVertex = oEdge.getTo();
+        // check for the presence of a class
+        if (!sourceVertex.getSchemaType().isPresent()) return null;
+
+        OClass sourceVertexClass = sourceVertex.getSchemaType().get();
+        EntityClassFactory.EntityClassName sourceClassName = EntityClassFactory.getEntityClassName(sourceVertexClass.getName());
+        EntityClass sourceClass = EntityClassFactory.createEntityClass(sourceClassName);
+        if (sourceClass == null) return null;
+
+        VertexEntity sourceVertexEntity = new VertexEntity(sourceClass);
+        // set the attributes
+        setProperties(sourceVertexEntity, sourceVertex);
+
+        // get the rest of the edge
+        EdgeEntity edgeEntity = processEdgeEntity(sourceVertexEntity, oEdge, true);
+        return edgeEntity;
     }
 }

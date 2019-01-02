@@ -14,6 +14,33 @@ public class EntityClassFactory {
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
 
+    // mapping for the internal orientdb classname to our enum
+    // we do not want the rest of our program to use the classNames directly, but want to be able
+    // to look up the enum values when going from orientdb to the state model
+    private static Map<String, EntityClassName> classNameMap;
+
+    static {
+        classNameMap = new HashMap<>();
+        classNameMap.put("AbstractState", EntityClassName.AbstractState);
+        classNameMap.put("AbstractAction", EntityClassName.AbstractAction);
+        classNameMap.put("AbstractStateModel", EntityClassName.AbstractStateModel);
+        classNameMap.put("Widget", EntityClassName.Widget);
+        classNameMap.put("ConcreteState", EntityClassName.ConcreteState);
+        classNameMap.put("ConcreteAction", EntityClassName.ConcreteAction);
+        classNameMap.put("isParentOf", EntityClassName.isParentOf);
+        classNameMap.put("isChildOf", EntityClassName.isChildOf);
+        classNameMap.put("isAbstractedBy", EntityClassName.isAbstractedBy);
+    }
+
+    /**
+     * This method will return an EntityClassName if it exists.
+     * @param className
+     * @return
+     */
+    public static EntityClassName getEntityClassName(String className) {
+        return classNameMap.get(className);
+    }
+
     /**
      * This method generates an EntityClass.
      * @param className
@@ -127,6 +154,11 @@ public class EntityClassFactory {
         stateId.setNullable(false);
         stateId.setIdentifier(true);
         concreteStateClass.addProperty(stateId);
+        Property screenshot = new Property("screenshot", OType.BINARY);
+        screenshot.setMandatory(false);
+        screenshot.setNullable(true);
+        screenshot.setIdentifier(false);
+        concreteStateClass.addProperty(screenshot);
         concreteStateClass.setSuperClassName("Widget");
         entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
         return concreteStateClass;
