@@ -5,11 +5,11 @@
  * Camino de Vera, s/n                                                                   *
  * 46022 Valencia, Spain                                                                 *
  * www.upv.es                                                                            *
- * *
+ *                                                                                       *
  * D I S C L A I M E R:                                                                  *
  * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
  * in the context of the TESTAR Proof of Concept project:                                *
- * "UPV, Programa de Prueba de Concepto 2014, SP20141402"                  *
+ * "UPV, Programa de Prueba de Concepto 2014, SP20141402"                                *
  * This software is distributed FREE of charge under the TESTAR license, as an open      *
  * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        *
  * *
@@ -55,12 +55,13 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       "v-menubar-menuitem", "v-menubar-menuitem-caption");
 
   // Disallow links and pages with these extensions
+  // Set to null to ignore this feature
   private static List<String> deniedExtensions = Arrays.asList(
       "pdf", "jpg", "png");
 
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
-  // To ignore this feature, set to null.
+  // Set to null to ignore this feature
   private static List<String> domainsAllowed =
       Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
 
@@ -69,13 +70,14 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private static boolean followLinks = true;
 
   // URL + form name, username input id + value, password input id + value
+  // Set login to null to disable this feature
   private static Pair<String, String> login = Pair.from(
       "https://login.awo.ou.nl/SSO/login", "OUinloggen");
   private static Pair<String, String> username = Pair.from("username", "");
   private static Pair<String, String> password = Pair.from("password", "");
 
   // List of atributes to identify and close policy popups
-  // TODO Check if this works with Eddies example
+  // Set to null to disable this feature
   private static Map<String, String> policyAttributes =
       new HashMap<String, String>() {{
         put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton");
@@ -206,16 +208,16 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
         continue;
       }
 
+      // type into text boxes
+      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
+        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
+      }
+
       // left clicks, but ignore links outside domain
       if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isClickable(widget))) {
         if (!isLinkDenied(widget)) {
           actions.add(ac.leftClickAt(widget));
         }
-      }
-
-      // type into text boxes
-      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
-        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
       }
     }
 
@@ -226,7 +228,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Check the state if we need to force an action
    */
   private Set<Action> detectForcedActions(State state, StdActionCompiler ac) {
-    Set<Action> actions = detectForcedActionsUrl();
+    Set<Action> actions = detectForcedDeniedUrl();
     if (actions != null && actions.size() > 0) {
       return actions;
     }
@@ -236,7 +238,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
       return actions;
     }
 
-    actions = detectForcedActionsPopupPolicies(state, ac);
+    actions = detectForcedPopupClick(state, ac);
     if (actions != null && actions.size() > 0) {
       return actions;
     }
@@ -248,6 +250,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Detect and perform login if defined
    */
   private Set<Action> detectForcedLogin(State state) {
+    if (login == null) {
+      return null;
+    }
+
     // Check if the current page is a login page
     String currentUrl = WdDriver.getCurrentUrl();
     if (currentUrl.startsWith(login.left())) {
@@ -275,8 +281,12 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /*
    * Force closing of Policies Popup
    */
-  private Set<Action> detectForcedActionsPopupPolicies(State state,
-                                                       StdActionCompiler ac) {
+  private Set<Action> detectForcedPopupClick(State state,
+                                             StdActionCompiler ac) {
+    if (policyAttributes == null || policyAttributes.size() == 0) {
+      return null;
+    }
+
     for (Widget widget : state) {
       if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
         continue;
@@ -299,22 +309,22 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   /*
    * Force back action due to disallowed domain or extension
    */
-  private Set<Action> detectForcedActionsUrl() {
+  private Set<Action> detectForcedDeniedUrl() {
     String currentUrl = WdDriver.getCurrentUrl();
 
-    // Don't get caught in a PDFs etc. and non-whitelisted domains
-    Set<Action> actions = new HashSet<>();
+    // Don't get caught in PDFs etc. and non-whitelisted domains
     if (isUrlDenied(currentUrl) || isExtensionDenied(currentUrl)) {
-      // If opened in new tab, close it, else go back
+      // If opened in new tab, close it
       if (WdDriver.getWindowHandles().size() > 1) {
-        actions.add(new WdCloseTabAction());
+        return new HashSet<>(Collections.singletonList(new WdCloseTabAction()));
       }
+      // Single tab, go back to previous page
       else {
-        actions.add(new WdHistoryBackAction());
+        return new HashSet<>(Collections.singletonList(new WdHistoryBackAction()));
       }
     }
 
-    return actions;
+    return null;
   }
 
   /*
@@ -323,6 +333,10 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
   private boolean isExtensionDenied(String currentUrl) {
     // If the current page doesn't have an extension, always allow
     if (!currentUrl.contains(".")) {
+      return false;
+    }
+
+    if (deniedExtensions == null || deniedExtensions.size() == 0) {
       return false;
     }
 
