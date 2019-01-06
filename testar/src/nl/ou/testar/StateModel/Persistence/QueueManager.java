@@ -25,6 +25,11 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
      */
     private EventHelper eventHelper;
 
+    /**
+     * Is the event listener processing events?
+     */
+    private boolean listening = true;
+
     public QueueManager(PersistenceManager persistenceManager, EventHelper eventHelper) {
         delegateManager = persistenceManager;
         queue = new ArrayDeque<>();
@@ -65,6 +70,8 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void eventReceived(StateModelEvent event) {
+        if (!listening) return;
+
         try {
             eventHelper.validateEvent(event);
         } catch (InvalidEventException e) {
@@ -86,5 +93,10 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));
         }
+    }
+
+    @Override
+    public void setListening(boolean listening) {
+        this.listening = listening;
     }
 }

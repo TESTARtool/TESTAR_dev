@@ -43,15 +43,12 @@ public class UnvisitedActionsSelector implements ActionSelector {
      * @return
      */
     private Set<AbstractAction> getUnvisitedActions(AbstractState state, AbstractStateModel abstractStateModel, int nrOfHopsLeft) {
-        Set<String> unvisitedActionIds = state.getUnvisitedActionIds();
-        if (unvisitedActionIds.size() > 0) {
-            return state.getActions(unvisitedActionIds);
-        }
-        Set<AbstractAction> actions = new HashSet<>();
-        // no more recursion possible?
-        if (nrOfHopsLeft == 0) {
+        Set<AbstractAction> actions = state.getUnvisitedActions();
+        if (!actions.isEmpty() || nrOfHopsLeft == 0) {
             return actions;
         }
+        actions = new HashSet<>();
+
         // go one layer deeper
         // the object is to return the action for this state that will lead to other states with
         // unvisited actions
@@ -59,6 +56,7 @@ public class UnvisitedActionsSelector implements ActionSelector {
         //@todo ad the following algorithm isn't perfect, as it will follow transitions for each action until it reaches
         //@todo an unvisited action. For one transition this will be the next state, for some it will be 3 down.
         //@todo Ideally the algorithm should go one level at a time
+        // it's meant as a demo of what is possible
         for (AbstractStateTransition transition:abstractStateModel.getOutgoingTransitionsForState(state.getStateId())) {
             try {
                 AbstractState targetState = abstractStateModel.getState(transition.getTargetStateId());

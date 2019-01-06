@@ -8,4 +8,10 @@ public interface StateModelEventListener {
      */
     void eventReceived(StateModelEvent event);
 
+    /**
+     * This method sets the event listener to active or deactive
+     * @param listening
+     */
+    void setListening(boolean listening);
+
 }

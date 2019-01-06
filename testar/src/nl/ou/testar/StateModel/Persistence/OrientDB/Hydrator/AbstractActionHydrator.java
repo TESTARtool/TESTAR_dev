@@ -26,12 +26,25 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         if (identifier == null) {
             throw new HydrationException();
         }
+
+        // because an abstract action might have multiple concrete actions tied to it, it is possible that the target
+        // for the same abstract action might me different states.
+        // we combine the ids from the source and target with the abstract action id for this purpose
+        Property sourceIdentifier = target.getSourceEntity().getEntityClass().getIdentifier();
+        String sourceId = (String)target.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).right();
+        Property targetIdentifier = target.getTargetEntity().getEntityClass().getIdentifier();
+        String targetId = (String)target.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).right();
+
+        String edgeId = sourceId + "-" + ((AbstractAction) source).getActionId() + "-" + targetId;
         // make sure the java and orientdb property types are compatible
-        OType identifierType = TypeConvertor.getInstance().getOrientDBType(((AbstractAction) source).getActionId().getClass());
+        OType identifierType = TypeConvertor.getInstance().getOrientDBType(edgeId.getClass());
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException();
         }
-        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), ((AbstractAction) source).getActionId());
+        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), edgeId);
+
+        // add the action id
+        target.addPropertyValue("actionId", OType.STRING, ((AbstractAction) source).getActionId());
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((AbstractAction) source).getAttributes();

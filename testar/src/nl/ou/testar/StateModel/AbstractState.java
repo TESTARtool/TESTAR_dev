@@ -14,7 +14,7 @@ public class AbstractState extends AbstractEntity {
     // list of possible actions that can be executed from this state
     private Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
-    private Set<String> unvisitedActionIds;
+    private Map<String, AbstractAction> unvisitedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
     // is this an initial state?
@@ -31,7 +31,7 @@ public class AbstractState extends AbstractEntity {
         for(AbstractAction action:actions) {
             this.actions.put(action.getActionId(), action);
         }
-        this.unvisitedActionIds = ActionHelper.getAbstractIds(actions); // all are unvisited when creating
+        unvisitedActions = this.actions; // all are unvisited when creating
         concreteStateIds = new HashSet<>();
     }
 
@@ -56,11 +56,11 @@ public class AbstractState extends AbstractEntity {
 
     /**
      * This method sets the given action id to status visited
-     * @param actionId the id for the visited action
+     * @param action the visited action
      */
-    public void addVisitedAction(String actionId){
-        if (unvisitedActionIds.contains(actionId)) {
-            unvisitedActionIds.remove(actionId);
+    public void addVisitedAction(AbstractAction action) {
+        if (unvisitedActions.containsKey(action.getActionId())) {
+            unvisitedActions.remove(action.getActionId());
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
         }
     }
@@ -121,8 +121,18 @@ public class AbstractState extends AbstractEntity {
      * This method returns the actions that have not yet been visited from this state
      * @return
      */
-    public Set<String> getUnvisitedActionIds() {
-        return unvisitedActionIds;
+    public Set<AbstractAction> getUnvisitedActions() {
+        return new HashSet<>(unvisitedActions.values());
+    }
+
+    /**
+     * This method returns all the actions for this abstract state that have been visited
+     * @return
+     */
+    public Set<AbstractAction> getVisitedActions() {
+        HashSet<AbstractAction> visitedActions = (HashSet<AbstractAction>) ((HashSet)getActions()).clone();
+        visitedActions.removeAll(getUnvisitedActions());
+        return visitedActions;
     }
 
     /**

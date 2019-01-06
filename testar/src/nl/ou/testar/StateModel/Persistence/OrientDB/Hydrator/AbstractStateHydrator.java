@@ -71,15 +71,6 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         }
         target.addPropertyValue(isInitial.getPropertyName(), isInitial.getPropertyType(), ((AbstractState) source).isInitial());
 
-        // specifically for abstract states we need to add the ids of unvisited actions
-        Property unvisitedActions = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "unvisitedActions");
-        if (unvisitedActions == null) {
-            throw new HydrationException();
-        }
-        if (!((AbstractState) source).getUnvisitedActionIds().isEmpty()) {
-            target.addPropertyValue(unvisitedActions.getPropertyName(), unvisitedActions.getPropertyType(), ((AbstractState) source).getUnvisitedActionIds());
-        }
-
         // we need to add the concrete state ids
         Property concreteStateIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteStateIds");
         if (concreteStateIds == null) {

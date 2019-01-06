@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy, BlackHole, UnvisitedAbstractAction}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -30,6 +30,8 @@ public class EntityClassFactory {
         classNameMap.put("isParentOf", EntityClassName.isParentOf);
         classNameMap.put("isChildOf", EntityClassName.isChildOf);
         classNameMap.put("isAbstractedBy", EntityClassName.isAbstractedBy);
+        classNameMap.put("BlackHole", EntityClassName.BlackHole);
+        classNameMap.put("UnvisitedAbstractAction", EntityClassName.UnvisitedAbstractAction);
     }
 
     /**
@@ -74,12 +76,20 @@ public class EntityClassFactory {
                             : createIsParentOfClass();
 
             case isChildOf:
-                    return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
-                            : createIsChildOfClass();
+                return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
+                        : createIsChildOfClass();
 
             case isAbstractedBy:
-                    return entityClasses.containsKey(EntityClassName.isAbstractedBy) ? entityClasses.get(EntityClassName.isAbstractedBy)
-                            : createIsAbstractedByClass();
+                return entityClasses.containsKey(EntityClassName.isAbstractedBy) ? entityClasses.get(EntityClassName.isAbstractedBy)
+                        : createIsAbstractedByClass();
+
+            case BlackHole:
+                return entityClasses.containsKey(EntityClassName.BlackHole) ? entityClasses.get(EntityClassName.BlackHole)
+                        : createBlackHoleClass();
+                
+            case UnvisitedAbstractAction:
+                return entityClasses.containsKey(EntityClassName.UnvisitedAbstractAction) ? entityClasses.get(EntityClassName.UnvisitedAbstractAction)
+                        : createUnvisitedAbstractActionClass();
 
             default:
                 return null;
@@ -119,10 +129,15 @@ public class EntityClassFactory {
 
     private static EntityClass createAbstractActionClass() {
         EntityClass abstractActionClass = new EntityClass("AbstractAction", EntityClass.EntityType.Edge);
+        Property uniqueId = new Property("uid", OType.STRING);
+        uniqueId.setMandatory(true);
+        uniqueId.setNullable(false);
+        uniqueId.setIdentifier(true);
+        abstractActionClass.addProperty(uniqueId);
         Property actionId = new Property("actionId", OType.STRING);
         actionId.setMandatory(true);
         actionId.setNullable(false);
-        actionId.setIdentifier(true);
+        actionId.setIdentifier(false);
         abstractActionClass.addProperty(actionId);
         Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
         unvisitedActions.setMandatory(false);
@@ -205,6 +220,38 @@ public class EntityClassFactory {
         edgeId.setIdentifier(true);
         entityClass.addProperty(edgeId);
         entityClasses.put(EntityClassName.isAbstractedBy, entityClass);
+        return entityClass;
+    }
+
+    private static EntityClass createBlackHoleClass() {
+        EntityClass entityClass = new EntityClass("BlackHole", EntityClass.EntityType.Vertex);
+        Property blackHoleId = new Property("blackHoleId", OType.STRING);
+        blackHoleId.setMandatory(true);
+        blackHoleId.setNullable(false);
+        blackHoleId.setIdentifier(true);
+        entityClass.addProperty(blackHoleId);
+        entityClasses.put(EntityClassName.BlackHole, entityClass);
+        return entityClass;
+    }
+
+    private static EntityClass createUnvisitedAbstractActionClass() {
+        EntityClass entityClass = new EntityClass("UnvisitedAbstractAction", EntityClass.EntityType.Edge);
+        Property uniqueId = new Property("uid", OType.STRING);
+        uniqueId.setMandatory(true);
+        uniqueId.setNullable(false);
+        uniqueId.setIdentifier(true);
+        entityClass.addProperty(uniqueId);
+        Property actionId = new Property("actionId", OType.STRING);
+        actionId.setMandatory(true);
+        actionId.setNullable(false);
+        actionId.setIdentifier(false);
+        entityClass.addProperty(actionId);
+        Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
+        unvisitedActions.setMandatory(false);
+        unvisitedActions.setNullable(false);
+        entityClass.addProperty(unvisitedActions);
+        entityClass.setSuperClassName("AbstractAction");
+        entityClasses.put(EntityClassName.AbstractAction, entityClass);
         return entityClass;
     }
 

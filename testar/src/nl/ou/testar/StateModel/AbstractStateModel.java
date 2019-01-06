@@ -104,7 +104,7 @@ public class AbstractStateModel {
         addState(targetState);
         addAction(executedAction);
         // we also set the action to visited for the source state
-        sourceState.addVisitedAction(executedAction.getActionId());
+        sourceState.addVisitedAction(executedAction);
         emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, newStateTransition));
     }
 

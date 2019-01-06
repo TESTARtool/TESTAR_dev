@@ -44,4 +44,9 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     public void persistConcreteState(ConcreteState concreteState, AbstractState abstractState) {
 
     }
+
+    @Override
+    public void setListening(boolean listening) {
+
+    }
 }

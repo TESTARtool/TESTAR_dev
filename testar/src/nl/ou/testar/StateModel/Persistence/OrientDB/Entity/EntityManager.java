@@ -14,6 +14,7 @@ import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
+import org.fruit.Pair;
 import org.fruit.alayer.Visualizer;
 
 import java.util.*;
@@ -318,6 +319,47 @@ public class EntityManager {
         edge.save();
     }
 
+    public void deleteEntity(DocumentEntity entity) {
+            // we delete an entity based on its class and its id
+            EntityClass entityClass = entity.getEntityClass();
+
+            Property identifier = entityClass.getIdentifier();
+            if (identifier == null) {
+                // cannot delete without an id value
+                return;
+            }
+            Set<Object> idValues = new HashSet<>();
+            idValues.add(entity.getPropertyValue(identifier.getPropertyName()).right());
+            deleteEntities(entityClass, idValues);
+    }
+
+    public void deleteEntities(EntityClass entityClass, Set<Object> idValues) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            String typeName;
+            if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
+                typeName = "VERTEX";
+            }
+            else if (entityClass.getEntityType() == EntityClass.EntityType.Edge) {
+                typeName = "EDGE";
+            }
+            else {
+                // should not happen
+                return;
+            }
+
+            Property identifier = entityClass.getIdentifier();
+            if (identifier == null) {
+                // cannot delete without an id value
+                return;
+            }
+
+            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
+            Map<String, Object> params = new HashMap<>();
+            params.put(identifier.getPropertyName(), idValues);
+            db.command(stmt, params);
+        }
+    }
+
     /**
      * Helper method to format a property before adding it to a map.
      * This is a bit of a dirty solution to prevent OrientDB from protesting to certain values that are
@@ -360,6 +402,11 @@ public class EntityManager {
         //@todo need to make the linked and set types right here
     }
 
+    /**
+     * Helper method to set all the properties collected from the datastore onto an entity instance.
+     * @param entity
+     * @param oElement
+     */
     private void setProperties(DocumentEntity entity, OElement oElement) {
         for (String propertyName : oElement.getPropertyNames()) {
             Object property = oElement.getProperty(propertyName);
@@ -371,6 +418,12 @@ public class EntityManager {
         }
     }
 
+    /**
+     * Helper method that converts an object value based on a specified OrientDB data type.
+     * @param oType
+     * @param valueToConvert
+     * @return
+     */
     private Object getConvertedValue(OType oType, Object valueToConvert) {
         Object convertedValue = null;
         switch (oType) {
@@ -396,20 +449,38 @@ public class EntityManager {
     /**
      * This method retrieves all stored instances of a given class.
      * @param entityClass
+     * @param entityProperties a map containing property values to use in selection, with the property name used as a key
      * @return
      */
-    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass) {
+    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, Pair<OType, Object>> entityProperties) {
         HashSet<DocumentEntity> documents = new HashSet<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             String stmt = "SELECT FROM " + entityClass.getClassName();
-            OResultSet rs = db.query(stmt);
+
+            OResultSet rs;
+            // check if there are properties that we need
+            if (entityProperties != null && !entityProperties.isEmpty()) {
+                Map<String, Object> params = new HashMap<>();
+                StringJoiner stringJoiner = new StringJoiner(" AND ");
+                stmt += " WHERE ";
+                for (String propertyName : entityProperties.keySet()) {
+                    stringJoiner.add(propertyName + " = :" + propertyName);
+                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).left(), entityProperties.get(propertyName).right()));
+                }
+                stmt += stringJoiner.toString();
+                rs = db.query(stmt, params);
+            }
+            else {
+                rs = db.query(stmt);
+            }
+
             while (rs.hasNext()) {
                 OResult result = rs.next();
                 if (result.isVertex()) {
                     documents.add(extractVertexEntity(result, entityClass));
                 }
                 else if (result.isEdge()) {
-                    documents.add(extractEdgeEntity(result, entityClass));
+                    documents.add(extractEdgeEntity(result));
                 }
                 // should not happen, but we just ignore the result
             }
@@ -417,6 +488,12 @@ public class EntityManager {
         return documents;
     }
 
+    /**
+     * THis method retrieves an entity of a given entity class from the data store, for a given id value.
+     * @param entityClass
+     * @param idValue
+     * @return
+     */
     public DocumentEntity retrieveEntity(EntityClass entityClass, Object idValue) {
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             // first we have to retrieve the identifying field
@@ -445,7 +522,7 @@ public class EntityManager {
                 return extractVertexEntity(oResult, entityClass);
             }
             else if (oResult.isEdge()) {
-                return extractEdgeEntity(oResult, entityClass);
+                return extractEdgeEntity(oResult);
             }
             else {
                 return null;
@@ -454,6 +531,12 @@ public class EntityManager {
         }
     }
 
+    /**
+     * Helper method that will extract a retrieved data store object into a vertex entity instance.
+     * @param result
+     * @param entityClass
+     * @return
+     */
     private VertexEntity extractVertexEntity(OResult result, EntityClass entityClass) {
         Optional<OVertex> op = result.getVertex();
         if (!op.isPresent()) return null;
@@ -480,6 +563,13 @@ public class EntityManager {
         return vertexEntity;
     }
 
+    /**
+     * Helper method that will create an edge entity instance for a retrieved edge object from the data store.
+     * @param vertexEntity
+     * @param edge
+     * @param vertexIsSource
+     * @return
+     */
     private EdgeEntity processEdgeEntity(VertexEntity vertexEntity, OEdge edge, boolean vertexIsSource) {
         Optional<OClass> opClass = edge.getSchemaType();
         // if the edge does not have a class for some reason, we cannot process it
@@ -514,7 +604,12 @@ public class EntityManager {
     }
 
 
-    private EdgeEntity extractEdgeEntity(OResult result, EntityClass entityClass) {
+    /**
+     * Helper method that will extract a retrieved data store object into a vertex entity instance.
+     * @param result
+     * @return
+     */
+    private EdgeEntity extractEdgeEntity(OResult result) {
         // check if the result contains an edge
         if (!result.getEdge().isPresent()) return null;
         OEdge oEdge = result.getEdge().get();
