@@ -93,6 +93,12 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 		scenarioCount = htmlReport.getScenarioCount();
 	}
 
+	private State renameStateAndGetScreenshot(State state, String newName){
+		state.set(Tags.ConcreteID, newName+"_"+scenarioCount+"_"+sequenceCount());
+		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		return state;
+	}
+
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
 	 */
@@ -109,16 +115,14 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 			 Util.pause(1);
 		 }
 		 //updating state for report:
-		 state.set(Tags.ConcreteID, "login");
-		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 state = renameStateAndGetScreenshot(state,"login");
 		 //open reporting menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"maintenance.jpg");
 		 Util.pause(1);
 		 htmlReport.addSequenceStep(state, "."+filePath+"maintenance.jpg");
 
 		 //updating state for report:
-		 state.set(Tags.ConcreteID, "maintenance");
-		 state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		 state = renameStateAndGetScreenshot(state,"maintenance");
 		 //press reporting sub-menu:
 		 nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"service.jpg");
 		 htmlReport.addSequenceStep(state, "."+filePath+"service.jpg");
@@ -129,8 +133,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 	@Override
 	protected void finishSequence(SUT system, State state){
 		//updating state for report:
-		state.set(Tags.ConcreteID, "end_of_sequence");
-		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		state = renameStateAndGetScreenshot(state,"end_of_sequence");
 		//adding the end state to the HTML report
 	 	htmlReport.addState(state);
 
@@ -141,8 +144,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "close_dialog");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"close_dialog");
 		}
 
 		// Ponsse environment: Check whether Acrobat reader with cancel dialog is visible and press cancel to close it:
@@ -151,8 +153,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 			filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"ponsse_acroread_cancel.jpg";
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "ponsse_acroread_cancel");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"ponsse_acroread_cancel");
 		}
 
 		// Ponsse environment: Check whether Windows screen like acrobat reader or file browser open and close it:
@@ -160,8 +161,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "windows_screen_close");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"windows_screen_close");
 		}
 
 		// Check whether acrobat reader open and close it:
@@ -170,8 +170,7 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "close_acrobat");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"close_acrobat");
 		}
 		// Check whether file system open and press cancel to close it:
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/"+"file_cancel_button.jpg";
@@ -179,37 +178,32 @@ public class Protocol_desktop_ponse_4g_services extends ClickFilterLayerProtocol
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath);
 			Util.pause(1);
 			htmlReport.addSequenceStep(state, "."+filePath);
-			state.set(Tags.ConcreteID, "file_cancel_button");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"file_cancel_button");
 		}
 		filePath = Main.getSettingsDir()+"desktop_ponse_4g_services/";
 		//open main menu:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"open_main_menu.jpg");
 		Util.pause(1);
 		htmlReport.addSequenceStep(state, "."+filePath+"open_main_menu.jpg");
-		state.set(Tags.ConcreteID, "open_main_menu");
-		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		state = renameStateAndGetScreenshot(state,"open_main_menu");
 		//end shift:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"end_shift.jpg");
 		Util.pause(1);
 		htmlReport.addSequenceStep(state, "."+filePath+"end_shift.jpg");
-		state.set(Tags.ConcreteID, "end_shift");
-		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		state = renameStateAndGetScreenshot(state,"end_shift");
 
 		//press no for "save changes in settings" if visible:
 		if(nl.ou.testar.SikulixUtil.textOrImageExists(filePath)){
 			nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"no.jpg");
 			Util.pause(1);
 			htmlReport.addSequenceStep(state, "."+filePath+"no.jpg");
-			state.set(Tags.ConcreteID, "no_saving");
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+			state = renameStateAndGetScreenshot(state,"no_saving");
 		}
 
 		//press close button:
 		nl.ou.testar.SikulixUtil.executeClickOnTextOrImagePath(filePath+"close_button.jpg");
 		htmlReport.addSequenceStep(state, "."+filePath+"close_button.jpg");
-		state.set(Tags.ConcreteID, "close_button");
-		state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		state = renameStateAndGetScreenshot(state,"close_button");
 	}
 
 	/**
