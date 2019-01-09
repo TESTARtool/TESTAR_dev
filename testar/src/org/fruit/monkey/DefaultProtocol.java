@@ -165,7 +165,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     protected List<ProcessInfo> contextRunningProcesses = null;
     protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
+    protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
     protected double passSeverity = Verdict.SEVERITY_OK;
     protected static int generatedSequenceNumber = -1;
 
@@ -245,6 +245,38 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	//Call the principal loop to work with different loop-modes
     	detectModeLoop(system);
 
+<<<<<<< HEAD
+=======
+    	//initialize TESTAR with the given settings:
+    	initialize(settings);
+
+    	try {
+
+    		if (mode() == Modes.View && isValidFile()) {
+    			new SequenceViewer(settings);
+    		} else if (mode() == Modes.Replay && isValidFile()) {
+    			runReplayLoop();
+    		} else if (mode() == Modes.Spy) {
+    			runSpyLoop();
+    		} else if(mode() == Modes.Record) {
+    			runRecordLoop(system);
+    		} else if (mode() == Modes.Generate) {
+    			runGenerateOuterLoop(system);
+    		}
+
+    	}catch(SystemStartException SystemStartException) {
+    		SystemStartException.printStackTrace();
+    		DEBUGLOG.error("Exception: ",SystemStartException);
+    		this.mode = Modes.Quit;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		DEBUGLOG.error("Exception: ",e);
+    		this.mode = Modes.Quit;
+    	}
+
+    	//Closing TESTAR EventHandler
+    	closeTestarTestSession();
+>>>>>>> logs & settings refactor, cmd read.me
     }
 
     /**
@@ -360,6 +392,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      	} catch (ClassNotFoundException | IOException e) {
      		
     		System.out.println("ERROR: File is not a readable, please select a correct file");
+    		DEBUGLOG.error("Exception: ",e);
+    		
      		return false;	
     	}
      	
@@ -393,9 +427,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     settings.get(LogLevel));
         } catch (NoSuchTagException e3) {
             // TODO Auto-generated catch block
+        	DEBUGLOG.error("Exception: ",e3);
             e3.printStackTrace();
         } catch (FileNotFoundException e3) {
             // TODO Auto-generated catch block
+        	DEBUGLOG.error("Exception: ",e3);
             e3.printStackTrace();
         }
         ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
@@ -416,12 +452,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.delete(currentSeq);
         } catch (IOException e2) {
             LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+            DEBUGLOG.error("Exception: ",e2);
         }
         try {
             TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
             LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
         } catch (IOException e) {
             LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+            DEBUGLOG.error("Exception: ",e);
         }
         return currentSeq;
     }
@@ -465,7 +503,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private void startTestSequence(SUT system) {
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
-        LOGGER.info("Starting test sequence {}", sequenceCount());
+        DEBUGLOG.info("Starting test sequence {}", sequenceCount());
 
         actionCount = 1;
         this.testFailTimes = 0;
@@ -491,7 +529,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.flush();
         LogSerialiser.finish();
         LogSerialiser.exit();
+<<<<<<< HEAD
         LOGGER.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+=======
+        DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+>>>>>>> logs & settings refactor, cmd read.me
     }
 
     /**
@@ -607,6 +649,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } catch (Exception e) {
                 System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
                 e.printStackTrace();
+                DEBUGLOG.error("Exception: ",e);
                 emergencyTerminateTestSequence(system, e);
             }
         }
@@ -629,8 +672,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
             } catch (NoSuchTagException e) {
                 LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                DEBUGLOG.error("Exception: ",e);
             } catch (IOException e) {
                 LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                DEBUGLOG.error("Exception: ",e);
             }
             FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
         }
@@ -789,7 +834,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				LogSerialiser.LogLevel.Info);
 
 		//bin folder 
-		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
+		DEBUGLOG.info(actionMode+" number {} Widget {} finished in {} ms",
 				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
 
     	
@@ -1045,8 +1090,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
         } catch(IOException ioe){
+        	DEBUGLOG.error("Exception: ",ioe);
             throw new RuntimeException("Cannot read file.", ioe);
         } catch (ClassNotFoundException cnfe) {
+        	DEBUGLOG.error("Exception: ",cnfe);
             throw new RuntimeException("Cannot read file.", cnfe);
         } finally {
             if (ois != null){

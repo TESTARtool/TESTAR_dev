@@ -59,10 +59,10 @@ public class Main {
 	public static String SSE_ACTIVATED = null;
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	public static String testarDir = null;
-	public static String settingsDir = null;
-	public static String outputDir = null;
-	public static String tempDir = null;
+	public static String testarDir = "";
+	public static String settingsDir = "";
+	public static String outputDir = "";
+	public static String tempDir = "";
 
 
 	/**
@@ -74,7 +74,7 @@ public class Main {
 		}catch (Exception e) {
 			testarDir = "." + File.separator;
 			System.out.println(e);
-			System.out.println("Please execute TESTAR since their existing directory");
+			System.out.println("Please execute TESTAR from their existing directory");
 		}
 		
 		settingsDir = testarDir + "settings" + File.separator;
