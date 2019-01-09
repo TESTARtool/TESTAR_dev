@@ -1587,15 +1587,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 		}
 
-		// If the system is in the background, we need to force it into the foreground!
-		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
-		// is putting the SUT back into the foreground.
-		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			//actions.add(ac.activateSystem());
-			this.forceToForeground = true;
-			return actions;
-		}
-
 		//Note this list is always empty in this deriveActions.
 		return actions;
 	}

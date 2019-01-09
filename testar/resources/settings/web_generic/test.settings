@@ -31,7 +31,7 @@ SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" ""
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
+Sequences = 3
 SequenceLength = 100
 
 #################################################################

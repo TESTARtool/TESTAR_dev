@@ -306,6 +306,19 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 				}
 			}
 		}
+		
+		// If the system is in the background, we need to force it into the foreground!
+		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
+		// is putting the SUT back into the foreground.
+		
+		
+		//Problems with popup windows (this is not a new IE process -> inspect.exe, investigate)
+		/*if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+			//actions.add(ac.activateSystem());
+			this.forceToForeground = true;
+			return actions;
+		}*/
+
 		//return the set of derived actions
 		return actions;
 	}
