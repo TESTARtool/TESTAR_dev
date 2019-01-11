@@ -20,10 +20,6 @@ public abstract class AbstractStateFactory {
     public static AbstractState createAbstractState(State newState, Set<Action> actions) {
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
         AbstractState newAbstractState = new AbstractState(abstractStateId, ActionHelper.convertActionsToAbstractActions(actions));
-        // add the needed tags and their values to the abstract state
-//        for (Tag<?> tag : CodingManager.getCustomTagsForAbstractId()) {
-//            newAbstractState.addAttribute(tag, newState.get(tag));
-//        }
         return newAbstractState;
     }
 

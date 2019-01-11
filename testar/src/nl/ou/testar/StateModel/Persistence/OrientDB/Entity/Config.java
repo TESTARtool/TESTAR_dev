@@ -17,6 +17,9 @@ public class Config {
     // database password
     private String password;
 
+    // create/reset the database?
+    private boolean resetDataStore;
+
     public String getConnectionType() {
         return connectionType;
     }
@@ -55,5 +58,13 @@ public class Config {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean resetDataStore() {
+        return resetDataStore;
+    }
+
+    public void setResetDataStore(boolean resetDataStore) {
+        this.resetDataStore = resetDataStore;
     }
 }

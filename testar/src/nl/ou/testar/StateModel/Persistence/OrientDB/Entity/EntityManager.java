@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
@@ -14,10 +15,12 @@ import com.orientechnologies.orient.core.record.impl.OBlob;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import org.fruit.Pair;
 import org.fruit.alayer.Visualizer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EntityManager {
 
@@ -34,6 +37,27 @@ public class EntityManager {
         String connectionString = config.getConnectionType() + ":" +"/" + config.getServer() + "/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         dbConfig = config;
+        init();
+    }
+
+    /**
+     * Initialization method for this entity manager
+     */
+    private void init() {
+        //init code here
+        // check if the database needs to be reset
+        if (dbConfig.resetDataStore()) {
+            try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+                // drop all the classes. This will drop all the records for these classes.
+                OSchema schema = db.getMetadata().getSchema();
+                for (OClass oClass : DependencyHelper.sortDependenciesForDeletion(schema.getClasses())) {
+                    if ((oClass.isEdgeType() || oClass.isVertexType()) && !(oClass.getName().equals("V") || oClass.getName().equals("E"))) {
+                        System.out.println("Dropping class " + oClass.getName());
+                        schema.dropClass(oClass.getName());
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -207,8 +231,24 @@ public class EntityManager {
             String superClassName = entityClass.getSuperClassName() != null ? entityClass.getSuperClassName() : entitySuperClass;
             oClass = db.createClass(entityClass.getClassName(), superClassName);
 
+            Set<String> propertyBlackList = new HashSet<>();
+            // if the entityclass has a super class, we need to filter out the properties that have already been
+            // created in the super class, as OrientDB will throw an error if we try to create it again in the child class
+            if (entityClass.getSuperClassName() != null) {
+                // fetch the superclass
+                EntityClass superClass = EntityClassFactory.createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
+                if (superClass != null) {
+                    propertyBlackList = superClass.getProperties().stream().map(property -> property.getPropertyName()).collect(Collectors.toSet());
+                }
+            }
+
             // set the properties
             for (Property property : entityClass.getProperties()) {
+                // check if this property needs to be skipped
+                if (propertyBlackList.contains(property.getPropertyName())) {
+                    continue;
+                }
+
                 OProperty dbProperty = null;
                 // binary types we do not create, as they will be stored as separate binary records
                 if (property.getPropertyType() == OType.BINARY) {
@@ -229,7 +269,7 @@ public class EntityManager {
 
             // we add an index for the identifier fields for fast lookup
             Property identifier = entityClass.getIdentifier();
-            if (identifier != null) {
+            if (identifier != null && !propertyBlackList.contains(identifier.getPropertyName())) {
                 String indexField = entityClass.getClassName() + "." + identifier.getPropertyName() + "Idx";
                 oClass.createIndex(indexField, OClass.INDEX_TYPE.UNIQUE,identifier.getPropertyName());
             }

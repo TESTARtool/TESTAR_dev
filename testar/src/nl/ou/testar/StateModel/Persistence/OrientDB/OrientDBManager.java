@@ -1,6 +1,5 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -13,7 +12,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Widget;
-import org.fruit.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,7 +71,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first
-        for (EntityClass entityClass : DependencyHelper.sortDependencies(entityClassSet)) {
+        for (EntityClass entityClass : DependencyHelper.sortDependenciesForDeletion(entityClassSet)) {
             System.out.println("Creating " + entityClass.getClassName() + " - " + entityClass.getSuperClassName());
             entityManager.createClass(entityClass);
         }
@@ -86,6 +84,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
+        System.out.println("Persisting abstract state");
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -103,7 +102,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // save the entity!
         entityManager.saveEntity(vertexEntity);
 
-        // there are two things left to do:
+        // deal with the unvisited actions on the states
+        persistUnvisitedActions(abstractState, vertexEntity);
+    }
+
+    private void persistUnvisitedActions(AbstractState abstractState, VertexEntity vertexEntity) {
         // 1) delete the unvisited actions that are no longer unvisited
         // 2) save the unvisited actions (for newly saved states)
 
@@ -112,6 +115,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
         // we need the ids
         Set<Object> visitedActionIds = visitedActions.stream().map(action -> action.getActionId()).collect(Collectors.toSet());
+        System.out.println("Visited actions: " + visitedActionIds.toString());
         EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
         entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
 
@@ -119,10 +123,21 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // all unvisited actions go to the black hole vertex!
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.BlackHole);
         VertexEntity blackHole = new VertexEntity(targetEntityClass);
+        try {
+            EntityHydrator blackHoleHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_BLACKHOLE);
+            blackHoleHydrator.hydrate(blackHole, null);
+        }
+        catch (HydrationException ex) {
+            ex.printStackTrace();
+            System.out.println("Encountered a problem while hydrating the black hole class for state " + abstractState.getStateId());
+            return;
+        }
 
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+            System.out.println("Adding unvisited actions");
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
+                System.out.println(unvisitedAction.getActionId());
                 EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, vertexEntity, blackHole);
                 actionHydrator.hydrate(actionEntity, unvisitedAction);
                 entityManager.saveEntity(actionEntity);
@@ -276,6 +291,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
+            System.out.println("Hydrating abstract action " + abstractStateTransition.getAction().getActionId());
             actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
         }
         catch (HydrationException ex) {
@@ -289,7 +305,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // there are two options here: either the abstract state model already exists in the database,
         // in which case we load it, or it doesn't exist yet, in which case we save it
         // first, disable the event listener. We do not want to process the events resulting from our object creations
-        setListening(false);
+//        setListening(false);
 
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -325,6 +341,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public void eventReceived(StateModelEvent event) {
         if (!listening) return;
 
+        System.out.println("Event received: " + event.getEventType().toString());
+
         try {
             eventHelper.validateEvent(event);
         } catch (InvalidEventException e) {
@@ -340,6 +358,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             case ABSTRACT_STATE_TRANSITION_ADDED:
             case ABSTRACT_ACTION_CHANGED:
+                //@todo the abstract action changed event needs to just update the action attributes
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;
 

@@ -41,7 +41,6 @@ import javax.swing.*;
 public class StateModelPanel extends JPanel {
 
 	private static final long serialVersionUID = -2815422165938356237L;
-	private JCheckBox stateModelEnabledChkBox = new JCheckBox();
     private JLabel label1 = new JLabel("State model enabled");
     private JLabel label2 = new JLabel("DataStore");
     private JLabel label3 = new JLabel("DataStoreType");
@@ -50,7 +49,9 @@ public class StateModelPanel extends JPanel {
     private JLabel label6 = new JLabel("DataStoreUser");
     private JLabel label7 = new JLabel("DataStorePassword");
     private JLabel label8 = new JLabel("DataStoreMode");
+    private JLabel label9 = new JLabel("Reset database");
 
+    private JCheckBox stateModelEnabledChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
     private JTextField dataStoreTypeTextfield = new JTextField();
     private JTextField dataStoreServerTextfield = new JTextField();
@@ -58,6 +59,7 @@ public class StateModelPanel extends JPanel {
     private JTextField dataStoreUserTextfield = new JTextField();
     private JPasswordField dataStorePasswordfield = new JPasswordField();
     private JTextField dataStoreModefield = new JTextField();
+    private JCheckBox resetDatabaseCheckbox = new JCheckBox();
 
     private StateModelPanel(){
         super();
@@ -78,38 +80,42 @@ public class StateModelPanel extends JPanel {
      */
     private void initialize() {
         setLayout(null);
-        label1.setBounds(10,14,120,27);
+        label1.setBounds(10,14,180,27);
         add(label1);
-        stateModelEnabledChkBox.setBounds(130,14,50,27);
+        stateModelEnabledChkBox.setBounds(190,14,50,27);
         add(stateModelEnabledChkBox);
-        label2.setBounds(10,52,120,27);
+        label2.setBounds(10,52,180,27);
         add(label2);
-        dataStoreTextfield.setBounds(130,52,200,27);
+        dataStoreTextfield.setBounds(190,52,200,27);
         add(dataStoreTextfield);
-        label3.setBounds(10,90,120,27);
+        label3.setBounds(10,90,180,27);
         add(label3);
-        dataStoreTypeTextfield.setBounds(130,90,200,27);
+        dataStoreTypeTextfield.setBounds(190,90,200,27);
         add(dataStoreTypeTextfield);
-        label4.setBounds(10,128,120,27);
+        label4.setBounds(10,128,180,27);
         add(label4);
-        dataStoreServerTextfield.setBounds(130,128,200,27);
+        dataStoreServerTextfield.setBounds(190,128,200,27);
         add(dataStoreServerTextfield);
-        label5.setBounds(10,166,120,27);
+        label5.setBounds(10,166,180,27);
         add(label5);
-        dataStoreDBTextfield.setBounds(130,166,200,27);
+        dataStoreDBTextfield.setBounds(190,166,200,27);
         add(dataStoreDBTextfield);
-        label6.setBounds(10,204,120,27);
+        label6.setBounds(10,204,180,27);
         add(label6);
-        dataStoreUserTextfield.setBounds(130,204,200,27);
+        dataStoreUserTextfield.setBounds(190,204,200,27);
         add(dataStoreUserTextfield);
-        label7.setBounds(10,242,120,27);
+        label7.setBounds(10,242,180,27);
         add(label7);
-        dataStorePasswordfield.setBounds(130,242,200,27);
+        dataStorePasswordfield.setBounds(190,242,200,27);
         add(dataStorePasswordfield);
-        label8.setBounds(10,280,120,27);
+        label8.setBounds(10,280,180,27);
         add(label8);
-        dataStoreModefield.setBounds(130,280,200,27);
+        dataStoreModefield.setBounds(190,280,200,27);
         add(dataStoreModefield);
+        label9.setBounds(10,318,180,27);
+        add(label9);
+        resetDatabaseCheckbox.setBounds(190, 318, 50, 27);
+        add(resetDatabaseCheckbox);
     }
 
     /**
@@ -140,6 +146,7 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
         settings.set(ConfigTags.DataStorePassword, getPassword());
         settings.set(ConfigTags.DataStoreMode, dataStoreModefield.getText());
+        settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
     }
 
     /**

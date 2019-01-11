@@ -68,18 +68,22 @@ public class StateModelManager {
         }
         catch (StateModelException ex) {
             // state wasn't found
+            System.out.println("Creating new abstract state");
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
-        // we want to provide the abstract state with the identifier of the concrete state
-        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
 
         // get the concrete state
         ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
 
         // add the abstract state to the model and persist the concrete state
         try {
+            System.out.println("Adding state to the model");
             abstractStateModel.addState(newAbstractState);
+            // we want to provide the abstract state with the identifier of the concrete state
+            newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+
             if (currentAbstractState == null) {
+                System.out.println("Initial state found");
                 // it's apparently the first state in our run
                 abstractStateModel.addInitialState(newAbstractState);
             }
@@ -89,6 +93,7 @@ public class StateModelManager {
                     // this should never happen if the notification process is followed correctly
                     throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
                 }
+                System.out.println("Adding transition");
                 abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
                 // we reset the executed action to await the next one.
                 actionUnderExecution = null;

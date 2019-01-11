@@ -6,7 +6,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 
-public class isAbstractedByHydrator implements EntityHydrator<EdgeEntity> {
+public class IsAbstractedByHydrator implements EntityHydrator<EdgeEntity> {
 
     @Override
     public void hydrate(EdgeEntity target, Object source) throws HydrationException {

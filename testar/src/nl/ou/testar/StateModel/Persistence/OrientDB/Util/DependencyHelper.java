@@ -1,7 +1,9 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Util;
 
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -14,7 +16,7 @@ public abstract class DependencyHelper {
      * @param entityClassSet a set of entity classes to sort by dependency
      * @return
      */
-    public static EntityClass[] sortDependencies(Set<EntityClass> entityClassSet) {
+    public static EntityClass[] sortDependenciesForDeletion(Set<EntityClass> entityClassSet) {
         LinkedList<EntityClass> classQueue = new LinkedList<>(entityClassSet);
         EntityClass[] entityClasses = new EntityClass[entityClassSet.size()];
         int i = 0;
@@ -42,6 +44,50 @@ public abstract class DependencyHelper {
             }
         }
         return entityClasses;
+    }
+
+    /**
+     * This method will accept a set of orient db classes and return them sorted by dependencies,
+     * so that classes that have subclasses will come after their subclasses.
+     * @param classes
+     * @return
+     */
+    public static OClass[] sortDependenciesForDeletion(Collection<OClass> classes) {
+        LinkedList<OClass> classQueue = new LinkedList<>(classes);
+        OClass[] oClasses = new OClass[classes.size()];
+        int i = 0;
+        while (!classQueue.isEmpty()) {
+            OClass oClass = classQueue.remove();
+            Collection<OClass> subClasses = oClass.getAllSubclasses();
+            if (subClasses.size() == 0) {
+                // no subclasses, we simply add it to the array
+                oClasses[i++] = oClass;
+            }
+            else {
+                // we need to make sure all the subclasses are in the array before we add this class
+                // if that is not the case, we add it to the back of the list
+                boolean allSubClassesInserted = true;
+                outer: for (OClass subClass : subClasses) {
+                    for (int x = 0; x < i; x++) {
+                        if (oClasses[x].getName().equals(subClass.getName())) {
+                            // subclass is present, good deal
+                            continue outer;
+                        }
+                    }
+                    // made it here means this subclass is not present yet
+                    allSubClassesInserted = false;
+                    break;
+                }
+
+                if (!allSubClassesInserted) {
+                    classQueue.addLast(oClass);
+                }
+                else {
+                    oClasses[i++] = oClass;
+                }
+            }
+        }
+        return oClasses;
     }
 
 }

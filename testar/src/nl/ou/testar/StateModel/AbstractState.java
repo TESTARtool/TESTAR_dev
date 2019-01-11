@@ -28,10 +28,11 @@ public class AbstractState extends AbstractEntity {
     public AbstractState(String stateId, Set<AbstractAction> actions) {
         super(stateId);
         this.actions = new HashMap<>();
+        unvisitedActions = new HashMap<>();
         for(AbstractAction action:actions) {
             this.actions.put(action.getActionId(), action);
+            unvisitedActions.put(action.getActionId(), action);
         }
-        unvisitedActions = this.actions; // all are unvisited when creating
         concreteStateIds = new HashSet<>();
     }
 
@@ -59,10 +60,7 @@ public class AbstractState extends AbstractEntity {
      * @param action the visited action
      */
     public void addVisitedAction(AbstractAction action) {
-        if (unvisitedActions.containsKey(action.getActionId())) {
             unvisitedActions.remove(action.getActionId());
-            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
-        }
     }
 
     /**
@@ -130,8 +128,15 @@ public class AbstractState extends AbstractEntity {
      * @return
      */
     public Set<AbstractAction> getVisitedActions() {
-        HashSet<AbstractAction> visitedActions = (HashSet<AbstractAction>) ((HashSet)getActions()).clone();
+        Set<AbstractAction> visitedActions = new HashSet<>();
+        for (AbstractAction action : actions.values()) {
+            visitedActions.add(action);
+        }
+        System.out.println("Values in visitedactions set: " + visitedActions.toString());
+        System.out.println("Values in unvisited actions set: " + getUnvisitedActions().toString());
         visitedActions.removeAll(getUnvisitedActions());
+        System.out.println("Values after removing unvisited actions: " + visitedActions.toString());
+        System.out.println("Values in all actions: " + actions.values().toString());
         return visitedActions;
     }
 

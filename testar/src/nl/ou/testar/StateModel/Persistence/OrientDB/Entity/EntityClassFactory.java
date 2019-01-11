@@ -250,8 +250,7 @@ public class EntityClassFactory {
         unvisitedActions.setMandatory(false);
         unvisitedActions.setNullable(false);
         entityClass.addProperty(unvisitedActions);
-        entityClass.setSuperClassName("AbstractAction");
-        entityClasses.put(EntityClassName.AbstractAction, entityClass);
+        entityClasses.put(EntityClassName.UnvisitedAbstractAction, entityClass);
         return entityClass;
     }
 
