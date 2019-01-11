@@ -44,7 +44,6 @@ public class QLearningActionSelector {
             currentQlearningGuiState.updateActionIdsOfTheStateIntoModel(actions, R_MAX);
         }
 
-
         System.out.println("DEBUG: state ID from model="+currentQlearningGuiState.getConcreteStateId());
        for (String id:currentQlearningGuiState.concreteActionIdsAndQValues.keySet()) {
             System.out.println("DEBUG: id="+id+", Q-value="+currentQlearningGuiState.concreteActionIdsAndQValues.get(id));

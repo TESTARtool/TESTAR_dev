@@ -66,12 +66,21 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
       if (!result.getType().equals(EvaluationResult.Type.OK)) {
         SuccessCriterion sc = result.getSuccessCriterion();
         Widget w = result.getWidget();
-        s += (!s.isEmpty() ? ";": "") + result.getType().name()
+        if (!s.isEmpty() ) {
+          s = s + ";";
+        } else {
+          s = s + "";
+        }
+        s = s + result.getType().name()
             + ":" + sc.toString()
             + ":" + sc.getLevel().name()
-            + ":" + sc.getURLSuffix()
-            + ":" + (w != null ? w.get(Tags.ConcreteID): "N/A")
-            + ":" + result.getMessage();
+            + ":" + sc.getURLSuffix();
+        if (w != null) {
+          s = s + w.get(Tags.ConcreteID);
+        } else {
+          s = s + "N/A";
+        }
+        s = s + ":" + result.getMessage();
       }
     }
     state.set(WCAG2Tags.WCAG2Violations, s);
@@ -87,13 +96,17 @@ public class Protocol_accessibility_wcag2ict extends AccessibilityProtocol {
         .split(";");
     for (String violation: violations) {
       String[] violationInfo = violation.split(":");
-      String violationType = violationInfo[0],
-          criterion = violationInfo[1],
-          level = violationInfo[2],
-          url = SuccessCriterion.URL_BASE + violationInfo[3],
-          widgetTitle = !violationInfo[4].equals("N/A")
-              ? getWidgetTitleFromGraphDB(violationInfo[4]): violationInfo[4],
-          message = violationInfo[5];
+      String violationType = violationInfo[0];
+      String criterion = violationInfo[1];
+      String level = violationInfo[2];
+      String url = SuccessCriterion.URL_BASE + violationInfo[3];
+      String widgetTitle;
+      if (!violationInfo[4].equals("N/A")) {
+        widgetTitle = getWidgetTitleFromGraphDB(violationInfo[4]);
+      } else {
+        widgetTitle =  violationInfo[4];
+      }
+      String   message = violationInfo[5];
       html.writeTableRowStart()
       .writeTableCell(violationType)
       .writeTableCellStart().writeLink(criterion, url, true).writeTableCellEnd()

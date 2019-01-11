@@ -38,7 +38,7 @@ public class SystemProcessHandling {
         return runningProcesses;
     }
 
-    final static long MAX_KILL_WINDOW = 10000; // 10 seconds
+    static final long MAX_KILL_WINDOW = 10000; // 10 seconds
 
     //TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
     public static void killTestLaunchedProcesses(List<ProcessInfo> contextRunningProcesses) {
@@ -51,19 +51,22 @@ public class SystemProcessHandling {
                     break;
                 }
             }
-            if (kill)
+            if (kill) {
                 killProcess(pi1,MAX_KILL_WINDOW);
+            }
         }
     }
 
     //TODO native linker is used and that requires platform specific implementation. move to SystemProcessHandling class
+    //TODO parameter killWindow is not used
     /**
      * Kills the SUT process. Also true if the process is not running anymore (killing might not happen)
-     * @param sut
-     * @param KILL_WINDOW
-     * @return
+     * @param sut the system under testing
+
+     * @param killWindow ???
+     * @return true if the running process is killed
      */
-    public static boolean killRunningProcesses(SUT sut, long KILL_WINDOW) {
+    public static boolean killRunningProcesses(SUT sut, long killWindow) {
         boolean allKilled = true;
         for (ProcessHandle ph: Util.makeIterable(sut.get(Tags.ProcessHandles, Collections.<ProcessHandle>emptyList().iterator()))) {
             if (ph.name() != null && sut.get(Tags.Desc, "").contains(ph.name())) {

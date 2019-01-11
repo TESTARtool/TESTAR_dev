@@ -24,7 +24,6 @@ import org.fruit.monkey.Settings;
 
 import nl.ou.testar.tgherkin.Utils;
 
-
 /**
  * JUnit test for the Document class.
  * This class tests execution of the document model:
@@ -33,6 +32,14 @@ import nl.ou.testar.tgherkin.Utils;
  *
  */
 public class DocumentTest {
+
+  private static final double RECT_X = 1304.0;
+  private static final double RECT_Y = 536.0;
+  private static final double RECT_W = 120.0;
+  private static final double RECT_H = 49.0;
+  private static final double MAX_Z_INDEX = 15.0;
+  private static final double Z_INDEX = 15.0;
+  private static final double STATE_INDEX = 15.0;
 
   private List<Widget> setUpGeneralWidgets() {
     List<Widget> generalWidgets = new ArrayList<Widget>();
@@ -44,12 +51,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID1");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID1");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID1");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteID2");
@@ -59,12 +66,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID2");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID2");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID2");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDclearButton");
@@ -73,12 +80,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID3");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID3");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID3");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDplusButton");
@@ -87,12 +94,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID4");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID4");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID4");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDequalButton");
@@ -101,12 +108,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID5");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID5");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID5");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum0Button");
@@ -115,12 +122,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID6");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID6");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID6");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum1Button");
@@ -129,12 +136,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID7");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID7");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID7");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum2Button");
@@ -143,12 +150,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID8");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID8");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID8");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum3Button");
@@ -157,12 +164,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID9");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID9");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID9");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum4Button");
@@ -171,12 +178,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID10");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID10");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID10");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum5Button");
@@ -185,12 +192,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID11");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID11");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID11");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum6Button");
@@ -199,12 +206,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID12");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID12");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID12");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum7Button");
@@ -213,12 +220,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID13");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID13");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID13");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum8Button");
@@ -227,12 +234,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID14");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID14");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID14");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDnum9Button");
@@ -241,12 +248,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID15");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID15");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID15");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDxpower2Button");
@@ -255,12 +262,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID16");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID16");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID16");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDsquareRootButton");
@@ -269,12 +276,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID17");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID17");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID17");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     widget = new StdWidget();
     widget.set(Tags.ConcreteID, "ConcreteIDText");
@@ -283,12 +290,12 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID18");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID18");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID18");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     generalWidgets.add(widget);
     return generalWidgets;
   }
@@ -296,7 +303,7 @@ public class DocumentTest {
   private State setUpGeneralState() {
     List<Widget> stateWidgets = setUpGeneralWidgets();
     State state = new StateMock(stateWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     return state;
   }
 
@@ -761,15 +768,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 2
     stepWidgets = setUpGeneralWidgets();
@@ -781,15 +788,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 3
     stepWidgets = setUpGeneralWidgets();
@@ -801,15 +808,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 4
     stepWidgets = setUpGeneralWidgets();
@@ -821,15 +828,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID104");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID104");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID104");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();
@@ -895,15 +902,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();
@@ -956,15 +963,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();
@@ -1023,15 +1030,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 2
     stepWidgets = setUpGeneralWidgets();
@@ -1043,15 +1050,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();
@@ -1117,15 +1124,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 2
     stepWidgets = setUpGeneralWidgets();
@@ -1137,15 +1144,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 3
     stepWidgets = setUpGeneralWidgets();
@@ -1157,15 +1164,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();
@@ -1235,15 +1242,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID101");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID101");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID101");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     State state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 2
     stepWidgets = setUpGeneralWidgets();
@@ -1255,15 +1262,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID102");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID102");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID102");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // Create after state for Step 3
     stepWidgets = setUpGeneralWidgets();
@@ -1275,15 +1282,15 @@ public class DocumentTest {
     widget.set(Tags.Blocked, false);
     widget.set(Tags.Enabled, true);
     widget.set(UIATags.UIAIsKeyboardFocusable,true);
-    widget.set(Tags.Shape, Rect.from(1304.0, 536.0, 120.0, 49.0));
+    widget.set(Tags.Shape, Rect.from(RECT_X, RECT_Y, RECT_W, RECT_H));
     widget.set(Tags.Abstract_R_ID, "Abstract_R_ID103");
     widget.set(Tags.Abstract_R_T_ID, "Abstract_R_T_ID103");
     widget.set(Tags.Abstract_R_T_P_ID, "Abstract_R_T_P_ID103");
-    widget.set(Tags.MaxZIndex, 15.0);
-    widget.set(Tags.ZIndex, 15.0);
+    widget.set(Tags.MaxZIndex, MAX_Z_INDEX);
+    widget.set(Tags.ZIndex,Z_INDEX);
     stepWidgets.add(widget);
     state = new StateMock(stepWidgets);
-    state.set(Tags.MaxZIndex, 15.0);
+    state.set(Tags.MaxZIndex, STATE_INDEX);
     states.add(state);
     // action set sizes
     List<Integer> actionSetSizes = new ArrayList<Integer>();

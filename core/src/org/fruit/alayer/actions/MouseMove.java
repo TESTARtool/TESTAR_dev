@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -62,7 +61,9 @@ public final class MouseMove extends TaggableBase implements Action {
     this(new AbsolutePosition(x, y), 0);
   }
 
-  public MouseMove(Position position) { this(position, 0); }
+  public MouseMove(Position position) {
+    this(position, 0);
+  }
 
   public MouseMove(Position position, double minDuration) {
     Assert.notNull(position);
@@ -75,12 +76,12 @@ public final class MouseMove extends TaggableBase implements Action {
     return "Move mouse to " + position.toString() + ".";
   }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     for (Role r: discardParameters) {
-      if (r.name().equals(ActionRoles.MouseMove.name()))
+      if (r.name().equals(ActionRoles.MouseMove.name())) {
         return "Mouse moved";
+      }
     }
     return toString();
   }
@@ -97,20 +98,18 @@ public final class MouseMove extends TaggableBase implements Action {
     }
   }
 
-  // by urueda
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString() + toParametersString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
-    //return position.toString();
     return "";
   }
 }

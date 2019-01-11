@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.*;
@@ -40,8 +39,6 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Observable;
-
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
 
 public class GeneralPanel extends JPanel {
 
@@ -75,30 +72,30 @@ public class GeneralPanel extends JPanel {
     }));
     cboxSUTconnector.setSelectedIndex(0);
     cboxSUTconnector.setBounds(114, 12, 171, 25);
-    cboxSUTconnector.setToolTipText(sutConnectorTTT);
+    cboxSUTconnector.setToolTipText(ToolTipTexts.getSutConnectorTTT());
     cboxSUTconnector.setMaximumRowCount(3);
     add(cboxSUTconnector);
 
     txtSutPath = new JTextArea();
     txtSutPath.setLineWrap(true);
-    txtSutPath.setToolTipText(sutPathTTT);
+    txtSutPath.setToolTipText(ToolTipTexts.getSutPathTTT());
 
     spnNumSequences = new JSpinner();
     spnNumSequences.setBounds(160, 161, 71, 25);
     spnNumSequences.setModel(new SpinnerNumberModel(1, 1, null, 1));
-    spnNumSequences.setToolTipText(nofSequencesTTT);
+    spnNumSequences.setToolTipText(ToolTipTexts.getNofSequencesTTT());
     add(spnNumSequences);
 
     spnSequenceLength = new JSpinner();
     spnSequenceLength.setBounds(160, 199, 71, 25);
     spnSequenceLength.setModel(new SpinnerNumberModel(999, 1, null, 1));
-    spnSequenceLength.setToolTipText(sequencesActionsTTT);
+    spnSequenceLength.setToolTipText(ToolTipTexts.getSequencesActionsTTT());
     add(spnSequenceLength);
 
     esiSpinner = new JSpinner();
     esiSpinner.setBounds(160, 275, 71, 25);
     esiSpinner.setValue(10);
-    esiSpinner.setToolTipText(intervalTTT);
+    esiSpinner.setToolTipText(ToolTipTexts.getIntervalTTT());
     add(esiSpinner);
 
     comboboxVerbosity = new JComboBox<>();
@@ -107,7 +104,7 @@ public class GeneralPanel extends JPanel {
     comboboxVerbosity.setSelectedIndex(1);
     comboboxVerbosity.setBounds(160, 313, 107, 25);
     comboboxVerbosity.setMaximumRowCount(3);
-    comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
+    comboboxVerbosity.setToolTipText(ToolTipTexts.getLoggingVerbosityTTT());
     add(comboboxVerbosity);
 
     comboBoxProtocol = new JComboBox<>();
@@ -117,22 +114,23 @@ public class GeneralPanel extends JPanel {
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
-    comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16: sutSettings.length);
+    int maxRowCount = Math.min(16, sutSettings.length);
+    comboBoxProtocol.setMaximumRowCount(maxRowCount);
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
     comboBoxProtocol.addItemListener(myItemListener);
-    comboBoxProtocol.setToolTipText(comboBoxProtocolTTT);
+    comboBoxProtocol.setToolTipText(ToolTipTexts.getComboBoxProtocolTTT());
     add(comboBoxProtocol);
 
     compileCheckBox = new JCheckBox("Always compile protocol");
     compileCheckBox.setBounds(286, 199, 192, 21);
-    compileCheckBox.setToolTipText(lblCompileTTT);
+    compileCheckBox.setToolTipText(ToolTipTexts.getLblCompileTTT());
     add(compileCheckBox);
 
     checkStopOnFault = new JCheckBox("Stop Test on Fault");
     checkStopOnFault.setBounds(10, 240, 192, 21);
-    checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
+    checkStopOnFault.setToolTipText(ToolTipTexts.getCheckStopOnFaultTTT());
     add(checkStopOnFault);
 
   }
@@ -141,13 +139,13 @@ public class GeneralPanel extends JPanel {
     JButton btnSutPath = new JButton("Select SUT");
     btnSutPath.setBounds(520, 11, 90, 25);
     btnSutPath.addActionListener(this::btnSutPathActionPerformed);
-    btnSutPath.setToolTipText(btnSelectSUTTTT);
+    btnSutPath.setToolTipText(ToolTipTexts.getBtnSelectSUTTTT());
     add(btnSutPath);
 
     JButton btnEditProtocol = new JButton("Edit Protocol");
     btnEditProtocol.setBounds(510, 199, 100, 25);
     btnEditProtocol.addActionListener(this::btnEditProtocolActionPerformed);
-    btnEditProtocol.setToolTipText(btnEditProtocolTTT);
+    btnEditProtocol.setToolTipText(ToolTipTexts.getBtnEditProtocolTTT());
     btnEditProtocol.setMaximumSize(new Dimension(160, 35));
     btnEditProtocol.setMinimumSize(new Dimension(160, 35));
     btnEditProtocol.setPreferredSize(new Dimension(160, 35));
@@ -162,32 +160,32 @@ public class GeneralPanel extends JPanel {
   private void addGeneralLabels() {
     JLabel lblSUTconnector = new JLabel("SUT connector:");
     lblSUTconnector.setBounds(10, 11, 97, 20);
-    lblSUTconnector.setToolTipText(sutConnectorTTT);
+    lblSUTconnector.setToolTipText(ToolTipTexts.getSutConnectorTTT());
     add(lblSUTconnector);
 
     JLabel lblNofSequences = new JLabel("Number of Sequences:");
     lblNofSequences.setBounds(10, 164, 135, 14);
-    lblNofSequences.setToolTipText(nofSequencesTTT);
+    lblNofSequences.setToolTipText(ToolTipTexts.getNofSequencesTTT());
     add(lblNofSequences);
 
     JLabel lblSamplingInterval = new JLabel("Sampling interval:");
     lblSamplingInterval.setBounds(10, 278, 100, 14);
-    lblSamplingInterval.setToolTipText(intervalTTT);
+    lblSamplingInterval.setToolTipText(ToolTipTexts.getIntervalTTT());
     add(lblSamplingInterval);
 
     JLabel lblLoggingVerbosity = new JLabel("Logging Verbosity:");
     lblLoggingVerbosity.setBounds(10, 316, 120, 14);
-    lblLoggingVerbosity.setToolTipText(lblLoggingVerbosityTTT);
+    lblLoggingVerbosity.setToolTipText(ToolTipTexts.getLblLoggingVerbosityTTT());
     add(lblLoggingVerbosity);
 
     JLabel lblSequenceActions = new JLabel("Sequence actions:");
     lblSequenceActions.setBounds(10, 202, 148, 14);
-    lblSequenceActions.setToolTipText(sequencesActionsTTT);
+    lblSequenceActions.setToolTipText(ToolTipTexts.getSequencesActionsTTT());
     add(lblSequenceActions);
 
     JLabel lblProtocol = new JLabel("Protocol:");
     lblProtocol.setBounds(286, 164, 64, 14);
-    lblProtocol.setToolTipText(comboBoxProtocolTTT);
+    lblProtocol.setToolTipText(ToolTipTexts.getComboBoxProtocolTTT());
     add(lblProtocol);
   }
 

@@ -27,21 +27,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.util;
 
-
 import org.bridj.Pointer;
-
 
 /**
  * Class to help with BridJ functionality.
  */
 public class BridJHelper {
 
-
     private static final String EmptyString = "";
-
 
     /**
      * Converts a pointer to a string to a String.
@@ -57,7 +52,6 @@ public class BridJHelper {
         return stringPointer.getCString();
     }
 
-
     /**
      * Converts a String to a pointer to a string.
      * @param str The string to get a pointer to.
@@ -66,6 +60,5 @@ public class BridJHelper {
     public static Pointer<Byte> convertToPointer(String str) {
         return Pointer.pointerToCString(str);
     }
-
 
 }

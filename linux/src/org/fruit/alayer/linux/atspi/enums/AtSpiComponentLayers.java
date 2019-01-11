@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
-
 
 /**
  * The AtspiComponentLayer of an AtspiComponent instance indicates its relative stacking order with respect
@@ -46,12 +44,10 @@ package org.fruit.alayer.linux.atspi.enums;
  */
 public enum AtSpiComponentLayers {
 
-
     /**
      * Indicates an error condition or uninitialized value.
      */
     Invalid,
-
 
     /**
      * The bottom-most layer, over which everything else is painted. The 'desktop background'
@@ -59,18 +55,15 @@ public enum AtSpiComponentLayers {
      */
     Background,
 
-
     /**
      * The 'background' layer for most content renderers and UI AtspiComponent containers.
      */
     Canvas,
 
-
     /**
      * The layer in which the majority of ordinary 'foreground' widgets reside.
      */
     Widget,
-
 
     /**
      * A special layer between ATSPI_LAYER_CANVAS and ATSPI_LAYER_WIDGET ,
@@ -78,29 +71,24 @@ public enum AtSpiComponentLayers {
      */
     Mdi,
 
-
     /**
      * A layer for popup window content, above ATSPI_LAYER_WIDGET .
      */
     Popup,
-
 
     /**
      * The topmost layer.
      */
     Overlay,
 
-
     /**
      * The layer in which a toplevel window background usually resides.
      */
     Window,
 
-
     /**
      * Used only to determine the end of the enumeration.
      */
     LastDefined
-
 
 }

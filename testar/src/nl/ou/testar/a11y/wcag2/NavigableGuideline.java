@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -56,6 +55,7 @@ public final class NavigableGuideline extends AbstractGuideline {
 
   NavigableGuideline(AbstractPrinciple parent) {
     super(4, "Navigable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Bypass Blocks",
         this, Level.A, "navigation-mechanisms-skip"));
     criteria.add(new SuccessCriterion(2, "Page Titled",
@@ -70,14 +70,16 @@ public final class NavigableGuideline extends AbstractGuideline {
         this, Level.AA, "navigation-mechanisms-descriptive"));
     criteria.add(new SuccessCriterion(7, "Focus Visible",
         this, Level.AA, "navigation-mechanisms-focus-visible"));
+    setCriteria(criteria);
   }
 
   @Override
   public EvaluationResults evaluate(List<Widget> widgets) {
     EvaluationResults results = new EvaluationResults();
-    for (Widget w: widgets)
+    for (Widget w: widgets) {
       // used during offline evaluation
       w.set(WCAG2Tags.WCAG2IsWindow, AccessibilityUtil.isWindow(w));
+    }
     return results;
   }
 
@@ -102,8 +104,9 @@ public final class NavigableGuideline extends AbstractGuideline {
             "\" appeared " + entry.getValue() + " times"));
       }
     }
-    if (!hasViolations)
+    if (!hasViolations) {
       results.add(evaluationPassed(sc));
+    }
     return results;
   }
 

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -67,12 +66,12 @@ public interface Action extends Taggable, Serializable {
    * If the action moves the cursor on a widget before clicking on it, a high value for
    * this parameter will cause the mouse movement to be slowed down. However, the value
    * is only a recommendation.
-   * @param system the SUT
+   * @param sut the system under test
    * @param state the SUT's current state
    * @param duration the duration of the action in seconds
-   * @throws ActionFailedException
+   * @throws ActionFailedException if action failed
    */
-  void run(SUT system, State state, double duration) throws ActionFailedException;
+  void run(SUT sut, State state, double duration) throws ActionFailedException;
 
   /**
    * @param action An action (from unknown state).
@@ -82,27 +81,30 @@ public interface Action extends Taggable, Serializable {
    *   [1] = Compact representation
    * @author urueda
    */
-  public static String[] getActionRepresentation(Action action, String tab) {
+  static String[] getActionRepresentation(Action action, String tab) {
     return getActionRepresentation(null,action,tab);
   }
 
   /**
-   * @param state A SUT state.
-   * @param action A state' action.
-   * @param tab A tabulator for indentation.
-   * @return A string representation for the action.
+   * @param state the SUT's current state
+   * @param action A state' action
+   * @param tab A tabulator for indentation
+   * @return A string representation for the action
    *   [0] = Extended representation
    *   [1] = Compact representation
    * @author urueda
    */
-  public static String[] getActionRepresentation(State state, Action action, String tab) {
+  static String[] getActionRepresentation(State state, Action action, String tab) {
     String[] returnS = new String[]{"",""};
 
     Role actionRole = action.get(Tags.Role, null);
     if (actionRole != null) {
       returnS[0] += tab + "ROLE = " + actionRole.toString() + "\n";
-      returnS[1] = String.format("%1$2s ",
-        actionRole == null ? "??": BriefActionRolesMap.map.get(actionRole.toString()));
+      if (actionRole == null) {
+        returnS[1] = String.format("%1$2s ", "??");
+      } else {
+        returnS[1] = String.format("%1$2s ", BriefActionRolesMap.map.get(actionRole.toString()));
+      }
     }
 
     if (state != null) {
@@ -117,19 +119,29 @@ public interface Action extends Taggable, Serializable {
             returnS[0] += tab + "TARGET =\n" + w.getRepresentation("\t\t");
             widgetRole = w.get(Tags.Role, null);
             title = w.get(Tags.Title, null);
+            String widgetStr;
+            if (widgetRole == null) {
+              widgetStr = "???";
+            } else {
+              widgetStr = widgetRole.toString();
+            }
+            String titleStr;
+            if (title == null) {
+              titleStr = "\"\"";
+            } else {
+              titleStr = title;
+            }
             returnS[1] += String.format("( %1$" + CodingManager.ID_LENTGH + "s, %2$11s, %3$s )",
-                w.get(Tags.ConcreteID),
-                widgetRole == null ? "???": widgetRole.toString(),
-                title == null ? "\"\"": title);
+                w.get(Tags.ConcreteID), widgetStr, titleStr);
           }
         }
       }
     }
 
     String desc = action.get(Tags.Desc, null);
-    if (desc != null)
+    if (desc != null) {
       returnS[0] += tab + "DESCRIPTION = " + desc + "\n";
-
+    }
     returnS[0] += tab + "TEXT = " + action.toString().replaceAll("\\r\\n|\\n", "\n\t\t") + "\n";
 
     String params = action.toParametersString()
@@ -139,7 +151,11 @@ public interface Action extends Taggable, Serializable {
         .replaceAll("BUTTON[1,3]","")
         .replaceAll(",,","")
         .replaceAll(", ",",");
-    returnS[1] += " [ " + (params.equals(",") ? "": params + " ]");
+    if (",".equals(params)) {
+      returnS[1] += " [  ]";
+    } else {
+      returnS[1] += " [ " + params + " ]";
+    }
 
     return returnS;
   }
@@ -158,7 +174,11 @@ public interface Action extends Taggable, Serializable {
    */
   String toParametersString();
 
-  // by urueda
-  public abstract String toString(Role... discardParameters);
-
+  /**
+   * Returns an extended string representation for the action.
+   * @param discardParameters a list of the parameters
+   * @return The extended string.
+   * @author urueda
+   */
+  String toString(Role... discardParameters);
 }

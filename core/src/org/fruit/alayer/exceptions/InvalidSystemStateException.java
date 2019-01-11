@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,7 +36,13 @@ import org.fruit.FruitException;
 
 public class InvalidSystemStateException extends FruitException {
   private static final long serialVersionUID = 1554849408074075595L;
-  public InvalidSystemStateException(String message) { this(message, null); }
-  public InvalidSystemStateException(String message, Throwable cause) { super(message, cause); }
-  public InvalidSystemStateException(Throwable cause) { super(cause); }
+  public InvalidSystemStateException(String message) {
+    this(message, null);
+  }
+  public InvalidSystemStateException(String message, Throwable cause) {
+    super(message, cause);
+  }
+  public InvalidSystemStateException(Throwable cause) {
+    super(cause);
+  }
 }

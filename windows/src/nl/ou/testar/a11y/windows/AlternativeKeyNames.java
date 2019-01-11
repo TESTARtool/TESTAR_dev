@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.windows;
 
 import java.util.HashMap;

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,7 +36,13 @@ import org.fruit.FruitException;
 
 public class AbstractionException extends FruitException {
   private static final long serialVersionUID = -7797424127481093948L;
-  public AbstractionException(String message) { this(message, null); }
-  public AbstractionException(String message, Throwable cause) { super(message, cause); }
-  public AbstractionException(Throwable cause) { super(cause); }
+  public AbstractionException(String message) {
+    this(message, null);
+  }
+  public AbstractionException(String message, Throwable cause) {
+    super(message, cause);
+  }
+  public AbstractionException(Throwable cause) {
+    super(cause);
+  }
 }

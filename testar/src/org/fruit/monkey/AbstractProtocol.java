@@ -38,7 +38,6 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
-import java.io.File;
 import java.util.Set;
 
 /**
@@ -66,12 +65,14 @@ import java.util.Set;
 public abstract class AbstractProtocol implements UnProc<Settings>  {
 
   protected Settings settings;
-  protected Settings settings() { return settings; }
+  protected Settings settings() {
+    return settings;
+  }
 
   /**
    * Initialize is run as the first thing to initialize TESTAR with the given settings
    *
-   * @param settings
+   * @param settings The settings to load
    */
   protected abstract void initialize(Settings settings);
 
@@ -107,8 +108,8 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
    * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
    * the SUT's configuration files etc.)
    *
-   * @param system
-   * @param state
+   * @param sut the system under testing
+   * @param state the SUT's current state
    */
   protected abstract void beginSequence(SUT system, State state);
 
@@ -119,7 +120,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
    *
-   * @param system
+   * @param sut the system under testing
    * @return the current state of the SUT with attached oracle.
    * @throws StateBuildException
    */
@@ -138,7 +139,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
    * You can use the SUT's current state, analyze the widgets and their properties to create
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    *
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return  a set of actions
    */
@@ -156,7 +157,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
   /**
    * Execute the selected action.
    *
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
@@ -196,7 +197,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
   /**
    * This methods stops the SUT
    *
-   * @param system
+   * @param sut the system under testing
    */
   protected abstract void stopSystem(SUT system);
 

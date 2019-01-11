@@ -60,7 +60,6 @@ public class AWTCanvasExample {
     pic.paint(scrshot, Rect.from(crop, crop, pic.width() - 2 * crop, pic.height() - 2 * crop),
         Rect.from(0, 0, 200, 200));
 
-
     Pen p = Pen.newPen().setStrokeWidth(20).setColor(Color.from(0, 250, 0, 255)).build();
     //scrshot.rect(p, 0, 0, 100, 100, true);
     scrshot.line(p, 0, 0, 100, 100);
@@ -78,9 +77,7 @@ public class AWTCanvasExample {
       scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger" + i + ".jpg", 0.5f);
     }
 
-
   }
-
 
   public static void saveImage(AWTCanvas image, String file) throws IOException{
     FileOutputStream fos = new FileOutputStream(new File(file));

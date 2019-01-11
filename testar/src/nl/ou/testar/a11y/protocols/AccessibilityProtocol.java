@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.protocols;
 
 import java.io.File;
@@ -85,7 +84,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
   protected HTMLReporter html = null;
 
   /**
-   * Constructs a new accessibility test protocol
+   * Constructs a new accessibility test protocol.
+   * @param evaluator the evaluator
    */
   public AccessibilityProtocol(Evaluator evaluator) {
     super();
@@ -109,12 +109,17 @@ public class AccessibilityProtocol extends DefaultProtocol {
           LogSerialiser.LogLevel.Critical);
       System.exit(-1);
     }
+    String graphEnabledStr;
+    if (settings().get(ConfigTags.GraphDBEnabled)) {
+      graphEnabledStr = "GraphDB";
+    } else {
+      graphEnabledStr = "On-the-fly";
+    }
     html.writeHeader()
     .writeHeading(2, "General Information")
     .writeUListStart()
     .writeListItem("Report time: " + Util.dateString("yyyy-MM-dd HH:mm:ss"))
-    .writeListItem("Report type: " +
-        (settings().get(ConfigTags.GraphDBEnabled) ? "GraphDB": "On-the-fly"))
+    .writeListItem("Report type: " + graphEnabledStr)
     .writeListItem("Accessibility standard implementation: " + evaluator.getImplementationVersion())
     .writeListItem("Sequence number: " + sequenceCount())
     .writeUListEnd();
@@ -144,9 +149,14 @@ public class AccessibilityProtocol extends DefaultProtocol {
     state.set(A11yTags.A11yWarningCount, results.getWarningCount());
     state.set(A11yTags.A11yErrorCount, results.getErrorCount());
     state.set(A11yTags.A11yHasViolations, results.hasViolations());
-    if (!settings().get(ConfigTags.GraphDBEnabled))
+    if (!settings().get(ConfigTags.GraphDBEnabled)) {
       writeOnTheFlyEvaluationResults(results);
-    return upstreamProblem ? verdict: results.getOverallVerdict();
+    }
+    if (upstreamProblem) {
+      return verdict;
+    } else {
+      return  results.getOverallVerdict();
+    }
   }
 
   /**
@@ -158,8 +168,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
   protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
     // first store all relevant widgets to the graph database
     String concreteID = state.get(Tags.ConcreteID);
-    for (Widget w: relevantWidgets)
+    for (Widget w: relevantWidgets) {
       storeWidget(concreteID, w);
+    }
 
     Set<Action> actions = super.deriveActions(system, state);
     if (actions.isEmpty()) {
@@ -201,8 +212,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
         hadViolations = true;
       }
     }
-    if (!hadViolations)
+    if (!hadViolations) {
       html.writeListItem("None");
+    }
     html.writeUListEnd();
   }
 

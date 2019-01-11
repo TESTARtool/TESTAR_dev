@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -60,7 +59,8 @@ public final class ShapeVisualizer implements Visualizer {
     Assert.notNull(state, c, pen);
     pen = Pen.merge(pen, this.pen);
     shape.paint(c, pen);
-    if (label != null)
+    if (label != null) {
       c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
+    }
   }
 }

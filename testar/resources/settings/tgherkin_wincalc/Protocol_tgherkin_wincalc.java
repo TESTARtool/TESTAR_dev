@@ -4,7 +4,6 @@ package tgherkin_wincalc;
 * Tgherkin document protocol for Windows calculator
 */
 
-import java.io.File;
 import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
@@ -26,7 +25,6 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
     super.initialize(settings);
   }
 
-
   /**
    * This method is invoked each time the TESTAR starts to generate a new sequence.
    */
@@ -36,14 +34,13 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
 
   }
 
-
   /**
    * This method is called when TESTAR starts the System Under Test (SUT). The method should
    * take care of
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
    *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
+   *      the SUT's configuration files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
@@ -53,22 +50,19 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
         return super.startSystem();
   }
 
-
-
   /**
    * This method is called when the TESTAR requests the state of the SUT.
    * Here you can add additional information to the SUT's state or write your
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
+   * @param state the SUT's current state
    * @return  the current state of the SUT with attached oracle.
    */
   @Override
-  protected State getState(SUT system) throws StateBuildException {
-    return super.getState(system);
+  protected State getState(SUT sut) throws StateBuildException {
+    return super.getState(sut);
   }
-
-
 
   /**
    * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -86,13 +80,14 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @return  a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-    return super.deriveActions(system,state);
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
+    return super.deriveActions(sut, state);
   }
 
   /**
@@ -106,19 +101,18 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
     return super.selectAction(state, actions);
   }
 
-
   /**
    * Execute the selected action.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
   @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -131,7 +125,6 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
     return super.moreActions(state);
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
@@ -139,7 +132,6 @@ public class Protocol_tgherkin_wincalc extends DocumentProtocol {
   protected void finishSequence() {
     super.finishSequence();
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

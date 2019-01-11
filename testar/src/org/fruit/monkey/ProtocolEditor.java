@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -40,10 +39,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-
 import jsyntaxpane.DefaultSyntaxKit;
-
 import org.fruit.Util;
 
 public class ProtocolEditor extends javax.swing.JDialog {
@@ -89,7 +85,6 @@ public class ProtocolEditor extends javax.swing.JDialog {
         jScrollPane1.setViewportView(codeEditor);
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
 
-
         btnCompile.setText("Save and Compile");
         btnCompile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,7 +127,6 @@ public class ProtocolEditor extends javax.swing.JDialog {
 
         pack();
     }
-
 
     private void compile() {
         try {
@@ -188,13 +182,15 @@ public class ProtocolEditor extends javax.swing.JDialog {
     }
 
     private void consoleKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
+        }
     }
 
     private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {
-        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
+        }
     }
 
     private javax.swing.JButton btnCompile;

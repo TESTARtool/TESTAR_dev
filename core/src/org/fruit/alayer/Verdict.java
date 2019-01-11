@@ -42,8 +42,6 @@ import org.fruit.Util;
 public final class Verdict implements Serializable {
   private static final long serialVersionUID = 3517681535425699094L;
 
-  //public static final Verdict OK = new Verdict(0.0, "No problem detected.", Util.NullVisualizer);
-
   // Verdict severities
   // PASS
   public static final double SEVERITY_MIN = 0.0;
@@ -59,7 +57,6 @@ public final class Verdict implements Serializable {
 
   public static final Verdict OK = new Verdict(SEVERITY_OK, "No problem detected.", Util.NullVisualizer);
   public static final Verdict FAIL = new Verdict(SEVERITY_FAIL, "SUT failed.", Util.NullVisualizer);
-
 
   private final String info;
   private final double severity;
@@ -82,13 +79,17 @@ public final class Verdict implements Serializable {
    * returns the likelihood of the state to be erroneous (value within interval [0, 1])
    * @return value within [0, 1]
    */
-  public double severity() { return severity; }
+  public double severity() {
+    return severity;
+  }
 
   /**
    * returns a short description about whether the state is erroneous and if so, what part of it
-   * @return
+   * @return a short description
    */
-  public String info() { return info; }
+  public String info() {
+    return info;
+  }
 
   /**
    * This visualizer should visualize the part of the state where the problem occurred.
@@ -96,9 +97,13 @@ public final class Verdict implements Serializable {
    * than this should be framed or pointed to with a big red arrow.
    * @return the visualizer which is guaranteed to be non-null
    */
-  public Visualizer visualizer() { return visualizer; }
+  public Visualizer visualizer() {
+    return visualizer;
+  }
 
-  public String toString() { return "severity: " + severity + " info: " + info; }
+  public String toString() {
+    return "severity: " + severity + " info: " + info;
+  }
 
   /**
    * Retrieves the verdict result of joining two verdicts.
@@ -113,16 +118,46 @@ public final class Verdict implements Serializable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o instanceof Verdict) {
-      Verdict other = (Verdict)o;
-      return this.severity == other.severity
-          && this.info.equals(other.info)
-          && this.visualizer.equals(other.visualizer);
-    }
-    return false;
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ( (info == null) ? 0: info.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(severity);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ( (visualizer == null) ? 0: visualizer.hashCode());
+    return result;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    Verdict other = (Verdict) obj;
+    if (info == null) {
+      if (other.info != null) {
+        return false;
+      }
+    } else if (!info.equals(other.info)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(severity) != Double.doubleToLongBits(other.severity)) {
+      return false;
+    }
+    if (visualizer == null) {
+      if (other.visualizer != null) {
+        return false;
+      }
+    } else if (!visualizer.equals(other.visualizer)) {
+      return false;
+    }
+    return true;
+  }
 }

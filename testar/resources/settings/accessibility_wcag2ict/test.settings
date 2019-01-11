@@ -116,6 +116,7 @@ GraphDBPassword = admin
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = false
 Reportstate = false
+SubroutineData = 
 TgherkinDocument = 
 Discount = 0.95
 TgherkinNrOfNOPRetries = 0

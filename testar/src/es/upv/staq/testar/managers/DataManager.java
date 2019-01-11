@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.managers;
 
 import java.io.BufferedInputStream;
@@ -71,7 +70,7 @@ public class DataManager {
               BASIC_DATA_TYPE_WEBURL =    -134513313,
               BASIC_DATA_TYPE_EMAIL =      -1345133417;
 
-    public static LinkedHashMap<String,Integer> DATA_TYPES;
+  public static LinkedHashMap<String,Integer> DATA_TYPES;
   public static HashMap<Integer,Set<String>> INPUT_VALUES;
   private static Integer[] INPUT_VALUES_ARRAY;
 
@@ -104,8 +103,9 @@ public class DataManager {
   public static String getRandomPrimitiveDataTypeText() {
       int textLength = rnd.nextInt(MAX_TEXT_LENGTH) + 1;
       StringBuffer sb = new StringBuffer(textLength);
-      for (int i=0; i<textLength; i++)
+      for (int i=0; i<textLength; i++) {
         sb.append((char)('a' + rnd.nextInt(LETTER_COUNT)));
+      }
       return sb.toString();
   }
 
@@ -206,8 +206,9 @@ public class DataManager {
                 if (typeS != null && desc != null && example != null &&
                   typeS.length() > 0 && desc.length() > 0 && example.length() > 0) {
                   DATA_TYPES.put(desc + "(" + example + ")", new Integer(typeS));
-                } else
+                } else {
                   System.out.println("DataManager: WRONG DATA TYPE");
+                }
               }
         }
 
@@ -229,8 +230,9 @@ public class DataManager {
                     INPUT_VALUES.put(key, typeValues);
                   }
                   typeValues.add(valueS);
-                } else
+                } else {
                   System.out.println("DataManager: WRONG INPUT VALUE");
+                }
               }
             }
         printData();
@@ -249,14 +251,16 @@ public class DataManager {
 
   public static void printData() {
     System.out.println("DATA TYPES (description x type_number):");
-    for (String key: DATA_TYPES.keySet())
+    for (String key: DATA_TYPES.keySet()) {
       System.out.println("\t" + key + ": " + DATA_TYPES.get(key).intValue());
+    }
     System.out.println("DATA VALUES (type_number x value):");
     Set<String> values;
     for (Integer key: INPUT_VALUES.keySet()) {
       values = INPUT_VALUES.get(key);
-      for (String v: values)
+      for (String v: values) {
         System.out.println("\t" + key + ": " + v);
+      }
     }
   }
 

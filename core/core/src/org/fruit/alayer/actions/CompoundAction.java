@@ -89,7 +89,7 @@ public final class CompoundAction extends TaggableBase implements Action {
     Assert.notNull((Object)actions);
     this.actions = Arrays.asList(actions);
     this.relativeDurations = Util.newArrayList();
-    
+
     for (int i = 0; i < actions.length; i++) {
       relativeDurations.add(1.0 / actions.length);
     }
@@ -100,7 +100,7 @@ public final class CompoundAction extends TaggableBase implements Action {
   }
 
   public void run(SUT system, State state, double duration) {
-    for(int i = 0; i < actions.size(); i++) {
+    for (int i = 0; i < actions.size(); i++) {
       actions.get(i).run(system, state, relativeDurations.get(i) * duration);
     }
   }

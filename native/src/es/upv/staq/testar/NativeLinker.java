@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import static org.fruit.alayer.windows.UIARoles.UIAButton;
@@ -109,12 +108,13 @@ public class NativeLinker {
       case "Windows 7":
         return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_7);
       default:
-        if (osName.contains("Windows"))
+        if (osName.contains("Windows")) {
           return EnumSet.of(OperatingSystems.WINDOWS);
-        else if (osName.contains("Linux"))
+        } else if (osName.contains("Linux")) {
           return EnumSet.of(OperatingSystems.UNIX);
-        else
+        } else {
           return EnumSet.of(OperatingSystems.UNKNOWN);
+        }
     }
   }
 
@@ -129,17 +129,17 @@ public class NativeLinker {
                            boolean accessBridgeEnabled,
                            String SUTProcesses) {
     if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-      if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
+      if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
         return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
-      else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
+      } else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
         // TODO: a win10 state builder might make use of the new CUI8 Automation object.
         return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
       }
-    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return new AtSpiStateBuilder(timeToFreeze);
+    }
     throw new UnsupportedPlatformException();
   }
-
 
   /**
    * Retrieves a canvas for the primary monitor so Testar can paint elements on screen in Spy mode.
@@ -158,53 +158,57 @@ public class NativeLinker {
     throw new UnsupportedPlatformException();
   }
 
-
   /**
    * Opens a SUT (runs a process) on the machine and returns a handle to the process in a SUT object.
    * @param executableCommand The application/ process/ command that will be run.
+   * @param processListenerEnabled true if processListener is enabled
    * @return A handle to the process in a SUT object.
    */
-  public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled) {
+  public static SUT getNativeSUT(String executableCommand, boolean processListenerEnabled) {
     if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
-      if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
-        return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-      else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
-        if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar"))
-          return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
-        else
+      if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7)) {
+        return WinProcess.fromExecutable(executableCommand, processListenerEnabled);
+      } else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_10)) {
+        if (executableCommand.toLowerCase().contains(".exe") || executableCommand.contains(".jar")) {
+          return WinProcess.fromExecutable(executableCommand, processListenerEnabled);
+        } else {
           return WinProcess.fromExecutableUwp(executableCommand);
+        }
       }
-    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return LinuxProcess.fromExecutable(executableCommand);
+    }
     throw new UnsupportedPlatformException();
   }
-
 
   /**
    * Gets a list of running processes wrapped in a SUT class.
    * @return A list of running processes wrapped in a SUT class.
    */
   public static List<SUT> getNativeProcesses() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return WinProcess.fromAll();
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return LinuxProcess.fromAll();
+    }
     throw new UnsupportedPlatformException();
   }
 
   public static SUT getNativeProcess(String processName) {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return WinProcess.fromProcName(processName);
+    }
     //else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
       // TODO
     throw new UnsupportedPlatformException();
   }
 
   public static ProcessHandle getNativeProcessHandle(long processPID) {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return new WinProcHandle(processPID);
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return new LinuxProcessHandle(processPID);
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -213,13 +217,13 @@ public class NativeLinker {
    * @return Memory usage in KB.
    */
   public static int getMemUsage(SUT nativeSUT) {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
+    }
     throw new UnsupportedPlatformException();
   }
-
 
   /** Gets the CPU usage for a SUT.
    * @param nativeSUT The SUT to get CPU usage for.
@@ -242,8 +246,9 @@ public class NativeLinker {
   }
 
   public static Collection<Role> getNativeRoles() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return UIARoles.rolesSet();
+    }
     // else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
       // TODO
     throw new UnsupportedPlatformException();
@@ -255,8 +260,9 @@ public class NativeLinker {
     Iterator<Role> it = roles.iterator();
     while (role == null && it.hasNext()) {
       r = (Role) it.next();
-      if (r.name().equals(roleName))
+      if (r.name().equals(roleName)) {
         return r;
+      }
     }
     return null; // not found
   }
@@ -274,10 +280,11 @@ public class NativeLinker {
    * @return The native Role wrapper for a window.
    */
   public static Role getNativeRole_Window() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return UIARoles.UIAWindow;
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return AtSpiRolesWrapper.AtSpiWindow;
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -286,10 +293,11 @@ public class NativeLinker {
    * @return The native Role wrapper for a button.
    */
   public static Role getNativeRole_Button() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return UIARoles.UIAButton;
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return AtSpiRolesWrapper.AtSpiPushButton;
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -298,10 +306,11 @@ public class NativeLinker {
    * @return The native Role wrapper for a menu item.
    */
   public static Role getNativeRole_Menuitem() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return UIARoles.UIAMenuItem;
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return AtSpiMenuItem;
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -310,10 +319,11 @@ public class NativeLinker {
    * @return Native tags.
    */
   public static Set<Tag<?>> getNativeTags() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return UIATags.tagSet();
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return AtSpiTags.tagSet();
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -324,8 +334,9 @@ public class NativeLinker {
    */
   public static Tag<?> getNativeTag(String tagName) {
     for (Tag<?> tag: getNativeTags()) {
-      if (tag.name().equals(tagName))
+      if (tag.name().equals(tagName)) {
         return tag;
+      }
     }
     return null; // not found
   }
@@ -372,11 +383,12 @@ public class NativeLinker {
    * @return All roles that correspond to elements that can be edited.
    */
   public static Role[] getNativeTypeableRoles() {
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return new Role[]{UIADocument, UIAEdit, UIAText};
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return new Role[]{AtSpiPasswordText, AtSpiText, AtSpiDocumentText, AtSpiDocumentWeb,
           AtSpiDocumentEmail};
+    }
     throw new UnsupportedPlatformException();
   }
 
@@ -386,13 +398,14 @@ public class NativeLinker {
    * @return True if the widget supports typing; False otherwise.
    */
   public static boolean isNativeTypeable(Widget w) {
-    if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles()))
+    if (!Role.isOneOf(w.get(Tags.Role, Roles.Widget), getNativeTypeableRoles())) {
       return false;
-    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+    }
+    if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
       return w.get(UIATags.UIAIsKeyboardFocusable);
-    else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
+    } else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
       return w.get(AtSpiTags.AtSpiIsFocusable);
+    }
     throw new UnsupportedPlatformException();
   }
-
 }

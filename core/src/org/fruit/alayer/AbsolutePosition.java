@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -55,11 +54,17 @@ import org.fruit.Assert;
 public final class AbsolutePosition extends AbstractPosition {
   private static final long serialVersionUID = -6784500620656208720L;
   private final Point p;
-  public AbsolutePosition(double x, double y) { p = Point.from(x, y); }
+  public AbsolutePosition(double x, double y) {
+    p = Point.from(x, y);
+  }
   public AbsolutePosition(Point point) {
     Assert.notNull(point);
     p = point;
   }
-  public Point apply(State state) { return p; }
-  public String toString() { return p.toString(); }
+  public Point apply(State state) {
+    return p;
+  }
+  public String toString() {
+    return p.toString();
+  }
 }

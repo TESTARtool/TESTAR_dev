@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,35 +35,35 @@ package org.fruit.alayer.actions;
 import org.fruit.alayer.Role;
 
 public final class ActionRoles {
-	private ActionRoles(){}
+  private ActionRoles() {}
 
-	public static final Role
+  public static final Role
 
-	Action = Role.from("Action"),
-	MouseAction = Role.from("MouseAction", Action),
-	KeyboardAction = Role.from("KeyboardAction", Action),
-	MouseMove = Role.from("MouseMove", MouseAction),
-	MouseDown = Role.from("MouseDown", MouseAction),
-	KeyDown = Role.from("KeyDown", KeyboardAction),
-	MouseUp = Role.from("MouseUp", MouseAction),
-	KeyUp = Role.from("KeyUp", KeyboardAction),
-	HitKey = Role.from("HitKey", KeyDown, KeyUp),
-	HitShortcutKey = Role.from("HitShortcutKey", KeyDown, KeyUp),
-	Click = Role.from("Click", MouseDown, MouseUp),
-	LeftClick = Role.from("LeftClick", Click),
-	RightClick = Role.from("RightClick", Click),
-	DoubleClick = Role.from("DoubleClick", Click),
-	LDoubleClick = Role.from("LDoubleClick", LeftClick, DoubleClick),
-	RDoubleClick = Role.from("RDoubleClick", RightClick, DoubleClick),
-	ClickAt = Role.from("ClickAt", Click, MouseMove),
-	LeftClickAt = Role.from("LeftClickAt", ClickAt, LeftClick),
-	RightClickAt = Role.from("RightClickAt", ClickAt, RightClick),
-	DoubleClickAt = Role.from("DoubleClickAt", ClickAt, DoubleClick),
-	LDoubleClickAt = Role.from("LDoubleClickAt", DoubleClickAt, LeftClick),
-	RDoubleClickAt = Role.from("RDoubleClickAt", DoubleClickAt, RightClick),
-	Type = Role.from("Type", HitKey),
-	ClickTypeInto = Role.from("ClickTypeInto", ClickAt, Type),
-	DropDown = Role.from("DropDown", Click, KeyDown), // /by mimarmu1
-	Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),
-	LeftDrag = Role.from("LeftDrag", Drag);
+  Action = Role.from("Action"),
+  MouseAction = Role.from("MouseAction", Action),
+  KeyboardAction = Role.from("KeyboardAction", Action),
+  MouseMove = Role.from("MouseMove", MouseAction),
+  MouseDown = Role.from("MouseDown", MouseAction),
+  KeyDown = Role.from("KeyDown", KeyboardAction),
+  MouseUp = Role.from("MouseUp", MouseAction),
+  KeyUp = Role.from("KeyUp", KeyboardAction),
+  HitKey = Role.from("HitKey", KeyDown, KeyUp),
+  HitShortcutKey = Role.from("HitShortcutKey", KeyDown, KeyUp),
+  Click = Role.from("Click", MouseDown, MouseUp),
+  LeftClick = Role.from("LeftClick", Click),
+  RightClick = Role.from("RightClick", Click),
+  DoubleClick = Role.from("DoubleClick", Click),
+  LDoubleClick = Role.from("LDoubleClick", LeftClick, DoubleClick),
+  RDoubleClick = Role.from("RDoubleClick", RightClick, DoubleClick),
+  ClickAt = Role.from("ClickAt", Click, MouseMove),
+  LeftClickAt = Role.from("LeftClickAt", ClickAt, LeftClick),
+  RightClickAt = Role.from("RightClickAt", ClickAt, RightClick),
+  DoubleClickAt = Role.from("DoubleClickAt", ClickAt, DoubleClick),
+  LDoubleClickAt = Role.from("LDoubleClickAt", DoubleClickAt, LeftClick),
+  RDoubleClickAt = Role.from("RDoubleClickAt", DoubleClickAt, RightClick),
+  Type = Role.from("Type", HitKey),
+  ClickTypeInto = Role.from("ClickTypeInto", ClickAt, Type),
+  DropDown = Role.from("DropDown", Click, KeyDown), // /by mimarmu1
+  Drag = Role.from("Drag", MouseDown, MouseUp, MouseMove),
+  LeftDrag = Role.from("LeftDrag", Drag);
 }

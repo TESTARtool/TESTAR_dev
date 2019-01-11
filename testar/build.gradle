@@ -39,9 +39,12 @@ dependencies {
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
     compile files('./lib/tess4j-4.0.0.jar')
+    compile files('./lib/jul-to-slf4j-1.7.2.jar')
+    compile files('./lib/jai-imageio-core-1.4.0.jar')
     compile 'com.1stleg:jnativehook:2.1.0'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 }
 evaluationDependsOn(':windows')
 

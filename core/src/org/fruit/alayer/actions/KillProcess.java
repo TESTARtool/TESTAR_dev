@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -55,8 +54,12 @@ public class KillProcess extends TaggableBase implements Action {
   final Long pid;
   final double waitTime;
 
-  public static KillProcess byName(String name, double timeToWaitForProcessToAppear) { return new KillProcess(name, null, timeToWaitForProcessToAppear); }
-  public static KillProcess byPID(long pid, double timeToWaitForProcessToAppear) { return new KillProcess(null, pid, timeToWaitForProcessToAppear); }
+  public static KillProcess byName(String name, double timeToWaitForProcessToAppear) {
+    return new KillProcess(name, null, timeToWaitForProcessToAppear);
+  }
+  public static KillProcess byPID(long pid, double timeToWaitForProcessToAppear) {
+    return new KillProcess(null, pid, timeToWaitForProcessToAppear);
+  }
 
   private KillProcess(String name, Long pid, double waitTime) {
     Assert.isTrue(!(name == null && pid == null) && waitTime >= 0);
@@ -82,28 +85,27 @@ public class KillProcess extends TaggableBase implements Action {
     Util.pause(duration - (Util.time() - start));
   }
 
-  public String toString() { return "KillProcess"; }
+  public String toString() {
+    return "KillProcess";
+  }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     return toString();
   }
 
-  // by urueda
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
     return "";
   }
-
 }

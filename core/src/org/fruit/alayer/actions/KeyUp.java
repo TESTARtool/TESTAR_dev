@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -50,31 +49,36 @@ public final class KeyUp extends //TaggableBase
     super(key);
   }
 
-  public String toString() { return "Release Key " + key; }
+  public String toString() {
+    return "Release Key " + key;
+  }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     for (Role r: discardParameters) {
-      if (r.name().equals(ActionRoles.KeyUp.name()))
+      if (r.name().equals(ActionRoles.KeyUp.name())) {
         return "Key released";
+      }
     }
     return toString();
   }
 
-  // by urueda
   @Override
   protected void performKeyAction(SUT system, KBKeys key) {
     system.get(Tags.StandardKeyboard).release(key);
   }
 
-  // by urueda
   @Override
   protected void altNumpad(SUT system, String numpadCodes) {}
 
   @Override
   public boolean equals(Object o) {
     return o == this || (o instanceof KeyUp && this.key.equals(((KeyUp)o).key));
+  }
+
+  @Override
+  public int hashCode() {
+    return key.hashCode();
   }
 
 }

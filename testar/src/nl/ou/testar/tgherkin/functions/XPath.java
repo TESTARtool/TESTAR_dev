@@ -51,7 +51,6 @@ public class XPath {
     return getXpathResult(proxy, xpathExpr).contains(widget);
   }
 
-
   /**
    * Get result of Xpath expression.
    * The result is a list of widgets that were present as widget elements in the XPath result.

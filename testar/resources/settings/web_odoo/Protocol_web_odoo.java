@@ -29,7 +29,6 @@ package web_odoo;
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author (base) Sebastian Bauersfeld
  *  Web protocol (generic) authors: urueda, fraalpe2, mimarmu1
@@ -68,14 +67,13 @@ import org.fruit.alayer.Tags;
 
 public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 
-  static final String LOGIN_USER_EMAIL = "odoo_login_user_email"; // set the value as required
+  private static final String LOGIN_USER_EMAIL = "odoo_login_user_email"; // set the value as required
 
   // platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-  static Role webText; // browser dependent
-  static double browser_toolbar_filter;
-
-  static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-  static double scrollThick = 16; //scroll thickness (iexplorer)
+  private static Role webText; // browser dependent
+  private static double browserToolbarFilter;
+  private static double scrollArrowSize = 36; // sliding arrows (iexplorer)
+  private static double scrollThick = 16; //scroll thickness (iexplorer)
 
   /**
    * Called once during the life time of TESTAR
@@ -93,19 +91,20 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
   private void initBrowser() {
     webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
     String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-    if (sutPath.contains("iexplore.exe"))
+    if (sutPath.contains("iexplore.exe")) {
       webText = NativeLinker.getNativeRole("UIAEdit");
-    else if (sutPath.contains("firefox"))
+    } else if (sutPath.contains("firefox")) {
       webText = NativeLinker.getNativeRole("UIAText");
+    }
   }
 
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence
-   */
-  protected void beginSequence(SUT system, State state) {
-
-    super.beginSequence(system, state);
-
+   * @param sut the system under test
+   * @param state  the SUT's current state
+  */
+  protected void beginSequence(SUT sut, State state) {
+    super.beginSequence(sut, state);
   }
 
   /**
@@ -114,7 +113,7 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
    *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
+   *      the SUT's configuration files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
@@ -150,16 +149,16 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
+   * @param sut the system under test
    * @return  the current state of the SUT with attached oracle.
    */
-  protected State getState(SUT system) throws StateBuildException{
-
-    State state = super.getState(system);
-
+  protected State getState(SUT sut) throws StateBuildException{
+    State state = super.getState(sut);
         for (Widget w: state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
-              browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
+              browserToolbarFilter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            }
         }
 
     return state;
@@ -192,13 +191,13 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
-   * @param state the SUT's current state
+   * @param sut the system under test
+   * @param state  the SUT's current state
    * @return  a set of actions
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(sut, state);
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -216,16 +215,16 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
           if (!blackListed(w)) {  // do not build actions for tabu widgets
 
             // left clicks
-            if (whiteListed(w) || isClickable(w))
+            if (whiteListed(w) || isClickable(w)) {
               actions.add(ac.leftClickAt(w));
-
+            }
             // type into text boxes
-            if (whiteListed(w) || isTypeable(w))
+            if (whiteListed(w) || isTypeable(w)) {
               actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-
+            }
             // slides
-            Drag[] drags = null;
-            if ((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null) {
+            Drag[] drags = w.scrollDrags(scrollArrowSize,scrollThick);
+            if (drags != null) {
               for (Drag drag: drags) {
                 actions.add(ac.dragFromTo(
                   new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
@@ -247,26 +246,27 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
   // by urueda
   @Override
   protected boolean isClickable(Widget w) {
-    if (isAtBrowserCanvas(w))
+    if (isAtBrowserCanvas(w)) {
       return super.isClickable(w);
-    else
+    } else {
       return false;
+    }
   }
 
   // by urueda
   @Override
   protected boolean isTypeable(Widget w) {
-    if (isAtBrowserCanvas(w))
+    if (isAtBrowserCanvas(w)) {
       return super.isTypeable(w);
-    else
+    } else {
       return false;
+    }
   }
 
-  // by urueda
   private boolean isAtBrowserCanvas(Widget w) {
     Shape shape = w.get(Tags.Shape,null);
-    return (shape != null && shape.y() > browser_toolbar_filter);
-   }
+    return (shape != null && shape.y() > browserToolbarFilter);
+  }
 
   /**
    * Select one of the possible actions (e.g. at random)
@@ -275,22 +275,18 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    * @return  the selected action (non-null!)
    */
   protected Action selectAction(State state, Set<Action> actions) {
-
     return super.selectAction(state, actions);
-
   }
 
   /**
    * Execute the selected action.
-   * @param system the SUT
-   * @param state the SUT's current state
+   * @param sut the system under test
+   * @param state  the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
-  protected boolean executeAction(SUT system, State state, Action action) {
-
-    return super.executeAction(system, state, action);
-
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -300,21 +296,15 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    * @return  if <code>true</code> continue generation, else stop
    */
   protected boolean moreActions(State state) {
-
     return super.moreActions(state);
-
   }
-
 
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   protected void finishSequence() {
-
     super.finishSequence();
-
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.
@@ -322,9 +312,6 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
    * after a specific time etc.
    * @return  if <code>true</code> continue test, else stop   */
   protected boolean moreSequences() {
-
     return super.moreSequences();
-
   }
-
 }

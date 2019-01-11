@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -64,7 +63,8 @@ public final class Color implements Serializable {
   public static final Color White = from(255, 255, 255, 255);
   public static final Color Black = from(0, 0, 0, 255);
 
-  public static Color from(int red, int green, int blue, int alpha) { return new Color(red, green, blue, alpha); }
+  public static Color from(int red, int green, int blue, int alpha) {
+    return new Color(red, green, blue, alpha); }
 
   private final int red, green, blue, alpha, argb32;
 
@@ -78,16 +78,29 @@ public final class Color implements Serializable {
     this.argb32 = red + (green << 8) + (blue << 16) + (alpha << 24);
   }
 
-  public int red() { return red; }
-  public int green() { return green; }
-  public int blue() { return blue; }
-  public int alpha() { return alpha; }
-  public int argb32() { return argb32; }
-  public int hashCode() { return argb32();  }
+  public int red() {
+    return red;
+  }
+  public int green() {
+    return green;
+  }
+  public int blue() {
+    return blue;
+  }
+  public int alpha() {
+    return alpha;
+  }
+  public int argb32() {
+    return argb32;
+  }
+  public int hashCode() {
+    return argb32();
+  }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
     if (o instanceof Color) {
       Color co = (Color) o;

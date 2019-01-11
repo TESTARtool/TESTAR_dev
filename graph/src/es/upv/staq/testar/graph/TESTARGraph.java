@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
 
 import java.io.BufferedInputStream;
@@ -476,7 +475,7 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
                      abswid = element.getAttribute(XML_ATTRIBUTE_STATE_ABS_ID);
                 gs = new GraphState(wid,abswid);
                 String visited = element.getAttribute(XML_ATTRIBUTE_STATE_VISITED);
-                try{
+                try {
                   int v = new Integer(visited).intValue();
                   gs.setCount(v);
                 } catch (NumberFormatException nfe) {
@@ -501,7 +500,6 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
                 //  System.out.println("key = " + k + " - value = " + m.get(k));
                 //}
                 //System.out.println("END: ... " + m.toString());
-
 
                 String unexecuted = element.getAttribute(XML_ATTRIBUTE_STATE_UNEXECUTED);
                 unexecuted = unexecuted.substring(1,unexecuted.length()-1); // remove []
@@ -533,7 +531,7 @@ public class TESTARGraph extends DirectedPseudograph<String, GraphEdge> { // sta
                 to = element.getAttribute(XML_ATTRIBUTE_ACTION_TO);
                 ga = new GraphAction(wid,absid);
                 String visited = element.getAttribute(XML_ATTRIBUTE_ACTION_VISITED);
-                try{
+                try {
                   int v = new Integer(visited).intValue();
                   ga.setCount(v);
                 } catch (NumberFormatException nfe) {}

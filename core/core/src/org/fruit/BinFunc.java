@@ -33,5 +33,5 @@
 package org.fruit;
 
 public interface BinFunc<L, R, T> {
-	T apply(L left, R right);
+  T apply(L left, R right);
 }

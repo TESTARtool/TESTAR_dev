@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.actions;
 
 import java.util.HashMap;

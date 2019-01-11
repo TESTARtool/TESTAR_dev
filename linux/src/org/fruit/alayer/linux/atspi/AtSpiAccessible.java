@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
-
 
 import org.fruit.alayer.linux.util.BridJHelper;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
@@ -39,137 +37,120 @@ import org.fruit.alayer.linux.glib.GHashTable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Java implementation of the AtSpiAccessible object.
  */
 public class AtSpiAccessible {
 
-
     //region Properties
-
 
     private long _accessiblePtr;
     public long accessiblePtr() {
         return _accessiblePtr;
     }
 
-
     private String _name;
     public String name() {
         return BridJHelper.convertToString(LibAtSpi.atspi_accessible_get_name(_accessiblePtr, 0));
     }
-
 
     private String _description;
     public String description() {
         return BridJHelper.convertToString(LibAtSpi.atspi_accessible_get_description(_accessiblePtr, 0));
     }
 
-
     private long _parentPtr;
     public long parentPtr() {
         return LibAtSpi.atspi_accessible_get_parent(_accessiblePtr, 0);
     }
-
 
     private AtSpiAccessible _parent;
     public AtSpiAccessible parent() {
         return _parent;
     }
 
-
     private int _childCount;
     public int childCount() {
         return LibAtSpi.atspi_accessible_get_child_count(_accessiblePtr, 0);
     }
 
-
     private List<AtSpiAccessible> _children;
-    public List<AtSpiAccessible> children() { return getAccessibleChildren(this); }
-
+    public List<AtSpiAccessible> children() {
+      return getAccessibleChildren(this);
+    }
 
     private int _indexInParent;
     public int indexInParent() {
         return LibAtSpi.atspi_accessible_get_index_in_parent(_accessiblePtr, 0);
     }
 
-
     // TODO: relation_set.
-
 
     private AtSpiRoles _role;
     public AtSpiRoles role() {
         return AtSpiRoles.values()[LibAtSpi.atspi_accessible_get_role(_accessiblePtr, 0)];
     }
 
-
     private String _roleName;
     public String roleName() {
         return BridJHelper.convertToString(LibAtSpi.atspi_accessible_get_role_name(_accessiblePtr, 0));
     }
-
 
     private AtSpiStateSet _states;
     public AtSpiStateSet states() {
         return AtSpiStateSet.CreateInstance(LibAtSpi.atspi_accessible_get_state_set(_accessiblePtr));
     }
 
-
     private List<AtSpiRelation> _relations;
     public List<AtSpiRelation> relations() {
         return createRelationList(LibAtSpi.atspi_accessible_get_relation_set(_accessiblePtr, 0));
     }
-
 
     private GHashTable _attributes;
     public GHashTable attributes() {
         return GHashTable.CreateInstance(LibAtSpi.atspi_accessible_get_attributes(_accessiblePtr, 0));
     }
 
-
     private GArray<String> _attributesAsArray;
-    public GArray<String> attributesAsArray() { return GArray.CreateInstance(LibAtSpi.atspi_accessible_get_attributes_as_array(_accessiblePtr, 0), String.class); }
-
+    public GArray<String> attributesAsArray() {
+      return GArray.CreateInstance(LibAtSpi.atspi_accessible_get_attributes_as_array(_accessiblePtr, 0), String.class);
+    }
 
     private String _toolkitName;
     public String toolkitName() {
         return BridJHelper.convertToString(LibAtSpi.atspi_accessible_get_toolkit_name(_accessiblePtr, 0));
     }
 
-
     private String _toolkitVersion;
     public String toolkitVersion() {
         return BridJHelper.convertToString(LibAtSpi.atspi_accessible_get_toolkit_version(_accessiblePtr, 0));
     }
 
-
     // TODO: application.
 
-
     private AtSpiAction _action;
-    public AtSpiAction action() { return AtSpiAction.CreateInstance(LibAtSpi.atspi_accessible_get_action_iface(_accessiblePtr)); }
-
+    public AtSpiAction action() {
+      return AtSpiAction.CreateInstance(LibAtSpi.atspi_accessible_get_action_iface(_accessiblePtr));
+    }
 
     private AtSpiComponent _component;
-    public AtSpiComponent component() { return AtSpiComponent.CreateInstance(LibAtSpi.atspi_accessible_get_component_iface(_accessiblePtr)); }
-
+    public AtSpiComponent component() {
+      return AtSpiComponent.CreateInstance(LibAtSpi.atspi_accessible_get_component_iface(_accessiblePtr));
+    }
 
     private AtSpiValue _value;
-    public AtSpiValue value() { return AtSpiValue.CreateInstance(LibAtSpi.atspi_accessible_get_value_iface(_accessiblePtr)); }
-
+    public AtSpiValue value() {
+      return AtSpiValue.CreateInstance(LibAtSpi.atspi_accessible_get_value_iface(_accessiblePtr));
+    }
 
     private GArray<String> _interfaces;
     public GArray<String> interfaces() {
         return GArray.CreateInstance(LibAtSpi.atspi_accessible_get_interfaces(_accessiblePtr), String.class);
     }
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Default empty constructor.
@@ -177,7 +158,6 @@ public class AtSpiAccessible {
     private AtSpiAccessible() {
 
     }
-
 
     /**
      * Creates a new instance of an AtSpiAccessible object from a pointer.
@@ -188,7 +168,6 @@ public class AtSpiAccessible {
         return CreateInstance(accessiblePtr, null);
     }
 
-
     /**
      * Creates a new instance of an AtSpiAccessible object from a pointer.
      * @param accessiblePtr Pointer to the AtSpiAccessible object.
@@ -197,22 +176,17 @@ public class AtSpiAccessible {
      */
     public static AtSpiAccessible CreateInstance(long accessiblePtr, AtSpiAccessible parent) {
 
-
         if (accessiblePtr == 0) {
             return null;
         }
 
-
         // Create a new instance.
         AtSpiAccessible aObj = new AtSpiAccessible();
-
 
         // Fill the instance's properties.
         //fillInstance(windowPtr, aObj, parent);
 
-
         aObj._accessiblePtr = accessiblePtr;
-
 
         if (parent == null && aObj.parentPtr() != 0) {
             aObj._parent = AtSpiAccessible.CreateInstance(aObj._parentPtr);
@@ -220,11 +194,9 @@ public class AtSpiAccessible {
             aObj._parent = parent;
         }
 
-
         return aObj;
 
     }
-
 
     /**
      * Fills an AtSpiAccessible object's information.
@@ -233,7 +205,6 @@ public class AtSpiAccessible {
      * @param parent The parent of the AtSpiAccessible object to fill the information for.
      */
     private static void fillInstance(long accessiblePtr, AtSpiAccessible aObj, AtSpiAccessible parent) {
-
 
         // Fill the properties with the information.
         aObj._accessiblePtr = accessiblePtr;
@@ -288,12 +259,9 @@ public class AtSpiAccessible {
 
     }
 
-
     //endregion
 
-
     //region AtSpiAccessible Functionality
-
 
     /**
      * Sets all of the descendants for this accessible object.
@@ -301,13 +269,11 @@ public class AtSpiAccessible {
      */
     public void createTree(boolean fillInfo) {
 
-
         // Create a complete tree with full info.
         if (fillInfo) {
             retrieveAccessibleInfoTree();
             return;
         }
-
 
         // Only create parent - child relations.
         _children = getAccessibleChildren(this);
@@ -318,7 +284,6 @@ public class AtSpiAccessible {
 
     }
 
-
     /**
      * Fills all the data of the AtSpiAccessible object - mostly for testing purposes: readily available data.
      */
@@ -326,14 +291,12 @@ public class AtSpiAccessible {
         fillInstance(_accessiblePtr, this, null);
     }
 
-
     /**
      * Fills all the data of the AtSpiAccessible object but not the relations - mostly for testing purposes: readily available data.
      */
     public void retrieveAccessibleInfoNoRelations() {
         fillInstance(_accessiblePtr, this, null);
     }
-
 
     /**
      * Gets all information for all of the descendants for this accessible object.
@@ -348,12 +311,9 @@ public class AtSpiAccessible {
 
     }
 
-
     //endregion
 
-
     //region Helper functions
-
 
     /**
      * Gets all children pointers of an AtSpiAccessible object.
@@ -362,13 +322,10 @@ public class AtSpiAccessible {
      */
     public static List<Long> getAccessibleChildrenPtrs(long accessiblePtr) {
 
-
         ArrayList<Long> children = new ArrayList<>();
-
 
         // First get the number of children.
         int childCount = LibAtSpi.atspi_accessible_get_child_count(accessiblePtr, 0);
-
 
         // Call the function numerous times to get all children.
         for (int i = 0; i < childCount; i++) {
@@ -381,12 +338,9 @@ public class AtSpiAccessible {
 
         }
 
-
         return children;
 
-
     }
-
 
     /**
      * Gets all children of an AtSpiAccessible object.
@@ -397,7 +351,6 @@ public class AtSpiAccessible {
         return getAccessibleChildren(AtSpiAccessible.CreateInstance(accessiblePtr));
     }
 
-
     /**
      * Gets all children of an AtSpiAccessible object.
      * @param parent The parent of the children to get.
@@ -405,13 +358,10 @@ public class AtSpiAccessible {
      */
     public static List<AtSpiAccessible> getAccessibleChildren(AtSpiAccessible parent) {
 
-
         ArrayList<AtSpiAccessible> children = new ArrayList<>();
-
 
         // Get the pointers to the children.
         List<Long> childPtrs = getAccessibleChildrenPtrs(parent.accessiblePtr());
-
 
         // For each pointer create a new instance of AtSpiAccessible.
         for (long childPtr: childPtrs) {
@@ -424,12 +374,9 @@ public class AtSpiAccessible {
 
         }
 
-
         return children;
 
-
     }
-
 
     /**
      * Turns a pointer to a GArray containing pointer to AtSpiRelation objects into a list of AtSpiRelations.
@@ -438,9 +385,7 @@ public class AtSpiAccessible {
      */
     private static List<AtSpiRelation> createRelationList(long relationsArrayPtr) {
 
-
         GArray<Long> relationPtrs = GArray.CreateInstance(relationsArrayPtr, Long.class);
-
 
         if (relationPtrs == null) {
             return null;
@@ -458,17 +403,13 @@ public class AtSpiAccessible {
 
         }
 
-
         return rs;
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     /**
      * Returns a string representation of an AtSpiAccessible object.
@@ -479,8 +420,6 @@ public class AtSpiAccessible {
         return "Name: " + _name + " - Role: " + _roleName + " - Children: " + _childCount;
     }
 
-
     //endregion
-
 
 }

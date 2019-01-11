@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import com.tinkerpop.blueprints.impls.orient.OrientGraph;
@@ -50,7 +49,6 @@ public class OrientDBRepositoryTest {
    private OrientGraphFactory factory;
 
    private OrientDBRepository sut;
-
 
    @Before
    public void setup() {
@@ -127,7 +125,6 @@ public class OrientDBRepositoryTest {
       assertEquals("The database shall contain one element", 1, data);
 
    }
-
 
    @Test
    public void testAddction() {
@@ -215,7 +212,6 @@ public class OrientDBRepositoryTest {
 
    }
 
-
    @Test
    public void testAddActionOnState() {
 
@@ -259,7 +255,6 @@ public class OrientDBRepositoryTest {
       }
    }
 
-
    @Test
    public void testAddWidgetOnUnknownState() {
       try {
@@ -273,7 +268,6 @@ public class OrientDBRepositoryTest {
          assertTrue("Expect a GraphDBException", e instanceof GraphDBException);
       }
    }
-
 
    @Test
    public void testAddActionOnStateWithMissingToState() {

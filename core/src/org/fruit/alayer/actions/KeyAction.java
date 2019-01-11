@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.actions;
 
 import org.fruit.Assert;
@@ -64,10 +63,13 @@ public abstract class KeyAction extends TaggableBase implements Action {
       Util.pause(duration);
       if (key.equals(KBKeys.VK_ARROBA) ||
         key.equals(KBKeys.VK_EXCLAMATION_MARK) ||
-        key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
+        key.equals(KBKeys.VK_UNDERSCORE)) {
+        // java.awt.Robot throwing "Invalid key code"
+
         altNumpad(system,new Integer(key.code()).toString());
-      else
+      } else {
         performKeyAction(system,key);
+      }
     } catch(NoSuchTagException tue) {
       throw new ActionFailedException(tue);
     }
@@ -112,10 +114,11 @@ public abstract class KeyAction extends TaggableBase implements Action {
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
   @Override

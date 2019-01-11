@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
 
 import java.util.Map;
@@ -37,50 +36,50 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Verdict;
 
 public interface IGraphState {
-	
-	//public State getState();
-	
-	public String getConcreteID();
-	public String getAbstract_R_ID();
-	public String getAbstract_R_T_ID();
-	public String getAbstract_R_T_P_ID();
-	
-	public Map<String,Integer> getStateWidgetsExecCount();
-	public String getParent(String widgetID);
-	public Map<String,String> getWidgetProperties(String widgetID);
 
-	public void setStateshot(String scrShotPath);
-	public String getStateshot();
+  //public State getState();
 
-	public int getCount();
-	public void setCount(int count);
-	public void incCount();
-		
-	public void updateUnexploredActions(IEnvironment env,
-										Set<Action> availableActions,
-										Set<String> exploredActions);
-	
-	public int getUnexploredActionsSize();
-	public String getUnexploredActionsString();
-	
-	/**
-	 * 
-	 * @param aid Abstract action ID.
-	 */
-	public void actionExplored(String aid);
-	/**
-	 * 
-	 * @param aid Abstract action ID.
-	 */
-	public void actionUnexplored(String aid);	
-	
-	public Verdict getVerdict();
-		
-	public void actionExecuted(String targetWidgetID);
-	
-	public void knowledge(boolean k);
-	public boolean knowledge();
-	public void revisited(boolean r);
-	public boolean revisited();
-	
+  public String getConcreteID();
+  public String getAbstract_R_ID();
+  public String getAbstract_R_T_ID();
+  public String getAbstract_R_T_P_ID();
+
+  public Map<String,Integer> getStateWidgetsExecCount();
+  public String getParent(String widgetID);
+  public Map<String,String> getWidgetProperties(String widgetID);
+
+  public void setStateshot(String scrShotPath);
+  public String getStateshot();
+
+  public int getCount();
+  public void setCount(int count);
+  public void incCount();
+
+  public void updateUnexploredActions(IEnvironment env,
+                    Set<Action> availableActions,
+                    Set<String> exploredActions);
+
+  public int getUnexploredActionsSize();
+  public String getUnexploredActionsString();
+
+  /**
+   *
+   * @param aid Abstract action ID.
+   */
+  public void actionExplored(String aid);
+  /**
+   *
+   * @param aid Abstract action ID.
+   */
+  public void actionUnexplored(String aid);
+
+  public Verdict getVerdict();
+
+  public void actionExecuted(String targetWidgetID);
+
+  public void knowledge(boolean k);
+  public boolean knowledge();
+  public void revisited(boolean r);
+  public boolean revisited();
+
 }

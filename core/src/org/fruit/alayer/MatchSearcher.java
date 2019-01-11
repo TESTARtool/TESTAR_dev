@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -52,12 +51,15 @@ public final class MatchSearcher implements Searcher {
 
     for (Widget w: Util.makeIterable(start)) {
       if (matcher.apply(w)) {
-        if (visitor.apply(w) == SearchFlag.Stop)
+        if (visitor.apply(w) == SearchFlag.Stop) {
           return SearchFlag.Stop;
+        }
       }
     }
     return SearchFlag.OK;
   }
 
-  public String toString() { return "MatchSearcher " + matcher.toString(); }
+  public String toString() {
+    return "MatchSearcher " + matcher.toString();
+  }
 }

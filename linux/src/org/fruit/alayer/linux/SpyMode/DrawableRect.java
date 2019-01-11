@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.SpyMode;
 
 import org.fruit.alayer.FillPattern;
@@ -40,13 +39,10 @@ import java.awt.*;
  */
 public class DrawableRect extends DrawableObject {
 
-
     //region DrawableObject implementation
-
 
     @Override
     public void draw(Graphics2D g2d) {
-
 
         // TODO: this is a hack that could be looked into to.
         // If the color (255,255,0,x) comes through make it completely transparent:
@@ -61,12 +57,12 @@ public class DrawableRect extends DrawableObject {
 
         Double sw = _pen.strokeWidth();
 
-        if (sw == null)
+        if (sw == null) {
             sw = _defaultPen.strokeWidth();
-
-        if (sw != null)
+        }
+        if (sw != null) {
             g2d.setStroke(new BasicStroke(sw.floatValue()));
-
+        }
 
         FillPattern fp = _pen.fillPattern();
 
@@ -82,12 +78,9 @@ public class DrawableRect extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Properties
-
 
     private Rectangle _rect;
     /**
@@ -98,12 +91,9 @@ public class DrawableRect extends DrawableObject {
         return _rect;
     }
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Creates a new DrawableRect object.
@@ -119,20 +109,15 @@ public class DrawableRect extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
         return "(" + _location.x + ", " + _location.y + ") - '" + _rect.width + " x " + _rect.height + "'";
     }
 
-
     //endregion
-
 
 }

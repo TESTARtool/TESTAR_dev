@@ -151,8 +151,8 @@ public class OCR {
           widgetShot.image().getColorModel().getColorSpace(),
           grayImage.getColorModel().getColorSpace(),null);
       op.filter(widgetShot.image(),grayImage);
+      result = getOCR(grayImage);
       try {
-        result = getOCR(grayImage);
         if (print) {
           teller++;
           File f = new File("ocr_res" + teller + ".png");

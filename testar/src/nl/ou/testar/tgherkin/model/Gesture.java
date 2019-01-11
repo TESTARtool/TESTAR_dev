@@ -8,8 +8,6 @@ import org.fruit.Assert;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-
-
 /**
  * Abstract class that represents a gesture.
  *

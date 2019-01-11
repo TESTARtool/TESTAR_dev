@@ -1,7 +1,6 @@
 package nl.ou.testar.SimpleGuiStateGraph;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
 import java.util.*;
@@ -28,8 +27,8 @@ public class QlearningGuiState {
 
     /**
      * Finding the highest Q value, that is also in the given set of available actions
-     * @param actions
-     * @return
+     * @param actions the Actions
+     * @return the highest Q value
      */
     public double getMaxQValueOfTheState(Set<Action> actions) {
         double qValue = 0;
@@ -63,15 +62,15 @@ public class QlearningGuiState {
     }
 
     /**
-     * For some reason, the actionIDs are changing even if the ConcreteStateID is the same
+     * For some reason, the actionIDs are changing even if the ConcreteStateID is the same.
      * So updating the actionIDs
      *
+     * @param actions the Actions
+     * @param R_MAX maximal possible reward
      */
     public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX) {
         for (Action action:actions) {
-            if (concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID))) {
-                // model contains the action ID
-            } else {
+            if (!concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID))) {
                 concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID),R_MAX);
                 concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID),R_MAX);
                 concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID),0);

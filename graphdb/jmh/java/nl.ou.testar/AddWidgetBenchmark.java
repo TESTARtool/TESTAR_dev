@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import org.fruit.alayer.StdWidget;
@@ -65,7 +64,6 @@ public class AddWidgetBenchmark {
         graphFactory.dropDatabase();
     }
 
-
     @Benchmark
     @Warmup(iterations = 30)
     @Fork(10)
@@ -75,7 +73,6 @@ public class AddWidgetBenchmark {
     public void addSingleWidgetToState() {
         graphFactory.addWidget("widget1",widget);
     }
-
 
     private Widget createWidget(String id) {
         Widget widget = new StdWidget();

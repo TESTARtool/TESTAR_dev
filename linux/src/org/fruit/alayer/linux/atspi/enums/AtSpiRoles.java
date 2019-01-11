@@ -27,15 +27,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
-
 
 /**
  * Enumerates possible AT-SPI roles used to specify the UI role of an accessible object.
  */
 public enum AtSpiRoles {
-
 
     /**
      * A role indicating an error condition, such as uninitialized Role data.
@@ -162,12 +159,5 @@ public enum AtSpiRoles {
     Subscript,              //An object that contains text that is displayed as a subscript. Since: 2.16.
     Superscript,            //An object that contains text that is displayed as a superscript. Since: 2.16.
     LastDefined,            //Not a valid role, used for finding end of enumeration.
-
-
-
-
-
-
-
 
 }

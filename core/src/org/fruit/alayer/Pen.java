@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -109,9 +108,15 @@ public abstract class Pen implements Serializable {
 
   // end by urueda
 
-  public static Builder newPen() { return new Builder(null); }
-  public static Builder startFrom(Pen base) { return new Builder(base); }
-  public static Pen merge(Pen priorityPen, Pen backupPen) { return new MergedPen(priorityPen, backupPen); }
+  public static Builder newPen() {
+    return new Builder(null);
+  }
+  public static Builder startFrom(Pen base) {
+    return new Builder(base);
+  }
+  public static Pen merge(Pen priorityPen, Pen backupPen) {
+    return new MergedPen(priorityPen, backupPen);
+  }
 
   public static final class Builder{
     Color color;
@@ -122,7 +127,9 @@ public abstract class Pen implements Serializable {
     StrokeCaps strokeCaps;
     Pen base;
 
-    private Builder(Pen base) { this.base = base; }
+    private Builder(Pen base) {
+      this.base = base;
+    }
 
     public Builder setColor(Color c) {
       Assert.notNull(c);
@@ -167,7 +174,11 @@ public abstract class Pen implements Serializable {
     }
 
     public Pen build() {
-      return base == null ? new StdPen(this): merge(new StdPen(this), base);
+      if (base == null) {
+        return new StdPen(this);
+      } else {
+        return merge(new StdPen(this), base);
+      }
     }
   }
 
@@ -179,7 +190,6 @@ public abstract class Pen implements Serializable {
   public abstract StrokePattern strokePattern();
   public abstract FillPattern fillPattern();
   public abstract StrokeCaps strokeCaps();
-
 
   private static final class StdPen extends Pen{
     private static final long serialVersionUID = -7928196200263289513L;
@@ -200,17 +210,29 @@ public abstract class Pen implements Serializable {
       strokePattern = b.strokePattern;
     }
 
-    public Color color() { return color; }
-    public Double strokeWidth() { return strokeWidth; }
-    public Double fontSize() { return fontSize; }
-    public String font() { return font; }
-    public StrokePattern strokePattern() { return strokePattern; }
-    public FillPattern fillPattern() { return fillPattern; }
-    public StrokeCaps strokeCaps() { return strokeCaps; }
+    public Color color() {
+      return color; }
+    public Double strokeWidth() {
+      return strokeWidth;
+    }
+    public Double fontSize() {
+      return fontSize;
+    }
+    public String font() {
+      return font;
+    }
+    public StrokePattern strokePattern() {
+      return strokePattern;
+    }
+    public FillPattern fillPattern() {
+      return fillPattern;
+    }
+    public StrokeCaps strokeCaps() {
+      return strokeCaps;
+    }
   }
 
-
-  private final static class MergedPen extends Pen{
+  private static final class MergedPen extends Pen{
     private static final long serialVersionUID = 6526439728542225584L;
     final Pen pen1, pen2;
     private MergedPen(Pen pen1, Pen pen2) {
@@ -220,31 +242,60 @@ public abstract class Pen implements Serializable {
     }
     public Color color() {
       Color c = pen1.color();
-      return c == null ? pen2.color(): c;
+      if (c == null) {
+        return pen2.color();
+      } else {
+        return c;
+      }
     }
     public Double strokeWidth() {
       Double sw = pen1.strokeWidth();
-      return sw == null ? pen2.strokeWidth(): sw;
+      if (sw == null) {
+        return pen2.strokeWidth();
+      } else {
+        return sw;
+      }
     }
+
     public Double fontSize() {
       Double fs = pen1.fontSize();
-      return fs == null ? pen2.fontSize(): fs;
+      if (fs == null) {
+        return pen2.fontSize();
+      } else {
+        return fs;
+      }
     }
     public String font() {
       String f = pen1.font();
-      return f == null ? pen2.font(): f;
+      if (f == null ) {
+        return pen2.font();
+      } else {
+        return f;
+      }
     }
     public FillPattern fillPattern() {
       FillPattern fp = pen1.fillPattern();
-      return fp == null ? pen2.fillPattern(): fp;
+      if (fp == null) {
+        return pen2.fillPattern();
+      } else {
+        return  fp;
+      }
     }
     public StrokePattern strokePattern() {
       StrokePattern sp = pen1.strokePattern();
-      return sp == null ? pen2.strokePattern(): sp;
+      if (sp == null) {
+        return pen2.strokePattern();
+      } else {
+        return sp;
+      }
     }
     public StrokeCaps strokeCaps() {
       StrokeCaps sc = pen1.strokeCaps();
-      return sc == null ? pen2.strokeCaps(): sc;
+      if (sc == null) {
+        return pen2.strokeCaps();
+      } else {
+        return sc;
+      }
     }
   }
 }

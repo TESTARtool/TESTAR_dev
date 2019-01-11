@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
-
 
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
@@ -42,63 +40,47 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Represents an AT-SPI node that can be used by Testar.
  */
 public class AtSpiElement implements Serializable {
 
-
     //region Properties
-
 
     public AtSpiElement parent;
     List<AtSpiElement> children = new ArrayList<>();
 
-
     public AtSpiRootElement root;
-
 
     /**
      * Reference to the AtSpiWidget this AtSpiElement is linked to in the State (widget tree) object created by AtSpiStateFetcher.
      */
     AtSpiWidget backRef;
 
-
     //region General AT-SPI information
-
 
     long accessiblePtr;
     public String name, description, toolkitName;
     public AtSpiRoles role;
     Rect boundingBoxOnScreen;
 
-
     //endregion
 
-
     //region AT-SPI State information
-
 
     boolean isEnabled, hasFocus, isFocusable, isModal, isBlocked;
     AtSpiElementOrientations orientation;
 
-
     //endregion
 
-
     //region Inferred information
-
 
     boolean canScrollHorizontally, canScrollVertically, isTopLevelContainer, canScroll;
     double zIndex, hScrollViewSizePercentage, vScrollViewSizePercentage, hScrollPercentage, vScrollPercentage;
 
-
     //endregion
 
-
     //region Miscellaneous information
-
 
     /**
      * Specifies that this element should be ignored since it contains invalid information or
@@ -106,15 +88,11 @@ public class AtSpiElement implements Serializable {
      */
     boolean ignore;
 
-
     //endregion
 
-
     //endregion
-
 
     //region Constructors
-
 
     /**
      * Default constructor with a parent specified.
@@ -130,20 +108,14 @@ public class AtSpiElement implements Serializable {
 
     }
 
-
     //endregion
 
-
     //region Serializable functionality
-
 
     // Used to determine the class during serialization.
     private static final long serialVersionUID = 159753654852L;
 
-
     // Most likely used to serialize and deserialize an instance of this class - don't know if this is used by Testar though.
-
-
 
     /**
      * Serialize an instance of this object.
@@ -153,7 +125,6 @@ public class AtSpiElement implements Serializable {
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }
-
 
     /**
      * Deserialize an instance of this object.
@@ -165,12 +136,9 @@ public class AtSpiElement implements Serializable {
         ois.defaultReadObject();
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
@@ -182,8 +150,6 @@ public class AtSpiElement implements Serializable {
 
     }
 
-
     //endregion
-
 
 }

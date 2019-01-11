@@ -77,7 +77,6 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
     this.dataTable = dataTable;
   }
 
-
   @Override
   public Boolean visitWidgetConditionInParen(WidgetConditionParser.WidgetConditionInParenContext ctx) {
     return asBoolean(ctx.widget_condition());
@@ -92,7 +91,6 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
   public Boolean visitWidgetConditionAnd(WidgetConditionParser.WidgetConditionAndContext ctx) {
     return asBoolean(ctx.left) && asBoolean(ctx.right);
   }
-
 
   @Override
   public Boolean visitWidgetConditionOr(WidgetConditionParser.WidgetConditionOrContext ctx) {
@@ -162,7 +160,6 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
     return asDouble(ctx.arithmetic_expr());
   }
 
-
   @Override
   public Double visitArithmeticExpressionMultDivMod(WidgetConditionParser.ArithmeticExpressionMultDivModContext ctx) {
     if (ctx.MULT() != null) {
@@ -181,7 +178,6 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
   public Double visitArithmeticExpressionNegation(WidgetConditionParser.ArithmeticExpressionNegationContext ctx) {
     return asDouble(ctx.arithmetic_expr()) * -1;
   }
-
 
   @Override
   public Double visitArithmeticExpressionPlusMinus(WidgetConditionParser.ArithmeticExpressionPlusMinusContext ctx) {
@@ -274,7 +270,6 @@ public class WidgetConditionEvaluator extends WidgetConditionParserBaseVisitor<O
     operatorQueue.add(WidgetCondition.Type.ALSO);
     return visitChildren(ctx);
   }
-
 
   @Override
   public Boolean visitLogicalConst(WidgetConditionParser.LogicalConstContext ctx) {

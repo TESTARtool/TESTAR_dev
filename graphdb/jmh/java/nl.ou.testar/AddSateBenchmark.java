@@ -27,13 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * Benchmark to measure the time it takes to add a State to the data model.
@@ -58,8 +56,6 @@ public class AddSateBenchmark {
        graphFactory.dropDatabase();
     }
 
-
-
     @Benchmark()
     @Warmup(iterations = 30)
     @Fork(10)
@@ -69,7 +65,6 @@ public class AddSateBenchmark {
     public void testAddState() {
         graphFactory.addState(Util.createState("0xCAFE"),true);
     }
-
 
     @Benchmark()
     @Warmup(iterations = 10)
@@ -81,6 +76,5 @@ public class AddSateBenchmark {
         graphFactory.addState(Util.createState("0xCAFE"),false);
         graphFactory.addState(Util.createState("0xCAFE"),false);
     }
-
 
 }

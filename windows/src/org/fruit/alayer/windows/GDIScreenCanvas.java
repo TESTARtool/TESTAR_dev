@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -45,6 +44,8 @@ import org.fruit.alayer.StrokePattern;
 
 public final class GDIScreenCanvas implements Canvas {
 
+  private static final double TEXT_LENGTH = 20.;
+  private static final double PAUSE_TIME = 0.01;
   double x, y;
   long width, height;
   boolean running;
@@ -69,10 +70,11 @@ public final class GDIScreenCanvas implements Canvas {
   /**
    * Creates a ScreenCanvas for the system's primary monitor
    * @return ScreenCanvas for the primary monitor
+   * @param defaultPen the default pen used for writing on the screen
    */
   public static GDIScreenCanvas fromPrimaryMonitor(Pen defaultPen) {
     long handle = Windows.GetPrimaryMonitorHandle();
-    long mi[] = Windows.GetMonitorInfo(handle);
+    long[] mi = Windows.GetMonitorInfo(handle);
     long x = mi[1];
     long y = mi[2];
     long width = mi[3] - mi[1];
@@ -122,6 +124,12 @@ public final class GDIScreenCanvas implements Canvas {
 
   /**
    * Create a ScreenCanvas with the given dimensions.
+   *
+   * @param x  x-coordinate on the screen
+   * @param y  y-coordinate on the scree
+   * @param width width of the screen
+   * @param height height of the screen
+   * @param defaultPen default pen to be used (color)
    */
   public GDIScreenCanvas(double x, double y, long width, long height, Pen defaultPen) {
     Assert.notNull(defaultPen);
@@ -138,7 +146,7 @@ public final class GDIScreenCanvas implements Canvas {
     bgt.start();
 
     while (!running) {
-      Util.pause(0.01);
+      Util.pause(PAUSE_TIME);
     }
 
     pPen = Windows.Gdiplus_Pen_Create(0, 0, 0, 0, 1);
@@ -179,19 +187,34 @@ public final class GDIScreenCanvas implements Canvas {
     }
   }
 
-  public void finalize() { release(); }
-
-  private void check() {
-    if (!running)
-      throw new IllegalStateException();
+  public void finalize() {
+    release();
   }
 
-  public double width() { return width; }
-  public double height() { return height; }
-  public double x() { return x; }
-  public double y() { return y; }
-  public void begin() { check(); }
-  public Pen defaultPen() { return defaultPen; }
+  private void check() {
+    if (!running) {
+      throw new IllegalStateException();
+    }
+  }
+
+  public double width() {
+    return width;
+  }
+  public double height() {
+    return height;
+  }
+  public double x() {
+    return x;
+  }
+  public double y() {
+    return y;
+  }
+  public void begin() {
+    check();
+  }
+  public Pen defaultPen() {
+    return defaultPen;
+  }
 
   public void end() {
     check();
@@ -227,39 +250,42 @@ public final class GDIScreenCanvas implements Canvas {
   public void ellipse(Pen pen, double x, double y, double width, double height) {
     check();
     adjustPen(pen);
-    if (fillPattern == FillPattern.Solid)
+    if (fillPattern == FillPattern.Solid) {
       Windows.Gdiplus_Graphics_FillEllipse(pGraphics, pBrush, x - this.x, y - this.y, width, height);
-    else
+    } else {
       Windows.Gdiplus_Graphics_DrawEllipse(pGraphics, pPen, x - this.x, y - this.y, width, height);
+    }
   }
 
   public void rect(Pen pen, double x, double y, double width, double height) {
     check();
     adjustPen(pen);
-    if (fillPattern == FillPattern.Solid)
+    if (fillPattern == FillPattern.Solid) {
       Windows.Gdiplus_Graphics_FillRectangle(pGraphics, pBrush, x - this.x, y - this.y, width, height);
-    else
+    } else {
       Windows.Gdiplus_Graphics_DrawRectangle(pGraphics, pPen, x - this.x, y - this.y, width, height);
+    }
   }
 
   public Pair<Double, Double> textMetrics(Pen pen, String text) {
     Assert.notNull(pen, text);
-    return Pair.from(text.length() * 2., 20.);
+    return Pair.from(text.length() * 2., TEXT_LENGTH);
   }
 
   private void adjustPen(Pen pen) {
     Double tstrokeWidth = pen.strokeWidth();
-    if (tstrokeWidth == null)
+    if (tstrokeWidth == null) {
       tstrokeWidth = defaultPen.strokeWidth();
+    }
 
     StrokePattern tstrokePattern = pen.strokePattern();
-    if (tstrokePattern == null)
+    if (tstrokePattern == null) {
       tstrokePattern = defaultPen.strokePattern();
-
+    }
     StrokeCaps tstrokeCaps = pen.strokeCaps();
-    if (tstrokeCaps == null)
+    if (tstrokeCaps == null) {
       tstrokeCaps = defaultPen.strokeCaps();
-
+    }
     if (!tstrokeWidth.equals(strokeWidth) || tstrokePattern != strokePattern || tstrokeCaps != strokeCaps) {
       strokePattern = tstrokePattern;
       strokeWidth = tstrokeWidth;
@@ -268,9 +294,9 @@ public final class GDIScreenCanvas implements Canvas {
     }
 
     Color tcolor = pen.color();
-    if (tcolor == null)
+    if (tcolor == null) {
       tcolor = defaultPen.color();
-
+    }
     if (!tcolor.equals(color)) {
       color = tcolor;
       Windows.Gdiplus_Pen_SetColor(pPen, color.alpha(), color.red(), color.green(), color.blue());
@@ -278,29 +304,30 @@ public final class GDIScreenCanvas implements Canvas {
     }
 
     String tfont = pen.font();
-    if (tfont == null)
+    if (tfont == null) {
       tfont = defaultPen.font();
-
+    }
     Double tfontSize = pen.fontSize();
-    if (tfontSize == null)
+    if (tfontSize == null) {
       tfontSize = defaultPen.fontSize();
-
+    }
     if (!tfont.equals(font) || !tfontSize.equals(fontSize)) {
       font = tfont;
       fontSize = tfontSize;
-      if (pFont != 0)
+      if (pFont != 0) {
         Windows.Gdiplus_Font_Destroy(pFont);
-      if (pFontFamily != 0)
+      }
+      if (pFontFamily != 0) {
         Windows.Gdiplus_FontFamily_Destroy(pFontFamily);
-
+      }
       pFontFamily = Windows.Gdiplus_FontFamily_Create(font);
       pFont = Windows.Gdiplus_Font_Create(pFontFamily, fontSize, Windows.Gdiplus_FontStyleRegular, Windows.Gdiplus_UnitPixel);
     }
 
     FillPattern tfillPattern = pen.fillPattern();
-    if (tfillPattern == null)
+    if (tfillPattern == null) {
       tfillPattern = defaultPen.fillPattern();
-
+    }
     if (tfillPattern != fillPattern) {
       fillPattern = tfillPattern;
     }
@@ -310,5 +337,4 @@ public final class GDIScreenCanvas implements Canvas {
       double x3, double y3) {
     throw new UnsupportedOperationException();
   }
-
 }

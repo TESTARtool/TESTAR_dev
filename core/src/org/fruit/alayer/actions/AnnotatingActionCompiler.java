@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -56,10 +55,8 @@ import org.fruit.alayer.visualizers.TrajectoryVisualizer;
 
 public class AnnotatingActionCompiler extends StdActionCompiler {
 
-  // begin by urueda
   private static final Pen MovePen = Pen.newPen().setColor(Color.Aqua)
       .setFillPattern(FillPattern.None).setStrokeWidth(3).build();
-  // end by urueda
   private static final Pen LClickPen = Pen.newPen().setColor(Color.Green)
       .setFillPattern(FillPattern.Solid).setStrokeWidth(3).build();
   private static final Pen RClickPen = Pen.newPen().setColor(Color.Yellow)
@@ -69,20 +66,19 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
   private static final Pen DragDropPen = Pen.newPen().setColor(Color.CornflowerBlue)
       .setFillPattern(FillPattern.None).setStrokeWidth(2).setStrokeCaps(StrokeCaps._Arrow).build();
 
-  // by mimarmu1
   private static final Pen DropdownPen = Pen.newPen().setColor(Color.Gold).setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();
 
   private static final Pen TypePen = Pen.newPen().setColor(Color.Blue)
       //.setFillPattern(FillPattern.None).setStrokeWidth(3).setFontSize(26).build();
       .setFillPattern(FillPattern.None).setStrokeWidth(3).build(); // by urueda (use default font size)
 
-  public AnnotatingActionCompiler() { super(); }
+  public AnnotatingActionCompiler() {
+    super();
+  }
 
   public AnnotatingActionCompiler(Abstractor abstractor) {
     super(abstractor);
   }
-
-  // begin by urueda
 
   @Override
   public Action mouseMove(Widget w) {
@@ -101,9 +97,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  // end by urueda
-
-  @Override // by urueda
+  @Override
   public Action leftClick() {
     Action ret = super.leftClick();
     ret.set(Tags.Desc, "Left Click");
@@ -111,7 +105,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action rightClick() {
     Action ret = super.rightClick();
     ret.set(Tags.Desc, "Right Click");
@@ -119,7 +113,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action leftDoubleClick() {
     Action ret = super.leftDoubleClick();
     ret.set(Tags.Desc, "Left Double Click");
@@ -127,16 +121,14 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action leftClickAt(Widget widget, double relX, double relY) {
-    //Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
-    Action ret = super.leftClickAt(widget, relX, relY); // by urueda
+    Action ret = super.leftClickAt(widget, relX, relY);
     ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
-    //ret.set(Tags.Targets, Util.newArrayList(wf));
-    return ret;
+     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action leftClickAt(Position position) {
     Action ret = super.leftClickAt(position);
     ret.set(Tags.Desc, "Left Click at '" + position.toString() + "'");
@@ -145,7 +137,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action rightClickAt(Position position) {
     Action ret = super.rightClickAt(position);
     ret.set(Tags.Desc, "Right Click at '" + position.toString() + "'");
@@ -154,7 +146,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action leftDoubleClickAt(Position position) {
     Action ret = super.leftDoubleClickAt(position);
     ret.set(Tags.Desc, "Double-Click at '" + position.toString() + "'");
@@ -165,7 +157,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 
   private final int DISPLAY_TEXT_MAX_LENGTH = 16;
 
-  @Override // by urueda
+  @Override
   public Action clickTypeInto(final Widget widget, double relX, double relY, final String text) {
     //Action ret = clickTypeInto(new WidgetPosition(abstractor.apply(widget), Tags.Shape, relX, relY, true), text);
     Action ret = super.clickTypeInto(widget, relX, relY, text); // by urueda
@@ -174,7 +166,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action clickTypeInto(final Position position, final String text) {
     Action ret = super.clickTypeInto(position, text);
     //ret.set(Tags.Visualizer, new TextVisualizer(position, Util.abbreviate(text, 5, "..."), TypePen));
@@ -185,8 +177,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  //by mimarmu1
-  @Override // by urueda
+  @Override
   public Action dropDownAt(Position position) {
     Action ret = super.dropDownAt(position);
     ret.set(Tags.Desc, "Dropdown at '" + position.toString() + "'");
@@ -195,7 +186,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action dragFromTo(Position from, Position to) {
     Action ret = super.dragFromTo(from, to);
     ret.set(Tags.Visualizer, new TrajectoryVisualizer(DragDropPen, from, new OrthogonalPosition(from, to, 0.2, 0), to));
@@ -204,7 +195,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action hitKey(KBKeys key) {
     Action ret = super.hitKey(key);
     ret.set(Tags.Desc, "Hit Key " + key);
@@ -212,32 +203,37 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action hitShortcutKey(List<KBKeys> keys) {
     Action ret = super.hitShortcutKey(keys);
     String keysString = "";
-    for (int i = 0; i < keys.size(); i++)
-      keysString += i != 0 ? "+": "" + keys.get(i);
+    for (int i = 0; i < keys.size(); i++) {
+      if (i != 0) {
+        keysString +=  " + " + keys.get(i);
+      } else {
+        keysString += keys.get(i);
+      }
+    }
     ret.set(Tags.Desc, "Hit Shortcut Key " + keysString);
     ret.set(Tags.Role, ActionRoles.HitShortcutKey);
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action killProcessByPID(long pid, double timeToWaitBeforeKilling) {
     Action ret = super.killProcessByPID(pid, timeToWaitBeforeKilling);
     ret.set(Tags.Desc, "Kill Process with pid: " + pid + ".");
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action killProcessByName(String name, double timeToWaitBeforeKilling) {
     Action ret = super.killProcessByName(name, timeToWaitBeforeKilling);
     ret.set(Tags.Desc, "Kill Process with name '" + name + "'");
     return ret;
   }
 
-  @Override // by urueda
+  @Override
   public Action activateSystem() {
     Action ret = super.activateSystem();
     ret.set(Tags.Desc, "Bring the system to the foreground.");

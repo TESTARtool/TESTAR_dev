@@ -18,7 +18,6 @@ public class StateMock extends StdState{
   private static final long serialVersionUID = 7755367830576251631L;
   private List<Widget> widgets = new ArrayList<Widget>();
 
-
   /**
    * Constructor.
    * @param widgets given list of widgets

@@ -27,17 +27,14 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
-import org.fruit.monkey.SettingsDialog;
+import static javax.swing.GroupLayout.PREFERRED_SIZE;
 
+import org.fruit.monkey.SettingsDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-
-import static javax.swing.GroupLayout.PREFERRED_SIZE;
-import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 
 public class AboutPanel extends JPanel {
 
@@ -49,7 +46,6 @@ public class AboutPanel extends JPanel {
   private JLabel ouLogo = getLogo("/icons/logos/ou.jpg");
   private JLabel testomatLogo  = getLogo("/icons/logos/TESTOMAT_Logo.png");
   private JLabel fittestLOGO = getLogo("/icons/logos/fittest_logo.png");
-
 
   public AboutPanel () throws IOException {
     setBackground(Color.WHITE);

@@ -69,7 +69,6 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
     return visitChildren(ctx);
   }
 
-
   @Override
   public Object visitNumericPlaceholder(WidgetConditionParser.NumericPlaceholderContext ctx) {
     // check whether placeholder is a valid column name of the data table
@@ -206,6 +205,5 @@ public class WidgetConditionValidator extends WidgetConditionParserBaseVisitor<O
       errorList.add(e.getMessage());
       }
   }
-
 
 }

@@ -44,14 +44,12 @@ public class Calc {
     ShutDownMenuItem = new MenuItem(FileMenu, SWT.PUSH);
     ShutDownMenuItem.setText("Shut Down...");
 
-
     //shut down
     ShutDownMenuItem.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Calculator.close();
       }
     });
-
 
     Menu4 = new Menu(Calculator , SWT.DROP_DOWN);
     MenuItem4 = new MenuItem(menuBar1 , SWT.CASCADE);
@@ -61,7 +59,6 @@ public class Calc {
     MenuItem5.setText("Copy");
     MenuItem6 = new MenuItem(Menu4 , SWT.PUSH);
     MenuItem6.setText("Paste");
-
 
     //hide an easter egg
     MenuItem5.addSelectionListener(new SelectionAdapter() {
@@ -73,7 +70,6 @@ public class Calc {
       }
     });
 
-
     //simulate critical message box
     MenuItem6.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -84,13 +80,11 @@ public class Calc {
       }
     });
 
-
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
     gridData.minimumWidth = 80;
     gridData.minimumHeight = 180;
-
 
     Menu7 = new Menu(Calculator , SWT.DROP_DOWN);
     MenuItem7 = new MenuItem(menuBar1 , SWT.CASCADE);
@@ -104,7 +98,6 @@ public class Calc {
     MenuItem10 = new MenuItem(Menu7 , SWT.PUSH);
     MenuItem10.setText("Digital Grouping");
 
-
     Menu11 = new Menu(Calculator , SWT.DROP_DOWN);
     MenuItem11 = new MenuItem(menuBar1 , SWT.CASCADE);
     MenuItem11.setText("Help");
@@ -116,9 +109,6 @@ public class Calc {
     MenuItem14 = new MenuItem(Menu11 , SWT.PUSH);
     MenuItem14.setText("Contact");
 
-
-
-
     //Division by 0
     MenuItem9.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -126,9 +116,6 @@ public class Calc {
         x = 10/0;
       }
     });
-
-
-
 
     //NullpointerException
     MenuItem10.addSelectionListener(new SelectionAdapter() {
@@ -138,7 +125,6 @@ public class Calc {
         mb.open();
       }
     });
-
 
     // startup external process
     MenuItem12.addSelectionListener(new SelectionAdapter() {
@@ -153,9 +139,6 @@ public class Calc {
       }
     });
 
-
-
-
     //About the calculator information
     MenuItem13.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -165,7 +148,6 @@ public class Calc {
         mb.open();
       }
     });
-
 
     //hide an TESTAR message
     MenuItem14.addSelectionListener(new SelectionAdapter() {
@@ -200,14 +182,11 @@ public class Calc {
     Button23 = new Button(Composite18 , SWT.PUSH);
     Button23.setText("C");
 
-
     Button20.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) {
         Text17.setText("What are you doing!!?????");
       }
     });
-
-
 
     Button21.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) {
@@ -215,14 +194,12 @@ public class Calc {
       }
     });
 
-
     Button23.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) {
         //calc.hitKey(Calculator.Clear);
         Text17.setText("0");
       }
     });
-
 
     JCalcPanel = new Composite(Composite14 , SWT.FLAT);
     GridLayout25 = new GridLayout();
@@ -235,7 +212,6 @@ public class Calc {
     Button26.setText("log x");
     Button26.setLayoutData(gridData);
 
-
     //simulate a crash
     Button26.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) {
@@ -244,7 +220,6 @@ public class Calc {
           throw new RuntimeException("Unknown Error!");
       }
     });
-
 
     Button27 = new Button(JCalcPanel , SWT.PUSH);
     Button27.setText("7");
@@ -255,9 +230,6 @@ public class Calc {
       }
     });
 
-
-
-
     Button28 = new Button(JCalcPanel , SWT.PUSH);
     Button28.setText("8");
     Button28.setLayoutData(gridData);
@@ -266,7 +238,6 @@ public class Calc {
         Text17.setText(Text17.getText() + "8");
       }
     });
-
 
     Button29 = new Button(JCalcPanel , SWT.PUSH);
     Button29.setText("9");
@@ -300,8 +271,6 @@ public class Calc {
       }
     });
 
-
-
     Button32 = new Button(JCalcPanel , SWT.PUSH);
     Button32.setText("tan x");
     Button32.setLayoutData(gridData);
@@ -314,7 +283,6 @@ public class Calc {
           while (true);
       }
     });
-
 
     Button33 = new Button(JCalcPanel , SWT.PUSH);
     Button33.setText("4");
@@ -374,7 +342,6 @@ public class Calc {
       }
     });
 
-
     Button40 = new Button(JCalcPanel , SWT.PUSH);
     Button40.setText("2");
     Button40.setLayoutData(gridData);
@@ -383,8 +350,6 @@ public class Calc {
         Text17.setText(Text17.getText() + "2");
       }
     });
-
-
 
     Button41 = new Button(JCalcPanel , SWT.PUSH);
     Button41.setText("3");
@@ -395,7 +360,6 @@ public class Calc {
         Text17.setText(Text17.getText() + "3");
       }
     });
-
 
     Button42 = new Button(JCalcPanel , SWT.PUSH);
     Button42.setText("-");
@@ -425,7 +389,6 @@ public class Calc {
       }
     });
 
-
     Button46 = new Button(JCalcPanel , SWT.PUSH);
     Button46.setText("+/-");
     Button46.setLayoutData(gridData);
@@ -439,7 +402,6 @@ public class Calc {
     Button49.setText("=");
     Button49.setLayoutData(gridData);
 
-
     //simulate critical message box
     Button49.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -449,7 +411,6 @@ public class Calc {
         mb.open();
       }
     });
-
 
     Calculator.pack();
     Calculator.open();

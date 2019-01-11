@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -46,9 +45,8 @@ import org.fruit.alayer.exceptions.PositionException;
  */
 public interface Position extends Serializable {
 
-	
-	Point apply(State state) throws PositionException;
+  Point apply(State state) throws PositionException;
 
-	public void obscuredByChildFeature(boolean enable); // by urueda
+  public void obscuredByChildFeature(boolean enable); // by urueda
 
 }

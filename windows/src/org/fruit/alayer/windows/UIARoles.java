@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -43,7 +42,7 @@ import org.fruit.alayer.Roles;
 public final class UIARoles {
   private UIARoles() {}
 
-  private final static Map<Long, Role> typeIdToRole = Util.newHashMap();
+  private static final Map<Long, Role> typeIdToRole = Util.newHashMap();
 
   public static final Role
 
@@ -99,7 +98,11 @@ public final class UIARoles {
 
   public static Role fromTypeId(long typeId) {
     Role ret = typeIdToRole.get(typeId);
-    return (ret == null) ? UIAUnknown: ret;
+    if (ret == null) {
+      return  UIAUnknown;
+    } else {
+      return ret;
+    }
   }
 
   // by urueda

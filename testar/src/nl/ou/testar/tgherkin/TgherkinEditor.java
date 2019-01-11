@@ -3,7 +3,6 @@
  */
 package nl.ou.testar.tgherkin;
 
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -87,7 +86,6 @@ public class TgherkinEditor extends javax.swing.JDialog{
     jScrollPane1.setRowHeaderView(lineNumbers);
     jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
 
-
     btnCheck.setText("Save and Check");
     btnCheck.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -131,7 +129,6 @@ public class TgherkinEditor extends javax.swing.JDialog{
     pack();
   }
 
-
   private void check() {
     try {
       console.setText("Saving file..." + System.getProperty("line.separator"));
@@ -164,7 +161,6 @@ public class TgherkinEditor extends javax.swing.JDialog{
       console.setText(console.getText() + System.getProperty("line.separator") + t.getMessage());
     }
   }
-
 
   private void btnCheckActionPerformed(java.awt.event.ActionEvent evt) {
     check();

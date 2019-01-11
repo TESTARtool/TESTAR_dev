@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph.reporting;
 
 import es.upv.staq.testar.CodingManager;
@@ -42,7 +41,6 @@ import org.fruit.alayer.actions.BriefActionRolesMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
 
 /**
  * Reporting pages.

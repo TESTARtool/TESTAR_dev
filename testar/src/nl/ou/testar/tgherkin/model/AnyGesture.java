@@ -8,13 +8,11 @@ import java.util.Set;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Widget;
 
-
 /**
  * Class responsible for handling any gesture.
  *
  */
 public class AnyGesture extends Gesture {
-
 
   private List<Gesture> gestures = new ArrayList<Gesture>();
 
@@ -37,7 +35,6 @@ public class AnyGesture extends Gesture {
     gestures.add(new TypeGesture(new ParameterBase()));
     }
 
-
     @Override
     public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
          // at least one gesture has to be possible
@@ -48,7 +45,6 @@ public class AnyGesture extends Gesture {
          }
       return false;
     }
-
 
     @Override
     public Set<Action> getActions(Widget widget, ProtocolProxy proxy, DataTable dataTable) {

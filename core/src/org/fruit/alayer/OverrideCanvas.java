@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -56,14 +55,30 @@ public final class OverrideCanvas implements Canvas {
     this.overridePen = pen;
   }
 
-  public double width() { return canvas.width(); }
-  public double height() {  return canvas.height(); }
-  public double x() { return canvas.x(); }
-  public double y() { return canvas.y(); }
-  public void begin() { canvas.begin(); }
-  public void end() { canvas.end(); }
-  public Pen defaultPen() { return Pen.merge(overridePen, canvas.defaultPen()); }
-  public void release() { canvas.release(); }
+  public double width() {
+    return canvas.width();
+  }
+  public double height() {
+    return canvas.height();
+  }
+  public double x() {
+    return canvas.x();
+  }
+  public double y() {
+    return canvas.y();
+  }
+  public void begin() {
+    canvas.begin();
+  }
+  public void end() {
+    canvas.end();
+  }
+  public Pen defaultPen() {
+    return Pen.merge(overridePen, canvas.defaultPen());
+  }
+  public void release() {
+    canvas.release();
+  }
 
   public void line(Pen pen, double x1, double y1, double x2, double y2) {
     canvas.line(Pen.merge(overridePen, pen), x1, y1, x2, y2);

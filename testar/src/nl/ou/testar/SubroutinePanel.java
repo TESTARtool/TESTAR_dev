@@ -1,7 +1,5 @@
 package nl.ou.testar;
 
-import static org.fruit.monkey.dialog.ToolTipTexts.urlTTT;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,6 +23,7 @@ import nl.ou.testar.tgherkin.protocol.SubroutineProtocol;
 import org.fruit.UnProc;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.dialog.ToolTipTexts;
 
 /**
  * Input table for subroutines settings.
@@ -163,7 +162,7 @@ public class SubroutinePanel extends JPanel {
         START_Y + lineNumber * GAP_Y_H,
         LABEL_WIDTH,
         LABEL_HEIGHT);
-    jlabelUrl.setToolTipText(urlTTT);
+    jlabelUrl.setToolTipText(ToolTipTexts.getUrlTTT());
     add(jlabelUrl);
 
     jtfUrl = new JTextField();
@@ -435,7 +434,7 @@ public class SubroutinePanel extends JPanel {
   /**
    * Populate Timing Fields from Settings structure.
    *
-   * @param settings  The settings to load.
+   * @param settings  The settings to load
    */
   public void populateFrom(final Settings settings) {
     protocolClass = settings.get(ConfigTags.ProtocolClass);
@@ -568,7 +567,7 @@ public class SubroutinePanel extends JPanel {
   /**
    * Retrieve information from the Timing GUI.
    *
-   * @param settings  reference to the object where the settings will be stored.
+   * @param settings  reference to the object where the settings will be stored
    */
   public void extractInformation(final Settings settings) {
   }

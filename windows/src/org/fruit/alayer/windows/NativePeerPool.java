@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -45,11 +44,15 @@ public final class NativePeerPool {
     boolean valid();
   }
 
-  private final static class InvalidPeer implements NativePeer{
+  private static final class InvalidPeer implements NativePeer{
     private InvalidPeer() {};
-    public long access() { throw new IllegalStateException(); }
+    public long access() {
+      throw new IllegalStateException();
+    }
     public void release() { }
-    public boolean valid() { return false; }
+    public boolean valid() {
+      return false;
+    }
   }
 
   public final class StdPeer implements NativePeer{
@@ -65,48 +68,59 @@ public final class NativePeerPool {
     }
 
     public long access() throws IllegalStateException {
-      if (ptr == 0)
+      if (ptr == 0) {
         throw new IllegalStateException("Peer has already been released!");
+      }
       return ptr;
     }
 
-    public boolean valid() { return ptr != 0; }
+    public boolean valid() {
+      return ptr != 0;
+    }
 
     public void release() {
-      if (ptr == 0)
+      if (ptr == 0) {
         return;
-
+      }
       switch(type) {
       case IUnknown: Windows.IUnknown_Release(ptr);
+      default:
       }
       ptr = 0;
 
-      if (pred != null)
+      if (pred != null) {
         pred.succ = succ;
-      if (succ != null)
+      }
+      if (succ != null) {
         succ.pred = pred;
-      if (this == NativePeerPool.this.first)  // we've been the first one, so make the second the new first
+      }
+      if (this == NativePeerPool.this.first) { // we've been the first one, so make the second the new first
         NativePeerPool.this.first = succ;
+      }
     }
   }
 
   private StdPeer first = null;
 
   public NativePeer register(long ptr, PeerType type) {
-    if (ptr == 0)
+    if (ptr == 0) {
       return InvalidPeer;
-
+    }
     StdPeer ret = new StdPeer(null, first, ptr, type);
-    if (first != null)
+    if (first != null) {
       first.pred = ret;
+    }
     first = ret;
     return ret;
   }
 
   public void release() {
-    while (first != null)
+    while (first != null) {
       first.release();
+    }
   }
 
-  public void finalize() { release(); }
+  public void finalize() {
+    release();
+  }
 }

@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -51,6 +49,7 @@ public final class PredictableGuideline extends AbstractGuideline {
 
   PredictableGuideline(AbstractPrinciple parent) {
     super(2, "Predictable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "On Focus",
         this, Level.A, "consistent-behavior-receive-focus"));
     criteria.add(new SuccessCriterion(2, "On Input",
@@ -59,6 +58,7 @@ public final class PredictableGuideline extends AbstractGuideline {
         this, Level.AA, "consistent-behavior-consistent-locations"));
     criteria.add(new SuccessCriterion(4, "Consistent Identification",
         this, Level.AA, "consistent-behavior-consistent-functionality"));
+    setCriteria(criteria);
   }
 
   @Override
@@ -84,11 +84,13 @@ public final class PredictableGuideline extends AbstractGuideline {
     List<Object> stateChanges = graphDB.getObjectsFromGremlinPipe(gremlinStateChange,
         GremlinStart.VERTICES);
     // the list contains the titles of the new states
-    for (Object title: stateChanges)
+    for (Object title: stateChanges) {
       results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
           "Unexpected state change to \"" + title + "\""));
-    if (stateChanges.isEmpty())
+    }
+    if (stateChanges.isEmpty()) {
       results.add(evaluationPassed(sc));
+    }
     return results;
   }
 

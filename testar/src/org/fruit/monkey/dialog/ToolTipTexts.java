@@ -27,82 +27,83 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
+
+import java.awt.Component;
 
 public class ToolTipTexts {
 
   // TTTs for the start buttons
-  public static String btnGenerateTTT = "<html>\nStart in GENERATE Mode:<br>\n" +
+  private  static String btnGenerateTTT = "<html>\nStart in GENERATE Mode:<br>\n" +
       "This mode will start up the SUT and generate test sequences.\n</html>";
-  public static String btnSpyTTT = "<html>\nStart in SPY Mode:<br>\n" +
+  private  static String btnSpyTTT = "<html>\nStart in SPY Mode:<br>\n" +
       "This mode does allows you to inspect the GUI of the System under Test. <br>\n" +
       "Simply use the mouse cursor to point on a widget and TESTAR<br>\n" +
       "will display everything it knows about it. The Spy-Mode will also visualize<br>\n" +
       "the set of actions that TESTAR recognizes, so that you can see<br>\n" +
       "which ones will be executed during a test.\n</html>";
-  public static String btnReplayTTT = "<html>\nStart in REPLAY Mode:<br>\n" +
+  private  static String btnReplayTTT = "<html>\nStart in REPLAY Mode:<br>\n" +
       "This mode replays a previously recorded sequence.<br>\n" +
       "TESTAR will ask you for the sequence to replay.\n</html>";
-  public static String btnViewTTT = "<html>\nStart in VIEW Mode:<br>\n" +
+  private  static String btnViewTTT = "<html>\nStart in VIEW Mode:<br>\n" +
       "The View-Mode allows you to inspect all steps of a previously recorded<br>\n" +
       "sequence. Contrary to the Replay-Mode, it will not execute any actions,<br>\n" +
       "but only show you the screenshots that were recorded during sequence<br>\n" +
       "generation. This is ideal if a sequence turns out not to be reproducible.\n</html>";
-  public static String btnRecordTTT = "<html>\nStart in RECORD Mode:<br>\n" +
+  private  static String btnRecordTTT = "<html>\nStart in RECORD Mode:<br>\n" +
           "This modes enables the tester to manually record (part of) a sequence.\n</html>";
 
   // TTTs for the general tab
-  public static String sutConnectorTTT = "How does TESTAR connect to the SUT";
-  public static String sutPathTTT = "Write the argument for the selected SUT connector";
-  public static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
-  public static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
+  private static String sutConnectorTTT = "How does TESTAR connect to the SUT";
+  private static String sutPathTTT = "Write the argument for the selected SUT connector";
+  private static String nofSequencesTTT = "<html>\nNumber of sequences to generate.\n</html>";
+  private static String sequencesActionsTTT = "<html>\nSequence length:<br>\n" +
       "After having executed the given amount of<br>\n" +
       "actions, TESTAR will stop the SUT and proceed with the next<br>\n" +
       "sequence.\n</html>";
-  public static String lblLoggingVerbosityTTT = "<html>\nLogging verbosity:<br>\n" +
+  private static String lblLoggingVerbosityTTT = "<html>\nLogging verbosity:<br>\n" +
       "The higher the value, the more information<br>\n" +
       "will be written to TESTAR's log-file.\n</html>";
-  public static String loggingVerbosityTTT = "<html> Logging verbosity:<br>\n" +
+  private static String loggingVerbosityTTT = "<html> Logging verbosity:<br>\n" +
       "Sets how much information will be written to TESTAR's log-file. </html>";
-  public static String checkStopOnFaultTTT = "<html> Stop sequence generation on fault: " +
+  private static String checkStopOnFaultTTT = "<html> Stop sequence generation on fault: " +
       "If TESTAR detects and error, it will immediately stop sequence generation. </html>";
-  public static String lblCompileTTT = "Always compile protocol on action start";
-  public static String btnEditProtocolTTT = "Open the protocol editor to edit, save and compile the Java Protocol";
-  public static String intervalTTT = "Set the sampling interval";
-  public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
-  public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
+  private static String lblCompileTTT = "Always compile protocol on action start";
+  private static String btnEditProtocolTTT = "Open the protocol editor to edit, save and compile the Java Protocol";
+  private static String intervalTTT = "Set the sampling interval";
+  private static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
+  private static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
 
   // TTTs for the walker tab
-  public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
-  public static String checkForceForegroundTTT = "<html> Force the SUT to the foreground: During test generation, windows might get minimized or other<br>  processes might block the SUT's GUI. If you check this option, TESTAR will force the SUT to the<br> foreground. </html>";
+  private static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
+  private static String checkForceForegroundTTT = "<html> Force the SUT to the foreground: During test generation, windows might get minimized or other<br>  processes might block the SUT's GUI. If you check this option, TESTAR will force the SUT to the<br> foreground. </html>";
 
   // TTTs for filter panel
-  public static String label1TTT = "<html>\nClick-filter:<br>\n" +
+  private static String label1TTT = "<html>\nClick-filter:<br>\n" +
       "Certain actions that TESTARs wants to execute might be dangerous or<br>\n" +
       "undesirable, such as printing out documents, creating, moving or deleting files.<br>\n" +
       "TESTAR will not execute clicks on any widget whose title matches the given regular expression.<br>\n" +
       "To see whether or not your expression works, simply start TESTAR in Spy-Mode, which will<br>\n" +
       "visualize the detected actions.\n</html>";
-  public static String label2TTT = "<html>\nProcesses to kill:<br>\n" +
+  private static String label2TTT = "<html>\nProcesses to kill:<br>\n" +
       "Some SUTs start other processes during test sequence generation. These might<br>\n" +
       "popup in the foreground and block the SUTs GUI. They might also consume excessive memory, etc.<br>\n" +
       "TESTAR will kill any process whose name matches the given regular expression.\n</html>";
 
   // TTTs for the oracle panel
-  public static String suspiciousTitlesTTT =
+  private static String suspiciousTitlesTTT =
       "<html>\nThis is a very simple oracle in the form of a regular expression, " +
           "which is applied to each<br>widget's Title property. " +
           "If TESTAR finds a widget on the screen, whose title matches the given<br>\n" +
           "expression, it will consider the current sequence to be erroneous.\n</html>";
 
   // TTTs for the timing panel
-  public static String actionDurationTTT = "<html>\nAction Duration: " +
+  private static String actionDurationTTT = "<html>\nAction Duration: " +
       "The higher this value, the longer the execution of actions will take.<br>\n" +
       "Mouse movements and typing become slower, so that it is easier to follow what the<br>\n" +
       "TESTAR is doing. This can be useful during Replay-Mode, in order to replay<br>\n" +
       "a recorded sequence with less speed to better understand a fault.\n</html>";
-  public static String actionWaitTimeTTT =
+  private static String actionWaitTimeTTT =
       "<html>\nTime to wait after execution of an action: " +
           "This is the time that TESTAR<br>\n" +
           "pauses after having executed an action in Generation-Mode. Usually, this value<br>\n" +
@@ -110,26 +111,26 @@ public class ToolTipTexts {
           "more time to react, before executing the next action. If this value is set to a<br>\n" +
           "value > 0, it can greatly enhance reproducibility of sequences at the expense<br>\n" +
           "of longer testing times.\n</html>";
-  public static String sutStartupTimeTTT = "<html>\nSUT startup time:<br>\n" +
+  private static String sutStartupTimeTTT = "<html>\nSUT startup time:<br>\n" +
       "This is the threshold time that TESTAR waits for the SUT to load.<br>\n" +
       "Large and complex SUTs might need more time than small ones.,<br>\n" +
       "Once the SUT UI is ready, TESTAR will start the test sequence.\n</html>";
-  public static String maxTestTimeTTT = "<html>\nMaximum test time (seconds):<br>\n" +
+  private static String maxTestTimeTTT = "<html>\nMaximum test time (seconds):<br>\n" +
       "TESTAR will cease to generate any sequences after this time has elapsed.<br>\n" +
       "This is useful for specifying a test time out, e.g. one hour, one day, one week.\n</html>";
-  public static String useRecordedTTT = "<html>\nThis option only affects Replay-Mode. " +
+  private static String useRecordedTTT = "<html>\nThis option only affects Replay-Mode. " +
       "If checked, TESTAR will use the action duration and action<br>\n" +
       "wait time that was used during sequence generation. If you uncheck the option, you can specify<br>\n" +
       "your own values.\n</html>";
 
   // TTTs for the misc panel
-  public static String copyFilesTTT = "<html> Files to copy before SUT start. " +
+  private static String copyFilesTTT = "<html> Files to copy before SUT start. " +
       "It is useful to restore certain<br>  configuration files to their default. " +
       "Therefore you can define pairs of paths (copy from / to).<br> " +
       "TESTAR will copy each specified file from the given source location to " +
       "the given destination.<br> " +
       "Simply double-click the text-area and a file dialog will pop up. </html>";
-  public static String deleteFiles = "<html> Files to delete before SUT start: " +
+  private static String deleteFiles = "<html> Files to delete before SUT start: " +
       "Certain SUTs generate configuration files, temporary files and files<br> " +
       "that save the system's state. " +
       "This might be problematic during sequence replay, when you want a<br> " +
@@ -137,10 +138,107 @@ public class ToolTipTexts {
       "these files, to be deleted<br> before the SUT gets started. " +
       "If you double-click the text-area a file dialog will pop up which allows<br> " +
       "selecting files and directories to be deleted. </html>";
-  
+
   // TTTs for the subroutine panel
-  public static String urlTTT =
+  private static String urlTTT =
       "<html>\nProvide a unique part of the URL to identify web form: \n</html>";
-  public static String fileTTT = "<html>\nSelect file name\n</html>";
+  private static String fileTTT = "<html>\nSelect file name\n</html>";
+  public static String getBtnGenerateTTT() {
+    return btnGenerateTTT;
+  }
+  public static String getBtnSpyTTT() {
+    return btnSpyTTT;
+  }
+  public static String getBtnReplayTTT() {
+    return btnReplayTTT;
+  }
+  public static String getBtnViewTTT() {
+    return btnViewTTT;
+  }
+  public static String getBtnRecordTTT() {
+    return btnRecordTTT;
+  }
+  public static String getSutConnectorTTT() {
+    return sutConnectorTTT;
+  }
+  public static String getSutPathTTT() {
+    return sutPathTTT;
+  }
+  public static String getNofSequencesTTT() {
+    return nofSequencesTTT;
+  }
+  public static String getSequencesActionsTTT() {
+    return sequencesActionsTTT;
+  }
+  public static String getLblLoggingVerbosityTTT() {
+    return lblLoggingVerbosityTTT;
+  }
+  public static String getLoggingVerbosityTTT() {
+    return loggingVerbosityTTT;
+  }
+  public static String getCheckStopOnFaultTTT() {
+    return checkStopOnFaultTTT;
+  }
+  public static String getLblCompileTTT() {
+    return lblCompileTTT;
+  }
+  public static String getBtnEditProtocolTTT() {
+    return btnEditProtocolTTT;
+  }
+  public static String getIntervalTTT() {
+    return intervalTTT;
+  }
+  public static String getComboBoxProtocolTTT() {
+    return comboBoxProtocolTTT;
+  }
+  public static String getBtnSelectSUTTTT() {
+    return btnSelectSUTTTT;
+  }
+  public static String getTestGeneratorTTT() {
+    return testGeneratorTTT;
+  }
+  public static String getCheckForceForegroundTTT() {
+    return checkForceForegroundTTT;
+  }
+  public static String getLabel1TTT() {
+    return label1TTT;
+  }
+  public static String getLabel2TTT() {
+    return label2TTT;
+  }
+  public static String getSuspiciousTitlesTTT() {
+    return suspiciousTitlesTTT;
+  }
+  public static String getActionDurationTTT() {
+    return actionDurationTTT;
+  }
+  public static String getActionWaitTimeTTT() {
+    return actionWaitTimeTTT;
+  }
+  public static String getSutStartupTimeTTT() {
+    return sutStartupTimeTTT;
+  }
+  public static String getMaxTestTimeTTT() {
+    return maxTestTimeTTT;
+  }
+  public static String getUseRecordedTTT() {
+    return useRecordedTTT;
+  }
+  public static String getCopyFilesTTT() {
+    return copyFilesTTT;
+  }
+  public static String getDeleteFiles() {
+    return deleteFiles;
+  }
+  public static String getUrlTTT() {
+    return urlTTT;
+  }
+  public static String getFileTTT() {
+    return fileTTT;
+  }
+  public static Component getTxtSutPath() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
 
 import es.upv.staq.testar.graph.reporting.GraphReporter;
@@ -46,7 +45,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
 
 /**
  * @author Urko Rueda Molina (urueda)

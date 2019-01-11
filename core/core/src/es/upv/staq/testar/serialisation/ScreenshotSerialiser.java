@@ -37,7 +37,7 @@ import org.fruit.alayer.AWTCanvas;
 
 /**
  * SUT screenshots serialiser
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
@@ -115,7 +115,7 @@ public class ScreenshotSerialiser extends Thread {
     }
     return statePath;
   }
-  
+
   public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot) {
     String actionPath = OUT_DIR + testSequenceFolder + "/" + stateID + "_" + actionID + ".png";
     if (!new File(actionPath).exists())
@@ -148,9 +148,9 @@ public class ScreenshotSerialiser extends Thread {
       //System.out.println("ScreenshotManager exited");
       testSequenceFolder = null;
     }
-  }  
+  }
 
   public static int queueLength() {
     return scrshotSavingQueue.size();
-  }  
+  }
 }

@@ -27,12 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
 
-
 import org.fruit.alayer.HitTester;
-
 
 /**
  * An object that can execute an hit test action on an AtSpiElement - determining if the element can be clicked on
@@ -40,22 +37,16 @@ import org.fruit.alayer.HitTester;
  */
 public class AtSpiHitTester implements HitTester {
 
-
     //region Global variables
-
 
     // Used to determine the class during serialization.
     private static final long serialVersionUID = 3216549871296454556L;
 
-
     private final AtSpiElement _element;
-
 
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Default constructor wrapping an AtSpiElement to hit test.
@@ -65,12 +56,9 @@ public class AtSpiHitTester implements HitTester {
         _element = element;
     }
 
-
     //endregion
 
-
     //region HitTester implementation
-
 
     /**
      * Runs the hit test action for a certain point on the element.
@@ -82,7 +70,6 @@ public class AtSpiHitTester implements HitTester {
     public boolean apply(double x, double y) {
         return _element.root.visibleAt(_element, x, y);
     }
-
 
     /**
      * Runs the hit test action for a certain point on the element.
@@ -96,12 +83,9 @@ public class AtSpiHitTester implements HitTester {
         return _element.root.visibleAt(_element, x, y, obscuredByChildFeature);
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
@@ -114,8 +98,6 @@ public class AtSpiHitTester implements HitTester {
 
     }
 
-
     //endregion
-
 
 }

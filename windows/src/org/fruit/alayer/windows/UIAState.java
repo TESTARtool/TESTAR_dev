@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -53,12 +52,14 @@ import org.fruit.alayer.exceptions.NoSuchTagException;
 final class UIAState extends UIAWidget implements State {
   private static final long serialVersionUID = 7823095941981151363L;
 
-  public UIAState(UIAElement root) {
+  UIAState(UIAElement root) {
     super(null, null, root);
     this.root = this;
   }
 
-  public Iterator<Widget> iterator() { return new WidgetIterator(this); }
+  public Iterator<Widget> iterator() {
+    return new WidgetIterator(this);
+  }
 
   void remove(UIAWidget w) {
     Assert.isTrue(this != w, "You cannot remove the root!");
@@ -68,11 +69,13 @@ final class UIAState extends UIAWidget implements State {
   }
 
   void invalidate(UIAWidget w) {
-    if (w.element != null)
+    if (w.element != null) {
       w.element.backRef = null;
+    }
     w.root = null;
-    for (UIAWidget c: w.children)
+    for (UIAWidget c: w.children) {
       invalidate(c);
+    }
   }
 
   void setParent(UIAWidget w, Widget parent, int idx) {
@@ -101,8 +104,9 @@ final class UIAState extends UIAWidget implements State {
 
   <T> T get(UIAWidget w, Tag<T> t) {
     T ret = get(w, t, null);
-    if (ret == null)
+    if (ret == null) {
       throw new NoSuchTagException(t);
+    }
     return ret;
   }
 
@@ -135,22 +139,45 @@ final class UIAState extends UIAWidget implements State {
     } else if (t.equals(Tags.ToolTipText)) {
       ret = w.element.helpText;
     } else if (t.equals(Tags.PID)) {
-      ret = w == this ? ((UIARootElement)element).pid: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).getPid();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(Tags.IsRunning)) {
-      ret = w == this ? ((UIARootElement)element).isRunning: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).isRunning();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(Tags.TimeStamp)) {
-      ret = w == this ? ((UIARootElement)element).timeStamp: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).getTimeStamp();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(Tags.Foreground)) {
-      ret = w == this ? ((UIARootElement)element).isForeground: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).isForeground();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(Tags.HasStandardKeyboard)) {
-      ret = w == this ? ((UIARootElement)element).hasStandardKeyboard: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).isHasStandardKeyboard();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(Tags.HasStandardMouse)) {
-      ret = w == this ? ((UIARootElement)element).hasStandardMouse: null;
+      if ( w == this) {
+        ret = ((UIARootElement)element).isHasStandardMouse();
+      } else {
+        ret = null;
+      }
     } else if (t.equals(UIATags.UIAName)) {
       ret = w.element.name;
     } else if (t.equals(UIATags.UIAOrientation)) {
       ret = w.element.orientation;
-    // begin by urueda
     } else if (t.equals(Tags.ZIndex)) {
       ret = w.element.zindex;
     } else if (t.equals(UIATags.UIAIsWindowModal)) {
@@ -163,12 +190,6 @@ final class UIAState extends UIAWidget implements State {
       ret = w.element.isControlElement;
     } else if (t.equals(UIATags.UIAScrollPattern)) {
       ret = w.element.scrollPattern;
-    //} else if (t.equals(UIATags.UIAScrollbarInfo)) {
-    //  ret = w.element.scrollbarInfo;
-    //} else if (t.equals(UIATags.UIAScrollbarInfoH)) {
-    //  ret = w.element.scrollbarInfoH;
-    //} else if (t.equals(UIATags.UIAScrollbarInfoV)) {
-    //  ret = w.element.scrollbarInfoV;
     } else if (t.equals(UIATags.UIAHorizontallyScrollable)) {
       ret = w.element.hScroll;
     } else if (t.equals(UIATags.UIAVerticallyScrollable)) {
@@ -181,7 +202,6 @@ final class UIAState extends UIAWidget implements State {
       ret = w.element.hScrollPercent;
     } else if (t.equals(UIATags.UIAScrollVerticalPercent)) {
       ret = w.element.vScrollPercent;
-    // end by urueda
     } else if (t.equals(UIATags.UIAHelpText)) {
       ret = w.element.helpText;
     } else if (t.equals(UIATags.UIAClassName)) {
@@ -211,8 +231,11 @@ final class UIAState extends UIAWidget implements State {
     }
 
     cacheTag(w, t, ret);
-
-    return (ret == null) ? defaultValue: (T)ret;
+    if (ret == null) {
+      return  defaultValue;
+    } else {
+      return (T)ret;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -231,10 +254,15 @@ final class UIAState extends UIAWidget implements State {
     w.tags.put(t, null);
   }
 
-  UIAWidget getChild(UIAWidget w, int idx) { return w.children.get(idx); }
-  int childCount(UIAWidget w) { return w.children.size(); }
-  UIAWidget getParent(UIAWidget w) { return w.parent; }
-
+  UIAWidget getChild(UIAWidget w, int idx) {
+    return w.children.get(idx);
+  }
+  int childCount(UIAWidget w) {
+    return w.children.size();
+  }
+  UIAWidget getParent(UIAWidget w) {
+    return w.parent;
+  }
 
   Iterable<Tag<?>> tags(final UIAWidget w) {
     Assert.notNull(w);
@@ -256,8 +284,9 @@ final class UIAState extends UIAWidget implements State {
             if (next == null) {
               while (i.hasNext()) {
                 next = i.next();
-                if (target.get(next, null) != null)
+                if (target.get(next, null) != null) {
                   return next;
+                }
               }
               next = null;
             }
@@ -270,13 +299,16 @@ final class UIAState extends UIAWidget implements State {
 
           public Tag<?> next() {
             Tag<?> ret = fetchNext();
-            if (ret == null)
+            if (ret == null) {
               throw new NoSuchElementException();
+            }
             next = null;
             return ret;
           }
 
-          public void remove() { throw new UnsupportedOperationException(); }
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
 
         };
       }
@@ -285,8 +317,9 @@ final class UIAState extends UIAWidget implements State {
     return ret;
   }
 
-  //public String toString() { return Util.treeDesc(this, 2, Tags.Desc); }
-  public String toString() { return Util.treeDesc(this, 2, Tags.Role, Tags.Title); }// by urueda
+  public String toString() {
+    return Util.treeDesc(this, 2, Tags.Role, Tags.Title);
+  }
 
   private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
     ois.defaultReadObject();

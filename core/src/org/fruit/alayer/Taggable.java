@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -54,6 +53,7 @@ public interface Taggable {
   /** Retrieves the value of <code>tag</code> if it is attached to this object.
    * If this object does not have the corresponding tag, then this method
    * throws a <code>NoSuchTagException</code>
+   * @param <T> class
    * @param tag tag to retrieve
    * @return the value associated with <code>tag</code>
    * @throws NoSuchTagException if the tag is not attached to this object
@@ -63,6 +63,7 @@ public interface Taggable {
   /**
    * Retrieves the value of <code>tag</code> or returns <code>defaultValue</code>
    * if the tag is not attached to this object.
+   * @param <T> class
    * @param tag the tag for which to retrieve the value
    * @param defaultValue the value that is returned if the tag is not available
    * @return the value associated with <code>tag</code> or <code>defaultValue</code>.
@@ -77,6 +78,7 @@ public interface Taggable {
 
   /**
    * Attach <code>tag</code> to this object and associate it with <code>value</code>
+   * @param <T> class
    * @param tag tag to attach to this object
    * @param value the value to associate with <code>tag</code>
    */

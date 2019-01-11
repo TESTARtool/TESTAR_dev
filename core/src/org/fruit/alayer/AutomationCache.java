@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package org.fruit.alayer;
 
 import java.util.HashMap;
@@ -52,16 +50,25 @@ public abstract class AutomationCache {
     private long hwnd, cachedElement; // pointers
     private Rect hwndShape;
     private AWTCanvas scrshot;
-    public CachedAutomationElement(long hwnd, long cachedElement, Rect hwndShape, AWTCanvas scrshot) {
+    CachedAutomationElement(long hwnd, long cachedElement, Rect hwndShape, AWTCanvas scrshot) {
       this.cacheAge = System.currentTimeMillis();
       this.hwnd = hwnd; this.cachedElement = cachedElement;
       this.hwndShape = hwndShape; this.scrshot = scrshot;
     }
-    public long getCacheAge() { return (System.currentTimeMillis() - this.cacheAge); }
-    public long getHwnd() { return this.hwnd; }
-    public long getCachedElement() { return this.cachedElement; }
-    public Rect getHwndShape() { return this.hwndShape; }
-    public AWTCanvas getScrshot() { return this.scrshot; }
+    public long getCacheAge() {
+      return (System.currentTimeMillis() - this.cacheAge); }
+    public long getHwnd() {
+      return this.hwnd;
+    }
+    public long getCachedElement() {
+      return this.cachedElement;
+    }
+    public Rect getHwndShape() {
+      return this.hwndShape;
+    }
+    public AWTCanvas getScrshot() {
+      return this.scrshot;
+    }
   }
 
   private int cacheHits = 0, cacheMisses = 0;
@@ -74,16 +81,17 @@ public abstract class AutomationCache {
   public AutomationCache() {
     try {
       String propertyValue = System.getProperty("SCRSHOT_SIMILARITY_THRESHOLD");
-      if (propertyValue != null)
+      if (propertyValue != null) {
         SCRSHOT_SIMILARITY_THRESHOLD = new Float(propertyValue).floatValue();
+      }
     } catch (Exception e) {
       System.out.println("Automation cache caught exception <" + e.getMessage() + ">");
     }
   }
 
   /**
-   *
-   * @param sst
+   * Set screenshot similarity treshold.
+   * @param sst screenshot similatity treshold
    */
   public void setScreenshotSimilarityThreshold(float sst) {
     this.SCRSHOT_SIMILARITY_THRESHOLD = sst;
@@ -91,18 +99,19 @@ public abstract class AutomationCache {
 
   /**
    *
-   * @param hwnd
+   * @param hwnd a handle for a window
+   *
    * @return The pointer to the cached automation element. Long.MIN_VALUE otherwise (cache miss).
    */
   public long getCachedAutomationElement(long hwnd, long pAutomation, long pCacheRequest) {
     if (SCRSHOT_SIMILARITY_THRESHOLD == Float.MIN_VALUE) {
-      //this.cacheMisses++;
       return Long.MIN_VALUE;
     }
     System.out.println("Automation cache SIZE <" + automationCache.size() + "> HITS <" + cacheHits + "> MISSES  <" + cacheMisses + ">");
     for (CachedAutomationElement ac: automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])) {
-      if (ac.getCacheAge() > AUTOMATION_CACHE_AGE_MAX || isSoftCacheCandidate(ac)) // soft reference implementation
+      if (ac.getCacheAge() > AUTOMATION_CACHE_AGE_MAX || isSoftCacheCandidate(ac)) {// soft reference implementation
         releaseCachedAutomationElement(ac);
+      }
     }
     long uiaPtr = nativeGetAutomationElementFromHandle(pAutomation, hwnd);
     if (uiaPtr == 0) { // failed to retrieve automation element?
@@ -110,11 +119,12 @@ public abstract class AutomationCache {
       this.cacheMisses++;
       return Long.MIN_VALUE;
     }
-    long hwndShape[] = nativeGetAutomationElementBoundingRectangl(uiaPtr, false);
+    long[] hwndShape = nativeGetAutomationElementBoundingRectangle(uiaPtr, false);
     nativeReleaseAutomationElement(uiaPtr);
     Rect hwndRect = null;
-    if (hwndShape != null)
+    if (hwndShape != null) {
       hwndRect = Rect.fromCoordinates(hwndShape[0], hwndShape[1], hwndShape[2], hwndShape[3]);
+    }
     if (hwndRect == null || Rect.area(hwndRect) == 0) {
       this.cacheMisses++;
       return Long.MIN_VALUE;
@@ -126,8 +136,9 @@ public abstract class AutomationCache {
         if (ac.getHwndShape().equals(hwndRect) && scrshot.compareImage(ac.getScrshot()) >= SCRSHOT_SIMILARITY_THRESHOLD) {
           this.cacheHits++;
           return ac.getCachedElement(); // get from cache
-        } else
+        } else {
           releaseCachedAutomationElement(ac); // force cache purge
+        }
       }
       // perform caching
       long r = nativeGetAutomationElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
@@ -150,8 +161,9 @@ public abstract class AutomationCache {
    * @return
    */
   public boolean isSoftCacheCandidate(CachedAutomationElement ac) {
-    if (automationCache.size() <= AUTOMATION_CACHE_LIMIT)
+    if (automationCache.size() <= AUTOMATION_CACHE_LIMIT) {
       return false;
+    }
     return ac.getCacheAge() > AUTOMATION_CACHE_AGE_MIN; // ms
   }
 
@@ -168,8 +180,9 @@ public abstract class AutomationCache {
    *
    */
   public synchronized void releaseCachedAutomationElements() {
-    for (CachedAutomationElement ac: automationCache.values().toArray(new CachedAutomationElement[automationCache.size()]))
+    for (CachedAutomationElement ac: automationCache.values().toArray(new CachedAutomationElement[automationCache.size()])) {
       releaseCachedAutomationElement(ac);
+    }
   }
 
   /**
@@ -181,23 +194,24 @@ public abstract class AutomationCache {
 
   /**
    * Retrieves the pointer to the automation element for a UI.
-   * @param automationPtr
-   * @param hwndPtr
+   * @param automationPtr pointer to automation element for a UI
+   * @param hwndPtr pointer to handle of the window
    */
-  public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);;
+  public abstract long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr);
 
   /**
    *
-   * @param cachedAutomationElementPtr
-   * @param fromCache
+   * @param cachedAutomationElementPtr cached point to automation element from UI
+   * @param fromCache current cache
    * @return
    */
-  public abstract long[] nativeGetAutomationElementBoundingRectangl(long cachedAutomationElementPtr, boolean fromCache);
+  public abstract long[] nativeGetAutomationElementBoundingRectangle(
+      long cachedAutomationElementPtr, boolean fromCache);
 
   /**
    * Builds a cached automation element for the UI and returns a pointer to it.
-   * @param automationPtr
-   * @param hwndPtr
+   * @param automationPtr pointer to automation element for a UI
+   * @param hwndPtr pointer to handle of the window
    * @param cacheRequestPtr
    * @return
    */

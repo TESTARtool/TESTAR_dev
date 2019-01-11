@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -41,26 +40,26 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Visualizer;
 
 public final class ShapeVisualizer implements Visualizer {
-	private static final long serialVersionUID = -1411595441118761574L;
-	private final Shape shape;
-	private final String label;
-	private final double labelX, labelY;
-	private final Pen pen;
-	
-	public ShapeVisualizer(Pen pen, Shape shape, String label, double labelX, double labelY){
-		Assert.notNull(shape, pen);
-		this.shape = shape;
-		this.pen = pen;
-		this.label = label;
-		this.labelX = labelX;
-		this.labelY = labelY;
-	}
+  private static final long serialVersionUID = -1411595441118761574L;
+  private final Shape shape;
+  private final String label;
+  private final double labelX, labelY;
+  private final Pen pen;
 
-	public void run(State state, Canvas c, Pen pen) {
-		Assert.notNull(state, c, pen);
-		pen = Pen.merge(pen, this.pen);
-		shape.paint(c, pen);
-		if(label != null)
-			c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
-	}
+  public ShapeVisualizer(Pen pen, Shape shape, String label, double labelX, double labelY) {
+    Assert.notNull(shape, pen);
+    this.shape = shape;
+    this.pen = pen;
+    this.label = label;
+    this.labelX = labelX;
+    this.labelY = labelY;
+  }
+
+  public void run(State state, Canvas c, Pen pen) {
+    Assert.notNull(state, c, pen);
+    pen = Pen.merge(pen, this.pen);
+    shape.paint(c, pen);
+    if (label != null)
+      c.text(pen, shape.x() + shape.width() * labelX, shape.y() + shape.height() * labelY, 0, label);
+  }
 }

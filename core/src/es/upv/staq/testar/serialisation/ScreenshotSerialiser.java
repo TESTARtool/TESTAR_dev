@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.serialisation;
 
 import java.io.File;
@@ -54,9 +53,11 @@ public class ScreenshotSerialiser extends Thread {
   private static boolean alive, queueBoost;
 
   private static class ScrshotRecord{
-    String scrshotPath;
-    AWTCanvas scrshot;
-    public ScrshotRecord(String scrshotPath, AWTCanvas scrshot) {this.scrshotPath = scrshotPath; this.scrshot = scrshot;}
+    private String scrshotPath;
+    private AWTCanvas scrshot;
+    ScrshotRecord(String scrshotPath, AWTCanvas scrshot) {
+      this.scrshotPath = scrshotPath; this.scrshot = scrshot;
+    }
   }
 
   private ScreenshotSerialiser() {}
@@ -115,15 +116,17 @@ public class ScreenshotSerialiser extends Thread {
 
   public static String saveStateshot(String stateID, AWTCanvas stateshot) {
     String statePath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + ".png";
-    if (!new File(statePath).exists())
+    if (!new File(statePath).exists()) {
       savethis(statePath,stateshot);
+    }
     return statePath;
   }
 
   public static String saveActionshot(String stateID, String actionID, final AWTCanvas actionshot) {
     String actionPath = scrshotOutputFolder + File.separator + testSequenceFolder + File.separator + stateID + "_" + actionID + ".png";
-    if (!new File(actionPath).exists())
+    if (!new File(actionPath).exists()) {
       savethis(actionPath,actionshot);
+    }
     return actionPath;
   }
 

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
@@ -57,7 +56,15 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
   /**
    * The list of all the success criteria in this guideline
    */
-  protected final List<SuccessCriterion> criteria = new ArrayList<>();
+  private List<SuccessCriterion> criteria = new ArrayList<>();
+
+  public void setCriteria(List<SuccessCriterion> criteria) {
+    this.criteria = criteria;
+  }
+
+  public List<SuccessCriterion> getCriteria() {
+    return criteria;
+  }
 
   /**
    * Constructs a new guideline
@@ -84,9 +91,11 @@ public abstract class AbstractGuideline extends ItemBase implements Evaluator {
    */
   protected SuccessCriterion getSuccessCriterionByName(String name) {
     Assert.notNull(name);
-    for (SuccessCriterion criterion: criteria)
-      if (criterion.getName().equalsIgnoreCase(name))
+    for (SuccessCriterion criterion: criteria) {
+      if (criterion.getName().equalsIgnoreCase(name)) {
         return criterion;
+      }
+    }
     return null;
   }
 

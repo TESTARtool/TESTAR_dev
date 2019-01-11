@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -62,7 +61,9 @@ public class ActivateSystem extends TaggableBase implements Action {
     }
   }
 
-  public String toString() { return "Bring the system to the foreground."; }
+  public String toString() {
+    return "Bring the system to the foreground.";
+  }
 
   @Override
   public String toString(Role... discardParameters) {
@@ -72,13 +73,13 @@ public class ActivateSystem extends TaggableBase implements Action {
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
     return "";

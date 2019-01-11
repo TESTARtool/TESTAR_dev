@@ -36,9 +36,9 @@ public class ConsumerImpl implements Consumer{
    */
   public boolean consume(Item item) {
     if (!shutdownCalled) {
-      try{
+      try {
         itemQueue.put(item);
-      }catch(InterruptedException ie) {
+      } catch(InterruptedException ie) {
         Thread.currentThread().interrupt();
         return false;
       }
@@ -60,4 +60,3 @@ public class ConsumerImpl implements Consumer{
   }
 
 }
-

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
 
 /**
@@ -35,12 +34,10 @@ package org.fruit.alayer.linux.atspi.enums;
  */
 public enum AtSpiStateTypes {
 
-
     /**
      * Indicates an invalid state - probably an error condition.
      */
     Invalid,
-
 
     /**
      * Indicates a window is currently the active window, or an object is the active subelement within a container or
@@ -50,12 +47,10 @@ public enum AtSpiStateTypes {
      */
     Active,
 
-
     /**
      * Indicates that the object is armed.
      */
     Armed,
-
 
     /**
      * Indicates the current object is busy, i.e. onscreen representation is in the process of changing,
@@ -63,30 +58,25 @@ public enum AtSpiStateTypes {
      */
     Busy,
 
-
     /**
      * Indicates this object is currently checked.
      */
     Checked,
-
 
     /**
      * Indicates this object is collapsed.
      */
     Collapsed,
 
-
     /**
      * Indicates that this object no longer has a valid backing widget (for instance, if its peer object has been destroyed).
      */
     Defunct,
 
-
     /**
      * Indicates the user can change the contents of this object.
      */
     Editable,
-
 
     /**
      * Indicates that this object is enabled, i.e. that it currently reflects some application state. Objects that are
@@ -95,18 +85,15 @@ public enum AtSpiStateTypes {
      */
     Enabled,
 
-
     /**
      * Indicates this object allows progressive disclosure of its children.
      */
     Expandable,
 
-
     /**
      * Indicates this object is expanded.
      */
     Expanded,
-
 
     /**
      * Indicates this object can accept keyboard focus, which means all events resulting from typing on the keyboard
@@ -114,42 +101,35 @@ public enum AtSpiStateTypes {
      */
     Focusable,
 
-
     /**
      * Indicates this object currently has the keyboard focus.
      */
     Focused,
-
 
     /**
      * Indicates that the object has an associated tooltip.
      */
     HasTooltip,
 
-
     /**
      * Indicates the orientation of this object is horizontal.
      */
     Horizontal,
-
 
     /**
      * Indicates this object is minimized and is represented only by an icon.
      */
     Iconified,
 
-
     /**
      * Indicates something must be done with this object before the user can interact with an object in a different window.
      */
     Modal,
 
-
     /**
      * Indicates this (text) object can contain multiple lines of text.
      */
     MultiLine,
-
 
     /**
      * Indicates this object allows more than one of its children to be selected at the same time, or in the case of
@@ -157,25 +137,21 @@ public enum AtSpiStateTypes {
      */
     MultiSelectable,
 
-
     /**
      * Indicates this object paints every pixel within its rectangular region. It also indicates an alpha value of unity,
      * if it supports alpha blending.
      */
     Opaque,
 
-
     /**
      * Indicates this object is currently pressed.
      */
     Pressed,
 
-
     /**
      * Indicates the size of this object's size is not fixed.
      */
     Resizable,
-
 
     /**
      * Indicates this object is the child of an object that allows its children to be selected and that this
@@ -183,13 +159,11 @@ public enum AtSpiStateTypes {
      */
     Selectable,
 
-
     /**
      * Indicates this object is the child of an object that allows its children to
      * be selected and that this child is one of those children that has been selected.
      */
     Selected,
-
 
     /**
      * Indicates this object is sensitive, e.g. to user interaction. ATSPI_STATE_SENSITIVE usually accompanies.
@@ -201,7 +175,6 @@ public enum AtSpiStateTypes {
      */
     Sensitive,
 
-
     /**
      * Indicates this object, the object's parent, the object's parent's parent, and so on, are all 'shown' to the
      * end-user, i.e. subject to "exposure" if blocking or obscuring objects do not interpose between this object
@@ -209,12 +182,10 @@ public enum AtSpiStateTypes {
      */
     Showing,
 
-
     /**
      * Indicates this (text) object can contain only a single line of text.
      */
     SingleLine,
-
 
     /**
      * Indicates that the information returned for this object may no longer be synchronized with the application
@@ -223,19 +194,16 @@ public enum AtSpiStateTypes {
      */
     Stale,
 
-
     /**
      * Indicates this object is transient.
      */
     Transient,
-
 
     /**
      * Indicates the orientation of this object is vertical; for example this state may appear on such objects
      * as scrollbars, text objects (with vertical text flow), separators, etc.
      */
     Vertical,
-
 
     /**
      * Indicates this object is visible, e.g. has been explicitly marked for exposure to the user.
@@ -246,7 +214,6 @@ public enum AtSpiStateTypes {
      * semantically equivalent to saying that an object is 'hidden'.
      */
     Visible,
-
 
     /**
      * Indicates that "active-descendant-changed" event is sent when children become 'active' (i.e. are selected
@@ -259,7 +226,6 @@ public enum AtSpiStateTypes {
      */
     ManagesDescendants,
 
-
     /**
      * Indicates that a check box or other boolean indicator is in a state other than checked or not checked.
      * This usually means that the boolean value reflected or controlled by the object does not apply consistently
@@ -271,19 +237,16 @@ public enum AtSpiStateTypes {
      */
     Indeterminate,
 
-
     /**
      * Indicates that user interaction with this object is 'required' from the user, for instance before
      * completing the processing of a form.
      */
     Required,
 
-
     /**
      * Indicates that an object's onscreen content is truncated, e.g. a text value in a spreadsheet cell.
      */
     Truncated,
-
 
     /**
      * Indicates this object's visual representation is dynamic, not static. This state may be applied to an object
@@ -294,13 +257,11 @@ public enum AtSpiStateTypes {
      */
     Animated,
 
-
     /**
      * This object has indicated an error condition due to failure of input validation. For instance,
      * a form control may acquire this state in response to invalid or malformed user input.
      */
     InvalidEntry,
-
 
     /**
      * This state indicates that the object in question implements some form of typeahead or pre-selection behavior
@@ -312,7 +273,6 @@ public enum AtSpiStateTypes {
      */
     SupportsAutoCompletion,
 
-
     /**
      * This state indicates that the object in question supports text selection. It should only be
      * exposed on objects which implement the AtspiText interface, in order to distinguish
@@ -322,13 +282,11 @@ public enum AtSpiStateTypes {
      */
     SelectableText,
 
-
     /**
      * This state indicates that the object in question is the 'default' interaction object in a dialog,
      * i.e. the one that gets activated if the user presses "Enter" when the dialog is initially posted.
      */
     IsDefault,
-
 
     /**
      * This state indicates that the object (typically a hyperlink) has already been activated or
@@ -336,12 +294,10 @@ public enum AtSpiStateTypes {
      */
     Visited,
 
-
     /**
      * Indicates this object has the potential to be checked, such as a checkbox or toggle-able table cell. Since: 2.12
      */
     Checkable,
-
 
     /**
      * Indicates that the object has a popup context menu or sub-level menu which may or may not be showing.
@@ -350,19 +306,16 @@ public enum AtSpiStateTypes {
      */
     HasPopup,
 
-
     /**
      * Indicates that an object which is ENABLED and SENSITIVE has a value which can be read,
      * but not modified, by the user. Since: 2.16
      */
     ReadOnly,
 
-
     /**
      * This value of the enumeration should not be used as a parameter,
      * it indicates the number of items in the AtspiStateType enumeration
      */
     LastDefined
-
 
 }

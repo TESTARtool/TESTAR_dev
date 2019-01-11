@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -58,7 +57,9 @@ public final class UIAStateBuilder implements StateBuilder {
   String SUTProcesses; // regex
   // end by urueda
 
-  public UIAStateBuilder() { this(10/*seconds*/,false,"");  }
+  public UIAStateBuilder() {
+    this(10/*seconds*/,false,"");
+  }
 
   public UIAStateBuilder(double timeOut, boolean accessBridgeEnabled, String SUTProcesses) { // seconds
     Assert.isTrue(timeOut > 0);
@@ -67,37 +68,32 @@ public final class UIAStateBuilder implements StateBuilder {
     // begin by urueda
     this.accessBridgeEnabled = accessBridgeEnabled;
     this.SUTProcesses = SUTProcesses;
-    if (accessBridgeEnabled)
-      new Thread() { public void run() { Windows.InitializeAccessBridge(); } }.start(); // based on ferpasri
-    // end by urueda
+    if (accessBridgeEnabled) {
+      new Thread() {
+        public void run() {
+          Windows.InitializeAccessBridge();
+        }
+      }.start();
+    }
     executor = Executors.newFixedThreadPool(1);
   }
 
   private void initialize() {
 
     Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
-    //System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
     pAutomation = Windows.CoCreateInstance(Windows.Get_CLSID_CUIAutomation_Ptr(), 0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IUIAutomation_Ptr());
 
     // scope and filter settings
-    //long pFirstCondition = Windows.IUIAutomation_CreateTrueCondition(pAutomation);
     long pFirstCondition = Windows.IUIAutomation_get_ControlViewCondition(pAutomation);
-
-
-    //pCondition = Windows.IUIAutomation_CreateTrueCondition(pAutomation);
     pCondition = Windows.IUIAutomation_CreateAndCondition(pAutomation, Windows.IUIAutomation_CreatePropertyCondition(pAutomation, Windows.UIA_IsOffscreenPropertyId, false), pFirstCondition);
-    //Windows.IUnknown_Release(pFirstCondition);
-
     pCacheRequest = Windows.IUIAutomation_CreateCacheRequest(pAutomation);
     Windows.IUIAutomationCacheRequest_put_TreeFilter(pCacheRequest, pCondition);
     Windows.IUIAutomationCacheRequest_put_TreeScope(pCacheRequest, Windows.TreeScope_Subtree);
     Windows.IUIAutomationCacheRequest_put_AutomationElementMode(pCacheRequest, Windows.AutomationElementMode_Full);
 
-
     // cache patterns
     Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_WindowPatternId);
     Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_ValuePatternId);
-
 
     // cache properties
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NamePropertyId);
@@ -106,34 +102,19 @@ public final class UIAStateBuilder implements StateBuilder {
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AutomationIdPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_BoundingRectanglePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClassNamePropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClickablePointPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControllerForPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControlTypePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_CulturePropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_DescribedByPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FlowsToPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FrameworkIdPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HasKeyboardFocusPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HelpTextPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsContentElementPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsControlElementPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsDataValidForFormPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsEnabledPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsKeyboardFocusablePropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsOffscreenPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsPasswordPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsRequiredForFormPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ItemStatusPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ItemTypePropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_LabeledByPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_LocalizedControlTypePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NativeWindowHandlePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ProviderDescriptionPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_OrientationPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_RuntimeIdPropertyId);
-    //Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsWindowPatternAvailablePropertyId);
 
-    // begin by urueda
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsScrollPatternAvailablePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticallyScrollablePropertyId);
@@ -141,7 +122,6 @@ public final class UIAStateBuilder implements StateBuilder {
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalViewSizePropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
-    // end by urueda
 
     // window role properties
     Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsTopmostPropertyId);
@@ -164,7 +144,9 @@ public final class UIAStateBuilder implements StateBuilder {
     }
   }
 
-  public void finalize() { release(); }
+  public void finalize() {
+    release();
+  }
 
   public UIAState apply(SUT system) throws StateBuildException {
     try {
@@ -177,22 +159,10 @@ public final class UIAStateBuilder implements StateBuilder {
       e.printStackTrace(); // make the exception traceable
       throw new StateBuildException(e);
     } catch (TimeoutException e) {
-      //UIAState ret = new UIAState(uiaRoot);
       UIAState ret = new UIAState(StateFetcher.buildRoot(system)); // by urueda
       ret.set(Tags.Role, Roles.Process);
       ret.set(Tags.NotResponding, true);
       return ret;
     }
   }
-
-  /*private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-    ois.defaultReadObject();
-    initialize();
-    executor = Executors.newFixedThreadPool(1);
-  }
-
-  private void writeObject(ObjectOutputStream oos) throws IOException{
-    oos.defaultWriteObject();
-  }*/
-
 }

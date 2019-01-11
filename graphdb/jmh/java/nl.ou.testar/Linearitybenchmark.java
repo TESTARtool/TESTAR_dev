@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package nl.ou.testar;
 
 import org.openjdk.jmh.annotations.*;

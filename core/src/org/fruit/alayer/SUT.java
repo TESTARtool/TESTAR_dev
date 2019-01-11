@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -83,7 +82,7 @@ public interface SUT extends Taggable {
 
   /**
    * Returns the native automation cache.
-   * @return
+   * @return the native automation cache
    */
   AutomationCache getNativeAutomationCache();
 

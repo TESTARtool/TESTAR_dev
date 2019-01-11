@@ -28,12 +28,12 @@ public class ItemProcessor implements Runnable  {
   @Override
   public void run() {
     while (keepProcessing || !jobQueue.isEmpty()) {
-      try{
+      try {
         Item item = jobQueue.poll(TIMEOUT, TimeUnit.SECONDS);
         if (item != null) {
           item.process();
         }
-      }catch(InterruptedException ie) {
+      } catch(InterruptedException ie) {
         Thread.currentThread().interrupt();
         return;
       }

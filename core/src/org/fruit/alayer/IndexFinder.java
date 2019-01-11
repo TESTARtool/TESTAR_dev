@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -41,10 +40,10 @@ import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 public final class IndexFinder implements Searcher, Finder {
   private static final long serialVersionUID = 2879822217515069377L;
-  final int indices[];
+  final int[] indices;
   transient YieldFirst yf;
 
-  public IndexFinder(int indices[]) {
+  public IndexFinder(int[] indices) {
     Assert.notNull(indices);
     this.indices = indices;
   }
@@ -53,10 +52,11 @@ public final class IndexFinder implements Searcher, Finder {
     Assert.notNull(start, visitor);
     Widget current = start;
     for (int idx: indices) {
-      if (idx >= 0 && idx < current.childCount())
+      if (idx >= 0 && idx < current.childCount()) {
         current = current.child(idx);
-      else
+      } else {
         return SearchFlag.OK;
+      }
     }
     return visitor.apply(current);
   }
@@ -66,8 +66,9 @@ public final class IndexFinder implements Searcher, Finder {
   }
 
   public Widget apply(Widget start) throws WidgetNotFoundException {
-    if (yf == null)
+    if (yf == null) {
       yf = new YieldFirst();
+    }
     apply(start, yf);
     return yf.result();
   }

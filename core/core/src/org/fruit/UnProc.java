@@ -27,12 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit;
 
 public interface UnProc<A> {
-	void run(A argument);
+  void run(A argument);
 }

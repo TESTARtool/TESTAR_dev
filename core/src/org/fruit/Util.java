@@ -27,18 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  * @author Sebastian Bauersfeld
  */
 package org.fruit;
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-
-import javax.tools.*;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -48,11 +41,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
+import javax.tools.*;
+import org.fruit.alayer.*;
+import org.fruit.alayer.devices.Mouse;
+import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 /**
  * Utility methods.
  */
 public final class Util {
+
+  private static final double PAUSE_TIME = 0.001;
 
   private Util() {
   }
@@ -181,12 +181,17 @@ public final class Util {
   }
 
   public static boolean contains(Shape shape, double x, double y) {
-    return shape == null ? false: shape.contains(x, y);
+    if (shape != null) {
+      return shape.contains(x, y);
+    }
+    return false;
   }
 
   public static boolean containsRel(Shape shape, double relX, double relY) {
-    return shape == null ? false:
-        shape.contains(shape.x() + relX * shape.width(), shape.y() + relY * shape.height());
+    if (shape != null) {
+      return shape.contains(shape.x() + relX * shape.width(), shape.y() + relY * shape.height());
+    }
+    return false;
   }
 
   public static boolean containsRel(Widget widget, double relX, double relY) {
@@ -300,7 +305,7 @@ public final class Util {
     while (time < deadline) {
       pos = (deadline - time) / duration;
       mouse.setCursor(x + pos * xDist, y + pos * yDist);
-      pause(0.001);
+      pause(PAUSE_TIME);
       time = time();
     }
     mouse.setCursor(x, y);
@@ -367,12 +372,17 @@ public final class Util {
     return depth;
   }
 
+  //TODO Do you need the levels parameter??
   public static List<Widget> ancestors(Widget widget, int levels) {
     Assert.notNull(widget);
     int lvl = 0;
+    Widget w = widget.parent();
     List<Widget> ret = Util.newArrayList();
-    while ((widget = widget.parent()) != null && ++lvl <= levels)
-      ret.add(widget);
+    while (w != null && lvl <= levels) {
+      ret.add(w);
+      lvl++;
+      w = w.parent();
+    }
     return ret;
   }
 
@@ -446,7 +456,7 @@ public final class Util {
     }
 
     Comparator<Widget> comp = new Comparator<Widget>() {
-      final static int WORSE = -1, BETTER = 1, EVEN = 0;
+      static final int WORSE = -1, BETTER = 1, EVEN = 0;
 
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);
@@ -490,7 +500,8 @@ public final class Util {
 
   public static boolean isAncestorOf(Widget ancestor, Widget of) {
     while (of != null) {
-      if ((of = of.parent()) == ancestor) {
+      of = of.parent();
+      if (of == ancestor) {
         return true;
       }
     }
@@ -615,7 +626,6 @@ public final class Util {
       }
     }
   }
-
 
   public static void delete(String fileOrDirectory) throws IOException {
     delete(new File(fileOrDirectory));
@@ -800,12 +810,10 @@ public final class Util {
           }
           throw new RuntimeException("compile errors");
         }
-      }
-      finally {
+      } finally {
         fileManager.close();
       }
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException("Exception: " + t.getMessage());
     }
@@ -825,54 +833,59 @@ public final class Util {
     return o1 == o2 || (o1 != null && o1.equals(o2));
   }
 
-  public static int hashCode(Object o) {
-    return o == null ? 0: o.hashCode();
+  public static int hashCode(Object obj) {
+    if (obj == null) {
+      return 0;
+    } else {
+      return obj.hashCode();
+    }
   }
 
-  public static String toString(Object o) {
-    if (o == null) {
+  public static String toString(Object obj) {
+    if (obj == null) {
       return "null";
     }
 
-    if (o instanceof boolean[]) {
-      return Arrays.toString((boolean[]) o);
+    if (obj instanceof boolean[]) {
+      return Arrays.toString((boolean[]) obj);
     }
-    else if (o instanceof byte[]) {
-      return Arrays.toString((byte[]) o);
+    else if (obj instanceof byte[]) {
+      return Arrays.toString((byte[]) obj);
     }
-    else if (o instanceof char[]) {
-      return Arrays.toString((char[]) o);
+    else if (obj instanceof char[]) {
+      return Arrays.toString((char[]) obj);
     }
-    else if (o instanceof short[]) {
-      return Arrays.toString((short[]) o);
+    else if (obj instanceof short[]) {
+      return Arrays.toString((short[]) obj);
     }
-    else if (o instanceof int[]) {
-      return Arrays.toString((int[]) o);
+    else if (obj instanceof int[]) {
+      return Arrays.toString((int[]) obj);
     }
-    else if (o instanceof long[]) {
-      return Arrays.toString((long[]) o);
+    else if (obj instanceof long[]) {
+      return Arrays.toString((long[]) obj);
     }
-    else if (o instanceof float[]) {
-      return Arrays.toString((float[]) o);
+    else if (obj instanceof float[]) {
+      return Arrays.toString((float[]) obj);
     }
-    else if (o instanceof double[]) {
-      return Arrays.toString((double[]) o);
+    else if (obj instanceof double[]) {
+      return Arrays.toString((double[]) obj);
     }
-    else if (o instanceof Object[]) {
-      return Arrays.toString((Object[]) o);
+    else if (obj instanceof Object[]) {
+      return Arrays.toString((Object[]) obj);
     }
     else {
-      return o.toString();
+      return obj.toString();
     }
   }
 
   public static File generateUniqueFile(String dir, String prefix) {
     Assert.notNull(dir, prefix);
-    //int i = 0;
-    int i = 1; // by urueda
-    File f;
-    while ((f = new File(dir + File.separator + prefix + i)).exists())
+    int i = 1;
+    File f = new File(dir + File.separator + prefix + i);
+    while (f.exists()) {
       i++;
+      f = new File(dir + File.separator + prefix + i);
+    }
     return f;
   }
 
@@ -948,5 +961,4 @@ public final class Util {
     System.arraycopy(second, 0, result, first.length, second.length);
     return result;
   }
-
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -47,13 +46,16 @@ public final class FirstFinder implements Finder {
   }
 
   public Widget apply(Widget start) throws WidgetNotFoundException {
-    if (yf == null)
+    if (yf == null) {
       yf = new YieldFirst();
+    }
     searcher.apply(start, yf);
     return yf.result();
   }
 
-  public String toString() { return "FirstFinder"; }
+  public String toString() {
+    return "FirstFinder";
+  }
 
   @Override
   public Widget getCachedWidget() {

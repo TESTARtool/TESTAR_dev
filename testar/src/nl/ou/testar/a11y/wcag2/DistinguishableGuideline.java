@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -43,6 +43,7 @@ public final class DistinguishableGuideline extends AbstractGuideline {
 
   DistinguishableGuideline(AbstractPrinciple parent) {
     super(4, "Distinguishable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Use of Color",
         this, Level.A, "visual-audio-contrast-without-color"));
     criteria.add(new SuccessCriterion(2, "Audio Control",
@@ -53,6 +54,7 @@ public final class DistinguishableGuideline extends AbstractGuideline {
         this, Level.AA, "visual-audio-contrast-scale"));
     criteria.add(new SuccessCriterion(5, "Images of Text",
         this, Level.AA, "visual-audio-contrast-text-presentation"));
+    setCriteria(criteria);
   }
 
 }

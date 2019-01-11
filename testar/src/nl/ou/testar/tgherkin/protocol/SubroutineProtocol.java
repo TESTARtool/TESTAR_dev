@@ -233,7 +233,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     int tekstboxes = 0;
     for (Widget widget: getTopWidgets(state)) {
       String role = widget.get(Tags.Role, null).toString();
-      if (role.equalsIgnoreCase("UIAEdit")) {
+      if ("UIAEdit".equalsIgnoreCase(role)) {
         tekstboxes++;
       }
     }
@@ -343,7 +343,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
 
   /**
    * Default derivation of action steps.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return actions the actions to be taken
    */
@@ -389,17 +389,17 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * This method is used by TESTAR to determine the set of
    * currently available actions.
    * Derivation of actions:
-   * 1 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ subroutine is not running
+   * 1 - subroutine is not running
    *   if startState() is true
    *   - initialize Document for subroutine (startState)
    *   - add action from subroutine
    *   if startState()  is false
    *   - TESTAR remains in control
-   * 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ subroutine is running
+   * 2 - subroutine is running
    *   if more subroutine actions available => continue subroutine
    *   if no more subroutine actions available =>
    *   - initialize finish state action set (finishState)
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return a set of actions
    * @throws ActionBuildException
@@ -489,7 +489,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   /**
    * Execute the selected action.
    * Determine whether or not the execution succeeded
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded

@@ -18,7 +18,6 @@ public class Reporter {
    */
   public static final String STANDARD_FILE_NAME = "output" + File.separator + "tgherkin" + File.separator + "Report_" + new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss").format(System.currentTimeMillis()) + ".csv";
 
-
   private Consumer consumer;
 
   /**

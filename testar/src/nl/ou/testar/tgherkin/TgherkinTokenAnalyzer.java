@@ -88,7 +88,6 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
     return visitChildren(ctx);
   }
 
-
   @Override
   public Object visitOracle(TgherkinParser.OracleContext ctx) {
     if (ctx.ORACLE_KEYWORD() != null) {
@@ -96,7 +95,6 @@ public class TgherkinTokenAnalyzer extends TgherkinParserBaseVisitor<Object> {
     }
     return visitChildren(ctx);
   }
-
 
   @Override
   public Object visitStep(TgherkinParser.StepContext ctx) {

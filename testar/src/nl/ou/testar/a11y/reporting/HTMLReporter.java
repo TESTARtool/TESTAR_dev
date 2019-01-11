@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.reporting;
 
 import java.io.FileNotFoundException;
@@ -77,7 +76,7 @@ public final class HTMLReporter {
   // Constants
   // ---------
 
-  public final static String CHARSET = "UTF-8";
+  public static final String CHARSET = "UTF-8";
 
   // ----------
   // Attributes
@@ -100,8 +99,9 @@ public final class HTMLReporter {
    * @return This HTML reporter.
    */
   public HTMLReporter writeHeader() {
-    for (String el: HEADER)
+    for (String el: HEADER) {
       write(el);
+    }
     writeHeading(1, "Accessibility Evaluation Report");
     return this;
   }
@@ -111,8 +111,9 @@ public final class HTMLReporter {
    * @return This HTML reporter.
    */
   public HTMLReporter writeFooter() {
-    for (String el: FOOTER)
+    for (String el: FOOTER) {
       write(el);
+    }
     return this;
   }
 
@@ -356,8 +357,9 @@ public final class HTMLReporter {
    */
   public HTMLReporter writeTableHeadings(String... headings) {
     writeTableRowStart();
-    for (String heading: headings)
+    for (String heading: headings) {
       writeTableHeading(heading);
+    }
     writeTableRowEnd();
     return this;
   }
@@ -369,8 +371,9 @@ public final class HTMLReporter {
    */
   public HTMLReporter writeTableRow(String... cells) {
     writeTableRowStart();
-    for (String cell: cells)
+    for (String cell: cells) {
       writeTableCell(cell);
+    }
     writeTableRowEnd();
     return this;
   }
@@ -382,8 +385,9 @@ public final class HTMLReporter {
    */
   public HTMLReporter writeTableRow(Object... cells) {
     writeTableRowStart();
-    for (Object cell: cells)
+    for (Object cell: cells) {
       writeTableCell(cell.toString());
+    }
     writeTableRowEnd();
     return this;
   }
@@ -413,8 +417,9 @@ public final class HTMLReporter {
     Assert.notNull(dest);
     Map<String, String> attrs = new HashMap<>();
     attrs.put(LINK_DEST, dest);
-    if (newWindow)
+    if (newWindow) {
       attrs.put(LINK_TARGET, LINK_TARGET_NEW);
+    }
     write(start(LINK, attrs));
     return this;
   }
@@ -460,8 +465,9 @@ public final class HTMLReporter {
 
   private String start(String el, Map<String, String> attrs) {
     String ret = "<" + el;
-    for (Entry<String, String> attr: attrs.entrySet())
+    for (Entry<String, String> attr: attrs.entrySet()) {
       ret += " " + attr.getKey() + "=\"" + attr.getValue() + "\"";
+    }
     ret += ">";
     return ret;
   }

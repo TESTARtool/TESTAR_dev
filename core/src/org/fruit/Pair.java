@@ -50,8 +50,9 @@ public class Pair<L, R> implements Serializable {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
     if (o instanceof Pair) {
       Pair<?, ?> po = (Pair<?, ?>) o;
@@ -70,6 +71,10 @@ public class Pair<L, R> implements Serializable {
     return "(" + Util.toString(left) + ", " + Util.toString(right) + ")";
   }
 
-  public L left() { return left; }
-  public R right() { return right; }
+  public L left() {
+    return left;
+  }
+  public R right() {
+    return right;
+  }
 }

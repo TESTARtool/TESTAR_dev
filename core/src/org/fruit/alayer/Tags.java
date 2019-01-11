@@ -65,7 +65,6 @@ public final class Tags extends TagsBase {
    * is visible at a specific location determine whether the widget */
   public static final Tag<HitTester> HitTester = from("HitTester", HitTester.class);
 
-
   /** Usually attached to widgets. Returns a <code>Shape</code> object which allows to
    * draw the widget's shape and to determine whether a point lies within the its shape.
    * However, a shape of a widget does not tell whether or not this widget is obscured

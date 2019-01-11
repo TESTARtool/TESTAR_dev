@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.reporting;
 
 import java.io.Serializable;
@@ -118,14 +117,19 @@ public class EvaluationResult implements Serializable {
    * @return The severity.
    */
   public double getVerdictSeverity() {
-    return type.equals(Type.OK) ? Verdict.SEVERITY_OK: Verdict.SEVERITY_FAIL;
+    if (type.equals(Type.OK)) {
+      return  Verdict.SEVERITY_OK;
+    } else {
+      return Verdict.SEVERITY_FAIL;
+    }
   }
 
   @Override
   public String toString() {
     String ret = type.name() + ": " + message;
-    if (widget != null)
+    if (widget != null) {
       ret += " [Widget: \"" + widget.get(Tags.Title, "") + "\" (" + widget.get(Tags.Role) + ")]";
+    }
     return ret;
   }
 

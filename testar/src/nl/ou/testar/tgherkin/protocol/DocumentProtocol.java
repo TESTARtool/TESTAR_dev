@@ -1,7 +1,6 @@
 package nl.ou.testar.tgherkin.protocol;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 import nl.ou.testar.tgherkin.Utils;
@@ -57,7 +56,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
   @Override
   /**
    * Begin sequence.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * This method is invoked each time TESTAR starts to generate a new sequence.
    */
@@ -100,7 +99,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return a set of actions
    * @throws ActionBuildException
@@ -143,7 +142,7 @@ public class DocumentProtocol extends ClickFilterLayerProtocol implements Protoc
   @Override
   /**
    * Execute the selected action.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded

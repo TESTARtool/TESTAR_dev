@@ -200,7 +200,6 @@ public class Report {
     }
   }
 
-
   /**
    * Transform report value to a value that is compatible with CSV.
    * @param value report value

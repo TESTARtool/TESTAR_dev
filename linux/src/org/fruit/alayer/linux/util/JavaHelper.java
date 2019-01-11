@@ -27,15 +27,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.util;
-
 
 /**
  * Some Java utility functions.
  */
 public class JavaHelper {
-
 
     /**
      * Tries to parse a String to an int.
@@ -52,7 +49,6 @@ public class JavaHelper {
         }
     }
 
-
     /**
      * Tries to parse a String to an int.
      * @param value The string to parse as an int.
@@ -68,7 +64,6 @@ public class JavaHelper {
         }
     }
 
-
     /***
      * Checks to see if a string is null or empty.
      * @param s string to check.
@@ -78,15 +73,15 @@ public class JavaHelper {
         return s == null || s.length() == 0;
     }
 
-
     /***
      * Checks if a string is null or empty or contains only whitespace.
      * @param s string to check.
      * @return true if null or emptry or only whitespace; otherwise false.
      */
     public static boolean isNullOrWhitespace(String s) {
-        if (isNullOrEmpty(s))
+        if (isNullOrEmpty(s)) {
             return true;
+        }
         for (int i = 0; i < s.length(); i++) {
             if (!Character.isWhitespace(s.charAt(i))) {
                 return false;
@@ -94,6 +89,5 @@ public class JavaHelper {
         }
         return true;
     }
-
 
 }

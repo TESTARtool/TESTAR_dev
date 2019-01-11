@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,9 +36,15 @@ import org.fruit.alayer.devices.ProcessHandle;
 
 public final class WinProcHandle implements ProcessHandle {
   private final long pid;
-  public WinProcHandle(long pid) { this.pid = pid;  }
-  public void kill() { WinProcess.killProcess(pid); }
-  public boolean isRunning() { return WinProcess.isRunning(pid); }
+  public WinProcHandle(long pid) {
+    this.pid = pid;
+  }
+  public void kill() {
+    WinProcess.killProcess(pid);
+  }
+  public boolean isRunning() {
+    return WinProcess.isRunning(pid);
+  }
   public String name() {
     try {
       return WinProcess.procName(pid);
@@ -47,5 +52,7 @@ public final class WinProcHandle implements ProcessHandle {
       return null;
     }
   }
-  public long pid() { return pid; }
+  public long pid() {
+    return pid;
+  }
 }

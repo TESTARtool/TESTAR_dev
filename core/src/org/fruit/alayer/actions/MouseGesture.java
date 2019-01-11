@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -75,7 +74,9 @@ public final class MouseGesture extends TaggableBase implements Action {
     Position currentPos = null;
     double minDuration;
 
-    public Builder() { this(new IndexAbstractor()); }
+    public Builder() {
+      this(new IndexAbstractor());
+    }
 
     public Builder(Abstractor abstractor) {
       Assert.notNull(abstractor);
@@ -148,16 +149,16 @@ public final class MouseGesture extends TaggableBase implements Action {
     duration = Math.max(duration, minDuration);
 
     Point[] actionPoints = new Point[actionPositions.size()];
-    for (int i = 0; i < actionPoints.length; i++)
+    for (int i = 0; i < actionPoints.length; i++) {
       actionPoints[i] = actionPositions.get(i).apply(state);
-
+    }
     Iterable<Point> movePoints = trajectory.apply(state);
     double trLength = length(movePoints);
     double movetimePerUnit = 0;
 
-    if (trLength > 0)
+    if (trLength > 0) {
       movetimePerUnit = duration / trLength;
-
+    }
     Iterator<Point> iter = movePoints.iterator();
     Point currentPos = iter.next();
     new MouseMove(currentPos).run(system, state, 0.0);
@@ -174,8 +175,9 @@ public final class MouseGesture extends TaggableBase implements Action {
       actions.get(i).run(system, state, 0.0);
     }
 
-    if (movetimePerUnit == 0)
+    if (movetimePerUnit == 0) {
       Util.pause(duration);
+    }
   }
 
   private double length(Iterable<Point> t) {
@@ -190,29 +192,26 @@ public final class MouseGesture extends TaggableBase implements Action {
     return ret;
   }
 
-  // by urueda
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
     return "(" + "UNDEF" + ")";
   }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     return toString();
   }
 
-  // by urueda
   public String toString() {
     return "Mouse gesture"; // TODO: add gesture parameters
   }

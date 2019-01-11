@@ -65,8 +65,8 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence.
-   * @param sut SUT
-   * @param state State of SUT
+   * @param sut the system under test
+   * @param state the SUT's current state
    */
   protected void beginSequence(SUT sut, State state) {
 
@@ -99,18 +99,18 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
    * @return  the current state of the SUT with attached oracle.
-   * @param system SUT
+   * @param sut the system under testing the SUT
    * @throws StateBuildException if error occurs
    */
-  protected State getState(SUT system) throws StateBuildException {
-    return super.getState(system);
+  protected State getState(SUT sut) throws StateBuildException {
+    return super.getState(sut);
   }
 
   /**
    * This is a helper method used by the default implementation of <code>buildState()</code>
    * It examines the SUT's current state and returns an oracle verdict.
    * @return oracle verdict, which determines whether the state is erroneous and why.
-   * @param state State of SUT
+   * @param state the SUT's current state
    */
   protected Verdict getVerdict(State state) {
 
@@ -127,22 +127,21 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 
   }
 
-
   /**
    * This method is used by TESTAR to determine the set of currently available actions.
    * You can use the SUT's current state, analyze the widgets and their properties to create
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+   * @param sut the system under testing the SUT
    * @param state the SUT's current state
    * @return  a set of actions
    * @throws ActionBuildException if error occurs
    */
 
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(sut, state); // by urueda
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -179,7 +178,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
    * Select one of the possible actions (e.g. at random)
    * @param state the SUT's current state
    * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-   * @return  the selected action (non-null!)
+   * @return the selected action (non-null!)
    */
 
   protected Action selectAction(State state, Set<Action> actions) {
@@ -188,15 +187,13 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 
   /**
    * Execute the selected action.
-   * @param system the SUT
+   * @param sut the system under testing the SUT
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
-  protected boolean executeAction(SUT system, State state, Action action) {
-
-    return super.executeAction(system, state, action);
-
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -204,7 +201,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
    * current sequence. You could stop the sequence's generation after a given amount of executed
    * actions or after a specific time etc.
    * @return  if <code>true</code> continue generation, else stop
-   * @param state State of SUT
+   * @param state the SUT's current state
    */
   protected boolean moreActions(State state) {
     return super.moreActions(state);

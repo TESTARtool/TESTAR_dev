@@ -92,8 +92,6 @@ public class Calculator {
            return num / 100;
         }
 
-
-
         // never reach
         throw new Error();
     }

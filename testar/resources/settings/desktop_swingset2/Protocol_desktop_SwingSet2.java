@@ -66,14 +66,12 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
   }
 
-
-
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence
    */
-  protected void beginSequence(SUT system, State state) {
+  protected void beginSequence(SUT sut, State state) {
 
-    super.beginSequence(system, state);
+    super.beginSequence(sut, state);
 
   }
 
@@ -83,7 +81,7 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
    *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
+   *      the SUT's configuration files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
@@ -102,9 +100,9 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
    * state is erroneous and if so why.
    * @return  the current state of the SUT with attached oracle.
    */
-  protected State getState(SUT system) throws StateBuildException{
+  protected State getState(SUT sut) throws StateBuildException{
 
-    return super.getState(system);
+    return super.getState(sut);
 
   }
 
@@ -128,21 +126,20 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
   }
 
-
   /**
    * This method is used by TESTAR to determine the set of currently available actions.
    * You can use the SUT's current state, analyze the widgets and their properties to create
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return  a set of actions
    */
 
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(sut, state); // by urueda
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -160,13 +157,13 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
         if (!blackListed(w)) {  // do not build actions for tabu widgets
 
           // left clicks
-          if (whiteListed(w) || isClickable(w))
+          if (whiteListed(w) || isClickable(w)) {
             actions.add(ac.leftClickAt(w));
-
+          }
           // type into text boxes
-          if (isTypeable(w))
+          if (isTypeable(w)) {
             actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-
+          }
           //Force actions on some widgets with a wrong accessibility
           //Optional, comment this changes if your Swing applications doesn't need it
 
@@ -176,11 +173,8 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
             widgetTree(w, actions);
           }
           //End of Force action
-
         }
-
       }
-
     }
 
     return actions;
@@ -210,20 +204,18 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
   }
 
-
   /**
    * Execute the selected action.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
-  protected boolean executeAction(SUT system, State state, Action action) {
+  protected boolean executeAction(SUT sut, State state, Action action) {
 
-    return super.executeAction(system, state, action);
+    return super.executeAction(sut, state, action);
 
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -237,8 +229,6 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
   }
 
-
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
@@ -247,8 +237,6 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
     super.finishSequence();
 
   }
-
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

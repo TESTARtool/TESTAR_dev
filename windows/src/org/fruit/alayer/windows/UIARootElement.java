@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -42,17 +41,82 @@ import org.fruit.Util;
 
 final class UIARootElement extends UIAElement {
   private static final long serialVersionUID = -2561441199642411403L;
-  long pid, timeStamp;
-  boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;
-  transient Map<Long, UIAElement> hwndMap;
-  ElementMap tlc;
+  private long pid;
+  private long timeStamp;
+  private boolean isRunning;
+  private boolean isForeground;
+  private boolean hasStandardMouse;
+  private boolean hasStandardKeyboard;
 
-  public UIARootElement() {
+  public long getPid() {
+    return pid;
+  }
+
+  public void setPid(long pid) {
+    this.pid = pid;
+  }
+
+  public long getTimeStamp() {
+    return timeStamp;
+  }
+
+  public void setTimeStamp(long timeStamp) {
+    this.timeStamp = timeStamp;
+  }
+
+  public boolean isRunning() {
+    return isRunning;
+  }
+
+  public void setRunning(boolean isRunning) {
+    this.isRunning = isRunning;
+  }
+
+  public boolean isForeground() {
+    return isForeground;
+  }
+
+  public void setForeground(boolean isForeground) {
+    this.isForeground = isForeground;
+  }
+
+  public boolean isHasStandardMouse() {
+    return hasStandardMouse;
+  }
+
+  public void setHasStandardMouse(boolean hasStandardMouse) {
+    this.hasStandardMouse = hasStandardMouse;
+  }
+
+  public boolean isHasStandardKeyboard() {
+    return hasStandardKeyboard;
+  }
+
+  public void setHasStandardKeyboard(boolean hasStandardKeyboard) {
+    this.hasStandardKeyboard = hasStandardKeyboard;
+  }
+
+  private transient Map<Long, UIAElement> hwndMap;
+  private ElementMap tlc;
+
+  public Map<Long, UIAElement> getHwndMap() {
+    return hwndMap;
+  }
+
+  public ElementMap getTlc() {
+    return tlc;
+  }
+
+  public void setTlc(ElementMap tlc) {
+    this.tlc = tlc;
+  }
+
+  UIARootElement() {
     super(null);
     root = this;
     hwndMap = Util.newHashMap();
     tlc = ElementMap.newBuilder().build();
-    isForeground = false; // by urueda
+    isForeground = false;
   }
 
   public UIAElement at(double x, double y) {
@@ -60,31 +124,28 @@ final class UIARootElement extends UIAElement {
   }
 
   public boolean visibleAt(UIAElement el, double x, double y) {
-    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
+    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
       return false;
-
+    }
     UIAElement topLevelContainer = tlc.at(x, y);
     return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
   }
 
-  // begin by urueda
-
   public boolean visibleAt(UIAElement el, double x, double y, boolean obscuredByChildFeature) {
-    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
+    if (el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y)) {
       return false;
-
+    }
     UIAElement topLevelContainer = tlc.at(x, y);
     return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
         !obscuredByChildFeature || !obscuredByChildren(el, x, y));
   }
 
-  // end by urueda
-
   boolean obscuredByChildren(UIAElement el, double x, double y) {
     for (int i = 0; i < el.children.size(); i++) {
       UIAElement child = el.children.get(i);
-      if (child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex)
+      if (child.rect != null && child.rect.contains(x, y) && child.zindex >= el.zindex) {
         return true;
+      }
     }
     return false;
   }

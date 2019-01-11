@@ -29,7 +29,6 @@
 
 package org.fruit.alayer;
 
-
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -60,7 +59,6 @@ public class TagTest {
 
       assertEquals("The name of the tag shall be identical to the provided name",
          "Boolean", tag1.name());
-
 
       Tag<Boolean> tag2 = Tag.from("Boolean", Boolean.class);
       assertEquals("There should be one object", tag1, tag2);

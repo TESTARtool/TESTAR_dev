@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
-
 
 import org.fruit.Assert;
 import org.fruit.Drag;
@@ -45,7 +43,6 @@ import java.util.*;
 
 import static org.fruit.alayer.linux.AtSpiTags.*;
 
-
 /**
  * Represents an element in an application - wraps properties of an AT-SPI node in a Testar defined way.
  *
@@ -58,24 +55,20 @@ import static org.fruit.alayer.linux.AtSpiTags.*;
  */
 public class AtSpiWidget implements Widget, Serializable {
 
-
+    private static final double NO_VALUE = -1.0;
     //region Properties
 
-
+    private static final double AVERAGE_VALUE = 50.0;
     AtSpiState root;
     public AtSpiWidget parent;
     public AtSpiElement element;
 
-
     private Map<Tag<?>, Object> tags = Util.newHashMap();
     public ArrayList<AtSpiWidget> children = new ArrayList<>();
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Constructs a new AtSpiWidget with a root, parent and linked to an AtSpiElement.
@@ -85,25 +78,19 @@ public class AtSpiWidget implements Widget, Serializable {
      */
     AtSpiWidget(AtSpiState root, AtSpiWidget parent, AtSpiElement element) {
 
-
         this.parent = parent;
         this.element = element;
         this.root = root;
-
 
         if (parent != null) {
             parent.children.add(this);
         }
 
-
     }
-
 
     //endregion
 
-
     //region Widget implementation
-
 
     /**
      * Gets the root of the widget tree.
@@ -114,7 +101,6 @@ public class AtSpiWidget implements Widget, Serializable {
         return root;
     }
 
-
     /**
      * Gets the parent of the widget tree.
      * @return The parent of the widget tree.
@@ -123,7 +109,6 @@ public class AtSpiWidget implements Widget, Serializable {
     public Widget parent() {
         return parent;
     }
-
 
     /**
      * Returns the child by index.
@@ -135,7 +120,6 @@ public class AtSpiWidget implements Widget, Serializable {
         return children.get(i);
     }
 
-
     /**
      * Adds a child to widget - Method is never used.
      * @return The widget that got added.
@@ -145,9 +129,7 @@ public class AtSpiWidget implements Widget, Serializable {
         return new AtSpiWidget(root, this, null);
     }
 
-
     //region Other necessary functionality
-
 
     /**
      * Adds a new widget to the State (widget tree) as a child of this widget.
@@ -158,9 +140,7 @@ public class AtSpiWidget implements Widget, Serializable {
         return new AtSpiWidget(root, this, element);
     }
 
-
     //endregion
-
 
     /**
      * Gets the number of children.
@@ -170,7 +150,6 @@ public class AtSpiWidget implements Widget, Serializable {
     public int childCount() {
         return children.size();
     }
-
 
     /**
      * Removes the widget and its children from the State tree - it resets the connections to null.
@@ -186,7 +165,6 @@ public class AtSpiWidget implements Widget, Serializable {
 
     }
 
-
     /**
      * Sets this widget to be a child of the supplied widget.
      * @param p The new parent widget of this widget.
@@ -200,11 +178,9 @@ public class AtSpiWidget implements Widget, Serializable {
         Assert.isTrue(this != root, "You cannot set the root's parent!");
         assert(parent != null);
 
-
         AtSpiWidget atSpiParent = (AtSpiWidget) p;
         Assert.isTrue(atSpiParent.root == root);
         Assert.isTrue(!Util.isAncestorOf(this, p), "The parent is a descendent of this widget!");
-
 
         // Set this widget to the child of the supplied widget.
         parent.children.remove(this);
@@ -212,7 +188,6 @@ public class AtSpiWidget implements Widget, Serializable {
         parent = atSpiParent;
 
     }
-
 
     /**
      * Creates an array of drag points - ?points where can be clicked and then the element will scroll?.
@@ -224,15 +199,12 @@ public class AtSpiWidget implements Widget, Serializable {
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
 
-
         boolean hasScroll = get(AtSpiCanScroll, null);
         if (!hasScroll) {
             return null;
         }
 
-
         Drag[] hDrags = null, vDrags = null;
-
 
         boolean hScroll = get(AtSpiCanScrollHorizontally, Boolean.FALSE);
         if (hScroll) {
@@ -241,7 +213,7 @@ public class AtSpiWidget implements Widget, Serializable {
 
             if (hViewSize > 0) {
 
-                double hScrollPercent = get(AtSpiHorizontalScrollPercentage, -1.0);
+                double hScrollPercent = get(AtSpiHorizontalScrollPercentage, NO_VALUE);
                 Shape shape = get(Tags.Shape, null);
 
                 if (shape != null) {
@@ -252,7 +224,6 @@ public class AtSpiWidget implements Widget, Serializable {
 
         }
 
-
         boolean vScroll = get(AtSpiCanScrollVertically, Boolean.FALSE);
         if (vScroll) {
 
@@ -260,7 +231,7 @@ public class AtSpiWidget implements Widget, Serializable {
 
             if (vViewSize > 0) {
 
-                double vScrollPercent = get(AtSpiVerticalScrollPercentage, -1.0);
+                double vScrollPercent = get(AtSpiVerticalScrollPercentage, NO_VALUE);
                 Shape shape = get(Tags.Shape, null);
 
                 if (shape != null) {
@@ -270,12 +241,9 @@ public class AtSpiWidget implements Widget, Serializable {
             }
         }
 
-
         return Util.join(hDrags,vDrags);
 
-
     }
-
 
     /**
      * Creates a string representation for the widget.
@@ -291,7 +259,6 @@ public class AtSpiWidget implements Widget, Serializable {
 
     }
 
-
     /**
      * Creates a string representation of the AtSpiWidget.
      * @param tags The tags to include in the string representation.
@@ -302,9 +269,7 @@ public class AtSpiWidget implements Widget, Serializable {
         return Util.treeDesc(this, 2, tags);
     }
 
-
     //region Widget Helper functions
-
 
     /**
      * Disconnects a widget and its children from the State tree.
@@ -312,22 +277,18 @@ public class AtSpiWidget implements Widget, Serializable {
      */
     private void invalidate(AtSpiWidget w) {
 
-
         // Reset the connection for the current widget.
         if (w.element != null) {
             w.element.backRef = null;
         }
         w.root = null;
 
-
         // Also reset the connections for its children.
         for (AtSpiWidget c: w.children) {
             invalidate(c);
         }
 
-
     }
-
 
     /**
      * Creates a string representation for the widget.
@@ -337,40 +298,29 @@ public class AtSpiWidget implements Widget, Serializable {
     @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
     private String getPropertiesRepresentation(String tab) {
 
-
         StringBuilder pr = new StringBuilder();
-
 
         Role role = this.get(Tags.Role, null);
         if (role != null) {
             pr.append(tab + "ROLE = " + role.toString() + "\n");
         }
 
-
-
         String title = this.get(Tags.Title, null);
         if (title != null) {
             pr.append(tab + "TITLE = " + title + "\n");
         }
-
-
 
         Shape shape = this.get(Tags.Shape, null);
         if (shape != null) {
             pr.append(tab + "SHAPE = " + shape.toString() + "\n");
         }
 
-
-
         pr.append(tab + "CHILDREN = " + this.childCount() + "\n");
         pr.append(tab + "PATH = " + this.get(Tags.Path) + "\n");
 
-
         return pr.toString();
 
-
     }
-
 
     /**
      * Gets drag points depending on orientation and certain scroll properties.
@@ -394,7 +344,7 @@ public class AtSpiWidget implements Widget, Serializable {
             // Horizontal.
             fixedH = shape.x() + scrollArrowSize +
                     scrollableSize*scrollPercent/100.0 +
-                    (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
+                    (scrollPercent < AVERAGE_VALUE ? scrollThick/2: -3*scrollThick/2);
             fixedV = shape.y() + shape.height() - scrollThick/2;
 
         } else {
@@ -403,21 +353,18 @@ public class AtSpiWidget implements Widget, Serializable {
             fixedH = shape.x() + shape.width() - scrollThick/2;
             fixedV = shape.y() + scrollArrowSize +
                     scrollableSize*scrollPercent/100.0 +
-                    (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
+                    (scrollPercent < AVERAGE_VALUE ? scrollThick/2: -3*scrollThick/2);
 
         }
-
 
         int dragC = (int)Math.ceil(100.0 / viewSize) - 1;
         if (dragC < 1) {
             return null;
         }
 
-
         double[] emptyDragPoints = calculateScrollDragPoints(dragC,
                 scrollOrientation ? fixedH-shape.x(): fixedV-shape.y(),
                 scrollableSize/(double)dragC);
-
 
         Drag[] drags = new Drag[dragC];
         for (int i=0; i<dragC; i++) {
@@ -427,12 +374,9 @@ public class AtSpiWidget implements Widget, Serializable {
             );
         }
 
-
         return drags;
 
-
     }
-
 
     /**
      * Creates drag points relative to a fixed point.
@@ -444,34 +388,27 @@ public class AtSpiWidget implements Widget, Serializable {
     @SuppressWarnings("Duplicates")
     private double[] calculateScrollDragPoints(int dragC, double fixedPoint, double fragment) {
 
-
         double dragP = 0.0;
         double[] dragPoints = new double[dragC];
 
-
         for (int i=0; i<dragC; i++) {
-            if (Math.abs(fixedPoint - dragP) < fragment)
+            if (Math.abs(fixedPoint - dragP) < fragment) {
                 dragP += fragment;
+            }
             dragPoints[i] = dragP;
             dragP += fragment;
         }
         dragPoints[dragC-1] -= 5;
 
-
         return dragPoints;
-
 
     }
 
-
     //endregion
 
-
     //endregion
-
 
     //region Taggable implementation
-
 
     /**
      * Retrieves the value associated with a tag from this AtSpiWidget.
@@ -493,7 +430,6 @@ public class AtSpiWidget implements Widget, Serializable {
 
     }
 
-
     /**
      * Retrieves the value associated with a tag from this AtSpiWidget.
      * @param tag Tag to retrieve.
@@ -504,10 +440,8 @@ public class AtSpiWidget implements Widget, Serializable {
     @Override
     public <T> T get(Tag<T> tag, T defaultValue) {
 
-
         // Check if the value for the tag is cached.
         Object ret = tags.get(tag);
-
 
         // Cached - return value.
         // No element to retrieve the value from or non-existing tag - return default value.
@@ -517,7 +451,6 @@ public class AtSpiWidget implements Widget, Serializable {
         } else if (element == null || tags.containsKey(tag)) {
             return defaultValue;
         }
-
 
         // Retrieve the value for the tag by returning the value from the linked AtSpiElement.
         // Notes:
@@ -589,17 +522,13 @@ public class AtSpiWidget implements Widget, Serializable {
             ret = element.description;
         }
 
-
         // Cache the value for a next time.
         tags.put(tag, ret);
-
 
         //noinspection unchecked
         return (ret == null) ? defaultValue: (T)ret;
 
-
     }
-
 
     /**
      * Gets an iterator for the tags of this widget.
@@ -607,7 +536,6 @@ public class AtSpiWidget implements Widget, Serializable {
      */
     @Override
     public Iterable<Tag<?>> tags() {
-
 
         final AtSpiWidget self = this;
         Assert.notNull(self);
@@ -617,48 +545,45 @@ public class AtSpiWidget implements Widget, Serializable {
         queryTags.addAll(Tags.tagSet());
         queryTags.addAll(AtSpiTags.tagSet());
 
-
         return () -> new Iterator<Tag<?>>() {
             Iterator<Tag<?>> i = queryTags.iterator();
             AtSpiWidget target = self;
             Tag<?> next;
-
 
             @SuppressWarnings("Duplicates")
             private Tag<?> fetchNext() {
                 if (next == null) {
                     while (i.hasNext()) {
                         next = i.next();
-                        if (target.get(next, null) != null)
+                        if (target.get(next, null) != null) {
                             return next;
+                        }
                     }
                     next = null;
                 }
                 return next;
             }
 
-
             public boolean hasNext() {
                 return fetchNext() != null;
             }
 
-
             public Tag<?> next() {
                 Tag<?> ret1 = fetchNext();
-                if (ret1 == null)
+                if (ret1 == null) {
                     throw new NoSuchElementException();
+                }
                 next = null;
                 return ret1;
             }
 
-
-            public void remove() { throw new UnsupportedOperationException(); }
-
+            public void remove() {
+              throw new UnsupportedOperationException();
+            }
 
         };
 
     }
-
 
     /**
      * Sets the value for the supplied tag.
@@ -672,7 +597,6 @@ public class AtSpiWidget implements Widget, Serializable {
         tags.put(tag, value);
     }
 
-
     /**
      * Clears the value of the tag - it does not actually remove the Tag object from the Map.
      * @param tag Tag to clear the value for.
@@ -683,20 +607,14 @@ public class AtSpiWidget implements Widget, Serializable {
         tags.put(tag, null);
     }
 
-
     //endregion
 
-
     //region Serializable functionality
-
 
     // Used to determine the class during serialization.
     private static final long serialVersionUID = 456999777888222L;
 
-
     // Most likely used to serialize and deserialize an instance of this class - don't know if this is used by Testar though.
-
-
 
     /**
      * Serialize an instance of this object.
@@ -706,7 +624,6 @@ public class AtSpiWidget implements Widget, Serializable {
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }
-
 
     /**
      * Deserialize an instance of this object.
@@ -718,8 +635,6 @@ public class AtSpiWidget implements Widget, Serializable {
         ois.defaultReadObject();
     }
 
-
     //endregion
-
 
 }

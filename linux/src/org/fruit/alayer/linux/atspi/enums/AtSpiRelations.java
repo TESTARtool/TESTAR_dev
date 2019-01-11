@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
-
 
 /**
  * AtspiRelationType specifies a relationship between objects (possibly one-to-many or many-to-one) outside of the
@@ -44,24 +42,20 @@ package org.fruit.alayer.linux.atspi.enums;
  */
 public enum AtSpiRelations {
 
-
     /**
      * Not a meaningful relationship; clients should not normally encounter this AtspiRelationType value.
      */
     Null,
-
 
     /**
      * Object is a label for one or more other objects.
      */
     LabelFor,
 
-
     /**
      * Object is labelled by one or more other objects.
      */
     LabelledBy,
-
 
     /**
      * Object is an interactive object which modifies the state, onscreen location, or other attributes
@@ -69,43 +63,36 @@ public enum AtSpiRelations {
      */
     ControllerFor,
 
-
     /**
      * Object state, position, etc. is modified/controlled by user interaction with one or more other objects.
      * For instance a viewport or scroll pane may be ATSPI_RELATION_CONTROLLED_BY scrollbars.
      */
     ControlledBy,
 
-
     /**
      * Object has a grouping relationship (e.g. 'same group as') to one or more other objects.
      */
     MemberOf,
-
 
     /**
      * Object is a tooltip associated with another object.
      */
     ToolTipFor,
 
-
     /**
      * Object is a child of the target.
      */
     NodeChildOf,
-
 
     /**
      * Object is a parent of the target.
      */
     NodeParentOf,
 
-
     /**
      * Used to indicate that a relationship exists, but its type is not specified in the enumeration.
      */
     Extended,
-
 
     /**
      * Object renders content which flows logically to another object. For instance, text in a paragraph may flow to
@@ -113,12 +100,10 @@ public enum AtSpiRelations {
      */
     FlowsTo,
 
-
     /**
      * Reciprocal of ATSPI_RELATION_FLOWS_TO.
      */
     FlowsFrom,
-
 
     /**
      * Object is visually and semantically considered a subwindow of another object, even though it is not the
@@ -127,19 +112,16 @@ public enum AtSpiRelations {
      */
     SubWindowOf,
 
-
     /**
      * Similar to ATSPI_RELATION_SUBWINDOW_OF, but specifically used for cross-process embedding.
      */
     Embeds,
-
 
     /**
      * Reciprocal of ATSPI_RELATION_EMBEDS. Used to denote content rendered by embedded
      * renderers that live in a separate process space from the embedding context.
      */
     EmbeddedBy,
-
 
     /**
      * Denotes that the object is a transient window or frame associated with another onscreen object. Similar
@@ -151,12 +133,10 @@ public enum AtSpiRelations {
      */
     PopupFor,
 
-
     /**
      * This is the reciprocal relation to ATSPI_RELATION_POPUP_FOR .
      */
     ParentWindowOf,
-
 
     /**
      * Indicates that an object provides descriptive information about another object; more verbose than
@@ -164,19 +144,15 @@ public enum AtSpiRelations {
      */
     DescriptionFor,
 
-
     /**
      * Indicates that another object provides descriptive information about this object;
      * more verbose than ATSPI_RELATION_LABELLED_BY .
      */
     DescribedBy,
 
-
     /**
      * Do not use as a parameter value, used to determine the size of the enumeration.
      */
     LastDefined
-
-
 
 }

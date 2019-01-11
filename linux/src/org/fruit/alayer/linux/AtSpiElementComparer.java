@@ -33,15 +33,12 @@ import org.fruit.alayer.Rect;
 
 import java.util.Comparator;
 
-
 /**
  * Compares two AtSpiElements - used when sorting a list of AtSpiElements.
  */
 public class AtSpiElementComparer implements Comparator<AtSpiElement> {
 
-
-    private final static int WORSE = 1, BETTER = -1, EVEN = 0;
-
+    private static final int WORSE = 1, BETTER = -1, EVEN = 0;
 
     /**
      * Compares two AtSpiElements and returns a result to be able to sort the elements in a list.
@@ -69,6 +66,5 @@ public class AtSpiElementComparer implements Comparator<AtSpiElement> {
             }
         }
     }
-
 
 }

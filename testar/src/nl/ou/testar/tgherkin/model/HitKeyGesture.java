@@ -28,7 +28,6 @@ public class HitKeyGesture extends Gesture {
     super(parameterBase);
   }
 
-
   @Override
   public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
     return super.gesturePossible(widget, proxy, dataTable) && (widget.get(UIATags.UIAHasKeyboardFocus, false) || widget.get(AtSpiTags.AtSpiHasFocus, false));

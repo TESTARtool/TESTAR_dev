@@ -84,7 +84,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
   /**
    * Add additional TESTAR keyboard shortcuts in SPY mode to enable the
    * filtering of actions by clicking on them
-   * 
+   *
    * @param key
    */
   @Override

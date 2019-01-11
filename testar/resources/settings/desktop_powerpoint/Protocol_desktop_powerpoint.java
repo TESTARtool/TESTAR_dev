@@ -57,8 +57,8 @@ import org.fruit.monkey.ConfigTags;
 
 public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 
-  static double scrollArrowSize = 36; // sliding arrows
-  static double scrollThick = 16; //scroll thickness
+  private static double scrollArrowSize = 36; // sliding arrows
+  private static double scrollThick = 16; //scroll thickness
 
   /**
    * Called once during the life time of TESTAR
@@ -72,8 +72,8 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence
    */
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
+  protected void beginSequence(SUT sut, State state) {
+    super.beginSequence(sut, state);
   }
 
   /**
@@ -82,7 +82,7 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
    *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
+   *      the SUT's configuration files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
@@ -99,8 +99,8 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
    * state is erroneous and if so why.
    * @return  the current state of the SUT with attached oracle.
    */
-  protected State getState(SUT system) throws StateBuildException{
-    return super.getState(system);
+  protected State getState(SUT sut) throws StateBuildException{
+    return super.getState(sut);
   }
 
   /**
@@ -129,13 +129,13 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return  a set of actions
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(sut, state);
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -153,16 +153,16 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
           if (!blackListed(w)) {  // do not build actions for tabu widgets
 
             // left clicks
-            if (whiteListed(w) || isClickable(w))
+            if (whiteListed(w) || isClickable(w)) {
               actions.add(ac.leftClickAt(w));
-
+            }
             // type into text boxes
-            if (whiteListed(w) || isTypeable(w))
+            if (whiteListed(w) || isTypeable(w)) {
               actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-
+            }
             // slides
-            Drag[] drags = null;
-            if ((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null) {
+            Drag[] drags = w.scrollDrags(scrollArrowSize,scrollThick);
+            if (drags  != null) {
               for (Drag drag: drags) {
                 actions.add(ac.dragFromTo(
                   new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
@@ -192,13 +192,13 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 
   /**
    * Execute the selected action.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -211,14 +211,12 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
     return super.moreActions(state);
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   protected void finishSequence() {
     super.finishSequence();
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

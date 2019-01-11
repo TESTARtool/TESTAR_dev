@@ -70,17 +70,17 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 
   }
 
-
   /**
    * This method is invoked each time the TESTAR starts to generate a new sequence
+   * @param sut the system under test
+   * @param state the SUT's current state
    */
    @Override
-  protected void beginSequence(SUT system, State state) {
+  protected void beginSequence(SUT sut, State state) {
 
-    super.beginSequence(system, state);
+    super.beginSequence(sut, state);
 
   }
-
 
   /**
    * This method is called when TESTAR starts the System Under Test (SUT). The method should
@@ -88,7 +88,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
    *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    *      out what executable to run)
    *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   *      the SUT's configuratio files etc.)
+   *      the SUT's configuration files etc.)
    *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    *      seconds until they have finished loading)
      * @return  a started SUT, ready to be tested.
@@ -122,24 +122,22 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 
   }
 
-
-
   /**
    * This method is called when the TESTAR requests the state of the SUT.
    * Here you can add additional information to the SUT's state or write your
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
+   * @param sut the system under test
+   * @param state the SUT's current state
    * @return  the current state of the SUT with attached oracle.
    */
   @Override
-  protected State getState(SUT system) throws StateBuildException{
+  protected State getState(SUT sut) throws StateBuildException{
 
-    return super.getState(system);
+    return super.getState(sut);
 
   }
-
-
 
   /**
    * This is a helper method used by the default implementation of <code>buildState()</code>
@@ -168,14 +166,15 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @return  a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state); // by urueda
+    Set<Action> actions = super.deriveActions(sut, state);
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -193,17 +192,16 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
           if (!blackListed(w)) {  // do not build actions for tabu widgets
 
             // left clicks
-            if (whiteListed(w) || isClickable(w))
+            if (whiteListed(w) || isClickable(w)) {
               actions.add(ac.leftClickAt(w));
-
+            }
             // type into text boxes
-            if (whiteListed(w) || isTypeable(w))
+            if (whiteListed(w) || isTypeable(w)) {
               actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-
+            }
           }
         }
       }
-
     }
 
     return actions;
@@ -223,21 +221,20 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 
   }
 
-
   /**
    * Execute the selected action.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
   @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
+  protected boolean executeAction(SUT sut, State state, Action action) {
 
-    return super.executeAction(system, state, action);
+    return super.executeAction(sut, state, action);
 
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -252,7 +249,6 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
@@ -262,7 +258,6 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
     super.finishSequence();
 
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

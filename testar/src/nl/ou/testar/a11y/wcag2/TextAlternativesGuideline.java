@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -50,15 +49,17 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
 
   TextAlternativesGuideline(AbstractPrinciple parent) {
     super(1, "Text Alternatives", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Non-text Content",
         this, Level.A, "text-equiv-all"));
+    setCriteria(criteria);
   }
 
   @Override
   public EvaluationResults evaluate(List<Widget> widgets) {
     EvaluationResults results = new EvaluationResults();
     SuccessCriterion sc = getSuccessCriterionByName("Non-text Content");
-    for (Widget w: widgets)
+    for (Widget w: widgets) {
       if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
         if (AccessibilityUtil.isKeyboardFocusable(w)) { // focusable images must have a text alternative
           results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
@@ -72,6 +73,7 @@ public final class TextAlternativesGuideline extends AbstractGuideline {
       else {
         results.add(evaluationPassed(sc));
       }
+    }
     return results;
   }
 

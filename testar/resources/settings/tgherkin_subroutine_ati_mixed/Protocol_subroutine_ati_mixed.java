@@ -1,6 +1,5 @@
 package tgherkin_subroutine_ati_mixed;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -112,7 +111,7 @@ public class Protocol_subroutine_ati_mixed
       StdActionCompiler ac = new StdActionCompiler();
       for (Widget widget: getTopWidgets(state)) {
         String title = widget.get(Tags.Title, null);
-        if (title.equalsIgnoreCase("bacheloropleidingen")) {
+        if ("bacheloropleidingen".equalsIgnoreCase(title)) {
           action = ac.leftClickAt(widget);
         }
       }
@@ -148,13 +147,14 @@ public class Protocol_subroutine_ati_mixed
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @return  a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-    return super.deriveActions(system, state);
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
+    return super.deriveActions(sut, state);
   }
 
   /**
@@ -180,14 +180,15 @@ public class Protocol_subroutine_ati_mixed
 
   /**
    * Execute the selected action.
-   * @param system the SUT
+
+   * @param sut the system under test
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
   @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**

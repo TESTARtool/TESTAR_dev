@@ -35,8 +35,8 @@ package org.fruit.alayer;
 import java.io.Serializable;
 
 public interface Image extends Serializable {
-	void paint(Canvas canvas, double x, double y, double width, double height);
-	void paint(Canvas canvas, Rect srcRect, Rect destRect);
-	double width();
-	double height();
+  void paint(Canvas canvas, double x, double y, double width, double height);
+  void paint(Canvas canvas, Rect srcRect, Rect destRect);
+  double width();
+  double height();
 }

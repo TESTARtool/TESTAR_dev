@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -85,8 +83,9 @@ public class Settings extends TaggableBase implements Serializable {
 
       int i = 0;
       for (Object o: l) {
-        if (i > 0)
+        if (i > 0) {
           sb.append(';');
+        }
         sb.append(Util.toString(o));
         i++;
       }
@@ -98,8 +97,9 @@ public class Settings extends TaggableBase implements Serializable {
 
       int i = 0;
       for (Pair<String, String> p: l) {
-        if (i > 0)
+        if (i > 0) {
           sb.append(';');
+        }
         sb.append(p.left()).append(';').append(p.right());
         i++;
       }
@@ -143,23 +143,26 @@ public class Settings extends TaggableBase implements Serializable {
     } else if (tag.type().equals(String.class)) {
       return (T)stringValue;
     } else if (tag.type().equals(List.class) && !tag.equals(ConfigTags.CopyFromTo)) {
-      if (stringValue.trim().length() == 0)
+      if (stringValue.trim().length() == 0) {
         return (T) new ArrayList<String>();
+      }
       return (T)Arrays.asList(stringValue.split(";"));
     } else if (tag.type().equals(List.class) && tag.equals(ConfigTags.CopyFromTo)) {
-      if (stringValue.trim().length() == 0)
+      if (stringValue.trim().length() == 0) {
         return (T) new ArrayList<Pair<String, String>>();
+      }
       List<String> pathList = Arrays.asList(stringValue.split(";"));
-      if (pathList.size() % 2 != 0)
+      if (pathList.size() % 2 != 0) {
         throw new ConfigParseException("The number of paths must be even!");
+      }
       List<Pair<String, String>> ret = new ArrayList<Pair<String, String>>();
-      for (int i = 0; i < pathList.size(); i += 2)
+      for (int i = 0; i < pathList.size(); i += 2) {
         ret.add(Pair.from(pathList.get(i), pathList.get(i + 1)));
+      }
       return (T)ret;
     }
     throw new ConfigParseException("");
   }
-
 
   public static Settings FromFile(String path) throws IOException{
     return fromFile(new ArrayList<Pair<?, ?>>(), path);
@@ -173,8 +176,12 @@ public class Settings extends TaggableBase implements Serializable {
     Reader in = new BufferedReader(isw);
     props.load(in);
     in.close();
-    if (isw != null) isw.close();
-    if (fis != null) fis.close();
+    if (isw != null) {
+      isw.close();
+    }
+    if (fis != null) {
+      fis.close();
+    }
 
     return new Settings(defaults, new Properties(props));
   }
@@ -189,7 +196,9 @@ public class Settings extends TaggableBase implements Serializable {
 
     for (String sett: argv) {
       //Ignore sse value
-      if (sett.toString().contains("sse=")) continue;
+      if (sett.toString().contains("sse=")) {
+        continue;
+      }
 
       System.out.println(sett.toString());
       StringReader sr = new StringReader(sett);
@@ -197,15 +206,23 @@ public class Settings extends TaggableBase implements Serializable {
     }
 
     in.close();
-    if (isw != null) isw.close();
-    if (fis != null) fis.close();
+    if (isw != null) {
+      isw.close();
+    }
+    if (fis != null) {
+      fis.close();
+    }
 
     return new Settings(defaults, new Properties(props));
   }
 
-  public Settings() { this(new Properties()); }
+  public Settings() {
+    this(new Properties());
+  }
 
-  public Settings(Properties props) { this(new ArrayList<Pair<?, ?>>(), props); }
+  public Settings(Properties props) {
+    this(new ArrayList<Pair<?, ?>>(), props);
+  }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Settings(List<Pair<?, ?>> defaults, Properties props) {
@@ -238,8 +255,6 @@ public class Settings extends TaggableBase implements Serializable {
       } else {
         set((Tag)defTag, parse(value, defTag));
       }
-
-
 
     }
   }
@@ -380,7 +395,6 @@ public class Settings extends TaggableBase implements Serializable {
           +"# Other more advanced settings\n"
           +"#################################################################\n");
 
-
       for (Tag<?> t: tags()) {
 
         int ini = sb.indexOf(t.name()+" =");
@@ -401,11 +415,14 @@ public class Settings extends TaggableBase implements Serializable {
         }
       }
 
-    } catch(Exception e) {System.out.println("Error trying to save current settings "+e);}
+    } catch(Exception e) {
+      System.out.println("Error trying to save current settings "+e);
+    }
 
     return sb.toString();
   }
 
-
-  private String escapeBackslash(String string) { return string.replace("\\", "\\\\");  }
+  private String escapeBackslash(String string) {
+    return string.replace("\\", "\\\\");
+  }
 }

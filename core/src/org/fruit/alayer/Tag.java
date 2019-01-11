@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -47,10 +46,11 @@ import org.fruit.Util;
  * They have a name and a type and are associated with values who must be of that type.
  */
 public final class Tag<T> implements Serializable{
-  private final static ConcurrentHashMap<Tag<?>, Tag<?>> existingTags = new ConcurrentHashMap<Tag<?>, Tag<?>>();
+  private static final ConcurrentHashMap<Tag<?>, Tag<?>> existingTags = new ConcurrentHashMap<Tag<?>, Tag<?>>();
 
   /**
    * Returns a tag object which is identified by <code>name</code> and <code>valueType</code>.
+   * @param <T> class
    * @param name The name of the tag
    * @param valueType The type of the values that are associated with this tag.
    * @return A tag object.
@@ -60,8 +60,9 @@ public final class Tag<T> implements Serializable{
     Assert.notNull(name, valueType);
     Tag<T> ret = new Tag<T>(name, valueType);
     Tag<T> existing = (Tag<T>)existingTags.putIfAbsent(ret, ret);
-    if (existing != null)
+    if (existing != null) {
       return existing;
+    }
     return ret;
   }
 
@@ -79,15 +80,20 @@ public final class Tag<T> implements Serializable{
    * The name of the tag
    * @return the name of the tag
    */
-  public String name() { return name; }
-
+  public String name() {
+    return name;
+  }
 
   /**
    * The type of the values associated with this tag (e.g. <code>String</code>)
    * @return value type
    */
-  public Class<T> type() { return clazz; }
-  public String toString() { return name; }
+  public Class<T> type() {
+    return clazz;
+  }
+  public String toString() {
+    return name;
+  }
 
   public int hashCode() {
     int ret = hashcode;
@@ -99,8 +105,9 @@ public final class Tag<T> implements Serializable{
   }
 
   public boolean equals(Object other) {
-    if (other == this)
+    if (other == this) {
       return true;
+    }
     if (other instanceof Tag) {
       Tag<?> ot = (Tag<?>) other;
       return name.equals(ot.name) && clazz.equals(ot.clazz);
@@ -114,15 +121,20 @@ public final class Tag<T> implements Serializable{
 
   private Object readResolve() throws ObjectStreamException{
     Tag<?> existing = existingTags.putIfAbsent(this, this);
-    return existing == null ? this: existing;
+    if (existing == null) {
+      return this;
+    } else {
+      return existing;
+    }
   }
 
   // by urueda
   public boolean isOneOf(Tag<?>... oneOf) {
     Assert.notNull(this, oneOf);
     for (Tag<?> o: oneOf) {
-      if (this.equals(o))
+      if (this.equals(o)) {
         return true;
+      }
     }
     return false;
   }

@@ -47,63 +47,60 @@ import org.fruit.alayer.Pen;
 import org.fruit.alayer.Rect;
 
 public class AWTCanvasExample {
-	public static void main(String[] args) throws IOException, ClassNotFoundException{
+  public static void main(String[] args) throws IOException, ClassNotFoundException{
 
-		final int xres = 1024, yres = 768;
-		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(0, 0, xres, yres));
-		AWTCanvas pic = AWTCanvas.fromFile("/Users/guitest/Desktop/fruit_logo.png");
-		//pic = AWTImage.FromScreenshot(new Rect(0, 0, xres, yres));
-		
-		scrshot.begin();
-		int crop = 10;
-		System.out.println(pic.width());
-		pic.paint(scrshot, Rect.from(crop, crop, pic.width() - 2 * crop, pic.height() - 2 * crop), 
-				Rect.from(0, 0, 200, 200));
-		
-		
-		Pen p = Pen.newPen().setStrokeWidth(20).setColor(Color.from(0, 250, 0, 255)).build();
-		//scrshot.rect(p, 0, 0, 100, 100, true);
-		scrshot.line(p, 0, 0, 100, 100);
+    final int xres = 1024, yres = 768;
+    AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(0, 0, xres, yres));
+    AWTCanvas pic = AWTCanvas.fromFile("/Users/guitest/Desktop/fruit_logo.png");
+    //pic = AWTImage.FromScreenshot(new Rect(0, 0, xres, yres));
 
-		scrshot.text(p, 400, 400, 0, "bla blubb 34 91 $ % ^ & *()");
-		
-		scrshot.end();
-		
-		scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger.jpg", 0.5f);
-		scrshot.saveAsPng("/Users/guitest/Desktop/wuffinger.png");
+    scrshot.begin();
+    int crop = 10;
+    System.out.println(pic.width());
+    pic.paint(scrshot, Rect.from(crop, crop, pic.width() - 2 * crop, pic.height() - 2 * crop),
+        Rect.from(0, 0, 200, 200));
 
-		for(int i = 0; i < 1; i++){
-			saveImage(scrshot, "/Users/guitest/Desktop/brabutzinger");
-			scrshot = loadImage("/Users/guitest/Desktop/brabutzinger");
-			scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger" + i + ".jpg", 0.5f);
-		}
-		
+    Pen p = Pen.newPen().setStrokeWidth(20).setColor(Color.from(0, 250, 0, 255)).build();
+    //scrshot.rect(p, 0, 0, 100, 100, true);
+    scrshot.line(p, 0, 0, 100, 100);
 
-	}
+    scrshot.text(p, 400, 400, 0, "bla blubb 34 91 $ % ^ & *()");
 
+    scrshot.end();
 
-	public static void saveImage(AWTCanvas image, String file) throws IOException{
-		FileOutputStream fos = new FileOutputStream(new File(file));
-		BufferedOutputStream bos = new BufferedOutputStream(fos);
-		ObjectOutputStream oos = new ObjectOutputStream(bos);
+    scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger.jpg", 0.5f);
+    scrshot.saveAsPng("/Users/guitest/Desktop/wuffinger.png");
 
-		for(int i = 0; i < 1; i++){
-			oos.writeObject(image);
-			oos.reset();
-		}
+    for (int i = 0; i < 1; i++) {
+      saveImage(scrshot, "/Users/guitest/Desktop/brabutzinger");
+      scrshot = loadImage("/Users/guitest/Desktop/brabutzinger");
+      scrshot.saveAsJpeg("/Users/guitest/Desktop/wuffinger" + i + ".jpg", 0.5f);
+    }
 
-		oos.close();
-		bos.close();
-	}
+  }
 
-	public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException{
-		FileInputStream fis = new FileInputStream(new File(file));
-		BufferedInputStream bis = new BufferedInputStream(fis);
-		ObjectInputStream ois = new ObjectInputStream(bis);
+  public static void saveImage(AWTCanvas image, String file) throws IOException{
+    FileOutputStream fos = new FileOutputStream(new File(file));
+    BufferedOutputStream bos = new BufferedOutputStream(fos);
+    ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-		AWTCanvas ret = (AWTCanvas)ois.readObject();
-		ois.close();
-		return ret;
-	}
+    for (int i = 0; i < 1; i++) {
+      oos.writeObject(image);
+      oos.reset();
+    }
+
+    oos.close();
+    bos.close();
+  }
+
+  public static AWTCanvas loadImage(String file) throws IOException, ClassNotFoundException{
+    FileInputStream fis = new FileInputStream(new File(file));
+    BufferedInputStream bis = new BufferedInputStream(fis);
+    ObjectInputStream ois = new ObjectInputStream(bis);
+
+    AWTCanvas ret = (AWTCanvas)ois.readObject();
+    ois.close();
+    return ret;
+  }
 
 }

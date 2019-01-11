@@ -38,7 +38,7 @@ import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.UIManager.*;
 import static org.fruit.Util.compileProtocol;
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
+
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -127,7 +127,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    * run method.
-   * @param settings   content of settings
+   * @param settings The settings to load
    * @param settingsFile   filename of file containing settings
    * @return null
    */
@@ -233,7 +233,7 @@ public class SettingsDialog extends JFrame implements Observer {
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
-      Main.SSE_ACTIVATED = sutSettings;
+      Main.setSseActivated(sutSettings);
     } catch (ConfigException cfe) {
       LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
     }
@@ -393,7 +393,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_generate.png")));
-    btn.setToolTipText(btnGenerateTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnGenerateTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnGenerateActionPerformed);
     return btn;
@@ -407,7 +407,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_spy.png")));
-    btn.setToolTipText(btnSpyTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnSpyTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnSpyActionPerformed);
     return btn;
@@ -421,7 +421,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.png")));
-    btn.setToolTipText(btnReplayTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnReplayTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnReplayActionPerformed);
     return btn;
@@ -443,7 +443,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.png")));
-    btn.setToolTipText(btnViewTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnViewTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnViewActionPerformed);
     return btn;
@@ -465,7 +465,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
-    btn.setToolTipText(btnRecordTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnRecordTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnRecordActionPerformed);
     return btn;

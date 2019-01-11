@@ -58,10 +58,10 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     firefox("voer zoekterm of adres in", "UIAEdit", "terug", null),
     chrome("adres- en zoekbalk", "UIAEdit", "vorige", "sluiten");
 
-    String addressTitle;
-    String addressRole;
-    String backTitle;
-    String closeTitle;
+    private String addressTitle;
+    private String addressRole;
+    private String backTitle;
+    private String closeTitle;
 
     Browser(String addressTitle, String addressRole,
             String backTitle, String closeTitle) {
@@ -98,7 +98,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * Called once during the life time of TESTAR
    * This method can be used to perform initial setup work
    *
-   * @param settings the current TESTAR settings as specified by the user.
+   * @param settings the current TESTAR settings as specified by the user
    */
   @Override
   protected void initialize(Settings settings) {
@@ -130,10 +130,13 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
   /**
    * This method is invoked each time TESTAR starts to generate a new sequence
+
+   * @param sut the system under test
+   * @param state the SUT's current state
    */
   @Override
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
+  protected void beginSequence(SUT sut, State state) {
+    super.beginSequence(sut, state);
   }
 
   /**
@@ -142,7 +145,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
    * out what executable to run)
    * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuratio files etc.)
+   * the SUT's configuration files etc.)
    * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
    * seconds until they have finished loading)
    *
@@ -160,12 +163,12 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
-   *
+   * @param sut the system under test
    * @return the current state of the SUT with attached oracle.
    */
   @Override
-  protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
+  protected State getState(SUT sut) throws StateBuildException {
+    State state = super.getState(sut);
 
     for (Widget w: state) {
       Role role = w.get(Tags.Role, Roles.Widget);
@@ -204,14 +207,14 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
    *
-   * @param system the SUT
+   * @param sut the system under test
    * @param state  the SUT's current state
    * @return a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state)
+  protected Set<Action> deriveActions(SUT sut, State state)
       throws ActionBuildException {
-    Set<Action> actions = super.deriveActions(system, state);
+    Set<Action> actions = super.deriveActions(sut, state);
 
     // Ignore this protocol if Prolog is activated
     if (settings().get(ConfigTags.PrologActivated)) {
@@ -304,14 +307,14 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   /**
    * Execute the selected action.
    *
-   * @param system the SUT
+   * @param sut the system under test
    * @param state  the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
   @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -491,7 +494,9 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * Small convenience function
    */
   private static String clean(String field) {
-    field = (field == null) ? "": field;
+    if (field == null) {
+      field = "";
+    }
     field = field.toLowerCase();
     field = field.replace(System.lineSeparator(), " ").replaceAll("\\s", " ");
     return field.substring(0, Math.min(35, field.length())).trim();

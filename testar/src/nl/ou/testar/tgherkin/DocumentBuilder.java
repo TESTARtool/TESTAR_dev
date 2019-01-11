@@ -328,7 +328,6 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
     return new WidgetTreeCondition(widgetConditions);
   }
 
-
   @Override
   public Step visitStep(TgherkinParser.StepContext ctx) {
     String title = null;
@@ -570,8 +569,6 @@ public class DocumentBuilder extends TgherkinParserBaseVisitor<Object> {
     }
     return new DragDropGesture(parameterBase);
   }
-
-
 
   @Override
   public Gesture visitParameterlessGesture(TgherkinParser.ParameterlessGestureContext ctx) {

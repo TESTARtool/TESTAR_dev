@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
-
 
 /**
  * Represents a movement in a test sequence as an executed action from a SUT state.

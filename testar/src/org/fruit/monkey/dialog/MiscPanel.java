@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
 import org.fruit.Pair;
@@ -47,8 +46,6 @@ import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
-import static org.fruit.monkey.dialog.ToolTipTexts.copyFilesTTT;
-import static org.fruit.monkey.dialog.ToolTipTexts.deleteFiles;
 
 public class MiscPanel extends JPanel {
 
@@ -72,11 +69,11 @@ public class MiscPanel extends JPanel {
     jScrollPane5.setViewportView(tblCopyFromTo);
 
     JLabel jLabel16 = new JLabel("Copy Files on SUT Startup:");
-    jLabel16.setToolTipText(copyFilesTTT);
+    jLabel16.setToolTipText(ToolTipTexts.getCopyFilesTTT());
     JLabel jLabel8 = new JLabel("Output Directory:");
     JLabel jLabel9 = new JLabel("Temp Directory:");
     JLabel jLabel20 = new JLabel("Delete Files on SUT Startup:");
-    jLabel20.setToolTipText(deleteFiles);
+    jLabel20.setToolTipText(ToolTipTexts.getDeleteFiles());
 
     JButton btnSetOutputDir = new JButton("Select");
     btnSetOutputDir.addActionListener(this::btnSetOutputDirActionPerformed);
@@ -147,7 +144,7 @@ public class MiscPanel extends JPanel {
     tblDelete.setModel(new javax.swing.table.DefaultTableModel(
         new Object[50][1], new String[]{"File / Directory"}) {
       private static final long serialVersionUID = 1L;
-      Class<?>[] types = new Class<?>[]{String.class};
+      private Class<?>[] types = new Class<?>[]{String.class};
 
       public Class<?> getColumnClass(int columnIndex) {
         return types[columnIndex];
@@ -166,7 +163,7 @@ public class MiscPanel extends JPanel {
         "Source File / Directory", "Destination"}
     ) {
       private static final long serialVersionUID = 1L;
-      Class<?>[] types = new Class<?>[]{String.class, String.class};
+      private Class<?>[] types = new Class<?>[]{String.class, String.class};
 
       public Class<?> getColumnClass(int columnIndex) {
         return types[columnIndex];

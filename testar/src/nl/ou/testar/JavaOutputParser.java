@@ -45,8 +45,7 @@ public class JavaOutputParser extends PrintStream{
     }
 
     @Override
-    public void print(String s)
-    {
+    public void print(String s) {
         // Still writing to the StdOut / Error as implemented in super
         super.print(s);
         // checking if the StdOut / Error contains the String we are looking for:
@@ -82,12 +81,12 @@ public class JavaOutputParser extends PrintStream{
     }
 
     /**
-     * Setter for stringToLookFound boolean
+     * Setter for stringToLookFound boolean.
      *
-     * @param stringToLookFound
+     * @param stringToLookFound true if string to look for is found
      */
     public void setStringToLookFound(boolean stringToLookFound) {
-        System.out.println("DEBUG: set stringToLookFound="+stringToLookFound);
+        System.out.println("DEBUG: set stringToLookFound=" + stringToLookFound);
         this.stringToLookFound = stringToLookFound;
     }
 

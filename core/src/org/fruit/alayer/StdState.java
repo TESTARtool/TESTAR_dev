@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,5 +36,7 @@ import java.util.Iterator;
 
 public class StdState extends StdWidget implements State {
   private static final long serialVersionUID = -1577816791038977163L;
-  public Iterator<Widget> iterator() { return new WidgetIterator(this); }
+  public Iterator<Widget> iterator() {
+    return new WidgetIterator(this);
+  }
 }

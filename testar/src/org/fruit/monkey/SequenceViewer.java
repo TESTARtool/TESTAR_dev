@@ -28,7 +28,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -71,13 +70,12 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 
-
 public class SequenceViewer extends javax.swing.JFrame{
 
   private static final long serialVersionUID = -7545369239319448135L;
-  ObjectInputStream stream;
-  BufferedImage buffer = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
-  int stateCount;
+  private ObjectInputStream stream;
+  private BufferedImage buffer = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
+  private int stateCount;
 
   private List<Taggable> cachedSequence;
   private int sequenceViewIndex;
@@ -121,7 +119,6 @@ public class SequenceViewer extends javax.swing.JFrame{
         g.drawImage(buffer, 0, 0, (int)(buffer.getWidth() * factor), (int)(buffer.getHeight() * factor), null);
       }
     };
-
 
     addComponentListener(new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
@@ -268,9 +265,9 @@ public class SequenceViewer extends javax.swing.JFrame{
       img = awtc;
     }
 
-    if (img.width() != buffer.getWidth() || img.height() != buffer.getHeight())
+    if (img.width() != buffer.getWidth() || img.height() != buffer.getHeight()) {
       buffer = new BufferedImage((int)img.width(), (int)img.height(), BufferedImage.TYPE_INT_ARGB);
-
+    }
     AWTCanvas cv = new AWTCanvas(0.0, 0.0, buffer, AWTCanvas.StorageFormat.PNG, 1);
     cv.begin();
     img.paint(cv, Rect.from(0, 0, img.width(), img.height()), Rect.from(0, 0, cv.width(), cv.height()));
@@ -323,9 +320,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 
   public void beginPic() throws IOException, ClassNotFoundException{
     synchronized(cachedSequence) {
-      if (sequenceViewIndex <= 0)
+      if (sequenceViewIndex <= 0) {
         return; // next must be invoked first!
-
+      }
       int steps = sequenceViewIndex;
       sequenceViewIndex = 0;
       movePic(cachedSequence.get(sequenceViewIndex),-steps);
@@ -334,9 +331,9 @@ public class SequenceViewer extends javax.swing.JFrame{
 
   public void prevPic() throws IOException, ClassNotFoundException{
     synchronized(cachedSequence) {
-      if (sequenceViewIndex <= 0)
+      if (sequenceViewIndex <= 0) {
         return; // next must be invoked first!
-
+      }
       sequenceViewIndex--;
       movePic(cachedSequence.get(sequenceViewIndex),DIRECTION_PREVIOUS);
     }
@@ -353,14 +350,16 @@ public class SequenceViewer extends javax.swing.JFrame{
 
       Taggable fragment = null;
 
-      if (sequenceViewIndex < cachedSequence.size() - 1)
+      if (sequenceViewIndex < cachedSequence.size() - 1) {
         fragment = cachedSequence.get(sequenceViewIndex + 1);
-      else {
+      } else {
         //This try catch is used for the case of reaching the end of the fragment
         try {
           fragment = (Taggable) stream.readObject();
           cachedSequence.add(fragment);
-        } catch (IOException ioe) { return; }
+        } catch (IOException ioe) {
+          return;
+        }
       }
 
       sequenceViewIndex++;
@@ -389,9 +388,13 @@ public class SequenceViewer extends javax.swing.JFrame{
           cachedSequence.add(fragment);
           steps++;
           sequenceViewIndex++;
-        }while (true); // til end of file
+        } while (true); // till end of file
       } catch (IOException ioe) { // end of file reached?
-        movePic(fragment == null ? cachedSequence.get(sequenceViewIndex): fragment, steps);
+        if (fragment == null) {
+          movePic(cachedSequence.get(sequenceViewIndex), steps);
+        } else {
+          movePic(fragment, steps);
+        }
       }
     }
   }
@@ -400,7 +403,7 @@ public class SequenceViewer extends javax.swing.JFrame{
     lblInfo.setText("State: " + Integer.toString(stateCount) + "  Action: " + actionText);
   }
 
-  Settings settings;
+  private Settings settings;
 
   // prevent thread finish while dialog is visible
   private void run() {

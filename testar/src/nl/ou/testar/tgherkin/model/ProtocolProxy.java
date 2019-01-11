@@ -84,5 +84,3 @@ public interface ProtocolProxy {
    */
   int getActionCount();
 }
-
-

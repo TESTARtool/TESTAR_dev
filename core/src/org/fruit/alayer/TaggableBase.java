@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -50,8 +49,9 @@ public class TaggableBase implements Taggable, Serializable {
 
   public final <T> T get(Tag<T> tag) throws NoSuchTagException {
     T ret = get(tag, null);
-    if (ret == null)
+    if (ret == null) {
       throw new NoSuchTagException(tag);
+    }
     return ret;
   }
 
@@ -70,20 +70,26 @@ public class TaggableBase implements Taggable, Serializable {
     Set<Tag<?>> ret =new HashSet<Tag<?>>();
 
     if (!allFetched) {
-      for (Tag<?> t: tagDomain())
+      for (Tag<?> t: tagDomain()) {
         get(t, null);
+      }
       allFetched = true;
     }
 
     for (Tag<?> t: tagValues.keySet()) {
-      if (tagValues.get(t) != null)
+      if (tagValues.get(t) != null) {
         ret.add(t);
+      }
     }
     return ret;
   }
 
-  protected <T> T fetch(Tag<T> tag) { return null; }
-  protected Set<Tag<?>> tagDomain() { return Collections.emptySet(); }
+  protected <T> T fetch(Tag<T> tag) {
+    return null;
+  }
+  protected Set<Tag<?>> tagDomain() {
+    return Collections.emptySet();
+  }
 
   public <T> void set(Tag<T> tag, T value) {
     Assert.notNull(tag, value);
@@ -91,5 +97,7 @@ public class TaggableBase implements Taggable, Serializable {
     tagValues.put(tag, value);
   }
 
-  public void remove(Tag<?> tag) { tagValues.put(Assert.notNull(tag), null); }
+  public void remove(Tag<?> tag) {
+    tagValues.put(Assert.notNull(tag), null);
+  }
 }

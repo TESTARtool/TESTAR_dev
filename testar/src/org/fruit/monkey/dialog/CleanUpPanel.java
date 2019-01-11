@@ -14,6 +14,8 @@ import org.fruit.monkey.Settings;
 public class CleanUpPanel extends JPanel {
   private static final String OUTPUT_TYPE_LOG = ".log";
   private static final String OUTPUT_TYPE_CSV = ".csv";
+
+  private static final double BASICGAP_LINES = 3.5;
   private static final int GAP_X = 20;
   private static final int HOOGTE = 20;
   private static final int BREEDTE = 192;
@@ -37,6 +39,56 @@ public class CleanUpPanel extends JPanel {
   public CleanUpPanel() {
   }
 
+  private void setDirs() {
+    settingsDirs = new File(rootSettingsFolderName).list(new FilenameFilter() {
+      @Override
+      public boolean accept(File current, String name) {
+        return !name.toLowerCase().endsWith(OUTPUT_TYPE_LOG);
+      }
+    });
+    this.numSettingsDirs = settingsDirs.length;
+
+    outputDirs = new File(rootOutputFolderName).list(new FilenameFilter() {
+      @Override
+      public boolean accept(File current, String name) {
+        return !name.toLowerCase().endsWith(OUTPUT_TYPE_CSV);
+      }
+    });
+    this.numOutputDirs = outputDirs.length;
+  }
+
+  private void deleteButton() {
+    // delete button
+    btnDelete = new JButton("Confirm deletion");
+    btnDelete.setBounds(
+        START_SETTINGS_X + GAP_X + BREEDTE,
+        START_Y + (numSettingsDirs - 1) * DELTA, BREEDTE,
+        2 * HOOGTE);
+    btnEmpty = new JButton("No files to delete");
+    btnEmpty.setBounds(
+        START_SETTINGS_X + GAP_X + BREEDTE,
+        START_Y + (numSettingsDirs - 1) * DELTA, BREEDTE,
+        2 * HOOGTE);
+  }
+
+  private void setEnabledAndVisible() {
+
+    boolean settingsBool = setupSettingsDirs();
+    boolean outputBool = setupOutputDirs();
+
+    if (settingsBool && outputBool) {
+      btnDelete.setEnabled(false);
+      btnDelete.setVisible(false);
+      btnEmpty.setEnabled(true);
+      btnEmpty.setVisible(true);
+    } else {
+      btnDelete.setEnabled(true);
+      btnDelete.setVisible(true);
+      btnEmpty.setEnabled(false);
+      btnEmpty.setVisible(false);
+    }
+  }
+
   /**
    * Populate CleanUp Fields from Settings structure.
    *
@@ -50,7 +102,7 @@ public class CleanUpPanel extends JPanel {
     JLabel titel = new JLabel("Check the folder(s) you want to empty");
     titel.setBounds(
         START_SETTINGS_X - GAP_X,
-        START_Y - (int) (3.5  * DELTA),
+        START_Y - (int) (BASICGAP_LINES  * DELTA),
         (int) (1.5 * BREEDTE),
         HOOGTE);
     add(titel);
@@ -67,50 +119,9 @@ public class CleanUpPanel extends JPanel {
     outputLabel.setBounds(START_OUTPUT_X - 2 * GAP_X, START_Y - 2 * DELTA, BREEDTE, HOOGTE);
     add(outputLabel);
 
-    settingsDirs = new File(rootSettingsFolderName).list(new FilenameFilter() {
-      @Override
-      public boolean accept(File current, String name) {
-        return !name.toLowerCase().endsWith(OUTPUT_TYPE_LOG);
-      }
-    });
-    this.numSettingsDirs = settingsDirs.length;
-
-    outputDirs = new File(rootOutputFolderName).list(new FilenameFilter() {
-      @Override
-      public boolean accept(File current, String name) {
-        return !name.toLowerCase().endsWith(OUTPUT_TYPE_CSV);
-      }
-    });
-    this.numOutputDirs = outputDirs.length;
-
-    // delete button
-    btnDelete = new JButton("Confirm deletion");
-    btnDelete.setBounds(
-        START_SETTINGS_X + GAP_X + BREEDTE,
-        START_Y + (numSettingsDirs - 1) * DELTA,
-        BREEDTE,
-        2 * HOOGTE);
-    btnEmpty = new JButton("No files to delete");
-    btnEmpty.setBounds(
-        START_SETTINGS_X + GAP_X + BREEDTE,
-        START_Y + (numSettingsDirs - 1) * DELTA,
-        BREEDTE,
-        2 * HOOGTE);
-
-    boolean settingsBool = setupSettingsDirs();
-    boolean outputBool = setupOutputDirs();
-
-    if (settingsBool && outputBool) {
-      btnDelete.setEnabled(false);
-      btnDelete.setVisible(false);
-      btnEmpty.setEnabled(true);
-      btnEmpty.setVisible(true);
-    } else {
-      btnDelete.setEnabled(true);
-      btnDelete.setVisible(true);
-      btnEmpty.setEnabled(false);
-      btnEmpty.setVisible(false);
-    }
+    setDirs();
+    deleteButton();
+    setEnabledAndVisible();
 
     btnDelete.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent evt) {
@@ -124,7 +135,6 @@ public class CleanUpPanel extends JPanel {
   private boolean setupSettingsDirs() {
     int emptyAll = 0;
     settingsBox = new JCheckBox[numSettingsDirs + 2];
-
     // root folder
     settingsBox[0] = new JCheckBox("root");
     settingsBox[0].setBounds(START_SETTINGS_X, START_Y, BREEDTE, HOOGTE);
@@ -134,7 +144,6 @@ public class CleanUpPanel extends JPanel {
     } else {
       settingsBox[0].setEnabled(true);
     }
-
     // sub folders
     for (int i = 1; i < numSettingsDirs + 1; i++) {
       settingsBox[i] = new JCheckBox(settingsDirs[i - 1]);
@@ -191,7 +200,6 @@ public class CleanUpPanel extends JPanel {
     for (int i = 1; i < numOutputDirs + 1; i++) {
       outputBox[i] = new JCheckBox(outputDirs[i - 1]);
       outputBox[i].setBounds(START_OUTPUT_X, START_Y + i * DELTA, BREEDTE, HOOGTE);
-
       if (isEmptyOutputDir(i)) {
         outputBox[i].setEnabled(false);
         emptyAll++;
@@ -204,7 +212,6 @@ public class CleanUpPanel extends JPanel {
     outputBox[numOutputDirs + 1] = new JCheckBox("Select all");
     outputBox[numOutputDirs + 1]
         .setBounds(START_OUTPUT_X - GAP_X, START_Y - DELTA, BREEDTE, HOOGTE);
-
     boolean empty = (emptyAll == numOutputDirs + 1);
     if (empty) {
       outputBox[numOutputDirs + 1].setEnabled(false);
@@ -438,4 +445,3 @@ public class CleanUpPanel extends JPanel {
     }
   }
 }
-

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -56,8 +55,9 @@ public final class DynWidgetDesc implements UnFunc<SUT, String>, Serializable {
     Assert.notNull(s);
     Widget w = finder.apply(s.get(Tags.SystemState));
     Object[] tagValues = new Object[tags.length];
-    for (int i = 0; i < tags.length; i++)
+    for (int i = 0; i < tags.length; i++) {
       tagValues[i] = w.get(tags[i], null);
+    }
     return String.format(formatString, tagValues);
   }
 }

@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package es.upv.staq.testar;
 
 import java.io.File;

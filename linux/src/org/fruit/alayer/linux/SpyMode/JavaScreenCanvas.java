@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.SpyMode;
 
 import org.fruit.Assert;
@@ -38,25 +37,20 @@ import org.fruit.alayer.Pen;
 import javax.swing.*;
 import java.awt.*;
 
-
 public class JavaScreenCanvas implements Canvas {
-
 
     //region Global variables
 
-
+    private static final double TEXT_LENGTH = 20.;
     private boolean _running;
     private DrawingPane _paneReference;
     private JFrame _frameReference;
 
     //endregion
 
-
     //region Canvas implementation
 
-
     //region Properties
-
 
     private double _width;
     @Override
@@ -64,13 +58,11 @@ public class JavaScreenCanvas implements Canvas {
         return _width;
     }
 
-
     private double _height;
     @Override
     public double height() {
         return _height;
     }
-
 
     private double _x;
     @Override
@@ -78,13 +70,11 @@ public class JavaScreenCanvas implements Canvas {
         return _x;
     }
 
-
     private double _y;
     @Override
     public double y() {
         return _y;
     }
-
 
     private Pen _defaultPen;
     @Override
@@ -92,33 +82,29 @@ public class JavaScreenCanvas implements Canvas {
         return _defaultPen;
     }
 
-
     //endregion
-
 
     @Override
     public void begin() {
         runningCheck();
     }
 
-
     @Override
     public void end() {
         // Not much to do here.
     }
 
-
     @Override
     public void release() {
 
-        if (!_running)
+        if (!_running) {
             return;
+        }
         _running = false;
 
         _frameReference.setVisible(false);
 
     }
-
 
     /**
      * Creates a pair of values for a text, most likely: a letter width of 2 and a height of 20.
@@ -129,9 +115,8 @@ public class JavaScreenCanvas implements Canvas {
     @Override
     public Pair<Double, Double> textMetrics(Pen pen, String text) {
         Assert.notNull(pen, text);
-        return Pair.from(text.length() * 2., 20.);
+        return Pair.from(text.length() * 2., TEXT_LENGTH);
     }
-
 
     /**
      * Clears the drawing area.
@@ -149,7 +134,6 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
-
     @Override
     public void line(Pen pen, double x1, double y1, double x2, double y2) {
 
@@ -158,7 +142,6 @@ public class JavaScreenCanvas implements Canvas {
         _paneReference.addDrawableContent(new DrawableLine(new Point(new Double(x1).intValue(), new Double(y1).intValue()), pen, _defaultPen, new Point(new Double(x2).intValue(), new Double(y2).intValue())));
 
     }
-
 
     @Override
     public void text(Pen pen, double x, double y, double angle, String text) {
@@ -169,7 +152,6 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
-
     @Override
     public void ellipse(Pen pen, double x, double y, double width, double height) {
 
@@ -179,7 +161,6 @@ public class JavaScreenCanvas implements Canvas {
                 new Rectangle(new Double(x).intValue(), new Double(y).intValue(), new Double(width).intValue(), new Double(height).intValue())));
 
     }
-
 
     @Override
     public void triangle(Pen pen, double x1, double y1, double x2, double y2, double x3, double y3) {
@@ -196,7 +177,6 @@ public class JavaScreenCanvas implements Canvas {
         throw new UnsupportedOperationException();
     }
 
-
     @Override
     public void rect(Pen pen, double x, double y, double width, double height) {
 
@@ -207,15 +187,11 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
-
     //endregion
-
 
     //region Constructors
 
-
     private JavaScreenCanvas(int x, int y, int width, int height, Pen defaultPen) {
-
 
         Assert.notNull(defaultPen);
         Assert.isTrue(width >= 0 && height >= 0);
@@ -228,17 +204,14 @@ public class JavaScreenCanvas implements Canvas {
 
         EventQueue.invokeLater(() -> {
 
-
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
                 ex.printStackTrace();
             }
 
-
             // Set a title for reference.
             _frameReference = new JFrame("Testar - Spy window");
-
 
             // No title bar, no task bar, always on top.
             _frameReference.setUndecorated(true);
@@ -246,41 +219,32 @@ public class JavaScreenCanvas implements Canvas {
             _frameReference.setAlwaysOnTop(true);
             _frameReference.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
             // Make the window invisible.
             _frameReference.setBackground(new Color(0, 0, 0, 0));
-
 
             // Set the size and location.
             _frameReference.setLocation(x, y);
             _frameReference.setSize(width, height);
 
-
             // Add content.
             _paneReference = new DrawingPane();
             _frameReference.add(_paneReference);
-
 
             // frame.pack();
 
             _frameReference.setLocationRelativeTo(null);
             _frameReference.setVisible(true);
 
-
             // Signal the window is currently active.
             _running = true;
-
 
         });
 
     }
 
-
     //endregion
 
-
     //region Other necessary methods
-
 
     /**
      * Creates a window covering the primary monitor.
@@ -296,15 +260,14 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
-
     /**
      * Checks whether the Spy- window is showing. If not, it will throw an IllegalStateException.
      */
     private void runningCheck() {
-        if (!_running)
+        if (!_running) {
             throw new IllegalStateException();
+        }
     }
-
 
     /**
      * Called by GC to clean up this object.
@@ -313,12 +276,9 @@ public class JavaScreenCanvas implements Canvas {
         release();
     }
 
-
     //endregion
 
-
     //region Helper methods
-
 
     /**
      * Gets the bounds of the primary monitor.
@@ -346,8 +306,6 @@ public class JavaScreenCanvas implements Canvas {
 
     }
 
-
     //endregion
-
 
 }

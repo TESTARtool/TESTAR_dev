@@ -53,9 +53,9 @@ public class GenerateConstants {
       if (notFirst) {
         pWriter.println(";");
       }
-    }catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
-    }catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }finally {
       if (pWriter != null) {

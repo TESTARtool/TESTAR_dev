@@ -27,26 +27,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
 
 import java.util.Set;
 
 /**
  * Graph utility class.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class GraphUtil {
 
-	public static int getActionClusterCount(IEnvironment env, IGraphAction graphAction){
-		int cc = 1;
-		String absID = graphAction.getAbstractID();
-		Set<String> acluster = env.getGraphActionClusters().get(absID);
-		if (acluster != null)
-			return acluster.size();
-		return cc;
-	}	
-	
+  public static int getActionClusterCount(IEnvironment env, IGraphAction graphAction) {
+    int cc = 1;
+    String absID = graphAction.getAbstractID();
+    Set<String> acluster = env.getGraphActionClusters().get(absID);
+    if (acluster != null)
+      return acluster.size();
+    return cc;
+  }
+
 }

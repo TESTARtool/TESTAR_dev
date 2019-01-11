@@ -28,14 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 /*
  *  @author Sebastian Bauersfeld
  */
 package org.fruit.alayer.devices;
 
-public enum KBKeys
-{
+public enum KBKeys {
   KEY_FIRST(2400, 400),
   KEY_LAST(2402, 402),
   KEY_TYPED(2400, 400),
@@ -205,29 +203,24 @@ public enum KBKeys
   private final int scanCode;
   private final int keyCode;
 
-  private KBKeys (int scanCode, int keyCode)
-  {
+  KBKeys (int scanCode, int keyCode) {
     this.scanCode = scanCode;
     this.keyCode = keyCode;
   }
 
-  public int code ()
-  {
+  public int code () {
     return keyCode;
   }
 
-  public int scanCode ()
-  {
+  public int scanCode () {
     return scanCode;
   }
 
-  public static boolean contains (String s)
-  {
+  public static boolean contains (String s) {
     try {
       KBKeys.valueOf(s);
       return true;
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       return false;
     }
   }

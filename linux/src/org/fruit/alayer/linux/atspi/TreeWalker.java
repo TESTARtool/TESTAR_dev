@@ -27,25 +27,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
-
-
-import org.fruit.alayer.linux.AtSpiState;
-import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
-import org.fruit.alayer.linux.atspi.enums.AtSpiStateTypes;
-import org.fruit.alayer.linux.util.xdotools;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
+import org.fruit.alayer.linux.atspi.enums.AtSpiStateTypes;
+import org.fruit.alayer.linux.util.xdotools;
 import java.util.Objects;
-
 
 /**
  * Class to help with creating and traversing AtSpi trees/ nodes.
  */
 public class TreeWalker {
-
 
     /**
      * Gets AtSpiAccessible nodes representing an application with the supplied name.
@@ -56,7 +50,6 @@ public class TreeWalker {
         return getApplicationNodes(applicationName, false);
     }
 
-
     /**
      * Gets AtSpiAccessible nodes representing an application with the supplied name.
      * @param applicationName The name of the application to get the AtSpiAccessible nodes for.
@@ -65,23 +58,18 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> getApplicationNodes(String applicationName, boolean createTree) {
 
-
         // The list that will hold the requested application nodes.
         ArrayList<AtSpiAccessible> applicationNodes = new ArrayList<>();
-
 
         // Get a pointer to the desktop accessible object.
         long desktopPointer = LibAtSpi.atspi_get_desktop(0);
 
-
         // Create an AtSpiAccessible object from the pointer.
         AtSpiAccessible desktopNode = AtSpiAccessible.CreateInstance(desktopPointer);
-
 
         if (applicationName.endsWith(".jar")) {
             applicationName = applicationName.replace(".jar", "");
         }
-
 
         if (desktopNode != null) {
 
@@ -97,7 +85,6 @@ public class TreeWalker {
 
         }
 
-
         // Get all children for each application node - making it the root of a tree.
         if (createTree) {
             for (AtSpiAccessible appplicationNode: applicationNodes) {
@@ -105,12 +92,9 @@ public class TreeWalker {
             }
         }
 
-
         return applicationNodes;
 
-
     }
-
 
     /**
      * Finds the application node belonging to the application with the supplied application name and PID.
@@ -122,7 +106,6 @@ public class TreeWalker {
         return findApplicationNode(getApplicationNodes(applicationName), pid);
     }
 
-
     /**
      * Finds the application node belonging to the application with the supplied PID.
      * @param applicationNodes A list of application nodes (most likely from likely named application) that should
@@ -132,27 +115,21 @@ public class TreeWalker {
      */
     public static AtSpiAccessible findApplicationNode(List<AtSpiAccessible> applicationNodes, long pid) {
 
-
         if (applicationNodes == null) {
             throw new IllegalArgumentException("The application nodes list cannot be null.");
         }
-
 
         if (pid <= 0) {
             throw new IllegalArgumentException("The PID of an applicaiton cannot be equal to or less than zero.");
         }
 
-
-
         if (applicationNodes.size() == 0) {
             System.out.println("Could not find a single running application by the supplied name.");
         }
 
-
         // Activate each application through AT-SPI and find the PID for each active application through xdotool.
         // Once verified that the node activated the instance of the application launched by us - stop.
         for (AtSpiAccessible application: applicationNodes) {
-
 
             // Activate application.
             if (TreeWalker.activateApplication(application)) {
@@ -164,31 +141,24 @@ public class TreeWalker {
                     e.printStackTrace();
                 }
 
-
                 // Retrieve PID through xdotool.
                 int activePID = xdotools.getPIDFromActiveWindow();
-
 
                 // Check if the PID matches the PID of the process we're supposed to activate.
                 if (pid == activePID) {
                     return application;
                 }
 
-
             } else {
                 System.out.println("Cannot activate an application with the same name - continuing loop...");
             }
 
-
         }
-
 
         System.out.println("Cannot find an application node in the list belonging to an application with PID '" + pid + "'.");
         return null;
 
-
     }
-
 
     /**
      * Retrieves the application that is currently active from the supplied list of application nodes.
@@ -197,11 +167,9 @@ public class TreeWalker {
      */
     public static AtSpiAccessible getActiveApplicationNode(List<AtSpiAccessible> applicationNodes) {
 
-
         if (applicationNodes == null) {
             throw new IllegalArgumentException("The application nodes list argument cannot be null.");
         }
-
 
         for (AtSpiAccessible application: applicationNodes) {
             if (isApplicationActive(application)) {
@@ -210,13 +178,10 @@ public class TreeWalker {
             }
         }
 
-
         // Active application is not one of the supplied applications.
         return null;
 
-
     }
-
 
     /**
      * Activates an application by focusing a focusable element.
@@ -225,15 +190,12 @@ public class TreeWalker {
      */
     public static boolean activateApplication(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
 
-
         // Find a child element that can be focused.
         AtSpiAccessible focusableNode = findFocusable(applicationNode);
-
 
         if (focusableNode == null) {
             System.out.println("Could not find a focusable application element node for '" + applicationNode.name() + "'.");
@@ -245,13 +207,10 @@ public class TreeWalker {
             return false;
         }
 
-
         // Focus the element and with it activate the application.
         return focusableNode.component().grabFocus();
 
-
     }
-
 
     /**
      * Determines whether an application is active.
@@ -260,11 +219,9 @@ public class TreeWalker {
      */
     public static boolean isApplicationActive(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
-
 
         // Check the children - Check all for the frame role and active state.
         for (AtSpiAccessible child: applicationNode.children()) {
@@ -275,9 +232,7 @@ public class TreeWalker {
 
         return false;
 
-
     }
-
 
     /**
      * Determines if an application has modal windows open.
@@ -286,11 +241,9 @@ public class TreeWalker {
      */
     public static boolean hasApplicationModalDialogs(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
-
 
         // Check the children - this could be frames, windows or modal dialogs - check if one is of them is modal.
         for (AtSpiAccessible child: applicationNode.children()) {
@@ -303,12 +256,9 @@ public class TreeWalker {
 
         }
 
-
         return false;
 
-
     }
-
 
     /**
      * Retrieves a list of non-modal application child nodes - it will only process the direct children of the
@@ -318,14 +268,11 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> getNonModalApplicationChildNodes(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
 
-
         ArrayList<AtSpiAccessible> nonModals = new ArrayList<>();
-
 
         // Check the children - this could be frames, windows or modal dialogs - add the non-modals to the list.
         for (AtSpiAccessible child: applicationNode.children()) {
@@ -338,12 +285,9 @@ public class TreeWalker {
 
         }
 
-
         return nonModals;
 
-
     }
-
 
     /**
      * Retrieves a list of non-modal application child nodes - it will only process the direct children of the
@@ -353,14 +297,11 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> getModalApplicationChildNodes(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
 
-
         ArrayList<AtSpiAccessible> modals = new ArrayList<>();
-
 
         // Check the children - this could be frames, windows or modal dialogs - add the non-modals to the list.
         for (AtSpiAccessible child: applicationNode.children()) {
@@ -373,12 +314,9 @@ public class TreeWalker {
 
         }
 
-
         return modals;
 
-
     }
-
 
     /**
      * Retrieves a list of application child nodes - it will only process the direct children of the
@@ -388,14 +326,11 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> getApplicationWindowNodes(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
 
-
         ArrayList<AtSpiAccessible> windows = new ArrayList<>();
-
 
         // Check the children - this could be frames, windows or modal dialogs - add the windows, frames,dialogs
         // to the list. This could be optimized by filtering unwanted stuff by role if there is any.
@@ -409,12 +344,9 @@ public class TreeWalker {
 
         }
 
-
         return windows;
 
-
     }
-
 
     /**
      * Determines the bounding box of the application on the screen.
@@ -423,11 +355,9 @@ public class TreeWalker {
      */
     public static AtSpiRect getApplicationExtentsOnScreen(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
-
 
         // Check the children - should be only one? Check all for the frame role and active state in any case to be sure.
         for (AtSpiAccessible child: applicationNode.children()) {
@@ -436,11 +366,9 @@ public class TreeWalker {
             }
         }
 
-
         return new AtSpiRect();
 
     }
-
 
     /**
      * Finds nodes with a certain role in the supplied node (which should have been processed by a method that
@@ -451,14 +379,11 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> findNodesWithRole(AtSpiAccessible node, AtSpiRoles role) {
 
-
         ArrayList<AtSpiAccessible> nodesWithRole = new ArrayList<>();
-
 
         if (node.role() == role) {
             nodesWithRole.add(node);
         }
-
 
         if (node.childCount() > 0) {
             for (AtSpiAccessible a: node.children()) {
@@ -468,11 +393,9 @@ public class TreeWalker {
             }
         }
 
-
         return nodesWithRole;
 
     }
-
 
     /**
      *
@@ -488,7 +411,6 @@ public class TreeWalker {
 
     }
 
-
     /**
      * Tries to find a focusable element of an AtSpiAccessible application child node.
      * @param applicationNode Element to start from - which needs to be an AtSpiAccessible application node.
@@ -496,16 +418,13 @@ public class TreeWalker {
      */
     public static AtSpiAccessible findFocusableApplicationElementNode(AtSpiAccessible applicationNode) {
 
-
         if (applicationNode.role() != AtSpiRoles.Application) {
             throw new IllegalArgumentException("The application node should be an AtSpiAccessible with role 'Application'.");
         }
 
         return findFocusable(applicationNode);
 
-
     }
-
 
     /**
      * Tries to find a focusable element.
@@ -514,11 +433,9 @@ public class TreeWalker {
      */
     private static AtSpiAccessible findFocusable(AtSpiAccessible root) {
 
-
         if (root.states().isFocusable() && root.component() != null) {
             return root;
         }
-
 
         for (AtSpiAccessible a: root.children()) {
 
@@ -541,7 +458,6 @@ public class TreeWalker {
 
     }
 
-
     /**
      * Creates an AtSpiAccessible object with all of its descendants available to be able to be browsed as a tree.
      * @param accessiblePtrStart Pointer to an AtSpiAccessible object where the tree will start.
@@ -550,16 +466,13 @@ public class TreeWalker {
      */
     public static AtSpiAccessible createAccessibleTree(long accessiblePtrStart, boolean fillInfo) {
 
-
         AtSpiAccessible parent = AtSpiAccessible.CreateInstance(accessiblePtrStart);
 
         createAccessibleTree(parent, fillInfo);
 
         return parent;
 
-
     }
-
 
     /**
      * Creates an AtSpiAccessible object with all of its descendants available to be able to be browsed as a tree.
@@ -571,7 +484,5 @@ public class TreeWalker {
             root.createTree(fillInfo);
         }
     }
-
-
 
 }

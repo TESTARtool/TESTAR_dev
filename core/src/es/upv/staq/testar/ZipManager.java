@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import java.io.ByteArrayInputStream;
@@ -67,8 +66,9 @@ public class ZipManager {
 
   public static Object compress(Object o) {
     byte[] bytes = ZipManager.convertToBytes(o);
-    if (bytes == null)
+    if (bytes == null) {
       return o;
+    }
     try {
       Deflater def = new Deflater(Deflater.BEST_COMPRESSION);
       def.setInput(bytes);

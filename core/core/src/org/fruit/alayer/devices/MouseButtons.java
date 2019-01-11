@@ -33,11 +33,11 @@
 package org.fruit.alayer.devices;
 
 public enum MouseButtons {
-	BUTTON1(16), BUTTON2(8), BUTTON3(4);
+  BUTTON1(16), BUTTON2(8), BUTTON3(4);
 
-	private final int code;
-	private MouseButtons(int code) {
-		this.code = code;
-	}
-	public int code(){ return code; }
+  private final int code;
+  private MouseButtons(int code) {
+    this.code = code;
+  }
+  public int code() { return code; }
 }

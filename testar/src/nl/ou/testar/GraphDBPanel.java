@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import org.fruit.monkey.ConfigTags;
@@ -91,7 +90,7 @@ public class GraphDBPanel extends JPanel {
 
     /**
      * Populate GraphDBFields from Settings structure.
-     * @param settings The settings to load.
+     * @param settings The settings to load
      */
     public void populateFrom(final Settings settings) {
         graphDBEnabledChkBox.setSelected(settings.get(ConfigTags.GraphDBEnabled));
@@ -102,7 +101,7 @@ public class GraphDBPanel extends JPanel {
 
     /**
      * Retrieve information from the GraphDB GUI.
-     * @param settings reference to the object where the settings will be stored.
+     * @param settings reference to the object where the settings will be stored
      */
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.GraphDBEnabled, graphDBEnabledChkBox.isSelected());

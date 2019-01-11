@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +69,6 @@ public class GraphDB implements GraphDBRepository {
             repository.addState(state,isInitial);
         }
     }
-
 
     /**
      * Add Widget to the graph database. A widget will be identified by it's concrete id.

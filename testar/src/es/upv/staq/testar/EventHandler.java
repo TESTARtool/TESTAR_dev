@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import org.fruit.alayer.devices.KBKeys;
@@ -80,22 +79,24 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 
   @Override
   public final void nativeMousePressed(NativeMouseEvent arg0) {
-    if (arg0.getButton() == 1)
+    if (arg0.getButton() == 1) {
       eventListener.mouseDown(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
-    else if (arg0.getButton() == 2)
+    } else if (arg0.getButton() == 2) {
       eventListener.mouseDown(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
-    else if (arg0.getButton() == 3)
+    } else if (arg0.getButton() == 3) {
       eventListener.mouseDown(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
+    }
   }
 
   @Override
   public final void nativeMouseReleased(NativeMouseEvent arg0) {
-    if (arg0.getButton() == 1)
+    if (arg0.getButton() == 1) {
       eventListener.mouseUp(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
-    else if (arg0.getButton() == 2)
+    } else if (arg0.getButton() == 2) {
       eventListener.mouseUp(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
-    else if (arg0.getButton() == 3)
+    } else if (arg0.getButton() == 3) {
       eventListener.mouseUp(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
+    }
   }
 
   // #########################################

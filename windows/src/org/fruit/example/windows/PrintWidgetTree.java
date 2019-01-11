@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -63,9 +62,9 @@ public class PrintWidgetTree {
     // print the role of each widget and a short description
     for (Widget widget: state) {
       // indent
-      for (int i = 0; i < Util.depth(widget); i++)
+      for (int i = 0; i < Util.depth(widget); i++) {
         System.out.print("  ");
-
+      }
       // print widget info
       System.out.printf("%s  %s\n",
           widget.get(Role, Roles.Widget),

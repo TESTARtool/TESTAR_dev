@@ -34,5 +34,5 @@
 package org.fruit;
 
 public interface Proc {
-	void run();
+  void run();
 }

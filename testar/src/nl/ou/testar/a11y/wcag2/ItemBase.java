@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.io.Serializable;
@@ -88,7 +87,11 @@ abstract class ItemBase implements Serializable {
    * @return This item's number as a String
    */
   public String getNr() {
-    return parent == null ? Integer.toString(nr): parent.getNr() + "." + nr;
+    if (parent == null) {
+      return  Integer.toString(nr) + "." + nr;
+    } else {
+      return parent.getNr() + "." + nr;
+    }
   }
 
   /**

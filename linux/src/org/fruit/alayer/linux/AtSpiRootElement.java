@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
-
 
 import org.fruit.Util;
 
@@ -38,36 +36,27 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 
-
 /**
  * Represents an AT-SPI root (application) node that can be used by Testar.
  */
 public class AtSpiRootElement extends AtSpiElement {
 
-
     //region Properties
-
 
     long pid, timeStamp;
 
-
     boolean isRunning, isActive, hasStandardMouse, hasStandardKeyboard;
-
 
     /**
      * Contains a mapping of AtSpiAccessible pointers and their corresponding AtSpiElements.
      */
     transient Map<Long, AtSpiElement> pointerMap;
 
-
     AtSpiElementMap topLevelContainerMap;
-
 
     //endregion
 
-
     //region Constructor
-
 
     /**
      * Default constructor.
@@ -81,13 +70,9 @@ public class AtSpiRootElement extends AtSpiElement {
 
     }
 
-
     //endregion
 
-
-
     //region Other needed functionality - Used by AtSpiHitTester
-
 
     /**
      * Determines whether an element encompasses a point on the screen.
@@ -98,16 +83,13 @@ public class AtSpiRootElement extends AtSpiElement {
      */
     boolean visibleAt(AtSpiElement element, double x, double y) {
 
-
         // The element doesn't encompass the point on the screen.
         if (element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
             return false;
         }
 
-
         // Get the top level container encompassing the hit test point.
         AtSpiElement topLevelContainer = topLevelContainerMap.at(x, y);
-
 
         // Top level containers always have z-index of 0 (I think) - checks if element is obscured by children
         // or a top level container.
@@ -115,7 +97,6 @@ public class AtSpiRootElement extends AtSpiElement {
                 !obscuredByChildren(element, x, y);
 
     }
-
 
     /**
      * Determines whether an element encompasses a point on the screen.
@@ -127,23 +108,19 @@ public class AtSpiRootElement extends AtSpiElement {
      */
     boolean visibleAt(AtSpiElement element, double x, double y, boolean obscuredByChildFeature) {
 
-
         // The element doesn't encompass the point on the screen.
         if (element.boundingBoxOnScreen == null || !element.boundingBoxOnScreen.contains(x, y) || !this.boundingBoxOnScreen.contains(x, y)) {
             return false;
         }
 
-
         // Get the top level container encompassing the hit test point.
         AtSpiElement topLevelContainer = topLevelContainerMap.at(x, y);
-
 
         // Top level containers always have z-index of 0 (I think) - checks if element is obscured by children
         // or a top level container.
         return (topLevelContainer == null || topLevelContainer.zIndex <= element.zIndex ||
                 !obscuredByChildFeature || !obscuredByChildren(element, x, y));
     }
-
 
     /**
      * Determines whether an element is obscured by a child at a certain point on the screen.
@@ -162,27 +139,20 @@ public class AtSpiRootElement extends AtSpiElement {
                 return true;
             }
 
-
         }
 
         return false;
 
     }
 
-
     //endregion
 
-
     //region Serializable functionality
-
 
     // Used to determine the class during serialization.
     private static final long serialVersionUID = 456852951753L;
 
-
     // Most likely used to serialize and deserialize an instance of this class - don't know if this is used by Testar though.
-
-
 
     /**
      * Serialize an instance of this object.
@@ -192,7 +162,6 @@ public class AtSpiRootElement extends AtSpiElement {
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }
-
 
     /**
      * Deserialize an instance of this object.
@@ -204,20 +173,15 @@ public class AtSpiRootElement extends AtSpiElement {
         ois.defaultReadObject();
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
         return "PID: " + pid + " - Running: " + isRunning + " - Active: " + isActive + " - Children: " + children.size();
     }
 
-
     //endregion
-
 
 }

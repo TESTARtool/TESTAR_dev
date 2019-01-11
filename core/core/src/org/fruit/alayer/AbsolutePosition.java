@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -38,12 +37,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FRUIT is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FRUIT.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -53,13 +52,13 @@ package org.fruit.alayer;
 import org.fruit.Assert;
 
 public final class AbsolutePosition extends AbstractPosition {
-	private static final long serialVersionUID = -6784500620656208720L;
-	private final Point p;
-	public AbsolutePosition(double x, double y){ p = Point.from(x, y); }
-	public AbsolutePosition(Point point){
-		Assert.notNull(point);
-		p = point;
-	}
-	public Point apply(State state){ return p; }
-	public String toString(){ return p.toString(); }
+  private static final long serialVersionUID = -6784500620656208720L;
+  private final Point p;
+  public AbsolutePosition(double x, double y) { p = Point.from(x, y); }
+  public AbsolutePosition(Point point) {
+    Assert.notNull(point);
+    p = point;
+  }
+  public Point apply(State state) { return p; }
+  public String toString() { return p.toString(); }
 }

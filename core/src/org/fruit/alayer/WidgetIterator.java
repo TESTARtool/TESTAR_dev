@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -55,14 +54,19 @@ public final class WidgetIterator implements Iterator<Widget> {
     this.navi.run(this.buffer);
   }
 
-  public boolean hasNext() { return !buffer.isEmpty(); }
+  public boolean hasNext() {
+    return !buffer.isEmpty();
+  }
 
   public Widget next() {
     Widget ret = buffer.remove();
-    if (!buffer.isEmpty())
+    if (!buffer.isEmpty()) {
       navi.run(buffer);
+    }
     return ret;
   }
 
-  public void remove() { throw new UnsupportedOperationException(); }
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
 }

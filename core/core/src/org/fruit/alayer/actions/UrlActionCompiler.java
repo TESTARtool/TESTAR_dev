@@ -18,9 +18,9 @@ public class UrlActionCompiler extends StdActionCompiler {
   private Abstractor abstractor;
   private final Action LMouseDown = new MouseDown(MouseButtons.BUTTON1);
   private final Action LMouseUp = new MouseUp(MouseButtons.BUTTON1);
-    
-  public UrlActionCompiler() {  
-    this(new StdAbstractor()); 
+
+  public UrlActionCompiler() {
+    this(new StdAbstractor());
   }
 
   public UrlActionCompiler(Abstractor abstractor) {

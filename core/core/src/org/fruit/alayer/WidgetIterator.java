@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -40,29 +39,29 @@ import org.fruit.Assert;
 
 public final class WidgetIterator implements Iterator<Widget> {
 
-	private final LinkedList<Widget> buffer;
-	private final Navigator navi;
-	
-	public WidgetIterator(Widget start){
-		this(start, new BFNavigator());
-	}
+  private final LinkedList<Widget> buffer;
+  private final Navigator navi;
 
-	public WidgetIterator(Widget start, Navigator navi){
-		Assert.notNull(start, navi);
-		this.buffer = new LinkedList<Widget>();
-		this.navi = navi;
-		this.buffer.add(start);
-		this.navi.run(this.buffer);
-	}
+  public WidgetIterator(Widget start) {
+    this(start, new BFNavigator());
+  }
 
-	public boolean hasNext() { return !buffer.isEmpty(); }
+  public WidgetIterator(Widget start, Navigator navi) {
+    Assert.notNull(start, navi);
+    this.buffer = new LinkedList<Widget>();
+    this.navi = navi;
+    this.buffer.add(start);
+    this.navi.run(this.buffer);
+  }
 
-	public Widget next() {
-		Widget ret = buffer.remove();
-		if(!buffer.isEmpty())
-			navi.run(buffer);
-		return ret;
-	}
+  public boolean hasNext() { return !buffer.isEmpty(); }
 
-	public void remove() { throw new UnsupportedOperationException(); }
+  public Widget next() {
+    Widget ret = buffer.remove();
+    if (!buffer.isEmpty())
+      navi.run(buffer);
+    return ret;
+  }
+
+  public void remove() { throw new UnsupportedOperationException(); }
 }

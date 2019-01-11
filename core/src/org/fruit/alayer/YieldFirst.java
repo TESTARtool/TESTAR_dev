@@ -44,10 +44,13 @@ public final class YieldFirst implements UnFunc<Widget, SearchFlag> {
   }
 
   public Widget result() throws WidgetNotFoundException{
-    if (result == null)
+    if (result == null) {
       throw new WidgetNotFoundException();
+    }
     return result;
   }
 
-  public boolean hasResult() { return result != null; }
+  public boolean hasResult() {
+    return result != null;
+  }
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -81,8 +80,9 @@ public final class WinProcess extends SUTBase {
       Util.pause(foregroundEstablishTime);
     }
 
-    if (!isForeground(pid) && isRunning(pid))
+    if (!isForeground(pid) && isRunning(pid)) {
       throw new WinApiException("Unable to bring process to foreground!");
+    }
   }
 
   public static WinProcess fromPID(long pid) throws SystemStartException{
@@ -99,8 +99,9 @@ public final class WinProcess extends SUTBase {
   public static WinProcess fromProcName(String processName) throws SystemStartException{
     Assert.notNull(processName);
     for (WinProcHandle wph: runningProcesses()) {
-      if (processName.equals(wph.name()))
+      if (processName.equals(wph.name())) {
         return fromPID(wph.pid());
+      }
     }
     throw new SystemStartException("Process '" + processName + "' not found!");
   }
@@ -108,8 +109,9 @@ public final class WinProcess extends SUTBase {
   // by urueda
   public static List<SUT> fromAll() {
     List<WinProcHandle> processes = runningProcesses();
-    if (processes == null || processes.isEmpty())
+    if (processes == null || processes.isEmpty()) {
       return null;
+    }
     List<SUT> suts = new ArrayList<SUT>();
     for (WinProcHandle wph: processes) {
       try {
@@ -126,7 +128,7 @@ public final class WinProcess extends SUTBase {
       //Disabled with browsers, only allow it with desktop applications executed with command_line
       if (!ProcessListenerEnabled) {
 
-        long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
+        long[] handles = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
         long hProcess = handles[0];
         long hThread = handles[1];
         Windows.CloseHandle(hThread);
@@ -146,11 +148,11 @@ public final class WinProcess extends SUTBase {
 
       //TODO: WaitForInputIdle is not working with java app, investigate this issue.
       //TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
-      if (path.contains("java -jar"))
+      if (path.contains("java -jar")) {
         Util.pause(5);
-      else
+      } else {
         Windows.WaitForInputIdle(procHandle);
-
+      }
       long pid = Windows.GetProcessId(procHandle);
 
       WinProcess ret = fromPID(pid);
@@ -180,22 +182,18 @@ public final class WinProcess extends SUTBase {
       // Initialize COM library; fails if already initialized but ignore it.
       Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
 
-
       // Create COM object to launch UWP applications.
       if (pApplicationActivationManager == 0) {
         pApplicationActivationManager = Windows.CoCreateInstance(Windows.Get_CLSID_ApplicationActivationManager_Ptr(),
             0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IApplicationActivationManager_Ptr());
       }
 
-
       // Launch the application: it will return its PID.
       long pid = Windows.IApplicationActivationManager_ActivateApplication(pApplicationActivationManager,
           appUserModelId, EMPTY_STRING, ActivateOptions.AO_NOERRORUI.getValue());
 
-
       // Process handle to Core.
       long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION + Windows.PROCESS_TERMINATE, false, pid);
-
 
       // SUT startup time.
       try {
@@ -204,13 +202,11 @@ public final class WinProcess extends SUTBase {
         e.printStackTrace();
       }
 
-
       // After launch the application should be the foreground.
       long fHwnd = Windows.GetForegroundWindow();
       long framePid = Windows.GetWindowProcessId(fHwnd);
 
       long fhProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION + Windows.PROCESS_TERMINATE, false, framePid);
-
 
       // Create a process wrapper, set the description for the widget to the appUserModelId.
       WinProcess ret = new WinProcess(fhProcess, true);
@@ -255,8 +251,9 @@ public final class WinProcess extends SUTBase {
     long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION | Windows.PROCESS_VM_READ, false, pid);
     long[] hm = Windows.EnumProcessModules(hProcess);
     String ret = null;
-    if (hm.length == 0)
+    if (hm.length == 0) {
       throw new WinApiException("Unable to retrieve process name!");
+    }
     ret = Windows.GetModuleBaseName(hProcess, hm[0]);
     Windows.CloseHandle(hProcess);
     return ret;
@@ -265,14 +262,18 @@ public final class WinProcess extends SUTBase {
   public static List<WinProcHandle> runningProcesses() {
     List<WinProcHandle> ret = Util.newArrayList();
     for (long pid: Windows.EnumProcesses()) {
-      if (pid != 0)
+      if (pid != 0) {
         ret.add(new WinProcHandle(pid));
+      }
     }
     return ret;
   }
 
   /**
+   * Get the memory usage of a given window process.
    * by urueda
+   * @param wp the window process
+   * @return the memory usage of a given window process
    */
   public static long getMemUsage(WinProcess wp) {
     long pid = -1;
@@ -286,7 +287,10 @@ public final class WinProcess extends SUTBase {
   }
 
   /**
+   * Get the CPU usage of a given window process.
    * by urueda
+   * @param wp the window process
+   * @return the CPU usage of a given window process
    */
   public static long[] getCPUsage(WinProcess wp) {
     long pid = -1;
@@ -304,7 +308,7 @@ public final class WinProcess extends SUTBase {
   final Keyboard kbd = AWTKeyboard.build();
   final Mouse mouse = AWTMouse.build();
   final long pid;
-  transient static long pApplicationActivationManager; // by wcoux
+  static transient long pApplicationActivationManager; // by wcoux
 
   private WinProcess(long hProcess, boolean stopProcess) {
     this.hProcess = hProcess;
@@ -317,7 +321,6 @@ public final class WinProcess extends SUTBase {
     release(); // by wcoux
   }
 
-
   /**
    * @author: wcoux
    */
@@ -327,18 +330,17 @@ public final class WinProcess extends SUTBase {
       Windows.CoUninitialize();
       pApplicationActivationManager = 0;
     }
-    // begin by urueda
-    if (this.getNativeAutomationCache() != null)
+    if (this.getNativeAutomationCache() != null) {
       this.getNativeAutomationCache().releaseCachedAutomationElements();
-    // end by urueda
+    }
   }
-
 
   public void stop() throws SystemStopException {
     try {
       if (hProcess != 0) {
-        if (stopProcess)
+        if (stopProcess) {
           Windows.TerminateProcess(hProcess, 0);
+        }
         Windows.CloseHandle(hProcess);
         hProcess = 0;
       }
@@ -357,30 +359,34 @@ public final class WinProcess extends SUTBase {
   }
 
   public long pid() {
-    if (!isRunning())
+    if (!isRunning()) {
       throw new IllegalStateException();
+    }
     return Windows.GetProcessId(hProcess);
   }
 
-  public boolean isForeground() { return isForeground(pid()); }
-  public void toForeground() { toForeground(pid()); }
+  public boolean isForeground() {
+    return isForeground(pid());
+  }
+  public void toForeground() {
+    toForeground(pid());
+  }
 
   @SuppressWarnings("unchecked")
   protected <T> T fetch(Tag<T> tag) {
-    if (tag.equals(Tags.StandardKeyboard))
+    if (tag.equals(Tags.StandardKeyboard)) {
       return (T)kbd;
-    else if (tag.equals(Tags.StandardMouse))
+    } else if (tag.equals(Tags.StandardMouse)) {
       return (T)mouse;
-    else if (tag.equals(Tags.PID))
+    } else if (tag.equals(Tags.PID)) {
       return (T)(Long)pid;
-    // begin by urueda
-    else if (tag.equals(Tags.HANDLE))
+    } else if (tag.equals(Tags.HANDLE)) {
       return (T)(Long)hProcess;
-    // end by urueda
-    else if (tag.equals(Tags.ProcessHandles))
+    } else if (tag.equals(Tags.ProcessHandles)) {
       return (T)runningProcesses().iterator();
-    else if (tag.equals(Tags.SystemActivator))
+    } else if (tag.equals(Tags.SystemActivator)) {
       return (T) new WinProcessActivator(pid);
+    }
     return null;
   }
 
@@ -403,15 +409,14 @@ public final class WinProcess extends SUTBase {
     this.nativeAutomationCache = new AutomationCache() {
       @Override
       public void nativeReleaseAutomationElement(long elementPtr) {
-        /*long refCount =*/ Windows.IUnknown_Release(elementPtr);
-        //System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
+        Windows.IUnknown_Release(elementPtr);
       }
       @Override
       public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr) {
         return Windows.IUIAutomation_ElementFromHandle(automationPtr, hwndPtr);
       }
       @Override
-      public long[] nativeGetAutomationElementBoundingRectangl(long cachedAutomationElementPtr, boolean fromCache) {
+      public long[] nativeGetAutomationElementBoundingRectangle(long cachedAutomationElementPtr, boolean fromCache) {
         return  Windows.IUIAutomationElement_get_BoundingRectangle(cachedAutomationElementPtr, fromCache);
       }
       @Override
@@ -420,5 +425,4 @@ public final class WinProcess extends SUTBase {
       }
     };
   }
-
 }

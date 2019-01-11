@@ -29,30 +29,29 @@
 
 package es.upv.staq.testar;
 
-
 public class UnsupportedPlatformException extends RuntimeException {
 
-	private static final long serialVersionUID = -763558210570361617L;
+  private static final long serialVersionUID = -763558210570361617L;
 
-	public UnsupportedPlatformException() {
-		super();
-	}
+  public UnsupportedPlatformException() {
+    super();
+  }
 
-	public UnsupportedPlatformException(String message) {
-		super(message);
-	}
+  public UnsupportedPlatformException(String message) {
+    super(message);
+  }
 
-	public UnsupportedPlatformException(Throwable cause) {
-		super(cause);
-	}
+  public UnsupportedPlatformException(Throwable cause) {
+    super(cause);
+  }
 
-	public UnsupportedPlatformException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public UnsupportedPlatformException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-	public UnsupportedPlatformException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+  public UnsupportedPlatformException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 
 }

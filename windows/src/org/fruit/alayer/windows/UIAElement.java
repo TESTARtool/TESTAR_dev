@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -62,12 +61,15 @@ class UIAElement implements Serializable {
   double zindex,
     hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
 
-  public UIAElement() { this(null); }
+  UIAElement() {
+    this(null);
+  }
 
-  public UIAElement(UIAElement parent) {
+  UIAElement(UIAElement parent) {
     this.parent = parent;
-    if (parent != null)
+    if (parent != null) {
       root = parent.root;
+    }
     enabled = true;
   }
 

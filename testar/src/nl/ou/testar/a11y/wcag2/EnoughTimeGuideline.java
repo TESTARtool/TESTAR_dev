@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -43,10 +43,11 @@ public final class EnoughTimeGuideline extends AbstractGuideline {
 
   EnoughTimeGuideline(AbstractPrinciple parent) {
     super(2, "Enough Time", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Timing Adjustable",
         this, Level.A, "time-limits-required-behaviors"));
     criteria.add(new SuccessCriterion(2, "Pause, Stop, Hide",
         this, Level.A, "time-limits-pause"));
+    setCriteria(criteria);
   }
-
 }

@@ -1,0 +1,58 @@
+  Feature: Open University - A user applies for a master program.
+
+  Scenario Outline: A user successfully changes his account details.
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change Voorvoegsel_geboortenaam
+    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+    Step: Change Geboortenaam
+    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Change Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
+    Step: Change Voorvoegsel geboortenaam partner
+    When  $Title="Voorvoegsel geboortenaam partner" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam_partner>)
+    Step: Change Geboortenaam partner
+    When  $Title="Geboortenaam partner" and $Role="UIAEdit" type(<Geboortenaam_partner>)
+    
+    Step: Visualize Naamweergave
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Naamweergave']//widget") click(true)
+    Step: Ensure Achternaam - Partnernaam is displayed  (effect hitKey depends on displayed selection)
+    While !state($Role="UIAComboBox" and $ValuePattern="Achternaam - Partnernaam")
+    When  hitKey(VK_A)    
+    Step: Select Naamweergave
+    When  hitKey(<Naamweergave>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+      
+    Step: Focus on Naamweergave titel
+    When  $Role="UIAText" and $Title="Naamweergave" click(true)
+    Step: Scroll down naar Taal titel
+    While !state($Role="UIAText" and ocr() = "Taal")
+    When  hitKey(VK_DOWN) 
+    
+    Step: Change Geboortedatum
+    When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
+    Step: Change Geboorteplaats
+    When  $Title="Geboorteplaats" and $Role="UIAEdit" type(<Geboorteplaats>)
+    Step: Visualize geslacht list
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Geslacht']//widget") click(true)
+    Step: Select Geslacht
+    When  hitKey(<Geslacht>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+    Step: Visualize Taal list
+    When  $Role="UIAComboBox" and xpath("//widget[Title='Taal']//widget") click(true)
+    Step: Select Taal
+    When  hitKey(<Taal>)
+    Step: Remove list elements from screen
+    When  hitKey(VK_ESCAPE)
+    
+    Step: Focus on Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" click(true)
+    Step: Scroll down
+    When  hitKey(VK_PAGE_DOWN)
+    Step: Save entered data
+    When  $Role="UIAButton" and $Title="OPSLAAN" click()
+ Examples: Account data
+|Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
+|AREM || Weijling|Adri || |VK_A|02-07-1963|Druten|VK_M|VK_N|

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import static org.fruit.alayer.windows.UIARoles.UIAButton;
@@ -140,7 +139,6 @@ public class NativeLinker {
     throw new UnsupportedPlatformException();
   }
 
-
   /**
    * Retrieves a canvas for the primary monitor so Testar can paint elements on screen in Spy mode.
    * @param pen A pen with which to paint on the screen.
@@ -157,7 +155,6 @@ public class NativeLinker {
     }
     throw new UnsupportedPlatformException();
   }
-
 
   /**
    * Opens a SUT (runs a process) on the machine and returns a handle to the process in a SUT object.
@@ -178,7 +175,6 @@ public class NativeLinker {
       return LinuxProcess.fromExecutable(executableCommand);
     throw new UnsupportedPlatformException();
   }
-
 
   /**
    * Gets a list of running processes wrapped in a SUT class.
@@ -219,7 +215,6 @@ public class NativeLinker {
       return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
     throw new UnsupportedPlatformException();
   }
-
 
   /** Gets the CPU usage for a SUT.
    * @param nativeSUT The SUT to get CPU usage for.

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  * @author Sebastian Bauersfeld
  */
@@ -181,11 +180,11 @@ public final class Util {
   }
 
   public static boolean contains(Shape shape, double x, double y) {
-    return shape == null ? false : shape.contains(x, y);
+    return shape == null ? false: shape.contains(x, y);
   }
 
   public static boolean containsRel(Shape shape, double relX, double relY) {
-    return shape == null ? false :
+    return shape == null ? false:
         shape.contains(shape.x() + relX * shape.width(), shape.y() + relY * shape.height());
   }
 
@@ -228,8 +227,8 @@ public final class Util {
     double xDiff = x2 - x1;
     double yDiff = y2 - y1;
     double length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-    double baseX = length == 0 ? x2 - headLength : x2 - xDiff * headLength / length;
-    double baseY = length == 0 ? y2 - headLength : y2 - yDiff * headLength / length;
+    double baseX = length == 0 ? x2 - headLength: x2 - xDiff * headLength / length;
+    double baseY = length == 0 ? y2 - headLength: y2 - yDiff * headLength / length;
     Point p1 = Util.OrthogonalPoint(baseX, baseY, x2, y2, headWidth * .5);
     Point p2 = Util.OrthogonalPoint(baseX, baseY, x2, y2, -headWidth * .5);
     canvas.line(pen, p1.x(), p1.y(), x2, y2);
@@ -310,7 +309,7 @@ public final class Util {
     Assert.notNull(string, abbreviation);
     Assert.isTrue(maxLen >= 0);
     return (string.substring(0, Math.min(maxLen, string.length()))
-        + (string.length() > maxLen ? abbreviation : ""))
+        + (string.length() > maxLen ? abbreviation: ""))
         .replaceAll("\\r\\n|\\n", "_");
   }
 
@@ -318,20 +317,20 @@ public final class Util {
     Point ret;
 
     if (x1 == x2) {
-      ret = y1 > y2 ? Point.from(x1 - r, y1) : Point.from(x1 + r, y1);
+      ret = y1 > y2 ? Point.from(x1 - r, y1): Point.from(x1 + r, y1);
     }
     else if (y1 == y2) {
-      ret = x1 > x2 ? Point.from(x1, y1 + r) : Point.from(x1, y1 - r);
+      ret = x1 > x2 ? Point.from(x1, y1 + r): Point.from(x1, y1 - r);
     }
     else {
       double m = -(x1 - x2) / (y1 - y2);
       double n = y1 - m * x1;
       double p = (2 * m * n - 2 * m * y1 - 2 * x1) / (1 + m * m);
       double q = (-2 * n * y1 + y1 * y1 - r * r + n * n + x1 * x1) / (1 + m * m);
-      double s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * (r > 0 ? 1 : -1);
-      double s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * (r > 0 ? 1 : -1);
+      double s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * (r > 0 ? 1: -1);
+      double s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * (r > 0 ? 1: -1);
       double dm = (y1 - y2) / Math.abs(x1 - x2);
-      double s = dm > 0 ? s2 : s1;
+      double s = dm > 0 ? s2: s1;
       ret = Point.from(s, m * s + n);
     }
     return ret;
@@ -401,12 +400,12 @@ public final class Util {
   public static String treeDesc(Widget root, int indent, Tag<?>... tags) {
     Assert.notNull(root, tags);
     StringBuilder sb = new StringBuilder();
-    for (Widget w : makeIterable(new WidgetIterator(root, new DFNavigator()))) {
+    for (Widget w: makeIterable(new WidgetIterator(root, new DFNavigator()))) {
       for (int i = 0; i < depth(w) * indent; i++) {
         sb.append(' ');
       }
 
-      for (Tag<?> t : tags) {
+      for (Tag<?> t: tags) {
         sb.append(w.get(t, null)).append(", ");
       }
 
@@ -451,9 +450,9 @@ public final class Util {
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);
         Shape s2 = w2.get(Tags.Shape, null);
-        double a1 = s1 == null ? -1 : Util.area(s1);
-        double a2 = s2 == null ? -1 : Util.area(s2);
-        return a1 < a2 ? WORSE : (a1 > a2 ? BETTER : EVEN);
+        double a1 = s1 == null ? -1: Util.area(s1);
+        double a2 = s2 == null ? -1: Util.area(s2);
+        return a1 < a2 ? WORSE: (a1 > a2 ? BETTER : EVEN);
       }
     };
 
@@ -463,7 +462,7 @@ public final class Util {
 
   public static Set<Widget> widgetsFromPoint(State state, double x, double y) {
     Set<Widget> ret = new HashSet<Widget>();
-    for (Widget w : Assert.notNull(state)) {
+    for (Widget w: Assert.notNull(state)) {
       if (w.get(Tags.HitTester, Util.FalseTester).apply(x, y)) {
         ret.add(w);
       }
@@ -476,7 +475,7 @@ public final class Util {
     Set<Widget> ret = new HashSet<Widget>();
     Shape shape;
     Rect rect;
-    for (Widget w : state) {
+    for (Widget w: state) {
       shape = w.get(Tags.Shape);
       if (shape != null) {
         rect = Rect.from(shape.x(), shape.y(), shape.width(), shape.height());
@@ -509,7 +508,7 @@ public final class Util {
     Assert.notNull(state, action);
     List<Finder> targetFinders = action.get(Tags.Targets, new ArrayList<Finder>());
     List<Widget> ret = Util.newArrayList();
-    for (Finder f : targetFinders) {
+    for (Finder f: targetFinders) {
       ret.add(f.apply(state));
     }
     return ret;
@@ -517,7 +516,7 @@ public final class Util {
 
   public static List<File> getAllFiles(List<File> dirs, String extension) {
     List<File> files = Util.newArrayList();
-    for (File f : dirs) {
+    for (File f: dirs) {
       files.addAll(getAllFiles(f, extension));
     }
     return files;
@@ -530,7 +529,7 @@ public final class Util {
   }
 
   public static void getAllFiles(File dir, String extension, List<File> fileList) {
-    for (File f : dir.listFiles()) {
+    for (File f: dir.listFiles()) {
       if (f.getName().endsWith(extension)) {
         fileList.add(f);
       }
@@ -616,7 +615,6 @@ public final class Util {
     }
   }
 
-
   public static void delete(String fileOrDirectory) throws IOException {
     delete(new File(fileOrDirectory));
   }
@@ -632,7 +630,7 @@ public final class Util {
     if (fileOrDirectory.isDirectory()) {
       File[] files = fileOrDirectory.listFiles();
       if (files != null) {
-        for (File f : files) {
+        for (File f: files) {
           delete(f);
         }
       }
@@ -715,7 +713,7 @@ public final class Util {
 
       File[] files = fileOrDirectory.listFiles();
       if (files != null) {
-        for (File f : files) {
+        for (File f: files) {
           copyToDirectory(f, copyDir, null,
               compress);
         }
@@ -728,7 +726,7 @@ public final class Util {
 
   // refactored from testar -> ProtocolEditor (by urueda)
   public static void compileJava(List<File> dir, String classPath) {
-    for (File f : dir) {
+    for (File f: dir) {
       System.out.println("Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
     }
     try {
@@ -794,7 +792,7 @@ public final class Util {
             null,
             compilationUnits);
         if (!task.call()) {
-          for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
+          for (Diagnostic<?> diagnostic: diagnostics.getDiagnostics()) {
             System.err.format("Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
           }
@@ -826,7 +824,7 @@ public final class Util {
   }
 
   public static int hashCode(Object o) {
-    return o == null ? 0 : o.hashCode();
+    return o == null ? 0: o.hashCode();
   }
 
   public static String toString(Object o) {
@@ -923,7 +921,7 @@ public final class Util {
   public static <T> ArrayList<T> newArrayList(T... elements) {
     Assert.notNull(elements);
     ArrayList<T> ret = new ArrayList<>();
-    for (T el : elements) {
+    for (T el: elements) {
       ret.add(el);
     }
     return ret;

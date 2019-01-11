@@ -53,7 +53,6 @@ public class ClickThroughWindow {
         new ClickThroughWindow();
     }
 
-
     public ClickThroughWindow() {
         EventQueue.invokeLater(() -> {
             try {

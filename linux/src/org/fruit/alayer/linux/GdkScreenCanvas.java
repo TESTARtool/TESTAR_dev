@@ -27,22 +27,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
 
 import org.fruit.Pair;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.Pen;
 
-
 /**
  * Represents a canvas for a linux screen on which can be painted.
  */
 public class GdkScreenCanvas implements Canvas {
 
-
     //region Canvas implementation
-
 
     @Override
     public double width() {
@@ -124,8 +120,6 @@ public class GdkScreenCanvas implements Canvas {
 
     }
 
-
     //endregion
-
 
 }

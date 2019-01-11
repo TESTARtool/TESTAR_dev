@@ -33,6 +33,4 @@ public class TgherkinException extends RuntimeException {
     super(cause);
   }
 
-
-
 }

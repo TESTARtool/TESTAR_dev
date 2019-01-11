@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,7 +35,7 @@ package org.fruit.alayer.exceptions; // refactored by urueda
 import org.fruit.FruitException;
 
 public class StateBuildException extends FruitException {
-	private static final long serialVersionUID = 5741711528841953961L;
-	public StateBuildException(String message) { super(message); }
-	public StateBuildException(Throwable cause){ super(cause); }
+  private static final long serialVersionUID = 5741711528841953961L;
+  public StateBuildException(String message) { super(message); }
+  public StateBuildException(Throwable cause) { super(cause); }
 }

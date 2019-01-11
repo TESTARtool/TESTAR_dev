@@ -35,6 +35,7 @@ public interface SubroutineProxy {
 ;
   /**
    * This method is invoked each time after TESTAR finished the generation of a subroutine.
+   * @param state the SUT's current state
    */
   void finishSubroutine(State state);
 }

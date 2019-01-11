@@ -52,8 +52,8 @@ import org.fruit.alayer.Tags;
 public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
   //Attributes for adding slide actions
-  static double scrollArrowSize = 36; // sliding arrows
-  static double scrollThick = 16; //scroll thickness
+  private static double scrollArrowSize = 36; // sliding arrows
+  private static double scrollThick = 16; //scroll thickness
 
   /**
    * Called once during the life time of TESTAR
@@ -90,10 +90,9 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
    * the SUT's configuration files etc.)
    */
    @Override
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
+  protected void beginSequence(SUT sut, State state) {
+    super.beginSequence(sut, state);
   }
-
 
   /**
    * This method is called when the TESTAR requests the state of the SUT.
@@ -104,9 +103,9 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
    * @return  the current state of the SUT with attached oracle.
    */
   @Override
-  protected State getState(SUT system) throws StateBuildException{
+  protected State getState(SUT sut) throws StateBuildException{
 
-    return super.getState(system);
+    return super.getState(sut);
   }
 
   /**
@@ -135,16 +134,16 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @return  a set of actions
    */
   @Override
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
     //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
     //the foreground. You should add all other actions here yourself.
-    Set<Action> actions = super.deriveActions(system,state);
+    Set<Action> actions = super.deriveActions(sut, state);
 
     // To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
     StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -198,7 +197,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
   }
 
   /**
-   * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+   * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions.
    * @param actions
    * @param ac
    * @param scrollArrowSize
@@ -206,9 +205,9 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
    * @param w
    */
   protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state) {
-    Drag[] drags = null;
+    Drag[] drags = w.scrollDrags(scrollArrowSize,scrollThick);
     //If there are scroll (drags/drops) actions possible
-    if ((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null) {
+    if (drags != null) {
       //For each possible drag, create an action and add it to the derived actions
       for (Drag drag: drags) {
         //Store the widget in the Graphdatabase
@@ -218,13 +217,12 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
             new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
             new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
         ));
-
       }
     }
   }
 
   /**
-   * Select one of the available actions (e.g. at random)
+   * Select one of the available actions (e.g. at random).
    * @param state the SUT's current state
    * @param actions the set of derived actions
    * @return  the selected action (non-null!)
@@ -236,21 +234,22 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
     Action a = preSelectAction(state, actions);
     if (a!= null) {
       return a;
-    } else
+    } else {
       //if no preSelected actions are needed, then implement your own strategy
       return RandomActionSelector.selectAction(actions);
+    }
   }
 
   /**
    * Execute the selected action.
-   * @param system the SUT
+
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
   @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -264,7 +263,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
   protected boolean moreActions(State state) {
     return super.moreActions(state);
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test sequence
@@ -280,11 +278,11 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
   /**
    * Here you can put graceful shutdown sequence for your SUT
-   * @param system
+   * @param sut the system under testing
    */
   @Override
-  protected void stopSystem(SUT system) {
-    super.stopSystem(system);
+  protected void stopSystem(SUT sut) {
+    super.stopSystem(sut);
   }
 
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
@@ -85,9 +84,11 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
   @Override
   public EvaluationResults evaluate(List<Widget> widgets) {
     EvaluationResults results = new EvaluationResults();
-    for (AbstractGuideline g: guidelines)
-      for (EvaluationResult result: g.evaluate(widgets).getResults())
+    for (AbstractGuideline g: guidelines) {
+      for (EvaluationResult result: g.evaluate(widgets).getResults()) {
         results.add(result);
+      }
+    }
     return results;
   }
 
@@ -102,8 +103,9 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
   @Override
   public Set<Action> deriveActions(List<Widget> widgets) {
     Set<Action> actions = new HashSet<>();
-    for (AbstractGuideline g: guidelines)
+    for (AbstractGuideline g: guidelines) {
       actions.addAll(g.deriveActions(widgets));
+    }
     return actions;
   }
 
@@ -117,9 +119,11 @@ public abstract class AbstractPrinciple extends ItemBase implements Evaluator {
   @Override
   public EvaluationResults query(GraphDB graphDB) {
     EvaluationResults results = new EvaluationResults();
-    for (AbstractGuideline g: guidelines)
-      for (EvaluationResult result: g.query(graphDB).getResults())
+    for (AbstractGuideline g: guidelines) {
+      for (EvaluationResult result: g.query(graphDB).getResults()) {
         results.add(result);
+      }
+    }
     return results;
   }
 

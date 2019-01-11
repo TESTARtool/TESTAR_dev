@@ -95,9 +95,9 @@ public class GenerateVariables {
       writeVariableType(pWriter, tagMap, Boolean.class, "BOOLEAN_VARIABLE_NAME:");
       writeVariableType(pWriter, tagMap, Double.class, "NUMBER_VARIABLE_NAME:");
       writeVariableType(pWriter, tagMap, String.class, "STRING_VARIABLE_NAME:");
-        }catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }finally {
             if (pWriter != null) {
@@ -123,6 +123,5 @@ public class GenerateVariables {
       pWriter.println(";");
     }
   }
-
 
 }

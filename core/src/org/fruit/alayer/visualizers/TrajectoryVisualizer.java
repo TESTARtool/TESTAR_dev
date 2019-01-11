@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -73,11 +72,11 @@ public class TrajectoryVisualizer implements Visualizer {
     while (iter.hasNext()) {
       Point current = iter.next();
 
-      if (!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_))
+      if (!iter.hasNext() && (pen.strokeCaps() == StrokeCaps._Arrow || pen.strokeCaps() == StrokeCaps.Arrow_)) {
         Util.arrow(c, pen, last.x(), last.y(), current.x(), current.y(), 5 * pen.strokeWidth(), 5 * pen.strokeWidth());
-      else
+      } else {
         c.line(pen, last.x(), last.y(), current.x(), current.y());
-
+      }
       last = current;
     }
   }

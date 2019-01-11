@@ -27,7 +27,7 @@ import org.sikuli.script.Pattern;
  */
 public class Image {
   private int teller = 0;
-  private boolean print = true;
+  private boolean print = false;
 
   private static final double TOLERANCE = 5E-16;
   private static Image image = new Image();
@@ -56,12 +56,6 @@ public class Image {
    */
   public void updateAllWidgets(ProtocolProxy proxy, String imageFile) {
     for (Widget widget: proxy.getTopWidgets(state)) {
-      if (print) {
-        String title = widget.get(Tags.Title, null);
-        if (imageFile.contains("Studie") && title.contains("Studie")) {
-          System.out.println("[Image temp ] " + teller + "  " + title);
-        }
-      }
       isRecognized(proxy, widget, imageFile);
     }
   }
@@ -96,10 +90,6 @@ public class Image {
       imagesMap.clear();
     }
     double confidence = 0;
-    if (imageFile.contains("Studie")) {
-      System.out.println("[Image temp ] " + teller + "  " + widget.get(Tags.Title, null));
-    }
-
     if (imagesMap.containsKey(imageFile)) {
       if (imagesMap.get(imageFile).containsKey(widget)) {
         return imagesMap.get(imageFile).get(widget);
@@ -131,7 +121,11 @@ public class Image {
         if (print) {
           File f = new File("image_" + (teller++) + ".png");
           ImageIO.write(widgetShot.image(), "png", f);
-          System.out.println("[Image temp] " + imageFile + "==" + teller + ": " + confidence);
+          File g = new File("widget_" + (teller) + ".png");
+          ImageIO.write(refShot.image(), "png", f);
+          System.out.println("[Image temp ] " + teller + "  " + widget.get(Tags.Title, null));
+          System.out.println("result is " + (confidence ) +
+          " - " + proxy.getSettings().get(ConfigTags.ConfidenceThreshold) + " >= " + - TOLERANCE);
         }
       }
     } catch (Exception e) {

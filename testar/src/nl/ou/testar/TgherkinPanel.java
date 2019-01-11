@@ -54,6 +54,13 @@ public class TgherkinPanel extends JPanel {
   private boolean documentProtocol;
   private boolean active;
 
+  private final Number spinValue = 0.0d;
+  private final Comparable<Double> spinMinimum = 0.0d;
+  private final Comparable<Double> spinMaximum1 = 1.0d;
+  private final Comparable<Double> spinMaximum2 = 100.0d;
+  private final Number spinStepsize1 = 0.01d;
+  private final Number spinStepsize2 = 1.0d;
+
   private List<String> myClassPath;
 
   /**
@@ -216,10 +223,9 @@ public class TgherkinPanel extends JPanel {
               .setEnabled(tgGenerateTgherkinReportCheckBox.isSelected());
         }
       });
-
     tgConfidenceThreshold = new JSpinner();
     tgConfidenceThreshold.setBounds(280, 274, 100, 25);
-    tgConfidenceThreshold.setModel(new SpinnerNumberModel(0.0d, 0.0d, 1.0d, 0.01d));
+    tgConfidenceThreshold.setModel(new SpinnerNumberModel(spinValue, spinMinimum, spinMaximum1, spinStepsize1));
     tgConfidenceThreshold
         .setToolTipText("<html>\nNumber between zero and one that represents "
         + "the confidence threshold.\n</html>");
@@ -228,7 +234,7 @@ public class TgherkinPanel extends JPanel {
     tgMinimumPercentageForImageRecognition = new JSpinner();
     tgMinimumPercentageForImageRecognition.setBounds(280, 298, 100, 25);
     tgMinimumPercentageForImageRecognition
-        .setModel(new SpinnerNumberModel(0.0d, 0.0d, 100.0d, 1.0d));
+        .setModel(new SpinnerNumberModel(spinValue, spinMinimum, spinMaximum2, spinStepsize2));
     tgMinimumPercentageForImageRecognition
         .setToolTipText("<html>\nMinimum percentage of entire widget screenshot"
         + "for the rectangle that contains the recognized image.<br>"
@@ -237,7 +243,7 @@ public class TgherkinPanel extends JPanel {
 
     tgNumberOfNOPRetries = new JSpinner();
     tgNumberOfNOPRetries.setBounds(280, 322, 100, 25);
-    tgNumberOfNOPRetries.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+    tgNumberOfNOPRetries.setModel(new SpinnerNumberModel(spinValue, spinMinimum, spinMaximum2, spinStepsize2));
     tgNumberOfNOPRetries
         .setToolTipText("<html>\nNumber of NOP (no operation) action retries "
         + "if a mismatch occurs during the derivation of actions.\n</html>");
@@ -270,7 +276,7 @@ public class TgherkinPanel extends JPanel {
 
   /**
    * Populate Tgherkin Fields from Settings structure.
-   * @param settings The settings to load.
+   * @param settings The settings to load
    */
   public void populateFrom(final Settings settings) {
     tgComboBoxTgherkinDocument.setSelectedItem(settings.get(ConfigTags.TgherkinDocument));
@@ -302,7 +308,7 @@ public class TgherkinPanel extends JPanel {
 
   /**
    * Retrieve information from the Tgherkin GUI.
-   * @param settings reference to the object where the settings will be stored.
+   * @param settings reference to the object where the settings will be stored
    */
   public void extractInformation(final Settings settings) {
     if (tgComboBoxTgherkinDocument.getSelectedItem() != null) {

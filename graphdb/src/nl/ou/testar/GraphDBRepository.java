@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import java.util.List;
@@ -35,7 +34,6 @@ import java.util.List;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-
 
 /**
  * Repository API
@@ -49,7 +47,7 @@ public interface GraphDBRepository {
      * @param state State of the SUT for this step.
      * @param isInitial indicate if the state is initial.
      */
-    void addState(final State state, final boolean isInitial);
+    void addState(State state, boolean isInitial);
 
     /**
      * Add Action on a widget to the graph database as Edge
@@ -57,7 +55,7 @@ public interface GraphDBRepository {
      * @param action      The performed action
      * @param toStateID   ConcreteID of the new State
      */
-    void addAction( final Action action, final String toStateID);
+    void addAction(Action action, String toStateID);
 
     /**
      * Add Action on a State to the graph database as Edge
@@ -66,15 +64,14 @@ public interface GraphDBRepository {
      * @param action the action.
      * @param toStateID the resulting state
      */
-    void addActionOnState(final String stateId, final Action action, final String toStateID);
-
+    void addActionOnState(String stateId, Action action, String toStateID);
 
     /**
      * Add a widget to the the graph database as Wiget.
      * @param stateID State to which the widget belongs
      * @param w The widget object
      */
-    void addWidget(final String stateID, Widget w);
+    void addWidget(String stateID, Widget w);
 
     /**
      * Store a custom type in the graph database.
@@ -82,7 +79,7 @@ public interface GraphDBRepository {
      * @param relation The name of the relation
      * @param instance the custom object.
      */
-    void addCustomType(final Action action, final String relation, final CustomType instance);
+    void addCustomType(Action action, String relation, CustomType instance);
 
     /**
      * Store a custom type in the graph database.
@@ -90,7 +87,7 @@ public interface GraphDBRepository {
      * @param relation The name of the relation
      * @param instance the custom object.
      */
-    void addCustomType(final State state, final String relation, final CustomType instance);
+    void addCustomType(State state, String relation, CustomType instance);
 
     /**
      * Store a custom type in the graph database.
@@ -98,7 +95,7 @@ public interface GraphDBRepository {
      * @param relation The name of the relation
      * @param instance the custom object.
      */
-    void addCustomType(final Widget widget, final String relation, final CustomType instance);
+    void addCustomType(Widget widget, String relation, CustomType instance);
 
     /**
      * Get all objects from a pipe specified by a Gremlin-Groovy expression

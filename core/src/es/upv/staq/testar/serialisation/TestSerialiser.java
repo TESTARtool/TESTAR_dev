@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.serialisation;
 
 import java.io.IOException;
@@ -75,8 +74,9 @@ public class TestSerialiser extends Thread {
   }
 
   public static boolean isSavingQueueEmpty() {
-    if (testSavingQueue.isEmpty())
+    if (testSavingQueue.isEmpty()) {
       return true;
+    }
     return false;
   }
 

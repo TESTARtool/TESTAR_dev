@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -50,19 +49,20 @@ public final class KeyDown extends //TaggableBase
     super(key);
   }
 
-  public String toString() { return "Press Key " + key; }
+  public String toString() {
+    return "Press Key " + key;
+  }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     for (Role r: discardParameters) {
-      if (r.name().equals(ActionRoles.KeyDown.name()))
+      if (r.name().equals(ActionRoles.KeyDown.name())) {
         return "Key pressed";
+      }
     }
     return toString();
   }
 
-  // by urueda
   @Override
   protected void performKeyAction(SUT system, KBKeys key) {
     system.get(Tags.StandardKeyboard).press(key);
@@ -73,4 +73,8 @@ public final class KeyDown extends //TaggableBase
     return o == this || (o instanceof KeyDown && this.key.equals(((KeyDown)o).key));
   }
 
+  @Override
+  public int hashCode() {
+    return key.hashCode();
+  }
 }

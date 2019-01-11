@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import java.util.Set;
@@ -43,181 +42,181 @@ import org.fruit.alayer.actions.ActionRoles;
 
 /**
  * Core coding manager.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class CodingManager {
 
-	public static final int ID_LENTGH = 24; // 2 (prefixes) + 7 (MAX_RADIX) + 5 (max expected text length) + 10 (CRC32)
-	
-	public static final String CONCRETE_ID = "ConcreteID";
-	// actions abstraction
-	public static final String ABSTRACT_ID = "AbstractID";
-	// widgets abstraction
-	public static final String ABSTRACT_R_ID = "Abs(R)ID"; // ROLE
-	public static final String ABSTRACT_R_T_ID = "Abs(R,T)ID"; // ROLE, TITLE
-	public static final String ABSTRACT_R_T_P_ID = "Abs(R,T,P)ID"; // ROLE, TITLE, PATH
+  public static final int ID_LENTGH = 24; // 2 (prefixes) + 7 (MAX_RADIX) + 5 (max expected text length) + 10 (CRC32)
 
-	public static final String ID_PREFIX_CONCRETE = "C";
-	public static final String ID_PREFIX_ABSTRACT_R = "R";
-	public static final String ID_PREFIX_ABSTRACT_R_T = "T";
-	public static final String ID_PREFIX_ABSTRACT_R_T_P = "P";
-	public static final String ID_PREFIX_ABSTRACT = "A";
-	
-	public static final String ID_PREFIX_STATE = "S";
-	public static final String ID_PREFIX_WIDGET = "W";
-	public static final String ID_PREFIX_ACTION = "A";
-	
-	private static final Tag<?>[] TAGS_CONCRETE_ID = new Tag<?>[]{Tags.Role,Tags.Title,/*Tags.Shape,*/Tags.Enabled, Tags.Path};
-	private static final Tag<?>[] TAGS_ABSTRACT_R_ID = new Tag<?>[]{Tags.Role};
-	private static final Tag<?>[] TAGS_ABSTRACT_R_T_ID = new Tag<?>[]{Tags.Role,Tags.Title};
-	private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[]{Tags.Role,Tags.Title,Tags.Path};
+  public static final String CONCRETE_ID = "ConcreteID";
+  // actions abstraction
+  public static final String ABSTRACT_ID = "AbstractID";
+  // widgets abstraction
+  public static final String ABSTRACT_R_ID = "Abs(R)ID"; // ROLE
+  public static final String ABSTRACT_R_T_ID = "Abs(R,T)ID"; // ROLE, TITLE
+  public static final String ABSTRACT_R_T_P_ID = "Abs(R,T,P)ID"; // ROLE, TITLE, PATH
 
-	public static final Role[] ROLES_ABSTRACT_ACTION = new Role[]{
-		ActionRoles.Type,
-		ActionRoles.KeyDown,
-		ActionRoles.KeyUp
-	};
-	
-	// ###########################################
-	//  Widgets/States and Actions IDs management
-	// ###########################################
-	
-	/**
-	 * Builds IDs for a widget or state.
-	 * @param widget A widget or a State (widget-tree, or widget with children)
-	 * 
-	 * An identifier (alphanumeric) for a state is built as: f(w1 + ... + wn),
-	 * where wi (i=1..n) is the identifier for a widget in the widget-tree
-	 * and the + operator is the concatenation of identifiers (alphanumeric).
-	 * The order of the widgets in f is determined by the UI structure.
-	 * f is a formula that converts, with low collision, a text of varying length
-	 * to a shorter representation: hashcode(text) + length(text) + crc32(text).
-	 * 
-	 * An identifier (alphanumeric) for a widget is calculated based on
-	 * the concatenation of a set of accessibility properties (e.g. ROLE, TITLE, ENABLED and PATH).
-	 * An example for an enabled "ok" button could be: Buttonoktrue0,0,1 ("0,0,1" being the path in the widget-tree).
- 	 *
-	 */
-	public static synchronized void buildIDs(Widget widget){
-		if (widget.parent() != null){
-			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
-			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
-			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
-			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
-		} else if (widget instanceof State) { // UI root
-			String cid = "", a_R_id = "", a_R_T_id = "", a_R_T_P_id = "";
-			for (Widget w : (State) widget){
-				if (w != widget){
-					buildIDs(w);
-					cid += w.get(Tags.ConcreteID);
-					a_R_id += w.get(Tags.Abstract_R_ID);
-					a_R_T_id += w.get(Tags.Abstract_R_T_ID);
-					a_R_T_P_id += w.get(Tags.Abstract_R_T_P_ID);
-				}
-			}
-			widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(cid));
-			widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.toID(a_R_id));
-			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.toID(a_R_T_id));
-			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.toID(a_R_T_P_id));
-		}	
-	}
-	
-	/**
-	 * Builds IDs (abstract, concrete) for a set of actions.
-	 * @param state Current State of the SUT
-	 * @param actions The actions.
-	 */
-	public static synchronized void buildIDs(State state, Set<Action> actions){
-		for (Action a : actions)
-			buildIDs(state,a);
-	}
-	
-	/**
-	 * Builds IDs (abstract, concrete, precise) for an action.
-	 * @param action An action.
-	 */
-	public static synchronized void buildIDs(State state, Action action){
-		action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
-				   CodingManager.codify(state.get(Tags.ConcreteID), action));
-		action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
-				   CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
-	}
-	
-	// ###############
-	//  STATES CODING
-	// ###############
-	
-	private static String codify(Widget state, boolean codifyContext, Tag<?>... tags){
-		return toID(getWidgetString(state,codifyContext,tags));
-	}
-	
-	private static String getWidgetString(Widget widget, boolean codifyContext, Tag<?>... tags){
-		String ws = getTaggedString(widget,tags);
-		if (codifyContext)
-			ws += "#" + getWidgetContextString(widget);
-		return ws;
-	}
-	
-	private static String getTaggedString(Widget leaf, Tag<?>... tags){
-		StringBuilder sb = new StringBuilder();
-		for(Tag<?> t : tags)
-			sb.append(leaf.get(t, null));
-		return sb.toString();
-	}
-	
-	private static String getWidgetContextString(Widget widget){
-		return "";
-	}
+  public static final String ID_PREFIX_CONCRETE = "C";
+  public static final String ID_PREFIX_ABSTRACT_R = "R";
+  public static final String ID_PREFIX_ABSTRACT_R_T = "T";
+  public static final String ID_PREFIX_ABSTRACT_R_T_P = "P";
+  public static final String ID_PREFIX_ABSTRACT = "A";
 
-	// ################
-	//  ACTIONS CODING
-	// ################
+  public static final String ID_PREFIX_STATE = "S";
+  public static final String ID_PREFIX_WIDGET = "W";
+  public static final String ID_PREFIX_ACTION = "A";
 
-	private static String codify(String stateID, Action action, Role... discardParameters){
-		return toID(stateID + action.toString(discardParameters));
-	}	
-	
-	// ############
-	//  IDS CODING
-	// ############
+  private static final Tag<?>[] TAGS_CONCRETE_ID = new Tag<?>[]{Tags.Role,Tags.Title,/*Tags.Shape,*/Tags.Enabled, Tags.Path};
+  private static final Tag<?>[] TAGS_ABSTRACT_R_ID = new Tag<?>[]{Tags.Role};
+  private static final Tag<?>[] TAGS_ABSTRACT_R_T_ID = new Tag<?>[]{Tags.Role,Tags.Title};
+  private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[]{Tags.Role,Tags.Title,Tags.Path};
 
-	private static String lowCollisionID(String text){ // reduce ID collision probability
-		CRC32 crc32 = new CRC32(); crc32.update(text.getBytes());
-		return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
-			   Integer.toHexString(text.length()) +
-			   crc32.getValue();
-	}
+  public static final Role[] ROLES_ABSTRACT_ACTION = new Role[]{
+    ActionRoles.Type,
+    ActionRoles.KeyDown,
+    ActionRoles.KeyUp
+  };
 
-	private static String toID(String text){
-		return lowCollisionID(text);
-	}
+  // ###########################################
+  //  Widgets/States and Actions IDs management
+  // ###########################################
 
-	// #################
-	//  Utility methods
-	// #################
-	
-	public static Widget find(State state, String widgetID, String idType){
-		Tag<String> t = null;
-		switch(idType){
-		case CodingManager.CONCRETE_ID:
-			t = Tags.ConcreteID;
-			break;
-		case CodingManager.ABSTRACT_R_ID:
-			t = Tags.Abstract_R_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_ID:
-			t = Tags.Abstract_R_T_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_P_ID:
-			t = Tags.Abstract_R_T_P_ID;
-			break;
-		}
-		for (Widget w : state){
-			if (widgetID.equals(w.get(t)))
-				return w;
-		}
-		return null; // not found
-	}
+  /**
+   * Builds IDs for a widget or state.
+   * @param widget A widget or a State (widget-tree, or widget with children)
+   *
+   * An identifier (alphanumeric) for a state is built as: f(w1 + ... + wn),
+   * where wi (i=1..n) is the identifier for a widget in the widget-tree
+   * and the + operator is the concatenation of identifiers (alphanumeric).
+   * The order of the widgets in f is determined by the UI structure.
+   * f is a formula that converts, with low collision, a text of varying length
+   * to a shorter representation: hashcode(text) + length(text) + crc32(text).
+   *
+   * An identifier (alphanumeric) for a widget is calculated based on
+   * the concatenation of a set of accessibility properties (e.g. ROLE, TITLE, ENABLED and PATH).
+   * An example for an enabled "ok" button could be: Buttonoktrue0,0,1 ("0,0,1" being the path in the widget-tree).
+    *
+   */
+  public static synchronized void buildIDs(Widget widget) {
+    if (widget.parent() != null) {
+      widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
+      widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
+      widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
+      widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
+    } else if (widget instanceof State) { // UI root
+      String cid = "", a_R_id = "", a_R_T_id = "", a_R_T_P_id = "";
+      for (Widget w: (State) widget) {
+        if (w != widget) {
+          buildIDs(w);
+          cid += w.get(Tags.ConcreteID);
+          a_R_id += w.get(Tags.Abstract_R_ID);
+          a_R_T_id += w.get(Tags.Abstract_R_T_ID);
+          a_R_T_P_id += w.get(Tags.Abstract_R_T_P_ID);
+        }
+      }
+      widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(cid));
+      widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.toID(a_R_id));
+      widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.toID(a_R_T_id));
+      widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.toID(a_R_T_P_id));
+    }
+  }
+
+  /**
+   * Builds IDs (abstract, concrete) for a set of actions.
+   * @param state Current State of the SUT
+   * @param actions The actions.
+   */
+  public static synchronized void buildIDs(State state, Set<Action> actions) {
+    for (Action a: actions)
+      buildIDs(state,a);
+  }
+
+  /**
+   * Builds IDs (abstract, concrete, precise) for an action.
+   * @param action An action.
+   */
+  public static synchronized void buildIDs(State state, Action action) {
+    action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
+           CodingManager.codify(state.get(Tags.ConcreteID), action));
+    action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+           CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
+  }
+
+  // ###############
+  //  STATES CODING
+  // ###############
+
+  private static String codify(Widget state, boolean codifyContext, Tag<?>... tags) {
+    return toID(getWidgetString(state,codifyContext,tags));
+  }
+
+  private static String getWidgetString(Widget widget, boolean codifyContext, Tag<?>... tags) {
+    String ws = getTaggedString(widget,tags);
+    if (codifyContext)
+      ws += "#" + getWidgetContextString(widget);
+    return ws;
+  }
+
+  private static String getTaggedString(Widget leaf, Tag<?>... tags) {
+    StringBuilder sb = new StringBuilder();
+    for (Tag<?> t: tags)
+      sb.append(leaf.get(t, null));
+    return sb.toString();
+  }
+
+  private static String getWidgetContextString(Widget widget) {
+    return "";
+  }
+
+  // ################
+  //  ACTIONS CODING
+  // ################
+
+  private static String codify(String stateID, Action action, Role... discardParameters) {
+    return toID(stateID + action.toString(discardParameters));
+  }
+
+  // ############
+  //  IDS CODING
+  // ############
+
+  private static String lowCollisionID(String text) { // reduce ID collision probability
+    CRC32 crc32 = new CRC32(); crc32.update(text.getBytes());
+    return Integer.toUnsignedString(text.hashCode(), Character.MAX_RADIX) +
+         Integer.toHexString(text.length()) +
+         crc32.getValue();
+  }
+
+  private static String toID(String text) {
+    return lowCollisionID(text);
+  }
+
+  // #################
+  //  Utility methods
+  // #################
+
+  public static Widget find(State state, String widgetID, String idType) {
+    Tag<String> t = null;
+    switch(idType) {
+    case CodingManager.CONCRETE_ID:
+      t = Tags.ConcreteID;
+      break;
+    case CodingManager.ABSTRACT_R_ID:
+      t = Tags.Abstract_R_ID;
+      break;
+    case CodingManager.ABSTRACT_R_T_ID:
+      t = Tags.Abstract_R_T_ID;
+      break;
+    case CodingManager.ABSTRACT_R_T_P_ID:
+      t = Tags.Abstract_R_T_P_ID;
+      break;
+    }
+    for (Widget w: state) {
+      if (widgetID.equals(w.get(t)))
+        return w;
+    }
+    return null; // not found
+  }
 }

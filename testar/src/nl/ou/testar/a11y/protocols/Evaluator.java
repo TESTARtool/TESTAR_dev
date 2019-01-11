@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.protocols;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public interface Evaluator {
    * @param widgets The widgets to consider.
    * @return The results of the evaluation.
    */
-  public EvaluationResults evaluate(List<Widget> widgets);
+  EvaluationResults evaluate(List<Widget> widgets);
 
   /**
    * Derives the possible actions from the given state
@@ -62,7 +61,7 @@ public interface Evaluator {
    * @param widgets The widgets to consider.
    * @return The set of actions.
    */
-  public Set<Action> deriveActions(List<Widget> widgets);
+  Set<Action> deriveActions(List<Widget> widgets);
 
   /**
    * Evaluates the overall accessibility of the SUT by querying the given graph database
@@ -70,12 +69,11 @@ public interface Evaluator {
    * @param graphDB The graph database.
    * @return The results of the evaluation.
    */
-  public EvaluationResults query(GraphDB graphDB);
+  EvaluationResults query(GraphDB graphDB);
 
   /**
    * Gets the unique version of the implementation for the guidelines being used
    * @return The version as a String.
    */
-  public String getImplementationVersion();
-
+  String getImplementationVersion();
 }

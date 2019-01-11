@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.gdiplus;
-
 
 import org.bridj.BridJ;
 import org.bridj.Pointer;
@@ -37,13 +35,11 @@ import org.bridj.ann.Library;
 
 import java.io.IOException;
 
-
 /**
  * Represents a canvas for a linux screen on which can be painted.
  */
 @Library("libgdiplus")
 public class LibGdiPlus {
-
 
     static{
         try {
@@ -53,7 +49,6 @@ public class LibGdiPlus {
         }
         BridJ.register();
     }
-
 
 //    /**
 //     * The MonitorFromPoint function retrieves a handle to the display monitor that contains a specified point.
@@ -75,8 +70,6 @@ public class LibGdiPlus {
 //     */
 //    public static native long CreateCompatibleDC(long hdc);
 
-
     public static native long GdiplusStartup(Pointer<Integer> token, Pointer<Integer> input, Pointer<Long> output);
-
 
 }

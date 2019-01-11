@@ -13,7 +13,6 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 
-
 /**
  * Class responsible for handling mouse moves.
  *

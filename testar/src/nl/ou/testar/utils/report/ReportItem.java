@@ -46,10 +46,8 @@ public class ReportItem implements Item {
         // create directories, if required
     try {
           Files.createDirectories(Paths.get(fileName).getParent());
-        }
-        catch(FileAlreadyExistsException e) {
-        }
-        catch(IOException e) {
+        } catch(FileAlreadyExistsException e) {
+        } catch(IOException e) {
           e.printStackTrace();
         }
     // write data to file
@@ -59,9 +57,9 @@ public class ReportItem implements Item {
       BufferedWriter bWriter = new BufferedWriter(fWriter);
       pWriter = new PrintWriter(bWriter);
             pWriter.write(data);
-        }catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }finally {
             if (pWriter != null) {

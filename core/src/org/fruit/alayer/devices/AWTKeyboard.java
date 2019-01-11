@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -39,7 +38,9 @@ import java.awt.Robot;
 import org.fruit.FruitException;
 
 public final class AWTKeyboard implements Keyboard {
-  public static AWTKeyboard build() throws FruitException{ return new AWTKeyboard(); }
+  public static AWTKeyboard build() throws FruitException{
+    return new AWTKeyboard();
+  }
   private final Robot robot;
 
   private AWTKeyboard() {
@@ -50,9 +51,15 @@ public final class AWTKeyboard implements Keyboard {
     }
   }
 
-  public String toString() { return "AWT Keyboard"; }
-  public void press(KBKeys k) { robot.keyPress(k.code());  }
-  public void release(KBKeys k) { robot.keyRelease(k.code());  }
+  public String toString() {
+    return "AWT Keyboard";
+  }
+  public void press(KBKeys k) {
+    robot.keyPress(k.code());
+  }
+  public void release(KBKeys k) {
+    robot.keyRelease(k.code());
+  }
 
   public void isPressed(KBKeys k) {
     throw new UnsupportedOperationException("Unfortunately AWT Keyboard cannot poll the keyboard's state!");

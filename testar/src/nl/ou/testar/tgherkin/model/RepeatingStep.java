@@ -46,7 +46,6 @@ public abstract class RepeatingStep extends Step {
       generalMismatch = false;
   }
 
-
   @Override
   public boolean evaluateGivenCondition(ProtocolProxy proxy, DataTable dataTable, boolean mismatchOccurred) {
     // reset status
@@ -60,7 +59,6 @@ public abstract class RepeatingStep extends Step {
     super.beginSequence();
     currentAction = 0;
   }
-
 
   @Override
     protected void nextAction() {

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -38,30 +37,30 @@ import org.fruit.UnFunc;
 
 public final class CombinedSearcher implements Searcher {
 
-	private static final class MyVisitor implements UnFunc<Widget, SearchFlag>{
-		Searcher nextSearcher;
-		UnFunc<Widget, SearchFlag> nextVisitor;
-		public SearchFlag apply(Widget widget) {
-			return nextSearcher.apply(widget, nextVisitor);
-		}
-	}
-	
-	private static final long serialVersionUID = -7319307314114534139L;
-	final Searcher searcher1, searcher2;
-	transient MyVisitor myVisitor;
-	
-	public CombinedSearcher(Searcher searcher1, Searcher searcher2){
-		Assert.notNull(searcher1, searcher2);
-		this.searcher1 = searcher1;
-		this.searcher2 = searcher2;
-	}
-	
-	public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
-		if(myVisitor == null){
-			myVisitor = new MyVisitor();
-			myVisitor.nextSearcher = searcher2;
-		}
-		myVisitor.nextVisitor = visitor;
-		return searcher1.apply(widget, myVisitor);
-	}
+  private static final class MyVisitor implements UnFunc<Widget, SearchFlag>{
+    Searcher nextSearcher;
+    UnFunc<Widget, SearchFlag> nextVisitor;
+    public SearchFlag apply(Widget widget) {
+      return nextSearcher.apply(widget, nextVisitor);
+    }
+  }
+
+  private static final long serialVersionUID = -7319307314114534139L;
+  final Searcher searcher1, searcher2;
+  transient MyVisitor myVisitor;
+
+  public CombinedSearcher(Searcher searcher1, Searcher searcher2) {
+    Assert.notNull(searcher1, searcher2);
+    this.searcher1 = searcher1;
+    this.searcher2 = searcher2;
+  }
+
+  public SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor) {
+    if (myVisitor == null) {
+      myVisitor = new MyVisitor();
+      myVisitor.nextSearcher = searcher2;
+    }
+    myVisitor.nextVisitor = visitor;
+    return searcher1.apply(widget, myVisitor);
+  }
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.Deque;
@@ -65,10 +64,12 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
 
   KeyboardAccessibleGuideline(AbstractPrinciple parent) {
     super(1, "Keyboard Accessible", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Keyboard",
         this, Level.A, "keyboard-operation-keyboard-operable"));
     criteria.add(new SuccessCriterion(2, "No Keyboard Trap",
         this, Level.A, "keyboard-operation-trapping"));
+    setCriteria(criteria);
   }
 
   @Override
@@ -101,8 +102,9 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
       String key1 = AccessibilityUtil.getAccessKey(w),
           key2 = AccessibilityUtil.getAcceleratorKey(w);
       if ((key1 != null && !key1.isEmpty())
-          || (key2 != null && !key2.isEmpty()))
+          || (key2 != null && !key2.isEmpty())) {
         shortcutKeyCount++;
+      }
     }
     if (shortcutKeyCount * SHORTCUT_KEYS_TO_WIDGETS_RATIO < widgets.size()) {
       results.add(new WCAG2EvaluationResult(scKbd, WCAG2EvaluationResult.Type.WARNING,
@@ -124,12 +126,12 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
       deriveActionsAll(actions, compiler, w);
       if (AccessibilityUtil.hasKeyboardFocus(w)) {
         // catch inconsistent keyboard focus reporting
-        if (prevHasKeyboardFocus != null)
+        if (prevHasKeyboardFocus != null) {
           reportDoubleFocus(prevHasKeyboardFocus, w);
+        }
         deriveActionsFocus(actions, compiler, w);
         prevHasKeyboardFocus = w;
-      }
-      else { // !hasKeyboardFocus(w)
+      } else { // !hasKeyboardFocus(w)
         deriveActionsNoFocus(actions, compiler, w);
       }
     }
@@ -164,29 +166,34 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
     String shortcutKey = AccessibilityUtil.getAcceleratorKey(w);
     if (shortcutKey != null && !shortcutKey.isEmpty()) {
       Action a = AccessibilityUtil.parseShortcutKey(shortcutKey);
-      if (a != null)
+      if (a != null) {
         addShortcutKey(a);
+      }
     }
 
     // find access keys
     String accessKey = AccessibilityUtil.getAccessKey(w);
     if (accessKey != null && !accessKey.isEmpty()) {
       Action a = AccessibilityUtil.parseShortcutKey(accessKey);
-      if (a != null)
+      if (a != null) {
         actions.add(a);
+      }
     }
   }
 
   private void deriveActionsFocus(Set<Action> actions, StdActionCompiler compiler,
       Widget w) {
     // get the applicable keys for this widget
-    for (Action a: AccessibilityUtil.getApplicableActions(w))
+    for (Action a: AccessibilityUtil.getApplicableActions(w)) {
       actions.add(a);
+    }
 
     // if shortcut keys are not blocked, e.g. by a modal window, try to use one
-    if (AccessibilityUtil.canUseShortcutKeys(w))
-      for (Action a: shortcutKeysCache)
+    if (AccessibilityUtil.canUseShortcutKeys(w)) {
+      for (Action a: shortcutKeysCache) {
         actions.add(a);
+      }
+    }
   }
 
   private void deriveActionsNoFocus(Set<Action> actions, StdActionCompiler compiler,
@@ -195,11 +202,13 @@ public final class KeyboardAccessibleGuideline extends AbstractGuideline {
   }
 
   private void addShortcutKey(Action a) {
-    if (shortcutKeysCache.contains(a))
+    if (shortcutKeysCache.contains(a)) {
       return;
+    }
     shortcutKeysCache.addLast(Assert.notNull(a));
-    while (shortcutKeysCache.size() > MAX_CACHED_SHORTCUT_KEYS)
+    while (shortcutKeysCache.size() > MAX_CACHED_SHORTCUT_KEYS) {
       shortcutKeysCache.removeFirst();
+    }
   }
 
   private void reportDoubleFocus(Widget oldW, Widget newW) {

@@ -27,64 +27,63 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.graph;
 
 import java.util.Set;
 
 /**
  * Graph action/edge.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public interface IGraphAction {
 
-	//public Action getAction();
+  //public Action getAction();
 
-	public String getConcreteID(); 
-	public String getAbstractID(); 
-	
-	public void setStateshot(String scrShotPath);	
-	public String getStateshot();
+  public String getConcreteID();
+  public String getAbstractID();
 
-	/**
-	 * @param memUsage In KB.
-	 */
-	public void setMemUsage(int memUsage);
-	public int getMemUsage();
-	
-	/**
-	 * @param cpuUsage User x system ... In ms.
-	 */
-	public void setCPUsage(long[] cpuUsage);
-	public long[] getCPUsage();
-	
-	public String getRole();
-	
-	public String getDetailedName();
-	public void setDetailedName(String detailedName);
+  public void setStateshot(String scrShotPath);
+  public String getStateshot();
 
-	public String getTargetWidgetID();
-	public void setTargetWidgetID(String targetWidgetID);
-	
-	public String getSourceStateID();
-	public void setSourceStateID(String SourceStateID);
-	public Set<String> getTargetStateIDs();
-	public void addTargetStateID(String targetStateID);
-	
-	public int getCount();
-	public void setCount(int count);	
-	public void incCount();
+  /**
+   * @param memUsage In KB.
+   */
+  public void setMemUsage(int memUsage);
+  public int getMemUsage();
 
-	public String getOrder(String targetStateID);
-	public String getOrder(Set<String> targetStatesID);
-	public void addOrder(String targetStateID, String order);
-	public String getLastOrder(String targetStateID);
-		
-	public void knowledge(boolean k);
-	public boolean knowledge();
-	public void revisited(boolean r);
-	public boolean revisited();
-	
+  /**
+   * @param cpuUsage User x system ... In ms.
+   */
+  public void setCPUsage(long[] cpuUsage);
+  public long[] getCPUsage();
+
+  public String getRole();
+
+  public String getDetailedName();
+  public void setDetailedName(String detailedName);
+
+  public String getTargetWidgetID();
+  public void setTargetWidgetID(String targetWidgetID);
+
+  public String getSourceStateID();
+  public void setSourceStateID(String SourceStateID);
+  public Set<String> getTargetStateIDs();
+  public void addTargetStateID(String targetStateID);
+
+  public int getCount();
+  public void setCount(int count);
+  public void incCount();
+
+  public String getOrder(String targetStateID);
+  public String getOrder(Set<String> targetStatesID);
+  public void addOrder(String targetStateID, String order);
+  public String getLastOrder(String targetStateID);
+
+  public void knowledge(boolean k);
+  public boolean knowledge();
+  public void revisited(boolean r);
+  public boolean revisited();
+
 }

@@ -210,14 +210,12 @@ public class Protocol_desktop_word extends ClickFilterLayerProtocol {
     return super.moreActions(state);
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   protected void finishSequence() {
     super.finishSequence();
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.

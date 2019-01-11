@@ -5,6 +5,8 @@ Feature: Open University - A user applies for a master program.
   Background: A user successfully logs on the system.
     Step: Enter username
     When  $Title="Gebruikersnaam" and $Role="UIAEdit" type("weijla3@wxs.nl")
+    Step: Focus on password
+    When  $Title="Wachtwoord" and $Role="UIAText" click(true)
     Step: Enter password
     When  $Title="Wachtwoord" and $Role="UIAEdit" type("Wachtwoord123")
     Step: Press log on button
@@ -18,12 +20,15 @@ Feature: Open University - A user applies for a master program.
     When  $Role="UIAText" and $Title="mijnOU" click(true)
     Step: Scroll down
     While !state($Role="UIAImage" and ocr() = "LOCI EVIE")
-    When  hitKey(VK_DOWN)
+    When  $Role="UIAText" and $Title="mijnOU" click(true)
+          hitKey(VK_DOWN)
     Step: Select Mijn Gegevens tile
     When  $Role="UIAImage" and ocr() = "LOCI EVIE" click(true)
     Step: Focus op pagina krijgen
     When  $Title="Accountgegevens" and $Role="UIAText" click(true)
           $Title="Voornamen" and $Role="UIAText" click(true)
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
@@ -32,6 +37,10 @@ Feature: Open University - A user applies for a master program.
     When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change Voorvoegsel_geboortenaam
+    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+    Step: Change Geboortenaam
+    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
     Step: Change Roepnaam
     When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
     Step: Change Voorvoegsel geboortenaam partner
@@ -47,10 +56,12 @@ Feature: Open University - A user applies for a master program.
     When  hitKey(<Naamweergave>)
     Step: Remove list elements from screen
     When  hitKey(VK_ESCAPE)
+    Step: Select Naamweergave
+    When  $Role="UIAText" and $Title="Naamweergave" click(true)
     Step: Scroll to OPSLAAN button
     While !state($Role="UIAButton" and $Title="OPSLAAN")
     When  $Role="UIAText" and $Title="mijn.awo.ou.nl" click(true)
-          hitKey(VK_DOWN)
+          hitKey(VK_DOWN)       
     Step: Change Geboortedatum
     When  $Title="Geboortedatum" and $Role="UIAEdit" type(<Geboortedatum>)
     Step: Change Geboorteplaats

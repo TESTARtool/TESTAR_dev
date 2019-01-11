@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -59,19 +58,28 @@ public final class Rect implements Shape {
   }
 
   public static Rect intersection(Rect r1, Rect r2) {
-    if (r2 == null) return r1;
-    if (r1 == null) return null;
+    if (r2 == null) {
+      return r1;
+    }
+    if (r1 == null) {
+      return null;
+    }
     double x1 = Math.max(r1.x(), r2.x());
     double x2 = Math.min(r1.x() + r1.width(),r2.x() + r2.width());
     double y1 = Math.max(r1.y(), r2.y());
     double y2 = Math.min(r1.y() + r1.height(), r2.y() + r2.height());
-    if (y2 < y1 || x2 < x1) return null;
+    if (y2 < y1 || x2 < x1) {
+      return null;
+    }
     return Rect.fromCoordinates(x1, y1, x2, y2);
   }
 
-
-  public static Rect from(double x, double y, double width, double height) { return new Rect(x, y, width, height); }
-  public static Rect fromCoordinates(double x1, double y1, double x2, double y2) { return new Rect(x1, y1, x2 - x1, y2 - y1); }
+  public static Rect from(double x, double y, double width, double height) {
+    return new Rect(x, y, width, height);
+  }
+  public static Rect fromCoordinates(double x1, double y1, double x2, double y2) {
+    return new Rect(x1, y1, x2 - x1, y2 - y1);
+  }
 
   private Rect(double x, double y, double width, double height) {
     Assert.isTrue(width >= 0 && height >= 0,
@@ -83,14 +91,26 @@ public final class Rect implements Shape {
     this.height = height;
   }
 
-  public double x() {  return this.x; }
-  public double y() { return this.y; }
-  public double width() { return this.width; }
-  public double height() { return this.height; }
+  public double x() {
+    return this.x;
+  }
+  public double y() {
+    return this.y;
+  }
+  public double width() {
+    return this.width;
+  }
+  public double height() {
+    return this.height;
+  }
 
   public boolean contains(double x, double y) {
-    if (x < this.x || y < this.y) return false;
-    if (x > this.x + width || y > this.y + height) return false;
+    if (x < this.x || y < this.y) {
+      return false;
+    }
+    if (x > this.x + width || y > this.y + height) {
+      return false;
+    }
     return true;
   }
 
@@ -105,11 +125,32 @@ public final class Rect implements Shape {
   // by urueda
   @Override
   public boolean equals(Object o) {
-    if (o == this) return true;
-    if (o == null) return false;
-    if (!(o instanceof Rect)) return false;
+    if (o == this) {
+      return true;
+    }
+    if (o == null) {
+      return false;
+    }
+    if (!(o instanceof Rect)) {
+      return false;
+    }
     Rect r = (Rect) o;
     return r.x == this.x && r.y == this.y && r.width == this.width && r.height == this.height;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(height);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(width);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(x);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(y);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
+  }
 }

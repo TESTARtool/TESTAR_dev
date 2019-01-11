@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -38,5 +37,5 @@ import java.util.LinkedList;
 import org.fruit.UnProc;
 
 public interface Navigator extends UnProc<LinkedList<Widget>> {
-	void run(LinkedList<Widget> buffer);
+  void run(LinkedList<Widget> buffer);
 }

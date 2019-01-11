@@ -27,7 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.ConfigTags;
@@ -38,7 +37,6 @@ import javax.swing.*;
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
-import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
 
 public class OraclePanel extends JPanel {
 
@@ -59,7 +57,6 @@ public class OraclePanel extends JPanel {
     processCheckBox.setBounds(10, 128, 192, 20);
     add(processCheckBox);
 
-
     spnFreezeTime = new JSpinner();
     spnFreezeTime.setModel(new SpinnerNumberModel(1.0d, 1.0d, null, 1.0d));
 
@@ -68,9 +65,8 @@ public class OraclePanel extends JPanel {
     JScrollPane suspiciousProcessPane = new JScrollPane();
     suspiciousProcessPane.setViewportView(txtProcTitles);
 
-
     JLabel suspiciousTitleLabel = new JLabel("Suspicious Titles:");
-    suspiciousTitleLabel.setToolTipText(suspiciousTitlesTTT);
+    suspiciousTitleLabel.setToolTipText(ToolTipTexts.getSuspiciousTitlesTTT());
     JLabel suspiciousProcessLabel = new JLabel("Suspicious Process Output:");
     JLabel freezeTimeLabel = new JLabel("Freeze Time:");
     JLabel secondsLabel = new JLabel("seconds");

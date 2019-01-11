@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
-
 
 import org.bridj.BridJ;
 import org.bridj.Pointer;
@@ -37,13 +35,11 @@ import org.bridj.ann.Library;
 
 import java.io.IOException;
 
-
 /**
  * AT-SPI implementation.
  */
 @Library("libatspi")
 public class LibAtSpi {
-
 
     static{
         try {
@@ -54,17 +50,13 @@ public class LibAtSpi {
         BridJ.register();
     }
 
-
-
     //***           Registry            ***\\
-
 
     /**
      * Gets the number of virtual desktops. NOTE: multiple virtual desktops are not implemented yet; as a consequence, this function always returns 1.
      * @return The number of active virtual desktops.
      */
     public static native int atspi_get_desktop_count();
-
 
     /**
      * Gets the virtual desktop indicated by index i. NOTE: currently multiple virtual desktops are not implemented; as
@@ -74,7 +66,6 @@ public class LibAtSpi {
      */
     public static native long atspi_get_desktop(int desktopIndex);
 
-
     /**
      * Gets the list of virtual desktops. On return, list will point to a newly-created, NULL terminated array of virtual desktop pointers.
      * It is the responsibility of the caller to free this array when it is no longer needed. NOTE: currently multiple virtual desktops
@@ -83,10 +74,7 @@ public class LibAtSpi {
      */
     public static native long atspi_get_desktop_list();
 
-
-
     //***           AtspiAccessible            ***\\
-
 
     /**
      * Gets the name of an AtspiAccessible object.
@@ -96,7 +84,6 @@ public class LibAtSpi {
      */
     public static native Pointer<Byte> atspi_accessible_get_name(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the description of an AtspiAccessible object.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -104,7 +91,6 @@ public class LibAtSpi {
      * @return Returns a UTF-8 string describing the AtspiAccessible object or NULL on exception.
      */
     public static native Pointer<Byte> atspi_accessible_get_description(long accessiblePtr, long errorPtrToPtr);
-
 
     /**
      * Gets (a pointer to) an AtspiAccessible object's parent container.
@@ -115,7 +101,6 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_parent(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the number of children contained by an AtspiAccessible object.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -123,7 +108,6 @@ public class LibAtSpi {
      * @return Returns a the number of AtspiAccessible children contained by an AtspiAccessible object or -1 on exception.
      */
     public static native int atspi_accessible_get_child_count(long accessiblePtr, long errorPtrToPtr);
-
 
     /**
      * Gets a UTF-8 string corresponding to the name of the role played by an object. This method will return useful values for
@@ -135,7 +119,6 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_child_at_index(long accessiblePtr, int childIndex, long errorPtrToPtr);
 
-
     /**
      * Gets the index of an AtspiAccessible object within its parent's AtspiAccessible children list.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -144,7 +127,6 @@ public class LibAtSpi {
      *         or -1 if obj has no containing parent or on exception.
      */
     public static native int atspi_accessible_get_index_in_parent(long accessiblePtr, long errorPtrToPtr);
-
 
     /**
      * Gets the set of AtspiRelation objects which describes this AtspiAccessible object's relationships with other
@@ -155,7 +137,6 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_relation_set(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the UI role played by an AtspiAccessible object. This role's name can be obtained via atspi_accessible_get_role_name().
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -163,7 +144,6 @@ public class LibAtSpi {
      * @return Returns the AtspiRole of an AtspiAccessible object.
      */
     public static native int atspi_accessible_get_role(long accessiblePtr, long errorPtrToPtr);
-
 
     /**
      * Gets a UTF-8 string corresponding to the name of the role played by an object. This method will return useful values for
@@ -174,14 +154,12 @@ public class LibAtSpi {
      */
     public static native Pointer<Byte> atspi_accessible_get_role_name(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the states currently held by an object.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
      * @return Returns a pointer to an AtspiStateSet representing an object's current state set.
      */
     public static native long atspi_accessible_get_state_set(long accessiblePtr);
-
 
     /**
      * Gets the AttributeSet representing any assigned name-value pair attributes or annotations for this object.
@@ -192,7 +170,6 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_attributes(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets a GArray representing any assigned name-value pair attributes or annotations for this object.
      * For typographic, textual, or textually-semantic attributes, see atspi_text_get_attributes_as_array instead.
@@ -202,7 +179,6 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_attributes_as_array(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the toolkit name for an AtspiAccessible object. Only works on application root objects.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -210,7 +186,6 @@ public class LibAtSpi {
      * @return Returns a UTF-8 string indicating the toolkit name for the AtspiAccessible object or NULL on exception.
      */
     public static native Pointer<Byte> atspi_accessible_get_toolkit_name(long accessiblePtr, long errorPtrToPtr);
-
 
     /**
      * Gets the toolkit version for an AtspiAccessible object. Only works on application root objects.
@@ -220,7 +195,6 @@ public class LibAtSpi {
      */
     public static native Pointer<Byte> atspi_accessible_get_toolkit_version(long accessiblePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the AtspiCollection interface for an AtspiAccessible.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
@@ -229,14 +203,12 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_collection_iface(long accessiblePtr);
 
-
     /**
      * Gets the AtspiComponent interface for an AtspiAccessible.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
      * @return a pointer to an AtspiComponent interface instance, or NULL if obj does not implement AtspiComponent.
      */
     public static native long atspi_accessible_get_component_iface(long accessiblePtr);
-
 
     /**
      * Gets the AtspiAction interface for an AtspiAccessible.
@@ -245,14 +217,12 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_action_iface(long accessiblePtr);
 
-
     /**
      * Gets the AtspiTable interface for an AtspiAccessible.
      * @param accessiblePtr A pointer to the AtspiAccessible object on which to operate.
      * @return Returns a pointer to an AtspiValue interface instance, or NULL if obj does not implement AtspiValue.
      */
     public static native long atspi_accessible_get_value_iface(long accessiblePtr);
-
 
     /**
      * A set of pointers to strings describing all interfaces supported by an AtspiAccessible.
@@ -262,10 +232,7 @@ public class LibAtSpi {
      */
     public static native long atspi_accessible_get_interfaces(long accessiblePtr);
 
-
-
     //***           AtSpi StateSet            ***\\
-
 
     /**
      * Determines whether a given AtspiStateSet includes a given state; that is, whether state is true
@@ -276,7 +243,6 @@ public class LibAtSpi {
      */
     public static native boolean atspi_state_set_contains(long setPtr, int state);
 
-
     /**
      * Returns the states in an AtspiStateSet as (a pointer to) an array.
      * @param setPtr A pointer to the AtspiStateSet object on which to operate.
@@ -284,10 +250,7 @@ public class LibAtSpi {
      */
     public static native long atspi_state_set_get_states(long setPtr);
 
-
-
     //***           AtSpiAction            ***\\
-
 
     /**
      * Get the number of actions invokable on an AtspiAction implementor.
@@ -296,7 +259,6 @@ public class LibAtSpi {
      * @return Returns an integer indicating the number of invocable actions.
      */
     public static native int atspi_action_get_n_actions(long actionPtr, long errorPtrToPtr);
-
 
     /**
      * Get the description of 'i -th' action invocable on an object implementing AtspiAction.
@@ -307,7 +269,6 @@ public class LibAtSpi {
      */
     public static native Pointer<Byte> atspi_action_get_action_description(long actionPtr, int actionIndex, long errorPtrToPtr);
 
-
     /**
      * Get the description of 'i -th' action invocable on an object implementing AtspiAction.
      * @param actionPtr A pointer to the AtSpiAction object on which to operate.
@@ -316,7 +277,6 @@ public class LibAtSpi {
      * @return Returns a UTF-8 string describing the 'i -th' invocable action.
      */
     public static native Pointer<Byte> atspi_action_get_key_binding(long actionPtr, int actionIndex, long errorPtrToPtr);
-
 
     /**
      * Get the keybindings for the i -th action invocable on an object implementing AtspiAction, if any are defined.
@@ -337,7 +297,6 @@ public class LibAtSpi {
      */
     public static native Pointer<Byte> atspi_action_get_action_name(long actionPtr, int actionIndex, long errorPtrToPtr);
 
-
     /**
      * Invoke the action indicated by index.
      * @param actionPtr A pointer to the AtSpiAction object on which to operate.
@@ -347,10 +306,7 @@ public class LibAtSpi {
      */
     public static native boolean atspi_action_do_action(long actionPtr, int actionIndex, long errorPtrToPtr);
 
-
-
     //***           AtSpiComponent            ***\\
-
 
     /**
      * Queries which layer the component is painted into, to help determine its visibility in terms of stacking order.
@@ -361,7 +317,6 @@ public class LibAtSpi {
      */
     public static native long atspi_component_get_extents(long componentPtr, int coordType, long errorPtrToPtr);
 
-
     /**
      * Gets the minimum x and y coordinates of the specified AtspiComponent.
      * @param componentPtr A pointer to the AtSpiComponent object on which to operate.
@@ -371,7 +326,6 @@ public class LibAtSpi {
      */
     public static native long atspi_component_get_position(long componentPtr, int coordType, long errorPtrToPtr);
 
-
     /**
      * Gets the size of the specified AtspiComponent.
      * @param componentPtr A pointer to the AtSpiComponent object on which to operate.
@@ -380,7 +334,6 @@ public class LibAtSpi {
      */
     public static native long atspi_component_get_size(long componentPtr, long errorPtrToPtr);
 
-
     /**
      * Queries which layer the component is painted into, to help determine its visibility in terms of stacking order.
      * @param componentPtr A pointer to the AtSpiComponent object on which to operate.
@@ -388,7 +341,6 @@ public class LibAtSpi {
      * @return Returns the AtspiComponentLayer into which this component is painted.
      */
     public static native int atspi_component_get_layer(long componentPtr, long errorPtrToPtr);
-
 
     /**
      * Queries the z stacking order of a component which is in the MDI or window layer
@@ -400,7 +352,6 @@ public class LibAtSpi {
      */
     public static native short atspi_component_get_mdi_z_order(long componentPtr, long errorPtrToPtr);
 
-
     /**
      * Attempts to set the keyboard input focus to the specified AtspiComponent.
      * @param componentPtr A pointer to the AtSpiComponent object on which to operate.
@@ -409,10 +360,7 @@ public class LibAtSpi {
      */
     public static native boolean atspi_component_grab_focus(long componentPtr, long errorPtrToPtr);
 
-
-
     //***           AtspiValue            ***\\
-
 
     /**
      * Gets the minimum allowed value for an AtspiValue.
@@ -422,7 +370,6 @@ public class LibAtSpi {
      */
     public static native double atspi_value_get_minimum_value(long valuePtr, long errorPtrToPtr);
 
-
     /**
      * Gets the current value for an AtspiValue.
      * @param valuePtr A pointer to the AtSpiValue object on which to operate.
@@ -430,7 +377,6 @@ public class LibAtSpi {
      * @return Returns the current value for this object.
      */
     public static native double atspi_value_get_current_value(long valuePtr, long errorPtrToPtr);
-
 
     /**
      * Gets the maximum allowed value for an AtspiValue.
@@ -440,10 +386,7 @@ public class LibAtSpi {
      */
     public static native double atspi_value_get_maximum_value(long valuePtr, long errorPtrToPtr);
 
-
-
     //***           AtspiRelation            ***\\
-
 
     /**
      * Gets the type of relationship represented by an AtspiRelation.
@@ -451,7 +394,6 @@ public class LibAtSpi {
      * @return Returns an AtspiRelationType indicating the type of relation encapsulated in this AtspiRelation object.
      */
     public static native int atspi_relation_get_relation_type(long relationPtr);
-
 
     /**
      * Gets the number of objects which this relationship has as its target objects (the subject is the
@@ -462,7 +404,6 @@ public class LibAtSpi {
      */
     public static native int atspi_relation_get_n_targets(long relationPtr);
 
-
     /**
      * Gets the i -th target of a specified AtspiRelation relationship.
      * @param relationPtr A pointer to the AtSpiRelation object on which to operate.
@@ -472,14 +413,9 @@ public class LibAtSpi {
      */
     public static native long atspi_relation_get_target(long relationPtr, int relationIndex);
 
-
-
     //***           gLib is a part of the libatspi library!!!               ***\\
 
-
-
     //***           GArray            ***\\
-
 
     /**
      * Gets the size of the elements in array.
@@ -488,10 +424,7 @@ public class LibAtSpi {
      */
     public static native int g_array_get_element_size(long arrayPtr);
 
-
-
     //***           GList            ***\\
-
 
     /**
      * Frees all of the memory used by a GList. The freed elements are returned to the slice allocator. If list
@@ -500,7 +433,6 @@ public class LibAtSpi {
      * @param listPtr A pointer to the GList.
      */
     public static native void g_list_free(long listPtr);
-
 
     /**
      * Gets the number of elements in a GList. This function iterates over the whole list to count
@@ -511,11 +443,7 @@ public class LibAtSpi {
      */
     public static native int g_list_length(long listPtr);
 
-
-
-
     //***           GHashTable            ***\\
-
 
     /**
      * Returns the number of elements contained in the GHashTable.
@@ -523,7 +451,6 @@ public class LibAtSpi {
      * @return Returns the number of key/value pairs in the GHashTable.
      */
     public static native int g_hash_table_size(long hashTablePtr);
-
 
     /**
      * Retrieves every key inside hash_table . The returned data is valid until changes to the hash release those keys.
@@ -534,7 +461,5 @@ public class LibAtSpi {
      *         owned by the hash table and should not be modified or freed. Use g_list_free() when done using the list.
      */
     public static native long g_hash_table_get_keys(long hashTablePtr);
-
-
 
 }

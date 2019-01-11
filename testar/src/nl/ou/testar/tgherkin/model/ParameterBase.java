@@ -80,7 +80,6 @@ public class ParameterBase {
     return resultList;
   }
 
-
   @SuppressWarnings("unchecked")
   private <T> T getPlaceholderValue(Parameter<T> parameter, String columnName, DataTable dataTable) {
     String tableValue = dataTable.getPlaceholderValue(columnName);
@@ -194,7 +193,6 @@ public class ParameterBase {
   public int size() {
     return parameterValues.size();
   }
-
 
   @Override
   public String toString() {

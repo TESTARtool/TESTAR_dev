@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -50,10 +49,12 @@ public final class CompatibleGuideline extends AbstractGuideline {
 
   CompatibleGuideline(AbstractPrinciple parent) {
     super(1, "Compatible", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Parsing",
         this, Level.A, "ensure-compat-parses"));
     criteria.add(new SuccessCriterion(2, "Name, Role, Value",
         this, Level.A, "ensure-compat-rsv"));
+    setCriteria(criteria);
   }
 
   @Override

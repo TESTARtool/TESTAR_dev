@@ -315,7 +315,6 @@ public class Feature {
     return list;
   }
 
-
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();

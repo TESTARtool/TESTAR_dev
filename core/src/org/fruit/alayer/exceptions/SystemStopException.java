@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,7 +36,13 @@ import org.fruit.FruitException;
 
 public class SystemStopException extends FruitException {
   private static final long serialVersionUID = -4938584367513438864L;
-  public SystemStopException(String message) { this(message, null); }
-  public SystemStopException(String message, Throwable cause) { super(message, cause); }
-  public SystemStopException(Throwable cause) { super(cause); }
+  public SystemStopException(String message) {
+    this(message, null);
+  }
+  public SystemStopException(String message, Throwable cause) {
+    super(message, cause);
+  }
+  public SystemStopException(Throwable cause) {
+    super(cause);
+  }
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -48,17 +47,18 @@ import org.fruit.Assert;
 
 public final class Role implements Serializable{
   private static final long serialVersionUID = 4301814192425648282L;
-  private final static ConcurrentHashMap<Role, Role> existingRoles = new ConcurrentHashMap<Role, Role>();
+  private static final ConcurrentHashMap<Role, Role> existingRoles = new ConcurrentHashMap<Role, Role>();
   private Set<Role> parents;
-  transient private Set<Role> ancestors;
+  private transient Set<Role> ancestors;
   private final String name;
   private int hashcode = 0;
 
   public static boolean isOneOf(Role r, Role... oneOf) {
     Assert.notNull(r, oneOf);
     for (Role o: oneOf) {
-      if (r.isA(o))
+      if (r.isA(o)) {
         return true;
+      }
     }
     return false;
   }
@@ -68,8 +68,9 @@ public final class Role implements Serializable{
   public static boolean isOneOf(Role r, Collection<Role> oneOf) {
     Assert.notNull(r, oneOf);
     for (Role o: oneOf) {
-      if (r.isA(o))
+      if (r.isA(o)) {
         return true;
+      }
     }
     return false;
   }
@@ -95,8 +96,9 @@ public final class Role implements Serializable{
     Assert.notNull(name, inheritFrom);
     Role ret = new Role(name, inheritFrom);
     Role existing = existingRoles.putIfAbsent(ret, ret);
-    if (existing != null)
+    if (existing != null) {
       return existing;
+    }
     return ret;
   }
 
@@ -122,17 +124,32 @@ public final class Role implements Serializable{
 
   private Object readResolve() throws ObjectStreamException{
     Role existing = existingRoles.putIfAbsent(this, this);
-    return existing == null ? this: existing;
+    if (existing == null) {
+      return this;
+    } else {
+      return existing;
+    }
   }
 
-  public Set<Role> parents() { return parents; }
-  public Iterable<Role> ancestors() { return ancestors; }
-  public boolean isA(Role other) { return equals(other) || ancestors.contains(other); }
-  public String toString() { return name(); }
-  public String name() { return name; }
+  public Set<Role> parents() {
+    return parents;
+  }
+  public Iterable<Role> ancestors() {
+    return ancestors;
+  }
+  public boolean isA(Role other) {
+    return equals(other) || ancestors.contains(other); }
+  public String toString() {
+    return name();
+  }
+  public String name() {
+    return name;
+  }
 
   public boolean equals(Object other) {
-    if (other == this) return true;
+    if (other == this) {
+      return true;
+    }
     if (other instanceof Role) {
       Role otherR = (Role) other;
       return name.equals(otherR.name) &&

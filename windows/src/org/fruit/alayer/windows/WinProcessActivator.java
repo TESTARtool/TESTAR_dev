@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -39,7 +38,9 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 public final class WinProcessActivator implements Proc {
   private final long pid;
 
-  public WinProcessActivator(long pid) { this.pid = pid; }
+  public WinProcessActivator(long pid) {
+    this.pid = pid;
+  }
 
   public void run() {
     try {

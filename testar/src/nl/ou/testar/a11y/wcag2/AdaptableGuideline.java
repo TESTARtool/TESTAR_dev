@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -43,12 +43,14 @@ public final class AdaptableGuideline extends AbstractGuideline {
 
   AdaptableGuideline(AbstractPrinciple parent) {
     super(3, "Adaptable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Info and Relationships",
         this, Level.A, "content-structure-separation-programmatic"));
     criteria.add(new SuccessCriterion(2, "Meaningful Sequence",
         this, Level.A, "content-structure-separation-sequence"));
     criteria.add(new SuccessCriterion(3, "Sensory Characteristics",
         this, Level.A, "content-structure-separation-understanding"));
+    setCriteria(criteria);
   }
 
 }

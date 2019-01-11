@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
  */
 public class Matches {
 
-
   private static Matches matches = new Matches();
   private Map<String,Pattern> matchesMap = new HashMap<String,Pattern>();
 

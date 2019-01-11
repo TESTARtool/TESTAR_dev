@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -57,14 +56,16 @@ public final class MouseUp extends TaggableBase implements Action {
     this.btn = btn;
   }
 
-  public String toString() { return "Release Mouse Button " + btn; }
+  public String toString() {
+    return "Release Mouse Button " + btn;
+  }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     for (Role r: discardParameters) {
-      if (r.name().equals(ActionRoles.MouseUp.name()))
+      if (r.name().equals(ActionRoles.MouseUp.name())) {
         return "Mouse button released";
+      }
     }
     return toString();
   }
@@ -79,21 +80,19 @@ public final class MouseUp extends TaggableBase implements Action {
     }
   }
 
-  // by urueda
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
-    //return "(" + btn.toString() + ")";
-    return "";
+     return "";
   }
 
 }

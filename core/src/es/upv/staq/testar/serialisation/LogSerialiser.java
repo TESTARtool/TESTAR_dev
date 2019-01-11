@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.serialisation;
 
 import java.io.PrintStream;
@@ -72,16 +71,23 @@ public class LogSerialiser extends Thread {
   }
 
   // by Sebastian Bauersfeld
-  public static enum LogLevel{
+  public enum LogLevel{
     Critical(0), Info(1), Debug(2);
     final int significance;
-    LogLevel(int significance) { this.significance = significance; }
-    public int significance() { return significance; }
+    LogLevel(int significance) {
+      this.significance = significance;
+    }
+    public int significance() {
+      return significance;
+    }
   }
 
   private static class LogRecord{
-    public String logS; public LogLevel logL;
-    public LogRecord(String logS, LogLevel logL) { this.logS = logS; this.logL = logL;}
+    public String logS;
+    public LogLevel logL;
+    LogRecord(String logS, LogLevel logL) {
+      this.logS = logS; this.logL = logL;
+    }
   }
 
   @Override
@@ -103,15 +109,15 @@ public class LogSerialiser extends Thread {
     log.flush();
     log.close();
     synchronized(log) {
-      //System.out.println("<" + singletonLogSerialiser.getName() + "> LogSerialiser finished");
       singletonLogSerialiser = null;
       log.notifyAll();
     }
   }
 
   public static void log(String logS) {
-    if (alive)
+    if (alive) {
       log(logS,LogLevel.Info);
+    }
   }
 
   public static void log(String logS, LogLevel logLevel) {
@@ -162,5 +168,4 @@ public class LogSerialiser extends Thread {
   public static int queueLength() {
     return logSavingQueue.size();
   }
-
 }

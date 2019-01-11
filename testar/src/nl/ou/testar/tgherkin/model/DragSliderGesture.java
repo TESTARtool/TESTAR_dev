@@ -16,7 +16,6 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 
-
 /**
  * Class responsible for handling slider drags.
  *
@@ -30,7 +29,6 @@ public class DragSliderGesture extends Gesture {
     public DragSliderGesture(ParameterBase parameterBase) {
       super(parameterBase);
     }
-
 
     @Override
     public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {

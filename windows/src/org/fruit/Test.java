@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -66,20 +65,16 @@ public final class Test{
   public static String queryAllTags(State s) {
     StringBuilder sb = new StringBuilder();
     for (Widget w: s) {
-      for (Tag<?> t: w.tags())
+      for (Tag<?> t: w.tags()) {
         sb.append(w.get(t));
+      }
     }
     return sb.toString();
   }
 
-
   public static void testSerialization() throws IOException, ClassNotFoundException {
-    //ISystem sys = new WinExecutable("C:\\Windows\\System32\\mspaint.exe");
-    //ISystem sys = new WinExecutable("C:\\Program Files (x86)\\Microsoft Office\\Office14\\winword.exe");
-    //ISystem sys = WinProcess.FromProcessName("firefox.exe");
     SUT sys = WinProcess.fromPID(5692);
     UIAStateBuilder sb = new UIAStateBuilder();
-
 
     Util.pause(2);
 
@@ -90,7 +85,6 @@ public final class Test{
     FileOutputStream fos = new FileOutputStream(new File("C:\\Users\\Tanja Vos\\Desktop\\serialized_state"));
     BufferedOutputStream bos = new BufferedOutputStream(fos);
     ObjectOutputStream oos = new ObjectOutputStream(bos);
-
 
     String info;
     info = queryAllTags(s);
@@ -115,18 +109,15 @@ public final class Test{
     sys.stop();
     sb.release();
 
-
     FileInputStream fis = new FileInputStream(new File("C:\\Users\\Tanja Vos\\Desktop\\serialized_state"));
     BufferedInputStream bis = new BufferedInputStream(fis);
     ObjectInputStream ois = new ObjectInputStream(bis);
-
 
     State rs = (State)ois.readObject();
 
     ois.close();
     info = queryAllTags(rs);
     System.out.println("Tree Size: " + Util.size(s) +  "   information size: " + info.length() + "  information: " );
-
 
   }
 
@@ -154,7 +145,6 @@ public final class Test{
     return ret;
   }
 
-
   public static void main(String[] args) throws IOException, ClassNotFoundException{
     UIAStateBuilder sb = new UIAStateBuilder();
     //SUT system = WinProcess.fromExecutable("C:\\Program Files\\CTE XL 3.1.3 Professional\\cte.exe");
@@ -170,7 +160,7 @@ public final class Test{
     Mouse mouse = AWTMouse.build();
 
     final int COUNT = 40;
-    String before[] = new String[COUNT];
+    String[] before = new String[COUNT];
 
     double t1 = Util.time();
     double writeTime = 0;
@@ -225,7 +215,6 @@ public final class Test{
     }
 
     oos.close();
-
 
     double t2 = Util.time();
     System.out.println("Writing took: " + writeTime + " seconds.");

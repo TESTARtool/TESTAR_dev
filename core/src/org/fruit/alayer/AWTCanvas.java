@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -73,20 +72,21 @@ import org.fruit.Pair;
 
 public class AWTCanvas implements Image, Canvas {
 
-  public static enum StorageFormat{ JPEG, PNG, BMP; }
+  public enum StorageFormat{ JPEG, PNG, BMP; }
 
   public static void saveAsJpeg(BufferedImage image, OutputStream os, double quality) throws IOException{
     if (quality == 1) {
-      if (!ImageIO.write(image, "jpeg", os))
+      if (!ImageIO.write(image, "jpeg", os)) {
         throw new IOException("Unable to write image as JPEG!");
+      }
       return;
     }
 
     Iterator<ImageWriter> writerIter = ImageIO.getImageWritersByFormatName("jpeg");
 
-    if (!writerIter.hasNext())
+    if (!writerIter.hasNext()) {
       throw new IOException();
-
+    }
     ImageWriter iw = writerIter.next();
     ImageOutputStream ios = ImageIO.createImageOutputStream(os);
     iw.setOutput(ios);
@@ -100,15 +100,17 @@ public class AWTCanvas implements Image, Canvas {
 
   public static void saveAsPng(BufferedImage image, OutputStream os)
       throws IOException{
-    if (!ImageIO.write(image, "png", os))
+    if (!ImageIO.write(image, "png", os)) {
       throw new IOException("Unable to write image as PNG!");
+    }
   }
 
   public static void saveAsBmp(BufferedImage image, OutputStream os) throws IOException{
     BufferedImage target = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
     target.getGraphics().drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
-    if (!ImageIO.write(target, "bmp", os))
+    if (!ImageIO.write(target, "bmp", os)) {
       throw new IOException("Unable to write image as BMP!");
+    }
   }
 
   public static AWTCanvas fromScreenshot(Rect r) {
@@ -133,7 +135,7 @@ public class AWTCanvas implements Image, Canvas {
 
     try {
       return fromInputStream(bis);
-    }finally{
+    } finally{
       bis.close();
     }
   }
@@ -155,16 +157,18 @@ public class AWTCanvas implements Image, Canvas {
   private StorageFormat format;
   private double quality;
   private double x, y;
-  transient Graphics2D gr;
-  static final Pen defaultPen = Pen.PEN_DEFAULT;
-  double fontSize, strokeWidth;
-  String font;
-  StrokePattern strokePattern;
-  FillPattern fillPattern;
-  StrokeCaps strokeCaps;
-  Color color;
+  private transient Graphics2D gr;
+  private static final Pen DEFAULTPEN = Pen.PEN_DEFAULT;
+  private double fontSize, strokeWidth;
+  private String font;
+  private StrokePattern strokePattern;
+  private FillPattern fillPattern;
+  private StrokeCaps strokeCaps;
+  private Color color;
 
-  public AWTCanvas(int width, int height) { this(0, 0, width, height);  }
+  public AWTCanvas(int width, int height) {
+    this(0, 0, width, height);
+  }
 
   public AWTCanvas(double x, double y, int width, int height) {
     this(x, y, new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB), StorageFormat.PNG, 1.0);
@@ -186,35 +190,44 @@ public class AWTCanvas implements Image, Canvas {
     this.format = format;
     this.quality = quality;
     gr = img.createGraphics();
-    //    gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-    //        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-    adjustPen(defaultPen);
-    //gr.setComposite(AlphaComposite.Clear);
+    adjustPen(DEFAULTPEN);
   }
 
   public void begin() {}
   public void end() {}
-  public Pen defaultPen() { return defaultPen; }
-  public double width() { return img.getWidth(); }
-  public double height() { return img.getHeight(); }
-  public double x() { return x; }
-  public double y() { return y; }
-  public BufferedImage image() { return img; }
+  public Pen defaultPen() {
+    return DEFAULTPEN;
+    }
+  public double width() {
+    return img.getWidth();
+  }
+  public double height() {
+    return img.getHeight();
+  }
+  public double x() {
+    return x;
+  }
+  public double y() {
+    return y;
+  }
+  public BufferedImage image() {
+    return img;
+  }
 
   private void adjustPen(Pen pen) {
     Double tstrokeWidth = pen.strokeWidth();
-    if (tstrokeWidth == null)
-      tstrokeWidth = defaultPen.strokeWidth();
-
+    if (tstrokeWidth == null) {
+      tstrokeWidth = DEFAULTPEN.strokeWidth();
+    }
     StrokePattern tstrokePattern = pen.strokePattern();
-    if (tstrokePattern == null)
-      tstrokePattern = defaultPen.strokePattern();
-
+    if (tstrokePattern == null) {
+      tstrokePattern = DEFAULTPEN.strokePattern();
+    }
     StrokeCaps tstrokeCaps = pen.strokeCaps();
-    if (tstrokeCaps == null)
-      tstrokeCaps = defaultPen.strokeCaps();
-
+    if (tstrokeCaps == null) {
+      tstrokeCaps = DEFAULTPEN.strokeCaps();
+    }
     if (!tstrokeWidth.equals(strokeWidth) || tstrokePattern != strokePattern || tstrokeCaps != strokeCaps) {
       strokePattern = tstrokePattern;
       strokeWidth = tstrokeWidth;
@@ -223,22 +236,22 @@ public class AWTCanvas implements Image, Canvas {
     }
 
     Color tcolor = pen.color();
-    if (tcolor == null)
-      tcolor = defaultPen.color();
-
+    if (tcolor == null) {
+      tcolor = DEFAULTPEN.color();
+    }
     if (!tcolor.equals(color)) {
       color = tcolor;
       gr.setColor(new java.awt.Color(color.red(), color.green(), color.blue(), color.alpha()));
     }
 
     String tfont = pen.font();
-    if (tfont == null)
-      tfont = defaultPen.font();
-
+    if (tfont == null) {
+      tfont = DEFAULTPEN.font();
+    }
     Double tfontSize = pen.fontSize();
-    if (tfontSize == null)
-      tfontSize = defaultPen.fontSize();
-
+    if (tfontSize == null) {
+      tfontSize = DEFAULTPEN.fontSize();
+    }
     if (!tfont.equals(font) || !tfontSize.equals(fontSize)) {
       font = tfont;
       fontSize = tfontSize;
@@ -246,14 +259,13 @@ public class AWTCanvas implements Image, Canvas {
     }
 
     FillPattern tfillPattern = pen.fillPattern();
-    if (tfillPattern == null)
-      tfillPattern = defaultPen.fillPattern();
-
+    if (tfillPattern == null) {
+      tfillPattern = DEFAULTPEN.fillPattern();
+    }
     if (tfillPattern != fillPattern) {
       fillPattern = tfillPattern;
     }
   }
-
 
   public void line(Pen pen, double x1, double y1, double x2, double y2) {
     Assert.notNull(pen);
@@ -265,15 +277,11 @@ public class AWTCanvas implements Image, Canvas {
     Assert.notNull(pen, text);
     adjustPen(pen);
 
-    //if (angle == 0) {
-    //    gr.drawString(text, (int)x, (int)y);
-    //    } else {
     TextLayout txtl = new TextLayout(text, gr.getFont(), new FontRenderContext(null, true, false));
     AffineTransform at = new AffineTransform();
     at.translate(x - this.x, y - this.y + txtl.getBounds().getHeight());
     at.rotate(angle);
     gr.fill(txtl.getOutline(at));
-    //}
   }
 
   public Pair<Double, Double> textMetrics(Pen pen, String text) {
@@ -303,20 +311,22 @@ public class AWTCanvas implements Image, Canvas {
     Assert.isTrue(width >= 0 && height >= 0);
 
     adjustPen(pen);
-    if (fillPattern == FillPattern.Solid)
+    if (fillPattern == FillPattern.Solid) {
       gr.fillOval((int)(x - this.x), (int)(y - this.y), (int)width, (int)height);
-    else
+    } else {
       gr.drawOval((int)(x - this.x), (int)(y - this.y), (int)width, (int)height);
+    }
   }
 
   public void rect(Pen pen, double x, double y, double width, double height) {
     Assert.notNull(pen);
     Assert.isTrue(width >= 0 && height >= 0);
     adjustPen(pen);
-    if (fillPattern.equals(FillPattern.Solid))
+    if (fillPattern.equals(FillPattern.Solid)) {
       gr.fillRect((int)(x - this.x), (int)(y - this.y), (int)width, (int)height);
-    else
+    } else {
       gr.drawRect((int)(x - this.x), (int)(y - this.y), (int)width, (int)height);
+    }
   }
 
   public void saveAsJpeg(OutputStream os, double quality) throws IOException{
@@ -330,7 +340,7 @@ public class AWTCanvas implements Image, Canvas {
 
     try {
       saveAsJpeg(bos, quality);
-    }finally{
+    } finally{
       bos.close();
     }
   }
@@ -344,7 +354,7 @@ public class AWTCanvas implements Image, Canvas {
 
     try {
       saveAsPng(bos);
-    }finally{
+    } finally{
       bos.close();
     }
   }
@@ -352,8 +362,9 @@ public class AWTCanvas implements Image, Canvas {
   private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
     is.defaultReadObject();
     img = ImageIO.read(is);
-    if (img == null)
+    if (img == null) {
       throw new IOException("Unable to read AWTCanvas!");
+    }
     BufferedImage converted = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
     converted.getGraphics().drawImage(img, 0, 0, null);
     img = converted;
@@ -373,7 +384,7 @@ public class AWTCanvas implements Image, Canvas {
       double height) {
     Assert.notNull(canvas);
 
-    int data[] = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
+    int[] data = ((DataBufferInt)img.getRaster().getDataBuffer()).getData();
     canvas.image(canvas.defaultPen(), x, y, width, height,
         data, img.getWidth(), img.getHeight());
   }
@@ -390,7 +401,7 @@ public class AWTCanvas implements Image, Canvas {
     BufferedImage subImage = new BufferedImage(srcWidth, srcHeight, BufferedImage.TYPE_INT_ARGB);
     subImage.getGraphics().drawImage(img.getSubimage(srcX, srcY, srcWidth, srcHeight), 0, 0, srcWidth, srcHeight, null);
 
-    int area[] = ((DataBufferInt)subImage.getRaster().getDataBuffer()).getData();
+    int[] area = ((DataBufferInt)subImage.getRaster().getDataBuffer()).getData();
     canvas.image(canvas.defaultPen(), destRect.x(), destRect.y(), destRect.width(), destRect.height(), area, srcWidth, srcHeight);
   }
 
@@ -399,15 +410,17 @@ public class AWTCanvas implements Image, Canvas {
     Polygon pol = new Polygon(new int[]{(int)(x1 - this.x), (int)(x2 - this.x), (int)(x3 - this.x)}, new int[]{(int)(y1 - this.y), (int)(y2 - this.y), (int)(y3 - this.y)}, 3);
     adjustPen(pen);
 
-    if (fillPattern.equals(FillPattern.Solid))
+    if (fillPattern.equals(FillPattern.Solid)) {
       gr.fillPolygon(pol);
-    else
+    } else {
       gr.drawPolygon(pol);
+    }
   }
 
   /**
    * @return Similarity percentage as 0.0 (different) .. 1.0 (equal).
    * @author urueda
+   * @param img image to compare with
    */
   public float compareImage(AWTCanvas img) {
     //long now = System.currentTimeMillis();
@@ -415,28 +428,42 @@ public class AWTCanvas implements Image, Canvas {
            dbImg = img.img.getData().getDataBuffer();
     int sizeThis = dbThis.getSize(),
       sizeImg = dbImg.getSize();
-    if (sizeThis == 0 || sizeImg == 0)
+    if (sizeThis == 0 || sizeImg == 0) {
       return 0f;
+    }
     float sizeSimilarity;
-    if (sizeThis == sizeImg)
+    if (sizeThis == sizeImg) {
       sizeSimilarity = 1.0f;
-    else if (sizeThis < sizeImg)
+    } else if (sizeThis < sizeImg) {
       sizeSimilarity = sizeThis / sizeImg;
-    else // sizeThis > sizeImg
+    } else { // sizeThis > sizeImg
       sizeSimilarity = sizeImg / sizeThis;
+    }
     int equalPixels = 0, i = 0;
     while (i < sizeThis && i < sizeImg) {
-      if (dbThis.getElem(i) == dbImg.getElem(i))
+      if (dbThis.getElem(i) == dbImg.getElem(i)) {
         equalPixels++;
+      }
       i++;
     }
     float meanSize = (sizeThis + sizeImg) / 2;
     float percent = sizeSimilarity - (1.0f - (equalPixels / meanSize));
     //System.out.println("Image comparison took: " + (System.currentTimeMillis() - now) + " ms");
-    return (percent < 0f ? 0f: (percent > 1f ? 1f: percent));
+    if (percent < 0f) {
+      return 0f;
+    } else {
+      if (percent >1f) {
+        return 1f;
+      } else {
+        return percent;
+      }
+    }
   }
 
-  public void release() {}
+  public void release() {
+  }
 
-  public String toString() { return "AWTCanvas (width: " + width() + " height: " + height() + ")";  }
+  public String toString() {
+    return "AWTCanvas (width: " + width() + " height: " + height() + ")";
+  }
 }

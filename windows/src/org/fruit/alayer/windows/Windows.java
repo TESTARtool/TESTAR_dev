@@ -662,7 +662,10 @@ public final class Windows{
   public static native long GetModuleHandleEx(long dwFlags, String lpModuleName);
   public static native long GetCurrentModule();
   public static native long MonitorFromPoint(long x, long y, long dwFlags);
-  public static long GetPrimaryMonitorHandle() { return MonitorFromPoint(0, 0, MONITOR_DEFAULTTOPRIMARY); /* because point {0,0} is always on the primary monitor!! */ }
+  public static long GetPrimaryMonitorHandle() {
+    /* because point {0,0} is always on the primary monitor!! */
+    return MonitorFromPoint(0, 0, MONITOR_DEFAULTTOPRIMARY);
+  }
   public static native long[] GetMonitorInfo(long hMonitor);
   public static native long GetDC(long hWnd);
   public static native long CreateCompatibleDC(long hdc);
@@ -704,7 +707,7 @@ public final class Windows{
    public static native long   GetProcessMemoryInfo(long processID);
   public static native long[] GetProcessTimes(long processID);
   public static native String  GetProcessNameFromHWND(long hwnd);
- 
+
   public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
   public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
   public static native long     GetHWNDFromAccessibleContext(long vmid, long ac);
@@ -831,33 +834,36 @@ public final class Windows{
 
     try {
       pUnderCursor = Windows.IUIAutomation_ElementFromPoint(pAutomation, x, y);
-      if (pUnderCursor == 0) return false;
+      if (pUnderCursor == 0) {
+        return false;
+      }
 
       long[] rid1 = Windows.IUIAutomationElement_GetRuntimeId(pExpected);
       long[] rid2 = Windows.IUIAutomationElement_GetRuntimeId(pUnderCursor);
-      if (rid1 == null || rid2 == null || rid1.length != rid2.length)
+      if (rid1 == null || rid2 == null || rid1.length != rid2.length) {
         return false;
-
+      }
       for (int i = 0; i < rid1.length; i++) {
-        if (rid1[i] != rid2[i])
+        if (rid1[i] != rid2[i]) {
           return false;
+        }
       }
       return true;
     }finally{
-      if (pUnderCursor != 0) Windows.IUnknown_Release(pUnderCursor);
+      if (pUnderCursor != 0) {
+        Windows.IUnknown_Release(pUnderCursor);
+      }
     }
   }
 
   static{
     try {
       loadExternalLib("../windows/target/resources/main/windows.dll");
-      // end by urueda
     } catch(IOException ioe) {
       throw new RuntimeException(ioe);
     }
   }
 
-  // by urueda
   private static void loadExternalLib(String name) throws IOException {
     File f = new File(name);
     if (f.exists()) {
@@ -883,8 +889,9 @@ public final class Windows{
   private static void copy(InputStream in, OutputStream out) throws IOException{
     while (true) {
       int data = in.read();
-      if (data == -1)
+      if (data == -1) {
         break;
+      }
       out.write(data);
     }
   }

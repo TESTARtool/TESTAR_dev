@@ -1,6 +1,5 @@
 package nl.ou.testar.tgherkin.model;
 
-import java.util.Collections;
 import java.util.List;
 import org.fruit.Assert;
 

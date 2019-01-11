@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -46,45 +45,45 @@ import org.fruit.alayer.exceptions.SystemStopException;
  * @see State
  */
 public interface SUT extends Taggable {
-	
-	/**
-	 * Stops execution of the system. Implementations should try to first shut down
-	 * the system "gently" and gradually get more aggressive if that fails. If it is
-	 * not possible to shutdown the system, implementors of this method are supposed to throw a
-	 * <code>SystemStopException</code>.
-	 * @throws SystemStopException if the system cannot be stopped
-	 */
-	void stop() throws SystemStopException;
-    
-	/** Is the system running?
-	 * @return returns whether the system is running
-	 */
-	boolean isRunning();
-	
-	/**
-	 * Retrieves a text representation of SUT status (i.e. CPU/memory usage).
-	 * @return The status.
-	 * @author urueda
-	 */
-	String getStatus();
-	
-	/**
-	 * Retrieves the running processes.
-	 * @return A list of pairs &lt;PID,NAME&gt; with the PID/NAME of running processes.
-	 * @author: urueda
-	 */
-	List<Pair<Long, String>> getRunningProcesses();
-	
-	/**
-	 * Sets a native automation cache.
-	 * @author: urueda
-	 */
-	void setNativeAutomationCache();
-	
-	/**
-	 * Returns the native automation cache.
-	 * @return
-	 */
-	AutomationCache getNativeAutomationCache();
-	
+
+  /**
+   * Stops execution of the system. Implementations should try to first shut down
+   * the system "gently" and gradually get more aggressive if that fails. If it is
+   * not possible to shutdown the system, implementors of this method are supposed to throw a
+   * <code>SystemStopException</code>.
+   * @throws SystemStopException if the system cannot be stopped
+   */
+  void stop() throws SystemStopException;
+
+  /** Is the system running?
+   * @return returns whether the system is running
+   */
+  boolean isRunning();
+
+  /**
+   * Retrieves a text representation of SUT status (i.e. CPU/memory usage).
+   * @return The status.
+   * @author urueda
+   */
+  String getStatus();
+
+  /**
+   * Retrieves the running processes.
+   * @return A list of pairs &lt;PID,NAME&gt; with the PID/NAME of running processes.
+   * @author: urueda
+   */
+  List<Pair<Long, String>> getRunningProcesses();
+
+  /**
+   * Sets a native automation cache.
+   * @author: urueda
+   */
+  void setNativeAutomationCache();
+
+  /**
+   * Returns the native automation cache.
+   * @return
+   */
+  AutomationCache getNativeAutomationCache();
+
 }

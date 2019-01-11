@@ -111,7 +111,6 @@ public class WidgetCondition {
     return validator.getErrorList();
   }
 
-
     @Override
     public String toString() {
       StringBuilder result = new StringBuilder();

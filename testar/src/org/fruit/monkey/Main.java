@@ -27,8 +27,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -44,120 +42,90 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 import nl.ou.testar.tgherkin.model.Document;
+import org.fruit.alayer.Tag;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
 
 public class Main {
+  private static final double MINIMUM_PERCENTAGE_DEFAULT = 95.0;
+  private static final double DISCOUNT_DEFAULT = .95;
+  private static final double MAXREWARD_DEFAULT = 9999999.0;
+  private static final double STARTUP_TIME_DEFAULT = 8.0;
+  private static final double MAXTIME_DEFAULT = 31536000.0;
+  private static final double REPLAY_RETRY_TIME_DEFAULT = 30.0;
   public static final String SETTINGS_DIR_PROPERTY = "SettingsDir";
   public static final String SETTINGS_DIR_DEFAULT = "./resources/settings/";
 
   private static String settingsDir = null;
 
+  @SuppressWarnings ("unchecked")
+  private static void overrideClass(Settings settings, Tag<?> configtag, String mnemonic) {
+    String configtagname;
+    String systemConfigtagName;
+    configtagname = configtag.name();
+    systemConfigtagName = System.getProperty(configtagname, null);
+    if (systemConfigtagName == null) {
+      systemConfigtagName = System.getProperty(mnemonic, null); // mnemonic
+    }
+    if (systemConfigtagName != null) {
+      if (configtag.type() == Boolean.class) {
+         settings.set((Tag<Boolean>)configtag, !(new Boolean(systemConfigtagName).booleanValue()));
+         LogSerialiser.log("Property <" + configtagname + "> overridden to <" + systemConfigtagName + ">", LogSerialiser.LogLevel.Critical);
+      }
+      if (configtag.type() == String.class) {
+         settings.set((Tag<String>)configtag, systemConfigtagName);
+         LogSerialiser.log("Property <" + configtagname + "> overridden to <" + systemConfigtagName + ">", LogSerialiser.LogLevel.Critical);
+      }
+      if (configtag.type() == Integer.class || configtag.type() == Float.class) {
+        try {
+          if (configtag.type() == Integer.class) {
+            Integer sl = new Integer(systemConfigtagName);
+            settings.set((Tag<Integer>)configtag, sl);
+          }
+          if (configtag.type() == Float.class) {
+            Float fl = new Float(systemConfigtagName);
+            settings.set((Tag<Float>)configtag, fl);
+          }
+          LogSerialiser.log("Property <" + configtagname + "> overridden to <" + systemConfigtagName + ">", LogSerialiser.LogLevel.Critical);
+        } catch (NumberFormatException e) {
+          LogSerialiser.log("Property <" + configtagname + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
+        }
+
+      }
+    }
+  }
+
   // TODO: Understand what this exactly does?
   /**
    * Override something. Not sure what
-   * @param settings
+   * @param settings The settings to load
    */
   private static void overrideWithUserProperties(Settings settings) {
-    String pS;
-    String p;
     // headless mode
-    pS = ConfigTags.ShowVisualSettingsDialogOnStartup.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("headless", null); // mnemonic
-    }
-    if (p != null) {
-      settings.set(ConfigTags.ShowVisualSettingsDialogOnStartup, !(new Boolean(p).booleanValue()));
-      LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-    }
+    overrideClass(settings, ShowVisualSettingsDialogOnStartup, "headless");
+
     // TestGenerator
-    pS = ConfigTags.TestGenerator.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("TG", null); // mnemonic
-    }
-    if (p != null) {
-      settings.set(ConfigTags.TestGenerator, p);
-      LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-    }
+    overrideClass(settings, TestGenerator, "TG");
+
     // SequenceLength
-    pS = ConfigTags.SequenceLength.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("SL", null); // mnemonic
-    }
-    if (p != null) {
-      try {
-        Integer sl = new Integer(p);
-        settings.set(ConfigTags.SequenceLength, sl);
-        LogSerialiser.log("Property <" + pS + "> overridden to <" + sl.toString() + ">", LogSerialiser.LogLevel.Critical);
-      } catch (NumberFormatException e) {
-        LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-      }
-    }
+    overrideClass(settings, SequenceLength, "SL");
+
     // GraphResumingActivated
-    pS = ConfigTags.GraphResuming.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("GRA", null); // mnemonic
-    }
-    if (p != null) {
-      settings.set(ConfigTags.GraphResuming, new Boolean(p).booleanValue());
-      LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-    }
+    overrideClass(settings, GraphResuming, "GRA");
+
     // ForceToSequenceLength
-    pS = ConfigTags.ForceToSequenceLength.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("F2SL", null); // mnemonic
-    }
-    if (p != null) {
-      settings.set(ConfigTags.ForceToSequenceLength, new Boolean(p).booleanValue());
-      LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-    }
+    overrideClass(settings, ForceToSequenceLength, "F2SL");
+
     // TypingTextsForExecutedAction
-    pS = ConfigTags.TypingTextsForExecutedAction.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("TT", null); // mnemonic
-    }
-    if (p != null) {
-      try {
-        Integer tt = new Integer(p);
-        settings.set(ConfigTags.TypingTextsForExecutedAction, tt);
-        LogSerialiser.log("Property <" + pS + "> overridden to <" + tt.toString() + ">", LogSerialiser.LogLevel.Critical);
-      } catch (NumberFormatException e) {
-        LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-      }
-    }
+    overrideClass(settings, TypingTextsForExecutedAction, "TT");
+
     // StateScreenshotSimilarityThreshold
-    pS = ConfigTags.StateScreenshotSimilarityThreshold.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("SST", null); // mnemonic
-    }
-    if (p != null) {
-      try {
-        Float sst = new Float(p);
-        settings.set(ConfigTags.StateScreenshotSimilarityThreshold, sst);
-        LogSerialiser.log("Property <" + pS + "> overridden to <" + sst.toString() + ">", LogSerialiser.LogLevel.Critical);
-      } catch (NumberFormatException e) {
-        LogSerialiser.log("Property <" + pS + "> could not be set! (using default)", LogSerialiser.LogLevel.Critical);
-      }
-    }
+    overrideClass(settings, StateScreenshotSimilarityThreshold, "SST");
+
     // UnattendedTests
-    pS = ConfigTags.UnattendedTests.name();
-    p = System.getProperty(pS, null);
-    if (p == null) {
-      p = System.getProperty("UT", null); // mnemonic
-    }
-    if (p != null) {
-      settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
-      LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
-    }
+    overrideClass(settings, UnattendedTests, "UT");
   }
 
   public static String getSettingsDir() {
@@ -173,12 +141,17 @@ public class Main {
 
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
-  public static String SSE_ACTIVATED = null;
+  private static String sseActivated = null;
+
+  public static void setSseActivated(String sseActivated) {
+    Main.sseActivated = sseActivated;
+  }
 
   /**
-   *  This method creates the dropdown menu to select a protocol when TESTAR starts WITHOUT a .sse file
+   *  This method creates the drop down menu to select a protocol when TESTAR starts WITHOUT a .sse file
    */
-  //FIXME: This method throws a NullPointerException when you do not start testar explicitly from the bin directorybecause it cannot find the settings files
+  //FIXME: This method throws a NullPointerException when you do not start TESTAR explicitly
+  //       from the bin directory because it cannot find the settings files
   private static void settingsSelection() {
     Set<String> sutSettings = new HashSet<String>();
     for (File f: new File(getSettingsDir()).listFiles()) {
@@ -198,7 +171,7 @@ public class Main {
           "SUT setting:", "Test setting selection",
           JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
       if (s == null) {
-        SSE_ACTIVATED = null;
+        sseActivated = null;
         return;
       }
       final String sse = s + SUT_SETTINGS_EXT;
@@ -206,14 +179,14 @@ public class Main {
         File f = new File(getSettingsDir() + File.separator + sse);
         if (f.createNewFile()) {
           //System.out.println("Using <" + s + "> test settings");
-          SSE_ACTIVATED = s;
+          sseActivated = s;
           return;
         }
       } catch (IOException e) {
         System.out.println("Exception creating <" + sse + "> file");
       }
     }
-    SSE_ACTIVATED = null;
+    sseActivated = null;
   }
 
   /**
@@ -230,7 +203,7 @@ public class Main {
   }
 
   public static String getSettingsFile() {
-    return getSettingsDir() + SSE_ACTIVATED + File.separator + SETTINGS_FILE;
+    return getSettingsDir() + sseActivated + File.separator + SETTINGS_FILE;
   }
 
   private static void startLogs(Settings settings) {
@@ -259,7 +232,8 @@ public class Main {
     // Start up the TESTAR Dialog
     if (settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
       try {
-        if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {
+        Settings testsettings = new SettingsDialog().run(settings, testSettingsFileName);
+        if (testsettings == null) {
           return false;
         }
       } catch (IOException e) {
@@ -352,13 +326,13 @@ public class Main {
     //If there is none, then start up a selection menu
     if (files == null || files.length == 0) {
       settingsSelection();
-      if (SSE_ACTIVATED == null) {
+      if (sseActivated == null) {
         System.exit(-1);
       }
     }
     else {
       //Use the only file that was found
-      SSE_ACTIVATED = files[0].split(SUT_SETTINGS_EXT)[0];
+      sseActivated = files[0].split(SUT_SETTINGS_EXT)[0];
     }
 
     return settings;
@@ -388,7 +362,6 @@ public class Main {
 
     settings = loadSettings(settings, args, testSettingsFileName);
 
-
     if (startTestarDialog(settings, testSettingsFileName)) {
 
       startLogs(settings);
@@ -411,10 +384,10 @@ public class Main {
   /**
    * Load the default settings for all the configurable settings and add/overwrite with those from the file
    * This is needed because the user might not have set all the possible settings in the test.settings file.
-   * @param argv
-   * @param file
+   * @param argv input arguments
+   * @param file file to load setting from
    * @return An instance of Settings
-   * @throws ConfigException
+   * @throws ConfigException if configuration fails
    */
   public static Settings loadSettings(String[] argv, String file) throws ConfigException {
     Assert.notNull(file);
@@ -438,10 +411,10 @@ public class Main {
       defaults.add(Pair.from(VisualizeActions, false));
       defaults.add(Pair.from(VisualizeSelectedAction, false));
       defaults.add(Pair.from(SequenceLength, 10));
-      defaults.add(Pair.from(ReplayRetryTime, 30.0));
+      defaults.add(Pair.from(ReplayRetryTime, REPLAY_RETRY_TIME_DEFAULT));
       defaults.add(Pair.from(Sequences, 1));
-      defaults.add(Pair.from(MaxTime, 31536000.0));
-      defaults.add(Pair.from(StartupTime, 8.0));
+      defaults.add(Pair.from(MaxTime, MAXTIME_DEFAULT));
+      defaults.add(Pair.from(StartupTime, STARTUP_TIME_DEFAULT));
       defaults.add(Pair.from(SUTConnectorValue, ""));
       defaults.add(Pair.from(Delete, new ArrayList<String>()));
       defaults.add(Pair.from(CopyFromTo, new ArrayList<Pair<String, String>>()));
@@ -456,8 +429,8 @@ public class Main {
       defaults.add(Pair.from(ShowSettingsAfterTest, true));
       defaults.add(Pair.from(SUTConnector, Settings.SUT_CONNECTOR_CMDLINE));
       defaults.add(Pair.from(TestGenerator, "random"));
-      defaults.add(Pair.from(MaxReward, 9999999.0));
-      defaults.add(Pair.from(Discount, .95));
+      defaults.add(Pair.from(MaxReward, MAXREWARD_DEFAULT));
+      defaults.add(Pair.from(Discount, DISCOUNT_DEFAULT));
       defaults.add(Pair.from(AlgorithmFormsFilling, false));
       defaults.add(Pair.from(TypingTextsForExecutedAction, 10));
       defaults.add(Pair.from(DrawWidgetTree, false));
@@ -496,11 +469,10 @@ public class Main {
       defaults.add(Pair.from(TgherkinReportIncludeImageRecognition, false));
       defaults.add(Pair.from(TgherkinNrOfNOPRetries, 0));
       defaults.add(Pair.from(TgherkinExecutionMode, Document.getRegisteredExecutionModes()[0]));
-      defaults.add(Pair.from(MinimumPercentageForImageRecognition, 95.0));
+      defaults.add(Pair.from(MinimumPercentageForImageRecognition, MINIMUM_PERCENTAGE_DEFAULT));
 
       //Overwrite the default settings with those from the file
       Settings settings = Settings.fromFile(defaults, file);
-
 
       //If user use command line to input properties, mix file settings with cmd properties
       if (argv.length>0) {

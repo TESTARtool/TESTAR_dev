@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -43,26 +42,32 @@ import org.fruit.alayer.exceptions.AbstractionException;
 public final class IndexAbstractor implements Abstractor {
 
   private static final class IndexNode{
-    int idx;
-    IndexNode parent;
-    public IndexNode(int idx, IndexNode parent) {
+    private int idx;
+    private IndexNode parent;
+    IndexNode(int idx, IndexNode parent) {
       this.idx = idx;
       this.parent = parent;
     }
   }
 
-  final boolean caching;
-  Map<Widget, IndexNode> wtoi;
+  private final boolean caching;
+  private Map<Widget, IndexNode> wtoi;
 
-  public IndexAbstractor() { this(true); }
+  public IndexAbstractor() {
+    this(true);
+  }
 
   public IndexAbstractor(boolean enableCaching) {
     caching = enableCaching;
     wtoi = new WeakHashMap<Widget, IndexNode>();
   }
 
-  public void clearCache() { wtoi.clear(); }
-  public void cache(Widget root) { cache(root, null); }
+  public void clearCache() {
+    wtoi.clear();
+  }
+  public void cache(Widget root) {
+    cache(root, null);
+  }
 
   private void cache(Widget widget, IndexNode parentNode) {
     for (int i = 0; i < widget.childCount(); i++) {
@@ -98,14 +103,16 @@ public final class IndexAbstractor implements Abstractor {
     }
     int size = list.size();
     int[] ret = new int[size];
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++) {
       ret[i] = list.get(size - i - 1);
+    }
     return ret;
   }
 
   public Finder apply(Widget widget) throws AbstractionException {
-    if (widget.parent() == null)
+    if (widget.parent() == null) {
       return new IndexFinder(new int[0]);
+    }
     return new IndexFinder(getIndexPath(widget));
   }
 }

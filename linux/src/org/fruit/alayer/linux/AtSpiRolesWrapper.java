@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
-
 
 import org.fruit.Util;
 import org.fruit.alayer.Role;
@@ -38,19 +36,15 @@ import org.fruit.alayer.linux.atspi.enums.AtSpiRoles;
 
 import java.util.Map;
 
-
 /**
  * Wraps native roles - it maps the native At-SPI roles to Testar defined ones.
  */
 public final class AtSpiRolesWrapper {
 
-
     //region Variables
 
-
     // The mapping of the navive Role wrappers with an ID (the AtSpiRoles enum value).
-    private final static Map<Long, Role> typeIdToRole = Util.newHashMap();
-
+    private static final Map<Long, Role> typeIdToRole = Util.newHashMap();
 
     // Define all native role wrappers.
     public static final Role
@@ -182,24 +176,18 @@ public final class AtSpiRolesWrapper {
                     AtSpiSuperscript = from(AtSpiRoles.Superscript.ordinal(), "AtSpi" + AtSpiRoles.Superscript.toString(), AtSpiWidget, Roles.Control),
                     AtSpiLastDefined = from(AtSpiRoles.LastDefined.ordinal(), "AtSpi" + AtSpiRoles.LastDefined.toString(), Roles.Invalid);
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Default empty constructor.
      */
     private AtSpiRolesWrapper() {}
 
-
     //endregion
 
-
     //region Helper functionality
-
 
     // The Role... means Role[] - you can define as many Roles as you like when calling this method and
     // the array will be created automatically.
@@ -216,7 +204,6 @@ public final class AtSpiRolesWrapper {
         return ret;
     }
 
-
     /**
      * Find a role belonging to a type id.
      * @param typeId The type id of an AtSpiRole.
@@ -227,8 +214,6 @@ public final class AtSpiRolesWrapper {
         return (ret == null) ? AtSpiUnknown: ret;
     }
 
-
     //endregion
-
 
 }

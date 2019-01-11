@@ -27,10 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit.alayer;
 
-public enum StrokePattern {	Solid, }
+public enum StrokePattern {  Solid, }

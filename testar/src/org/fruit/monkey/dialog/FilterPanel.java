@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
 
 import org.fruit.monkey.ConfigTags;
@@ -37,8 +36,6 @@ import javax.swing.*;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
-import static org.fruit.monkey.dialog.ToolTipTexts.label1TTT;
-import static org.fruit.monkey.dialog.ToolTipTexts.label2TTT;
 
 public class FilterPanel extends JPanel {
 
@@ -50,10 +47,10 @@ public class FilterPanel extends JPanel {
   public FilterPanel() {
     JLabel filterByTitleLabel = new JLabel(
         "Filter actions by the widget its TITLE property (regular expression):");
-    filterByTitleLabel.setToolTipText(label1TTT);
+    filterByTitleLabel.setToolTipText(ToolTipTexts.getLabel1TTT());
     JLabel killProcessByNameLabel = new JLabel(
         "Kill processes by name (regular expression):");
-    killProcessByNameLabel.setToolTipText(label2TTT);
+    killProcessByNameLabel.setToolTipText(ToolTipTexts.getLabel2TTT());
 
     JScrollPane filterByTitlePane = new JScrollPane();
     JScrollPane killProcessByNamePane = new JScrollPane();

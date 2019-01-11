@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -49,17 +48,19 @@ public final class ReadableGuideline extends AbstractGuideline {
 
   ReadableGuideline(AbstractPrinciple parent) {
     super(1, "Readable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
     criteria.add(new SuccessCriterion(1, "Language of Page",
         this, Level.A, "meaning-doc-lang-id"));
     criteria.add(new SuccessCriterion(2, "Language of Parts",
         this, Level.AA, "meaning-other-lang-id"));
+    setCriteria(criteria);
   }
 
   @Override
   public EvaluationResults evaluate(List<Widget> widgets) {
     EvaluationResults results = new EvaluationResults();
     SuccessCriterion sc = getSuccessCriterionByName("Language of Page");
-    for (Widget w: widgets)
+    for (Widget w: widgets) {
       if (AccessibilityUtil.isWindow(w) && AccessibilityUtil.getLanguage(w) == 0) {
         results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
             "Missing top-level language identifier", w));
@@ -67,6 +68,7 @@ public final class ReadableGuideline extends AbstractGuideline {
       else {
         results.add(evaluationPassed(sc));
       }
+    }
     return results;
   }
 

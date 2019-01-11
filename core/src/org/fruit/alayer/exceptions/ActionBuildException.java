@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,7 +36,13 @@ import org.fruit.FruitException;
 
 public class ActionBuildException extends FruitException {
   private static final long serialVersionUID = -4992879959880705549L;
-  public ActionBuildException(String message) { this(message, null); }
-  public ActionBuildException(String message, Throwable cause) { super(message, cause); }
-  public ActionBuildException(Throwable cause) { super(cause); }
+  public ActionBuildException(String message) {
+    this(message, null);
+  }
+  public ActionBuildException(String message, Throwable cause) {
+    super(message, cause);
+  }
+  public ActionBuildException(Throwable cause) {
+    super(cause);
+  }
 }

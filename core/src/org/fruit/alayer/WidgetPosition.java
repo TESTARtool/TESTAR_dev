@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -60,11 +59,10 @@ public final class WidgetPosition extends AbstractPosition {
     Assert.notNull(finder, shapeTag);
     this.shapeTag = shapeTag;
     this.finder = finder;
-    // begin by urueda
     Widget cachedWidget = finder.getCachedWidget();
-    if (cachedWidget != null)
+    if (cachedWidget != null) {
       cachedWidgetPoint = Util.relToAbs(cachedWidget.get(shapeTag), relX, relY);
-    // end by urueda
+    }
     this.relX = relX;
     this.relY = relY;
     this.hitTest = hitTest;
@@ -75,8 +73,9 @@ public final class WidgetPosition extends AbstractPosition {
     try {
       Widget widget = finder.apply(state);
       //if (hitTest && !Util.hitTest(widget, relX, relY))
-      if (hitTest && !Util.hitTest(widget, relX, relY,this.obscuredByChildEnabled))
+      if (hitTest && !Util.hitTest(widget, relX, relY,this.obscuredByChildEnabled)) {
         throw new PositionException("Widget found, but hittest failed!");
+      }
       //return Util.relToAbs(widget.get(shapeTag), relX, relY);
       // start by urueda
       cachedWidgetPoint = Util.relToAbs(widget.get(shapeTag), relX, relY);
@@ -89,17 +88,12 @@ public final class WidgetPosition extends AbstractPosition {
     }
   }
 
-  @Override // by urueda
+  @Override
   public String toString() {
-    //return "WidgetPosition (" + relX + ", " + relY + ")";
-    // start by urueda
-    //return "WidgetPosition" +
-    //    ((cachedWidgetPoint == null) ? "": cachedWidgetPoint.toString()) +
-    //    " (" + relX + ", " + relY + ")";
-    if (cachedWidgetPoint == null)
+    if (cachedWidgetPoint == null) {
       return "(" + relX + "," + relY + ")";
-    else
+    } else {
       return cachedWidgetPoint.toString();
-    // end by urueda
+    }
   }
 }

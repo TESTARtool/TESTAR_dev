@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -74,27 +73,31 @@ public final class Type extends TaggableBase implements Action {
       boolean shift = false;
 
       if (Character.isLetter(c)) {
-        if (Character.isLowerCase(c))
+        if (Character.isLowerCase(c)) {
           c = Character.toUpperCase(c);
-        else
+        } else {
           shift = true;
+        }
       }
 
       KBKeys key = getKey(c);
 
-      if (shift)
+      if (shift) {
         shiftDown.run(system, state, .0);
+      }
       new KeyDown(key).run(system, state, .0);
       new KeyUp(key).run(system, state, .0);
-      if (shift)
+      if (shift) {
         shiftUp.run(system, state, .0);
+      }
       Util.pause(d);
     }
   }
 
   public static void checkAscii(String text) {
-      if (!asciiEncoder.canEncode(text))
+      if (!asciiEncoder.canEncode(text)) {
         throw new IllegalArgumentException("This string is not an ascii string!");
+      }
   }
 
   private KBKeys getKey(char c) {
@@ -107,32 +110,32 @@ public final class Type extends TaggableBase implements Action {
         throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
     }
 
-  public String toString() { return "Type text '" + text + "'"; }
+  public String toString() {
+    return "Type text '" + text + "'";
+  }
 
-  // by urueda
   @Override
   public String toString(Role... discardParameters) {
     for (Role r: discardParameters) {
-      if (r.name().equals(ActionRoles.Type.name()))
+      if (r.name().equals(ActionRoles.Type.name())) {
         return "Text typed";
+      }
     }
     return toString();
   }
 
-  // by urueda
   @Override
   public String toShortString() {
     Role r = get(Tags.Role, null);
-    if (r != null)
+    if (r != null) {
       return r.toString();
-    else
+    } else {
       return toString();
+    }
   }
 
-  // by urueda
   @Override
   public String toParametersString() {
     return "(" + text + ")";
   }
-
 }

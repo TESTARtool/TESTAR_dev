@@ -74,7 +74,7 @@ public class TestSerialiser extends Thread {
   @Override
   public void run() {
     while (alive || !testSavingQueue.isEmpty()) {
-      while(alive && testSavingQueue.isEmpty()) {
+      while (alive && testSavingQueue.isEmpty()) {
         try {
           Thread.sleep(1000); // 1 second
         } catch (InterruptedException e1) {}
@@ -103,7 +103,7 @@ public class TestSerialiser extends Thread {
       try {
         test.close();
       } catch (IOException e) {
-        LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);       
+        LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);
       }
     }
     synchronized(test) {
@@ -153,7 +153,7 @@ public class TestSerialiser extends Thread {
             }
           }
         }
-      } catch (Exception e) {} // test may be set to null when we try to sync on it   
+      } catch (Exception e) {} // test may be set to null when we try to sync on it
       //System.out.println("TestSerialisationManager exited");
       test = null;
     }

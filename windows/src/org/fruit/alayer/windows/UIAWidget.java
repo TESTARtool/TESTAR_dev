@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -58,6 +57,8 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
 class UIAWidget implements Widget, Serializable {
+  private static final double NO_VALUE = -1.0;
+  private static final double AVERAGE_VALUE = 50.0;
   private static final long serialVersionUID = 8840515358018797073L;
   UIAState root;
   UIAWidget parent;
@@ -70,8 +71,9 @@ class UIAWidget implements Widget, Serializable {
     this.element = element;
     this.root = root;
 
-    if (parent != null)
+    if (parent != null) {
       root.connect(parent, this);
+    }
   }
 
   private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
@@ -82,31 +84,61 @@ class UIAWidget implements Widget, Serializable {
     oos.defaultWriteObject();
   }
 
+  final boolean valid() {
+    return root != null;
+  }
+  final void check() {
+    if (root == null) {
+      throw new IllegalStateException();
+    }
+  }
 
-  final boolean valid() { return root != null; }
-  final void check() { if (root == null) throw new IllegalStateException(); }
+  public final void moveTo(Widget p, int idx) {
+    /*check();*/ root.setParent(this, p, idx);
+  }
+  public final UIAWidget addChild() {
+    /*check();*/ return root.addChild(this, null);
+  }
+  public final UIAState root() {
+    return root;
+  }
+  public final UIAWidget parent() {
+    /*check();*/ return root.getParent(this);
+  }
+  public final UIAWidget child(int i) {
+    /*check();*/ return root.getChild(this, i);
+  }
+  public final void remove() {
+    /*check();*/ root.remove(this);
+  }
+  public final int childCount() {
+    /*check();*/ return root.childCount(this);
+  }
 
-  final public void moveTo(Widget p, int idx) { /*check();*/ root.setParent(this, p, idx); }
-  public final UIAWidget addChild() { /*check();*/ return root.addChild(this, null); }
-  public final UIAState root() { return root; }
-  public final UIAWidget parent() { /*check();*/ return root.getParent(this); }
-  public final UIAWidget child(int i) { /*check();*/ return root.getChild(this, i); }
-  public final void remove() { /*check();*/ root.remove(this); }
-  public final int childCount() { /*check();*/ return root.childCount(this); }
+  public final <T> T get(Tag<T> tag) {
+    /*check;*/ return root.get(this, tag);
+  }
+  public final <T> void set(Tag<T> tag, T value) {
+    /*check;*/ root.setTag(this, tag, value);
+  }
+  public final <T> T get(Tag<T> tag, T defaultValue) {
+    /*check;*/ return root.get(this, tag, defaultValue);
+  }
+  public final Iterable<Tag<?>> tags() {
+    /*check;*/ return root.tags(this);
+  }
+  public final void remove(Tag<?> tag) {
+    /*check;*/ root.remove(this, tag);
+  }
 
-  public final <T> T get(Tag<T> tag) { /*check;*/ return root.get(this, tag); }
-  public final <T> void set(Tag<T> tag, T value) { /*check;*/ root.setTag(this, tag, value); }
-  public final <T> T get(Tag<T> tag, T defaultValue) { /*check;*/ return root.get(this, tag, defaultValue); }
-  public final Iterable<Tag<?>> tags() { /*check;*/ return root.tags(this); }
-  public final void remove(Tag<?> tag) { /*check;*/ root.remove(this, tag); }
-
-  // by urueda (scrolls helper)
+  // scrolls helper
   private double[] calculateScrollDragPoints(int dragC, double fixedPoint, double fragment) { // returns relative points
     double dragP = 0.0;
     double[] dragPoints = new double[dragC];
     for (int i=0; i<dragC; i++) {
-      if (Math.abs(fixedPoint - dragP) < fragment)
+      if (Math.abs(fixedPoint - dragP) < fragment) {
         dragP += fragment;
+      }
       dragPoints[i] = dragP;
       dragP += fragment;
     }
@@ -114,55 +146,78 @@ class UIAWidget implements Widget, Serializable {
     return dragPoints;
   }
 
-  // by urueda (scrolls helper)
+  // scrolls helper
   private Drag[] getDrags(Shape shape,
       boolean scrollOrientation, // true = horizontal, false = vertical
       double viewSize, double scrollPercent,
       double scrollArrowSize, double scrollThick) { // system dependent
-    double scrollableSize = (scrollOrientation ? shape.width(): shape.height()) - scrollArrowSize*2;
-    double fixedH = 0.0, fixedV = 0.0;
+    double scrollableSize;
+    if (scrollOrientation) {
+      scrollableSize = shape.width();
+    } else {
+      scrollableSize = shape.height() - scrollArrowSize*2;
+    }
+    double fixedH = 0.0;
+    double fixedV = 0.0;
+    double scrollThickCurrent;
+    if (scrollPercent < AVERAGE_VALUE ) {
+      scrollThickCurrent = scrollThick/2;
+    } else {
+      scrollThickCurrent = -3*scrollThick/2;
+    }
+
     if (scrollOrientation) { // horizontal
       fixedH = shape.x() + scrollArrowSize +
           scrollableSize*scrollPercent/100.0 +
-          (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
+          scrollThickCurrent;
       fixedV = shape.y() + shape.height() - scrollThick/2;
     } else { // vertical
       fixedH = shape.x() + shape.width() - scrollThick/2;
       fixedV = shape.y() + scrollArrowSize +
           scrollableSize*scrollPercent/100.0 +
-          (scrollPercent < 50.0 ? scrollThick/2: -3*scrollThick/2);
+          scrollThickCurrent;
     }
     int dragC = (int)Math.ceil(100.0 / viewSize) - 1;
-    if (dragC < 1)
+    if (dragC < 1) {
       return null;
+    }
+    double fixedOrientation;
+    if (scrollOrientation) {
+      fixedOrientation = fixedH-shape.x();
+    } else {
+      fixedOrientation = fixedV-shape.y();
+    }
     double[] emptyDragPoints = calculateScrollDragPoints(dragC,
-        scrollOrientation ? fixedH-shape.x(): fixedV-shape.y(),
-            scrollableSize/(double)dragC);
+        fixedOrientation, scrollableSize/(double)dragC);
     Drag[] drags = new Drag[dragC];
+    Double toX;
+    Double toY;
     for (int i=0; i<dragC; i++) {
-      drags[i] = new Drag(
-        fixedH,
-        fixedV,
-        scrollOrientation ? shape.x() + scrollArrowSize + emptyDragPoints[i]: fixedH,
-        scrollOrientation ? fixedV: shape.y() + scrollArrowSize + emptyDragPoints[i]
-      );
+      if (scrollOrientation) {
+        toX = shape.x() + scrollArrowSize + emptyDragPoints[i];
+        toY = fixedV;
+      } else {
+        toX = fixedH;
+        toY = shape.y() + scrollArrowSize + emptyDragPoints[i];
+      }
+
+      drags[i] = new Drag(fixedH, fixedV, toX, toY);
     }
     return drags;
   }
 
-  // by urueda
   @Override
   public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
     boolean hasScroll = get(UIAScrollPattern, null);
-    if (!hasScroll)
+    if (!hasScroll) {
       return null;
-
+    }
     Drag[] hDrags = null, vDrags = null;
     boolean hScroll = get(UIAHorizontallyScrollable, Boolean.FALSE);
     if (hScroll) {
       double hViewSize = get(UIAScrollHorizontalViewSize, Double.MIN_VALUE);
       if (hViewSize > 0) {
-        double hScrollPercent = get(UIAScrollHorizontalPercent, -1.0);
+        double hScrollPercent = get(UIAScrollHorizontalPercent, NO_VALUE);
         Shape shape = get(Tags.Shape, null);
         if (shape != null) {
           hDrags = getDrags(shape,true,hViewSize,hScrollPercent,scrollArrowSize,scrollThick);
@@ -173,7 +228,7 @@ class UIAWidget implements Widget, Serializable {
     if (vScroll) {
       double vViewSize = get(UIAScrollVerticalViewSize, Double.MIN_VALUE);
       if (vViewSize > 0) {
-        double vScrollPercent = get(UIAScrollVerticalPercent, -1.0);
+        double vScrollPercent = get(UIAScrollVerticalPercent, NO_VALUE);
         Shape shape = get(Tags.Shape, null);
         if (shape != null) {
           vDrags = getDrags(shape,false,vViewSize,vScrollPercent,scrollArrowSize,scrollThick);
@@ -192,14 +247,17 @@ class UIAWidget implements Widget, Serializable {
   private String getPropertiesRepresentation(String tab) {
     StringBuffer pr = new StringBuffer();
     Role role = this.get(Tags.Role, null);
-    if (role != null)
+    if (role != null) {
       pr.append(tab + "ROLE = " + role.toString() + "\n");
+    }
     String title = this.get(Tags.Title, null);
-    if (title != null)
+    if (title != null) {
       pr.append(tab + "TITLE = " + title + "\n");
+    }
     Shape shape = this.get(Tags.Shape, null);
-    if (shape != null)
+    if (shape != null) {
       pr.append(tab + "SHAPE = " + shape.toString() + "\n");
+    }
     pr.append(tab + "CHILDREN = " + this.childCount() + "\n");
     pr.append(tab + "PATH = " + this.get(Tags.Path) + "\n");
 
@@ -223,10 +281,8 @@ class UIAWidget implements Widget, Serializable {
     return repr.toString();
   }
 
-  // by urueda
   @Override
   public String toString(Tag<?>... tags) {
     return Util.treeDesc(this, 2, tags);
   }
-
 }

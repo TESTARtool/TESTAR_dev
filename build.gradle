@@ -1,9 +1,9 @@
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'jacoco'
-
-    sourceSets {
+   apply plugin: 'java'
+   apply plugin: 'jacoco'
+   
+   sourceSets {
         main {
             java {
                 srcDirs = ['src']

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -48,22 +47,32 @@ public final class SplineTrajectory implements UnFunc<State, Iterable<Point>>, S
 
   private final class PointIterable implements Iterable<Point>{
     final Point[] points;
-    public PointIterable(Point[] points) { this.points = points; }
-    public Iterator<Point> iterator() { return new Iter(points); }
+    PointIterable(Point[] points) {
+      this.points = points;
+    }
+    public Iterator<Point> iterator() {
+      return new Iter(points);
+    }
   }
 
   private final class Iter implements Iterator<Point>{
-    List<Point> intermediatePoints;
-    Iterator<Point> iter;
+    private List<Point> intermediatePoints;
+    private Iterator<Point> iter;
 
-    public Iter(Point[] points) {
+    Iter(Point[] points) {
       intermediatePoints = Spline.evaluate(points, smoothness + 1); //TODO: only create points on demand!!
       iter = intermediatePoints.iterator();
     }
 
-    public boolean hasNext() { return iter.hasNext(); }
-    public Point next() { return iter.next(); }
-    public void remove() { throw new UnsupportedOperationException(); }
+    public boolean hasNext() {
+      return iter.hasNext();
+    }
+    public Point next() {
+      return iter.next();
+    }
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   public SplineTrajectory(int smoothness, Position... positions) {
@@ -76,8 +85,9 @@ public final class SplineTrajectory implements UnFunc<State, Iterable<Point>>, S
   public Iterable<Point> apply(State s) {
     Assert.notNull(s);
     Point[] points = new Point[positions.length];
-    for (int i = 0; i < positions.length; i++)
+    for (int i = 0; i < positions.length; i++) {
       points[i] = positions[i].apply(s);
+    }
     return new PointIterable(points);
   }
 }

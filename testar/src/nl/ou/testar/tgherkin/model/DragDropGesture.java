@@ -16,7 +16,6 @@ import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 
-
 /**
  * Class responsible for handling drag and drop.
  *
@@ -30,7 +29,6 @@ public class DragDropGesture extends Gesture {
     public DragDropGesture(ParameterBase parameterBase) {
       super(parameterBase);
     }
-
 
     @Override
     public boolean gesturePossible(Widget widget, ProtocolProxy proxy, DataTable dataTable) {
@@ -110,7 +108,6 @@ public class DragDropGesture extends Gesture {
     }
     return list;
   }
-
 
     @Override
     public String toString() {

@@ -139,5 +139,4 @@ public class DerivedGesturesReportItem extends ReportItem {
     return reportContent.toString();
   }
 
-
 }

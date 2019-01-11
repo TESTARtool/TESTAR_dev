@@ -49,12 +49,12 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
   // This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
 
-  static Role webText; // browser dependent
-  static double browser_toolbar_filter;
+  private static Role webText; // browser dependent
+  private static double browser_toolbar_filter;
 
   //Attributes for adding slide actions
-  static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-  static double scrollThick = 16; // scroll thickness (iexplorer)
+  private static double scrollArrowSize = 36; // sliding arrows (iexplorer)
+  private static double scrollThick = 16; // scroll thickness (iexplorer)
 
   /**
    * Called once during the life time of TESTAR
@@ -70,10 +70,11 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
   private void initBrowser() {
     webText = NativeLinker.getNativeRole("UIAEdit"); // just init with some value
     String sutPath = settings().get(ConfigTags.SUTConnectorValue);
-    if (sutPath.contains("iexplore.exe"))
+    if (sutPath.contains("iexplore.exe")) {
       webText = NativeLinker.getNativeRole("UIAEdit");
-    else if (sutPath.contains("firefox"))
+    } else if (sutPath.contains("firefox")) {
       webText = NativeLinker.getNativeRole("UIAText");
+    }
   }
 
   /**
@@ -98,10 +99,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * This can be used for example for bypassing a login screen by filling the username and password
    * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
    * the SUT's configuration files etc.)
-   */
-  protected void beginSequence(SUT system, State state) {
+   * @param sut the system under test
+   * @param state  the SUT's current state
 
-    super.beginSequence(system, state);
+   */
+  protected void beginSequence(SUT sut, State state) {
+
+    super.beginSequence(sut, state);
 
   }
 
@@ -111,16 +115,18 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * own state fetching routine. The state should have attached an oracle
    * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
    * state is erroneous and if so why.
+   * @param sut the system under test
    * @return  the current state of the SUT with attached oracle.
    */
-  protected State getState(SUT system) throws StateBuildException{
+  protected State getState(SUT sut) throws StateBuildException{
 
-    State state = super.getState(system);
+    State state = super.getState(sut);
 
         for (Widget w: state) {
             Role role = w.get(Tags.Role, Roles.Widget);
-            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
+            if (Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")})) {
               browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+            }
         }
 
     return state;
@@ -153,13 +159,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    * The return value is supposed to be non-null. If the returned set is empty, TESTAR
    * will stop generation of the current action and continue with the next one.
-   * @param system the SUT
-   * @param state the SUT's current state
+   * @param sut the system under test
+   * @param state  the SUT's current state
    * @return  a set of actions
    */
-  protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
+  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException{
 
-    Set<Action> actions = super.deriveActions(system,state);
+    Set<Action> actions = super.deriveActions(sut, state);
     // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
     // create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -175,13 +181,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
         if (!blackListed(w)) {  // do not build actions for tabu widgets
 
           // left clicks
-          if (whiteListed(w) || isClickable(w))
+          if (whiteListed(w) || isClickable(w)) {
             actions.add(ac.leftClickAt(w));
-
+          }
           // type into text boxes
-          if (whiteListed(w) || isTypeable(w))
+          if (whiteListed(w) || isTypeable(w)) {
             actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
-
+          }
           // slides
           addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
 
@@ -202,9 +208,9 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
    * @param w
    */
   protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state) {
-    Drag[] drags = null;
+    Drag[] drags = w.scrollDrags(scrollArrowSize,scrollThick);
     //If there are scroll (drags/drops) actions possible
-    if ((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null) {
+    if (drags != null) {
       //For each possible drag, create an action and add it to the derived actions
       for (Drag drag: drags) {
         //Store the widget in the Graphdatabase
@@ -221,21 +227,22 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
   @Override
   protected boolean isClickable(Widget w) {
-    if (isAtBrowserCanvas(w))
+    if (isAtBrowserCanvas(w)) {
       return super.isClickable(w);
-    else
+    } else {
       return false;
+    }
   }
 
   @Override
   protected boolean isTypeable(Widget w) {
-    if (!isAtBrowserCanvas(w))
+    if (!isAtBrowserCanvas(w)) {
       return false;
-
+    }
     Role role = w.get(Tags.Role, null);
-    if (role != null && Role.isOneOf(role, webText))
+    if (role != null && Role.isOneOf(role, webText)) {
       return isUnfiltered(w);
-
+    }
     return false;
   }
 
@@ -258,15 +265,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
   /**
    * Execute the selected action.
-   * @param system the SUT
-   * @param state the SUT's current state
+   * @param sut the system under test
+   * @param state  the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
-  protected boolean executeAction(SUT system, State state, Action action) {
-
-    return super.executeAction(system, state, action);
-
+  protected boolean executeAction(SUT sut, State state, Action action) {
+    return super.executeAction(sut, state, action);
   }
 
   /**
@@ -281,7 +286,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
   }
 
-
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
@@ -290,7 +294,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
     super.finishSequence();
 
   }
-
 
   /**
    * TESTAR uses this method to determine when to stop the entire test.
