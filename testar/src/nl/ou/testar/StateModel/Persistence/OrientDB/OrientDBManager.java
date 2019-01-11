@@ -305,7 +305,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // there are two options here: either the abstract state model already exists in the database,
         // in which case we load it, or it doesn't exist yet, in which case we save it
         // first, disable the event listener. We do not want to process the events resulting from our object creations
-//        setListening(false);
+        setListening(false);
 
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -322,19 +322,19 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // step 1: persist the state model entity to the database. if it already exists, nothing will happen
         entityManager.saveEntity(vertexEntity);
 
-        /*// step 2: see if there are abstract states present in the data store that are tied to this abstract state model
-        EntityClass abstractStateEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
+        /*EntityClass abstractStateEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         if (abstractStateEntityClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
 
         // in order to retrieve the abstract states, we need to provide the abstract state model id to the query
         Map<String, Pair<OType, Object>> entityProperties = new HashMap<>();
         Property identifier = entityClass.getIdentifier();
         if (identifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put(identifier.getPropertyName(), vertexEntity.getPropertyValue(identifier.getPropertyName()));
+        entityProperties.put(identifier.getPropertyName(), vertexEntity.getPropertyValue(identifier.getPropertyName()));*/
 
 
         // enable the event listener again
-        setListening(true);*/
+        setListening(true);
     }
 
     @Override

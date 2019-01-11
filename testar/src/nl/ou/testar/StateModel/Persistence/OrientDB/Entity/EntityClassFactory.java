@@ -102,6 +102,7 @@ public class EntityClassFactory {
         uniqueId.setMandatory(true);
         uniqueId.setNullable(false);
         uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
         abstractStateClass.addProperty(uniqueId);
         Property stateId = new Property("stateId", OType.STRING);
         stateId.setMandatory(true);
@@ -110,6 +111,7 @@ public class EntityClassFactory {
         Property abstractionLevelIdentifier = new Property("abstractionLevelIdentifier", OType.STRING);
         abstractionLevelIdentifier.setMandatory(true);
         abstractionLevelIdentifier.setNullable(false);
+        abstractionLevelIdentifier.setIndexAble(true);
         abstractStateClass.addProperty(abstractionLevelIdentifier);
         Property isInitial = new Property("isInitial", OType.BOOLEAN);
         isInitial.setMandatory(true);
@@ -133,6 +135,7 @@ public class EntityClassFactory {
         uniqueId.setMandatory(true);
         uniqueId.setNullable(false);
         uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
         abstractActionClass.addProperty(uniqueId);
         Property actionId = new Property("actionId", OType.STRING);
         actionId.setMandatory(true);
@@ -153,6 +156,7 @@ public class EntityClassFactory {
         id.setMandatory(true);
         id.setNullable(false);
         id.setIdentifier(true);
+        id.setIndexAble(true);
         abstractStateModelClass.addProperty(id);
         Property abstractionAttributes = new Property("abstractionAttributes", OType.EMBEDDEDSET, OType.STRING);
         abstractionAttributes.setMandatory(true);
@@ -168,6 +172,7 @@ public class EntityClassFactory {
         stateId.setMandatory(true);
         stateId.setNullable(false);
         stateId.setIdentifier(true);
+        stateId.setIndexAble(true);
         concreteStateClass.addProperty(stateId);
         Property screenshot = new Property("screenshot", OType.BINARY);
         screenshot.setMandatory(false);
@@ -185,6 +190,7 @@ public class EntityClassFactory {
         widgetId.setMandatory(true);
         widgetId.setNullable(false);
         widgetId.setIdentifier(true);
+        widgetId.setIndexAble(true);
         widgetClass.addProperty(widgetId);
         entityClasses.put(EntityClassName.Widget, widgetClass);
         return widgetClass;
@@ -196,6 +202,7 @@ public class EntityClassFactory {
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
+        edgeId.setIndexAble(true);
         parentClass.addProperty(edgeId);
         entityClasses.put(EntityClassName.isParentOf, parentClass);
         return parentClass;
@@ -207,6 +214,7 @@ public class EntityClassFactory {
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
+        edgeId.setIndexAble(true);
         childClass.addProperty(edgeId);
         entityClasses.put(EntityClassName.isChildOf, childClass);
         return childClass;
@@ -218,6 +226,7 @@ public class EntityClassFactory {
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
+        edgeId.setIndexAble(true);
         entityClass.addProperty(edgeId);
         entityClasses.put(EntityClassName.isAbstractedBy, entityClass);
         return entityClass;
@@ -229,6 +238,7 @@ public class EntityClassFactory {
         blackHoleId.setMandatory(true);
         blackHoleId.setNullable(false);
         blackHoleId.setIdentifier(true);
+        blackHoleId.setIndexAble(true);
         entityClass.addProperty(blackHoleId);
         entityClasses.put(EntityClassName.BlackHole, entityClass);
         return entityClass;
@@ -240,6 +250,7 @@ public class EntityClassFactory {
         uniqueId.setMandatory(true);
         uniqueId.setNullable(false);
         uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
         entityClass.addProperty(uniqueId);
         Property actionId = new Property("actionId", OType.STRING);
         actionId.setMandatory(true);

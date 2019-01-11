@@ -22,6 +22,9 @@ public class Property {
     // is this property the identifying property for a given class?
     private boolean identifier = false;
 
+    // is this property indexable?
+    private boolean indexAble = false;
+
     /**
      * Constructor
      * @param propertyName
@@ -96,5 +99,13 @@ public class Property {
 
     public void setIdentifier(boolean identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isIndexAble() {
+        return indexAble;
+    }
+
+    public void setIndexAble(boolean indexAble) {
+        this.indexAble = indexAble;
     }
 }

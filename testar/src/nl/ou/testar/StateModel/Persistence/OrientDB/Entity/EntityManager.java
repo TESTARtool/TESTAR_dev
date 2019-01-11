@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
+import com.orientechnologies.common.jna.OCLibrary;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -265,13 +266,13 @@ public class EntityManager {
                 dbProperty.setReadonly(property.isReadOnly());
                 dbProperty.setMandatory(property.isMandatory());
                 dbProperty.setNotNull(!property.isNullable());
-            }
 
-            // we add an index for the identifier fields for fast lookup
-            Property identifier = entityClass.getIdentifier();
-            if (identifier != null && !propertyBlackList.contains(identifier.getPropertyName())) {
-                String indexField = entityClass.getClassName() + "." + identifier.getPropertyName() + "Idx";
-                oClass.createIndex(indexField, OClass.INDEX_TYPE.UNIQUE,identifier.getPropertyName());
+                // we add an index for certain property fields
+                if (property.isIndexAble()) {
+                    String indexField = entityClass.getClassName() + "." + property.getPropertyName() + "Idx";
+                    OClass.INDEX_TYPE indexType = property.isIdentifier() ? OClass.INDEX_TYPE.UNIQUE_HASH_INDEX : OClass.INDEX_TYPE.NOTUNIQUE_HASH_INDEX;
+                    oClass.createIndex(indexField, indexType,property.getPropertyName());
+                }
             }
         }
     }
