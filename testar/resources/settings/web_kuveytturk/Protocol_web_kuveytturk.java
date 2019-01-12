@@ -409,15 +409,6 @@ public class Protocol_web_kuveytturk extends ClickFilterLayerProtocol {
 	}
 
 
-	/** 
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	protected void finishSequence(File recordedSequence){
-		
-		super.finishSequence(recordedSequence);
-		
-	}
-
 
 	/**
 	 * TESTAR uses this method to determine when to stop the entire test.
