@@ -64,33 +64,34 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	}
 
 	/**
-	 * This method is invoked each time the TESTAR starts to generate a new sequence
+	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
+	 * take care of
+	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
+	 *      out what executable to run)
+	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
+	 *      seconds until they have finished loading)
+	 * @return  a started SUT, ready to be tested.
+	 */
+	@Override
+	protected SUT startSystem() throws SystemStartException{
+
+		SUT sut = super.startSystem();
+
+		return sut;
+
+	}
+
+	/**
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
 	}
 
-	 /**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 *      the SUT's configuratio files etc.)
-	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-	 *   4) bypassing a login screen by filling the username and password
-     * @return  a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException{
-		
-		SUT sut = super.startSystem();
-		
-		return sut;
-
-	}
 
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
@@ -186,7 +187,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w);
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
 				}
 			}
 		}
@@ -203,7 +204,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * @param scrollThick
 	 * @param w
 	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w){
+	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
 		Drag[] drags = null;
 		//If there are scroll (drags/drops) actions possible
 		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
@@ -272,7 +273,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * You could stop the test after:
 	 * - a specified amount of sequences, which is specified through the Sequences setting, or
 	 * - after a specific time, that is set in the MaxTime setting
-	 * @return  if <code>true</code> continue test, else stop	 */
+	 * @return  if <code>true</code> continue test, else stop
+	 */
 	@Override
 	protected boolean moreSequences() {
 		return super.moreSequences();

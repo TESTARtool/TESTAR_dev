@@ -11,11 +11,10 @@ import java.util.Random;
 import java.util.Set;
 
 public class GuiStateGraphWithVisitedActions {
-    Set<IdBasedGuiState> idBasedGuiStates;
-
-    private String startingStateConcreteId;
-    private String previousStateConcreteId;
-    private String previousActionConcreteId;
+    protected Set<IdBasedGuiState> idBasedGuiStates;
+    protected String startingStateConcreteId;
+    protected String previousStateConcreteId;
+    protected String previousActionConcreteId;
 
     public GuiStateGraphWithVisitedActions() {
         idBasedGuiStates = new HashSet<IdBasedGuiState>();
@@ -25,6 +24,7 @@ public class GuiStateGraphWithVisitedActions {
         return getIdBasedGuiState(state.get(Tags.ConcreteID)).getUnvisitedActionIds();
     }
 
+    //TODO move into a new action selector:
     public Action selectAction(State state, Set<Action> actions){
         // saving the starting node of the graph:
         if(startingStateConcreteId==null){
@@ -97,7 +97,7 @@ public class GuiStateGraphWithVisitedActions {
      * @param concreteActionId
      * @return
      */
-    private Action getActionWithConcreteId(Set<Action> actions, String concreteActionId){
+    protected Action getActionWithConcreteId(Set<Action> actions, String concreteActionId){
         for(Action action:actions){
             // find the action with concreteId:
             if(action.get(Tags.ConcreteID).equals(concreteActionId)){
@@ -107,7 +107,7 @@ public class GuiStateGraphWithVisitedActions {
         return null;
     }
 
-    private String getConcreteIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId){
+    protected String getConcreteIdOfActionLeadingToStateWithMostUnvisitedActions(String currentStateId){
         IdBasedGuiState currentState = getIdBasedGuiState(currentStateId);
         if(currentState==null || currentState.getUnvisitedActionIds()==null){
             System.out.println(this.getClass()+": ERROR, current state or transitions is null!");
@@ -155,7 +155,7 @@ public class GuiStateGraphWithVisitedActions {
      * @param concreteStateId
      * @return
      */
-    private IdBasedGuiState getIdBasedGuiState(String concreteStateId){
+    protected IdBasedGuiState getIdBasedGuiState(String concreteStateId){
         for(IdBasedGuiState state:idBasedGuiStates){
             if(state.getConcreteStateId().equals(concreteStateId)){
                 return state;
@@ -164,7 +164,7 @@ public class GuiStateGraphWithVisitedActions {
         return null;
     }
 
-    private IdBasedGuiState createIdBasedGuiState(State state, Set<Action> actions){
+    protected IdBasedGuiState createIdBasedGuiState(State state, Set<Action> actions){
         Set<String> actionIds = new HashSet<>();
         for(Action action:actions){
             actionIds.add(action.get(Tags.ConcreteID));
@@ -172,7 +172,7 @@ public class GuiStateGraphWithVisitedActions {
         return new IdBasedGuiState(state.get(Tags.ConcreteID),actionIds);
     }
 
-    private boolean containsStateId(String stateId){
+    protected boolean containsStateId(String stateId){
         for(IdBasedGuiState state:idBasedGuiStates){
             if(state.getConcreteStateId().equals(stateId)){
                 return true;
