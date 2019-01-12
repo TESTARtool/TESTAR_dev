@@ -83,7 +83,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	private int sequenceViewIndex;
 	private static final int DIRECTION_NEXT = 1, DIRECTION_PREVIOUS = -1;
 
-	public SequenceViewer(Settings settings){
+	public SequenceViewer(Settings settings) throws ClassNotFoundException, IOException{
 		this.settings = settings;
 		initComponents();
 		this.setBounds(0, 0, 1024, 768);
@@ -92,6 +92,12 @@ public class SequenceViewer extends javax.swing.JFrame{
 		cachedSequence = new ArrayList<Taggable>();
 		sequenceViewIndex = -1; stateCount = -1;
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		//Start with the first picture instead a black screen
+		nextPic();
+		postActionPerformed();
+
+		this.run();
 	}
 
 	private void initComponents(){
@@ -397,7 +403,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	Settings settings;
 
 	// prevent thread finish while dialog is visible
-	public void run() {
+	private void run() {
 		while(isShowing()){
 			Util.pause(1);
 		}
