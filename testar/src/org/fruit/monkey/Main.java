@@ -53,34 +53,18 @@ import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
-	public static final String TESTAR_DIR_PROPERTY = "DIRNAME";
+	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	public static String testarDir = "";
-	public static String settingsDir = "";
-	public static String outputDir = "";
-	public static String tempDir = "";
+	//Default paths
+	public static String testarDir = "." + File.separator;
+	public static String settingsDir = testarDir + "settings" + File.separator;
+	public static String outputDir = testarDir + "output" + File.separator;
+	public static String tempDir = outputDir + "temp" + File.separator;
 
-
-	/**
-	 * Set the current directory of TESTAR, settings and output folders
-	 */
-	private static void setTestarDirectory() {
-		try {
-			testarDir = System.getenv(TESTAR_DIR_PROPERTY);
-		}catch (Exception e) {
-			testarDir = "." + File.separator;
-			System.out.println(e);
-			System.out.println("Please execute TESTAR from their existing directory");
-		}
-		
-		settingsDir = testarDir + "settings" + File.separator;
-		outputDir = testarDir + "output" + File.separator;
-		tempDir = outputDir + "temp" + File.separator;
-	}
 
 	/**
 	 * This method scans the settings directory of TESTAR for a file that end with extension SUT_SETTINGS_EXT
@@ -113,8 +97,6 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		setTestarDirectory();
-
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
@@ -128,17 +110,21 @@ public class Main {
 
 			settingsLogs(settings);
 
+			setTestarDirectory(settings);
+
 			startTestar(settings, testSettingsFileName);
 		}
 
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
 			while(startTestarDialog(settings, testSettingsFileName)) {
-
-				settingsLogs(settings);
-
+				
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(args, testSettingsFileName);
+				
+				setTestarDirectory(settings);
+				
+				settingsLogs(settings);
 
 				startTestar(settings, testSettingsFileName);
 			}
@@ -150,6 +136,23 @@ public class Main {
 
 		System.exit(0);
 
+	}
+	
+	/**
+	 * Set the current directory of TESTAR, settings and output folders
+	 */
+	private static void setTestarDirectory(Settings settings) {
+		//Use the OS environment to obtain TESTAR directory
+		/*try {
+			testarDir = System.getenv(TESTAR_DIR_PROPERTY);
+		}catch (Exception e) {
+			testarDir = "." + File.separator;
+			System.out.println(e);
+			System.out.println("Please execute TESTAR from their existing directory");
+		}*/
+		
+		outputDir = settings.get(ConfigTags.OutputDir);
+		tempDir = settings.get(ConfigTags.TempDir);
 	}
 
 	/**
@@ -290,10 +293,19 @@ public class Main {
 	}
 
 	/**
+	 * If logs file doesn't exist create it
 	 * Create a log into the output/logs directory to save the information of selected settings
+	 * 
 	 * @param settings
 	 */
 	private static void settingsLogs(Settings settings) {
+		//Check if logs dir exist, if not create it
+		File logsDir = new File(outputDir + File.separator +"logs");
+		if(!logsDir.exists())
+			logsDir.mkdirs();
+		
+		System.out.println("Existe "+outputDir + File.separator +"logs"+" resultado: "+ logsDir.exists());
+		
 		// Starting the logs
 		try {
 			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
