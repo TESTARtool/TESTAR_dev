@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -113,7 +114,7 @@ public class GeneralPanel extends JPanel {
     comboBoxProtocol = new JComboBox<>();
     comboBoxProtocol.setBounds(350, 161, 260, 25);
  //   String[] sutSettings = new File("./settings/")
-    String[] sutSettings = new File(Main.getSettingsDir())
+    String[] sutSettings = new File(Main.settingsDir)
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
@@ -205,7 +206,7 @@ public class GeneralPanel extends JPanel {
   }
 
   private void btnEditProtocolActionPerformed(ActionEvent evt) {
-    JDialog dialog = new ProtocolEditor(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
+    JDialog dialog = new ProtocolEditor(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
     dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
     dialog.setVisible(true);
   }

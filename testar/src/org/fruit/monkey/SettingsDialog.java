@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -153,7 +154,7 @@ public class SettingsDialog extends JFrame implements Observer {
       saveCurrentSettings();
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
-        compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
+        compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
       }
       this.dispose();
     } catch (IllegalStateException ise) {
@@ -215,7 +216,7 @@ public class SettingsDialog extends JFrame implements Observer {
       return;
     }
     saveCurrentSettings();
-    String settingsDir = Main.getSettingsDir();
+    String settingsDir = Main.settingsDir;
     new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
       settingsFile = settingsDir + sutSettings + File.separator + Main.SETTINGS_FILE;
