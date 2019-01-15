@@ -776,9 +776,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Output/logs folder
 		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
 				actionCount,
-				"action = " + action.get(Tags.ConcreteID) +
-				" (" + action.get(Tags.AbstractID) + ") @state = " +
-				state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+				"action = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
+				" (" + action.get(Tags.AbstractID, "AbstractID not available") + ") @state = " +
+				state.get(Tags.ConcreteID, "ConcreteID not available") + " (" + state.get(Tags.Abstract_R_ID, "Abstract_R_ID not available") + ")\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
