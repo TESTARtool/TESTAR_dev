@@ -187,7 +187,7 @@ function getIsBlockedTestar(element) {
 
 function isClickableTestar(element) {
     // onClick defined as tag attribute
-    if (element.onclick !== null) {
+    if (element.getAttribute("onclick") !== null) {
         return true;
     }
     // onClick added via JS

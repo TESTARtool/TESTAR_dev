@@ -250,7 +250,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
    * Detect and perform login if defined
    */
   private Set<Action> detectForcedLogin(State state) {
-    if (login == null) {
+    if (login == null || username == null || password == null) {
       return null;
     }
 
@@ -449,11 +449,9 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
       // Input type are special...
-      if (!role.equals(WdRoles.WdINPUT)) {
+      if (role.equals(WdRoles.WdINPUT)) {
         String type = ((WdWidget) widget).element.type;
-        if (WdRoles.clickableInputTypes().contains(type)) {
-          return true;
-        }
+        return WdRoles.clickableInputTypes().contains(type);
       }
       return true;
     }
