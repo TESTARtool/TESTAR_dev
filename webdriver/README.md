@@ -17,7 +17,7 @@ Next, download a webdriver for the browser to use, the browser itself also needs
 - Chrome/Chromium : http://chromedriver.chromium.org/downloads
 - Firefox : https://github.com/mozilla/geckodriver/releases
 - Edge : https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/  
-  Make sure to downloaded version matches the installed Edge version.
+  Make sure the downloaded version matches the installed Edge version.
 
 Place the driver in an accessible location.
 This location needs to be first argument in the SUTConnectorValue, either via the test.settings file,
@@ -44,6 +44,10 @@ Under _System Preferences_, _Security & Privacy_, _Accessibility_ allow the term
 
 While the webdriver tries to find all clickable elements on the page via the _onclick_ attribute or eventlistener, this is not sufficient for certain web frameworks that use global eventlisteners. Global eventListeners use class attributes to determine the required actions when the element is clicked. The protocol allows the tester to add these attributes to _clickableClasses_.
 
+Because the webdriver is dependent on the use of the (Javascript) web extension, it fails when the browser encounters PDFs or images. With the _deniedExtensions_ option the testar can deny these URLs.
+
 While testing web applications, it is desirable to keep the testing on the same domain. Many applications have links pointing to domains outside the scope. When the browser reaches a domain not defined in _domainsAllowed_ it will try to go back to the last allowed page. Related to this is the _followLinks_ option to follow links opened in new tabs or stay with the original tab. 
 
-Because the webdriver is dependent on the use of the (Javascript) web extension, it fails when the browser encounters PDFs or images. With the _deniedExtensions_ option the testar can deny these URLs.
+The _login_, _username_ and _password_ fields allow TESTAR to automatically login on websites that need authentication. The first pair consists of the URL with the login and the id of the FORM. The next 2 items should contain the ids of the input fields with their credential values.
+
+The last configurable item is a list of attribute names and values. When the deriveAction method finds all these name-value pairs on an element, a click action is forced. This is used to automate the removal of annoying policy popups.
