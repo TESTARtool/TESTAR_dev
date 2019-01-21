@@ -29,8 +29,6 @@
 
 package org.fruit.monkey.dialog;
 
-import java.awt.Component;
-
 public class ToolTipTexts {
 
   // TTTs for the start buttons
@@ -143,6 +141,16 @@ public class ToolTipTexts {
   private static String urlTTT =
       "<html>\nProvide a unique part of the URL to identify web form: \n</html>";
   private static String fileTTT = "<html>\nSelect file name\n</html>";
+  
+  // TTTs for the form panel
+  private static String roleTTT =
+      "<html>\nProvide the widget role (e.g. UIAEdit)</html>";
+  private static String titleTTT =
+      "<html>\nProvide the widget title</html>";
+  private static String inputTTT =
+      "<html>\nProvide the input (only text fields)/html>";
+  
+  
   public static String getBtnGenerateTTT() {
     return btnGenerateTTT;
   }
@@ -236,9 +244,18 @@ public class ToolTipTexts {
   public static String getFileTTT() {
     return fileTTT;
   }
-  public static Component getTxtSutPath() {
+  public static String getTxtSutPath() {
+    return sutPathTTT;
+  }
+  public static String getRoleTTT() {
+    return roleTTT;
+  }
+  public static String getTitleTTT() {
+    return titleTTT;
+  }
+  public static String getInputTTT() {
     // TODO Auto-generated method stub
-    return null;
+    return inputTTT;
   }
 
 }

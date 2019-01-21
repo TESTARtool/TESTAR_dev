@@ -70,6 +70,7 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
   private static final String LOGIN_USER_EMAIL = "odoo_login_user_email"; // set the value as required
 
   // platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
+  @SuppressWarnings ("unused")
   private static Role webText; // browser dependent
   private static double browserToolbarFilter;
   private static double scrollArrowSize = 36; // sliding arrows (iexplorer)

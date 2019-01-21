@@ -50,7 +50,7 @@ evaluationDependsOn(':windows')
 
 task prepareSettings(type: Copy) {
     from 'resources/settings'
-    into 'target/scripts/settings'
+    into 'target/scripts/resources/settings'
 }
 
 task prepareOracles(type: Copy) {
@@ -60,7 +60,7 @@ task prepareOracles(type: Copy) {
 
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
-    into 'target/scripts/output'
+    into 'target/scripts/resources/output'
 }
 
 /**

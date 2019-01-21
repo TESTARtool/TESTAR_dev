@@ -81,7 +81,7 @@ public class GraphAction implements IGraphAction {
   /**
    * @param action Non null action.
    */
-  public GraphAction(Action action) { //, String stateactionID, String actionID, String abstractID){
+  public GraphAction(Action action) { //, String stateactionID, String actionID, String abstractID) {
     //this.action = new WeakReference<Action>((action == null) ? new NOP(): action);
     //this.actionZipped = ZipManager.compress(action);
     //if (this.actionZipped == action)

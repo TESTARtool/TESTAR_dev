@@ -24,9 +24,7 @@ public class SystemProcessHandling {
         long pid, handle; String desc;
         List<SUT> runningP = NativeLinker.getNativeProcesses();
         System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
-        int i = 1;
         for (SUT sut: runningP) {
-            //System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
             pid = sut.get(Tags.PID, Long.MIN_VALUE);
             if (pid != Long.MIN_VALUE) {
                 handle = sut.get(Tags.HANDLE, Long.MIN_VALUE);

@@ -115,7 +115,7 @@ GraphDBPassword =
 #################################################################
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = true
-Reportstate = true
+ReportState = true
 SubroutineData = 
 TgherkinDocument = ./resources/settings/tgherkin_wincalc/test1.tgherkin
 Discount = 0.95

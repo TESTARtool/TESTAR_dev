@@ -29,8 +29,6 @@
 
 package org.fruit.monkey.dialog;
 
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
-
 import javax.swing.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;

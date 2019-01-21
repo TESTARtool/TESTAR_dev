@@ -1,0 +1,21 @@
+  Feature: Notepad Opmaak
+
+  Scenario: Adjust outlay with menu item Opmaak
+    Step: Select Opmaak
+    When  $Role="UIAMenuItem" and $Title="Opmaak" doubleClick(true)
+    Step: Select Lettertype
+    When  $Role="UIAMenuItem" and $Title="Lettertype..." click(true)
+    Step: Select Arial
+    When  $Role="UIAListItem" and $Title="Arial Rounded MT" click(true)
+    Step: Select Vet
+    When  $Role="UIAListItem" and $Title="Vet" click(true)
+    Step: Select 14
+    When  $Role="UIAListItem" and $Title="18" click(true)
+    Step: Accept lettertype
+    While state($Role="UIAButton" and $Title="OK")
+    When  $Role="UIAButton" and $Title="OK" click(true)
+    Step: Add text
+    When  $Role="UIAEdit" and $Title="Teksteditor" type("Hoera, gelukt!")
+    Step: Default focus
+    When  $Role="UIAEdit" and $Title="Teksteditor" click(true)
+    

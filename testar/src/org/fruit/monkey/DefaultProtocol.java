@@ -1879,7 +1879,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     // create an action compiler, which helps us create actions, such as clicks,
     // drag + drop, typing...
-    StdActionCompiler ac = new AnnotatingActionCompiler();
+    // StdActionCompiler ac = new AnnotatingActionCompiler();
 
     // If there is an unwanted process running, we need to kill it.
     // This is an unwanted process that is defined in the filter.

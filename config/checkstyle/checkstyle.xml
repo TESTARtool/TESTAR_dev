@@ -13,6 +13,9 @@
   <module name="SuppressionFilter">
     <property name="file" value="${configDir}/suppressions.xml"/>
   </module>
+  <module name="SuppressionFilter">
+    <property name="file" value="C:\Users\CHage\Desktop\Open Universiteit\35_Afstuderen\OU_Suppressions.xml"/>
+  </module>
   <module name="TreeWalker">
     <module name="ConstantName"/>
     <module name="LocalFinalVariableName"/>
@@ -125,10 +128,7 @@
     <module name="UpperEll"/>
     <module name="BooleanExpressionComplexity"/>
     <module name="CyclomaticComplexity"/>
-    <module name="JavadocVariable">
-      <property name="scope" value="package"/>
-    </module>
-    <module name="JavadocType">
+   <module name="JavadocType">
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
@@ -170,8 +170,5 @@
     <property name="format" value="\s+$"/>
     <property name="message" value="Line has trailing spaces."/>
     <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
-  </module>
-  <module name="SuppressionFilter">
-    <property name="file" value="C:\Users\CHage\Desktop\Open Universiteit\35_Afstuderen\OU_Suppressions.xml"/>
   </module>
 </module>

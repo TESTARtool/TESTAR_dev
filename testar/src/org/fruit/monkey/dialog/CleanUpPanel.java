@@ -411,6 +411,22 @@ public class CleanUpPanel extends JPanel {
       for (File f: files) {
         if (!f.isDirectory() && !f.getName().toLowerCase().contains("dummy")) {
           printDelete(f);
+        } else {
+          if (f.isDirectory()) {
+            String subFolderName = folderName + "/" + f.getName();
+            File[] subFiles = new File(subFolderName).listFiles();
+           if (subFiles != null && subFiles.length > 0) {
+              printLine(subFolderName);
+              for (File g: subFiles) {
+                if (!g.isDirectory() && !g.getName().toLowerCase().contains("dummy")) {
+                  printDelete(g);
+                } 
+                if (g.isDirectory()) {
+                  printDelete(g);
+                }
+              }
+            }
+          }
         }
       }
     }

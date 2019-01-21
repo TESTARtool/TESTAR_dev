@@ -264,7 +264,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
         // Notes:
         //      - HelpTest: not defined in AT-SPI - also used as ToolTipText in Testar, perhaps AT-SPI
         //                  does have such property somewhere?
-        //      - AutomationId: AT-SPI doesnÃƒâ€šÃ‚Â´t use IDs to find elements - it uses pointers?
+        //      - AutomationId: AT-SPI doesnÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â´t use IDs to find elements - it uses pointers?
         //      - FrameworkId: called toolkit name in AT-SPI.
         //      - CtrlId: equal to the name of the Role enumeration in AT-SPI.
         //      - ClassName: perhaps under AtSpiAccessible's AtSpi-Relation?? - since it's not being

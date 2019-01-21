@@ -87,6 +87,7 @@ public class GArray<T> {
     }
 
     protected List<T> _elements;
+    @SuppressWarnings ("unchecked")
     public List<T> elements() {
 
         if (Objects.equals(_elementType.getName(), Long.class.getName())) {
@@ -103,7 +104,7 @@ public class GArray<T> {
 
         } else if (Objects.equals(_elementType.getName(), Integer.class.getName())) {
 
-            //noinspection unchecked
+            // No inspection unchecked
             _elements = (List<T>) new ArrayList<Integer>();
 
             Pointer<int[]> ptr = Pointer.pointerToAddress(dataPtr(), int[].class, null);

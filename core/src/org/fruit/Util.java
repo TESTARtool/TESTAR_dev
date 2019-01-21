@@ -233,8 +233,17 @@ public final class Util {
     double xDiff = x2 - x1;
     double yDiff = y2 - y1;
     double length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-    double baseX = length == 0 ? x2 - headLength: x2 - xDiff * headLength / length;
-    double baseY = length == 0 ? y2 - headLength: y2 - yDiff * headLength / length;
+    
+    double baseX;
+    double baseY;
+    if (length == 0) {
+      baseX = x2 - headLength;
+      baseY = y2 - headLength;
+    } else {
+      baseX = x2 - xDiff * headLength / length;
+      baseY = y2 - yDiff * headLength / length;
+      
+    }
     Point p1 = Util.OrthogonalPoint(baseX, baseY, x2, y2, headWidth * .5);
     Point p2 = Util.OrthogonalPoint(baseX, baseY, x2, y2, -headWidth * .5);
     canvas.line(pen, p1.x(), p1.y(), x2, y2);
@@ -314,29 +323,53 @@ public final class Util {
   public static String abbreviate(String string, int maxLen, String abbreviation) {
     Assert.notNull(string, abbreviation);
     Assert.isTrue(maxLen >= 0);
-    return (string.substring(0, Math.min(maxLen, string.length()))
-        + (string.length() > maxLen ? abbreviation: ""))
+    if (string.length() > maxLen) {
+    return (string.substring(0, Math.min(maxLen, string.length())) +  abbreviation)
         .replaceAll("\\r\\n|\\n", "_");
+    } else {
+      return (string.substring(0, Math.min(maxLen, string.length())) ).replaceAll("\\r\\n|\\n", "_");
+    }
+            
   }
 
   public static Point OrthogonalPoint(double x1, double y1, double x2, double y2, double r) {
     Point ret;
 
     if (x1 == x2) {
-      ret = y1 > y2 ? Point.from(x1 - r, y1): Point.from(x1 + r, y1);
+      if (y1 > y2) {
+        ret = Point.from(x1 - r, y1);
+      } else {
+        ret = Point.from(x1 + r, y1);
+      }
     }
     else if (y1 == y2) {
-      ret = x1 > x2 ? Point.from(x1, y1 + r): Point.from(x1, y1 - r);
+      if (x1 > x2 ) {
+        ret = Point.from(x1, y1 + r);
+      } else {
+        ret = Point.from(x1, y1 - r);
+      }
     }
     else {
       double m = -(x1 - x2) / (y1 - y2);
       double n = y1 - m * x1;
       double p = (2 * m * n - 2 * m * y1 - 2 * x1) / (1 + m * m);
       double q = (-2 * n * y1 + y1 * y1 - r * r + n * n + x1 * x1) / (1 + m * m);
-      double s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * (r > 0 ? 1: -1);
-      double s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * (r > 0 ? 1: -1);
+      double s1;
+      double s2;
+      if (r > 0) {
+        s1 = -p * .5 + Math.sqrt(p * p * .25 - q);
+        s2 = -p * .5 - Math.sqrt(p * p * .25 - q);
+      } else {
+        s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * -1;
+        s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * -1;
+      }
       double dm = (y1 - y2) / Math.abs(x1 - x2);
-      double s = dm > 0 ? s2: s1;
+      double s; 
+      if (dm > 0) {
+        s = s2; 
+      } else {
+        s = s1;
+      }
       ret = Point.from(s, m * s + n);
     }
     return ret;
@@ -461,10 +494,28 @@ public final class Util {
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);
         Shape s2 = w2.get(Tags.Shape, null);
-        double a1 = s1 == null ? -1: Util.area(s1);
-        double a2 = s2 == null ? -1: Util.area(s2);
-        return a1 < a2 ? WORSE: (a1 > a2 ? BETTER: EVEN);
-      }
+        double a1;
+        if (s1 == null) {
+          a1 = -1;
+        } else {
+          a1 = Util.area(s1);
+        }
+        double a2;
+        if (s2 == null) {
+          a2 = -1;
+        } else {
+          a2 = Util.area(s2);
+        }
+        if (a1 < a2) {
+          return WORSE;
+        } else {
+          if (a1 > a2) {
+            return BETTER;
+          } else {
+            return EVEN;
+          }
+        }
+       }
     };
 
     candidates.sort(comp);

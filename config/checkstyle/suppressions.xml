@@ -5,5 +5,5 @@
 
 <suppressions>
     <suppress files="[\\/]generated-src[\\/]" checks="[a-zA-Z0-9]*"/>
-    <suppress files="[\\/]src[\\/]org[\\/]fruit[\\/]alayer[\\/]linux[\\/]AtSpi[\\/]" checks="[a-zA-Z0-9]*"/>
+    <suppress files="[?]*AtSpi[?]*" checks="[a-zA-Z0-9]*"/>
 </suppressions>

@@ -74,7 +74,7 @@ public class Utils {
 
   private static nl.ou.testar.tgherkin.model.Document getDocument(TgherkinLexer lexer) {
     Document document = null;
-      TgherkinParser parser = getTgherkinParser(lexer);
+    TgherkinParser parser = getTgherkinParser(lexer);
     TgherkinErrorListener errorListener = new TgherkinErrorListener();
     parser.addErrorListener(errorListener);
     document = new nl.ou.testar.tgherkin.DocumentBuilder().visitDocument(parser.document());

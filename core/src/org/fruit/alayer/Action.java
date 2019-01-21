@@ -100,11 +100,7 @@ public interface Action extends Taggable, Serializable {
     Role actionRole = action.get(Tags.Role, null);
     if (actionRole != null) {
       returnS[0] += tab + "ROLE = " + actionRole.toString() + "\n";
-      if (actionRole == null) {
-        returnS[1] = String.format("%1$2s ", "??");
-      } else {
-        returnS[1] = String.format("%1$2s ", BriefActionRolesMap.map.get(actionRole.toString()));
-      }
+      returnS[1] = String.format("%1$2s ", BriefActionRolesMap.map.get(actionRole.toString()));
     }
 
     if (state != null) {

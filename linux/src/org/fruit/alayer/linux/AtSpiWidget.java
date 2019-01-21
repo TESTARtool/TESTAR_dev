@@ -195,7 +195,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick The scroller thickness.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
     @Override
     public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
 
@@ -295,7 +294,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param tab The TAB string to use - to be able to define different spacings most likely.
      * @return Returns a string representation for the widget.
      */
-    @SuppressWarnings("StringConcatenationInsideStringBufferAppend")
     private String getPropertiesRepresentation(String tab) {
 
         StringBuilder pr = new StringBuilder();
@@ -332,7 +330,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param scrollThick Size of the scroll thumb.
      * @return An array of drag points.
      */
-    @SuppressWarnings("Duplicates")
     private Drag[] getDrags(Shape shape, boolean scrollOrientation, double viewSize, double scrollPercent,
                             double scrollArrowSize, double scrollThick) {
 
@@ -385,7 +382,6 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param fragment The length two drag points will be apart.
      * @return Returns relative points.
      */
-    @SuppressWarnings("Duplicates")
     private double[] calculateScrollDragPoints(int dragC, double fixedPoint, double fragment) {
 
         double dragP = 0.0;
@@ -437,6 +433,7 @@ public class AtSpiWidget implements Widget, Serializable {
      * @param defaultValue Default value which will be returned if the tag cannot be found.
      * @return The value associated with the tag.
      */
+    @SuppressWarnings ("unchecked")
     @Override
     public <T> T get(Tag<T> tag, T defaultValue) {
 
@@ -446,7 +443,7 @@ public class AtSpiWidget implements Widget, Serializable {
         // Cached - return value.
         // No element to retrieve the value from or non-existing tag - return default value.
         if (ret != null) {
-            //noinspection unchecked
+            //No inspection unchecked
             return (T)ret;
         } else if (element == null || tags.containsKey(tag)) {
             return defaultValue;
@@ -550,7 +547,6 @@ public class AtSpiWidget implements Widget, Serializable {
             AtSpiWidget target = self;
             Tag<?> next;
 
-            @SuppressWarnings("Duplicates")
             private Tag<?> fetchNext() {
                 if (next == null) {
                     while (i.hasNext()) {

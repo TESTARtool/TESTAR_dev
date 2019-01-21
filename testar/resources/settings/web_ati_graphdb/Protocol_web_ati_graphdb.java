@@ -489,16 +489,4 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     String url = parts[parts.length - 1].replace("\"", "");
     domainsAllowed = new String[]{getDomain(url)};
   }
-
-  /*
-   * Small convenience function
-   */
-  private static String clean(String field) {
-    if (field == null) {
-      field = "";
-    }
-    field = field.toLowerCase();
-    field = field.replace(System.lineSeparator(), " ").replaceAll("\\s", " ");
-    return field.substring(0, Math.min(35, field.length())).trim();
-  }
 }

@@ -105,18 +105,20 @@ public final class ConfigTags {
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
   public static final Tag<String> TgherkinDocument = Tag.from("TgherkinDocument", String.class);
-  public static final Tag<String> SubroutineData = Tag.from("SubroutineData", String.class);
   public static final Tag<Boolean> ApplyDefaultOnMismatch = Tag.from("ApplyDefaultOnMismatch", Boolean.class);
   public static final Tag<Boolean> ContinueToApplyDefault = Tag.from("ContinueToApplyDefault", Boolean.class);
   public static final Tag<Boolean> RepeatTgherkinScenarios = Tag.from("RepeatTgherkinScenarios", Boolean.class);
   public static final Tag<Boolean> GenerateTgherkinReport = Tag.from("GenerateTgherkinReport", Boolean.class);
   public static final Tag<Boolean> StoreTgherkinReport = Tag.from("StoreTgherkinReport", Boolean.class);
   public static final Tag<Boolean> ReportDerivedGestures = Tag.from("ReportDerivedGestures", Boolean.class);
-  public static final Tag<Boolean> ReportState = Tag.from("Reportstate", Boolean.class);
+  public static final Tag<Boolean> ReportState = Tag.from("ReportState", Boolean.class);
   public static final Tag<Double> ConfidenceThreshold = Tag.from("ConfidenceThreshold", Double.class);
   public static final Tag<Boolean> TgherkinReportIncludeOCR = Tag.from("TgherkinReportIncludeOCR", Boolean.class);
   public static final Tag<Boolean> TgherkinReportIncludeImageRecognition = Tag.from("TgherkinReportIncludeImageRecognition", Boolean.class);
   public static final Tag<Integer> TgherkinNrOfNOPRetries = Tag.from("TgherkinNrOfNOPRetries", Integer.class);
   public static final Tag<String> TgherkinExecutionMode = Tag.from("TgherkinExecutionMode", String.class);
   public static final Tag<Double> MinimumPercentageForImageRecognition = Tag.from("MinimumPercentageForImageRecognition", Double.class);
+  // subroutine and form tags
+  public static final Tag<String> SubroutineData = Tag.from("SubroutineData", String.class);
+  public static final Tag<String> FormData = Tag.from("FormData", String.class);
 }

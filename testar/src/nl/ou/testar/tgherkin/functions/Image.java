@@ -122,7 +122,7 @@ public class Image {
           File f = new File("image_" + (teller++) + ".png");
           ImageIO.write(widgetShot.image(), "png", f);
           File g = new File("widget_" + (teller) + ".png");
-          ImageIO.write(refShot.image(), "png", f);
+          ImageIO.write(refShot.image(), "png", g);
           System.out.println("[Image temp ] " + teller + "  " + widget.get(Tags.Title, null));
           System.out.println("result is " + (confidence ) +
           " - " + proxy.getSettings().get(ConfigTags.ConfidenceThreshold) + " >= " + - TOLERANCE);

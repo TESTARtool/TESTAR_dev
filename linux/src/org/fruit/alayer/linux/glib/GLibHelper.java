@@ -48,6 +48,7 @@ public class GLibHelper {
      * @param <T> The type of the elements.
      * @return A list of typed elements read from memory.
      */
+    @SuppressWarnings ("unchecked")
     public static <T> List<T> createTypedList(long dataPtr, int dataStructureLength, Class<T> elementType) {
 
         List<T> elements = null;
@@ -66,7 +67,7 @@ public class GLibHelper {
 
         } else if (Objects.equals(elementType.getName(), Integer.class.getName())) {
 
-            //noinspection unchecked
+            // No inspection unchecked
             elements = (List<T>) new ArrayList<Integer>();
 
             Pointer<int[]> ptr = Pointer.pointerToAddress(dataPtr, int[].class, null);

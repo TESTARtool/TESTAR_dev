@@ -58,7 +58,9 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
   private boolean displayWhiteTabu = Toolkit.getDefaultToolkit()
       .getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
   private boolean whiteTabuMode    = false;                     // true
+  @SuppressWarnings ("unused")
   private boolean ctrlPressed      = false;
+  @SuppressWarnings ("unused")
   private boolean altPressed       = false;
   private boolean shiftPressed     = false;
 
@@ -67,7 +69,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
   private double[] filterArea = new double[] { Double.MAX_VALUE, Double.MAX_VALUE,
       Double.MIN_VALUE, Double.MIN_VALUE };                                       // <x1,y1,x2,y2>
 
-  private FilteringManager filteringManager;
+  protected FilteringManager filteringManager;
   private DataManager      dataManager;
 
   /**

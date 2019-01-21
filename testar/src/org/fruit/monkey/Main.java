@@ -56,7 +56,8 @@ public class Main {
   private static final double MAXTIME_DEFAULT = 31536000.0;
   private static final double REPLAY_RETRY_TIME_DEFAULT = 30.0;
   public static final String SETTINGS_DIR_PROPERTY = "SettingsDir";
-  public static final String SETTINGS_DIR_DEFAULT = "./resources/settings/";
+  public static String SETTINGS_DIR_DEFAULT = "./resources/settings/";
+ 
 
   private static String settingsDir = null;
 
@@ -138,7 +139,7 @@ public class Main {
     }
     return  settingsDir;
   }
-
+  
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
   private static String sseActivated = null;
@@ -158,7 +159,7 @@ public class Main {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
-    }
+    } 
     if (sutSettings.isEmpty()) {
       System.out.println("No SUT settings found!");
     }
@@ -258,7 +259,6 @@ public class Main {
       loader = new URLClassLoader(classPath);
 
       String protocolClass = settings.get(ProtocolClass).replace("/",".");
-
       LogSerialiser.log("Trying to load TESTAR protocol in class '" +
           protocolClass +
           "' with class path '" + Util.toString(cp) + "'\n", LogSerialiser.LogLevel.Debug);
@@ -276,7 +276,6 @@ public class Main {
       t.printStackTrace();
       t.printStackTrace(LogSerialiser.getLogStream());
     } finally {
-
       TestSerialiser.exit();
       ScreenshotSerialiser.exit();
       LogSerialiser.exit();
@@ -308,7 +307,7 @@ public class Main {
       if (sett.toString().contains("sse=")) {
         try {
           protocolFromCmd(sett);
-        } catch(Exception e) {
+         } catch(Exception e) {
           System.out.println("Error trying to modify sse from command line");
         }
       }
@@ -371,7 +370,7 @@ public class Main {
 
       startTestar(settings, testSettingsFileName);
     }
-
+    
     TestSerialiser.exit();
     ScreenshotSerialiser.exit();
     LogSerialiser.exit();
@@ -457,6 +456,7 @@ public class Main {
       // Tgherkin and subroutine tags
       defaults.add(Pair.from(TgherkinDocument, ""));
       defaults.add(Pair.from(SubroutineData, ""));
+      defaults.add(Pair.from(FormData, ""));
       defaults.add(Pair.from(ApplyDefaultOnMismatch, true));
       defaults.add(Pair.from(ContinueToApplyDefault, true));
       defaults.add(Pair.from(RepeatTgherkinScenarios, true));
@@ -501,6 +501,7 @@ public class Main {
    * @param sett protocol name
    * @throws IOException input/output exception
    */
+  @SuppressWarnings ("unused")
   public static void protocolFromCmd(String sett) throws IOException {
     String sseName = sett.substring(sett.indexOf("=")+1);
     boolean existSSE = false;
@@ -535,8 +536,6 @@ public class Main {
         f.createNewFile();
       }
       System.out.println("Protocol changed from command line to: "+sseName);
-
     }
   }
-
 }

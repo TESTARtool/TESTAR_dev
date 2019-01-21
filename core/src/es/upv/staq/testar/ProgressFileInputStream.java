@@ -42,6 +42,7 @@ import java.io.IOException;
  */
 public class ProgressFileInputStream  extends FileInputStream {
 
+  @SuppressWarnings ("unused")
   private String fileName;
   private long fileLength;
 

@@ -29,15 +29,15 @@
 
 package org.fruit.example.linux;
 
-import org.fruit.alayer.linux.atspi.LibAtSpi;
-import org.fruit.alayer.linux.LinuxProcess;
-
 /**
  * Test class to test Linux functionality.
  */
 public class Main {
 
-    private static final String ApplicationPath_GEdit = "/usr/bin/gedit";
+    /*
+     * TODO CH: never used
+     */
+    // private static final String ApplicationPath_GEdit = "/usr/bin/gedit";
 
     /**
      * Entry-point for the test class.
@@ -54,6 +54,7 @@ public class Main {
     /**
      * Tests launching a Linux application.
      */
+    /* TODO CH: Method never used
     private static void launchApplication() {
 
         LinuxProcess lp = LinuxProcess.fromExecutable(ApplicationPath_GEdit);
@@ -63,16 +64,18 @@ public class Main {
         }
 
     }
+    */
 
     /**
      * Tests AT-SPI functions.
      */
+    /* TODO CH: Method never used
     private static void testAtSpi() {
 
         System.out.println("Desktop count: " +  LibAtSpi.atspi_get_desktop_count());
 
     }
-
+   */
 //    /**
 //     * Tests XLib functions.
 //     */

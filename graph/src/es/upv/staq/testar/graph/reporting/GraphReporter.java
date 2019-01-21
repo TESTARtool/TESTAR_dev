@@ -142,9 +142,9 @@ public class GraphReporter {
 
         color = getLineColor(vertex.getCount());
 
-        sb0.append(vertex.toString() + " [label=" + label + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color + "];\n");
-        sb1.append(vertex.toString() + " [label=\"" + nodeLabel + "\"" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color +  "];\n");
-        sb2.append(vertex.toString() + " [label=\"" + vertex.getCount() + "\", height=0.3" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", color=" + color +  "];\n");
+        sb0.append(vertex.toString() + " [label=" + label + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", color=" + color + "];\n");
+        sb1.append(vertex.toString() + " [label=\"" + nodeLabel + "\"" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", color=" + color +  "];\n");
+        sb2.append(vertex.toString() + " [label=\"" + vertex.getCount() + "\", height=0.3" + thickS + (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", color=" + color +  "];\n");
 
         verdict = vertex.getVerdict();
         if (verdict != null) {
@@ -191,10 +191,10 @@ public class GraphReporter {
       unexploredClusterCount.put(cluster,unexploredCount);
       if (clusterCount != 0) {
         String toAppend = cluster + " [label=\"" + cluster + " (" + clusterCount + ")\"" +
-            (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n";
+            (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN): STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n";
         sb4.append(toAppend);
         sb5.append(cluster + " [label=\"" + clusterCount + "\"" + ", height=0.3" +
-            (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN) : STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
+            (k ? (r ? STYLE_VERTEX_REVISIT: STYLE_KNOWN): STYLE_NORMAL) + ", color=" + color + CLUSTER_THICK_PROPERTY + "];\n");
         if (scrshot == null)
           sb3.append(toAppend); // unable to retrieve any screenshot for the cluster
         else {
@@ -369,10 +369,10 @@ public class GraphReporter {
 
         k = graphAction.knowledge(); r = graphAction.revisited();
 
-        sb0.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", label=" + label + "];\n");
+        sb0.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", label=" + label + "];\n");
         //label = label.replaceAll("(.*->.*)((?:\\n|<br/>)\\{(?s)[^\\}]*(?-s)\\})?(.*;)","$1$2"); // no detailed edges/actions
-        sb1.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" + linkLabel + "\"];\n");
-        sb2.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL ) + ", label=\"" +
+        sb1.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", label=\"" + linkLabel + "\"];\n");
+        sb2.append(" [color=" + color + multiTargetVisuals + (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL ) + ", label=\"" +
                (edgeClusterCount == 0 ? graphAction.getConcreteID(): edgeClusterCount) + "\"" + "];\n");
 
       }
@@ -425,11 +425,11 @@ public class GraphReporter {
             " -> " +
             abstractTID; // target state
         sb4.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
-            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
         sb5.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
-            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
         sb3.append(toAppend + " [color=" + color + ", label=" + "\"" + clusterOrder + " (" + clusterCount + ")\"" +
-            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN) : STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
+            (k ? (r ? STYLE_EDGE_REVISIT: STYLE_KNOWN): STYLE_NORMAL) + CLUSTER_THICK_PROPERTY + "];\n");
           // which screenshot for a cluster of actions?
         /*String scrshotLabel =
               "<<TABLE border=\"0\" cellborder=\"1\" color='#cccccc'><TR><TD><IMG SRC=\"" +

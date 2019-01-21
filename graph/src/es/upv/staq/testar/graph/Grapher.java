@@ -342,7 +342,7 @@ public class Grapher implements Runnable {
 
     Set<Action> filteredActions = FORMS_TYPING_ENHANCEMENT ?
       FormsFilling.filterFormActions(state,actions) // prioritize typing actions for text inputs dependent behaviors
-     : actions;
+    : actions;
     if (Grapher.GRAPHS_ACTIVATED) {
       env.notifyEnvironment(state, filteredActions);
     }

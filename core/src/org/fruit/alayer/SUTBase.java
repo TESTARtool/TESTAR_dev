@@ -73,7 +73,11 @@ public abstract class SUTBase implements SUT {
     if (ret == null && !tagValues.containsKey(tag)) {
       ret = fetch(tag);
     }
-    return ret == null ? defaultValue: ret;
+    if (ret == null) {
+      return defaultValue;
+    } else {
+      return ret;
+    }
   }
 
   public final Iterable<Tag<?>> tags() {

@@ -1,0 +1,9 @@
+  Feature: Notepad Beeld
+
+  Scenario: Adjust view (beeld)
+    Step: Select Beeld
+    When  $Role="UIAMenuItem" and $Title="Beeld" doubleClick(true)
+    Step: Select Lettertype
+    When  $Role="UIAMenuItem" and $Title="Statusbalk" click(true)
+    Step: Default focus
+    When  $Role="UIAEdit" and $Title="Teksteditor" click(true)

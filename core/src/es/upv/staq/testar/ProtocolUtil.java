@@ -138,22 +138,30 @@ public class ProtocolUtil {
       nw = WIDGET_TREE_NODE_HEIGHT / 2;
       printedIDs++;
       int printY = y + nh + 1 + printedIDs * FONT_SIZE;
-      canvas.rect((isCursor ? Pen.PEN_BLUE_FILL: (isRoot ? Pen.PEN_RED_FILL: Pen.PEN_GREEN_FILL)), x, y, nw, nh+1);
+      if (isCursor) {
+        canvas.rect(Pen.PEN_BLUE_FILL, x, y, nw, nh + 1);
+      } else {
+        if (isRoot) {
+          canvas.rect(Pen.PEN_RED_FILL, x, y, nw, nh + 1);
+        } else {
+          canvas.rect(Pen.PEN_GREEN_FILL, x, y, nw, nh + 1);
+        }
+      }
       if (isRoot) {
         colorShadowText(canvas, Pen.PEN_RED_TEXT_12px, Pen.PEN_WHITE_TEXT_12px, x + nh, y, system.getStatus());
       } else {
-        canvas.line((isCursor ? Pen.PEN_BLUE_1px_ALPHA: Pen.PEN_GREEN_1px_ALPHA), x, y + nh + 1, x, printY);
-        canvas.rect((isCursor ? Pen.PEN_BLUE_FILL: Pen.PEN_GREEN_FILL),
-              (isCursor ? FONT_SIZE: x - nw/2),
-              printY, nw, FONT_SIZE);
         if (isCursor) {
+          canvas.line(Pen.PEN_BLUE_1px_ALPHA, x, y + nh + 1, x, printY);
+          canvas.rect(Pen.PEN_BLUE_FILL, FONT_SIZE, printY, nw, FONT_SIZE);
           canvas.line(Pen.PEN_BLUE_1px, FONT_SIZE, printY, x, printY);
+          colorShadowText(canvas, Pen.PEN_BLUE_TEXT_12px, Pen.PEN_WHITE_TEXT_12px,
+              FONT_SIZE + nw, printY, wtWidget.getRepresentation(""));
+        } else {
+          canvas.line(Pen.PEN_GREEN_1px_ALPHA, x, y + nh + 1, x, printY);
+          canvas.rect(Pen.PEN_GREEN_FILL, x - nw/2, printY, nw, FONT_SIZE);
+          colorShadowText(canvas, Pen.PEN_GREEN_TEXT_12px, Pen.PEN_WHITE_TEXT_12px,
+               x + nw, printY, wtWidget.get(Tags.ConcreteID) + " (" + briefRepresentation(wtWidget) + ")");
         }
-        colorShadowText(canvas,(isCursor ? Pen.PEN_BLUE_TEXT_12px: Pen.PEN_GREEN_TEXT_12px), Pen.PEN_WHITE_TEXT_12px,
-                (isCursor ? FONT_SIZE + nw: x + nw), printY,
-                (isCursor ? wtWidget.getRepresentation(""):
-                  wtWidget.get(Tags.ConcreteID) +
-                          " (" + briefRepresentation(wtWidget) + ")"));
       }
     } else {
       canvas.line(Pen.PEN_WHITE_1px, x, y, x, y + nh);
@@ -194,7 +202,11 @@ public class ProtocolUtil {
       canvas.text(Pen.PEN_WHITE_TEXT_6px, currentX[1] + 1, y + 9, 0, "" + af);
     }
     int maxf = Math.max(bf, af);
-    return new int[]{x + (childOverflow ? (int)(6*Math.log10(maxf)): 0), returnX + nw - 1};
+    if (childOverflow ) {
+      return new int[] {x + (int)(6*Math.log10(maxf)), returnX + nw - 1};
+    } else {
+      return new int[] {x, returnX + nw - 1};
+    }
   }
 
   // ###############################
@@ -212,8 +224,8 @@ public class ProtocolUtil {
     if (offset[0] > 0 && offset[1] > 0) {
       return shape;
     } else {
-      double offsetX = offset[0] > 0 ? 0: offset[0];
-      double offsetY = offset[1] > 0 ? 0: offset[1];
+      double offsetX = Math.min(0, offset[0]);
+      double offsetY = Math.min(0, offset[1]);
       return Rect.from(shape.x() + offsetX, shape.y() + offsetY,
                 shape.width(), shape.height());
     }

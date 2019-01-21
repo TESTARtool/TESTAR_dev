@@ -115,7 +115,7 @@ GraphDBPassword =
 #################################################################
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = false
-Reportstate = false
+ReportState = false
 SubroutineData = 
 TgherkinDocument = 
 Discount = 0.95

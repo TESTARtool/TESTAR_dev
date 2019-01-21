@@ -115,7 +115,7 @@ GraphDBPassword = testar
 #################################################################
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = true
-Reportstate = false
+ReportState = false
 SubroutineData = 
 TgherkinDocument = ./resources/settings/testOU/OU_ATI.tgherkin
 Discount = 0.95

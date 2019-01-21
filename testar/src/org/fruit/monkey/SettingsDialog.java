@@ -60,8 +60,6 @@ import javax.swing.GroupLayout.Alignment;
 import nl.ou.testar.GraphDBPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
-import nl.ou.testar.TgherkinPanel;
-import nl.ou.testar.SubroutinePanel;
 
 /**
  * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
@@ -93,6 +91,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private GraphDBPanel graphDBPanel;
   private TgherkinPanel tgherkinPanel;
   private SubroutinePanel subroutinePanel;
+  private FormPanel formPanel;
 
   /**
    * Starts the settings Dialog.
@@ -249,9 +248,10 @@ public class SettingsDialog extends JFrame implements Observer {
     graphDBPanel.populateFrom(settings);
     tgherkinPanel.populateFrom(settings);
     subroutinePanel.populateFrom(settings);
+    formPanel.populateFrom(settings);
 
-    // only show Tgherkin tab if the protocol is a DocumentProtocol
-    if (tgherkinPanel.isDocumentProtocol()) {
+    // only show Tgherkin tab if the protocol is a DocumentProtocol or a SubroutineProtocol
+    if (tgherkinPanel.isDocumentProtocol() || subroutinePanel.isSubroutineProtocol()) {
 
       if (!tgherkinPanel.isActive()) {
         jtabsPane.addTab("Tgherkin", tgherkinPanel);
@@ -268,7 +268,7 @@ public class SettingsDialog extends JFrame implements Observer {
     if (subroutinePanel.isSubroutineProtocol()) {
       if (!subroutinePanel.isActive()) {
         jtabsPane.addTab("Subroutine Data", subroutinePanel);
-        tgherkinPanel.setActive(true);
+        subroutinePanel.setActive(true);
       }
     } else {
       if (subroutinePanel.isActive()) {
@@ -276,6 +276,20 @@ public class SettingsDialog extends JFrame implements Observer {
         subroutinePanel.setActive(false);
       }
     }
+    
+    // only show form tab if the protocol is a FormProtocol
+    if (formPanel.isFormProtocol()) {
+      if (!formPanel.isActive()) {
+        jtabsPane.addTab("Form Data", formPanel);
+        formPanel.setActive(true);
+      }
+    } else {
+      if (formPanel.isActive()) {
+        jtabsPane.remove(formPanel);
+        formPanel.setActive(false);
+      }
+    }
+
   }
 
   private void extractInformation(Settings settings) {
@@ -287,6 +301,8 @@ public class SettingsDialog extends JFrame implements Observer {
     graphDBPanel.extractInformation(settings);
     tgherkinPanel.extractInformation(settings);
     subroutinePanel.extractInformation(settings);
+    formPanel.extractInformation(settings);
+
   }
 
   private void initComponents() throws IOException {
@@ -311,10 +327,11 @@ public class SettingsDialog extends JFrame implements Observer {
     jtabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
     jtabsPane.addTab("GraphDB", graphDBPanel);
-    subroutinePanel = new SubroutinePanel();
-    tgherkinPanel = new TgherkinPanel();
     cleanUpPanel = new CleanUpPanel();
     jtabsPane.addTab("Clean Up", cleanUpPanel);
+    tgherkinPanel = new TgherkinPanel();
+    subroutinePanel = new SubroutinePanel();
+    formPanel = new FormPanel();
 
     setLayout(jtabsPane);
     pack();

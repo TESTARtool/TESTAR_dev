@@ -1,0 +1,19 @@
+  Feature: Open University - A user logs in to API site.
+ 
+  Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+
+  Scenario: A user successfully logs on the system.
+    Step: Press log on button
+    When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Check whether user is logged on
+    Given $Role="UIAText" and image("resources\settings\subroutineAtiMixed\Expand.png")
+    When  NOP
+    Step: Focus op pagina krijgen
+    When  $Role="UIAText" and $Title="mijnOU" click(true)
+    Step: Remove products from shopping cart (if applicable)
+    While state($Role="UIAText" and image("resources\settings\subroutineAtiMixed\RemoveCourse.png"))
+    When  $Role="UIAText" and image("resources\settings\subroutineAtiMixed\RemoveCourse.png") click(true)
+    Step: Click close shopping cart button (if applicable)
+    While $Role="UIAText" and image("resources\settings\subroutineAtiMixed\CloseShoppingCart.png")
+    When  $Role="UIAText" and image("resources\settings\subroutineAtiMixed\CloseShoppingCart.png") click(true)
+    

@@ -216,12 +216,4 @@ public class HtmlSequenceReport {
         out.println(s);
         out.flush();
     }
-
-    private String start(String tag) {
-        return "<" + tag + ">";
-    }
-
-    private String end(String tag) {
-        return "</" + tag + ">";
-    }
 }

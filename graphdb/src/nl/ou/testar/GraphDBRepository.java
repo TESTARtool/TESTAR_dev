@@ -67,7 +67,7 @@ public interface GraphDBRepository {
     void addActionOnState(String stateId, Action action, String toStateID);
 
     /**
-     * Add a widget to the the graph database as Wiget.
+     * Add a widget to the the graph database as Widget.
      * @param stateID State to which the widget belongs
      * @param w The widget object
      */
@@ -75,7 +75,7 @@ public interface GraphDBRepository {
 
     /**
      * Store a custom type in the graph database.
-     * @param action the actionto which the custom type relates.
+     * @param action the action to which the custom type relates.
      * @param relation The name of the relation
      * @param instance the custom object.
      */
