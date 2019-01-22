@@ -113,7 +113,7 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
-    protected boolean faultySequence;
+    public static boolean faultySequence;
     private State stateForClickFilterLayerProtocol;
 
     public State getStateForClickFilterLayerProtocol() {
@@ -131,17 +131,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected Mouse mouse = AWTMouse.build();
     protected State lastState = null;
     protected int nonReactingActionNumber;
-    private Verdict processVerdict = Verdict.OK;
-
-    protected void setProcessVerdict(Verdict processVerdict) {
-        this.processVerdict = processVerdict;
+    
+    protected ProcessListener processListener = new ProcessListener();
+    private boolean enabledProcessListener = false;
+    private static Verdict processVerdict = Verdict.OK;
+    public static void setProcessVerdict(Verdict newprocessVerdict) {
+        processVerdict = newprocessVerdict;
+    }
+    protected static Verdict getProcessVerdict() {
+        return processVerdict;
     }
 
-    protected Verdict getProcessVerdict() {
-        return this.processVerdict;
-    }
-
-    protected boolean processListenerEnabled;
     protected String lastPrintParentsOf = "null-id";
     protected int actionCount;
 
@@ -165,17 +165,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     protected List<ProcessInfo> contextRunningProcesses = null;
     protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
+    protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
     protected double passSeverity = Verdict.SEVERITY_OK;
-    protected int generatedSequenceNumber = -1;
+    protected static int generatedSequenceNumber = -1;
 
-    protected final int generatedSequenceCount() {
+    public final static int generatedSequenceCount() {
         return generatedSequenceNumber;
     }
 
-    protected Action lastExecutedAction = null;
+    protected static Action lastExecutedAction = null;
 
-    protected final Action lastExecutedAction() {
+    public final static Action lastExecutedAction() {
         return lastExecutedAction;
     }
 
@@ -236,15 +236,41 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param settings
      */
     public final void run(final Settings settings) {
-    	
+
     	//Associate start settings of the first TESTAR dialog
     	this.settings = settings;
 
     	SUT system = null;
-    	
-    	//Call the principal loop to work with different loop-modes
-    	detectModeLoop(system);
 
+    	//initialize TESTAR with the given settings:
+    	initialize(settings);
+
+    	try {
+
+    		if (mode() == Modes.View && isValidFile()) {
+    			new SequenceViewer(settings);
+    		} else if (mode() == Modes.Replay && isValidFile()) {
+    			runReplayLoop();
+    		} else if (mode() == Modes.Spy) {
+    			runSpyLoop();
+    		} else if(mode() == Modes.Record) {
+    			runRecordLoop(system);
+    		} else if (mode() == Modes.Generate) {
+    			runGenerateOuterLoop(system);
+    		}
+
+    	}catch(SystemStartException SystemStartException) {
+    		SystemStartException.printStackTrace();
+    		DEBUGLOG.error("Exception: ",SystemStartException);
+    		this.mode = Modes.Quit;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		DEBUGLOG.error("Exception: ",e);
+    		this.mode = Modes.Quit;
+    	}
+
+    	//Closing TESTAR EventHandler
+    	closeTestarTestSession();
     }
 
     /**
@@ -300,47 +326,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     /**
-     * Method to change between the different loops that represent the principal modes of execution on TESTAR
-     *
-     * @param system
-     */
-    protected void detectModeLoop(SUT system) {
-
-    	do {
-    		//initialize TESTAR with the given settings:
-    		initialize(settings);
-
-    		try {
-    			
-    			if (mode() == Modes.View && isValidFile()) {
-    				new SequenceViewer(settings);
-    			} else if (mode() == Modes.Replay && isValidFile()) {
-    				runReplayLoop();
-    			} else if (mode() == Modes.Spy) {
-    				runSpyLoop();
-    			} else if(mode() == Modes.Record) {
-    				runRecordLoop(system);
-    			} else if (mode() == Modes.Generate) {
-    				runGenerateOuterLoop(system);
-    			}
-    			
-    		}catch(SystemStartException SystemStartException) {
-    			System.out.println(SystemStartException);
-    			this.mode = Modes.Quit;
-    		} catch (Exception e) {
-    			System.out.println(e);
-    			this.mode = Modes.Quit;
-    		}
-
-    		//Closing TESTAR EventHandler
-            closeTestarTestSession();
-    	}
-    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-    	while(startTestarSettingsDialog());
-
-    }
-    
-    /**
      * Check if the selected file to Replay or View contains a valid fragment object
      */
     public boolean isValidFile(){
@@ -360,6 +345,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      	} catch (ClassNotFoundException | IOException e) {
      		
     		System.out.println("ERROR: File is not a readable, please select a correct file");
+    		DEBUGLOG.error("Exception: ",e);
+    		
      		return false;	
     	}
      	
@@ -393,9 +380,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     settings.get(LogLevel));
         } catch (NoSuchTagException e3) {
             // TODO Auto-generated catch block
+        	DEBUGLOG.error("Exception: ",e3);
             e3.printStackTrace();
         } catch (FileNotFoundException e3) {
             // TODO Auto-generated catch block
+        	DEBUGLOG.error("Exception: ",e3);
             e3.printStackTrace();
         }
         ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
@@ -416,12 +405,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.delete(currentSeq);
         } catch (IOException e2) {
             LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+            DEBUGLOG.error("Exception: ",e2);
         }
         try {
             TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
             LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
         } catch (IOException e) {
             LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+            DEBUGLOG.error("Exception: ",e);
         }
         return currentSeq;
     }
@@ -445,8 +436,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             LogSerialiser.log("SUT is running!\n", LogSerialiser.LogLevel.Debug);
             LogSerialiser.log("Building canvas...\n", LogSerialiser.LogLevel.Debug);
             
-            //Activate process Listeners if enabled in the test.settings
-            processListeners(system);
+          //Activate process Listeners if enabled in the test.settings
+            if(enabledProcessListener)
+            	processListener.startListeners(system, settings);
         }
         
         return system;
@@ -464,7 +456,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private void startTestSequence(SUT system) {
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
-        LOGGER.info("Starting test sequence {}", sequenceCount());
+        DEBUGLOG.info("Starting test sequence {}", sequenceCount());
 
         actionCount = 1;
         this.testFailTimes = 0;
@@ -490,7 +482,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.flush();
         LogSerialiser.finish();
         LogSerialiser.exit();
-        LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+        DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
     }
 
     /**
@@ -606,6 +598,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } catch (Exception e) {
                 System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
                 e.printStackTrace();
+                DEBUGLOG.error("Exception: ",e);
                 emergencyTerminateTestSequence(system, e);
             }
         }
@@ -628,8 +621,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
             } catch (NoSuchTagException e) {
                 LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                DEBUGLOG.error("Exception: ",e);
             } catch (IOException e) {
                 LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                DEBUGLOG.error("Exception: ",e);
             }
             FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
         }
@@ -696,6 +691,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Executing the selected action:
             executeAction(system, state, action);
+            lastExecutedAction = action;
             actionCount++;
 
             //Saving the actions and the executed action into replayable test sequence:
@@ -797,14 +793,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Output/logs folder
 		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
 				actionCount,
-				"action = " + action.get(Tags.ConcreteID) +
-				" (" + action.get(Tags.AbstractID) + ") @state = " +
-				state.get(Tags.ConcreteID) + " (" + state.get(Tags.Abstract_R_ID) + ")\n",
+				"action = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
+				" (" + action.get(Tags.AbstractID, "AbstractID not available") + ") @state = " +
+				state.get(Tags.ConcreteID, "ConcreteID not available") + " (" + state.get(Tags.Abstract_R_ID, "Abstract_R_ID not available") + ")\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
 		//bin folder 
-		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
+		DEBUGLOG.info(actionMode+" number {} Widget {} finished in {} ms",
 				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
 
     	
@@ -885,7 +881,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         	currentSeq = getAndStoreSequenceFile();
         	
         	//Activate process Listeners if enabled in the test.settings
-        	processListeners(system);
+            if(enabledProcessListener)
+            	processListener.startListeners(system, settings);
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
@@ -926,6 +923,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             if (actionStatus.isUserEventAction()) {
     			CodingManager.buildIDs(state, actionStatus.getAction());
     			saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
+    			lastExecutedAction = actionStatus.getAction();
     			actionCount++;
             }
     		
@@ -946,8 +944,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         
         //If user change to Generate mode & we start TESTAR on Record mode, invoke Generate mode with the created SUT
         if(mode() == Modes.Generate && startedRecordMode){
-        	Util.clear(cv);
-        	cv.end();
         	
         	runGenerateOuterLoop(system);
         }
@@ -963,9 +959,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         	//Copy sequence file into proper directory:
         	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-
-            Util.clear(cv);
-            cv.end();
             
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
@@ -1213,206 +1206,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void finishSequence(){
 		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 	}
-	
-	//TODO: Move out of DefaultProtocol?
-	protected boolean enableProcessListeners(){
-		//User doesn't want to enable
-		if(!settings().get(ConfigTags.ProcessListenerEnabled))
-			return false;
-		//Only for SUTs executed with command_line
-		if(!settings().get(ConfigTags.SUTConnector).equals("COMMAND_LINE"))
-			return false;
-
-		String path = settings().get(ConfigTags.SUTConnectorValue);
-		//Disable for browsers
-		if(path.contains("chrome.exe") || path.contains("iexplore.exe") || path.contains("firefox.exe") || path.contains("MicrosoftEdge"))
-			return false;
-
-		return true;
-	}
-
-    //TODO: Move out of DefaultProtocol?
-	/**
-	 * If SUT process is invoked through COMMAND_LINE,
-	 * this method create threads to work with oracles at the process level.
-	 */
-	protected void processListeners(SUT system) {
-
-		//Only if we enabled ProcessListener and executed SUT with command_line
-		if(processListenerEnabled){
-			final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-			//Process Oracles use SuspiciousProcessOutput regular expression from test settings file
-			Pattern processOracles = Pattern.compile(settings().get(ConfigTags.SuspiciousProcessOutput), Pattern.UNICODE_CHARACTER_CLASS);
-			//Process Logs use ProcessLogs regular expression from test settings file
-			Pattern processLogs= Pattern.compile(settings().get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
-
-			int seqn = generatedSequenceCount();
-			//Create File to save the logs of these oracles
-			File dir = new File("output/ProcessLogs");
-			if(!dir.exists())
-				dir.mkdirs();
-			
-			//Prepare runnable to read Error buffer
-			Runnable readErrors = new Runnable() {
-				public void run() {
-					try {
-						PrintWriter writerError;
-						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
-						String actionId = "";
-						String ch;
-						Matcher mOracles, mLogs;
-						while (system.isRunning() && (ch = input.readLine()) != null)
-						{	
-							mOracles = processOracles.matcher(ch);
-							mLogs= processLogs.matcher(ch);
-
-							if(processOracles!=null && mOracles.matches()) {		
-
-								/*try {
-									semaphore.acquire();
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}*/
-
-								//Prepare Verdict report
-								State state = getState(system);
-								actionId=lastExecutedAction().get(Tags.ConcreteID);
-								Visualizer visualizer = Util.NullVisualizer;
-								// visualize the problematic state
-								if(state.get(Tags.Shape, null) != null)
-									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-								Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
-
-								setProcessVerdict(verdict);
-
-								faultySequence = true;
-								
-								//Prepare Log report
-								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdErr:	" +ch);
-
-								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
-								if(lastExecutedAction()!=null)
-									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
-								writerError.flush();
-								writerError.close();
-
-								//semaphore.release();
-
-							}
-							//processOracle has priority
-							else if(processLogs!=null && mLogs.matches()) {
-								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT Log StdErr:	" +ch);
-
-								writerError = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdErr.log", true));
-								if(lastExecutedAction()!=null)
-									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
-								writerError.flush();
-								writerError.close();
-							}
-						}
-						
-						input.close();
-						//Thread.currentThread().interrupt();
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			};
-			
-			//Prepare runnable to read Output buffer
-			Runnable readOutput = new Runnable() {
-				public void run() {
-					try {
-						PrintWriter writerOut;
-						BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
-						String actionId = "";
-						String ch;
-						Matcher mOracles, mLogs;
-						while (system.isRunning() && (ch = input.readLine()) != null)
-						{	
-							mOracles = processOracles.matcher(ch);
-							mLogs = processLogs.matcher(ch);
-							
-							if(processOracles!=null && mOracles.matches()) {	
-
-								/*try {
-									semaphore.acquire();
-								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}*/
-
-								//Prepare Verdict report
-								State state = getState(system);
-								actionId=lastExecutedAction().get(Tags.ConcreteID);
-								Visualizer visualizer = Util.NullVisualizer;
-								// visualize the problematic state
-								if(state.get(Tags.Shape, null) != null)
-									visualizer = new ShapeVisualizer(RedPen, state.get(Tags.Shape), "Suspicious Title", 0.5, 0.5);
-								Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-										"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".", visualizer);
-
-								setProcessVerdict(verdict);
-
-								faultySequence = true;
-								
-								//Prepare Log report
-								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT StdOut:	" +ch);
-
-								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
-								if(lastExecutedAction()!=null)
-									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
-								writerOut.flush();
-								writerOut.close();
-
-								//semaphore.release();
-
-							}
-							//processOracle has priority
-							else if(processLogs!=null && mLogs.matches()) {
-								String DateString = Util.dateString(DATE_FORMAT);
-								System.out.println("SUT Log StdOut:	" +ch);
-
-								writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+seqn+"_StdOut.log", true));
-								if(lastExecutedAction()!=null)
-									actionId=lastExecutedAction().get(Tags.ConcreteID);
-								writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
-								writerOut.flush();
-								writerOut.close();
-							}
-						}
-						
-						input.close();
-						//Thread.currentThread().interrupt();
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			};  
-			//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
-			//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
-			//¿ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
-			
-			new Thread(readErrors).start();
-			new Thread(readOutput).start();
-
-			/*int nbThreads =  Thread.getAllStackTraces().keySet().size();
-			System.out.println("Number of Threads running on VM: "+nbThreads);*/
-		}
-	}
 
 	// refactored
 	protected SUT startSystem() throws SystemStartException{
@@ -1451,9 +1244,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			return getSUTByProcessName(settings().get(ConfigTags.SUTConnectorValue));
 		else{ // Settings.SUT_CONNECTOR_CMDLINE
 			Assert.hasText(settings().get(ConfigTags.SUTConnectorValue));
-			processListenerEnabled = enableProcessListeners();
-			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), processListenerEnabled);
-			//sut.setNativeAutomationCache();
+			
+			//Read the settings to know if user wants to start the process listener
+			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
+				enabledProcessListener = processListener.enableProcessListeners(settings);
+			}
+			
+			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 			
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
 			String printSutInfo = "Waiting for the SUT to be accessible ...";
@@ -1960,22 +1757,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(system !=null){
 		    system.stop();
 		}
-	}
-
-	private boolean startTestarSettingsDialog(){
-		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			this.mode = settings().get(ConfigTags.Mode);
-
-			if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
-				try {
-					this.settings = Main.loadSettings(new String[0], Main.getSettingsFile());
-				} catch (ConfigException e) {
-					e.printStackTrace();
-				}
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
