@@ -3,15 +3,12 @@ package nl.ou.testar.StateModel;
 import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
-import nl.ou.testar.StateModel.Exception.StateNotFoundException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
-import nl.ou.testar.StateModel.Util.ActionHelper;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class StateModelManager {
@@ -63,12 +60,17 @@ public class StateModelManager {
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
         AbstractState newAbstractState;
-        try {
-            newAbstractState = abstractStateModel.getState(abstractStateId);
-        }
-        catch (StateModelException ex) {
-            // state wasn't found
-            System.out.println("Creating new abstract state");
+
+        // fetch or create an abstract state
+        if (abstractStateModel.containsState(abstractStateId)) {
+            try {
+                newAbstractState = abstractStateModel.getState(abstractStateId);
+            }
+            catch (StateModelException ex) {
+                ex.printStackTrace();
+                return;
+            }
+        } else {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
 
@@ -113,7 +115,17 @@ public class StateModelManager {
      * @param actionUnderExecution
      */
     public void notifyActionExecution(Action actionUnderExecution) {
-        this.actionUnderExecution = new AbstractAction(actionUnderExecution.get(Tags.AbstractID));
+        System.out.println("Setting new action under exection");
+        // the action that is executed should always be traceable to an action on the current abstract state
+        // in other words, we should be able to find the action on the current abstract state
+        try {
+            this.actionUnderExecution = currentAbstractState.getAction(actionUnderExecution.get(Tags.AbstractID));
+        }
+        catch (ActionNotFoundException ex) {
+            System.out.println("Action not found. Adding new one to state");
+            this.actionUnderExecution = new AbstractAction(actionUnderExecution.get(Tags.AbstractID));
+            currentAbstractState.addNewAction(this.actionUnderExecution);
+        }
         this.actionUnderExecution.addConcreteActionId(actionUnderExecution.get(Tags.ConcreteID));
     }
 

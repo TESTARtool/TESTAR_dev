@@ -142,6 +142,11 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(false);
         abstractActionClass.addProperty(actionId);
+        Property abstractionLevelIdentifier = new Property("abstractionLevelIdentifier", OType.STRING);
+        abstractionLevelIdentifier.setMandatory(true);
+        abstractionLevelIdentifier.setNullable(false);
+        abstractionLevelIdentifier.setIndexAble(true);
+        abstractActionClass.addProperty(abstractionLevelIdentifier);
         Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
         unvisitedActions.setMandatory(false);
         unvisitedActions.setNullable(false);
@@ -257,6 +262,11 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(false);
         entityClass.addProperty(actionId);
+        Property abstractionLevelIdentifier = new Property("abstractionLevelIdentifier", OType.STRING);
+        abstractionLevelIdentifier.setMandatory(true);
+        abstractionLevelIdentifier.setNullable(false);
+        abstractionLevelIdentifier.setIndexAble(true);
+        entityClass.addProperty(abstractionLevelIdentifier);
         Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
         unvisitedActions.setMandatory(false);
         unvisitedActions.setNullable(false);

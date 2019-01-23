@@ -37,43 +37,37 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
         // now, the actions
         Set<AbstractAction> actions = new HashSet<>();
+        Set<AbstractAction> unvisitedActions = new HashSet<>();
         for (EdgeEntity edgeEntity : ((VertexEntity) entity).getOutgoingEdges()) {
-            // for each edge, we check if the edge is an abstract action
-            // there can be several different types of relations in the data store
+            // for each edge, we check if the edge is an abstract action or an unvisited abstract action
             EntityClass edgeEntityClass = edgeEntity.getEntityClass();
-            if (!edgeEntityClass.getClassName().equals("AbstractAction")) {
-                continue;
-            }
-            // get the action id
-            propertyValue = edgeEntity.getPropertyValue("actionId");
-            if (propertyValue.left() != OType.STRING) {
-                throw new ExtractionException("Expected string value for actionId attribute. Type " + propertyValue.left().toString() + " given.");
-            }
-            String abstractActionId = propertyValue.right().toString();
-            AbstractAction abstractAction = new AbstractAction(abstractActionId);
+            if (edgeEntityClass.getClassName().equals("AbstractAction") || edgeEntityClass.getClassName().equals("UnvisitedAction")) {
+                AbstractAction action = processEdge(edgeEntity);
+                actions.add(action);
 
-            // get the concrete action id's
-            Pair<OType, Object> concreteActionIdValues = edgeEntity.getPropertyValue("concreteActionIds");
-            if (concreteActionIdValues == null) {
-                continue;
+                if (edgeEntityClass.getClassName().equals("UnvisitedAction")) {
+                    unvisitedActions.add(action);
+                }
             }
-            if (concreteActionIdValues.left() != OType.EMBEDDEDSET) {
-                throw new ExtractionException("Embedded set was expected for concrete action ids. " + concreteActionIdValues.left().toString() + " was given.");
-            }
-            if (!Set.class.isAssignableFrom(concreteActionIdValues.right().getClass())) {
-                throw new ExtractionException("Set expected for value of concrete action ids");
-            }
-            Set<String> concreteActionIds = (Set<String>)concreteActionIdValues.right();
-            for (String concreteActionId : concreteActionIds) {
-                abstractAction.addConcreteActionId(concreteActionId);
-            }
-            actions.add(abstractAction);
         }
-
-
 
         // create the abstract state
         AbstractState abstractState = new AbstractState(abstractStateId, actions);
+
+        // is it an initial state?
+        propertyValue = entity.getPropertyValue("isInitial");
+        if (propertyValue.left() != OType.BOOLEAN) {
+            throw new ExtractionException("Expected boolean value for isInitial attribute. Type " + propertyValue.left().toString() + " was given.");
+        }
+        boolean isInitial = (boolean) propertyValue.right();
+        abstractState.setInitial(isInitial);
+
+        // add the visited abstract actions
+        Set<AbstractAction> visitedActions = (HashSet<AbstractAction>)((HashSet<AbstractAction>) actions).clone();
+        visitedActions.removeAll(unvisitedActions);
+        for (AbstractAction visitedAction : visitedActions) {
+            abstractState.addVisitedAction(visitedAction);
+        }
 
         // get the concrete state ids
         Pair<OType, Object> concreteStateIdValues = entity.getPropertyValue("concreteStateIds");
@@ -88,6 +82,34 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
                 abstractState.addConcreteStateId(concreteStateId);
             }
         }
-        return null;
+        return abstractState;
+    }
+
+    private AbstractAction processEdge(EdgeEntity edgeEntity) throws ExtractionException {
+        // get the action id
+        Pair<OType, Object> propertyValue;
+        propertyValue = edgeEntity.getPropertyValue("actionId");
+        if (propertyValue.left() != OType.STRING) {
+            throw new ExtractionException("Expected string value for actionId attribute. Type " + propertyValue.left().toString() + " given.");
+        }
+        String actionId = propertyValue.right().toString();
+        AbstractAction action = new AbstractAction(actionId);
+
+        // get the concrete action id's
+        Pair<OType, Object> concreteActionIdValues = edgeEntity.getPropertyValue("concreteActionIds");
+        if (concreteActionIdValues == null) {
+            return null;
+        }
+        if (concreteActionIdValues.left() != OType.EMBEDDEDSET) {
+            throw new ExtractionException("Embedded set was expected for concrete action ids. " + concreteActionIdValues.left().toString() + " was given.");
+        }
+        if (!Set.class.isAssignableFrom(concreteActionIdValues.right().getClass())) {
+            throw new ExtractionException("Set expected for value of concrete action ids");
+        }
+        Set<String> concreteActionIds = (Set<String>)concreteActionIdValues.right();
+        for (String concreteActionId : concreteActionIds) {
+            action.addConcreteActionId(concreteActionId);
+        }
+        return action;
     }
 }

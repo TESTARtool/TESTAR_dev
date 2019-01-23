@@ -132,11 +132,7 @@ public class AbstractState extends AbstractEntity {
         for (AbstractAction action : actions.values()) {
             visitedActions.add(action);
         }
-        System.out.println("Values in visitedactions set: " + visitedActions.toString());
-        System.out.println("Values in unvisited actions set: " + getUnvisitedActions().toString());
         visitedActions.removeAll(getUnvisitedActions());
-        System.out.println("Values after removing unvisited actions: " + visitedActions.toString());
-        System.out.println("Values in all actions: " + actions.values().toString());
         return visitedActions;
     }
 
@@ -153,5 +149,29 @@ public class AbstractState extends AbstractEntity {
      */
     public void setInitial(boolean initial) {
         isInitial = initial;
+    }
+
+    @Override
+    public void setAbstractionLevelIdentifier(String abstractionLevelIdentifier) {
+        super.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+        // set the identifier on the abstract actions for this state
+        for (String key : actions.keySet()) {
+            actions.get(key).setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+            if (unvisitedActions.containsKey(key)) {
+                unvisitedActions.get(key).setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+            }
+        }
+    }
+
+    /**
+     * Add a new abstract action to the abstract state.
+     * @param action
+     */
+    public void addNewAction(AbstractAction action) {
+        if (!this.actions.containsKey(action.getActionId())) {
+            action.setAbstractionLevelIdentifier(this.getAbstractionLevelIdentifier());
+            actions.put(action.getActionId(), action);
+            unvisitedActions.put(action.getActionId(), action);
+        }
     }
 }

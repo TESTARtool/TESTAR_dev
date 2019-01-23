@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -12,9 +13,12 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Widget;
+import org.fruit.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.System.exit;
 
 
 public class OrientDBManager implements PersistenceManager, StateModelEventListener {
@@ -110,13 +114,17 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // 1) delete the unvisited actions that are no longer unvisited
         // 2) save the unvisited actions (for newly saved states)
 
+//        System.out.println("number of actions: " + abstractState.getActions().size());
+//        System.out.println("number of visited actions: " + abstractState.getVisitedActions().size());
+//        System.out.println("number of unvisited actions: " + abstractState.getUnvisitedActions().size());
 
         // step 1:
         Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
         // we need the ids
         Set<Object> visitedActionIds = visitedActions.stream().map(action -> action.getActionId()).collect(Collectors.toSet());
-        System.out.println("Visited actions: " + visitedActionIds.toString());
+//        System.out.println("Visited action ids: " + visitedActionIds.toString());
         EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
+//        System.out.println("deleting visited actions : " + visitedActionIds.size());
         entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
 
         // step 2:
@@ -135,16 +143,27 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
-            System.out.println("Adding unvisited actions");
+//            System.out.println("Adding unvisited actions");
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
-                System.out.println(unvisitedAction.getActionId());
+//                System.out.println(unvisitedAction.getActionId());
                 EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, vertexEntity, blackHole);
                 actionHydrator.hydrate(actionEntity, unvisitedAction);
+                //print the properties and values
+//                System.out.println("Hydrated properties: ");
+                for (String propertyName : actionEntity.getPropertyNames()) {
+//                    System.out.println(propertyName + " : " + actionEntity.getPropertyValue(propertyName).right());
+                }
+//                System.out.println();
                 entityManager.saveEntity(actionEntity);
             }
         }
         catch (HydrationException ex) {
-            //@todo add some meaningful logging here as well
+            System.out.println(ex.getMessage());
+        }
+        catch (NullPointerException ex) {
+            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+            exit(1);
         }
     }
 
@@ -330,8 +349,15 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         Map<String, Pair<OType, Object>> entityProperties = new HashMap<>();
         Property identifier = entityClass.getIdentifier();
         if (identifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put(identifier.getPropertyName(), vertexEntity.getPropertyValue(identifier.getPropertyName()));*/
+        entityProperties.put("abstractionLevelIdentifier", vertexEntity.getPropertyValue(identifier.getPropertyName()));
 
+        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateEntityClass, entityProperties);
+        if (retrievedDocuments.isEmpty()) {
+            System.out.println("Could not find abstract states in the model");
+        }
+        else {
+            // we need to create the abstract states from the returned document entities
+        }*/
 
         // enable the event listener again
         setListening(true);
@@ -347,6 +373,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             eventHelper.validateEvent(event);
         } catch (InvalidEventException e) {
             // There is something wrong with the event. we do nothing and exit
+            System.out.println("Received wrong payload for event: " + event.getPayload().getClass().toString());
             return;
         }
 

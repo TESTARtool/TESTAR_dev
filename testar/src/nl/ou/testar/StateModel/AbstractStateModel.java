@@ -180,6 +180,7 @@ public class AbstractStateModel {
         if (!initialStates.containsKey(initialState.getStateId())) {
             initialState.setInitial(true);
             initialStates.put(initialState.getStateId(), initialState);
+            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, initialState));
         }
     }
 
