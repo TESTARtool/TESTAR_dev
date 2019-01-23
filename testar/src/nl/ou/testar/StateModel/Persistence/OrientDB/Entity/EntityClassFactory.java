@@ -117,10 +117,6 @@ public class EntityClassFactory {
         isInitial.setMandatory(true);
         isInitial.setNullable(false);
         abstractStateClass.addProperty(isInitial);
-        Property unvisitedActions = new Property("unvisitedActions", OType.EMBEDDEDSET, OType.STRING);
-        unvisitedActions.setMandatory(false);
-        unvisitedActions.setNullable(true);
-        abstractStateClass.addProperty(unvisitedActions);
         Property concreteStateIds = new Property("concreteStateIds", OType.EMBEDDEDSET, OType.STRING);
         concreteStateIds.setMandatory(false);
         concreteStateIds.setNullable(false);
