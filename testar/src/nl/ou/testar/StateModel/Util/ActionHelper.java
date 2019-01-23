@@ -31,7 +31,9 @@ public class ActionHelper {
     public static Set<AbstractAction> convertActionsToAbstractActions(Set<Action> actions) {
         Set<AbstractAction> abstractActions = new HashSet<>();
         for(Action action:actions) {
-            abstractActions.add(new AbstractAction(action.get(Tags.AbstractID)));
+            AbstractAction abstractAction = new AbstractAction(action.get(Tags.AbstractID));
+            abstractAction.addConcreteActionId(action.get(Tags.ConcreteID));
+            abstractActions.add(abstractAction);
         }
         return abstractActions;
     }

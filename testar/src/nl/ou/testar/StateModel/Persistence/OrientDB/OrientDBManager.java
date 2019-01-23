@@ -4,9 +4,13 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
+import nl.ou.testar.StateModel.Exception.ExtractionException;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.EntityExtractor;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
@@ -326,41 +330,62 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // first, disable the event listener. We do not want to process the events resulting from our object creations
         setListening(false);
 
-        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
-        VertexEntity vertexEntity = new VertexEntity(entityClass);
+        EntityClass stateModelClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractStateModel);
+        VertexEntity stateModelEntity = new VertexEntity(stateModelClass);
 
         // hydrate the entity with the abstract state model information
         try {
             EntityHydrator stateModelHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE_MODEL);
-            stateModelHydrator.hydrate(vertexEntity, abstractStateModel);
+            stateModelHydrator.hydrate(stateModelEntity, abstractStateModel);
         }
         catch (HydrationException ex) {
             ex.printStackTrace();
         }
 
         // step 1: persist the state model entity to the database. if it already exists, nothing will happen
-        entityManager.saveEntity(vertexEntity);
+        entityManager.saveEntity(stateModelEntity);
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
-        /*EntityClass abstractStateEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        if (abstractStateEntityClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
+        /*EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
 
-        // in order to retrieve the abstract states, we need to provide the abstract state model id to the query
+        // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
         Map<String, Pair<OType, Object>> entityProperties = new HashMap<>();
-        Property identifier = entityClass.getIdentifier();
-        if (identifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put("abstractionLevelIdentifier", vertexEntity.getPropertyValue(identifier.getPropertyName()));
+        Property stateModelClassIdentifier = stateModelClass.getIdentifier();
+        if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
+        entityProperties.put("abstractionLevelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
 
-        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateEntityClass, entityProperties);
+        Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties);
         if (retrievedDocuments.isEmpty()) {
             System.out.println("Could not find abstract states in the model");
         }
         else {
+            System.out.println(retrievedDocuments.size() + " number of abstract state were returned");
             // we need to create the abstract states from the returned document entities
+            try {
+                EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
+                for (DocumentEntity documentEntity : retrievedDocuments) {
+                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity);
+                    abstractStateModel.addState(abstractState);
+                    if (abstractState.isInitial()) {
+                        abstractStateModel.addInitialState(abstractState);
+                    }
+
+                    // testing
+                    System.out.println("abstract state id : " + abstractState.getStateId());
+                    System.out.println(abstractState.getActions().size() + " number of actions on retrieved state");
+                    System.out.println(abstractState.getUnvisitedActions().size() + " number of unvisited actions on state");
+                    System.out.println(abstractState.getVisitedActions().size() + " number of visited actions on state");
+                    System.out.println(abstractState.getConcreteStateIds().size() + " number of concrete state ids on state");
+                }
+            } catch (ExtractionException | StateModelException e) {
+                e.printStackTrace();
+            }
         }*/
 
         // enable the event listener again
         setListening(true);
+//        throw new RuntimeException("Made it here!");
     }
 
     @Override

@@ -41,11 +41,11 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
         for (EdgeEntity edgeEntity : ((VertexEntity) entity).getOutgoingEdges()) {
             // for each edge, we check if the edge is an abstract action or an unvisited abstract action
             EntityClass edgeEntityClass = edgeEntity.getEntityClass();
-            if (edgeEntityClass.getClassName().equals("AbstractAction") || edgeEntityClass.getClassName().equals("UnvisitedAction")) {
+            if (edgeEntityClass.getClassName().equals("AbstractAction") || edgeEntityClass.getClassName().equals("UnvisitedAbstractAction")) {
                 AbstractAction action = processEdge(edgeEntity);
                 actions.add(action);
 
-                if (edgeEntityClass.getClassName().equals("UnvisitedAction")) {
+                if (edgeEntityClass.getClassName().equals("UnvisitedAbstractAction")) {
                     unvisitedActions.add(action);
                 }
             }

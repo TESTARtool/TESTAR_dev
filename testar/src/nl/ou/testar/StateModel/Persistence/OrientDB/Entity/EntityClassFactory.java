@@ -143,10 +143,10 @@ public class EntityClassFactory {
         abstractionLevelIdentifier.setNullable(false);
         abstractionLevelIdentifier.setIndexAble(true);
         abstractActionClass.addProperty(abstractionLevelIdentifier);
-        Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
-        unvisitedActions.setMandatory(false);
-        unvisitedActions.setNullable(false);
-        abstractActionClass.addProperty(unvisitedActions);
+        Property concreteActionIds = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
+        concreteActionIds.setMandatory(false);
+        concreteActionIds.setNullable(false);
+        abstractActionClass.addProperty(concreteActionIds);
         entityClasses.put(EntityClassName.AbstractAction, abstractActionClass);
         return abstractActionClass;
     }
@@ -263,10 +263,10 @@ public class EntityClassFactory {
         abstractionLevelIdentifier.setNullable(false);
         abstractionLevelIdentifier.setIndexAble(true);
         entityClass.addProperty(abstractionLevelIdentifier);
-        Property unvisitedActions = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
-        unvisitedActions.setMandatory(false);
-        unvisitedActions.setNullable(false);
-        entityClass.addProperty(unvisitedActions);
+        Property concreteActionIds = new Property("concreteActionIds", OType.EMBEDDEDSET, OType.STRING);
+        concreteActionIds.setMandatory(false);
+        concreteActionIds.setNullable(false);
+        entityClass.addProperty(concreteActionIds);
         entityClasses.put(EntityClassName.UnvisitedAbstractAction, entityClass);
         return entityClass;
     }

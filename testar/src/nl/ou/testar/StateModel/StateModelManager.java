@@ -68,7 +68,7 @@ public class StateModelManager {
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();
-                return;
+                throw new RuntimeException("An error occurred while retrieving abstract state from the state model");
             }
         } else {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
