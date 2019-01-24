@@ -236,24 +236,12 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		//PopUp of IE SUT
-		/*if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			LOGGER.warn("Ventana de alerta mostrada al usuario");
-			Keyboard kb = AWTKeyboard.build();
-
-			new CompoundAction.Builder()
-			.add(new KeyDown(KBKeys.VK_ENTER),0.5)
-			.build()
-			.run(system,null, 0.5);
-
-			kb.release(KBKeys.VK_ENTER);
-		}*/	
 		// iterate through all widgets
 		for(Widget w : getTopWidgets(state)){
 
 			//Check current browser tab, to close possible undesired tabs
-			if(w.get(Tags.Title,"").toString().contains("Address and search")) {
-				if(!w.get(Tags.ValuePattern,"").toString().contains("184.193")) {
+			/*if(w.get(Tags.Title,"").toString().contains("Address and search")) {
+				if(!w.get(Tags.ValuePattern,"").toString().contains("vims-alm")) {
 
 					Keyboard kb = AWTKeyboard.build();
 					CompoundAction cAction = new CompoundAction(new KeyDown(KBKeys.VK_CONTROL),new KeyDown(KBKeys.VK_W));
@@ -263,7 +251,9 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 					kb.release(KBKeys.VK_CONTROL);
 					kb.release(KBKeys.VK_W);
 				}
-			}
+			}*/
+			
+			
 			// Only consider enabled and non-blocked widgets
 			
 			//Qualitate
@@ -306,18 +296,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 				}
 			}
 		}
-		
-		// If the system is in the background, we need to force it into the foreground!
-		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
-		// is putting the SUT back into the foreground.
-		
-		
-		//Problems with popup windows (this is not a new IE process -> inspect.exe, investigate)
-		/*if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			//actions.add(ac.activateSystem());
-			this.forceToForeground = true;
-			return actions;
-		}*/
 
 		//return the set of derived actions
 		return actions;

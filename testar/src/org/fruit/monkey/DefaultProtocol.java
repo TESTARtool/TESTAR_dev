@@ -660,10 +660,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
-                if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-                    LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-                }
-                //----------------------------------
+            	if (escAttempts >= MAX_ESC_ATTEMPTS){
+            		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
+            			this.forceToForeground = true;
+            		}
+            	}
+            	//----------------------------------
                 // THERE MUST ALMOST BE ONE ACTION!
                 //----------------------------------
                 // if we did not find any actions, then we just hit escape, maybe that works ;-)
@@ -1956,7 +1958,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	protected int escAttempts = 0;
-	protected static final int MAX_ESC_ATTEMPTS = 99;
+	protected static final int MAX_ESC_ATTEMPTS = 5;
 
 	protected boolean isNOP(Action action){
 		String as = action.toString();
