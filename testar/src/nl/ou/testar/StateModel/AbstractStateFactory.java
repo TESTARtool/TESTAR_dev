@@ -1,10 +1,8 @@
 package nl.ou.testar.StateModel;
 
-import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.StateModel.Util.ActionHelper;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
 import java.util.Set;

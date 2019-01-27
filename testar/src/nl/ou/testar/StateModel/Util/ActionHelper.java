@@ -6,7 +6,10 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ActionHelper {
 
@@ -29,10 +32,17 @@ public class ActionHelper {
      * @return
      */
     public static Set<AbstractAction> convertActionsToAbstractActions(Set<Action> actions) {
+        System.out.println("nr of actions: " + actions.size());
         Set<AbstractAction> abstractActions = new HashSet<>();
-        for(Action action:actions) {
-            AbstractAction abstractAction = new AbstractAction(action.get(Tags.AbstractID));
-            abstractAction.addConcreteActionId(action.get(Tags.ConcreteID));
+        // group the actions by the abstract action id
+        Map<String, List<Action>> actionMap = actions.stream().collect(Collectors.groupingBy(a -> a.get(Tags.AbstractID)));
+        System.out.println("nr of actions after grouping: " + actionMap.keySet().size());
+        // create the actions
+        for (String abstractActionId : actionMap.keySet()) {
+            AbstractAction abstractAction = new AbstractAction(abstractActionId);
+            for (Action action : actionMap.get(abstractActionId)) {
+                abstractAction.addConcreteActionId(action.get(Tags.ConcreteID));
+            }
             abstractActions.add(abstractAction);
         }
         return abstractActions;

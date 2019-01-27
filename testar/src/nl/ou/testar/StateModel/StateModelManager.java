@@ -4,10 +4,12 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Util.AbstractStateService;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.sikuli.guide.Run;
 
 import java.util.Set;
 
@@ -51,13 +53,67 @@ public class StateModelManager {
         // initialization logic here
     }
 
-    /**
-     * This method should be called once when a new state is reached after the execution
-     * of an action or succesfully starting the SUT.
-     * @param newState
-     * @param actions
-     */
+//    /**
+//     * This method should be called once when a new state is reached after the execution
+//     * of an action or succesfully starting the SUT.
+//     * @param newState
+//     * @param actions
+//     */
+//    public void notifyNewStateReached(State newState, Set<Action> actions) {
+//        String abstractStateId = newState.get(Tags.AbstractIDCustom);
+//        AbstractState newAbstractState;
+//
+//        // fetch or create an abstract state
+//        if (abstractStateModel.containsState(abstractStateId)) {
+//            try {
+//                newAbstractState = abstractStateModel.getState(abstractStateId);
+//            }
+//            catch (StateModelException ex) {
+//                ex.printStackTrace();
+//                throw new RuntimeException("An error occurred while retrieving abstract state from the state model");
+//            }
+//        } else {
+//            newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
+//        }
+//
+//        // get the concrete state
+//        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
+//
+//        // add the abstract state to the model and persist the concrete state
+//        try {
+//            System.out.println("Adding state to the model");
+//            abstractStateModel.addState(newAbstractState);
+//            // we want to provide the abstract state with the identifier of the concrete state
+//            newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
+//
+//            if (currentAbstractState == null) {
+//                System.out.println("Initial state found");
+//                // it's apparently the first state in our run
+//                abstractStateModel.addInitialState(newAbstractState);
+//            }
+//            else {
+//                // it's not the first state, so we want to add a transition
+//                if (actionUnderExecution == null) {
+//                    // this should never happen if the notification process is followed correctly
+//                    throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
+//                }
+//                System.out.println("Adding transition");
+//                abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
+//                // we reset the executed action to await the next one.
+//                actionUnderExecution = null;
+//            }
+//
+//            // we simply persist the concrete state
+//            persistenceManager.persistConcreteState(concreteState, newAbstractState);
+//        } catch (StateModelException e) {
+//            System.out.println(this.getClass() + " : Could not add state: " + e.getMessage());
+//        }
+//
+//        currentAbstractState = newAbstractState;
+//    }
+
     public void notifyNewStateReached(State newState, Set<Action> actions) {
+        // check if we are dealing with a new state or an existing one
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
         AbstractState newAbstractState;
 
@@ -65,6 +121,8 @@ public class StateModelManager {
         if (abstractStateModel.containsState(abstractStateId)) {
             try {
                 newAbstractState = abstractStateModel.getState(abstractStateId);
+                // update the abstract state
+                AbstractStateService.updateAbstractStateActions(newAbstractState, actions);
             }
             catch (StateModelException ex) {
                 ex.printStackTrace();
@@ -74,40 +132,44 @@ public class StateModelManager {
             newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
         }
 
-        // get the concrete state
-        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
+        // add the concrete state id to the abstract state
+        newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
 
-        // add the abstract state to the model and persist the concrete state
-        try {
-            System.out.println("Adding state to the model");
-            abstractStateModel.addState(newAbstractState);
-            // we want to provide the abstract state with the identifier of the concrete state
-            newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
-
+        // check if an action was executed
+        if (actionUnderExecution == null) {
+            // no action is being executed, so we consider this an initial state
+            newAbstractState.setInitial(true);
+            try {
+                abstractStateModel.addState(newAbstractState);
+            } catch (StateModelException e) {
+                e.printStackTrace();
+                throw new RuntimeException("An error occurred while adding a new abstract state to the model");
+            }
+        }
+        else {
+            // an action is being executed
+            // that means we need to have a current abstract state already set
             if (currentAbstractState == null) {
-                System.out.println("Initial state found");
-                // it's apparently the first state in our run
-                abstractStateModel.addInitialState(newAbstractState);
-            }
-            else {
-                // it's not the first state, so we want to add a transition
-                if (actionUnderExecution == null) {
-                    // this should never happen if the notification process is followed correctly
-                    throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
-                }
-                System.out.println("Adding transition");
-                abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
-                // we reset the executed action to await the next one.
-                actionUnderExecution = null;
+                throw new RuntimeException("An action was being executed without a recorded current state");
             }
 
-            // we simply persist the concrete state
-            persistenceManager.persistConcreteState(concreteState, newAbstractState);
-        } catch (StateModelException e) {
-            System.out.println(this.getClass() + " : Could not add state: " + e.getMessage());
+            //add a transition to the statemodel
+            try {
+                abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
+            } catch (StateModelException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Encountered a problem adding a state transition into the statemodel");
+            }
+            // we reset the executed action to await the next one.
+            actionUnderExecution = null;
         }
 
+        // we now store this state to be the current abstract state
         currentAbstractState = newAbstractState;
+
+        // and then we store the concrete state
+        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
+        persistenceManager.persistConcreteState(concreteState, newAbstractState);
     }
 
     /**

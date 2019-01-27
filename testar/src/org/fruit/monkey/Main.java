@@ -48,6 +48,7 @@ import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;

@@ -29,9 +29,11 @@ public class AbstractState extends AbstractEntity {
         super(stateId);
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
-        for(AbstractAction action:actions) {
-            this.actions.put(action.getActionId(), action);
-            unvisitedActions.put(action.getActionId(), action);
+        if (actions != null) {
+            for(AbstractAction action:actions) {
+                this.actions.put(action.getActionId(), action);
+                unvisitedActions.put(action.getActionId(), action);
+            }
         }
         concreteStateIds = new HashSet<>();
     }
@@ -43,7 +45,7 @@ public class AbstractState extends AbstractEntity {
     public void addConcreteStateId(String concreteStateId) {
         if (!concreteStateIds.contains(concreteStateId)) {
             this.concreteStateIds.add(concreteStateId);
-            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
+//            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
         }
     }
 

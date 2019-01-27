@@ -293,6 +293,15 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
+        if (abstractStateTransition.getSourceState() == null || abstractStateTransition.getTargetState() == null || abstractStateTransition.getAction() == null) {
+            System.out.println("Objects missing in abstract state transition");
+            return;
+        }
+
+        // persist the source and target states
+        persistAbstractState(abstractStateTransition.getSourceState());
+        persistAbstractState(abstractStateTransition.getTargetState());
+
         // create entities for the target and source states
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
@@ -409,7 +418,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case ABSTRACT_STATE_TRANSITION_ADDED:
-            case ABSTRACT_ACTION_CHANGED:
+            case ABSTRACT_STATE_TRANSITION_CHANGED:
                 //@todo the abstract action changed event needs to just update the action attributes
                 persistAbstractStateTransition((AbstractStateTransition) (event.getPayload()));
                 break;

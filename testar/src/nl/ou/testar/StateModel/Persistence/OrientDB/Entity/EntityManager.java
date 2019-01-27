@@ -328,7 +328,7 @@ public class EntityManager {
             //@todo we could at some point implement some error handling here, but for now we simply do not store the edge
         }
 
-        // make sure the edge's endpoints exist in the database
+        // make sure the edge's endpoints exist in the database and are updated!
         if (!vertexExists(entity.getSourceEntity(), db)) {
             saveVertexEntity(entity.getSourceEntity(), db);
         }
@@ -374,6 +374,11 @@ public class EntityManager {
             deleteEntities(entityClass, idValues);
     }
 
+    /**
+     * Delete entities in a given entity class, based on a provided set of id values.
+     * @param entityClass
+     * @param idValues
+     */
     public void deleteEntities(EntityClass entityClass, Set<Object> idValues) {
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             String typeName;

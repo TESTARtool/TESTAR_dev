@@ -40,6 +40,9 @@ public class AbstractStateModel {
     // a set of event listeners
     private Set<StateModelEventListener> eventListeners;
 
+    // are we emitting events or not?
+    private boolean emitEvents = true;
+
     /**
      * constructor
      * @param abstractionLevelIdentifier
@@ -85,26 +88,28 @@ public class AbstractStateModel {
             // loop through all the transitions that have the same source state and check for matches
             for(AbstractStateTransition stateTransition : stateTransitionsBySource.get(sourceState.getStateId())) {
                 if (targetState.getStateId().equals(stateTransition.getTargetStateId()) && executedAction.getActionId().equals(stateTransition.getActionId())) {
-                    // the transition already exists. What we want to do is update the action to reflect that there may
-                    // be an extra concrete action.
-                    for(String concreteActionId : executedAction.getConcreteActionIds()) {
-                        stateTransition.getAction().addConcreteActionId(concreteActionId);
-                    }
+                    // the transition already exists. We send an update event to deal with changes in the states and actions
                     // now we notify our listeners of the possible update
-                    emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_ACTION_CHANGED, stateTransition));
+                    emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_CHANGED, stateTransition));
                     return;
                 }
             }
         }
 
+        // we set the action to visited for the source state
+        sourceState.addVisitedAction(executedAction);
+
         // new transition
         AbstractStateTransition newStateTransition = new AbstractStateTransition(sourceState, targetState, executedAction);
+        // temporarily tell the state model not to emit events. We do not want to give double updates.
+        deactivateEvents();
+
         addTransition(newStateTransition);
         addState(sourceState);
         addState(targetState);
         addAction(executedAction);
-        // we also set the action to visited for the source state
-        sourceState.addVisitedAction(executedAction);
+
+        activateEvents();
         emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, newStateTransition));
     }
 
@@ -146,6 +151,15 @@ public class AbstractStateModel {
             this.states.put(newState.getStateId(), newState);
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
         }
+        else {
+            System.out.println("State is in the model already. Updating");
+            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, newState));
+        }
+
+        // check for initial state
+        if (newState.isInitial()) {
+            addInitialState(newState);
+        }
     }
 
     /**
@@ -175,12 +189,11 @@ public class AbstractStateModel {
      * @param initialState
      * @throws StateModelException
      */
-    public void addInitialState(AbstractState initialState) throws StateModelException{
+    private void addInitialState(AbstractState initialState) throws StateModelException{
         checkStateId(initialState.getStateId());
         if (!initialStates.containsKey(initialState.getStateId())) {
             initialState.setInitial(true);
             initialStates.put(initialState.getStateId(), initialState);
-            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, initialState));
         }
     }
 
@@ -236,6 +249,7 @@ public class AbstractStateModel {
      * @param event
      */
     private void emitEvent(StateModelEvent event) {
+        if (!emitEvents) return;
         for (StateModelEventListener eventListener: eventListeners) {
             System.out.println("emitting event " + event.getEventType().toString());
             eventListener.eventReceived(event);
@@ -256,5 +270,19 @@ public class AbstractStateModel {
      */
     public Set<Tag<?>> getTags() {
         return tags;
+    }
+
+    /**
+     * Set the abstract state model to not emit events.
+     */
+    private void deactivateEvents() {
+        emitEvents = false;
+    }
+
+    /**
+     * Set the abstract state model to emit events.
+     */
+    private void activateEvents() {
+        emitEvents = true;
     }
 }
