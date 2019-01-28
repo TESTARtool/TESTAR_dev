@@ -1,31 +1,31 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 /**
@@ -45,20 +45,20 @@ import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 public class StateFetcher implements Callable<UIAState>{
-	
+
 	private final SUT system;
 
 	transient long pAutomation, pCacheRequest;
 	// begin by urueda
 	private boolean releaseCachedAutomatinElement;
-	
+
 	private boolean accessBridgeEnabled;
-	
+
 	private static Pattern sutProcessesMatcher;
 	// end by urueda
-	
+
 	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
-						boolean accessBridgeEnabled, String SUTProcesses){		
+			boolean accessBridgeEnabled, String SUTProcesses){		
 		this.system = system;
 		this.pAutomation = pAutomation;
 		this.pCacheRequest = pCacheRequest;
@@ -70,7 +70,7 @@ public class StateFetcher implements Callable<UIAState>{
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);		
 		// end by urueda
 	}
-	
+
 	// by urueda (refactor)
 	public static UIARootElement buildRoot(SUT system){
 		UIARootElement uiaRoot = new UIARootElement();	
@@ -82,15 +82,15 @@ public class StateFetcher implements Callable<UIAState>{
 		uiaRoot.timeStamp = System.currentTimeMillis();
 		uiaRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
 		uiaRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;		
-		
+
 		return uiaRoot;
 	}
 
 	public UIAState call() throws Exception {				
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
-		
+
 		UIARootElement uiaRoot = buildSkeletton(system);
-				
+
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
@@ -101,10 +101,10 @@ public class StateFetcher implements Callable<UIAState>{
 			system.getNativeAutomationCache().releaseCachedAutomationElements(); // prevent SUT UI not ready due to caching
 		// end by urueda
 		Windows.CoUninitialize();
-		
+
 		return root;
 	}
-	
+
 	/**
 	 * Checks whether a window conforms to the SUT.
 	 * @param hwnd A window.
@@ -114,9 +114,9 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean isSUTProcess(long hwnd){
 		if (StateFetcher.sutProcessesMatcher == null)
 			return false;
-		
+
 		String processName = Windows.GetProcessNameFromHWND(hwnd);
-		
+
 		if (processName != null && !(processName.isEmpty()) && StateFetcher.sutProcessesMatcher.matcher(processName).matches())
 			return true;
 		else
@@ -136,10 +136,10 @@ public class StateFetcher implements Callable<UIAState>{
 
 		uiaRoot.pid = system.get(Tags.PID);
 		//uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
-		
+
 		// find all visible top level windows on the desktop
 		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();		
-		
+
 		UIAElement modalElement = null; // by urueda
 
 		// descend the root windows which belong to our process, using UIAutomation
@@ -157,12 +157,12 @@ public class StateFetcher implements Callable<UIAState>{
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 					// by urueda
 					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-															  uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
+						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
 				} else
 					ownedWindows.add(hwnd);
 			}
 		}
-		
+
 		// if UIAutomation missed an owned window, we'll collect it here
 		for(long hwnd : ownedWindows){				
 			if(!uiaRoot.hwndMap.containsKey(hwnd)){
@@ -170,7 +170,7 @@ public class StateFetcher implements Callable<UIAState>{
 				UIAElement modalE;
 				// begin by urueda
 				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-														 uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 					modalElement = modalE;
 				// end by urueda
 			}
@@ -197,7 +197,7 @@ public class StateFetcher implements Callable<UIAState>{
 					continue;
 				}*/
 			// end by wcoux
-			
+
 			if(wnd == null){
 				wnd = new UIAElement(uiaRoot);
 				uiaRoot.children.add(wnd);
@@ -209,14 +209,14 @@ public class StateFetcher implements Callable<UIAState>{
 				wnd.ctrlId = Windows.UIA_WindowControlTypeId;
 				uiaRoot.hwndMap.put(hwnd, wnd);
 			}
-						
+
 			wnd.zindex = z++;
-						
+
 			if(wnd.ctrlId == Windows.UIA_MenuControlTypeId || wnd.ctrlId == Windows.UIA_WindowControlTypeId || wnd.parent == uiaRoot)
 				wnd.isTopLevelContainer = true;				
-				
+
 		}
-		
+
 		calculateZIndices(uiaRoot);
 		buildTLCMap(uiaRoot);
 		markBlockedElements(uiaRoot);
@@ -244,12 +244,12 @@ public class StateFetcher implements Callable<UIAState>{
 			}
 			hwnd = Windows.GetNextWindow(hwnd, Windows.GW_HWNDNEXT);
 		}
-		
+
 		System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES"); // by urueda
-		
+
 		return ret;
 	}
-	
+
 	/* fire up the cache request */
 	private long uiaCacheWindowTree(long hwnd){
 		//return Windows.IUIAutomation_ElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
@@ -287,92 +287,81 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAElement modalElement = null; // by urueda
 
 		UIAElement el = new UIAElement(parent);
-		
-		
-		
-		//Qualitate dev, faster?? UIAutomation tree 
-		if(!el.blocked && el.enabled) {
 
+		parent.children.add(el);
 
-			parent.children.add(el);
+		el.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaPtr, true);			
+		el.hwnd = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaPtr, true);
 
-			el.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaPtr, true);			
-			el.hwnd = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaPtr, true);
+		// bounding rectangle
+		long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaPtr, true);
+		if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
+			el.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
 
-			// bounding rectangle
-			long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaPtr, true);
-			if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
-				el.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+		el.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaPtr, true);
+		el.name = Windows.IUIAutomationElement_get_Name(uiaPtr, true);
+		el.helpText = Windows.IUIAutomationElement_get_HelpText(uiaPtr, true); 
+		el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaPtr, true);
+		el.className = Windows.IUIAutomationElement_get_ClassName(uiaPtr, true); 
+		el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaPtr, true); 
+		el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaPtr, true); 
+		el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
+		el.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaPtr, true);
+		el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaPtr, true);
+		el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
+		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
+		el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
+		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
+		el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaPtr, Windows.UIA_ValuePatternId);
 
-			el.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaPtr, true);
-			el.name = Windows.IUIAutomationElement_get_Name(uiaPtr, true);
-			el.helpText = Windows.IUIAutomationElement_get_HelpText(uiaPtr, true); 
-			el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaPtr, true);
-			el.className = Windows.IUIAutomationElement_get_ClassName(uiaPtr, true); 
-			el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaPtr, true); 
-			el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaPtr, true); 
-			el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
-			el.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaPtr, true);
-			el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaPtr, true);
-			el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
-			el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
-			el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
-			el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
-			el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaPtr, Windows.UIA_ValuePatternId);
+		parent.root.hwndMap.put(el.hwnd, el);
 
-			parent.root.hwndMap.put(el.hwnd, el);
-
-			// get extra infos from windows
-			if(el.ctrlId == Windows.UIA_WindowControlTypeId){
-				//long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
-				long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true); // by urueda
-				if(uiaWndPtr != 0){
-					el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWndPtr, true);
-					el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
-					el.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWndPtr, true);
-					el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWndPtr, true);
-					Windows.IUnknown_Release(uiaWndPtr);
-				}
-				el.culture = Windows.IUIAutomationElement_get_Culture(uiaPtr, true);
+		// get extra infos from windows
+		if(el.ctrlId == Windows.UIA_WindowControlTypeId){
+			//long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
+			long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true); // by urueda
+			if(uiaWndPtr != 0){
+				el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWndPtr, true);
+				el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
+				el.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWndPtr, true);
+				el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWndPtr, true);
+				Windows.IUnknown_Release(uiaWndPtr);
 			}
-
-			// begin by urueda
-			if (!el.isModal && el.automationId != null &&
-					(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
-				modalElement = markModal(el);
-			}
-			Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true); 
-			el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-			if (el.scrollPattern){
-				//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_CLIENT);
-				//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_HSCROLL);
-				//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_VSCROLL);
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
-				el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
-				el.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
-				el.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
-				el.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
-				el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-				obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
-				el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-			}
-			// end by urueda	
-
-
-
-
+			el.culture = Windows.IUIAutomationElement_get_Culture(uiaPtr, true);
 		}
 
+		// begin by urueda
+		if (!el.isModal && el.automationId != null &&
+				(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
+			modalElement = markModal(el);
+		}
+		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true); 
+		el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+		if (el.scrollPattern){
+			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_CLIENT);
+			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_HSCROLL);
+			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_VSCROLL);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
+			el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
+			el.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
+			el.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
+			el.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
+			el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
+			el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+		}
+		// end by urueda
+
 		// descend children
-				
+
 		long uiaChildrenPtr = Windows.IUIAutomationElement_GetCachedChildren(uiaPtr);
 		if (releaseCachedAutomatinElement) // by urueda
 			Windows.IUnknown_Release(uiaPtr);
-		
+
 		if(uiaChildrenPtr != 0){
 			long count = Windows.IUIAutomationElementArray_get_Length(uiaChildrenPtr);
 
@@ -392,10 +381,10 @@ public class StateFetcher implements Callable<UIAState>{
 			}
 			Windows.IUnknown_Release(uiaChildrenPtr);
 		}
-		
+
 		return modalElement; // by urueda
 	}
-	
+
 	// by urueda (through AccessBridge)
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
@@ -409,19 +398,19 @@ public class StateFetcher implements Callable<UIAState>{
 			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
 			if (props != null){
 				String role 		 = (String) props[0],
-					   name 		 = (String) props[1],
-					   description 	 = (String) props[2],
-					   x 			 = (String) props[3],
-					   y 			 = (String) props[4],
-					   width 		 = (String) props[5],
-					   height 		 = (String) props[6],
-					   indexInParent = (String) props[7],
-					   childrenCount = (String) props[8];
+						name 		 = (String) props[1],
+						description 	 = (String) props[2],
+						x 			 = (String) props[3],
+						y 			 = (String) props[4],
+						width 		 = (String) props[5],
+						height 		 = (String) props[6],
+						indexInParent = (String) props[7],
+						childrenCount = (String) props[8];
 
 				Rect rect = null;
 				try {
 					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									 new Double(width).doubleValue(), new Double(height).doubleValue());
+							new Double(width).doubleValue(), new Double(height).doubleValue());
 					//if (parent.parent == null)
 					//	parent.rect = el.rect; // fix UI actions at root widget
 				} catch (Exception e){
@@ -446,11 +435,11 @@ public class StateFetcher implements Callable<UIAState>{
 				el.helpText = description;
 				// el.enabled = true;
 				parent.root.hwndMap.put(el.hwnd, el);
-				
-				
+
+
 				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
 				if(!role.equals("menu") && !role.equals("combo box")
-					&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+						&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 					if (cc > 0){
 						el.children = new ArrayList<UIAElement>(cc);
@@ -458,21 +447,21 @@ public class StateFetcher implements Callable<UIAState>{
 						for (int i=0; i<children.length; i++)
 							abDescend(hwnd,el,vmidAC[0],children[i]);
 					}*/
-					
-						long childAC;
-						int c = new Integer(childrenCount).intValue();
-						el.children = new ArrayList<UIAElement>(c);
-						for (int i=0; i<c; i++){
-							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,el,vmidAC[0],childAC);
-						}
+
+					long childAC;
+					int c = new Integer(childrenCount).intValue();
+					el.children = new ArrayList<UIAElement>(c);
+					for (int i=0; i<c; i++){
+						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+						abDescend(hwnd,el,vmidAC[0],childAC);
+					}
 				}
 
 			}
 		}
-				
+
 		return modalElement;
-		
+
 	}
 
 	// by urueda (mark a proper widget as modal)
@@ -516,7 +505,7 @@ public class StateFetcher implements Callable<UIAState>{
 			else if (!el.isTopLevelContainer)		
 				el.zindex = el.parent.zindex;
 		}
-									
+
 		for(int i = 0; i < el.children.size(); i++)
 			calculateZIndices(el.children.get(i));
 	}
@@ -531,21 +520,13 @@ public class StateFetcher implements Callable<UIAState>{
 		return state;
 	}
 
-	
-	//Qualitate dev, faster?? widget tree build
 	private void createWidgetTree(UIAWidget parent, UIAElement element){
-		
-		if(!element.blocked && element.enabled) {
-			UIAWidget w = parent.root().addChild(parent, element);
-			element.backRef = w;
-			for(UIAElement child : element.children)
-				createWidgetTree(w, child);
-		}else {
-			for(UIAElement child : element.children)
-				createWidgetTree(parent, child);
-		}
-		
+
+		UIAWidget w = parent.root().addChild(parent, element);
+		element.backRef = w;
+		for(UIAElement child : element.children)
+			createWidgetTree(w, child);
 		
 	}
-	
+
 }

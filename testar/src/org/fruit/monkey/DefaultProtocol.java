@@ -336,11 +336,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			stopSystem(system);
     			system = null;
     		}
-    		
-    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-    		    System.out.println(ste);
-    		}*/
-    		
     		if (mode() == Modes.Quit) {
 				stopSystem(system);
 			}
@@ -658,6 +653,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
 
+            //Qualitate specific usage of MAX_ESC_ATTEMPTS && forceToForeground
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
             	if (escAttempts >= MAX_ESC_ATTEMPTS){
@@ -1957,6 +1953,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 	}
 
+	//Qualitate specific usage of MAX_ESC_ATTEMPTS && forceToForeground
 	protected int escAttempts = 0;
 	protected static final int MAX_ESC_ATTEMPTS = 5;
 

@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" ""
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" -k "https:URL"
 
 #################################################################
 # Sequences
@@ -93,7 +93,7 @@ DrawWidgetUnderCursor = true
 MyClassPath = ./settings
 OnlySaveFaultySequences = false
 ForceToSequenceLength = false
-ActionDuration = 0.0
+ActionDuration = 0.5
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
 Delete =

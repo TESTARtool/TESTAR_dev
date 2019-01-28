@@ -143,13 +143,13 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		SUT sut = super.startSystem();
 
 		//wait a bit to give the UI some time and get focus
-		Util.pause(3);
+		Util.pause(5);
 
 		//Enter password on .add(new Type(""),0.1)
 		new CompoundAction.Builder()   
-		.add(new Type("password"),0.1)
+		.add(new Type("password"),0.5)
 		.build()
-		.run(sut,null, 0.1);   
+		.run(sut,null, 0.5);   
 
 		//wait a bit to give the UI some time and get focus
 		Util.pause(1);
@@ -158,7 +158,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		new CompoundAction.Builder()
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5)
 		.build()
-		.run(sut, null, 0.1); 
+		.run(sut, null, 0.5); 
 
 		Util.pause(1);
 
@@ -166,10 +166,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		new CompoundAction.Builder()
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5)
 		.build()
-		.run(sut, null, 0.1);
+		.run(sut, null, 0.5);
 
 		//Wait x seconds
-		Util.pause(3);
+		Util.pause(5);
 
 		return sut;
 
