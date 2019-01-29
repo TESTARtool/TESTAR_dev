@@ -304,8 +304,6 @@ public class Main {
 		if(!logsDir.exists())
 			logsDir.mkdirs();
 		
-		System.out.println("Existe "+outputDir + File.separator +"logs"+" resultado: "+ logsDir.exists());
-		
 		// Starting the logs
 		try {
 			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
