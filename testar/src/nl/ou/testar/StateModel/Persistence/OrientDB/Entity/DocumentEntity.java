@@ -14,7 +14,10 @@ public abstract class DocumentEntity {
      */
     private EntityClass entityClass;
 
-    private Map<String,Pair<OType, Object>> entityProperties;
+    /**
+     * A map of properties for this entity.
+     */
+    private Map<String, PropertyValue> entityProperties;
 
     public DocumentEntity(EntityClass entityClass) {
         this.entityClass = entityClass;
@@ -28,11 +31,10 @@ public abstract class DocumentEntity {
     /**
      * Add a property to this document entity
      * @param propertyName
-     * @param propertyType
      * @param propertyValue
      */
-    public void addPropertyValue(String propertyName, OType propertyType, Object propertyValue) {
-        entityProperties.put(propertyName, Pair.from(propertyType, propertyValue));
+    public void addPropertyValue(String propertyName, PropertyValue propertyValue) {
+        entityProperties.put(propertyName, propertyValue);
     }
 
     /**
@@ -40,7 +42,7 @@ public abstract class DocumentEntity {
      * @param propertyName
      * @return
      */
-    public Pair<OType, Object> getPropertyValue(String propertyName) {
+    public PropertyValue getPropertyValue(String propertyName) {
         return entityProperties.getOrDefault(propertyName, null);
     }
 

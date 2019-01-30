@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
@@ -37,7 +38,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
-                target.addPropertyValue(prop.getPropertyName(), prop.getPropertyType(), ((AbstractState) source).getStateId());
+                target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getStateId()));
                 stateId = ((AbstractState) source).getStateId();
             }
             else if (prop.getPropertyName().equals("abstractionLevelIdentifier")) {
@@ -45,7 +46,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
-                target.addPropertyValue(prop.getPropertyName(), prop.getPropertyType(), ((AbstractState) source).getAbstractionLevelIdentifier());
+                target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getAbstractionLevelIdentifier()));
                 abstractionLevelIdentifier = ((AbstractState) source).getAbstractionLevelIdentifier();
             }
         }
@@ -55,13 +56,13 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
             throw new HydrationException("Missing identity property in abstract state hydrator");
         }
         String uniqueId = HydrationHelper.lowCollisionID(abstractionLevelIdentifier + "--" + stateId);
-        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), uniqueId);
+        target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((AbstractState) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
             // we simply add a property for each tag
-            target.addPropertyValue(tag.name(), TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag));
+            target.addPropertyValue(tag.name(), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));
         }
 
         // is it an initial, meaning starting, state?
@@ -69,7 +70,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
         if (isInitial == null) {
             throw new HydrationException("Property `isInitial` was not found in abstract state class");
         }
-        target.addPropertyValue(isInitial.getPropertyName(), isInitial.getPropertyType(), ((AbstractState) source).isInitial());
+        target.addPropertyValue(isInitial.getPropertyName(), new PropertyValue(isInitial.getPropertyType(), ((AbstractState) source).isInitial()));
 
         // we need to add the concrete state ids
         Property concreteStateIds = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "concreteStateIds");
@@ -77,7 +78,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
             throw new HydrationException();
         }
         if (!((AbstractState) source).getConcreteStateIds().isEmpty()) {
-            target.addPropertyValue(concreteStateIds.getPropertyName(), concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds());
+            target.addPropertyValue(concreteStateIds.getPropertyName(), new PropertyValue(concreteStateIds.getPropertyType(), ((AbstractState) source).getConcreteStateIds()));
         }
 
     }

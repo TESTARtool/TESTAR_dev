@@ -45,7 +45,6 @@ public class AbstractState extends AbstractEntity {
     public void addConcreteStateId(String concreteStateId) {
         if (!concreteStateIds.contains(concreteStateId)) {
             this.concreteStateIds.add(concreteStateId);
-//            emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, this));
         }
     }
 

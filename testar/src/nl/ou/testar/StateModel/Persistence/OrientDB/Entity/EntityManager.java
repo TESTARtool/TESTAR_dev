@@ -99,7 +99,7 @@ public class EntityManager {
         String stmt = "SELECT FROM " + className + " WHERE " + idField + " = :" + idField;
         // get the id parameter ready
         Map<String, Object> params = new HashMap<>();
-        params.put(idField, vertexEntity.getPropertyValue(idField).right());
+        params.put(idField, vertexEntity.getPropertyValue(idField).getValue());
         //execute the query using statement and parameters
         OResultSet rs = db.query(stmt, params);
 
@@ -169,7 +169,7 @@ public class EntityManager {
         String stmt = "SELECT FROM " + className + " WHERE " + idField + " = :" + idField;
         // get the id parameter ready
         Map<String, Object> params = new HashMap<>();
-        params.put(idField, edgeEntity.getPropertyValue(idField).right());
+        params.put(idField, edgeEntity.getPropertyValue(idField).getValue());
         //execute the query using statement and parameters
         OResultSet rs = db.query(stmt, params);
         return rs;
@@ -198,8 +198,8 @@ public class EntityManager {
         // extract the necessary variables needed in query execution
         String sourceIdName = sourceIdentifier.getPropertyName();
         String targetIdName = targetIdentifier.getPropertyName();
-        String sourceId = (String)edgeEntity.getPropertyValue(sourceIdName).right();
-        String targetId = (String)edgeEntity.getPropertyValue(targetIdName).right();
+        String sourceId = (String)edgeEntity.getPropertyValue(sourceIdName).getValue();
+        String targetId = (String)edgeEntity.getPropertyValue(targetIdName).getValue();
 
         String sourceClass = edgeEntity.getSourceEntity().getEntityClass().getClassName();
         String targetClass = edgeEntity.getTargetEntity().getEntityClass().getClassName();
@@ -310,7 +310,7 @@ public class EntityManager {
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
-            setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).right(), db);
+            setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
         oVertex.save();
     }
@@ -355,7 +355,7 @@ public class EntityManager {
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
-            setProperty(edge, propertyName, entity.getPropertyValue(propertyName).right(), db);
+            setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
         edge.save();
     }
@@ -370,7 +370,7 @@ public class EntityManager {
                 return;
             }
             Set<Object> idValues = new HashSet<>();
-            idValues.add(entity.getPropertyValue(identifier.getPropertyName()).right());
+            idValues.add(entity.getPropertyValue(identifier.getPropertyName()).getValue());
             deleteEntities(entityClass, idValues);
     }
 
@@ -459,7 +459,7 @@ public class EntityManager {
             OType oType = OType.getTypeByValue(property);
             Object convertedProperty = getConvertedValue(oType, property);
             if (convertedProperty != null) {
-                entity.addPropertyValue(propertyName, oType, convertedProperty);
+                entity.addPropertyValue(propertyName, new PropertyValue(oType, convertedProperty));
             }
         }
     }

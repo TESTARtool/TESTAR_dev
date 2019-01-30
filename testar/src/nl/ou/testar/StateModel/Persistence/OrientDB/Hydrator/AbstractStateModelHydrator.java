@@ -4,10 +4,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.Exception.HydrationException;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 
@@ -33,7 +30,7 @@ public class AbstractStateModelHydrator implements EntityHydrator<VertexEntity> 
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException();
         }
-        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), ((AbstractStateModel) source).getAbstractionLevelIdentifier());
+        target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), ((AbstractStateModel) source).getAbstractionLevelIdentifier()));
 
         // add the tags that were used in the creation of the unique states of the state model
         Property abstractionAttributes = HydrationHelper.getProperty(target.getEntityClass().getProperties(), "abstractionAttributes");
@@ -44,6 +41,6 @@ public class AbstractStateModelHydrator implements EntityHydrator<VertexEntity> 
         for (Tag<?> tag : ((AbstractStateModel) source).getTags()) {
             attributeSet.add(tag.name());
         }
-        target.addPropertyValue(abstractionAttributes.getPropertyName(), abstractionAttributes.getPropertyType(), attributeSet);
+        target.addPropertyValue(abstractionAttributes.getPropertyName(), new PropertyValue(abstractionAttributes.getPropertyType(), attributeSet));
     }
 }

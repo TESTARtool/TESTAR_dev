@@ -3,6 +3,7 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
@@ -34,13 +35,13 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException();
         }
-        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), uniqueId);
+        target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((Widget) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
             // we simply add a property for each tag
-            target.addPropertyValue(Validation.sanitizeAttributeName(tag.name()), TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag));
+            target.addPropertyValue(Validation.sanitizeAttributeName(tag.name()), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));
         }
     }
 }

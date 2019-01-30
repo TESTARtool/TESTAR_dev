@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 
 public class WidgetRelationHydrator implements EntityHydrator<EdgeEntity> {
@@ -19,9 +20,9 @@ public class WidgetRelationHydrator implements EntityHydrator<EdgeEntity> {
         // the edge between two widgets needs an identifier to make sure we do not create unnecessary double edges
         // we combine the widget id's from the source and target for this purpose
         Property sourceIdentifier = target.getSourceEntity().getEntityClass().getIdentifier();
-        String sourceId = (String)target.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).right();
+        String sourceId = (String)target.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).getValue();
         Property targetIdentifier = target.getTargetEntity().getEntityClass().getIdentifier();
-        String targetId = (String)target.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).right();
+        String targetId = (String)target.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).getValue();
 
         String edgeId = sourceId + "-" + targetId;
         // make sure the java and orientdb property types are compatible
@@ -29,6 +30,6 @@ public class WidgetRelationHydrator implements EntityHydrator<EdgeEntity> {
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException();
         }
-        target.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), edgeId);
+        target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), edgeId));
     }
 }

@@ -4,10 +4,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.ExtractionException;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClass;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
 import org.fruit.Pair;
 
 import java.util.HashSet;
@@ -26,11 +23,11 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
         // to create an abstract state, we need an abstract state id and a set of abstract actions
         // first, the id
-        Pair<OType, Object> propertyValue = entity.getPropertyValue("stateId");
-        if (propertyValue.left() != OType.STRING) {
-            throw new ExtractionException("Expected string value for stateId attribute. Type " + propertyValue.left().toString() + " given.");
+        PropertyValue propertyValue = entity.getPropertyValue("stateId");
+        if (propertyValue.getType() != OType.STRING) {
+            throw new ExtractionException("Expected string value for stateId attribute. Type " + propertyValue.getType().toString() + " given.");
         }
-        String abstractStateId = propertyValue.right().toString();
+        String abstractStateId = propertyValue.getValue().toString();
         if (abstractStateId == null) {
             throw new ExtractionException("AbstractStateId has a null value.");
         }
@@ -56,10 +53,10 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
         // is it an initial state?
         propertyValue = entity.getPropertyValue("isInitial");
-        if (propertyValue.left() != OType.BOOLEAN) {
-            throw new ExtractionException("Expected boolean value for isInitial attribute. Type " + propertyValue.left().toString() + " was given.");
+        if (propertyValue.getType() != OType.BOOLEAN) {
+            throw new ExtractionException("Expected boolean value for isInitial attribute. Type " + propertyValue.getType().toString() + " was given.");
         }
-        boolean isInitial = (boolean) propertyValue.right();
+        boolean isInitial = (boolean) propertyValue.getValue();
         abstractState.setInitial(isInitial);
 
         // add the visited abstract actions
@@ -70,15 +67,15 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
         }
 
         // get the concrete state ids
-        Pair<OType, Object> concreteStateIdValues = entity.getPropertyValue("concreteStateIds");
-        if (concreteStateIdValues.left() != OType.EMBEDDEDSET) {
-            throw new ExtractionException("Embedded set was expected for concrete state ids. " + concreteStateIdValues.left().toString() + " was given.");
+        PropertyValue concreteStateIdValues = entity.getPropertyValue("concreteStateIds");
+        if (concreteStateIdValues.getType() != OType.EMBEDDEDSET) {
+            throw new ExtractionException("Embedded set was expected for concrete state ids. " + concreteStateIdValues.getType().toString() + " was given.");
         }
-        if (concreteStateIdValues.right() != null) {
-            if (!Set.class.isAssignableFrom(concreteStateIdValues.right().getClass())) {
+        if (concreteStateIdValues.getValue() != null) {
+            if (!Set.class.isAssignableFrom(concreteStateIdValues.getValue().getClass())) {
                 throw new ExtractionException("Set expected for value of concrete state ids");
             }
-            for(String concreteStateId : (Set<String>)concreteStateIdValues.right()) {
+            for(String concreteStateId : (Set<String>)concreteStateIdValues.getValue()) {
                 abstractState.addConcreteStateId(concreteStateId);
             }
         }
@@ -87,26 +84,26 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
     private AbstractAction processEdge(EdgeEntity edgeEntity) throws ExtractionException {
         // get the action id
-        Pair<OType, Object> propertyValue;
+        PropertyValue propertyValue;
         propertyValue = edgeEntity.getPropertyValue("actionId");
-        if (propertyValue.left() != OType.STRING) {
-            throw new ExtractionException("Expected string value for actionId attribute. Type " + propertyValue.left().toString() + " given.");
+        if (propertyValue.getType() != OType.STRING) {
+            throw new ExtractionException("Expected string value for actionId attribute. Type " + propertyValue.getType().toString() + " given.");
         }
-        String actionId = propertyValue.right().toString();
+        String actionId = propertyValue.getValue().toString();
         AbstractAction action = new AbstractAction(actionId);
 
         // get the concrete action id's
-        Pair<OType, Object> concreteActionIdValues = edgeEntity.getPropertyValue("concreteActionIds");
+        PropertyValue concreteActionIdValues = edgeEntity.getPropertyValue("concreteActionIds");
         if (concreteActionIdValues == null) {
             return null;
         }
-        if (concreteActionIdValues.left() != OType.EMBEDDEDSET) {
-            throw new ExtractionException("Embedded set was expected for concrete action ids. " + concreteActionIdValues.left().toString() + " was given.");
+        if (concreteActionIdValues.getType() != OType.EMBEDDEDSET) {
+            throw new ExtractionException("Embedded set was expected for concrete action ids. " + concreteActionIdValues.getType().toString() + " was given.");
         }
-        if (!Set.class.isAssignableFrom(concreteActionIdValues.right().getClass())) {
+        if (!Set.class.isAssignableFrom(concreteActionIdValues.getValue().getClass())) {
             throw new ExtractionException("Set expected for value of concrete action ids");
         }
-        Set<String> concreteActionIds = (Set<String>)concreteActionIdValues.right();
+        Set<String> concreteActionIds = (Set<String>)concreteActionIdValues.getValue();
         for (String concreteActionId : concreteActionIds) {
             action.addConcreteActionId(concreteActionId);
         }

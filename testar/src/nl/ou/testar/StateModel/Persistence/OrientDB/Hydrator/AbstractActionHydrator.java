@@ -6,6 +6,7 @@ import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
@@ -30,16 +31,16 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         // fetch the abstract level identifier for the current state model
         String abstractionLevelIdentifier = ((AbstractAction) source).getAbstractionLevelIdentifier();
 //        System.out.println("abstractionLevelIdentifier: " + abstractionLevelIdentifier);
-        edgeEntity.addPropertyValue("abstractionLevelIdentifier", OType.STRING, abstractionLevelIdentifier);
+        edgeEntity.addPropertyValue("abstractionLevelIdentifier", new PropertyValue(OType.STRING, abstractionLevelIdentifier));
 
         // because an abstract action might have multiple concrete actions tied to it, it is possible that the target
 
         // for the same abstract action might me different states.
         // we combine the ids from the source and target with the abstract action id for this purpose, and also add the abstraction level identifier
         Property sourceIdentifier = edgeEntity.getSourceEntity().getEntityClass().getIdentifier();
-        String sourceId = (String)edgeEntity.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).right();
+        String sourceId = (String)edgeEntity.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).getValue();
         Property targetIdentifier = edgeEntity.getTargetEntity().getEntityClass().getIdentifier();
-        String targetId = (String)edgeEntity.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).right();
+        String targetId = (String)edgeEntity.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).getValue();
 //        System.out.println("sourceId: " + sourceId);
 //        System.out.println("targetId:" + targetId);
 
@@ -50,10 +51,10 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException("Wrong type specified for action identifier");
         }
-        edgeEntity.addPropertyValue(identifier.getPropertyName(), identifier.getPropertyType(), edgeId);
+        edgeEntity.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), edgeId));
 
         // add the action id
-        edgeEntity.addPropertyValue("actionId", OType.STRING, ((AbstractAction) source).getActionId());
+        edgeEntity.addPropertyValue("actionId", new PropertyValue(OType.STRING, ((AbstractAction) source).getActionId()));
 //        System.out.println("actionId: " + ((AbstractAction) source).getActionId());
 
         // loop through the tagged attributes for this state and add them
@@ -61,7 +62,7 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         for (Tag<?> tag :attributes.tags()) {
             // we simply add a property for each tag
 //            System.out.println("tag: " + tag.name());
-            edgeEntity.addPropertyValue(tag.name(), TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag));
+            edgeEntity.addPropertyValue(tag.name(), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));
         }
 
         // we need to store the concrete action ids that are connected to this abstract action id
@@ -70,7 +71,7 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
             throw new HydrationException();
         }
         if (!((AbstractAction) source).getConcreteActionIds().isEmpty()) {
-            edgeEntity.addPropertyValue(concreteActionIds.getPropertyName(), concreteActionIds.getPropertyType(), ((AbstractAction) source).getConcreteActionIds());
+            edgeEntity.addPropertyValue(concreteActionIds.getPropertyName(), new PropertyValue(concreteActionIds.getPropertyType(), ((AbstractAction) source).getConcreteActionIds()));
         }
     }
 }
