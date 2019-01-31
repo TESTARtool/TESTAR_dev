@@ -30,7 +30,6 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
 
         // fetch the abstract level identifier for the current state model
         String abstractionLevelIdentifier = ((AbstractAction) source).getAbstractionLevelIdentifier();
-//        System.out.println("abstractionLevelIdentifier: " + abstractionLevelIdentifier);
         edgeEntity.addPropertyValue("abstractionLevelIdentifier", new PropertyValue(OType.STRING, abstractionLevelIdentifier));
 
         // because an abstract action might have multiple concrete actions tied to it, it is possible that the target
@@ -41,11 +40,8 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         String sourceId = (String)edgeEntity.getSourceEntity().getPropertyValue(sourceIdentifier.getPropertyName()).getValue();
         Property targetIdentifier = edgeEntity.getTargetEntity().getEntityClass().getIdentifier();
         String targetId = (String)edgeEntity.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).getValue();
-//        System.out.println("sourceId: " + sourceId);
-//        System.out.println("targetId:" + targetId);
 
         String edgeId = sourceId + "-" + ((AbstractAction) source).getActionId() + "-" + targetId + "-" + abstractionLevelIdentifier;
-//        System.out.println("edgeId: " + edgeId);
         // make sure the java and orientdb property types are compatible
         OType identifierType = TypeConvertor.getInstance().getOrientDBType(edgeId.getClass());
         if (identifierType != identifier.getPropertyType()) {
@@ -55,13 +51,11 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
 
         // add the action id
         edgeEntity.addPropertyValue("actionId", new PropertyValue(OType.STRING, ((AbstractAction) source).getActionId()));
-//        System.out.println("actionId: " + ((AbstractAction) source).getActionId());
 
         // loop through the tagged attributes for this state and add them
         TaggableBase attributes = ((AbstractAction) source).getAttributes();
         for (Tag<?> tag :attributes.tags()) {
             // we simply add a property for each tag
-//            System.out.println("tag: " + tag.name());
             edgeEntity.addPropertyValue(tag.name(), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));
         }
 

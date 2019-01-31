@@ -53,65 +53,12 @@ public class StateModelManager {
         // initialization logic here
     }
 
-//    /**
-//     * This method should be called once when a new state is reached after the execution
-//     * of an action or succesfully starting the SUT.
-//     * @param newState
-//     * @param actions
-//     */
-//    public void notifyNewStateReached(State newState, Set<Action> actions) {
-//        String abstractStateId = newState.get(Tags.AbstractIDCustom);
-//        AbstractState newAbstractState;
-//
-//        // fetch or create an abstract state
-//        if (abstractStateModel.containsState(abstractStateId)) {
-//            try {
-//                newAbstractState = abstractStateModel.getState(abstractStateId);
-//            }
-//            catch (StateModelException ex) {
-//                ex.printStackTrace();
-//                throw new RuntimeException("An error occurred while retrieving abstract state from the state model");
-//            }
-//        } else {
-//            newAbstractState = AbstractStateFactory.createAbstractState(newState, actions);
-//        }
-//
-//        // get the concrete state
-//        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
-//
-//        // add the abstract state to the model and persist the concrete state
-//        try {
-//            System.out.println("Adding state to the model");
-//            abstractStateModel.addState(newAbstractState);
-//            // we want to provide the abstract state with the identifier of the concrete state
-//            newAbstractState.addConcreteStateId(newState.get(Tags.ConcreteIDCustom));
-//
-//            if (currentAbstractState == null) {
-//                System.out.println("Initial state found");
-//                // it's apparently the first state in our run
-//                abstractStateModel.addInitialState(newAbstractState);
-//            }
-//            else {
-//                // it's not the first state, so we want to add a transition
-//                if (actionUnderExecution == null) {
-//                    // this should never happen if the notification process is followed correctly
-//                    throw new RuntimeException("Encountered a state after the initial state without a transition being set.");
-//                }
-//                System.out.println("Adding transition");
-//                abstractStateModel.addTransition(currentAbstractState, newAbstractState, actionUnderExecution);
-//                // we reset the executed action to await the next one.
-//                actionUnderExecution = null;
-//            }
-//
-//            // we simply persist the concrete state
-//            persistenceManager.persistConcreteState(concreteState, newAbstractState);
-//        } catch (StateModelException e) {
-//            System.out.println(this.getClass() + " : Could not add state: " + e.getMessage());
-//        }
-//
-//        currentAbstractState = newAbstractState;
-//    }
-
+    /**
+     * This method should be called once when a new state is reached after the execution
+     * of an action or succesfully starting the SUT.
+     * @param newState
+     * @param actions
+     */
     public void notifyNewStateReached(State newState, Set<Action> actions) {
         // check if we are dealing with a new state or an existing one
         String abstractStateId = newState.get(Tags.AbstractIDCustom);
@@ -177,14 +124,12 @@ public class StateModelManager {
      * @param actionUnderExecution
      */
     public void notifyActionExecution(Action actionUnderExecution) {
-        System.out.println("Setting new action under exection");
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
             this.actionUnderExecution = currentAbstractState.getAction(actionUnderExecution.get(Tags.AbstractID));
         }
         catch (ActionNotFoundException ex) {
-            System.out.println("Action not found. Adding new one to state");
             this.actionUnderExecution = new AbstractAction(actionUnderExecution.get(Tags.AbstractID));
             currentAbstractState.addNewAction(this.actionUnderExecution);
         }

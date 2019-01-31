@@ -140,19 +140,16 @@ public class AbstractStateModel {
     public void addState(AbstractState newState) throws StateModelException {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
-            System.out.println("State is not in the model yet. Adding.");
             // provide the state with this state model's abstract identifier
             newState.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
             // provide the state with the event listeners from this state model
             for (StateModelEventListener eventListener: eventListeners) {
-                System.out.println("Adding event listener");
                 newState.addEventListener(eventListener);
             }
             this.states.put(newState.getStateId(), newState);
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_ADDED, newState));
         }
         else {
-            System.out.println("State is in the model already. Updating");
             emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_CHANGED, newState));
         }
 
@@ -251,7 +248,6 @@ public class AbstractStateModel {
     private void emitEvent(StateModelEvent event) {
         if (!emitEvents) return;
         for (StateModelEventListener eventListener: eventListeners) {
-            System.out.println("emitting event " + event.getEventType().toString());
             eventListener.eventReceived(event);
         }
     }

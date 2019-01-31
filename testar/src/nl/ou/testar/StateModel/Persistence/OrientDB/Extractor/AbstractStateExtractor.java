@@ -3,6 +3,7 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Extractor;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
+import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.Exception.ExtractionException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.*;
 import org.fruit.Pair;
@@ -12,8 +13,18 @@ import java.util.Set;
 
 public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
 
+    private AbstractActionExtractor abstractActionExtractor;
+
+    /**
+     * Constructor.
+     * @param abstractActionExtractor
+     */
+    public AbstractStateExtractor(AbstractActionExtractor abstractActionExtractor) {
+        this.abstractActionExtractor = abstractActionExtractor;
+    }
+
     @Override
-    public AbstractState extract(DocumentEntity entity) throws ExtractionException {
+    public AbstractState extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException {
         if (!(entity instanceof VertexEntity)) {
             throw new ExtractionException("Abstract state extractor expects a vertex entity. Instance of " + entity.getClass().toString() + " was given.");
         }
@@ -39,7 +50,7 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
             // for each edge, we check if the edge is an abstract action or an unvisited abstract action
             EntityClass edgeEntityClass = edgeEntity.getEntityClass();
             if (edgeEntityClass.getClassName().equals("AbstractAction") || edgeEntityClass.getClassName().equals("UnvisitedAbstractAction")) {
-                AbstractAction action = processEdge(edgeEntity);
+                AbstractAction action = abstractActionExtractor.extract(edgeEntity, abstractStateModel);
                 actions.add(action);
 
                 if (edgeEntityClass.getClassName().equals("UnvisitedAbstractAction")) {
@@ -80,33 +91,5 @@ public class AbstractStateExtractor implements EntityExtractor<AbstractState> {
             }
         }
         return abstractState;
-    }
-
-    private AbstractAction processEdge(EdgeEntity edgeEntity) throws ExtractionException {
-        // get the action id
-        PropertyValue propertyValue;
-        propertyValue = edgeEntity.getPropertyValue("actionId");
-        if (propertyValue.getType() != OType.STRING) {
-            throw new ExtractionException("Expected string value for actionId attribute. Type " + propertyValue.getType().toString() + " given.");
-        }
-        String actionId = propertyValue.getValue().toString();
-        AbstractAction action = new AbstractAction(actionId);
-
-        // get the concrete action id's
-        PropertyValue concreteActionIdValues = edgeEntity.getPropertyValue("concreteActionIds");
-        if (concreteActionIdValues == null) {
-            return null;
-        }
-        if (concreteActionIdValues.getType() != OType.EMBEDDEDSET) {
-            throw new ExtractionException("Embedded set was expected for concrete action ids. " + concreteActionIdValues.getType().toString() + " was given.");
-        }
-        if (!Set.class.isAssignableFrom(concreteActionIdValues.getValue().getClass())) {
-            throw new ExtractionException("Set expected for value of concrete action ids");
-        }
-        Set<String> concreteActionIds = (Set<String>)concreteActionIdValues.getValue();
-        for (String concreteActionId : concreteActionIds) {
-            action.addConcreteActionId(concreteActionId);
-        }
-        return action;
     }
 }

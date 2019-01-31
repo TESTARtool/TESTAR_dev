@@ -498,7 +498,7 @@ public class EntityManager {
      * @param entityProperties a map containing property values to use in selection, with the property name used as a key
      * @return
      */
-    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, Pair<OType, Object>> entityProperties) {
+    public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, PropertyValue> entityProperties) {
         HashSet<DocumentEntity> documents = new HashSet<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             String stmt = "SELECT FROM " + entityClass.getClassName();
@@ -511,7 +511,7 @@ public class EntityManager {
                 stmt += " WHERE ";
                 for (String propertyName : entityProperties.keySet()) {
                     stringJoiner.add(propertyName + " = :" + propertyName);
-                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).left(), entityProperties.get(propertyName).right()));
+                    params.put(propertyName, getConvertedValue(entityProperties.get(propertyName).getType(), entityProperties.get(propertyName).getValue()));
                 }
                 stmt += stringJoiner.toString();
                 rs = db.query(stmt, params);

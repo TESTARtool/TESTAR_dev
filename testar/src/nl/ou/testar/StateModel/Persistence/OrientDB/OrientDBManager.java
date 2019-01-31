@@ -92,7 +92,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        System.out.println("Persisting abstract state");
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -118,17 +117,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // 1) delete the unvisited actions that are no longer unvisited
         // 2) save the unvisited actions (for newly saved states)
 
-//        System.out.println("number of actions: " + abstractState.getActions().size());
-//        System.out.println("number of visited actions: " + abstractState.getVisitedActions().size());
-//        System.out.println("number of unvisited actions: " + abstractState.getUnvisitedActions().size());
-
         // step 1:
         Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
         // we need the ids
         Set<Object> visitedActionIds = visitedActions.stream().map(action -> action.getActionId()).collect(Collectors.toSet());
-//        System.out.println("Visited action ids: " + visitedActionIds.toString());
         EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
-//        System.out.println("deleting visited actions : " + visitedActionIds.size());
         entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
 
         // step 2:
@@ -147,17 +140,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
-//            System.out.println("Adding unvisited actions");
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
-//                System.out.println(unvisitedAction.getActionId());
                 EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, vertexEntity, blackHole);
                 actionHydrator.hydrate(actionEntity, unvisitedAction);
-                //print the properties and values
-//                System.out.println("Hydrated properties: ");
-                for (String propertyName : actionEntity.getPropertyNames()) {
-//                    System.out.println(propertyName + " : " + actionEntity.getPropertyValue(propertyName).right());
-                }
-//                System.out.println();
                 entityManager.saveEntity(actionEntity);
             }
         }
@@ -355,11 +340,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         entityManager.saveEntity(stateModelEntity);
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
-        /*EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
+        EntityClass abstractStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
         if (abstractStateClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract state entity class.");
 
         // in order to retrieve the abstract states, we need to provide the abstract state model identifier to the query
-        Map<String, Pair<OType, Object>> entityProperties = new HashMap<>();
+        Map<String, PropertyValue> entityProperties = new HashMap<>();
         Property stateModelClassIdentifier = stateModelClass.getIdentifier();
         if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
         entityProperties.put("abstractionLevelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
@@ -369,39 +354,47 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             System.out.println("Could not find abstract states in the model");
         }
         else {
-            System.out.println(retrievedDocuments.size() + " number of abstract state were returned");
             // we need to create the abstract states from the returned document entities
             try {
                 EntityExtractor<AbstractState> abstractStateExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE);
                 for (DocumentEntity documentEntity : retrievedDocuments) {
-                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity);
+                    AbstractState abstractState = abstractStateExtractor.extract(documentEntity, abstractStateModel);
                     abstractStateModel.addState(abstractState);
-                    if (abstractState.isInitial()) {
-                        abstractStateModel.addInitialState(abstractState);
-                    }
-
-                    // testing
-                    System.out.println("abstract state id : " + abstractState.getStateId());
-                    System.out.println(abstractState.getActions().size() + " number of actions on retrieved state");
-                    System.out.println(abstractState.getUnvisitedActions().size() + " number of unvisited actions on state");
-                    System.out.println(abstractState.getVisitedActions().size() + " number of visited actions on state");
-                    System.out.println(abstractState.getConcreteStateIds().size() + " number of concrete state ids on state");
                 }
             } catch (ExtractionException | StateModelException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
+
+        // step 3: fetch the transitions from the database
+        EntityClass abstractActionClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
+        if (abstractActionClass == null) throw new RuntimeException("Error occurred: could not retrieve an abstract action entity class");
+
+        retrievedDocuments = entityManager.retrieveAllOfClass(abstractActionClass, entityProperties);
+        if (retrievedDocuments.isEmpty()) {
+            System.out.println("Could not find abstract actions in the model");
+        }
+        else {
+            System.out.println(retrievedDocuments.size() + " number of abstract actions were returned");
+            // we need to create the transitions from the returned document entities
+            try {
+                EntityExtractor<AbstractStateTransition> abstractStateTransitionEntityExtractor = ExtractorFactory.getExtractor(ExtractorFactory.EXTRACTOR_ABSTRACT_STATE_TRANSITION);
+                for (DocumentEntity documentEntity : retrievedDocuments) {
+                    AbstractStateTransition abstractStateTransition = abstractStateTransitionEntityExtractor.extract(documentEntity, abstractStateModel);
+                    abstractStateModel.addTransition( abstractStateTransition.getSourceState(), abstractStateTransition.getTargetState(), abstractStateTransition.getAction());
+                }
+            } catch (ExtractionException | StateModelException e) {
+                e.printStackTrace();
+            }
+        }
 
         // enable the event listener again
         setListening(true);
-//        throw new RuntimeException("Made it here!");
     }
 
     @Override
     public void eventReceived(StateModelEvent event) {
         if (!listening) return;
-
-        System.out.println("Event received: " + event.getEventType().toString());
 
         try {
             eventHelper.validateEvent(event);
