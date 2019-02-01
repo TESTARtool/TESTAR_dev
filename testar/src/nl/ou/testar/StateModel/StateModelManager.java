@@ -9,7 +9,6 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
-import org.sikuli.guide.Run;
 
 import java.util.Set;
 
