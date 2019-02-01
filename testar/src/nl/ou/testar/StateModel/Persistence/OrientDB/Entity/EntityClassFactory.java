@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class EntityClassFactory {
 
-    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy, BlackHole, UnvisitedAbstractAction}
+    public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
+        BlackHole, UnvisitedAbstractAction}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -49,47 +50,43 @@ public class EntityClassFactory {
      * @return
      */
     public static EntityClass createEntityClass(EntityClassName className) {
-        //@todo this class will need refactoring as the number of vertex types grows
+        if (entityClasses.containsKey(className)) {
+            return entityClasses.get(className);
+        }
+
         switch (className) {
             case AbstractState:
-                return entityClasses.containsKey(EntityClassName.AbstractState) ? entityClasses.get(EntityClassName.AbstractState)
-                            : createAbstractStateClass();
+                return createAbstractStateClass();
 
             case AbstractAction:
-                return entityClasses.containsKey(EntityClassName.AbstractAction) ? entityClasses.get(EntityClassName.AbstractAction)
-                            : createAbstractActionClass();
+                return createAbstractActionClass();
 
             case AbstractStateModel:
-                return entityClasses.containsKey(EntityClassName.AbstractStateModel) ? entityClasses.get(EntityClassName.AbstractStateModel)
-                            : createAbstractStateModelClass();
+                return createAbstractStateModelClass();
 
             case ConcreteState:
-                return entityClasses.containsKey(EntityClassName.ConcreteState) ? entityClasses.get(EntityClassName.ConcreteState)
-                            : createConcreteStateClass();
+                return createConcreteStateClass();
+
+            case ConcreteAction:
+                return createConcreteActionClass();
 
             case Widget:
-                return entityClasses.containsKey(EntityClassName.Widget) ? entityClasses.get(EntityClassName.Widget)
-                            : createWidgetClass();
+                return createWidgetClass();
 
             case isParentOf:
-                return entityClasses.containsKey(EntityClassName.isParentOf) ? entityClasses.get(EntityClassName.isParentOf)
-                            : createIsParentOfClass();
+                return createIsParentOfClass();
 
             case isChildOf:
-                return entityClasses.containsKey(EntityClassName.isChildOf) ? entityClasses.get(EntityClassName.isChildOf)
-                        : createIsChildOfClass();
+                return createIsChildOfClass();
 
             case isAbstractedBy:
-                return entityClasses.containsKey(EntityClassName.isAbstractedBy) ? entityClasses.get(EntityClassName.isAbstractedBy)
-                        : createIsAbstractedByClass();
+                return createIsAbstractedByClass();
 
             case BlackHole:
-                return entityClasses.containsKey(EntityClassName.BlackHole) ? entityClasses.get(EntityClassName.BlackHole)
-                        : createBlackHoleClass();
+                return createBlackHoleClass();
                 
             case UnvisitedAbstractAction:
-                return entityClasses.containsKey(EntityClassName.UnvisitedAbstractAction) ? entityClasses.get(EntityClassName.UnvisitedAbstractAction)
-                        : createUnvisitedAbstractActionClass();
+                return createUnvisitedAbstractActionClass();
 
             default:
                 return null;
@@ -183,6 +180,23 @@ public class EntityClassFactory {
         concreteStateClass.setSuperClassName("Widget");
         entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
         return concreteStateClass;
+    }
+
+    private static EntityClass createConcreteActionClass() {
+        EntityClass concreteActionClass = new EntityClass("ConcreteAction", EntityClass.EntityType.Edge);
+        Property uniqueId = new Property("uid", OType.STRING);
+        uniqueId.setMandatory(true);
+        uniqueId.setNullable(false);
+        uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
+        concreteActionClass.addProperty(uniqueId);
+        Property actionId = new Property("actionId", OType.STRING);
+        actionId.setMandatory(true);
+        actionId.setNullable(false);
+        actionId.setIdentifier(false);
+        concreteActionClass.addProperty(actionId);
+        entityClasses.put(EntityClassName.ConcreteAction, concreteActionClass);
+        return concreteActionClass;
     }
 
     private static EntityClass createWidgetClass() {

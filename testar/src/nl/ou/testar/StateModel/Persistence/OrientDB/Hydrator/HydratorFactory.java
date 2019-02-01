@@ -23,34 +23,43 @@ public abstract class HydratorFactory {
 
     public static final int HYDRATOR_BLACKHOLE = 8;
 
+    public static final int HYDRATOR_CONCRETE_ACTION = 9;
+
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityHydrator> hydrators = new HashMap<>();
 
     public static EntityHydrator getHydrator(int hydratorType) throws HydrationException {
+        if (hydrators.containsKey(hydratorType)) {
+            return hydrators.get(hydratorType);
+        }
+
         switch (hydratorType) {
             case HYDRATOR_ABSTRACT_STATE:
-                return hydrators.containsKey(HYDRATOR_ABSTRACT_STATE) ? hydrators.get(HYDRATOR_ABSTRACT_STATE) : createAbstractStateHydrator();
+                return createAbstractStateHydrator();
 
             case HYDRATOR_ABSTRACT_ACTION:
-                return hydrators.containsKey(HYDRATOR_ABSTRACT_ACTION) ? hydrators.get(HYDRATOR_ABSTRACT_ACTION) : createAbstractActionHydrator();
+                return createAbstractActionHydrator();
 
             case HYDRATOR_ABSTRACT_STATE_MODEL:
-                return hydrators.containsKey(HYDRATOR_ABSTRACT_STATE_MODEL) ? hydrators.get(HYDRATOR_ABSTRACT_STATE_MODEL) : createAbstractStateModelHydrator();
+                return createAbstractStateModelHydrator();
 
             case HYDRATOR_CONCRETE_STATE:
-                return hydrators.containsKey(HYDRATOR_CONCRETE_STATE) ? hydrators.get(HYDRATOR_CONCRETE_STATE) : createConcreteStateHydrator();
+                return createConcreteStateHydrator();
+
+            case HYDRATOR_CONCRETE_ACTION:
+                return createConcreteActionHydrator();
 
             case HYDRATOR_WIDGET:
-                return hydrators.containsKey(HYDRATOR_WIDGET) ? hydrators.get(HYDRATOR_WIDGET) : createWidgetHydrator();
+                return createWidgetHydrator();
 
             case HYDRATOR_WIDGET_RELATION:
-                return hydrators.containsKey(HYDRATOR_WIDGET_RELATION) ? hydrators.get(HYDRATOR_WIDGET_RELATION) : createWidgetRelationHydrator();
+                return createWidgetRelationHydrator();
 
             case HYDRATOR_ABSTRACTED_BY:
-                return hydrators.containsKey(HYDRATOR_ABSTRACTED_BY) ? hydrators.get(HYDRATOR_ABSTRACTED_BY) : createIsAbstractedByHydrator();
+                return createIsAbstractedByHydrator();
 
             case HYDRATOR_BLACKHOLE:
-                return hydrators.containsKey(HYDRATOR_BLACKHOLE) ? hydrators.get(HYDRATOR_BLACKHOLE) : createBlackHoleHydrator();
+                return createBlackHoleHydrator();
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
@@ -105,4 +114,9 @@ public abstract class HydratorFactory {
         return blackHoleHydrator;
     }
 
+    private static ConcreteActionHydrator createConcreteActionHydrator() {
+        ConcreteActionHydrator concreteActionHydrator = new ConcreteActionHydrator();
+        hydrators.put(HYDRATOR_CONCRETE_ACTION, concreteActionHydrator);
+        return concreteActionHydrator;
+    }
 }

@@ -39,6 +39,12 @@ public interface PersistenceManager {
     void persistConcreteState(ConcreteState concreteState);
 
     /**
+     * This method persists a concrete action.
+     * @param concreteStateTransition
+     */
+    void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition);
+
+    /**
      * This method initializes and abstract state model before use in Testar.
      * @param abstractStateModel
      */

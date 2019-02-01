@@ -46,6 +46,11 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
+    public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
+
+    }
+
+    @Override
     public void setListening(boolean listening) {
 
     }

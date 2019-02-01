@@ -32,6 +32,12 @@ public class StateModelManager {
     // tags containing the attributes that were used in creating the concrete state ID
     private Set<Tag<?>> concreteStateTags;
 
+    // current concrete state
+    private ConcreteState currentConcreteState;
+
+    // the concrete action that is being executed.
+    private ConcreteAction concreteActionUnderExecution;
+
     /**
      * Constructor
      * @param abstractStateModel
@@ -113,26 +119,35 @@ public class StateModelManager {
         // we now store this state to be the current abstract state
         currentAbstractState = newAbstractState;
 
-        // and then we store the concrete state
-        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState);
-        persistenceManager.persistConcreteState(concreteState);
+        // and then we store the concrete state and possibly the action
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState);
+        if (concreteActionUnderExecution == null) {
+            persistenceManager.persistConcreteState(newConcreteState);
+        }
+        else {
+            ConcreteStateTransition concreteStateTransition = new ConcreteStateTransition(currentConcreteState, newConcreteState, concreteActionUnderExecution);
+            persistenceManager.persistConcreteStateTransition(concreteStateTransition);
+        }
+        currentConcreteState = newConcreteState;
+        concreteActionUnderExecution = null;
     }
 
     /**
      * This method should be called when an action is about to be executed.
-     * @param actionUnderExecution
+     * @param action
      */
-    public void notifyActionExecution(Action actionUnderExecution) {
+    public void notifyActionExecution(Action action) {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
-            this.actionUnderExecution = currentAbstractState.getAction(actionUnderExecution.get(Tags.AbstractID));
+            this.actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractID));
         }
         catch (ActionNotFoundException ex) {
-            this.actionUnderExecution = new AbstractAction(actionUnderExecution.get(Tags.AbstractID));
-            currentAbstractState.addNewAction(this.actionUnderExecution);
+            this.actionUnderExecution = new AbstractAction(action.get(Tags.AbstractID));
+            currentAbstractState.addNewAction(actionUnderExecution);
         }
-        this.actionUnderExecution.addConcreteActionId(actionUnderExecution.get(Tags.ConcreteID));
+        concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
+        this.actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
     }
 
     public void notifySequenceEnded() {

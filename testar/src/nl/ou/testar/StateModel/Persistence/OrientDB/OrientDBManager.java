@@ -51,6 +51,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.AbstractStateModel,
             EntityClassFactory.EntityClassName.Widget,
             EntityClassFactory.EntityClassName.ConcreteState,
+            EntityClassFactory.EntityClassName.ConcreteAction,
             EntityClassFactory.EntityClassName.isParentOf,
             EntityClassFactory.EntityClassName.isChildOf,
             EntityClassFactory.EntityClassName.isAbstractedBy,
@@ -212,7 +213,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(edgeEntity);
-
     }
 
     /**
@@ -308,8 +308,47 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
-            System.out.println("Hydrating abstract action " + abstractStateTransition.getAction().getActionId());
             actionHydrator.hydrate(actionEntity, abstractStateTransition.getAction());
+        }
+        catch (HydrationException ex) {
+            //@todo add some meaningful logging here as well
+        }
+        entityManager.saveEntity(actionEntity);
+    }
+
+    @Override
+    public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
+        if (concreteStateTransition.getSourceState() == null || concreteStateTransition.getTargetState() == null | concreteStateTransition.getAction() == null) {
+            System.out.println("Objects missing in concrete state transition");
+            return;
+        }
+
+        // persist the source and target states
+        persistConcreteState(concreteStateTransition.getSourceState());
+        persistConcreteState(concreteStateTransition.getTargetState());
+
+        // create entities for the target and source states
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
+        VertexEntity sourceVertexEntity = new VertexEntity(entityClass);
+        VertexEntity targetVertexEntity = new VertexEntity(entityClass);
+
+        // hydrate the entities to a format the orient database can store
+        try {
+            EntityHydrator stateHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_CONCRETE_STATE);
+            stateHydrator.hydrate(sourceVertexEntity, concreteStateTransition.getSourceState());
+            stateHydrator.hydrate(targetVertexEntity, concreteStateTransition.getTargetState());
+        } catch (HydrationException e) {
+            //@todo add some meaningful logging here
+            return;
+        }
+
+        // now we create an action entity that will link our two state entities
+        entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteAction);
+        EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
+
+        try {
+            EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_CONCRETE_ACTION);
+            actionHydrator.hydrate(actionEntity, concreteStateTransition.getAction());
         }
         catch (HydrationException ex) {
             //@todo add some meaningful logging here as well
