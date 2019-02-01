@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 5
-SequenceLength = 15
+Sequences = 7
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -62,7 +62,7 @@ SuspiciousTitles =
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = (?!x)x
+SuspiciousProcessOutput = 
 
 #################################################################
 # Process Logs
@@ -106,26 +106,26 @@ ProtocolClass = formDtg/ProtocolFormDtg
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl = remote:/localhost/TestarDemo2
-GraphDBUser = root
-GraphDBPassword = testar
+GraphDBUrl = 
+GraphDBUser = 
+GraphDBPassword = 
 
 #################################################################
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
-ReportDerivedGestures = true
-FormData = ./resources/settings/formDtg/formData.csv
+ReportDerivedGestures = false
+SubroutineData = 
 TgherkinDocument = 
 Discount = 0.95
 TgherkinNrOfNOPRetries = 100
 TempDir = ./resources/output/temp
-MaxTime = 3.1536E7
+MaxTime = 3123456.0
 StopGenerationOnFault = true
 TgherkinReportIncludeImageRecognition = false
 ExecuteActions = true
 DrawWidgetTree = false
-ApplyDefaultOnMismatch = true
+ApplyDefaultOnMismatch = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 AlgorithmFormsFilling = false
@@ -147,18 +147,18 @@ OutputDir = ./resources/output
 UnattendedTests = false
 TestGenerator = random
 StartupTime = 3.0
-ActionDuration = 0.5
+ActionDuration = 1.5
 NonReactingUIThreshold = 100
 ContinueToApplyDefault = false
-ConfidenceThreshold = 0.7
+ConfidenceThreshold = 0.0
 GraphsActivated = true
 GraphResuming = false
 CopyFromTo = 
-TimeToFreeze = 30.0
+TimeToFreeze = 1.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 TgherkinExecutionMode = sequential
-TimeToWaitAfterAction = 0.5
+TimeToWaitAfterAction = 1.5
 DrawWidgetUnderCursor = true
 ReportState = false
 AlwaysCompile = true
@@ -169,3 +169,4 @@ OnlySaveFaultySequences = false
 RepeatTgherkinScenarios = false
 MinimumPercentageForImageRecognition = 0.0
 OfflineGraphConversion = false
+FormData = ./resources/settings/formDtg/formData.csv

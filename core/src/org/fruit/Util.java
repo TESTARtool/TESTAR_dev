@@ -233,7 +233,7 @@ public final class Util {
     double xDiff = x2 - x1;
     double yDiff = y2 - y1;
     double length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-    
+
     double baseX;
     double baseY;
     if (length == 0) {
@@ -242,7 +242,7 @@ public final class Util {
     } else {
       baseX = x2 - xDiff * headLength / length;
       baseY = y2 - yDiff * headLength / length;
-      
+
     }
     Point p1 = Util.OrthogonalPoint(baseX, baseY, x2, y2, headWidth * .5);
     Point p2 = Util.OrthogonalPoint(baseX, baseY, x2, y2, -headWidth * .5);
@@ -329,7 +329,7 @@ public final class Util {
     } else {
       return (string.substring(0, Math.min(maxLen, string.length())) ).replaceAll("\\r\\n|\\n", "_");
     }
-            
+
   }
 
   public static Point OrthogonalPoint(double x1, double y1, double x2, double y2, double r) {
@@ -364,9 +364,9 @@ public final class Util {
         s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * -1;
       }
       double dm = (y1 - y2) / Math.abs(x1 - x2);
-      double s; 
+      double s;
       if (dm > 0) {
-        s = s2; 
+        s = s2;
       } else {
         s = s1;
       }

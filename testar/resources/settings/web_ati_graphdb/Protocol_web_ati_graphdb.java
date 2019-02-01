@@ -232,7 +232,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     for (Widget widget: getTopWidgets(state)) {
       // only consider enabled and non-blocked widgets
       if (widget.get(Enabled, true) && !widget.get(Blocked, false)) {
-        // do not build actions for tabu widgets
+        // do not build actions for tab widgets
         if (blackListed(widget)) {
           continue;
         }

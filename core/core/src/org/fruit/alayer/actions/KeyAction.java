@@ -103,7 +103,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
       case '7': return KBKeys.VK_NUMPAD7;
       case '8': return KBKeys.VK_NUMPAD8;
       case '9': return KBKeys.VK_NUMPAD9;
-      default : System.out.println("AltNumpad - not a number 0-9: " + numberChar);
+      default: System.out.println("AltNumpad - not a number 0-9: " + numberChar);
     return null;
     }
   }

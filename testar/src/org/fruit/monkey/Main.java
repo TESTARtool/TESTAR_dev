@@ -57,7 +57,6 @@ public class Main {
   private static final double REPLAY_RETRY_TIME_DEFAULT = 30.0;
   public static final String SETTINGS_DIR_PROPERTY = "SettingsDir";
   public static String SETTINGS_DIR_DEFAULT = "./resources/settings/";
- 
 
   private static String settingsDir = null;
 
@@ -139,7 +138,7 @@ public class Main {
     }
     return  settingsDir;
   }
-  
+
   public static final String SETTINGS_FILE = "test.settings";
   public static final String SUT_SETTINGS_EXT = ".sse";
   private static String sseActivated = null;
@@ -159,7 +158,7 @@ public class Main {
       if (new File(f.getPath() + "/" + SETTINGS_FILE).exists()) {
         sutSettings.add(f.getName());
       }
-    } 
+    }
     if (sutSettings.isEmpty()) {
       System.out.println("No SUT settings found!");
     }
@@ -370,7 +369,7 @@ public class Main {
 
       startTestar(settings, testSettingsFileName);
     }
-    
+
     TestSerialiser.exit();
     ScreenshotSerialiser.exit();
     LogSerialiser.exit();
@@ -486,7 +485,7 @@ public class Main {
       }
 
       //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
-      //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
+      //Need this during re-factoring process of getting Prolog code out. Re-factoring will assume that
       //PrologActivated is ALWAYS false.
       //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
       settings.set(ConfigTags.PrologActivated, false);

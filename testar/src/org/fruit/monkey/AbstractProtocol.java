@@ -139,7 +139,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
    * You can use the SUT's current state, analyze the widgets and their properties to create
    * a set of sensible actions, such as: "Click every Button which is enabled" etc.
    *
-
    * @param state the SUT's current state
    * @return  a set of actions
    */
@@ -156,8 +155,6 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
 
   /**
    * Execute the selected action.
-   *
-
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
@@ -165,7 +162,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
   protected abstract boolean executeAction(SUT system, State state, Action action);
 
   /**
-   * StopCriteria for a sequence:
+   * StopCriteria for a sequence.
    *
    * TESTAR uses this method to determine when to stop the generation of actions for the
    * current sequence. You can stop deriving more actions after:
@@ -177,7 +174,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
   protected abstract boolean moreActions(State state);
 
   /**
-   * StopCriteria for a test session:
+   * StopCriteria for a test session.
    *
    * TESTAR uses this method to determine when to stop the entire test sequence
    * You could stop the test after:
@@ -195,7 +192,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>  {
   protected abstract void finishSequence();
 
   /**
-   * This methods stops the SUT
+   * This methods stops the SUT.
    *
    * @param sut the system under testing
    */

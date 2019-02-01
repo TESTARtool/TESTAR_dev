@@ -122,7 +122,7 @@ public final class Verdict implements Serializable {
     final int prime = 31;
     int result = 1;
     if (info == null) {
-    result = prime * result; 
+    result = prime * result;
     } else {
       result = prime * result + info.hashCode();
     }

@@ -431,7 +431,7 @@ public class AWTCanvas implements Image, Canvas {
     float meanSize = (sizeThis + sizeImg) / 2;
     float percent = sizeSimilarity - (1.0f - (equalPixels / meanSize));
     //System.out.println("Image comparison took: " + (System.currentTimeMillis() - now) + " ms");
-    return (percent < 0f ? 0f: (percent > 1f ? 1f : percent));
+    return (percent < 0f ? 0f: (percent > 1f ? 1f: percent));
   }
 
   public void release() {}

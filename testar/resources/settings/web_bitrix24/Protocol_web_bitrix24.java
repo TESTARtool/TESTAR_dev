@@ -255,7 +255,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
       if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
 
-        if (!blackListed(w)) {  // do not build actions for tabu widgets
+        if (!blackListed(w)) {  // do not build actions for tab widgets
 
           // create left clicks
           if (whiteListed(w) || isClickable(w)) {

@@ -1,127 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nl.ou.testar.OrientDBRepositoryTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2018-10-17T14:29:26" hostname="DESKTOP-HJN7EB1" time="19.248">
+<testsuite name="nl.ou.testar.OrientDBRepositoryTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2019-01-27T21:30:10" hostname="LENOVO-CH" time="10.852">
   <properties/>
-  <testcase name="testAddWidgetOnUnknownState" classname="nl.ou.testar.OrientDBRepositoryTest" time="8.221"/>
-  <testcase name="testAddActionOnStateWithMissingToState" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.21"/>
-  <testcase name="testAddActionOnState" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.529"/>
-  <testcase name="testAddState" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.57"/>
-  <testcase name="testAddction" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.295"/>
-  <testcase name="testAddactionMissingWidget" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.388"/>
-  <testcase name="testAddWidgetOnce" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.344"/>
-  <testcase name="testAddctionMissingToState" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.635"/>
-  <testcase name="testAddActionOnStateWithMissingFromState" classname="nl.ou.testar.OrientDBRepositoryTest" time="1.055"/>
+  <testcase name="testAddWidgetOnUnknownState" classname="nl.ou.testar.OrientDBRepositoryTest" time="5.1"/>
+  <testcase name="testAddActionOnStateWithMissingToState" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.878"/>
+  <testcase name="testAddActionOnState" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.848"/>
+  <testcase name="testAddState" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.783"/>
+  <testcase name="testAddction" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.664"/>
+  <testcase name="testAddactionMissingWidget" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.567"/>
+  <testcase name="testAddWidgetOnce" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.871"/>
+  <testcase name="testAddctionMissingToState" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.697"/>
+  <testcase name="testAddActionOnStateWithMissingFromState" classname="nl.ou.testar.OrientDBRepositoryTest" time="0.441"/>
   <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[okt 17, 2018 4:29:35 PM com.orientechnologies.common.log.OLogManager log
+  <system-err><![CDATA[jan 27, 2019 10:30:16 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:35 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:16 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:35 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:16 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'Action' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'targetedBy' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'resultsIn' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:37 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:17 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbstractAction' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:38 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:38 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:38 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'Widget' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'has' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRole' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'role' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitle' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitle' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitlePath' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitlePath' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'Action' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'targetedBy' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'resultsIn' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:40 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:18 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbstractAction' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:41 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:19 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:41 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:19 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:41 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:19 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'Widget' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'has' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRole' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'role' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitle' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitle' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitlePath' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:42 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitlePath' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:20 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'Widget' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'has' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRole' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'role' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitle' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitle' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsRoleTitlePath' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:44 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'roleTitlePath' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:45 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'State' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:45 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'Committing the active transaction to create the new type 'AbsState' as subclass of 'V'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
-okt 17, 2018 4:29:45 PM com.orientechnologies.common.log.OLogManager log
+jan 27, 2019 10:30:21 PM com.orientechnologies.common.log.OLogManager log
 WARNING: $ANSI{green {db=demo}} Requested command 'create edge type 'isA' as subclass of 'E'' must be executed outside active transaction: the transaction will be committed and reopen right after it. To avoid this behavior execute it outside a transaction
 ]]></system-err>
 </testsuite>

@@ -189,7 +189,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
       // iterate through all widgets
       for (Widget w: getTopWidgets(state)) {
         if (w.get(Enabled, true) && !w.get(Blocked, false)) { // only consider enabled and non-blocked widgets
-          if (!blackListed(w)) {  // do not build actions for tabu widgets
+          if (!blackListed(w)) {  // do not build actions for tab widgets
 
             // left clicks
             if (whiteListed(w) || isClickable(w)) {

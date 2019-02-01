@@ -48,7 +48,7 @@ public class SuccessCriterionTest {
     AbstractPrinciple p = new PerceivablePrinciple();
     AbstractGuideline g = new TimeBasedMediaGuideline(p);
     SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A, "foo");
-    assertEquals("1.2.3", s.getNr());
+    assertEquals("1.1.2.3", s.getNr());
   }
 
   @Test
@@ -56,7 +56,7 @@ public class SuccessCriterionTest {
     AbstractPrinciple p = new PerceivablePrinciple();
     AbstractGuideline g = new TimeBasedMediaGuideline(p);
     SuccessCriterion s = new SuccessCriterion(3, "Foo", g, Level.A, "foo");
-    assertEquals("1.2.3 Foo", s.toString());
+    assertEquals("1.1.2.3 Foo", s.toString());
   }
 
   @SuppressWarnings("unused")

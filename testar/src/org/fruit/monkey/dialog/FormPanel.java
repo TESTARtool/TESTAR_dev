@@ -76,7 +76,7 @@ public class FormPanel extends JPanel {
 
   // used with class loader
   private List<String> myClassPath;
-  
+
   // line number within Form Panel
   private int lineNumber = 0;
 
@@ -201,7 +201,7 @@ public class FormPanel extends JPanel {
         LABEL_WIDTH,
         LABEL_HEIGHT);
     jlabelInput.setToolTipText(ToolTipTexts.getInputTTT());
-    
+
     add(jlabelInput);
 
     jtfInput = new JTextField();
@@ -365,7 +365,7 @@ public class FormPanel extends JPanel {
 
     jtfRole.setEditable(false);
     jtfTitle.setVisible(true);
- 
+
     adjustRanges();
     showButtons(true, true, true, false, false);
   }
@@ -388,7 +388,7 @@ public class FormPanel extends JPanel {
   private void showFormData(int index) {
     String searchRole = formData.get(index)[0];
     String searchTitle = formData.get(index)[1];
-    String searchText = formData.get(index)[2];   
+    String searchText = formData.get(index)[2];
     jtfN.setText(index + "");
     jtfRole.setText(searchRole);
     jtfTitle.setText(searchTitle);
@@ -444,7 +444,7 @@ public class FormPanel extends JPanel {
     String searchRole = "";
     String searchLabel = "";
     String searchInput = "";
-    
+
     try (Scanner in = new Scanner(formDataFile)) {
       while (in.hasNextLine()) {
         String instring = in.nextLine();
@@ -458,11 +458,11 @@ public class FormPanel extends JPanel {
             searchLabel =  instring.substring(0, n);
             searchInput = instring.substring(n + 1);
           }
-        }      
+        }
         index++;
         String[] r = {searchRole, searchLabel, searchInput};
         formData.put(index, r);
-      }   
+      }
       maxIndexFormData = index;
     } catch (FileNotFoundException e) {
       e.printStackTrace();

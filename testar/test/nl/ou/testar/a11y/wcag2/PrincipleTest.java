@@ -38,7 +38,7 @@ public class PrincipleTest {
   @Test
   public void testGetNr() {
     AbstractPrinciple p = new PerceivablePrinciple();
-    assertEquals("1", p.getNr());
+    assertEquals("1.1", p.getNr());
   }
 
 }

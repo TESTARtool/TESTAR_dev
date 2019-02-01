@@ -1,2 +1,4 @@
 /.gradle/
-testar/resources/settings/tgherkin_subroutine_ati_mixed.sse
+testar/resources/settings/subroutineAtiMixed.sse
+*.sse
+*.xml

@@ -420,7 +420,7 @@ public class CleanUpPanel extends JPanel {
               for (File g: subFiles) {
                 if (!g.isDirectory() && !g.getName().toLowerCase().contains("dummy")) {
                   printDelete(g);
-                } 
+                }
                 if (g.isDirectory()) {
                   printDelete(g);
                 }

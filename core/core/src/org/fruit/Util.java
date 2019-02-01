@@ -452,7 +452,7 @@ public final class Util {
         Shape s2 = w2.get(Tags.Shape, null);
         double a1 = s1 == null ? -1: Util.area(s1);
         double a2 = s2 == null ? -1: Util.area(s2);
-        return a1 < a2 ? WORSE: (a1 > a2 ? BETTER : EVEN);
+        return a1 < a2 ? WORSE: (a1 > a2 ? BETTER: EVEN);
       }
     };
 

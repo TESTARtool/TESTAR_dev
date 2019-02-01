@@ -29,12 +29,13 @@ Feature: Open University - A user applies for a master program.
           $Title="Voornamen" and $Role="UIAText" click(true)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
-    Step: Change voornamen
-    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam
     When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
     Step: Change Geboortenaam
     When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Focus op pagina krijgen
+    When  $Title="Accountgegevens" and $Role="UIAText" click(true)
+          $Title="Voornamen" and $Role="UIAText" click(true)
     Step: Change voornamen
     When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
     Step: Change Voorvoegsel_geboortenaam

@@ -55,7 +55,7 @@ public class UI implements ActionListener {
         butMultiply = new JButton("*");
         butDivide = new JButton("/");
         butEqual = new JButton("=");
-        butSquareRoot = new JButton("Ã‚Â²");
+        butSquareRoot = new JButton("Ãƒâ€šÃ‚Â²");
         butSquare = new JButton("x*x");
         butOneDevidedBy = new JButton("1/x");
         butCos = new JButton("Cos");

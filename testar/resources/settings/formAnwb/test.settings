@@ -115,7 +115,7 @@ GraphDBPassword = testar
 #################################################################
 TypingTextsForExecutedAction = 10
 ReportDerivedGestures = true
-FormData = ./resources/settings/formAnwb/formData.csv
+SubroutineData = 
 TgherkinDocument = 
 Discount = 0.95
 TgherkinNrOfNOPRetries = 100
@@ -169,3 +169,4 @@ OnlySaveFaultySequences = false
 RepeatTgherkinScenarios = false
 MinimumPercentageForImageRecognition = 0.0
 OfflineGraphConversion = false
+FormData = ./resources/settings/formAnwb/formData.csv

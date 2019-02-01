@@ -112,8 +112,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
   private static final double WAIT_TIME = 0.01;
-  protected boolean faultySequence;
-  private State     stateForClickFilterLayerProtocol;
+  protected boolean           faultySequence;
+  private State               stateForClickFilterLayerProtocol;
 
   public State getStateForClickFilterLayerProtocol() {
     return stateForClickFilterLayerProtocol;
@@ -203,11 +203,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
   /**
    * Value set when SUT started, used for calculating the duration of test.
-   *
    */
-  private String    startOfSutDateString;
+  private String startOfSutDateString;
 
-  protected static final Pen REDPEN = Pen.newPen().setColor(Color.Red)
+  protected static final Pen REDPEN  = Pen.newPen().setColor(Color.Red)
       .setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
   protected static final Pen BLUEPEN = Pen.newPen().setColor(Color.Blue)
       .setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build();
@@ -355,6 +354,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
   /**
    * Check if the selected file to Replay or View contains a valid fragment
    * object
+   *
    * @return true if replay or view contains a valid fragment
    */
   public boolean isValidFile() {
@@ -651,10 +651,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         writeAndCloseFragmentForReplayableSequence();
 
         if (faultySequence) {
-          LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
+          LogSerialiser.log(
+              "Sequence contained faults!\n", LogSerialiser.LogLevel.Critical
+          );
         }
 
-        Verdict stateVerdict = verdict.join(new Verdict(passSeverity, "", Util.NullVisualizer));
+        Verdict stateVerdict = verdict
+            .join(new Verdict(passSeverity, "", Util.NullVisualizer));
         Verdict finalVerdict;
 
         finalVerdict = stateVerdict.join(processVerdict);
@@ -1171,7 +1174,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
               .get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay)) {
             actionDelay = fragment.get(Tags.ActionDelay, 0.0);
           } else {
-             actionDelay = settings.get(ConfigTags.TimeToWaitAfterAction);
+            actionDelay = settings.get(ConfigTags.TimeToWaitAfterAction);
           }
 
           try {
@@ -1405,7 +1408,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 writerError.flush();
                 writerError.close();
 
-              // processOracle has priority
+                // processOracle has priority
               } else if (processLogs != null && mLogs.matches()) {
                 String dateString = Util.dateString(DATE_FORMAT);
                 System.out.println("SUT Log StdErr:  " + ch);
@@ -1484,7 +1487,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 writerOut.flush();
                 writerOut.close();
 
-              // processOracle has priority
+                // processOracle has priority
               } else if (processLogs != null && mLogs.matches()) {
                 String dateString = Util.dateString(DATE_FORMAT);
                 System.out.println("SUT Log StdOut:  " + ch);
@@ -1673,8 +1676,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     Assert.hasText(processName);
     List<SUT> suts = null;
     long now = System.currentTimeMillis();
-    final double maxEngageTime =
-        Math.round(settings().get(ConfigTags.StartupTime) * 1000.0);
+    final double maxEngageTime = Math
+        .round(settings().get(ConfigTags.StartupTime) * 1000.0);
     do {
       Util.pauseMs(100);
       suts = NativeLinker.getNativeProcesses();
@@ -1699,8 +1702,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     Role role;
     String title;
     long now = System.currentTimeMillis();
-    final double maxEngageTime =
-        Math.round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
+    final double maxEngageTime = Math
+        .round(settings().get(ConfigTags.StartupTime).doubleValue() * 1000.0);
     do {
       Util.pauseMs(100);
       suts = NativeLinker.getNativeProcesses();

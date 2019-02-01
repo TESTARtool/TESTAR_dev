@@ -39,7 +39,7 @@ public class GuidelineTest {
   public void testGetNr() {
     AbstractPrinciple p = new PerceivablePrinciple();
     AbstractGuideline g = new TimeBasedMediaGuideline(p);
-    assertEquals("1.2", g.getNr());
+    assertEquals("1.1.2", g.getNr());
   }
 
   @Test

@@ -141,7 +141,7 @@ public class ToolTipTexts {
   private static String urlTTT =
       "<html>\nProvide a unique part of the URL to identify web form: \n</html>";
   private static String fileTTT = "<html>\nSelect file name\n</html>";
-  
+
   // TTTs for the form panel
   private static String roleTTT =
       "<html>\nProvide the widget role (e.g. UIAEdit)</html>";
@@ -149,8 +149,7 @@ public class ToolTipTexts {
       "<html>\nProvide the widget title</html>";
   private static String inputTTT =
       "<html>\nProvide the input (only text fields)/html>";
-  
-  
+
   public static String getBtnGenerateTTT() {
     return btnGenerateTTT;
   }

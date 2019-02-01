@@ -276,7 +276,7 @@ public class SettingsDialog extends JFrame implements Observer {
         subroutinePanel.setActive(false);
       }
     }
-    
+
     // only show form tab if the protocol is a FormProtocol
     if (formPanel.isFormProtocol()) {
       if (!formPanel.isActive()) {
