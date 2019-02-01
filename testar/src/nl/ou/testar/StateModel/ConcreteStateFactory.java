@@ -18,9 +18,9 @@ public abstract class ConcreteStateFactory {
      * @param tags the tags containing the atributes that were used in the construction of the concrete state id
      * @return the new concrete state
      */
-    public static ConcreteState createConcreteState(State newState, Set<Tag<?>> tags) {
+    public static ConcreteState createConcreteState(State newState, Set<Tag<?>> tags, AbstractState abstractState) {
         String concreteStateId = newState.get(Tags.ConcreteIDCustom);
-        ConcreteState concreteState = new ConcreteState(concreteStateId, tags);
+        ConcreteState concreteState = new ConcreteState(concreteStateId, tags, abstractState);
 
         // next we want to add all the attributes contained in the state, and then do the same thing for the child widgets
         setAttributes(concreteState, newState);

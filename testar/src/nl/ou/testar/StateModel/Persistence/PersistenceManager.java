@@ -36,7 +36,7 @@ public interface PersistenceManager {
      * This method persists a concrete state.
      * @param concreteState
      */
-    void persistConcreteState(ConcreteState concreteState, AbstractState abstractState);
+    void persistConcreteState(ConcreteState concreteState);
 
     /**
      * This method initializes and abstract state model before use in Testar.

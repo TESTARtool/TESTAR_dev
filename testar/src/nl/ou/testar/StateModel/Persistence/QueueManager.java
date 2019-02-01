@@ -59,8 +59,8 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
-    public void persistConcreteState(ConcreteState concreteState, AbstractState abstractState) {
-        queue.add(() -> delegateManager.persistConcreteState(concreteState, abstractState));
+    public void persistConcreteState(ConcreteState concreteState) {
+        queue.add(() -> delegateManager.persistConcreteState(concreteState));
     }
 
     @Override

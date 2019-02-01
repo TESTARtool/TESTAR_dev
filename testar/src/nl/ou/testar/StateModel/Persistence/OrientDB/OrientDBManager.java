@@ -162,7 +162,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     }
 
     @Override
-    public void persistConcreteState(ConcreteState concreteState, AbstractState abstractState) {
+    public void persistConcreteState(ConcreteState concreteState) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
@@ -185,7 +185,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         persistWidgetTree(concreteState, vertexEntity);
 
         // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
-        if (abstractState == null) {
+        if (concreteState.getAbstractState() == null) {
             return;
         }
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
@@ -193,10 +193,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // hydrate the entity to a format the orient database can store
         try {
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
-            hydrator.hydrate(targetVertexEntity, abstractState);
+            hydrator.hydrate(targetVertexEntity, concreteState.getAbstractState());
         } catch (HydrationException e) {
             e.printStackTrace();
-            System.out.println("Encountered a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
+            System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
             return;
         }
 

@@ -114,8 +114,8 @@ public class StateModelManager {
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state
-        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags);
-        persistenceManager.persistConcreteState(concreteState, newAbstractState);
+        ConcreteState concreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState);
+        persistenceManager.persistConcreteState(concreteState);
     }
 
     /**
