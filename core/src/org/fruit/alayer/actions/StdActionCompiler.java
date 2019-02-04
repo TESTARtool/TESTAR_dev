@@ -266,11 +266,11 @@ public class StdActionCompiler {
 
 	public Action clickAndReplaceText(final Position position, final String text){
 		Assert.notNull(position, text);
-		// double clicking the widget to select all text:
+		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder()
-				.add(leftDoubleClickAt(position), 1);
-		// pressing Delete key:
-		builder.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
+				.add(leftClickAt(position), 1);
+		// pressing Cntr + A keys to select all text:
+		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
 		/*
 		// old text replacements by pressing delete multiple times:
 		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
