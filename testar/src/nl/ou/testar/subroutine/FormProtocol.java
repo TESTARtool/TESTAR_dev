@@ -266,7 +266,6 @@ public class FormProtocol
    */
   protected void finishSubroutine(State state) {
     System.out.println("Finish action subroutine");
-    listOfFormActions = new HashSet<Action>();
     setStartBoolean(false);
   }
   
@@ -310,6 +309,7 @@ public class FormProtocol
         System.out.println("Finish state form subroutine");
         finishSubroutine(state);
         actions = finishState(sut, state);
+        System.out.println("Finale waarde startBoolean " + isStartBoolean());
       } else {
         System.out.println("Continue TESTAR");
         actions = defaultDeriveActions(sut, state);
@@ -335,6 +335,7 @@ public class FormProtocol
       // Initializes parameters to start values/
       if (previousSequence < sequenceCount()) {
         previousSequence = sequenceCount();
+        listOfFormActions = new HashSet<Action>();
       }
       // Reset action on form
       formAction = null;

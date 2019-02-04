@@ -51,7 +51,6 @@ public class ProtocolFormDtg
 
     for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null);
-      System.out.println(title);
       if ("feedback".equalsIgnoreCase(title)) {
         action = ac.leftClickAt(widget);
       }
