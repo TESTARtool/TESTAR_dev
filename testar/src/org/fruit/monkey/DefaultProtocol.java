@@ -1794,7 +1794,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				return null;
 			try {
 				Widget w = targets.get(0).apply(state);
-				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0]);
+				return (new AnnotatingActionCompiler()).clickTypeInto(w,(String)userEvent[0], true);
 		} catch (WidgetNotFoundException we){
 				return null;
 			}

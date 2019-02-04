@@ -181,7 +181,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 
 					// type into text boxes
 					if(whiteListed(w) || isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 
 					// slides
 					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);

@@ -196,7 +196,7 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 	
 					// type into text boxes
 					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it
