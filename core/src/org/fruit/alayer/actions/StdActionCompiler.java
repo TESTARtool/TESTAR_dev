@@ -267,8 +267,7 @@ public class StdActionCompiler {
 	public Action clickAndReplaceText(final Position position, final String text){
 		Assert.notNull(position, text);
 		// clicking the widget to select it:
-		Builder builder = new CompoundAction.Builder()
-				.add(leftClickAt(position), 1);
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing Cntr + A keys to select all text:
 		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
 		/*
@@ -291,7 +290,13 @@ public class StdActionCompiler {
 
 	public Action clickAndAppendText(final Position position, final String text){
 		Assert.notNull(position, text);
-		return new CompoundAction.Builder().add(leftClickAt(position), 1).add(new Type(text), 1).build();
+		// clicking the widget to select it:
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+		// pressing End key to append into the end of the text:
+		builder.add(new KeyDown(KBKeys.VK_END), 0.1).add(new KeyUp(KBKeys.VK_END), 0.1);
+		//inserting text:
+		builder.add(new Type(text), 1);
+		return builder.build();
 	}
 
 	public Action hitKey(KBKeys key) {
