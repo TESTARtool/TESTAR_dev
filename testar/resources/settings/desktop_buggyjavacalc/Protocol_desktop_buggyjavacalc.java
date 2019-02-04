@@ -197,7 +197,7 @@ public class Protocol_desktop_buggyjavacalc extends ClickFilterLayerProtocol { /
 	
 					// type into text boxes
 					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 
 				}
 				
