@@ -366,7 +366,6 @@ public class Main {
 
       testSettingsFileName = getSettingsFile();
       settings = loadSettings(settings, args, testSettingsFileName);
-
       startTestar(settings, testSettingsFileName);
     }
 

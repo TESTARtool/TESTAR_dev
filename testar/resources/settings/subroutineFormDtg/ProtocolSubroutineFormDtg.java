@@ -16,18 +16,22 @@ public class ProtocolSubroutineFormDtg
     extends FormProtocol {
 
   private String searchTitle = "/personen/6-1/";
- /**
+  /**
    * Constructor.
-   * Including settings for print facilities
+   * Settings for form parameters
+   * - Set number of editable widgets that is used as a criterion to define a form
+   * - Set the number of screens a form consists of.
+   * Settings for print facilities
    * - Print additional information on widgets
-   * - Set number of editable widgets is used as a criterion to define a form
-   * - Set maximum number of screens a form consists of.
+   *   => helps to define the contents of input data file
+   * - Print additional information on building compound action for current screen.
+   *   => show the actual building step for each predefined widget
    */
   public ProtocolSubroutineFormDtg() {
     setPrintWidgets(false);
     setPrintBuild(true);
-    setMinimumNumberOfEditWidgets(5);
-    setMaximumNumberOfScreens(1);
+    setMinNoOfEditWidgets(5);
+    setNumberOfScreens(1);
   }
   /**
    * State is fulfilling criterion for running a form subroutine.

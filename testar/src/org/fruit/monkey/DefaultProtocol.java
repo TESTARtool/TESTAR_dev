@@ -538,7 +538,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     LogSerialiser.finish();
     LogSerialiser.exit();
     LOGGER.info(
-        "Test sequence {} finished in {} ms", sequenceCount() - 1,
+        "Test sequence {} finished in {} ms", sequenceCount(),
         System.currentTimeMillis() - tStart
     );
   }

@@ -11,7 +11,6 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.KeyUp;
@@ -31,60 +30,59 @@ public class FormProtocol
 
   /**
    * Constructor.
-   * Including settings for print facilities
+   * Settings for form parameters
+   * - Set number of editable widgets that is used as a criterion to define a form
+   * - Set the number of screens a form consists of.
+   * Settings for print facilities
    * - Print additional information on widgets
-   * - Print additional information on screen number where you want to start an action based on start state.
-   * - Set number of editable widgets is used as a criterion to define a form
-   * - Set maximum number of screens a form consists of.
+   *   => helps to define the contents of input data file
+   * - Print additional information on building compound action for current screen.
+   *   => show the actual building step for each predefined widget
    */
   public FormProtocol() {
+    setMinNoOfEditWidgets(5);
+    setNumberOfScreens(1);
     setPrintWidgets(false);
-     setPrintBuild(true);
-    setMinimumNumberOfEditWidgets(5);
+    setPrintBuild(true);
   }
 
   // if true a subroutine can start
   private boolean startBoolean = false;
 
   /**
-   * Compound action for widget on a form.
+   * Compound action for widgets on a form.
    */
-  protected Action actionOnForm;
+  protected Action formAction;
 
   /**
-   * List of all created compound actions.
+   * Cumulative list of form actions.
    */
-  protected Set<Action> listOfActionsOnForm = new HashSet<Action>();
+  protected Set<Action> listOfFormActions = new HashSet<Action>();
 
   /**
-   * Data set with options for widget on a form.
+   * Data set with options for widgets on a form.
    */
   protected HashMap<Integer,String[]> formData = new HashMap<Integer,String[]>();
 
   /**
    * Sequence number of previous action.
    */
-  protected int previousSequence = 0;
+  protected int previousSequence = 1;
 
   /**
    * Number of editable widgets is used as a criterion to define a form.
    * default value is 5
    */
-  protected int minimumNumberOfEditWidgets = 5;
+  protected int minNoOfEditWidgets = 5;
 
   /**
-   *  Actual screen number.
+   * Form consists of one or more screens.
+   * If size of listOfActionsOnForm
+   * - = 0                   form has not yet been completed in this sequence
+   * - <0, numberOfScreens>  continue search for new unique screen to complete form
+   * - >= numberOfScreens    form has been completed in this sequence
    */
-  protected int screenNumber = 0;
-
-  /**
-   * Form consists of maximumNumberOfScreens.
-   * If
-   * - screenNumber = 0                           form has not yet been completed in this sequence
-   * - 0 < screenNumber < maximumNumberOfScreens  continue with next screen
-   * - screenNumber >= maximumNumberOfScreens     form has been completed in this sequence
-   */
-  private Integer maximumNumberOfScreens = 1;
+  private int numberOfScreens = 1;
 
   // Print additional information on widgets
   private boolean printWidgets = false;
@@ -100,8 +98,12 @@ public class FormProtocol
     formData = readDataInputfile();
   }
 
-  // Counting the number of editable widgets, Role = UIAEdit
-  protected int countNumberOfEditWidgets(State state) {
+  /**
+   * Counting the number of editable widgets on a web page, Role = UIAEdit
+   * @param state the SUT's current state
+   * @return the number of editable widgets on a web page
+   */
+  protected int countEditWidgets(State state) {
     int numberOfEditWidgets = 0;
     int teller = 0;
     for (Widget widget: state) {
@@ -125,42 +127,38 @@ public class FormProtocol
 
   /**
    * State is fulfilling criterion for running a form subroutine.
-   * @param state     the SUT's current state
-   * @return state    is ready for form subroutine action
+   * Number of editable widgets is at least equal to or larger than minNoOfEditWidgets
+   * @param state the SUT's current state
+   * @return state is ready for form subroutine action
    */
   @Override
   public boolean startState(State state) {
-
+    
     // Set actual index of widget condition to 1 if you are using the Form Data tab on
     // the TESTAR panel
     setActualIndexSD(1);
-    int numberOfEditWidgets = countNumberOfEditWidgets(state);
+    int numberOfEditWidgets = countEditWidgets(state);
+    // Number of editable widgets is at least equal to or larger than minNoOfEditWidgets
+    setStartBoolean(numberOfEditWidgets >= minNoOfEditWidgets);
 
-    // Not all screens of the form have been evaluated
-    if (!isStartBoolean()) {
-
-      setStartBoolean( (numberOfEditWidgets >= minimumNumberOfEditWidgets));
-    }
     // Printing additional information, optional (setPrintScreenNumber(true))
     if (isPrintWidgets()) {
        System.out.print("[FP/startState] form available, create compound action\n");
        System.out.println("                number of editable widgets is "
-                + numberOfEditWidgets + " (min = " + minimumNumberOfEditWidgets + ")");
+                + numberOfEditWidgets + " (min = " + minNoOfEditWidgets + ")");
     }
     return isStartBoolean();
   }
 
   /**
    * Create compound action on all available fields with same role using form data set.
-   *
    * @param builder  used to build the compound action
    * @param role     specific widget role
-   * @param ac       either an StdActionCompiler or UrlActioncompiler
    * @param state    the SUT's current state
-   * @return builder subset for the specified rol
+   * @return builder subset for the specified role
    */
-  public Builder selectRoleSet(Builder builder, String role, StdActionCompiler ac,
-      State state) {
+  public Builder selectRoleSet(Builder builder, String role, State state) {
+    UrlActionCompiler uc = new UrlActionCompiler();
     for (Integer index: formData.keySet()) {
       String searchRole = formData.get(index)[0];
       String searchLabel = formData.get(index)[1];
@@ -188,7 +186,7 @@ public class FormProtocol
               if (printBuild) {
                 System.out.println("clickTypeInfo(" + searchLabel + ": " + searchInput + ")");
               }
-              builder.add(ac.clickTypeInto(w, searchInput), 5);
+              builder.add(uc.clickTypeInto(w, searchInput), 5);
             }
           }
 
@@ -203,7 +201,7 @@ public class FormProtocol
             if (printBuild) {
               System.out.println("leftClickAt(" + searchLabel + ")");
             }
-            builder.add(ac.leftClickAt(w), 5);
+            builder.add(uc.leftClickAt(w), 5);
           }
           break;
         }
@@ -212,7 +210,12 @@ public class FormProtocol
     return builder;
   }
 
-  public Builder AddScrollPage(Builder builder) {
+  /**
+   * Add page down action to builder.
+   * @param builder  used to build the compound action
+   * @return builder builder for compound action
+   */
+  public Builder addPageDown(Builder builder) {
     if (printBuild) {
       System.out.println("Compound action: => page down");
     }
@@ -227,36 +230,46 @@ public class FormProtocol
    */
   @Override
   public void startSubroutine(State state) {
-    UrlActionCompiler uc = new UrlActionCompiler();
+    System.out.println("Start action subroutine");
     Builder builder = new CompoundAction.Builder();
 
     // add text fields using form data set
-    builder = selectRoleSet(builder, "UIAEdit", uc, state);
+    builder = selectRoleSet(builder, "UIAEdit", state);
 
     // add radio button using form data set
-    builder = selectRoleSet(builder, "UIARadioButton", uc, state);
+    builder = selectRoleSet(builder, "UIARadioButton", state);
 
     // add check box using form data set
-    builder = selectRoleSet(builder, "UIACheckBox", uc, state);
+    builder = selectRoleSet(builder, "UIACheckBox", state);
 
     // add text fields using form data set
-    builder = selectRoleSet(builder, "UIASpinner", uc, state);
+    builder = selectRoleSet(builder, "UIASpinner", state);
 
     // add custom control using form data set
-    builder = selectRoleSet(builder, "UIACustomControl", uc, state);
+    builder = selectRoleSet(builder, "UIACustomControl", state);
 
     // add buttons using form data set
-    builder = selectRoleSet(builder, "UIAButton", uc, state);
+    builder = selectRoleSet(builder, "UIAButton", state);
 
-    if (maximumNumberOfScreens > 1) {
+    if (numberOfScreens > 1) {
       // add page down
-      AddScrollPage(builder);
+      addPageDown(builder);
     }
 
      // final compound action
-    actionOnForm = builder.build();
+    formAction = builder.build();
   }
 
+  /**
+   * This method is invoked each time after TESTAR finishes the generation of a form subroutine.
+   * @param state the SUT's current state
+   */
+  protected void finishSubroutine(State state) {
+    System.out.println("Finish action subroutine");
+    listOfFormActions = new HashSet<Action>();
+    setStartBoolean(false);
+  }
+  
   @Override
   /**
    * This method is used by TESTAR to determine the set of
@@ -273,46 +286,58 @@ public class FormProtocol
    */
   protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
     Set<Action> actions = new HashSet<Action>();
-    if (startState(state)) {
-      // First screen is available
-      if (listOfActionsOnForm.size() == 0) {
+    int n = listOfFormActions.size();
+    if (n == 0) {
+      if (startState(state)) {
         System.out.println("Start state form subroutine");
       }
-
+    }
+    if (isStartBoolean() && n >= 0 && n < numberOfScreens) {
       // Create compound action for current screen
       startSubroutine(state);
 
-      // Add eacht unique compound action (i.e. screen) to a list.
+      // Add each unique compound action (i.e. screen) to a list.
       // As such count the number of screens that have been completed
-      if (!listOfActionsOnForm.contains(actionOnForm)) {
-        listOfActionsOnForm.add(actionOnForm);
-      }
-
-      // Last screen is available
-      if (listOfActionsOnForm.size() == maximumNumberOfScreens) {
-        System.out.println("Finish state form subroutine");
-        setStartBoolean(false);
+      if (!listOfFormActions.contains(formAction)) {
+        listOfFormActions.add(formAction);
       }
 
       // Current action only contains the previously defined compound action
-      actions.add(actionOnForm);
-    } else {
-      System.out.println("Continue TESTAR");
-      actions = defaultDeriveActions(sut, state);
+      actions.add(formAction);
+    } else { 
+      // Last screen is available
+      if (isStartBoolean() && listOfFormActions.size() == numberOfScreens) {
+        System.out.println("Finish state form subroutine");
+        finishSubroutine(state);
+        actions = finishState(sut, state);
+      } else {
+        System.out.println("Continue TESTAR");
+        actions = defaultDeriveActions(sut, state);
+      }
     }
     return actions;
   }
-
+  
+  /**
+   * Execute the selected action.
+   * Determine whether or not the execution succeeded
+   * Update value of previous sequence and form action
+   * @param state the SUT's current state
+   * @param action the action to execute
+   * @return whether or not the execution succeeded
+   */
   protected boolean executeAction(SUT system, State state, Action action) {
     // Execute current action on form
     boolean actionExecuted = super.executeAction(system, state, action);
+     
     if (actionExecuted) {
-      // Start a new sequence
+      // Start a new sequence. 
+      // Initializes parameters to start values/
       if (previousSequence < sequenceCount()) {
         previousSequence = sequenceCount();
       }
       // Reset action on form
-      actionOnForm = null;
+      formAction = null;
     }
     return actionExecuted;
   }
@@ -332,24 +357,17 @@ public class FormProtocol
   }
 
   /**
-   * @param minimumNumberOfEditWidgets the minimumNumberOfEditWidgets to set
+   * @param minNoOfEditWidgets the minimum number of editable widgets to set
    */
-  public void setMinimumNumberOfEditWidgets(int minimumNumberOfEditWidgets) {
-    this.minimumNumberOfEditWidgets = minimumNumberOfEditWidgets;
+  public void setMinNoOfEditWidgets(int minNoOfEditWidgets) {
+    this.minNoOfEditWidgets = minNoOfEditWidgets;
   }
 
   /**
-   * @param screenNumber the screenNumber to set
+   * @param numberOfScreens the maximum number of screens to set
    */
-  public void setScreenNumber(int screenNumber) {
-    this.screenNumber = screenNumber;
-  }
-
-  /**
-   * @param maximumNumberOfScreens the maximumNumberOfScreens to set
-   */
-  public void setMaximumNumberOfScreens(Integer maximumNumberOfScreens) {
-    this.maximumNumberOfScreens = maximumNumberOfScreens;
+  public void setNumberOfScreens(int numberOfScreens) {
+    this.numberOfScreens = numberOfScreens;
   }
 
   /**

@@ -8,7 +8,7 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.UrlActionCompiler;
 
 /**
  * Class responsible for executing a SubroutineProtocol with
@@ -60,7 +60,7 @@ public class ProtocolSubroutineDtg
     return false;
   }
 
-  /** Define action to be taken when switching from subroutine to .
+  /** Define action to be taken when switching from subroutine to TESTAR.
    * @param sut the system under test
    * @param state the SUT's current state
    * @return the action to be taken
@@ -70,7 +70,7 @@ public class ProtocolSubroutineDtg
     Set<Action> actions = new HashSet<Action>();
 
     Action action = null;
-    StdActionCompiler ac = new StdActionCompiler();
+    UrlActionCompiler ac = new UrlActionCompiler();
 
     for (Widget widget: getTopWidgets(state)) {
       String title = widget.get(Tags.Title, null);

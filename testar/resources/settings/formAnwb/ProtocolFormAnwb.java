@@ -11,18 +11,22 @@ import nl.ou.testar.subroutine.FormProtocol;
  */
 public class ProtocolFormAnwb
     extends FormProtocol {
-
+  
   /**
    * Constructor.
-   * Including settings for print facilities
+   * Settings for form parameters
+   * - Set number of editable widgets that is used as a criterion to define a form
+   * - Set the number of screens a form consists of.
+   * Settings for print facilities
    * - Print additional information on widgets
-   * - Set number of editable widgets is used as a criterion to define a form
-   * - Set maximum number of screens a form consists of.
+   *   => helps to define the contents of input data file
+   * - Print additional information on building compound action for current screen.
+   *   => show the actual building step for each predefined widget
    */
-  public ProtocolFormAnwb() {
-    setPrintWidgets(false);
-    setPrintBuild(true);
-    setMinimumNumberOfEditWidgets(2);
-    setMaximumNumberOfScreens(4);
-  }
+ public ProtocolFormAnwb() {
+   setMinNoOfEditWidgets(2);
+   setNumberOfScreens(3);
+   setPrintWidgets(false);
+   setPrintBuild(true);
+ } 
 }

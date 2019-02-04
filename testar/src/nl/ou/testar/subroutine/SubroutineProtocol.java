@@ -220,7 +220,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
 
   /**
    * Store contents of String sourceCode in Document subroutine.
-   *
    */
   protected void initializeDocument() {
     if (sourceFile != null) {
@@ -321,6 +320,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @param state the SUT's current state
    */
   protected void startSubroutine(State state) {
+    System.out.println("Start action subroutine");
     initializeDocument();
     if (subroutine != null) {
       shuffleSubroutine(state);
@@ -331,7 +331,8 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
     }
   }
 
-  /** Define a set of actions to be taken when switching from the subroutine to TESTAR.
+  /** 
+   * Define a set of actions to be taken when switching from the subroutine to TESTAR.
    * @param state the SUT's current state
    * @return the available actions
   */
@@ -344,6 +345,7 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * @param state the SUT's current state
    */
   protected void finishSubroutine(State state) {
+    System.out.println("Finish action subroutine");
     sourceCode = null;
     subroutine = null;
     int index = getActualIndexSubD();
@@ -365,7 +367,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
 
   /**
    * Default derivation of action steps.
-
    * @param state the SUT's current state
    * @return actions the actions to be taken
    */
@@ -510,7 +511,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
   /**
    * Execute the selected action.
    * Determine whether or not the execution succeeded
-
    * @param state the SUT's current state
    * @param action the action to execute
    * @return whether or not the execution succeeded
@@ -753,7 +753,6 @@ public abstract class SubroutineProtocol extends ClickFilterLayerProtocol implem
    * Retrieve last action.
    * @return last action
    */
-
   public Action getLastAction() {
     return lastAction;
   }
