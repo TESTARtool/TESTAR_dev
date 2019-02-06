@@ -181,7 +181,6 @@ public class StateModelManager {
 
     public void notifyTestSequencedStarted() {
         sequenceManager.startNewSequence();
-        throw new RuntimeException("testing");
     }
 
     public void notifyTestSequenceStopped() {
