@@ -18,10 +18,12 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
+import nl.ou.testar.StateModel.Sequence.SequenceNode;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Widget;
 import org.fruit.Pair;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +62,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.isAbstractedBy,
             EntityClassFactory.EntityClassName.BlackHole,
             EntityClassFactory.EntityClassName.UnvisitedAbstractAction,
-            EntityClassFactory.EntityClassName.TestSequence
+            EntityClassFactory.EntityClassName.TestSequence,
+            EntityClassFactory.EntityClassName.SequenceNode
     ));
 
     /**
@@ -450,6 +453,21 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     }
 
     @Override
+    public void persistSequenceNode(SequenceNode sequenceNode) {
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceNode);
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
+
+        try {
+            EntityHydrator sequenceNodeHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE_NODE);
+            sequenceNodeHydrator.hydrate(vertexEntity, sequenceNode);
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        entityManager.saveEntity(vertexEntity);
+    }
+
+    @Override
     public void initSequenceManager(SequenceManager sequenceManager) {
 
     }
@@ -488,6 +506,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             case SEQUENCE_MANAGER_INITIALIZED:
                 initSequenceManager((SequenceManager) event.getPayload());
+                break;
+
+            case SEQUENCE_NODE_ADDED:
+
         }
 
     }

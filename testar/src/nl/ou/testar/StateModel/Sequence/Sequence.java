@@ -1,11 +1,14 @@
 package nl.ou.testar.StateModel.Sequence;
 
+import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Event.StateModelEventType;
 import org.fruit.alayer.Tag;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,6 +25,16 @@ public class Sequence {
      * The nr that identifies the sequence order in the test run.
      */
     private int currentSequenceNr;
+
+    /**
+     * The nr that identifies the last node in the sequence.
+     */
+    private int currentNodeNr = 0;
+
+    /**
+     * A list of nodes in this sequence
+     */
+    private List<SequenceNode> nodes;
 
     /**
      * The identifier for the abstract state model version that we are currently testing in.
@@ -48,6 +61,7 @@ public class Sequence {
         this.eventListeners = eventListeners;
         this.currentSequenceNr = currentSequenceNr;
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        nodes = new ArrayList<>();
     }
 
     /**
@@ -96,6 +110,16 @@ public class Sequence {
     public void stop() {
         active = false;
         //todo event here?
+    }
+
+    /**
+     * Add a new note to the sequence.
+     * @param concreteState
+     */
+    public void addNode(ConcreteState concreteState) {
+        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr);
+        nodes.add(node);
+        emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
 
 

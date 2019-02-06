@@ -8,6 +8,7 @@ import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
+import nl.ou.testar.StateModel.Sequence.SequenceNode;
 
 public class EventHelper {
 
@@ -48,6 +49,13 @@ public class EventHelper {
                 if (!(event.getPayload() instanceof SequenceManager)) {
                     throw new InvalidEventException();
                 }
+                break;
+
+            case SEQUENCE_NODE_ADDED:
+                if (!(event.getPayload() instanceof SequenceNode)) {
+                    throw new InvalidEventException();
+                }
+                break;
         }
     }
 

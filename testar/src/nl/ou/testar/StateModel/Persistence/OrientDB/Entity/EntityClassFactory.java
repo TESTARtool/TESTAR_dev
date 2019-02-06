@@ -1,6 +1,7 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.Sequence.SequenceNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -33,6 +34,8 @@ public class EntityClassFactory {
         classNameMap.put("BlackHole", EntityClassName.BlackHole);
         classNameMap.put("UnvisitedAbstractAction", EntityClassName.UnvisitedAbstractAction);
         classNameMap.put("TestSequence", EntityClassName.TestSequence);
+        classNameMap.put("SequenceNode", EntityClassName.SequenceNode);
+        classNameMap.put("SequenceStep", EntityClassName.SequenceStep);
     }
 
     /**
@@ -90,6 +93,9 @@ public class EntityClassFactory {
 
             case TestSequence:
                 return createTestSequenceClass();
+
+            case SequenceNode:
+                return createSequenceNodeClass();
 
             default:
                 return null;
@@ -311,5 +317,28 @@ public class EntityClassFactory {
         return entityClass;
     }
 
+    private static EntityClass createSequenceNodeClass() {
+        EntityClass entityClass = new EntityClass("SequenceNode", EntityClass.EntityType.Vertex);
+        Property identifier = new Property("nodeId", OType.STRING);
+        identifier.setIdentifier(true);
+        identifier.setNullable(false);
+        identifier.setMandatory(true);
+        identifier.setIndexAble(true);
+        entityClass.addProperty(identifier);
+        Property nodeNr = new Property("NodeNr", OType.INTEGER);
+        nodeNr.setIdentifier(false);
+        nodeNr.setNullable(false);
+        nodeNr.setMandatory(true);
+        nodeNr.setIndexAble(false);
+        entityClass.addProperty(nodeNr);
+        Property timestamp = new Property("timestamp", OType.DATETIME);
+        timestamp.setIdentifier(false);
+        timestamp.setNullable(false);
+        timestamp.setMandatory(true);
+        timestamp.setIndexAble(false);
+        entityClass.addProperty(timestamp);
+        entityClasses.put(EntityClassName.SequenceNode, entityClass);
+        return entityClass;
+    }
 
 }

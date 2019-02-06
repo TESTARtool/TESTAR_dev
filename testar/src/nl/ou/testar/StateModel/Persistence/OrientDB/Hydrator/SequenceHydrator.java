@@ -2,7 +2,6 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.Exception.HydrationException;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EntityClassFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
