@@ -4,6 +4,8 @@ package nl.ou.testar.StateModel.Persistence;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 
 /**
  * This class serves as a black hole for when persistance is not enabled
@@ -51,7 +53,17 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
+    public void persistSequence(Sequence sequence) {
+
+    }
+
+    @Override
     public void setListening(boolean listening) {
+
+    }
+
+    @Override
+    public void initSequenceManager(SequenceManager sequenceManager) {
 
     }
 }

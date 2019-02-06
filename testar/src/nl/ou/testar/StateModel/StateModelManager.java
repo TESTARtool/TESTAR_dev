@@ -4,6 +4,8 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -38,16 +40,21 @@ public class StateModelManager {
     // the concrete action that is being executed.
     private ConcreteAction concreteActionUnderExecution;
 
+    // manager that is responsible for recording test sequences as they are executed
+    private SequenceManager sequenceManager;
+
     /**
      * Constructor
      * @param abstractStateModel
      * @param actionSelector
      */
-    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager, Set<Tag<?>> concreteStateTags) {
+    public StateModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
+                             Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
         this.concreteStateTags = concreteStateTags;
+        this.sequenceManager = sequenceManager;
         init();
     }
 
@@ -172,6 +179,14 @@ public class StateModelManager {
         return null;
     }
 
+    public void notifyTestSequencedStarted() {
+        sequenceManager.startNewSequence();
+        throw new RuntimeException("testing");
+    }
+
+    public void notifyTestSequenceStopped() {
+        sequenceManager.stopSequence();
+    }
 
 
 }

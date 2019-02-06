@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel.Persistence;
 
 import nl.ou.testar.StateModel.*;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 
 public interface PersistenceManager {
 
@@ -49,5 +51,17 @@ public interface PersistenceManager {
      * @param abstractStateModel
      */
     void initAbstractStateModel(AbstractStateModel abstractStateModel);
+
+    /**
+     * This method persists a sequence to the orient data store.
+     * @param sequence
+     */
+    void persistSequence(Sequence sequence);
+
+    /**
+     * This method initializes a sequence manager implementation with data from the data store.
+     * @param sequenceManager
+     */
+    void initSequenceManager(SequenceManager sequenceManager);
 
 }

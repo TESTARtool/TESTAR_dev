@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import nl.ou.testar.StateModel.Widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction}
+        BlackHole, UnvisitedAbstractAction, TestSequence}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -33,6 +32,7 @@ public class EntityClassFactory {
         classNameMap.put("isAbstractedBy", EntityClassName.isAbstractedBy);
         classNameMap.put("BlackHole", EntityClassName.BlackHole);
         classNameMap.put("UnvisitedAbstractAction", EntityClassName.UnvisitedAbstractAction);
+        classNameMap.put("TestSequence", EntityClassName.TestSequence);
     }
 
     /**
@@ -87,6 +87,9 @@ public class EntityClassFactory {
                 
             case UnvisitedAbstractAction:
                 return createUnvisitedAbstractActionClass();
+
+            case TestSequence:
+                return createTestSequenceClass();
 
             default:
                 return null;
@@ -282,6 +285,29 @@ public class EntityClassFactory {
         concreteActionIds.setNullable(false);
         entityClass.addProperty(concreteActionIds);
         entityClasses.put(EntityClassName.UnvisitedAbstractAction, entityClass);
+        return entityClass;
+    }
+
+    private static EntityClass createTestSequenceClass() {
+        EntityClass entityClass = new EntityClass("TestSequence", EntityClass.EntityType.Vertex);
+        Property identifier = new Property("sequenceId", OType.STRING);
+        identifier.setIdentifier(true);
+        identifier.setNullable(false);
+        identifier.setMandatory(true);
+        identifier.setIndexAble(true);
+        entityClass.addProperty(identifier);
+        Property startDateTime = new Property("startDateTime", OType.DATETIME);
+        startDateTime.setIdentifier(false);
+        startDateTime.setNullable(false);
+        startDateTime.setMandatory(true);
+        startDateTime.setIndexAble(false);
+        entityClass.addProperty(startDateTime);
+        Property abstractionLevelIdentifier = new Property("abstractionLevelIdentifier", OType.STRING);
+        abstractionLevelIdentifier.setMandatory(true);
+        abstractionLevelIdentifier.setNullable(false);
+        abstractionLevelIdentifier.setIndexAble(true);
+        entityClass.addProperty(abstractionLevelIdentifier);
+        entityClasses.put(EntityClassName.TestSequence, entityClass);
         return entityClass;
     }
 

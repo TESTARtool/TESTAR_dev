@@ -465,6 +465,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
         this.cv = buildCanvas();
+        // notify the statemodelmanager
+        stateModelManager.notifyTestSequencedStarted();
     }
 
     /**
@@ -483,6 +485,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.finish();
         LogSerialiser.exit();
         LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+        // notify the statemodelmanager
+        stateModelManager.notifyTestSequenceStopped();
     }
 
     /**

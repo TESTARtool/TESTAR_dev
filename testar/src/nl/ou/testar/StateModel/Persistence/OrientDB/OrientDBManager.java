@@ -13,8 +13,11 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.EntityExtractor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.SequenceHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Widget;
 import org.fruit.Pair;
@@ -56,7 +59,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.isChildOf,
             EntityClassFactory.EntityClassName.isAbstractedBy,
             EntityClassFactory.EntityClassName.BlackHole,
-            EntityClassFactory.EntityClassName.UnvisitedAbstractAction
+            EntityClassFactory.EntityClassName.UnvisitedAbstractAction,
+            EntityClassFactory.EntityClassName.TestSequence
     ));
 
     /**
@@ -431,6 +435,25 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         setListening(true);
     }
 
+    public void persistSequence(Sequence sequence) {
+        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.TestSequence);
+        VertexEntity vertexEntity = new VertexEntity(entityClass);
+
+        try {
+            EntityHydrator sequenceHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE);
+            sequenceHydrator.hydrate(vertexEntity, sequence);
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        entityManager.saveEntity(vertexEntity);
+    }
+
+    @Override
+    public void initSequenceManager(SequenceManager sequenceManager) {
+
+    }
+
     @Override
     public void eventReceived(StateModelEvent event) {
         if (!listening) return;
@@ -457,6 +480,14 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));
+                break;
+
+            case SEQUENCE_STARTED:
+                persistSequence((Sequence) event.getPayload());
+                break;
+
+            case SEQUENCE_MANAGER_INITIALIZED:
+                initSequenceManager((SequenceManager) event.getPayload());
         }
 
     }

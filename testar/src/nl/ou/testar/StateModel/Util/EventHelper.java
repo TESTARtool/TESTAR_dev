@@ -6,6 +6,8 @@ import nl.ou.testar.StateModel.AbstractStateModel;
 import nl.ou.testar.StateModel.AbstractStateTransition;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 
 public class EventHelper {
 
@@ -32,6 +34,18 @@ public class EventHelper {
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 if (!(event.getPayload() instanceof AbstractStateModel)) {
+                    throw new InvalidEventException();
+                }
+                break;
+
+            case SEQUENCE_STARTED:
+                if (!(event.getPayload() instanceof Sequence)) {
+                    throw new InvalidEventException();
+                }
+                break;
+
+            case SEQUENCE_MANAGER_INITIALIZED:
+                if (!(event.getPayload() instanceof SequenceManager)) {
                     throw new InvalidEventException();
                 }
         }

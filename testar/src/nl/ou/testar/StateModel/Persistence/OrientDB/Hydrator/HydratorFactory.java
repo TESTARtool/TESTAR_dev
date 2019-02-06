@@ -25,6 +25,8 @@ public abstract class HydratorFactory {
 
     public static final int HYDRATOR_CONCRETE_ACTION = 9;
 
+    public static final int HYDRATOR_SEQUENCE = 10;
+
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityHydrator> hydrators = new HashMap<>();
 
@@ -60,6 +62,9 @@ public abstract class HydratorFactory {
 
             case HYDRATOR_BLACKHOLE:
                 return createBlackHoleHydrator();
+
+            case HYDRATOR_SEQUENCE:
+                return createSequenceHydrator();
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
@@ -118,5 +123,11 @@ public abstract class HydratorFactory {
         ConcreteActionHydrator concreteActionHydrator = new ConcreteActionHydrator();
         hydrators.put(HYDRATOR_CONCRETE_ACTION, concreteActionHydrator);
         return concreteActionHydrator;
+    }
+
+    private static SequenceHydrator createSequenceHydrator() {
+        SequenceHydrator sequenceHydrator = new SequenceHydrator();
+        hydrators.put(HYDRATOR_SEQUENCE, sequenceHydrator);
+        return sequenceHydrator;
     }
 }

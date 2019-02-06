@@ -4,6 +4,8 @@ import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Exception.InvalidEventException;
+import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.EventHelper;
 
 import java.util.ArrayDeque;
@@ -74,6 +76,16 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
+    public void persistSequence(Sequence sequence) {
+        queue.add(() -> delegateManager.persistSequence(sequence));
+    }
+
+    @Override
+    public void initSequenceManager(SequenceManager sequenceManager) {
+        delegateManager.initSequenceManager(sequenceManager);
+    }
+
+    @Override
     public void eventReceived(StateModelEvent event) {
         if (!listening) return;
 
@@ -97,6 +109,12 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
             case ABSTRACT_STATE_MODEL_INITIALIZED:
                 initAbstractStateModel((AbstractStateModel) (event.getPayload()));
+
+            case SEQUENCE_STARTED:
+                persistSequence((Sequence) event.getPayload());
+
+            case SEQUENCE_MANAGER_INITIALIZED:
+                initSequenceManager((SequenceManager) event.getPayload());
         }
     }
 
