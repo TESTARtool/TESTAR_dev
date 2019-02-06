@@ -146,6 +146,8 @@ public final class Tags extends TagsBase {
 	public static final Tag<String> Abstract_R_ID = from(CodingManager.ABSTRACT_R_ID, String.class);
 	public static final Tag<String> Abstract_R_T_ID = from(CodingManager.ABSTRACT_R_T_ID, String.class);
 	public static final Tag<String> Abstract_R_T_P_ID = from(CodingManager.ABSTRACT_R_T_P_ID, String.class);
+	public static final Tag<String> ConcreteIDCustom = from(CodingManager.CONCRETE_ID_CUSTOM, String.class);
+	public static final Tag<String> AbstractIDCustom = from(CodingManager.ABSTRACT_ID_CUSTOM, String. class);
 	// end by urueda
 	
 	@SuppressWarnings("unchecked")

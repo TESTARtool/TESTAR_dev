@@ -67,6 +67,8 @@ import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.StateModel.StateModelManager;
+import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -209,6 +211,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     protected GraphDB graphDB;
+    protected StateModelManager stateModelManager;
     private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
     protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -272,7 +275,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         eventHandler = initializeEventHandler();
 
         //Initializing Graph Database:
-        graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+        graphDB = new GraphDB(false,
                 settings.get(ConfigTags.GraphDBUrl),
                 settings.get(ConfigTags.GraphDBUser),
                 settings.get(ConfigTags.GraphDBPassword));
@@ -282,6 +285,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 settings.get(ConfigTags.AccessBridgeEnabled),
                 settings.get(ConfigTags.SUTProcesses)
         );
+        // new state model manager
+        stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -555,14 +560,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
-                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
 
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
+
+                // notify the state model manager of the initial state
+                Set<Action> actions = deriveActions(system, state);
+                CodingManager.buildIDs(state, actions);
+                stateModelManager.notifyNewStateReached(state, actions);
 
                 /*
                  ***** starting the INNER LOOP:
@@ -571,6 +579,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence(system, state);
+
+                // notify the state model manager of the sequence end
+                stateModelManager.notifySequenceEnded();
 
                 writeAndCloseFragmentForReplayableSequence();
 
@@ -666,7 +677,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
-
             CodingManager.buildIDs(state, actions);
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
@@ -690,9 +700,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Showing the red dot if visualization is on:
             if(visualizationOn || settings.get(ConfigTags.VisualizeSelectedAction)) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
+            //before action execution, pass it to the state model manager
+            stateModelManager.notifyActionExecution(action);
+
             //Executing the selected action:
             executeAction(system, state, action);
             actionCount++;
+
+            // notify the state model manager of the newly reached state
+            actions = deriveActions(system, state);
+            CodingManager.buildIDs(state, actions);
+            stateModelManager.notifyNewStateReached(state, actions);
 
             //Saving the actions and the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state, actions);

@@ -35,6 +35,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
+import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -86,7 +87,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
-  private GraphDBPanel graphDBPanel;
+  private StateModelPanel stateModelPanel;
 
   /**
    * Starts the settings Dialog.
@@ -235,7 +236,7 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
-    graphDBPanel.populateFrom(settings);
+    stateModelPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -244,7 +245,7 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.extractInformation(settings);
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
-    graphDBPanel.extractInformation(settings);
+    stateModelPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -268,8 +269,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Time Settings", timingPanel);
     miscPanel = new MiscPanel();
     jTabsPane.addTab("Misc", miscPanel);
-    graphDBPanel = GraphDBPanel.createGraphDBPanel();
-    jTabsPane.addTab("GraphDB", graphDBPanel);
+    stateModelPanel = StateModelPanel.createStateModelPanel();
+    jTabsPane.addTab("State Model", stateModelPanel);
 
     setLayout(jTabsPane);
     pack();

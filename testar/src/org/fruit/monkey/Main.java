@@ -34,13 +34,26 @@
  */
 package org.fruit.monkey;
 
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ODirection;
+import com.orientechnologies.orient.core.record.OEdge;
+import com.orientechnologies.orient.core.record.OVertex;
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
+import nl.ou.testar.StateModel.AbstractState;
 import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.alayer.Tag;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import javax.swing.*;
@@ -50,6 +63,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
+import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -250,7 +264,7 @@ public class Main {
 		} catch (Throwable t) {
 			System.out.println("Cannot initialize log file!");
 			t.printStackTrace(System.out);
-			System.exit(-1);
+			exit(-1);
 		}
 		//TODO: DATE-FORMAT not consistent
 		LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
@@ -321,7 +335,7 @@ public class Main {
 				}
 			}
 
-			System.exit(0);
+			exit(0);
 		}
 
 	}
@@ -357,7 +371,7 @@ public class Main {
 		if (files == null || files.length == 0) {
 			settingsSelection();
 			if (SSE_ACTIVATED == null) {
-				System.exit(-1);
+				exit(-1);
 			}
 		}
 		else {
@@ -384,7 +398,6 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		Settings settings = initTestarSettings(args);
 
 		String testSettingsFileName = getSettingsFile();
@@ -399,6 +412,7 @@ public class Main {
 			
 			testSettingsFileName = getSettingsFile();
 			settings = loadSettings(settings, args, testSettingsFileName);
+			initCodingManager(settings);
 			
 			startTestar(settings, testSettingsFileName);
 		}
@@ -407,7 +421,7 @@ public class Main {
 		ScreenshotSerialiser.exit();
 		LogSerialiser.exit();
 
-		System.exit(0);
+		exit(0);
 
 	}
 
@@ -480,10 +494,26 @@ public class Main {
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
+			defaults.add(Pair.from(StateModelEnabled, false));
+			defaults.add(Pair.from(DataStore, ""));
+			defaults.add(Pair.from(DataStoreType, ""));
+			defaults.add(Pair.from(DataStoreServer, ""));
+			defaults.add(Pair.from(DataStoreDB, ""));
+			defaults.add(Pair.from(DataStoreUser, ""));
+			defaults.add(Pair.from(DataStorePassword, ""));
+			defaults.add(Pair.from(DataStoreMode, ""));
+			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+
+			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
+			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+				{
+					add("Role");
+				}
+			}));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
@@ -507,6 +537,17 @@ public class Main {
 			//PrologActivated is ALWAYS false.
 			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
 			settings.set(ConfigTags.PrologActivated, false);
+
+			// check that the abstract state properties and the abstract action properties have at least 1 value
+			if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
+			}
+
+			// check that the abstract state properties and the abstract action properties have at least 1 value
+			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+			}
+
 			return settings;
 		} catch (IOException ioe) {
 			throw new ConfigException("Unable to load configuration file!", ioe);
@@ -553,5 +594,41 @@ public class Main {
 
 	  }
   }
+
+    /**
+     * This method initializes the coding manager with custom tags to use for constructing
+     * concrete and abstract state id's, if provided of course.
+     * @param settings
+     */
+    private static void initCodingManager(Settings settings) {
+        // we look if there are user-provided custom state tags in the settings
+        // if so, we provide these to the coding manager
+        int i;
+
+        // first the attributes for the concrete state id
+        if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+            i = 0;
+
+            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+            for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+                concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+            }
+
+            CodingManager.setCustomTagsForConcreteId(concreteTags);
+        }
+
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            i = 0;
+
+            Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+            for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+                abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+            }
+
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+
+    }
 
 }

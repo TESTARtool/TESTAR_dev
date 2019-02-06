@@ -231,6 +231,15 @@ public class ProtocolUtil {
 	// #####################
 	
 	public String getStateshot(State state){
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), getStateshotBinary(state));
+	}
+
+	/**
+	 * Method returns a binary representation of a state's screenshot.
+	 * @param state
+	 * @return
+	 */
+	public AWTCanvas getStateshotBinary(State state) {
 		Shape viewPort = null;
 		if (state.childCount() > 0){
 			viewPort = state.child(0).get(Tags.Shape, null);
@@ -242,7 +251,7 @@ public class ProtocolUtil {
 		if (viewPort.width() <= 0 || viewPort.height() <= 0)
 			return null;
 		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), scrshot);
+		return scrshot;
 	}
 	
 	public String getActionshot(State state, Action action){
