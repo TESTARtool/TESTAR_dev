@@ -187,7 +187,7 @@ public class Protocol_desktop_powerpoint extends ClickFilterLayerProtocol {
 		
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w))
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 
 						// slides
 						Drag[] drags = null;

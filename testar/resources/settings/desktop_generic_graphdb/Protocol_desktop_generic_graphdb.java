@@ -185,7 +185,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
 							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 						}
 						// slides
 						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
