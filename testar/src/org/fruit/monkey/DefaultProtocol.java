@@ -276,8 +276,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 settings.get(ConfigTags.AccessBridgeEnabled),
                 settings.get(ConfigTags.SUTProcesses)
         );
+        
         // new state model manager
-        stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+        if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
+        		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -331,12 +333,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			}
     			
     		}catch(SystemStartException SystemStartException) {
-    			System.out.println(SystemStartException);
+    			SystemStartException.printStackTrace();
     			this.mode = Modes.Quit;
     			stopSystem(system);
     			system = null;
     		} catch (Exception e) {
-    			System.out.println(e);
+    			e.printStackTrace();
     			this.mode = Modes.Quit;
     			stopSystem(system);
     			system = null;
@@ -880,6 +882,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
+        	
+        	// notify the statemodelmanager
+            stateModelManager.notifyTestSequencedStarted();
         }
         //else, SUT & canvas exists (startSystem() & buildCanvas() created from other mode)
 
@@ -893,6 +898,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
+            
+            //notify the state model manager of the new state
+            stateModelManager.notifyNewStateReached(state, actions);
+            
             if(actions.isEmpty()){
                 if (escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -915,7 +924,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             
             //Save the user action information into the logs
             if (actionStatus.isUserEventAction()) {
+            	
     			CodingManager.buildIDs(state, actionStatus.getAction());
+    			
+    			//notify the state model manager of the executed action
+                stateModelManager.notifyActionExecution(actionStatus.getAction());
+    			
     			saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
     			actionCount++;
             }
@@ -949,14 +963,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
 
         if(startedRecordMode && mode() == Modes.Quit){
+        	
+        	// notify the state model manager of the sequence end
+            stateModelManager.notifySequenceEnded();
+        	
         	//Closing fragment for recording replayable test sequence:
         	writeAndCloseFragmentForReplayableSequence();
 
         	//Copy sequence file into proper directory:
         	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-
-            Util.clear(cv);
-            cv.end();
+        	
+        	// notify the statemodelmanager
+            stateModelManager.notifyTestSequenceStopped();
             
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
