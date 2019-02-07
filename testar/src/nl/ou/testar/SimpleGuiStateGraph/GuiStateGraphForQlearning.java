@@ -18,7 +18,7 @@ public class GuiStateGraphForQlearning {
         this.R_MAX = R_MAX;
         this.gammaDiscount=gammaDiscount;
 
-        qlearningGuiStates = new HashSet<QlearningGuiState>();
+        qlearningGuiStates = new HashSet<>();
     }
 
     /**
@@ -68,19 +68,14 @@ public class GuiStateGraphForQlearning {
 
     protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions){
         HashMap<String, Double> actionIds = new HashMap<String, Double>();
-        for(Action action:actions){
-            actionIds.put(action.get(Tags.ConcreteID), R_MAX);
-        }
-        return new QlearningGuiState(state.get(Tags.ConcreteID),actionIds);
+        actions.forEach(action -> actionIds.put(action.get(Tags.ConcreteID), R_MAX));
+        return new QlearningGuiState(state.get(Tags.ConcreteID), actionIds);
     }
 
     protected boolean containsStateId(String stateId){
-        for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getConcreteStateId().equals(stateId)){
-                return true;
-            }
-        }
-        return false;
+        return qlearningGuiStates
+                .stream()
+                .anyMatch(state -> state.getConcreteStateId().equals(stateId));
     }
 
 }

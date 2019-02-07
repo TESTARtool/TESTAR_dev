@@ -1,5 +1,6 @@
-package nl.ou.testar.SimpleGuiStateGraph;
+package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Tags;
 
@@ -9,15 +10,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class QlearningGuiState {
-    protected String concreteStateId;
+public class StrategyGuiState {
+    private String concreteStateId;
     //TODO use QlearningValues instead and only 1 hash map
-    protected HashMap<String, Double> concreteActionIdsAndRewards;
-    protected HashMap<String, Double> concreteActionIdsAndQValues;
-    protected HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
-    protected Set<GuiStateTransition> stateTransitions;
+    private HashMap<String, Double> concreteActionIdsAndRewards;
+    private HashMap<String, Double> concreteActionIdsAndQValues;
+    private HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
+    private Set<GuiStateTransition> stateTransitions;
 
-    public QlearningGuiState(String concreteStateId, HashMap<String, Double> concreteActionIdsAndRewards) {
+    StrategyGuiState(final String concreteStateId, final HashMap<String, Double> concreteActionIdsAndRewards) {
         this.concreteStateId = concreteStateId;
         this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
         this.concreteActionIdsAndQValues = concreteActionIdsAndRewards; // all Q values are the same as R Max in the beginning
@@ -71,15 +72,13 @@ public class QlearningGuiState {
      * So updating the actionIDs
      */
     public void updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX) {
-        for (Action action : actions) {
-            if (concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID))) {
-                // model contains the action ID
-            } else {
-                concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID), R_MAX);
-                concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID), R_MAX);
-                concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID), 0);
-            }
-        }
+        actions.stream()
+                .filter(action -> concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID)))
+                .forEach(action -> {
+                    concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID), R_MAX);
+                    concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID), R_MAX);
+                    concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID), 0);
+                });
     }
 
     public void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState) {

@@ -9,8 +9,7 @@ import java.util.Set;
 public class RandomActionSelector {
 
     public static Action selectAction(Set<Action> actions) {
-        long graphTime = System.currentTimeMillis();
-        Random rnd = new Random(graphTime);
-        return new ArrayList<Action>(actions).get(rnd.nextInt(actions.size()));
+        Random rnd = new Random(System.currentTimeMillis());
+        return new ArrayList<>(actions).get(rnd.nextInt(actions.size()));
     }
 }

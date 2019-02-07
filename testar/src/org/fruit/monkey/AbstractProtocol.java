@@ -210,4 +210,9 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	 */
 	protected abstract void closeTestSession();
 
+	/**
+	 *
+	 */
+	protected abstract void saveStrategyMetrics(String testSequenceName, boolean problems);
+
 }
