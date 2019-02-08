@@ -206,6 +206,20 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//using the action selector of the state model:
+		String abstractActionId = stateModelManager.getAbstractActionIdToExecute();
+		Action retAction = null;
+		for(Action action:actions){
+			if(action.get(Tags.AbstractIDCustom, "not available").equals(abstractActionId)){
+				retAction = action;
+			}
+		}
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
 		return super.selectAction(state, actions);
 
 	}
