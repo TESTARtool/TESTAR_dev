@@ -208,8 +208,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
 			//For each possible drag, create an action and add it to the derived actions
 			for (Drag drag : drags){
-				//Store the widget in the Graphdatabase
-				storeWidget(state.get(Tags.ConcreteID), w);
 				//Create a slide action with the Action Compiler, and add it to the set of derived actions
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
