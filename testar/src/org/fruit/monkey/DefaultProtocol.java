@@ -1784,10 +1784,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return topWidgets;
 	}
 
-    protected void storeWidget(String stateID, Widget widget) {
-        graphDB.addWidget(stateID, widget);
-    }
-
 	/**
 	 * Check whether widget w should be filtered based on
 	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
@@ -2039,8 +2035,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
             //For each possible drag, create an action and add it to the derived actions
             for (Drag drag : drags){
-                //Store the widget in the Graphdatabase
-                storeWidget(state.get(Tags.ConcreteID), w);
                 //Create a slide action with the Action Compiler, and add it to the set of derived actions
                 actions.add(ac.slideFromTo(
                         new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
