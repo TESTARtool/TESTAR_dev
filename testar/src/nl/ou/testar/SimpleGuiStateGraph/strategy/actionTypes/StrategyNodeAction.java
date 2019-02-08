@@ -1,8 +1,8 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes;
 
+import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 
 import java.util.ArrayList;
 
@@ -13,5 +13,5 @@ public abstract class StrategyNodeAction extends StrategyNode {
 
     }
 
-    public abstract Action getAction(State state);
+    public abstract Action getAction(final StrategyGuiState state);
 }

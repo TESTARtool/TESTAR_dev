@@ -1,10 +1,10 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy.actions;
 
+import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
 
 import java.util.ArrayList;
 
@@ -21,12 +21,8 @@ public class SnIfThenElse extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(State state) {
-        if (this.child.getValue(state)) {
-            return this.child1.getAction(state);
-        } else {
-            return this.child2.getAction(state);
-        }
+    public Action getAction(final StrategyGuiState state) {
+        return (this.child.getValue(state)) ? this.child1.getAction(state) : this.child2.getAction(state);
     }
 
 }

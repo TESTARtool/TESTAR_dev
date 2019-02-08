@@ -1,31 +1,27 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy.actions;
 
+import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActiontype;
+import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionType;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
-import org.fruit.alayer.State;
 
 import java.util.ArrayList;
 
 public class SnRandomActionOfTypeOtherThan extends StrategyNodeAction {
-    private StrategyNodeActiontype child;
+    private StrategyNodeActionType child;
 
     public SnRandomActionOfTypeOtherThan(ArrayList<StrategyNode> children) {
         super(children);
-        this.child = (StrategyNodeActiontype) children.get(0);
+        this.child = (StrategyNodeActionType) children.get(0);
 
     }
 
     @Override
-    public Action getAction(State state) {
+    public Action getAction(final StrategyGuiState state) {
         Role role = this.child.getActionType(state);
-        if (role != null) {
-            return state.getRandomActionOfTypeOtherThan(role);
-        } else {
-            return null;
-        }
+        return (role != null) ? state.getRandomActionOfTypeOtherThan(role) : null;
     }
 
 }

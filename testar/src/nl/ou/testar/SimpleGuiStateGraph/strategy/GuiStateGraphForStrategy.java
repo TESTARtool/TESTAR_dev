@@ -1,14 +1,12 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-interface GuiStateGraphForStrategy {
+public interface GuiStateGraphForStrategy {
 
     /**
      * Resetting the last action and last state to null for a new test sequence
@@ -28,9 +26,9 @@ interface GuiStateGraphForStrategy {
      * Get the a state by concrete id
      *
      * @param concreteStateId - Concrete state identifier
-     * @return Optional containing a StrategyGuiState or empty
+     * @return Optional containing a StrategyGuiStateImpl or empty
      */
-    Optional<StrategyGuiState> getStateByConcreteId(String concreteStateId);
+    Optional<StrategyGuiStateImpl> getStateByConcreteId(String concreteStateId);
 
     /**
      * Create new GUI state
@@ -39,11 +37,11 @@ interface GuiStateGraphForStrategy {
      * @param actions - Actions available
      * @return Optional - newly created GUI state
      */
-    StrategyGuiState createStrategyGuiState(final State state, Set<Action> actions);
+    StrategyGuiStateImpl createStrategyGuiState(final State state, Set<Action> actions);
 
-    Set<StrategyGuiState> getStrategyGuiStates();
+    Set<StrategyGuiStateImpl> getStrategyGuiStates();
 
-    String getStartingStateConcreteId();
+    Optional<String> getStartingStateConcreteId();
 
     void setStartingStateConcreteId(final String startingStateConcreteId);
 
@@ -54,36 +52,4 @@ interface GuiStateGraphForStrategy {
     String getPreviousActionConcreteId();
 
     void setPreviousActionConcreteId(String previousActionConcreteId);
-
-    boolean isAvailable(Role actiontype);
-
-    int getNumberOfActions();
-
-    int getNumberOfActions(Role actiontype);
-
-    Action getRandomAction(Role actiontype);
-
-    Action getRandomAction();
-
-    Action getRandomActionOfTypeOtherThan(Role actiontype);
-
-    Action getRandomAction(String status);
-
-    Action getRandomAction(String status, List<Action> providedListofActions);
-
-    Action getRandomAction(Role actiontype, String status);
-
-    List<Action> getActionsOfType(Role actiontype);
-
-    Action previousAction();
-
-    int getNumberOfPreviousActions();
-
-    void setState(IEnvironment env, State state, Set<Action> acts);
-
-    void setPreviousAction(Action previousAction);
-
-    boolean hasStateNotChanged();
-
-    void setPreviousState(State st);
 }

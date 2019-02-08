@@ -47,7 +47,7 @@ import java.util.Objects;
 import java.util.Queue;
 
 public class StrategyFactory {
-    private Queue<Function> queue = new LinkedList<>();
+    private Queue<AvailableReturnTypes> queue = new LinkedList<>();
 
     public StrategyFactory(final String strategy) {
         if (strategy.endsWith(".txt")) {
@@ -182,22 +182,10 @@ public class StrategyFactory {
     }
 
     private void makeQueue(final String strategy) {
-        String[] list = strategy.replace(" ", "")
+        Arrays.stream(strategy.replace(" ", "")
                 .replace("(", "")
                 .replace(")", "")
-                .split(":");
-        Arrays.stream(list)
-                .forEach(s -> queue.add(Function.valueOf(s.replace("-", "").toUpperCase())));
-    }
-
-    public enum Function {
-        AND, CLICKACTION, DRAGACTION, DRAGACTIONSAVAILABLE, EQUALS, EQUALSTYPE, ESCAPE, GREATERTHAN, HITKEYACTION, IFTHENELSE,
-        LEFTCLICKSAVAILABLE, NOT, NUMBEROFACTIONS, NUMBEROFACTIONSOFTYPE, NUMBEROFDRAGACTIONS,
-        NUMBEROFLEFTCLICKS, NUMBEROFPREVIOUSACTIONS, NUMBEROFTYPEACTIONS,
-        NUMBEROFUNEXECUTEDDRAGACTIONS, NUMBEROFUNEXECUTEDLEFTCLICKS,
-        NUMBEROFUNEXECUTEDTYPEACTIONS, OR, PREVIOUSACTION, RANDOMACTION, RANDOMACTIONOFTYPE,
-        RANDOMACTIONOFTYPEOTHERTHAN, RANDOMLEASTEXECUTEDACTION,
-        RANDOMMOSTEXECUTEDACTION, RANDOMNUMBER, RANDOMUNEXECUTEDACTION, RANDOMUNEXECUTEDACTIONOFTYPE,
-        STATEHASNOTCHANGED, TYPEACTION, TYPEACTIONSAVAILABLE, TYPEOFACTIONOF
+                .split(":"))
+                .forEach(s -> queue.add(AvailableReturnTypes.valueOf(s.replace("-", "").toUpperCase())));
     }
 }
