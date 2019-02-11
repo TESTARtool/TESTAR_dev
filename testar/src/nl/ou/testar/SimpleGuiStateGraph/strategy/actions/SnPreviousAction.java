@@ -6,6 +6,7 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnPreviousAction extends StrategyNodeAction {
 
@@ -14,8 +15,8 @@ public class SnPreviousAction extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(final StrategyGuiState state) {
-        return state.previousAction();
+    public Optional<Action> getAction(final StrategyGuiState state) {
+        return Optional.ofNullable(state.previousAction());
     }
 
 }

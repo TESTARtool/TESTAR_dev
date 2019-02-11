@@ -8,6 +8,7 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnEscape extends StrategyNodeAction {
 
@@ -16,8 +17,8 @@ public class SnEscape extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(final StrategyGuiState state) {
-        return new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+    public Optional<Action> getAction(final StrategyGuiState state) {
+        return Optional.of(new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE));
     }
 
 }

@@ -6,8 +6,10 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionType;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Role;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
     private StrategyNodeActionType child;
@@ -18,8 +20,12 @@ public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(final StrategyGuiState state) {
-        return state.getRandomAction(this.child.getActionType(state), ActionExecutionStatus.UNEX);
+    public Optional<Action> getAction(final StrategyGuiState state) {
+        final Optional<Role> role = this.child.getActionType(state);
+        if (!role.isPresent()) {
+            throw new RuntimeException("Role not set!");
+        }
+        return Optional.ofNullable(state.getRandomAction(role.get(), ActionExecutionStatus.UNEX));
     }
 
 }

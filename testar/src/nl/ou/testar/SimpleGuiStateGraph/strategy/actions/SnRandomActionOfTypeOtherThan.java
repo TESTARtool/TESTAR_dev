@@ -5,9 +5,9 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionType;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnRandomActionOfTypeOtherThan extends StrategyNodeAction {
     private StrategyNodeActionType child;
@@ -19,9 +19,8 @@ public class SnRandomActionOfTypeOtherThan extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(final StrategyGuiState state) {
-        Role role = this.child.getActionType(state);
-        return (role != null) ? state.getRandomActionOfTypeOtherThan(role) : null;
+    public Optional<Action> getAction(final StrategyGuiState state) {
+        return this.child.getActionType(state).map(state::getRandomActionOfTypeOtherThan);
     }
 
 }

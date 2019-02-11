@@ -4,11 +4,11 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionType;
-import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Tags;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnTypeOfActionOf extends StrategyNodeActionType {
     private StrategyNodeAction child;
@@ -19,9 +19,8 @@ public class SnTypeOfActionOf extends StrategyNodeActionType {
     }
 
     @Override
-    public Role getActionType(final StrategyGuiState state) {
-        final Action action = this.child.getAction(state);
-        return (action != null) ? action.get(Tags.Role) : null;
+    public Optional<Role> getActionType(final StrategyGuiState state) {
+        return this.child.getAction(state).map(action -> action.get(Tags.Role));
     }
 
 }

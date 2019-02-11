@@ -36,11 +36,10 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         final StrategyGuiStateImpl currentStrategyGuiState = this.findCurrentStateFromPreviousState(state, actions);
 
         // statemgr.setState(env, state, actions);
-        Action result = strategyTree.getAction(currentStrategyGuiState);
+        final Action result = strategyTree.getAction(currentStrategyGuiState);
         if (result == null){
             System.out.println("Found no action with the strategy, returning a random action");
-            env.incRandomAction();
-            result = statemgr.getRandomAction();
+            result = currentStrategyGuiState.getRandomAction();
         }
         statemgr.setPreviousAction(result);
         statemgr.setPreviousState(state);

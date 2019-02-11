@@ -7,13 +7,14 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnClickAction extends StrategyNodeActionType {
     public SnClickAction(ArrayList<StrategyNode> children) {
         super(children);
     }
 
-    public Role getActionType(final StrategyGuiState state) {
-        return ActionRoles.LeftClickAt;
+    public Optional<Role> getActionType(final StrategyGuiState state) {
+        return Optional.of(ActionRoles.LeftClickAt);
     }
 }

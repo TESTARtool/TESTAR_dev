@@ -7,6 +7,7 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnTypeAction extends StrategyNodeActionType {
 
@@ -15,8 +16,8 @@ public class SnTypeAction extends StrategyNodeActionType {
     }
 
     @Override
-    public Role getActionType(final StrategyGuiState state) {
-        return ActionRoles.Type;
+    public Optional<Role> getActionType(final StrategyGuiState state) {
+        return Optional.of(ActionRoles.Type);
     }
 
 }

@@ -6,6 +6,7 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnRandomAction extends StrategyNodeAction {
 
@@ -14,8 +15,8 @@ public class SnRandomAction extends StrategyNodeAction {
     }
 
     @Override
-    public Action getAction(final StrategyGuiState state) {
-        return state.getRandomAction();
+    public Optional<Action> getAction(final StrategyGuiState state) {
+        return Optional.ofNullable(state.getRandomAction());
     }
 
 }

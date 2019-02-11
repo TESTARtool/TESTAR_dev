@@ -7,13 +7,14 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class SnHitKeyAction extends StrategyNodeActionType {
     public SnHitKeyAction(ArrayList<StrategyNode> children) {
         super(children);
     }
 
-    public Role getActionType(final StrategyGuiState state) {
-        return ActionRoles.HitKey;
+    public Optional<Role> getActionType(final StrategyGuiState state) {
+        return Optional.of(ActionRoles.HitKey);
     }
 }

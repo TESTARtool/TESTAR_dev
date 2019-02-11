@@ -5,6 +5,7 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import org.fruit.alayer.Role;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public abstract class StrategyNodeActionType extends StrategyNode {
     public StrategyNodeActionType(ArrayList<StrategyNode> children) {
@@ -12,5 +13,5 @@ public abstract class StrategyNodeActionType extends StrategyNode {
 
     }
 
-    public abstract Role getActionType(final StrategyGuiState state);
+    public abstract Optional<Role> getActionType(final StrategyGuiState state);
 }
