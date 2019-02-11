@@ -35,36 +35,35 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
         final StrategyGuiStateImpl currentStrategyGuiState = this.findCurrentStateFromPreviousState(state, actions);
 
-        // statemgr.setState(env, state, actions);
-        final Action result = strategyTree.getAction(currentStrategyGuiState);
-        if (result == null){
-            System.out.println("Found no action with the strategy, returning a random action");
-            result = currentStrategyGuiState.getRandomAction();
-        }
-        statemgr.setPreviousAction(result);
-        statemgr.setPreviousState(state);
+        currentStrategyGuiState.setState(state, actions);
+        final Action result = strategyTree.getAction(currentStrategyGuiState)
+                .orElse(currentStrategyGuiState.getRandomAction());
+
+        currentStrategyGuiState.setPreviousAction(result);
+        currentStrategyGuiState.setPreviousState(state);
         System.out.println("The selected action is of type "+result.get(Tags.Role));
+
         return result;
 
-        if (graph.getPreviousStateConcreteId() != null && graph.getPreviousActionConcreteId() != null) {
-            graph.getStateByConcreteId(graph.getPreviousStateConcreteId())
-                    .ifPresent(prevState -> this.updatePreviousState(prevState, currentStrategyGuiState, state, actions));
-        }
-
-        Optional<Action> optionalReturnAction;
-        ArrayList<String> actionIdsWithMaxQvalue = currentStrategyGuiState.getActionsIdsWithMaxQvalue(actions);
-        if (actionIdsWithMaxQvalue.size() == 0) {
-            optionalReturnAction = Optional.of(RandomActionSelector.selectAction(actions));
-        } else {
-            String concreteIdOfRandomAction = actionIdsWithMaxQvalue.get(this.getRandomValue().nextInt(actionIdsWithMaxQvalue.size()));
-            optionalReturnAction = graph.getActionWithConcreteId(actions, concreteIdOfRandomAction);
-        }
-
-        final Action returnAction = optionalReturnAction.orElseGet(() -> RandomActionSelector.selectAction(actions));
-        this.updateGUIStatesList(currentStrategyGuiState);
-        this.updateState(returnAction, state);
-
-        return returnAction;
+//        if (graph.getPreviousStateConcreteId() != null && graph.getPreviousActionConcreteId() != null) {
+//            graph.getStateByConcreteId(graph.getPreviousStateConcreteId())
+//                    .ifPresent(prevState -> this.updatePreviousState(prevState, currentStrategyGuiState, state, actions));
+//        }
+//
+//        Optional<Action> optionalReturnAction;
+//        ArrayList<String> actionIdsWithMaxQvalue = currentStrategyGuiState.getActionsIdsWithMaxQvalue(actions);
+//        if (actionIdsWithMaxQvalue.size() == 0) {
+//            optionalReturnAction = Optional.of(RandomActionSelector.selectAction(actions));
+//        } else {
+//            String concreteIdOfRandomAction = actionIdsWithMaxQvalue.get(this.getRandomValue().nextInt(actionIdsWithMaxQvalue.size()));
+//            optionalReturnAction = graph.getActionWithConcreteId(actions, concreteIdOfRandomAction);
+//        }
+//
+//        final Action returnAction = optionalReturnAction.orElseGet(() -> RandomActionSelector.selectAction(actions));
+//        this.updateGUIStatesList(currentStrategyGuiState);
+//        this.updateState(returnAction, state);
+//
+//        return returnAction;
     }
 
     private Random getRandomValue() {
