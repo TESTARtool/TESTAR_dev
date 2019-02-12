@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class SnEscape extends StrategyNodeAction {
 
-    public SnEscape(ArrayList<StrategyNode> children) {
+    public SnEscape(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

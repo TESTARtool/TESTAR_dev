@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class SnTypeAction extends StrategyNodeActionType {
 
-    public SnTypeAction(ArrayList<StrategyNode> children) {
+    public SnTypeAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

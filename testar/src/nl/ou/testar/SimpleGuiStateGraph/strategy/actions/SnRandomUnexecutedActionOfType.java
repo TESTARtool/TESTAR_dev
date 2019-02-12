@@ -14,7 +14,7 @@ import java.util.Optional;
 public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
     private StrategyNodeActionType child;
 
-    public SnRandomUnexecutedActionOfType(ArrayList<StrategyNode> children) {
+    public SnRandomUnexecutedActionOfType(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeActionType) children.get(0);
     }

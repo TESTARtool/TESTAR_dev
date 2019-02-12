@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class SnHitKeyAction extends StrategyNodeActionType {
-    public SnHitKeyAction(ArrayList<StrategyNode> children) {
+    public SnHitKeyAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

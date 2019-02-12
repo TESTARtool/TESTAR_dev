@@ -11,7 +11,7 @@ public class SnEquals extends StrategyNodeBoolean {
     private StrategyNodeNumber child;
     private StrategyNodeNumber child1;
 
-    public SnEquals(ArrayList<StrategyNode> children) {
+    public SnEquals(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeNumber) children.get(0);
         this.child1 = (StrategyNodeNumber) children.get(1);

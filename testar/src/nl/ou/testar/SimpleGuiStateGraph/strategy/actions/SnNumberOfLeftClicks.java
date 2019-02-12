@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SnNumberOfLeftClicks extends StrategyNodeNumber {
 
-    public SnNumberOfLeftClicks(ArrayList<StrategyNode> children) {
+    public SnNumberOfLeftClicks(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

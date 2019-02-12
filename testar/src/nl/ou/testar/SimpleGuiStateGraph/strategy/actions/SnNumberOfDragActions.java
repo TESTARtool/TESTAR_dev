@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class SnNumberOfDragActions extends StrategyNodeNumber {
 
-    public SnNumberOfDragActions(ArrayList<StrategyNode> children) {
+    public SnNumberOfDragActions(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

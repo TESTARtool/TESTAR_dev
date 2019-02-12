@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SnNumberOfUnexecutedDragActions extends StrategyNodeNumber {
 
-    public SnNumberOfUnexecutedDragActions(ArrayList<StrategyNode> children) {
+    public SnNumberOfUnexecutedDragActions(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

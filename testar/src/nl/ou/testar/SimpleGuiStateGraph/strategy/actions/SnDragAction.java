@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class SnDragAction extends StrategyNodeActionType {
 
-    public SnDragAction(ArrayList<StrategyNode> children) {
+    public SnDragAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

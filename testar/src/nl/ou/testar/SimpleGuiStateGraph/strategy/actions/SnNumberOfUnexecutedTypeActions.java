@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SnNumberOfUnexecutedTypeActions extends StrategyNodeNumber {
 
-    public SnNumberOfUnexecutedTypeActions(ArrayList<StrategyNode> children) {
+    public SnNumberOfUnexecutedTypeActions(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

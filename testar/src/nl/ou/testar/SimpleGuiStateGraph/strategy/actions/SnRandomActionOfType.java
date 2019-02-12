@@ -13,7 +13,7 @@ import java.util.Optional;
 public class SnRandomActionOfType extends StrategyNodeAction {
     private StrategyNodeActionType child;
 
-    public SnRandomActionOfType(ArrayList<StrategyNode> children) {
+    public SnRandomActionOfType(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeActionType) children.get(0);
     }

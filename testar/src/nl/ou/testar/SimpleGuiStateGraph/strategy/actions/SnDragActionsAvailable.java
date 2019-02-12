@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class SnDragActionsAvailable extends StrategyNodeBoolean {
 
-    public SnDragActionsAvailable(ArrayList<StrategyNode> children) {
+    public SnDragActionsAvailable(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

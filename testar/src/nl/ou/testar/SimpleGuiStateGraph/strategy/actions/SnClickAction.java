@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class SnClickAction extends StrategyNodeActionType {
-    public SnClickAction(ArrayList<StrategyNode> children) {
+    public SnClickAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

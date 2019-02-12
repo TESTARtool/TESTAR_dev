@@ -41,7 +41,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
         currentStrategyGuiState.setPreviousAction(result);
         currentStrategyGuiState.setPreviousState(state);
-        System.out.println("The selected action is of type "+result.get(Tags.Role));
+        System.out.printf("The selected action is of type %s", result.get(Tags.Role));
 
         return result;
 

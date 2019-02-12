@@ -307,7 +307,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public void setState(State state, Set<Action> acts) {
         this.state = state;
-        this.actions = new ArrayList<Action>(acts);
+        this.actions = new ArrayList<>(acts);
     }
 
     public void setPreviousAction(Action previousAction) {

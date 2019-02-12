@@ -13,7 +13,7 @@ import java.util.Optional;
 public class SnTypeOfActionOf extends StrategyNodeActionType {
     private StrategyNodeAction child;
 
-    public SnTypeOfActionOf(ArrayList<StrategyNode> children) {
+    public SnTypeOfActionOf(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeAction) children.get(0);
     }

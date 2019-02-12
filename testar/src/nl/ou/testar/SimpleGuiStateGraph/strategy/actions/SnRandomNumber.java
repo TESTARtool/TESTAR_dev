@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class SnRandomNumber extends StrategyNodeNumber {
 
-    public SnRandomNumber(ArrayList<StrategyNode> children) {
+    public SnRandomNumber(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class SnStateHasNotChanged extends StrategyNodeBoolean {
 
-    public SnStateHasNotChanged(ArrayList<StrategyNode> children) {
+    public SnStateHasNotChanged(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

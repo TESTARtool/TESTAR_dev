@@ -12,7 +12,7 @@ import java.util.Optional;
 public class SnNumberOfActionsOfType extends StrategyNodeNumber {
     private StrategyNodeActionType child;
 
-    public SnNumberOfActionsOfType(ArrayList<StrategyNode> children) {
+    public SnNumberOfActionsOfType(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeActionType) children.get(0);
     }

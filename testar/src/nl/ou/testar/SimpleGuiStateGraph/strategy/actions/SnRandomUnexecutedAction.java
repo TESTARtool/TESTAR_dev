@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class SnRandomUnexecutedAction extends StrategyNodeAction {
 
-    public SnRandomUnexecutedAction(ArrayList<StrategyNode> children) {
+    public SnRandomUnexecutedAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

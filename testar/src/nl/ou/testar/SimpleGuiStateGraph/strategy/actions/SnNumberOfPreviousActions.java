@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class SnNumberOfPreviousActions extends StrategyNodeNumber {
 
-    public SnNumberOfPreviousActions(ArrayList<StrategyNode> children) {
+    public SnNumberOfPreviousActions(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

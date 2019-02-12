@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class SnPreviousAction extends StrategyNodeAction {
 
-    public SnPreviousAction(ArrayList<StrategyNode> children) {
+    public SnPreviousAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

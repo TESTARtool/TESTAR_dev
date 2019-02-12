@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class SnRandomAction extends StrategyNodeAction {
 
-    public SnRandomAction(ArrayList<StrategyNode> children) {
+    public SnRandomAction(final ArrayList<StrategyNode> children) {
         super(children);
     }
 

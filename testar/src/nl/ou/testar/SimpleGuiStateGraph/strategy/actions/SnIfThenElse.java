@@ -14,7 +14,7 @@ public class SnIfThenElse extends StrategyNodeAction {
     private StrategyNodeAction child1;
     private StrategyNodeAction child2;
 
-    public SnIfThenElse(ArrayList<StrategyNode> children) {
+    public SnIfThenElse(final ArrayList<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeBoolean) children.get(0);
         this.child1 = (StrategyNodeAction) children.get(1);
