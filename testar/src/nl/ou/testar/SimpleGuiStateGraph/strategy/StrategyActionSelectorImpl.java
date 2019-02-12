@@ -1,14 +1,11 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
-import nl.ou.testar.RandomActionSelector;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 

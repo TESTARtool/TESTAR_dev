@@ -25,7 +25,7 @@ public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
         if (!role.isPresent()) {
             throw new RuntimeException("Role not set!");
         }
-        return Optional.ofNullable(state.getRandomAction(role.get(), ActionExecutionStatus.UNEX));
+        return Optional.ofNullable(state.getRandomUnexecutedActionOfType(role.get()));
     }
 
 }

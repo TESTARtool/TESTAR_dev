@@ -1,7 +1,6 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
@@ -25,28 +24,28 @@ import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.UN
 public class StrategyGuiStateImpl implements StrategyGuiState {
     private String concreteStateId;
     //TODO use QlearningValues instead and only 1 hash map
-    private HashMap<String, Double> concreteActionIdsAndRewards;
-    private HashMap<String, Double> concreteActionIdsAndQValues;
-    private HashMap<String, Integer> concreteActionIdsAndExecutionCounters;
+    private Map<String, Double> concreteActionIdsAndRewards;
+    private Map<String, Double> concreteActionIdsAndQValues;
+    private Map<String, Integer> concreteActionIdsAndExecutionCounters;
     private Set<GuiStateTransition> stateTransitions;
 
     private List<Action> actions = new ArrayList<>();
     private State state = null;
     private List<Action> previousActions = new ArrayList<>();
     private List<String> previousStates = new ArrayList<>();
-    private TreeMap<String, Integer> executed = new TreeMap<>();
+    private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    StrategyGuiStateImpl(final String concreteStateId, final HashMap<String, Double> concreteActionIdsAndRewards) {
+    StrategyGuiStateImpl(final String concreteStateId, final Map<String, Double> concreteActionIdsAndRewards) {
         this.concreteStateId = concreteStateId;
         this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
         this.concreteActionIdsAndQValues = concreteActionIdsAndRewards; // all Q values are the same as R Max in the beginning
         //creating execution counters for each action:
-        concreteActionIdsAndExecutionCounters = new HashMap<String, Integer>();
+        concreteActionIdsAndExecutionCounters = new HashMap<>();
         for (String id : concreteActionIdsAndRewards.keySet()) {
             concreteActionIdsAndExecutionCounters.put(id, 0);
         }
-        stateTransitions = new HashSet<GuiStateTransition>();
+        stateTransitions = new HashSet<>();
     }
 
     /**
@@ -67,23 +66,6 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             }
         }
         return qValue;
-    }
-
-    public ArrayList<String> getActionsIdsWithMaxQvalue(Set<Action> actions) {
-        ArrayList<String> actionIdsWithMaxQvalue = new ArrayList<String>();
-        double maxQValue = getMaxQValueOfTheState(actions);
-        for (String actionId : concreteActionIdsAndQValues.keySet()) {
-            if (concreteActionIdsAndQValues.get(actionId).equals(maxQValue)) {
-                //checking that the actionID from the model is also in the list of available actions of the state:
-                for (Action action : actions) {
-                    if (action.get(Tags.ConcreteID).equals(actionId)) {
-                        actionIdsWithMaxQvalue.add(actionId);
-                    }
-                }
-            }
-        }
-        System.out.println("DEBUG: max Q value of the state was " + maxQValue + ", and " + actionIdsWithMaxQvalue.size() + " action with that value");
-        return actionIdsWithMaxQvalue;
     }
 
     /**
@@ -172,7 +154,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         this.concreteStateId = concreteStateId;
     }
 
-    public HashMap<String, Double> getConcreteActionIdsAndRewards() {
+    public Map<String, Double> getConcreteActionIdsAndRewards() {
         return concreteActionIdsAndRewards;
     }
 
@@ -192,17 +174,13 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return (actionType == null) ? 0 : getActionsOfType(actionType).size();
     }
 
-    public int getNumberOfActions(final Role actionType, final ActionExecutionStatus actionExecutionStatus) {
-        int result = 0;
-        if (actionExecutionStatus == UNEX) {
-            result = (int) actions.stream()
-                    .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.ConcreteID))))
-                    .count();
-        }
-        return result;
+    public int getNumberOfUnexecutedActionsOfRole(final Role actionType) {
+        return (int) actions.stream()
+                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.ConcreteID))))
+                .count();
     }
 
-    public Action getRandomAction(final Role actionType) {
+    public Action getRandomActionOfType(final Role actionType) {
         if (actionType == null) {
             return null;
         }
@@ -218,17 +196,17 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         final List<Action> actions = this.actions.stream()
                 .filter(action -> !(action.get(Tags.Role) == actionType))
                 .collect(Collectors.toList());
-        return actions.size() == 0  ? null : actions.get(rnd.nextInt(actions.size()));
+        return actions.size() == 0 ? null : actions.get(rnd.nextInt(actions.size()));
     }
 
-    public Action getRandomAction(final ActionExecutionStatus actionExecutionStatus) {
-        return getRandomAction(actionExecutionStatus, actions);
+    public Action getRandomActionOfType(final ActionExecutionStatus actionExecutionStatus) {
+        return getRandomActionOfType(actionExecutionStatus, actions);
     }
 
-    public Action getRandomAction(final ActionExecutionStatus actionExecutionStatus, final List<Action> providedListOfActions) {
+    public Action getRandomActionOfType(final ActionExecutionStatus actionExecutionStatus, final List<Action> providedListOfActions) {
         if (executed.size() == 0) {
             System.out.println("List of executed actions is empty, returning a random action from the list of actions.");
-            return getRandomAction(providedListOfActions);
+            return getRandomActionOfType(providedListOfActions);
         }
         int i;
         final List<Action> filteredListOfActions = new ArrayList<>();
@@ -259,7 +237,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return (filteredListOfActions.size() == 0) ? null : filteredListOfActions.get(rnd.nextInt(filteredListOfActions.size()));
     }
 
-    private Action getRandomAction(List<Action> providedListOfActions) {
+    private Action getRandomActionOfType(List<Action> providedListOfActions) {
         if (providedListOfActions.size() != 0) {
             System.out.println("Getting a random action from the provided list.");
             return providedListOfActions.get(rnd.nextInt(providedListOfActions.size()));
@@ -269,12 +247,24 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         }
     }
 
-    public Action getRandomAction(final Role actionType, final ActionExecutionStatus actionExecutionStatus) {
+    public Action getRandomUnexecutedActionOfType(final Role actionType) {
         if (actionType == null) {
             System.out.println("ActionType is null, returning null");
             return null;
         }
-        return getRandomAction(actionExecutionStatus, getActionsOfType(actionType));
+        return getRandomActionOfType(UNEX, getActionsOfType(actionType));
+    }
+
+    public Action randomLeastExecutedAction() {
+        return this.getRandomActionOfType(ActionExecutionStatus.LEAST);
+    }
+
+    public Action randomMostExecutedAction() {
+        return this.getRandomActionOfType(ActionExecutionStatus.MOST);
+    }
+
+    public Action randomUnexecutedAction() {
+        return this.getRandomActionOfType(ActionExecutionStatus.UNEX);
     }
 
     public List<Action> getActionsOfType(Role actiontype) {
@@ -289,7 +279,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public Action previousAction() {
-        if (previousActions.size() != 0) {
+        if (previousActions.size() > 1) {
             System.out.println("Returning the previous action");
             return previousActions.get(previousActions.size() - 1);
 
@@ -328,12 +318,12 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public boolean hasStateNotChanged() {
-        return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1) == previousStates.get(previousStates.size() - 2);
+        return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1).equals(previousStates.get(previousStates.size() - 2));
     }
 
     public void setPreviousState(State st) {
         System.out.println("Adding state to the history...");
-        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1) == state.get(Tags.ConcreteID)) {
+        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.ConcreteID))) {
             System.out.println("Hmmm I'm still in the same state!");
         } else if (previousStates.contains(st.get(Tags.ConcreteID))) {
             System.out.println("Hey, I've been here before!");

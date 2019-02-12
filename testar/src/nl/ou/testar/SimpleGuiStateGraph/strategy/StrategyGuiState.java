@@ -14,19 +14,25 @@ public interface StrategyGuiState {
 
     int getNumberOfActions(final Role actionType);
 
-    int getNumberOfActions(final Role actionType, final ActionExecutionStatus actionExecutionStatus);
+    int getNumberOfUnexecutedActionsOfRole(final Role actionType);
 
-    Action getRandomAction(final Role actionType);
+    Action getRandomActionOfType(final Role actionType);
 
     Action getRandomActionOfTypeOtherThan(final Role actionType);
 
     Action getRandomAction();
 
-    Action getRandomAction(final ActionExecutionStatus actionExecutionStatus);
+    Action getRandomActionOfType(final ActionExecutionStatus actionExecutionStatus);
 
-    Action getRandomAction(final ActionExecutionStatus actionExecutionStatus, final List<Action> providedListOfActions);
+    Action getRandomActionOfType(final ActionExecutionStatus actionExecutionStatus, final List<Action> providedListOfActions);
 
-    Action getRandomAction(final Role actionType, final ActionExecutionStatus actionExecutionStatus);
+    Action getRandomUnexecutedActionOfType(final Role actionType);
+
+    Action randomLeastExecutedAction();
+
+    Action randomMostExecutedAction();
+
+    Action randomUnexecutedAction();
 
     List<Action> getActionsOfType(final Role actionType);
 
