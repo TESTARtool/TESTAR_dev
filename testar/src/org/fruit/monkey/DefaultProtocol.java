@@ -1753,63 +1753,66 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     @Override
-    protected void saveStrategyMetrics(final String testSequenceName, final boolean problems) {
+    protected void saveStrategyMetrics(final String testSequenceName, final boolean problems) {}
 
-        if (Grapher.GRAPHS_ACTIVATED) {
-            try {
-                String filename;
-                if (System.getProperty("Dcounter") == null) {
-                    filename = "ecj_" + testSequenceName;
-                } else {
-                    filename = "ecj_sequence" + System.getProperty("Dcounter");
-                }
-
-                PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-                        settings.get(OutputDir) + File.separator + "metrics" + File.separator + filename + ".csv"))));
-                String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$14s",
-                        "verdict",     // test verdict
-                        "FAILS",     // test FAIL count
-                        "minCvg(%)", // min coverage
-                        "maxCvg(%)", // max coverage
-                        "maxpath",     // longest path
-                        "graph-states",     // graph states
-                        "abstract-states", // abstract states
-                        "graph-actions", // graph actions
-                        "test-actions", // test actions
-                        "SUTRAM(KB)",     // SUT RAM peak
-                        "SUTCPU(%)",     // SUT CPU peak
-                        "TestRAM(MB)",     // TESTAR RAM peak
-                        "TestCPU(s)",     // TESTAR CPU peak
-                        "random-actions"    //Number of random actions instead of selected by strategy
-                );
-                ps.println(heading);
-                IEnvironment env = Grapher.getEnvironment();
-                double[] cvgMetrics = env.getCoverageMetrics();
-                TreeMap<String, Double> strategyMetrics = env.getStrategyMetrics();
-                String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
-                        (problems ? "FAIL" : "PASS"),          // verdict
-                        this.testFailTimes,                      // test FAIL count
-                        String.format("%.2f", cvgMetrics[0]), // min coverage);
-                        String.format("%.2f", cvgMetrics[1]), // max coverage
-                        env.getLongestPathLength(),              // longest path
-                        env.getGraphStates().size() - 2,      // graph states
-                        env.getGraphStateClusters().size(),      // abstract states
-                        env.getGraphActions().size() - 2,      // graph actions
-                        this.actionCount - 1,                 // test actions
-                        sutRAMpeak,                              // SUT RAM peak
-                        String.format("%.2f", sutCPUpeak),      // SUT CPU peak
-                        testRAMpeak,                          // TESTAR RAM peak
-                        String.format("%.3f", testCPUpeak),      // TESTAR CPU peak
-                        strategyMetrics.get("randomactions")  // Random actions
-                );
-                ps.print(metrics);
-                ps.close();
-                System.out.println(heading + "\n" + metrics);
-            } catch (NoSuchTagException | FileNotFoundException e) {
-                LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
-            }
-        }
-    }
+//    @Override
+//    protected void saveStrategyMetrics(final String testSequenceName, final boolean problems) {
+//
+//        if (Grapher.GRAPHS_ACTIVATED) {
+//            try {
+//                String filename;
+//                if (System.getProperty("Dcounter") == null) {
+//                    filename = "ecj_" + testSequenceName;
+//                } else {
+//                    filename = "ecj_sequence" + System.getProperty("Dcounter");
+//                }
+//
+//                PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+//                        settings.get(OutputDir) + File.separator + "metrics" + File.separator + filename + ".csv"))));
+//                String heading = String.format("%1$7s,%2$5s,%3$9s,%4$8s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$14s",
+//                        "verdict",     // test verdict
+//                        "FAILS",     // test FAIL count
+//                        "minCvg(%)", // min coverage
+//                        "maxCvg(%)", // max coverage
+//                        "maxpath",     // longest path
+//                        "graph-states",     // graph states
+//                        "abstract-states", // abstract states
+//                        "graph-actions", // graph actions
+//                        "test-actions", // test actions
+//                        "SUTRAM(KB)",     // SUT RAM peak
+//                        "SUTCPU(%)",     // SUT CPU peak
+//                        "TestRAM(MB)",     // TESTAR RAM peak
+//                        "TestCPU(s)",     // TESTAR CPU peak
+//                        "random-actions"    //Number of random actions instead of selected by strategy
+//                );
+//                ps.println(heading);
+//                IEnvironment env = Grapher.getEnvironment();
+//                double[] cvgMetrics = env.getCoverageMetrics();
+//                TreeMap<String, Double> strategyMetrics = env.getStrategyMetrics();
+//                String metrics = String.format("%1$7s,%2$5s,%3$9s,%4$9s,%5$7s,%6$12s,%7$15s,%8$13s,%9$12s,%10$10s,%11$9s,%12$11s,%13$10s,%14$7s",
+//                        (problems ? "FAIL" : "PASS"),          // verdict
+//                        this.testFailTimes,                      // test FAIL count
+//                        String.format("%.2f", cvgMetrics[0]), // min coverage);
+//                        String.format("%.2f", cvgMetrics[1]), // max coverage
+//                        env.getLongestPathLength(),              // longest path
+//                        env.getGraphStates().size() - 2,      // graph states
+//                        env.getGraphStateClusters().size(),      // abstract states
+//                        env.getGraphActions().size() - 2,      // graph actions
+//                        this.actionCount - 1,                 // test actions
+//                        sutRAMpeak,                              // SUT RAM peak
+//                        String.format("%.2f", sutCPUpeak),      // SUT CPU peak
+//                        testRAMpeak,                          // TESTAR RAM peak
+//                        String.format("%.3f", testCPUpeak),      // TESTAR CPU peak
+//                        strategyMetrics.get("randomactions")  // Random actions
+//                );
+//                ps.print(metrics);
+//                ps.close();
+//                System.out.println(heading + "\n" + metrics);
+//            } catch (NoSuchTagException | FileNotFoundException e) {
+//                LogSerialiser.log("Metrics serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+//            }
+//        }
+//    }
 
     //TODO move to ManualRecording helper class??
 //	/**
