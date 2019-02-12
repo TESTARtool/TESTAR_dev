@@ -6,12 +6,12 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionT
 import org.fruit.alayer.Role;
 import org.fruit.alayer.actions.ActionRoles;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnTypeAction extends StrategyNodeActionType {
 
-    public SnTypeAction(final ArrayList<StrategyNode> children) {
+    public SnTypeAction(final List<StrategyNode> children) {
         super(children);
     }
 

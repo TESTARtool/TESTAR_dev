@@ -6,12 +6,12 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnRandomMostExecutedAction extends StrategyNodeAction {
 
-    public SnRandomMostExecutedAction(final ArrayList<StrategyNode> children) {
+    public SnRandomMostExecutedAction(final List<StrategyNode> children) {
         super(children);
     }
 

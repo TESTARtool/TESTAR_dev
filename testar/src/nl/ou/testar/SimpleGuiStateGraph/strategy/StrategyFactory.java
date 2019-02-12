@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
@@ -74,15 +75,15 @@ public class StrategyFactory {
         return strategyFromFile;
     }
 
-    public StrategyWalker getStrategyWalker() {
-        StrategyNode main = getNode();
-        StrategyWalker selector = new StrategyWalker(main);
-        selector.print();
-        return selector;
-    }
+//    public StrategyWalker getStrategyWalker() {
+//        StrategyNode main = getNode();
+//        StrategyWalker selector = new StrategyWalker(main);
+//        selector.print();
+//        return selector;
+//    }
 
     private StrategyNode getNode() {
-        final ArrayList<StrategyNode> children = new ArrayList<>();
+        final List<StrategyNode> children = new ArrayList<>();
 
         switch (Objects.requireNonNull(queue.poll())) {
             case AND:

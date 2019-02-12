@@ -4,13 +4,13 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SnAnd extends StrategyNodeBoolean {
     private StrategyNodeBoolean child;
     private StrategyNodeBoolean child1;
 
-    public SnAnd(final ArrayList<StrategyNode> children) {
+    public SnAnd(final List<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeBoolean) children.get(0);
         this.child1 = (StrategyNodeBoolean) children.get(1);

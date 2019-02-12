@@ -5,12 +5,12 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnRandomAction extends StrategyNodeAction {
 
-    public SnRandomAction(final ArrayList<StrategyNode> children) {
+    public SnRandomAction(final List<StrategyNode> children) {
         super(children);
     }
 

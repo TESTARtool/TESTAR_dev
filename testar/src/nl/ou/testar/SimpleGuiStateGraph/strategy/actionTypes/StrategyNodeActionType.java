@@ -4,11 +4,11 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import org.fruit.alayer.Role;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class StrategyNodeActionType extends StrategyNode {
-    public StrategyNodeActionType(ArrayList<StrategyNode> children) {
+    public StrategyNodeActionType(List<StrategyNode> children) {
         super(children);
 
     }

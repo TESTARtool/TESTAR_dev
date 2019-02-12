@@ -5,11 +5,11 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 import org.fruit.alayer.actions.ActionRoles;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SnDragActionsAvailable extends StrategyNodeBoolean {
 
-    public SnDragActionsAvailable(final ArrayList<StrategyNode> children) {
+    public SnDragActionsAvailable(final List<StrategyNode> children) {
         super(children);
     }
 

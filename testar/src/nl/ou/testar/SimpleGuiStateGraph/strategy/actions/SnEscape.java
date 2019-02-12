@@ -7,12 +7,12 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.devices.KBKeys;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnEscape extends StrategyNodeAction {
 
-    public SnEscape(final ArrayList<StrategyNode> children) {
+    public SnEscape(final List<StrategyNode> children) {
         super(children);
     }
 

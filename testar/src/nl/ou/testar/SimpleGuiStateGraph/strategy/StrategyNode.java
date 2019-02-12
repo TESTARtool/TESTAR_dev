@@ -1,12 +1,12 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public abstract class StrategyNode {
-   private ArrayList<StrategyNode> children;
+    private List<StrategyNode> children;
 
-    public StrategyNode(final ArrayList<StrategyNode> children) {
+    public StrategyNode(final List<StrategyNode> children) {
         this.children = children;
     }
 

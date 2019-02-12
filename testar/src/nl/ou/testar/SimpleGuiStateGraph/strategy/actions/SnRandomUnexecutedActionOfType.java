@@ -8,13 +8,13 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionT
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
     private StrategyNodeActionType child;
 
-    public SnRandomUnexecutedActionOfType(final ArrayList<StrategyNode> children) {
+    public SnRandomUnexecutedActionOfType(final List<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeActionType) children.get(0);
     }

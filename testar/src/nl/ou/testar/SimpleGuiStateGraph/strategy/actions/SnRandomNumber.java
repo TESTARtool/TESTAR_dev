@@ -4,12 +4,12 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeNumber;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class SnRandomNumber extends StrategyNodeNumber {
 
-    public SnRandomNumber(final ArrayList<StrategyNode> children) {
+    public SnRandomNumber(final List<StrategyNode> children) {
         super(children);
     }
 

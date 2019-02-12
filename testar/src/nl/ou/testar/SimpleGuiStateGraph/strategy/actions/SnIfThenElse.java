@@ -6,7 +6,7 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 import org.fruit.alayer.Action;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SnIfThenElse extends StrategyNodeAction {
@@ -14,7 +14,7 @@ public class SnIfThenElse extends StrategyNodeAction {
     private StrategyNodeAction child1;
     private StrategyNodeAction child2;
 
-    public SnIfThenElse(final ArrayList<StrategyNode> children) {
+    public SnIfThenElse(final List<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeBoolean) children.get(0);
         this.child1 = (StrategyNodeAction) children.get(1);

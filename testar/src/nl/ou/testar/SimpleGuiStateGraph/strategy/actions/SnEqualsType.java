@@ -5,13 +5,13 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeActionType;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SnEqualsType extends StrategyNodeBoolean {
     private StrategyNodeActionType child;
     private StrategyNodeActionType child1;
 
-    public SnEqualsType(final ArrayList<StrategyNode> children) {
+    public SnEqualsType(final List<StrategyNode> children) {
         super(children);
         this.child = (StrategyNodeActionType) children.get(0);
         this.child1 = (StrategyNodeActionType) children.get(1);

@@ -5,12 +5,12 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeNumber;
 import org.fruit.alayer.actions.ActionRoles;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class SnNumberOfLeftClicks extends StrategyNodeNumber {
 
-    public SnNumberOfLeftClicks(final ArrayList<StrategyNode> children) {
+    public SnNumberOfLeftClicks(final List<StrategyNode> children) {
         super(children);
     }
 

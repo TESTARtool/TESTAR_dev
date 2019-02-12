@@ -4,11 +4,11 @@ import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeNumber;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SnNumberOfPreviousActions extends StrategyNodeNumber {
 
-    public SnNumberOfPreviousActions(final ArrayList<StrategyNode> children) {
+    public SnNumberOfPreviousActions(final List<StrategyNode> children) {
         super(children);
     }
 
