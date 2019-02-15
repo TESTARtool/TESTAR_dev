@@ -1866,6 +1866,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return topWidgets;
 	}
 
+    /**
+     * DEPRECATED
+     *
+     * @param stateID
+     * @param widget
+     */
     protected void storeWidget(String stateID, Widget widget) {
         graphDB.addWidget(stateID, widget);
     }

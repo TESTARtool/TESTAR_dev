@@ -31,7 +31,6 @@
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.SikulixClickOnTextOrImagePath;
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
@@ -66,7 +65,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	static double scrollThick = 16; //scroll thickness
 
 	private HtmlSequenceReport htmlReport;
-	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 	private SUT updatedSUTprocess = null;
 	private int scenarioCount = 1;
 
@@ -77,8 +75,6 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		// initializing simple GUI state graph:
-		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
 
