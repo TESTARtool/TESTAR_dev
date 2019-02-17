@@ -147,10 +147,10 @@ public class StateModelManager {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
-            this.actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractID));
+            this.actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
         }
         catch (ActionNotFoundException ex) {
-            this.actionUnderExecution = new AbstractAction(action.get(Tags.AbstractID));
+            this.actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);

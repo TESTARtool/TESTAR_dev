@@ -34,7 +34,7 @@ public class ActionHelper {
     public static Set<AbstractAction> convertActionsToAbstractActions(Set<Action> actions) {
         Set<AbstractAction> abstractActions = new HashSet<>();
         // group the actions by the abstract action id
-        Map<String, List<Action>> actionMap = actions.stream().collect(Collectors.groupingBy(a -> a.get(Tags.AbstractID)));
+        Map<String, List<Action>> actionMap = actions.stream().collect(Collectors.groupingBy(a -> a.get(Tags.AbstractIDCustom)));
         // create the actions
         for (String abstractActionId : actionMap.keySet()) {
             AbstractAction abstractAction = new AbstractAction(abstractActionId);
