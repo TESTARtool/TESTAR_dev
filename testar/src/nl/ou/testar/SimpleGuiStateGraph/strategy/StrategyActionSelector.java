@@ -8,12 +8,18 @@ import java.util.Set;
 public interface StrategyActionSelector {
 
     /**
-     * Select the next action
-     * @param state - current state
+     * Select the next action to execute
+     *
+     * @param state   - current state
      * @param actions - actions
      * @return action to execute
      */
-    Action selectAction(State state, Set<Action> actions);
+    Action selectAction(final State state, final Set<Action> actions);
 
     void resetGraphForNewTestSequence();
+
+    /**
+     * Print the strategy tree
+     */
+    public void print();
 }

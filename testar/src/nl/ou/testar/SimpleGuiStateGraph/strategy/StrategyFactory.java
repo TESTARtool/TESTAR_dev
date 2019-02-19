@@ -1,5 +1,6 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
+import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actions.SnAnd;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actions.SnClickAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actions.SnDragAction;
@@ -75,12 +76,12 @@ public class StrategyFactory {
         return strategyFromFile;
     }
 
-//    public StrategyWalker getStrategyWalker() {
-//        StrategyNode main = getNode();
-//        StrategyWalker selector = new StrategyWalker(main);
-//        selector.print();
-//        return selector;
-//    }
+    public StrategyActionSelector getStrategyActionSelector() {
+        final StrategyNode main = getNode();
+        StrategyActionSelector selector = new StrategyActionSelectorImpl(main);
+        selector.print();
+        return selector;
+    }
 
     private StrategyNode getNode() {
         final List<StrategyNode> children = new ArrayList<>();

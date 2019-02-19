@@ -20,7 +20,7 @@ public interface GuiStateGraphForStrategy {
      * @param concreteActionId - Concrete action identifier
      * @return Optional - Optional containing an Action or empty
      */
-    Optional<Action> getActionWithConcreteId(Set<Action> actions, String concreteActionId);
+    Optional<Action> getActionWithAbstractId(Set<Action> actions, String concreteActionId);
 
     /**
      * Get the a state by concrete id
@@ -28,7 +28,7 @@ public interface GuiStateGraphForStrategy {
      * @param concreteStateId - Concrete state identifier
      * @return Optional containing a StrategyGuiStateImpl or empty
      */
-    Optional<StrategyGuiStateImpl> getStateByConcreteId(String concreteStateId);
+    Optional<StrategyGuiStateImpl> getStateByAbstractId(String concreteStateId);
 
     /**
      * Create new GUI state
@@ -41,15 +41,15 @@ public interface GuiStateGraphForStrategy {
 
     Set<StrategyGuiStateImpl> getStrategyGuiStates();
 
-    Optional<String> getStartingStateConcreteId();
+    Optional<String> getStartingStateAbstractId();
 
-    void setStartingStateConcreteId(final String startingStateConcreteId);
+    void setStartingStateAbstractId(final String startingStateAbstractId);
 
-    String getPreviousStateConcreteId();
+    String getPreviousStateAbstractId();
 
-    void setPreviousStateConcreteId(String previousStateConcreteId);
+    void setPreviousStateAbstractId(String previousStateConcreteId);
 
-    String getPreviousActionConcreteId();
+    String getPreviousActionAbstractId();
 
-    void setPreviousActionConcreteId(String previousActionConcreteId);
+    void setPreviousActionAbstractId(String previousActionConcreteId);
 }

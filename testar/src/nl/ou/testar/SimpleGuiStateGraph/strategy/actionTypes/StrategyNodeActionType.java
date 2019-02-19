@@ -1,7 +1,6 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes;
 
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
 import org.fruit.alayer.Role;
 
 import java.util.List;

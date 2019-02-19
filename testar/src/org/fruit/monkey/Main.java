@@ -241,9 +241,8 @@ public class Main {
 
     private static void tooManyFiles(final String[] files) {
         System.out.println("Too many *.sse files - exactly one expected!");
-        for (String f : files) {
-            System.out.println("Delete file <" + f + "> = " + new File(f).delete());
-        }
+        Arrays.stream(files)
+                .forEach(file -> System.out.println("Delete file <" + file + "> = " + new File(file).delete()));
     }
 
     private static void readProtocolFromCmd(final String[] args) {
@@ -293,7 +292,7 @@ public class Main {
         }
     }
 
-    private static void selectSse(String sseSelected, String sseFile) {
+    private static void selectSse(final String sseSelected, final String sseFile) {
         final File f = new File(settingsDir + File.separator + sseFile);
         try {
             if (f.createNewFile()) {
@@ -313,7 +312,7 @@ public class Main {
      * @param testSettingsFileName
      * @return settings
      */
-    private static Optional<Settings> loadTestarSettings(String[] args, String testSettingsFileName) {
+    private static Optional<Settings> loadTestarSettings(final String[] args, final String testSettingsFileName) {
         Optional<Settings> settings = Optional.empty();
         try {
             settings = Optional.of(loadSettings(args, testSettingsFileName));
@@ -341,7 +340,7 @@ public class Main {
      * @param testSettingsFileName
      * @return true if users starts TESTAR, or false is users close TESTAR
      */
-    private static boolean startTestarDialog(Settings settings, String testSettingsFileName) {
+    private static boolean startTestarDialog(Settings settings, final String testSettingsFileName) {
         // Start up the TESTAR Dialog
         try {
             if ((settings = new SettingsDialog().run(settings, testSettingsFileName)) == null) {

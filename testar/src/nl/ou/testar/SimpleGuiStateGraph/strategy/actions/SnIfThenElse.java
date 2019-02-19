@@ -1,7 +1,7 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy.actions;
 
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyGuiState;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyNode;
+import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeBoolean;
 import org.fruit.alayer.Action;

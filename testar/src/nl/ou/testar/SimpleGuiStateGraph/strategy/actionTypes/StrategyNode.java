@@ -1,4 +1,4 @@
-package nl.ou.testar.SimpleGuiStateGraph.strategy;
+package nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public abstract class StrategyNode {
         this.children = children;
     }
 
-    private void print(final int level) {
+    public void print(final int level) {
         for (int i = 0; i < level; i++) {
             System.out.print("-");
         }

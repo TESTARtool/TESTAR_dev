@@ -1,6 +1,7 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
+import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
@@ -15,19 +16,24 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     private StrategyNodeAction strategyTree;
     private Action result;
 
-    public StrategyActionSelectorImpl() {
+    StrategyActionSelectorImpl(final StrategyNode main) {
         System.out.println("DEBUG: creating genetic programming strategy");
         graph = new GuiStateGraphForStrategyImpl();
+        strategyTree = (StrategyNodeAction) main;
     }
 
     public void resetGraphForNewTestSequence() {
         graph.startANewTestSequence();
     }
 
+    public void print() {
+        strategyTree.print(0);
+    }
+
     public Action selectAction(final State state, final Set<Action> actions) {
         // saving the starting node of the graph:
-        if (!graph.getStartingStateConcreteId().isPresent()){
-            graph.setStartingStateConcreteId(state.get(Tags.ConcreteID));
+        if (!graph.getStartingStateAbstractId().isPresent()){
+            graph.setStartingStateAbstractId(state.get(Tags.ConcreteID));
         }
 
         final StrategyGuiStateImpl currentStrategyGuiState = this.findCurrentStateFromPreviousState(state, actions);
@@ -42,8 +48,8 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
         return result;
 
-//        if (graph.getPreviousStateConcreteId() != null && graph.getPreviousActionConcreteId() != null) {
-//            graph.getStateByConcreteId(graph.getPreviousStateConcreteId())
+//        if (graph.getPreviousStateAbstractId() != null && graph.getPreviousActionAbstractId() != null) {
+//            graph.getStateByAbstractId(graph.getPreviousStateAbstractId())
 //                    .ifPresent(prevState -> this.updatePreviousState(prevState, currentStrategyGuiState, state, actions));
 //        }
 //
@@ -53,7 +59,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 //            optionalReturnAction = Optional.of(RandomActionSelector.selectAction(actions));
 //        } else {
 //            String concreteIdOfRandomAction = actionIdsWithMaxQvalue.get(this.getRandomValue().nextInt(actionIdsWithMaxQvalue.size()));
-//            optionalReturnAction = graph.getActionWithConcreteId(actions, concreteIdOfRandomAction);
+//            optionalReturnAction = graph.getActionWithAbstractId(actions, concreteIdOfRandomAction);
 //        }
 //
 //        final Action returnAction = optionalReturnAction.orElseGet(() -> RandomActionSelector.selectAction(actions));
@@ -69,8 +75,8 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     private void updateState(final Action returnAction, final State state) {
         // saving the state and action for state transition after knowing the target state:
-        graph.setPreviousActionConcreteId(returnAction.get(Tags.ConcreteID));
-        graph.setPreviousStateConcreteId(state.get(Tags.ConcreteID));
+        graph.setPreviousActionAbstractId(returnAction.get(Tags.ConcreteID));
+        graph.setPreviousStateAbstractId(state.get(Tags.ConcreteID));
     }
 
     private void updateGUIStatesList(final StrategyGuiStateImpl currentStrategyGuiState) {
@@ -79,15 +85,15 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     private StrategyGuiStateImpl findCurrentStateFromPreviousState(final State state, final Set<Action> actions) {
-        return graph.getStateByConcreteId(state.get(Tags.ConcreteID))
-                .map(foundState -> foundState.updateActionIdsOfTheStateIntoModel(actions, 1.0))
+        return graph.getStateByAbstractId(state.get(Tags.ConcreteID))
+                .map(foundState -> foundState.updateActionIdsOfTheStateIntoModel(actions))
                 .orElseGet(() -> graph.createStrategyGuiState(state, actions));
     }
 
     private void updatePreviousState(final StrategyGuiStateImpl prevState, final StrategyGuiStateImpl currentStrategyGuiState, final State state, final Set<Action> actions) {
-        final GuiStateTransition guiStateTransition = new GuiStateTransition(graph.getPreviousStateConcreteId(), state.get(Tags.ConcreteID), graph.getPreviousActionConcreteId());
+        final GuiStateTransition guiStateTransition = new GuiStateTransition(graph.getPreviousStateAbstractId(), state.get(Tags.ConcreteID), graph.getPreviousActionAbstractId());
         graph.getStrategyGuiStates().remove(prevState);
-        prevState.addStateTransition(guiStateTransition, 2, currentStrategyGuiState.getMaxQValueOfTheState(actions));
+        //prevState.addStateTransition(guiStateTransition, 2, currentStrategyGuiState.getMaxQValueOfTheState(actions));
         graph.getStrategyGuiStates().add(prevState);
     }
 }

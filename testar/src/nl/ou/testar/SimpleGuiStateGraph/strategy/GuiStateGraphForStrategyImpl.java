@@ -4,16 +4,17 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
     private Set<StrategyGuiStateImpl> strategyGuiStates;
-    private String startingStateConcreteId;
-    private String previousStateConcreteId;
-    private String previousActionConcreteId;
+    private String startingStateAbstractId;
+    private String previousStateAbstractId;
+    private String previousActionAbstractId;
 
     GuiStateGraphForStrategyImpl() {
         strategyGuiStates = new HashSet<>();
@@ -23,50 +24,50 @@ public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
         return strategyGuiStates;
     }
 
-    public Optional<String> getStartingStateConcreteId() {
-        return Optional.ofNullable(startingStateConcreteId);
+    public Optional<String> getStartingStateAbstractId() {
+        return Optional.ofNullable(startingStateAbstractId);
     }
 
-    public void setStartingStateConcreteId(final String startingStateConcreteId) {
-        this.startingStateConcreteId = startingStateConcreteId;
+    public void setStartingStateAbstractId(final String startingStateAbstractId) {
+        this.startingStateAbstractId = startingStateAbstractId;
     }
 
-    public String getPreviousStateConcreteId() {
-        return previousStateConcreteId;
+    public String getPreviousStateAbstractId() {
+        return previousStateAbstractId;
     }
 
-    public void setPreviousStateConcreteId(String previousStateConcreteId) {
-        this.previousStateConcreteId = previousStateConcreteId;
+    public void setPreviousStateAbstractId(String previousStateAbstractId) {
+        this.previousStateAbstractId = previousStateAbstractId;
     }
 
-    public String getPreviousActionConcreteId() {
-        return previousActionConcreteId;
+    public String getPreviousActionAbstractId() {
+        return previousActionAbstractId;
     }
 
-    public void setPreviousActionConcreteId(String previousActionConcreteId) {
-        this.previousActionConcreteId = previousActionConcreteId;
+    public void setPreviousActionAbstractId(String previousActionAbstractId) {
+        this.previousActionAbstractId = previousActionAbstractId;
     }
 
     public void startANewTestSequence() {
-        previousActionConcreteId = null;
-        previousStateConcreteId = null;
+        previousActionAbstractId = null;
+        previousStateAbstractId = null;
     }
 
-    public Optional<Action> getActionWithConcreteId(final Set<Action> actions, final String concreteActionId) {
+    public Optional<Action> getActionWithAbstractId(final Set<Action> actions, final String abstractActionId) {
         return actions.stream()
-                .filter(action -> action.get(Tags.ConcreteID).equals(concreteActionId))
+                .filter(action -> action.get(Tags.AbstractID).equals(abstractActionId))
                 .findFirst();
     }
 
-    public Optional<StrategyGuiStateImpl> getStateByConcreteId(final String concreteStateId) {
+    public Optional<StrategyGuiStateImpl> getStateByAbstractId(final String abstractStateId) {
         return strategyGuiStates.stream()
-                .filter(state -> state.getConcreteStateId().equals(concreteStateId))
+                .filter(state -> state.getAbstractStateId().equals(abstractStateId))
                 .findFirst();
     }
 
     public StrategyGuiStateImpl createStrategyGuiState(final State state, final Set<Action> actions) {
-        final HashMap<String, Double> actionIds = new HashMap<>();
-        actions.forEach(action -> actionIds.put(action.get(Tags.ConcreteID), null));
+        final List<String> actionIds = new ArrayList<>();
+        actions.forEach(action -> actionIds.add(action.get(Tags.ConcreteID)));
         return new StrategyGuiStateImpl(state.get(Tags.ConcreteID), actionIds);
     }
 }

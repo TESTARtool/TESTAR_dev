@@ -22,10 +22,8 @@ import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.LE
 import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.UNEX;
 
 public class StrategyGuiStateImpl implements StrategyGuiState {
-    private String concreteStateId;
-    //TODO use QlearningValues instead and only 1 hash map
-    private Map<String, Double> concreteActionIdsAndRewards;
-    private Map<String, Double> concreteActionIdsAndQValues;
+    private String abstractStateId;
+    private String actionId;
     private Map<String, Integer> concreteActionIdsAndExecutionCounters;
     private Set<GuiStateTransition> stateTransitions;
 
@@ -36,130 +34,31 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    StrategyGuiStateImpl(final String concreteStateId, final Map<String, Double> concreteActionIdsAndRewards) {
-        this.concreteStateId = concreteStateId;
-        this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
-        this.concreteActionIdsAndQValues = concreteActionIdsAndRewards; // all Q values are the same as R Max in the beginning
+    StrategyGuiStateImpl(final String abstractStateId, final List<String> actionIds) {
+        this.abstractStateId = abstractStateId;
+        this.actionId = actionId;
         //creating execution counters for each action:
         concreteActionIdsAndExecutionCounters = new HashMap<>();
-        for (String id : concreteActionIdsAndRewards.keySet()) {
-            concreteActionIdsAndExecutionCounters.put(id, 0);
-        }
         stateTransitions = new HashSet<>();
-    }
-
-    /**
-     * Finding the highest Q value, that is also in the given set of available actions
-     *
-     * @param actions
-     * @return
-     */
-    public double getMaxQValueOfTheState(Set<Action> actions) {
-        double qValue = 0;
-        for (Map.Entry<String, Double> entry : concreteActionIdsAndQValues.entrySet()) {
-            if (entry.getValue() > qValue) {
-                for (Action action : actions) {
-                    if (action.get(Tags.ConcreteID).equals(entry.getKey())) {
-                        qValue = entry.getValue();
-                    }
-                }
-            }
-        }
-        return qValue;
     }
 
     /**
      * For some reason, the actionIDs are changing even if the ConcreteStateID is the same
      * So updating the actionIDs
      */
-    StrategyGuiStateImpl updateActionIdsOfTheStateIntoModel(Set<Action> actions, double R_MAX) {
+    StrategyGuiStateImpl updateActionIdsOfTheStateIntoModel(final Set<Action> actions) {
         actions.stream()
-                .filter(action -> concreteActionIdsAndQValues.containsKey(action.get(Tags.ConcreteID)))
-                .forEach(action -> {
-                    concreteActionIdsAndQValues.put(action.get(Tags.ConcreteID), R_MAX);
-                    concreteActionIdsAndRewards.put(action.get(Tags.ConcreteID), R_MAX);
-                    concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID), 0);
-                });
+                .filter(action -> concreteActionIdsAndExecutionCounters.containsKey(action.get(Tags.ConcreteID)))
+                .forEach(action ->  concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID), 0));
         return this;
-    }
-
-    void addStateTransition(GuiStateTransition newTransition, double gammaDiscount, double maxRMaxOfTheNewState) {
-        //updating reward and Q value for the executed action:
-        updateRMaxAndQValues(newTransition.getActionConcreteId(), gammaDiscount, maxRMaxOfTheNewState);
-        if (stateTransitions.size() > 0) {
-            //if existing transitions, checking for identical ones:
-            for (GuiStateTransition guiStateTransition : stateTransitions) {
-                if (guiStateTransition.getSourceStateConcreteId().equals(newTransition.getSourceStateConcreteId())) {
-                    // the same source state, as it should be:
-                    if (guiStateTransition.getActionConcreteId().equals(newTransition.getActionConcreteId())) {
-                        // also the action is the same:
-                        if (guiStateTransition.getTargetStateConcreteId().equals(newTransition.getTargetStateConcreteId())) {
-                            // also the target state is the same -> identical transition
-                            System.out.println(this.getClass() + ": addStateTransition: identical transition found - no need to save again");
-                            return;
-                        } else {
-                            // same source state and same action, but different target state -> some external factor or the data values affect the behaviour
-                            System.out.println(this.getClass() + ": addStateTransition: WARNING: same source state, same action, but different target state!");
-                        }
-                    }
-                } else {
-                    System.out.println(this.getClass() + ": ERROR, source state is NOT same as in other state transitions from the same state!");
-                }
-            }
-        }
-        // otherwise adding the new state transition:
-//        System.out.println(this.getClass()+": addStateTransition: adding the new state transition");
-        stateTransitions.add(newTransition);
-    }
-
-    private void updateRMaxAndQValues(String actionConcreteId, double gammaDiscount, double maxQValueOfTheNewState) {
-        int executionCounter = concreteActionIdsAndExecutionCounters.get(actionConcreteId);
-        executionCounter++;
-        System.out.println("DEBUG: execution counter for action " + actionConcreteId + " is now " + executionCounter);
-        concreteActionIdsAndExecutionCounters.put(actionConcreteId, executionCounter);
-        double reward = calculateReward(executionCounter);
-        System.out.println("DEBUG: new reward for action " + actionConcreteId + " is " + reward);
-        concreteActionIdsAndRewards.put(actionConcreteId, reward);
-        double qValue = calculateQValue(reward, gammaDiscount, maxQValueOfTheNewState);
-        System.out.println("DEBUG: new Q value for action " + actionConcreteId + " is " + qValue);
-        concreteActionIdsAndQValues.put(actionConcreteId, qValue);
-    }
-
-    private double calculateReward(int executionCounter) {
-        double reward = 0.0;
-        if (executionCounter == 0) {
-            System.out.println("ERROR - calculating Q value for unvisited action should not be needed!");
-        } else {
-            System.out.println("DEBUG: executionCounter=" + executionCounter);
-            int divider = executionCounter + 1;
-            reward = 1.0 / (double) divider;
-            System.out.println("DEBUG: reward=" + reward);
-        }
-        return reward;
-    }
-
-    private double calculateQValue(double reward, double gammaDiscount, double maxQValueOfTheNewState) {
-        return reward + gammaDiscount * maxQValueOfTheNewState;
     }
 
     public Set<GuiStateTransition> getStateTransitions() {
         return stateTransitions;
     }
 
-    public String getConcreteStateId() {
-        return concreteStateId;
-    }
-
-    public void setConcreteStateId(String concreteStateId) {
-        this.concreteStateId = concreteStateId;
-    }
-
-    public Map<String, Double> getConcreteActionIdsAndRewards() {
-        return concreteActionIdsAndRewards;
-    }
-
-    public void setConcreteActionIdsAndRewards(HashMap<String, Double> concreteActionIdsAndRewards) {
-        this.concreteActionIdsAndRewards = concreteActionIdsAndRewards;
+    public String getAbstractStateId() {
+        return abstractStateId;
     }
 
     public boolean isAvailable(final Role actionType) {
@@ -176,7 +75,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public int getNumberOfUnexecutedActionsOfRole(final Role actionType) {
         return (int) actions.stream()
-                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.ConcreteID))))
+                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.AbstractID))))
                 .count();
     }
 
@@ -189,7 +88,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public Action getRandomAction() {
-        return actions.get(rnd.nextInt(actions.size()));
+        return !actions.isEmpty() ? actions.get(rnd.nextInt(actions.size())) : null;
     }
 
     public Action getRandomActionOfTypeOtherThan(final Role actionType) {
@@ -267,19 +166,14 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return this.getRandomActionOfType(ActionExecutionStatus.UNEX);
     }
 
-    public List<Action> getActionsOfType(Role actiontype) {
-        List<Action> actionsoftype = new ArrayList<>();
-        for (Action a : actions) {
-            if (a.get(Tags.Role) == actiontype) {
-                actionsoftype.add(a);
-            }
-        }
-        System.out.println("Returning all actions of type " + actiontype.toString() + ": found " + actionsoftype.size());
-        return actionsoftype;
+    public List<Action> getActionsOfType(final Role actionType) {
+        return actions.stream()
+                .filter(action -> action.get(Tags.Role) == actionType)
+                .collect(Collectors.toList());
     }
 
     public Action previousAction() {
-        if (previousActions.size() > 1) {
+        if (previousActions != null && !previousActions.isEmpty()) {
             System.out.println("Returning the previous action");
             return previousActions.get(previousActions.size() - 1);
 
@@ -300,14 +194,14 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         this.actions = new ArrayList<>(acts);
     }
 
-    public void setPreviousAction(Action previousAction) {
+    public void setPreviousAction(final Action previousAction) {
         System.out.println("Adding the selected action to the history...");
         try {
             previousActions.add(previousAction);
 
             int i = 1;
 
-            String pa = previousAction.get(Tags.ConcreteID);
+            final String pa = previousAction.get(Tags.AbstractID);
             if (executed.containsKey(pa))
                 i = executed.get(pa) + 1;
             executed.put(pa, i);
@@ -323,12 +217,12 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public void setPreviousState(State st) {
         System.out.println("Adding state to the history...");
-        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.ConcreteID))) {
+        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.AbstractID))) {
             System.out.println("Hmmm I'm still in the same state!");
-        } else if (previousStates.contains(st.get(Tags.ConcreteID))) {
+        } else if (previousStates.contains(st.get(Tags.AbstractID))) {
             System.out.println("Hey, I've been here before!");
         }
-        previousStates.add(st.get(Tags.ConcreteID));
+        previousStates.add(st.get(Tags.AbstractID));
 
     }
 }
