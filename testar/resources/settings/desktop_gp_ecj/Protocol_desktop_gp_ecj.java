@@ -1,5 +1,3 @@
-package desktop_gp_ecj;
-
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactory;
