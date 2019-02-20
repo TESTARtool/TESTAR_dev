@@ -173,14 +173,16 @@ public class Main {
         // Continuous Integration: If GUI is disabled TESTAR was executed from command line.
         // We only want to execute TESTAR one time with the selected settings.
         settings.ifPresent(setting -> {
-            Optional<Settings> newSettings = settings;
             if (setting.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-                while (startTestarDialog(setting, testSettingsFileName)) {
-                    newSettings = loadTestarSettings(args, testSettingsFileName);
+                while (startTestarDialog(setting, getTestSettingsFile())) {
+                    Optional<Settings> newSettings = loadTestarSettings(args, getTestSettingsFile());
+                    newSettings.ifPresent(Main::setSettings);
                 }
+            } else {
+               Main.setSettings(setting);
             }
-            newSettings.ifPresent(Main::setSettings);
         });
+
 
         TestSerialiser.exit();
         ScreenshotSerialiser.exit();
