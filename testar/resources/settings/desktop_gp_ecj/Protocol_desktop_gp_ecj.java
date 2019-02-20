@@ -1,5 +1,6 @@
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
+import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyActionSelector;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactory;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
@@ -56,6 +57,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     static double scrollThick = 16; //scroll thickness
     private HtmlSequenceReport htmlReport;
     private StrategyFactory strategyFactory;
+    private StrategyActionSelector strategyActionSelector;
 
     /**
      * Called once during the life time of TESTAR
@@ -70,6 +72,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         // initializing simple GUI state graph:
         //stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
         strategyFactory = new StrategyFactory("RandomAction:");
+        strategyActionSelector = strategyFactory.getStrategyActionSelector();
         super.initialize(settings);
     }
 
@@ -86,12 +89,12 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      */
     @Override
     protected void preSequencePreparations() {
-        strategyFactory.getStrategyActionSelector().resetGraphForNewTestSequence();
+        strategyActionSelector.resetGraphForNewTestSequence();
     }
 
     @Override
     protected void postSequenceProcessing() {
-        strategyFactory.getStrategyActionSelector().print();
+        strategyActionSelector.print();
     }
 
     /**
@@ -240,7 +243,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         } else {
             //if no preSelected actions are needed, then implement your own action selection strategy
             // Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-            a = strategyFactory.getStrategyActionSelector().selectAction(state, actions);
+            a = strategyActionSelector.selectAction(state, actions);
             //a = RandomActionSelector.selectAction(actions);
         }
         htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);

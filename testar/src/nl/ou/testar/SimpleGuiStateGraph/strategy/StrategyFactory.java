@@ -78,7 +78,7 @@ public class StrategyFactory {
 
     public StrategyActionSelector getStrategyActionSelector() {
         final StrategyNode main = getNode();
-        StrategyActionSelector selector = new StrategyActionSelectorImpl(main);
+        final StrategyActionSelector selector = new StrategyActionSelectorImpl(main);
         selector.print();
         return selector;
     }
