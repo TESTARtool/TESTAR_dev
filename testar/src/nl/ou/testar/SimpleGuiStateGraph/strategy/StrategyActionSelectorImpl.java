@@ -33,7 +33,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     public Action selectAction(final State state, final Set<Action> actions) {
         // saving the starting node of the graph:
         if (!graph.getStartingStateAbstractId().isPresent()){
-            graph.setStartingStateAbstractId(state.get(Tags.ConcreteID));
+            graph.setStartingStateAbstractId(state.get(Tags.Abstract_R_T_P_ID));
         }
 
         final StrategyGuiStateImpl currentStrategyGuiState = this.findCurrentStateFromPreviousState(state, actions);
@@ -75,8 +75,8 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     private void updateState(final Action returnAction, final State state) {
         // saving the state and action for state transition after knowing the target state:
-        graph.setPreviousActionAbstractId(returnAction.get(Tags.ConcreteID));
-        graph.setPreviousStateAbstractId(state.get(Tags.ConcreteID));
+        graph.setPreviousActionAbstractId(returnAction.get(Tags.Abstract_R_T_P_ID));
+        graph.setPreviousStateAbstractId(state.get(Tags.Abstract_R_T_P_ID));
     }
 
     private void updateGUIStatesList(final StrategyGuiStateImpl currentStrategyGuiState) {
@@ -85,7 +85,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     private StrategyGuiStateImpl findCurrentStateFromPreviousState(final State state, final Set<Action> actions) {
-        return graph.getStateByAbstractId(state.get(Tags.ConcreteID))
+        return graph.getStateByAbstractId(state.get(Tags.Abstract_R_T_P_ID))
                 .map(foundState -> foundState.updateActionIdsOfTheStateIntoModel(actions))
                 .orElseGet(() -> graph.createStrategyGuiState(state, actions));
     }

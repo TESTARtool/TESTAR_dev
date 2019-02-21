@@ -55,7 +55,7 @@ public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
 
     public Optional<Action> getActionWithAbstractId(final Set<Action> actions, final String abstractActionId) {
         return actions.stream()
-                .filter(action -> action.get(Tags.AbstractID).equals(abstractActionId))
+                .filter(action -> action.get(Tags.Abstract_R_T_P_ID).equals(abstractActionId))
                 .findFirst();
     }
 
@@ -67,7 +67,7 @@ public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
 
     public StrategyGuiStateImpl createStrategyGuiState(final State state, final Set<Action> actions) {
         final List<String> actionIds = new ArrayList<>();
-        actions.forEach(action -> actionIds.add(action.get(Tags.ConcreteID)));
-        return new StrategyGuiStateImpl(state.get(Tags.ConcreteID), actionIds);
+        actions.forEach(action -> actionIds.add(action.get(Tags.Abstract_R_T_P_ID)));
+        return new StrategyGuiStateImpl(state.get(Tags.Abstract_R_T_P_ID), actionIds);
     }
 }

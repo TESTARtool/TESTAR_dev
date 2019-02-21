@@ -19,7 +19,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.LEAST;
-import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.UNEX;
+import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.UNEXECUTED;
 
 public class StrategyGuiStateImpl implements StrategyGuiState {
     private String abstractStateId;
@@ -75,7 +75,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public int getNumberOfUnexecutedActionsOfRole(final Role actionType) {
         return (int) actions.stream()
-                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.AbstractID))))
+                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.Abstract_R_T_P_ID))))
                 .count();
     }
 
@@ -110,7 +110,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         int i;
         final List<Action> filteredListOfActions = new ArrayList<>();
 
-        if (UNEX == actionExecutionStatus) {
+        if (UNEXECUTED == actionExecutionStatus) {
             i = 0;
         } else if (LEAST == actionExecutionStatus) {
             final boolean notExecutedAction = actions.stream()
@@ -151,7 +151,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             System.out.println("ActionType is null, returning null");
             return null;
         }
-        return getRandomActionOfType(UNEX, getActionsOfType(actionType));
+        return getRandomActionOfType(UNEXECUTED, getActionsOfType(actionType));
     }
 
     public Action randomLeastExecutedAction() {
@@ -163,7 +163,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public Action randomUnexecutedAction() {
-        return this.getRandomActionOfType(ActionExecutionStatus.UNEX);
+        return this.getRandomActionOfType(ActionExecutionStatus.UNEXECUTED);
     }
 
     public List<Action> getActionsOfType(final Role actionType) {
@@ -201,7 +201,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
             int i = 1;
 
-            final String pa = previousAction.get(Tags.AbstractID);
+            final String pa = previousAction.get(Tags.Abstract_R_T_P_ID);
             if (executed.containsKey(pa))
                 i = executed.get(pa) + 1;
             executed.put(pa, i);
@@ -217,12 +217,12 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public void setPreviousState(State st) {
         System.out.println("Adding state to the history...");
-        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.AbstractID))) {
+        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.Abstract_R_T_P_ID))) {
             System.out.println("Hmmm I'm still in the same state!");
-        } else if (previousStates.contains(st.get(Tags.AbstractID))) {
+        } else if (previousStates.contains(st.get(Tags.Abstract_R_T_P_ID))) {
             System.out.println("Hey, I've been here before!");
         }
-        previousStates.add(st.get(Tags.AbstractID));
+        previousStates.add(st.get(Tags.Abstract_R_T_P_ID));
 
     }
 }
