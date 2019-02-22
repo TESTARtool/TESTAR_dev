@@ -213,8 +213,9 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		for(Action action:actions){
 //			System.out.println("Action IDs, abstractCustom="+action.get(Tags.AbstractIDCustom, "not available")+
 //					"abstract="+action.get(Tags.AbstractID, "not available"));
-			if(action.get(Tags.AbstractID, "not available").equals(abstractActionId)){
+			if(action.get(Tags.AbstractIDCustom , "not available").equals(abstractActionId)){
 				retAction = action;
+				break;
 			}
 		}
 		if(retAction!=null){
