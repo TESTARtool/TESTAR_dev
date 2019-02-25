@@ -182,7 +182,6 @@ public class WdDriver extends SUTBase
     options.setCapability("extensionPaths", new String[]{edgeSideLoadPath});
     RemoteWebDriver webDriver = new EdgeDriver(service, options);
 
-    // Annoying bug in loading extensions in EdgeDriver
     closeDialog(webDriver);
 
     return webDriver;
@@ -226,6 +225,10 @@ public class WdDriver extends SUTBase
     }
   }
 
+  /**
+   * Edge has an annoying bug during the loading of the extension
+   * This method closes the dialog without user action
+   */
   private static void closeDialog (RemoteWebDriver webDriver)
   {
     // Fix window size/position, so we don't have to look for the button

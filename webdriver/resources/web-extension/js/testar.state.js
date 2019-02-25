@@ -73,7 +73,9 @@ function getChildNodesTestar(parentWrapped) {
     var childNodes = parentWrapped.element.childNodes;
 
     // Might be contained in an iFrame
-    if (childNodes.length === 0 && parentWrapped.element.contentDocument !== undefined) {
+    if (childNodes.length === 0 &&
+        parentWrapped.element.contentDocument !== undefined &&
+        parentWrapped.element.contentDocument !== null) {
         childNodes = parentWrapped.element.contentDocument.childNodes;
 
         var style = getComputedStyle(parentWrapped.element);
@@ -224,6 +226,12 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
     if (elem === null) {
         return false;
     }
+
+    // Ignore encapsulated childs of <a>
+    if (element.tagName === "A" && element.contains(elem)) {
+        return false;
+    }
+
     return elem.parentNode !== element.parentNode;
 }
 

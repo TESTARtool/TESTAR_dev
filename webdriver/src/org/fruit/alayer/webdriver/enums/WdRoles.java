@@ -33,7 +33,6 @@ public class WdRoles {
     WdBDO = from("bdo", "WdBDO", WdWidget, Roles.Control),
     WdBIG = from("big", "WdBIG", WdWidget, Roles.Control),
     WdBLOCKQUOTE = from("blockquote", "WdBLOCKQUOTE", WdWidget, Roles.Control),
-    // TODO
     WdBODY = from("body", "WdBODY", WdWidget, Roles.Control),
     WdBR = from("br", "WdBR", WdWidget, Roles.Control),
     WdBUTTON = from("button", "WdBUTTON", WdWidget, Roles.Control),
@@ -69,7 +68,6 @@ public class WdRoles {
     WdH4 = from("h4", "WdH4", WdWidget, Roles.Control),
     WdH5 = from("h5", "WdH5", WdWidget, Roles.Control),
     WdH6 = from("h6", "WdH6", WdWidget, Roles.Control),
-    // TODO
     WdHEAD = from("head", "WdHEAD", WdWidget, Roles.Control),
     WdHEADER = from("header", "WdHEADER", WdWidget, Roles.Control),
     WdHGROUP = from("hgroup", "WdHGROUP", WdWidget, Roles.Control),
@@ -89,7 +87,6 @@ public class WdRoles {
     WdMAP = from("map", "WdMAP", WdWidget, Roles.Control),
     WdMARK = from("mark", "WdMARK", WdWidget, Roles.Control),
     WdMENU = from("menu", "WdMENU", WdWidget, Roles.Control),
-    // TODO
     WdMETA = from("meta", "WdMETA", WdWidget, Roles.Control),
     WdMETER = from("meter", "WdMETER", WdWidget, Roles.Control),
     WdNAV = from("nav", "WdNAV", WdWidget, Roles.Control),
@@ -110,7 +107,6 @@ public class WdRoles {
     WdRUBY = from("ruby", "WdRUBY", WdWidget, Roles.Control),
     WdS = from("s", "WdS", WdWidget, Roles.Control),
     WdSAMP = from("samp", "WdSAMP", WdWidget, Roles.Control),
-    // TODO
     WdSCRIPT = from("script", "WdSCRIPT", WdWidget, Roles.Control),
     WdSECTION = from("section", "WdSECTION", WdWidget, Roles.Control),
     WdSELECT = from("select", "WdSELECT", WdWidget, Roles.Control),
@@ -119,7 +115,6 @@ public class WdRoles {
     WdSPAN = from("span", "WdSPAN", WdWidget, Roles.Control),
     WdSTRIKE = from("strike", "WdSTRIKE", WdWidget, Roles.Control),
     WdSTRONG = from("strong", "WdSTRONG", WdWidget, Roles.Control),
-    // TODO
     WdSTYLE = from("style", "WdSTYLE", WdWidget, Roles.Control),
     WdSUB = from("sub", "WdSUB", WdWidget, Roles.Control),
     WdSUMMARY = from("summary", "WdSUMMARY", WdWidget, Roles.Control),
@@ -142,7 +137,6 @@ public class WdRoles {
     WdVIDEO = from("video", "WdVIDEO", WdWidget, Roles.Control),
     WdWBR = from("wbr", "WdWBR", WdWidget, Roles.Control),
     WdUnknown = from("-2", "WdUnknown", WdWidget, Roles.Control);
-
 
   private static Role from(String tag, String name, Role... inheritFrom) {
     Role ret = Role.from(name, inheritFrom);

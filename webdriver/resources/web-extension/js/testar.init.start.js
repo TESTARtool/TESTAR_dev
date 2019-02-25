@@ -46,7 +46,8 @@ var actualCode = '(' + function () {
 
         // Find the event in the list
         for (var i = 0; i < this.eventListenerList[a].length; i++) {
-            if (this.eventListenerList[a][i].listener === b, this.eventListenerList[a][i].useCapture === c) {
+            if (this.eventListenerList[a][i].listener === b &&
+                this.eventListenerList[a][i].useCapture === c) {
                 this.eventListenerList[a].splice(i, 1);
                 break;
             }
