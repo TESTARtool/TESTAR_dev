@@ -14,7 +14,6 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     private GuiStateGraphForStrategy graph;
     private StrategyNodeAction strategyTree;
-    private Action result;
 
     StrategyActionSelectorImpl(final StrategyNode main) {
         System.out.println("DEBUG: creating genetic programming strategy");
@@ -48,7 +47,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
         return result;
 
-//        if (graph.getPreviousStateAbstractId() != null && graph.getPreviousActionAbstractId() != null) {
+//        if (graph.getPreviousStateAbstraFctId() != null && graph.getPreviousActionAbstractId() != null) {
 //            graph.getStateByAbstractId(graph.getPreviousStateAbstractId())
 //                    .ifPresent(prevState -> this.updatePreviousState(prevState, currentStrategyGuiState, state, actions));
 //        }
@@ -75,7 +74,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     private void updateState(final Action returnAction, final State state) {
         // saving the state and action for state transition after knowing the target state:
-        graph.setPreviousActionAbstractId(returnAction.get(Tags.Abstract_R_T_P_ID));
+        graph.setPreviousActionAbstractId(returnAction.get(Tags.AbstractID));
         graph.setPreviousStateAbstractId(state.get(Tags.Abstract_R_T_P_ID));
     }
 

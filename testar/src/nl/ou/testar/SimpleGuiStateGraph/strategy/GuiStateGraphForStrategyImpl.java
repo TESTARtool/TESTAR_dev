@@ -4,11 +4,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
     private Set<StrategyGuiStateImpl> strategyGuiStates;
@@ -55,7 +51,7 @@ public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
 
     public Optional<Action> getActionWithAbstractId(final Set<Action> actions, final String abstractActionId) {
         return actions.stream()
-                .filter(action -> action.get(Tags.Abstract_R_T_P_ID).equals(abstractActionId))
+                .filter(action -> action.get(Tags.AbstractID).equals(abstractActionId))
                 .findFirst();
     }
 
@@ -67,7 +63,7 @@ public class GuiStateGraphForStrategyImpl implements GuiStateGraphForStrategy {
 
     public StrategyGuiStateImpl createStrategyGuiState(final State state, final Set<Action> actions) {
         final List<String> actionIds = new ArrayList<>();
-        actions.forEach(action -> actionIds.add(action.get(Tags.Abstract_R_T_P_ID)));
+        actions.forEach(action -> actionIds.add(action.get(Tags.AbstractID)));
         return new StrategyGuiStateImpl(state.get(Tags.Abstract_R_T_P_ID), actionIds);
     }
 }

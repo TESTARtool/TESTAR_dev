@@ -7,15 +7,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.LEAST;
@@ -201,7 +193,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
             int i = 1;
 
-            final String pa = previousAction.get(Tags.Abstract_R_T_P_ID);
+            final String pa = previousAction.get(Tags.AbstractID);
             if (executed.containsKey(pa))
                 i = executed.get(pa) + 1;
             executed.put(pa, i);
