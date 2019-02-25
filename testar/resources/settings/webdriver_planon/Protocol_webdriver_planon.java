@@ -224,7 +224,7 @@ public class Protocol_webdriver_planon extends ClickFilterLayerProtocol {
 
       // type into text boxes
       if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
-        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
+        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget),true));
       }
 
       // left clicks, but ignore links outside domain
