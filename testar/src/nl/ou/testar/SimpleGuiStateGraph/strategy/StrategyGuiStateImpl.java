@@ -181,40 +181,36 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
 
-    public void setState(State state, Set<Action> acts) {
+    public void setState(final State state, final Set<Action> acts) {
         this.state = state;
         this.actions = new ArrayList<>(acts);
     }
 
-    public void setPreviousAction(final Action previousAction) {
+    public void addActionToPreviousActions(final Action action) {
         System.out.println("Adding the selected action to the history...");
         try {
-            previousActions.add(previousAction);
-
-            int i = 1;
-
-            final String pa = previousAction.get(Tags.AbstractID);
-            if (executed.containsKey(pa))
-                i = executed.get(pa) + 1;
-            executed.put(pa, i);
+            previousActions.add(action);
+            this.incrementPreviousExecutedActions(action);
         } catch (NoSuchTagException e) {
             System.out.println("This was an irregular action, I've not added it to the history.");
         }
 
     }
 
+    private void incrementPreviousExecutedActions(final Action previousAction) {
+        final String pa = previousAction.get(Tags.AbstractID);
+        if (executed.containsKey(pa)) {
+            executed.put(pa, executed.get(pa) + 1);
+        } else {
+            executed.put(pa, 1);
+        }
+    }
+
     public boolean hasStateNotChanged() {
         return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1).equals(previousStates.get(previousStates.size() - 2));
     }
 
-    public void setPreviousState(State st) {
-        System.out.println("Adding state to the history...");
-        if (previousStates.size() != 0 && previousStates.get(previousStates.size() - 1).equals(state.get(Tags.Abstract_R_T_P_ID))) {
-            System.out.println("Hmmm I'm still in the same state!");
-        } else if (previousStates.contains(st.get(Tags.Abstract_R_T_P_ID))) {
-            System.out.println("Hey, I've been here before!");
-        }
+    public void addStateToPreviousStates(State st) {
         previousStates.add(st.get(Tags.Abstract_R_T_P_ID));
-
     }
 }

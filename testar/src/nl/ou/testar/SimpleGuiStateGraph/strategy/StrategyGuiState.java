@@ -42,9 +42,9 @@ public interface StrategyGuiState {
 
     void setState(final State state, final Set<Action> acts);
 
-    void setPreviousAction(final Action previousAction);
+    void addActionToPreviousActions(final Action previousAction);
 
     boolean hasStateNotChanged();
 
-    void setPreviousState(final State state);
+    void addStateToPreviousStates(final State state);
 }

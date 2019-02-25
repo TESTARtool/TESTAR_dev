@@ -36,16 +36,15 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         }
 
         final StrategyGuiStateImpl currentStrategyGuiState = this.findCurrentStateFromPreviousState(state, actions);
-
         currentStrategyGuiState.setState(state, actions);
-        final Action result = strategyTree.getAction(currentStrategyGuiState)
+        final Action action = strategyTree.getAction(currentStrategyGuiState)
                 .orElse(currentStrategyGuiState.getRandomAction());
 
-        currentStrategyGuiState.setPreviousAction(result);
-        currentStrategyGuiState.setPreviousState(state);
-        System.out.printf("The selected action is of type %s", result.get(Tags.Role));
+        currentStrategyGuiState.addActionToPreviousActions(action);
+        currentStrategyGuiState.addStateToPreviousStates(state);
+        System.out.printf("The selected action is of type %s", action.get(Tags.Role));
 
-        return result;
+        return action;
 
 //        if (graph.getPreviousStateAbstraFctId() != null && graph.getPreviousActionAbstractId() != null) {
 //            graph.getStateByAbstractId(graph.getPreviousStateAbstractId())

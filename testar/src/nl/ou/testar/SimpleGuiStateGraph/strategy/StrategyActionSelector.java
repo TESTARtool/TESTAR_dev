@@ -21,5 +21,5 @@ public interface StrategyActionSelector {
     /**
      * Print the strategy tree
      */
-    public void print();
+    void print();
 }
