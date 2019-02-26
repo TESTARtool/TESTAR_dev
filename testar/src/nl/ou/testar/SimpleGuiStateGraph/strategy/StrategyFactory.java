@@ -39,9 +39,7 @@ public class StrategyFactory {
     }
 
     public StrategyActionSelector getStrategyActionSelector() {
-        final StrategyActionSelector selector = new StrategyActionSelectorImpl(queue);
-        selector.print();
-        return selector;
+        return new StrategyActionSelectorImpl(queue);
     }
 
     private void makeQueue(final String strategy) {

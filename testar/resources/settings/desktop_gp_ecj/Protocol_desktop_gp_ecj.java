@@ -71,7 +71,8 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         htmlReport = new HtmlSequenceReport();
         // initializing simple GUI state graph:
         //stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
-        strategyFactory = new StrategyFactory("RandomAction:");
+        strategyFactory = new StrategyFactory("RandomAction:RandomMostExecutedAction:RandomLeastExecutedAction:");
+        strategyActionSelector = strategyFactory.getStrategyActionSelector();
         super.initialize(settings);
     }
 
@@ -242,7 +243,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         } else {
             //if no preSelected actions are needed, then implement your own action selection strategy
             // Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-            a = strategyFactory.getStrategyActionSelector().selectAction(state, actions);
+            a = strategyActionSelector.selectAction(state, actions);
             //a = RandomActionSelector.selectAction(actions);
         }
         htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
