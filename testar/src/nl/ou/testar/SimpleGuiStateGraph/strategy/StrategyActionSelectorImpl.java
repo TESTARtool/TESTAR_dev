@@ -80,7 +80,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         strategyTree = (StrategyNodeAction) this.getStrategyNode();
         final Action action = strategyTree.getAction(currentStrategyGuiState)
                 .orElse(currentStrategyGuiState.getRandomAction());
-
+        this.print();
         currentStrategyGuiState.addActionToPreviousActions(action);
         currentStrategyGuiState.addStateToPreviousStates(state);
         System.out.printf("The selected action is of type %s", action.get(Tags.Role));
