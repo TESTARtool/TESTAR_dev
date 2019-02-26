@@ -50,6 +50,7 @@ import static org.fruit.alayer.Tags.Enabled;
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
+@SuppressWarnings("WrongPackageStatement")
 public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
 
     //Attributes for adding slide actions
