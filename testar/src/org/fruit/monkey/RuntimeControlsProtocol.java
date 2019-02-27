@@ -96,39 +96,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     	FlashFeedback.flash(modeNfo, 1000);
     	
     }
-    
-    //Old code to switch between modes
-    /*private synchronized void nextMode(boolean forward){
-        if(forward){
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }else{
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }
-
-        // Add some logging
-        // Add the FlashFeedback about the mode you are in in the upper left corner.
-        String modeParamS = "";
-        if (mode == Modes.Record)
-            modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
-
-        String modeNfo = "'" + mode + "' mode active." + modeParamS;
-        LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        FlashFeedback.flash(modeNfo);
-    }*/
 
     /**
      * Set the mode with the given parameter value
@@ -137,9 +104,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected synchronized void setMode(Modes mode){
         if (mode() == mode) return;
         else this.mode = mode;
-//        List<Modes> modesList = Arrays.asList(Modes.values());
-//        while (mode() != mode)
-//            nextMode(modesList.indexOf(mode) > modesList.indexOf(mode()));
     }
 
 
@@ -194,7 +158,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
             // SHIFT + ARROW-DOWN --> stop TESTAR run
         else if(key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)){
-            LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
+            //LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
             mode = Modes.Quit;
         }
 

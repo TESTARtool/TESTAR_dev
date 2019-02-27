@@ -304,8 +304,6 @@ public class Main {
 		if(!logsDir.exists())
 			logsDir.mkdirs();
 		
-		System.out.println("Existe "+outputDir + File.separator +"logs"+" resultado: "+ logsDir.exists());
-		
 		// Starting the logs
 		try {
 			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
@@ -455,6 +453,7 @@ public class Main {
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			defaults.add(Pair.from(TestCaseName, "RandomTest"));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);

@@ -23,7 +23,7 @@ public class SystemProcessHandling {
         List<ProcessInfo> runningProcesses = new ArrayList<ProcessInfo>();
         long pid, handle; String desc;
         List<SUT> runningP = NativeLinker.getNativeProcesses();
-        System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
+        //System.out.println("[" + debugTag + "] " + "Running processes (" + runningP.size() + "):");
         int i = 1;
         for (SUT sut : runningP){
             //System.out.println("\t[" + (i++) +  "] " + sut.getStatus());
@@ -88,7 +88,7 @@ public class SystemProcessHandling {
      */
     private static boolean killProcess(ProcessInfo pi, long KILL_WINDOW){
         if (pi.sut.isRunning()){
-            System.out.println("Will kill process: " + pi.toString());
+            //System.out.println("Will kill process: " + pi.toString());
             long now = System.currentTimeMillis(),
                     elapsed;
             do{
@@ -96,13 +96,13 @@ public class SystemProcessHandling {
                 try {
                     NativeLinker.getNativeProcessHandle(pi.pid).kill();
                 } catch (Exception e){
-                    System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
+                    //System.out.println("\tException trying to kill process: <" + e.getMessage() + "> after <" + elapsed + "> ms");
                     Util.pauseMs(500);
                 }
             } while (pi.sut.isRunning() && elapsed < KILL_WINDOW);
             return pi.sut.isRunning();
         } else{
-            System.out.println("Did not kill process as it is not running: " + pi.toString());
+            //System.out.println("Did not kill process as it is not running: " + pi.toString());
             return true;
         }
     }

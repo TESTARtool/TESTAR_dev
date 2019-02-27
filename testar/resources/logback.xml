@@ -5,10 +5,10 @@
 
   <appender name="FILE-AUDIT"
             class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>output/logs/debug.log</file>
+    <file>summary.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <Pattern>
-        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n
+        %d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n
       </Pattern>
     </encoder>
 
@@ -18,7 +18,7 @@
       </fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy
               class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>10MB</maxFileSize>
+        <maxFileSize>500MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
     </rollingPolicy>
 

@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Generate
+Mode = Spy
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -23,7 +23,7 @@ Mode = Generate
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "http://"
 
 #################################################################
 # Sequences
@@ -31,8 +31,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 100
+Sequences = 20
+SequenceLength = 200
 
 #################################################################
 # Oracles based on suspicious titles
@@ -40,7 +40,30 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
 
 #################################################################
 # Actionfilter
@@ -49,7 +72,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[tT]ab.*|.*[hH]elp.*|.*Help.*|.*LOGOUT.*|.*[cC]lose.*|.*[cC]errar.*|.*[mM]aximi[sz]e.*|.*[mM]aximizar.*|.*[sS]ave.*|.*[gG]uardar.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[aA]rchivo.*|.*[mM]inimi[sz]e.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
 
 #################################################################
 # Processfilter
@@ -66,7 +89,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_simple_stategraph/Protocol_desktop_simple_stategraph
+ProtocolClass = web_firefox/Protocol_web_firefox
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -106,6 +129,4 @@ StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
-TestGenerator = random
-MaxReward = 9999999
-Discount = .95
+ForceToSequenceLength = false

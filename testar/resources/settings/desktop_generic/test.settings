@@ -51,7 +51,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Process Logs
@@ -129,6 +129,4 @@ StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
-TestGenerator = random
-MaxReward = 9999999
-Discount = .95
+ForceToSequenceLength = false

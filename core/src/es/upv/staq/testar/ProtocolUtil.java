@@ -262,7 +262,7 @@ public class ProtocolUtil {
 				return null;
 			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),
 														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID), action.get(Tags.ConcreteID), scrshot);
+			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID,""), action.get(Tags.ConcreteID,""), scrshot);
 		}
 		return null;
 	}	

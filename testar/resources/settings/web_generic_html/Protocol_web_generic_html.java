@@ -41,7 +41,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Random;
 
+import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
+
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -97,7 +100,7 @@ import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class Protocol_web_generic extends ClickFilterLayerProtocol {
+public class Protocol_web_generic_html extends ClickFilterLayerProtocol {
 
 	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
 	static final int BROWSER_IEXPLORER = 1;
@@ -112,6 +115,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	//Attributes for adding slide actions
 	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
 	static double scrollThick = 16; // scroll thickness (iexplorer)
+	
+	//Html Report
+	private HtmlSequenceReport htmlReport;
+	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -119,6 +126,10 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
+		// initializing simple GUI state graph:
+		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 		initBrowser();
 		initialMode = settings.get(ConfigTags.Mode).toString();
@@ -160,7 +171,6 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	@Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
-
 	}
 
 	/**
@@ -422,14 +432,26 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
+		//adding state to the HTML sequence report:
+		try {
+			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+		}catch(Exception e){
+			// catching null for the first state or any new state, when unvisited actions is still null
+			htmlReport.addState(state, actions);
+		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action a = preSelectAction(state, actions);
 		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+			// returning pre-selected action
+		} else{
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
+			a = stateGraphWithVisitedActions.selectAction(state,actions);
+			//a = RandomActionSelector.selectAction(actions);
+		}
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
+		return a;
 	}
 
 	/**
@@ -465,7 +487,7 @@ public class Protocol_web_generic extends ClickFilterLayerProtocol {
 		}
 		setURLofState(URL);
 	}
-
+	
 	/**
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
 	 * current sequence. You can stop deriving more actions after:

@@ -7,13 +7,9 @@ import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.fruit.monkey.ConfigTags;
-
 import java.io.*;
 
 import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public class FileHandling {
 
@@ -62,11 +58,17 @@ public class FileHandling {
         saveReportPage(reportPages[3], new File(outputDir + File.separator + "logs" + File.separator + generatedSequence + "_" + "stats" + ".log"), logLevel);
     }
 
-
+    public static boolean userRecordSequence = false;
     public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict, String outputDir){
         String targetFolder = "";
+        
         final double sev = verdict.severity();
-        if (sev == Verdict.SEVERITY_OK)
+        
+        //Save recorded sequences in a specific file
+		if(userRecordSequence)
+			targetFolder = "sequences_recorded";
+       
+		else if (sev == Verdict.SEVERITY_OK)
             targetFolder = "sequences_ok";
         else if (sev == Verdict.SEVERITY_WARNING)
             targetFolder = "sequences_warning";
@@ -80,7 +82,7 @@ public class FileHandling {
             targetFolder = "sequencces_fail";
         else
             targetFolder = "sequences_other";
-        LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
+        //LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
         try {
             Util.copyToDirectory(currentSeq.getAbsolutePath(),
                     outputDir + File.separator + targetFolder,
@@ -91,6 +93,16 @@ public class FileHandling {
         } catch (IOException e) {
             LogSerialiser.log("I/O exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
         }
-        LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);
+        //LogSerialiser.log("Copied classified sequence to output <" + targetFolder + "> directory!\n", LogSerialiser.LogLevel.Debug);
+    
+        /*try {
+			PrintWriter pw = new PrintWriter(new FileWriter("resultsSummary.log", true));
+			pw.println(generatedSequence+": "+targetFolder);
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+        
     }
 }

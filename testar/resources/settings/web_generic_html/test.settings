@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "http://"
 
 #################################################################
 # Sequences
@@ -31,8 +31,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 20
+SequenceLength = 200
 
 #################################################################
 # Oracles based on suspicious titles
@@ -40,7 +40,30 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
 
 #################################################################
 # Actionfilter
@@ -49,7 +72,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[cC]lose.*|.*[cC]errar.*|.*[mM]aximi[sz]e.*|.*[mM]aximizar.*|.*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[aA]rchivo.*|.*[mM]inimi[sz]e.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*|.*[lL]ogout.*|.*[tT]ab.*|.*[hH]elp.*
 
 #################################################################
 # Processfilter
@@ -66,15 +89,15 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_graphdb/Protocol_desktop_generic_graphdb
+ProtocolClass = web_generic_html/Protocol_web_generic_html
 
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = true
-GraphDBUrl = plocal:output/run_1x10
-GraphDBUser = admin
-GraphDBPassword = admin
+GraphDBEnabled = false
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
 
 #################################################################
 # Other more advanced settings
@@ -99,13 +122,11 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 2.0
+StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
 CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
-TestGenerator = random
-MaxReward = 9999999
-Discount = .95
+ForceToSequenceLength = false
