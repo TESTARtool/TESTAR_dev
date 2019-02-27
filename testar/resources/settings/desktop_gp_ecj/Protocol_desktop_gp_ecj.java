@@ -1,8 +1,8 @@
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyActionSelector;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactory;
-import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactoryImpl;
+import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
+import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
+import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
