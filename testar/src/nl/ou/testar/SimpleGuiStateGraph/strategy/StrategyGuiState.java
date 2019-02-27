@@ -40,7 +40,7 @@ public interface StrategyGuiState {
 
     int getNumberOfPreviousActions();
 
-    void setState(final State state, final Set<Action> acts);
+    void setActions(final Set<Action> acts);
 
     void addActionToPreviousActions(final Action previousAction);
 

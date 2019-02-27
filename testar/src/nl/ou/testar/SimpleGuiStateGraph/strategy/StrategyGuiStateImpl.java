@@ -1,57 +1,31 @@
 package nl.ou.testar.SimpleGuiStateGraph.strategy;
 
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.LEAST;
 import static nl.ou.testar.SimpleGuiStateGraph.strategy.ActionExecutionStatus.UNEXECUTED;
 
 public class StrategyGuiStateImpl implements StrategyGuiState {
-    private String abstractStateId;
-    private String actionId;
-    private Map<String, Integer> concreteActionIdsAndExecutionCounters;
-    private Set<GuiStateTransition> stateTransitions;
-
     private List<Action> actions = new ArrayList<>();
-    private State state = null;
     private List<Action> previousActions = new ArrayList<>();
     private List<String> previousStates = new ArrayList<>();
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    StrategyGuiStateImpl(final String abstractStateId, final List<String> actionIds) {
-        this.abstractStateId = abstractStateId;
-        this.actionId = actionId;
-        //creating execution counters for each action:
-        concreteActionIdsAndExecutionCounters = new HashMap<>();
-        stateTransitions = new HashSet<>();
-    }
-
-    /**
-     * For some reason, the actionIDs are changing even if the ConcreteStateID is the same
-     * So updating the actionIDs
-     */
-    StrategyGuiStateImpl updateActionIdsOfTheStateIntoModel(final Set<Action> actions) {
-        actions.stream()
-                .filter(action -> concreteActionIdsAndExecutionCounters.containsKey(action.get(Tags.ConcreteID)))
-                .forEach(action ->  concreteActionIdsAndExecutionCounters.put(action.get(Tags.ConcreteID), 0));
-        return this;
-    }
-
-    public Set<GuiStateTransition> getStateTransitions() {
-        return stateTransitions;
-    }
-
-    public String getAbstractStateId() {
-        return abstractStateId;
-    }
+    StrategyGuiStateImpl() { }
 
     public boolean isAvailable(final Role actionType) {
         return actions.stream().anyMatch(action -> action.get(Tags.Role) == actionType);
@@ -181,8 +155,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
 
-    public void setState(final State state, final Set<Action> acts) {
-        this.state = state;
+    public void setActions(final Set<Action> acts) {
         this.actions = new ArrayList<>(acts);
     }
 
@@ -210,7 +183,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1).equals(previousStates.get(previousStates.size() - 2));
     }
 
-    public void addStateToPreviousStates(State st) {
+    public void addStateToPreviousStates(final State st) {
         previousStates.add(st.get(Tags.Abstract_R_T_P_ID));
     }
 }

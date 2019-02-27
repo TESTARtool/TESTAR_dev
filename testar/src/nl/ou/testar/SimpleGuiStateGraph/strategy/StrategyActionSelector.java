@@ -16,8 +16,6 @@ public interface StrategyActionSelector {
      */
     Action selectAction(final State state, final Set<Action> actions);
 
-    void resetGraphForNewTestSequence();
-
     /**
      * Print the strategy tree
      */

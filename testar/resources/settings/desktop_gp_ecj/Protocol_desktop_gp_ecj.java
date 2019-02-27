@@ -2,6 +2,7 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyActionSelector;
 import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactory;
+import nl.ou.testar.SimpleGuiStateGraph.strategy.StrategyFactoryImpl;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
@@ -72,7 +73,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         htmlReport = new HtmlSequenceReport();
         // initializing simple GUI state graph:
         //stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
-        strategyFactory = new StrategyFactory("RandomAction:RandomMostExecutedAction:RandomLeastExecutedAction:");
+        strategyFactory = new StrategyFactoryImpl("RandomAction:RandomMostExecutedAction:RandomLeastExecutedAction:");
         strategyActionSelector = strategyFactory.getStrategyActionSelector();
         super.initialize(settings);
     }
@@ -90,7 +91,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      */
     @Override
     protected void preSequencePreparations() {
-        strategyActionSelector.resetGraphForNewTestSequence();
+
     }
 
     @Override
