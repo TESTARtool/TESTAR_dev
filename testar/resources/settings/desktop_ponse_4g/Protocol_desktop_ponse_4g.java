@@ -64,6 +64,7 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	static double scrollArrowSize = 36; // sliding arrows
 	static double scrollThick = 16; //scroll thickness
 
+	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 	private HtmlSequenceReport htmlReport;
 	private SUT updatedSUTprocess = null;
 	private int scenarioCount = 1;
@@ -75,6 +76,8 @@ public class Protocol_desktop_ponse_4g extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		// initializing simple GUI state graph:
+		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
 	}
 
