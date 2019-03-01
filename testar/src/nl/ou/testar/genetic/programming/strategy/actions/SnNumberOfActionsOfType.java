@@ -20,10 +20,7 @@ public class SnNumberOfActionsOfType extends StrategyNodeNumber {
     @Override
     public int getValue(final StrategyGuiState state) {
         final Optional<Role> role = this.child.getActionType(state);
-        if (!role.isPresent()) {
-            throw new RuntimeException("Role not set");
-        }
-        return state.getNumberOfActions(role.get());
+        return state.getNumberOfActions(role.orElse(null));
     }
 
 }

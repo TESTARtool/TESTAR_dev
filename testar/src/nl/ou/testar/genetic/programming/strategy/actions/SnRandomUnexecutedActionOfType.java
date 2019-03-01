@@ -21,10 +21,7 @@ public class SnRandomUnexecutedActionOfType extends StrategyNodeAction {
     @Override
     public Optional<Action> getAction(final StrategyGuiState state) {
         final Optional<Role> role = this.child.getActionType(state);
-        if (!role.isPresent()) {
-            throw new RuntimeException("Role not set!");
-        }
-        return Optional.ofNullable(state.getRandomUnexecutedActionOfType(role.get()));
+        return Optional.ofNullable(state.getRandomUnexecutedActionOfType(role.orElse(null)));
     }
 
 }
