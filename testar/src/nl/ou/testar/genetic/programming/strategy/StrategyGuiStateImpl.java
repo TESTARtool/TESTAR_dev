@@ -24,6 +24,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private List<String> previousStates = new ArrayList<>();
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
+    private State state;
 
     StrategyGuiStateImpl() { }
 
@@ -80,7 +81,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             i = 0;
         } else if (LEAST == actionExecutionStatus) {
             final boolean notExecutedAction = actions.stream()
-                    .anyMatch(action -> !(executed.containsKey(action.get(Tags.ConcreteID))));
+                    .anyMatch(action -> !(executed.containsKey(action.get(Tags.AbstractID))));
             if (notExecutedAction) {
                 i = 0;
             } else {
@@ -92,11 +93,11 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
         if (i == 0) {
             providedListOfActions.stream()
-                    .filter(action -> !executed.containsKey(action.get(Tags.ConcreteID)))
+                    .filter(action -> !executed.containsKey(action.get(Tags.AbstractID)))
                     .forEach(filteredListOfActions::add);
         } else {
             providedListOfActions.stream()
-                    .filter(action -> executed.containsKey(action.get(Tags.ConcreteID)) && executed.get(action.get(Tags.ConcreteID)) == i)
+                    .filter(action -> executed.containsKey(action.get(Tags.AbstractID)) && executed.get(action.get(Tags.AbstractID)) == i)
                     .forEach(filteredListOfActions::add);
         }
         return (filteredListOfActions.size() == 0) ? null : filteredListOfActions.get(rnd.nextInt(filteredListOfActions.size()));
@@ -155,12 +156,13 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
 
-    public void setActions(final Set<Action> acts) {
+    public void updateState(final State state, final Set<Action> acts) {
+        this.state = state;
         this.actions = new ArrayList<>(acts);
     }
 
     public void addActionToPreviousActions(final Action action) {
-        System.out.println("Adding the selected action to the history...");
+        System.out.println("Adding the selected action of type '" + action.get(Tags.Role) + " ' to the history...");
         try {
             previousActions.add(action);
             this.incrementPreviousExecutedActions(action);
