@@ -15,7 +15,11 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
         System.out.println("DEBUG: creating genetic programming strategy");
-        strategyTree = (StrategyNodeAction) strategy;
+        if (strategy instanceof StrategyNodeAction) {
+            strategyTree = (StrategyNodeAction) strategy;
+        } else {
+            throw new RuntimeException("strategy is not of type 'StrategyNodeAction'!");
+        }
         stateManager = new StrategyGuiStateImpl();
     }
 
@@ -24,7 +28,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     public Action selectAction(final State state, final Set<Action> actions) {
-        stateManager.setActions(actions);
+        stateManager.updateState(state, actions);
         final Action action = strategyTree.getAction(stateManager)
                 .orElse(stateManager.getRandomAction());
         stateManager.addActionToPreviousActions(action);
