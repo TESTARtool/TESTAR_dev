@@ -15,13 +15,11 @@
 #include <Psapi.h>
 #include <Shobjidl.h>
 
- // begin by urueda
 #include <AccessBridgeCalls.h>
 
 #ifndef uint
 #define uint unsigned int
 #endif
-// end by urueda
 
 const int ERROR_BUFFER_LEN = 2000;
 TCHAR ErrorBuffer[ERROR_BUFFER_LEN];
@@ -2057,7 +2055,6 @@ JNI_SIG(jlongArray, WINAPI_NS(IUIAutomationElement_1GetRuntimeId)) (JNIEnv * env
 }
 
 
-// begin by urueda
 /* IUIAutomationElement_GetCurrentPropertyValue */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIEnv * env, jclass,
 		jlong pElement, jlong propertyId, jboolean fromCache){
@@ -2092,7 +2089,6 @@ JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetCurrentPropertyValue)) (JNIE
 
 	return ret;
 }
-// end by urueda
 
 /* IUIAutomationElement_GetPropertyValueEx */
 JNI_SIG(jobject, WINAPI_NS(IUIAutomationElement_1GetPropertyValueEx)) (JNIEnv * env, jclass,
@@ -2402,7 +2398,7 @@ JNI_SIG(void, WINAPI_NS(Gdiplus_1Bitmap_1Destroy))(JNIEnv *env, jclass, jlong pB
 
 /**
   * GetProcessMemoryInfo
-  * by urueda */
+  */
 JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong processID){
 
     HANDLE hProcess;
@@ -2427,7 +2423,7 @@ JNI_SIG(jlong, WINAPI_NS(GetProcessMemoryInfo)) (JNIEnv *env, jclass cl, jlong p
 
 /**
   * GetProcessTimes
-  * by urueda */
+  */
 JNI_SIG(jlongArray, WINAPI_NS(GetProcessTimes)) (JNIEnv *env, jclass cl, jlong processID) {
 
     static HANDLE self;
@@ -2502,7 +2498,7 @@ std::wstring Java_To_WStr(JNIEnv *env, jstring string)
 
 /**
   * InitializeAccessBridge
-  * by ferpasri & urueda (copy from Windows 7) */
+  *(copy from Windows 7) */
 JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 	MSG msg;
@@ -2524,7 +2520,7 @@ JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 /**
   * GetAccessibleContext
-  * by urueda (based on ferpasri) (copy from Windows 7) */
+  * (copy from Windows 7) */
 JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd){
 	
 	HWND window = (HWND)hwnd;
@@ -2555,7 +2551,7 @@ JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlon
 
 /**
   * GetHWNDFromAccessibleContext
-  * by urueda (copy from Windows 7) */
+  * (copy from Windows 7) */
 JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 
     HWND window = getHWNDFromAccessibleContext((long) vmid, (long) ac);
@@ -2566,7 +2562,7 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 
 /**
   * GetAccessibleChildFromContext
-  * by urueda (copy from Windows 7) */
+  * (copy from Windows 7) */
 JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i){
 
 	AccessibleContext child = GetAccessibleChildFromContext(vmid, ac, (int)i);
@@ -2575,8 +2571,7 @@ JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, 
 
 }
 
-/**
-  * by urueda (copy from Windows 7) */			   
+/**(copy from Windows 7) */			   
 char* wchart2String(JNIEnv * env, wchar_t *value){
 
 	char bf[sizeof(value)/sizeof(wchar_t)];
@@ -2587,8 +2582,7 @@ char* wchart2String(JNIEnv * env, wchar_t *value){
 	
 }
 
-/**
-  * by urueda (copy from Windows 7) */			   
+/**(copy from Windows 7) */			   
 char* jint2String(JNIEnv * env, jint value){
 
 	char bf[64];
@@ -2601,7 +2595,7 @@ char* jint2String(JNIEnv * env, jint value){
 
 /**
   * GetAccessibleContextProperties
-  * by urueda (copy from Windows 7) */
+  * (copy from Windows 7) */
 JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 	
 	jobjectArray ret = 0;
@@ -2610,19 +2604,25 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 
 	if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)ac, &info)){
 		
-		const int ACCESSIBLE_PROPERTIES = 9;
+		const int ACCESSIBLE_PROPERTIES = 15;
 		
 		ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
 		
-		env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.role)));
-		env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.name)));
-		env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.description)));
-		env->SetObjectArrayElement(ret, 3, env->NewStringUTF(jint2String(env, info.x)));
-		env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.y)));
-		env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.width)));
-		env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.height)));
-		env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.indexInParent)));
-		env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.childrenCount)));
+		env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.name)));
+		env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.description)));
+		env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.role)));
+		env->SetObjectArrayElement(ret, 3, env->NewStringUTF(wchart2String(env, info.states)));
+		env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.indexInParent)));
+		env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.childrenCount)));
+		env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.x)));
+		env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.y)));
+		env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.width)));
+		env->SetObjectArrayElement(ret, 9, env->NewStringUTF(jint2String(env, info.height)));
+		env->SetObjectArrayElement(ret, 10, env->NewStringUTF(jint2String(env, info.accessibleComponent)));
+		env->SetObjectArrayElement(ret, 11, env->NewStringUTF(jint2String(env, info.accessibleAction)));
+		env->SetObjectArrayElement(ret, 12, env->NewStringUTF(jint2String(env, info.accessibleSelection)));
+		env->SetObjectArrayElement(ret, 13, env->NewStringUTF(jint2String(env, info.accessibleText)));
+		env->SetObjectArrayElement(ret, 14, env->NewStringUTF(jint2String(env, info.accessibleInterfaces)));
 	
 	}
 	
@@ -2632,7 +2632,7 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 
 /**
   * GetProcessNameFromHWND
-  * by urueda (copy from Windows 7) */
+  * (copy from Windows 7) */
 JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
 
 	HWND window = (HWND) hwnd;
