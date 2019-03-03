@@ -30,6 +30,14 @@ task runTestar(type: Exec) {
     commandLine 'cmd', '/c', 'testar.bat'
 }
 
+/*  There's error on Linux, crashing the JVM on unregistering the NativeHook
+    For now, use the old version, 2.1.1 should fix the issue
+    https://github.com/kwhat/jnativehook/issues/168
+ */
+def jnativehook = System.getProperty("os.name").toLowerCase() == "linux"
+        ? 'com.1stleg:jnativehook:2.0.2'
+        : 'com.1stleg:jnativehook:2.1.0'
+
 dependencies {
     compile project(':core')
     compile project(':native')
@@ -37,7 +45,7 @@ dependencies {
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
-    compile 'com.1stleg:jnativehook:2.1.0'
+    compile jnativehook
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
