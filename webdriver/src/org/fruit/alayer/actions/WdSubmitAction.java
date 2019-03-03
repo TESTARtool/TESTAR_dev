@@ -19,7 +19,13 @@ public class WdSubmitAction extends TaggableBase implements Action {
       WdDriver.executeScript(String.format("%s.submit();", form));
     }
     catch (Exception wde) {
-      if (wde.getMessage().contains("submit is not a function")) {
+      // The form can not be found by id, let's try by name
+      if (wde.getMessage().contains("Cannot read property 'submit' of null")) {
+        form = String.format("document.getElementsByName('%s')[0]", formId);
+        WdDriver.executeScript(String.format("%s.submit();", form));
+      }
+      // Let's try by clicking on the submit button
+      else if (wde.getMessage().contains("submit is not a function")) {
         WdDriver.executeScript(String.format(
             "%s.querySelector('input[type=\"submit\"]').click();", form));
       }

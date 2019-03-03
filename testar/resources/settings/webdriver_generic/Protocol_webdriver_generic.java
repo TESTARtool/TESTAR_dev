@@ -379,7 +379,7 @@ public class Protocol_webdriver_generic extends ClickFilterLayerProtocol {
     }
 
     // Not a web link (or link to the same domain), allow
-    if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("https://"))) {
+    if (!(linkUrl.startsWith("https://") || linkUrl.startsWith("http://"))) {
       return false;
     }
 
