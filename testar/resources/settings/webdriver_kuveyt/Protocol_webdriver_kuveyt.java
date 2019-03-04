@@ -265,9 +265,12 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
               password.left(), "value", password.right()), 1);
         }
       }
-      // Submit form
-      builder.add(new WdSubmitAction(login.right()), 1);
-      return new HashSet<>(Collections.singletonList(builder.build()));
+      // Submit form, but only if user and pass are filled
+      builder.add(new WdSubmitAction(login.right()), 2);
+      CompoundAction actions = builder.build();
+      if (actions.getActions().size() >= 3) {
+        return new HashSet<>(Collections.singletonList(actions));
+      }
     }
 
     return null;
@@ -436,8 +439,8 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
     }
 
     // Widget must be completely visible on viewport for screenshots
-    return shape.x() > 0 && shape.x() + shape.width() < CanvasDimensions.getCanvasWidth() &&
-           shape.y() > 0 && shape.y() + shape.height() < CanvasDimensions.getInnerHeight();
+    return shape.x() >= 0 && shape.x() + shape.width() <= CanvasDimensions.getCanvasWidth() &&
+           shape.y() >= 0 && shape.y() + shape.height() <= CanvasDimensions.getInnerHeight();
   }
 
   protected boolean isClickable(Widget widget) {

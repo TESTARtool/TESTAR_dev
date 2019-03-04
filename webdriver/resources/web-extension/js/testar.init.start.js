@@ -58,6 +58,7 @@ var actualCode = '(' + function () {
 
     // Disallow browser dialogs
     window.alert = function () {};
+    window.confirm = function () {};
     window.print = function () {};
 } + ')();';
 
