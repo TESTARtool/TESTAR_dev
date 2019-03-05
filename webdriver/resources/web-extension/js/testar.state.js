@@ -211,6 +211,7 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
     // element is inside iframe(s)
     var outer = undefined;
     while (elem instanceof HTMLIFrameElement ||
+           elem instanceof HTMLFrameElement ||
             (outer !== undefined && outer.contentWindow !== undefined &&
              elem instanceof outer.contentWindow.HTMLIFrameElement)) {
         outer = elem;
