@@ -416,21 +416,24 @@ public class StateFetcher implements Callable<UIAState>{
 					el.isTopLevelContainer = true;
 				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
 					el.isKeyboardFocusable = true;
+				
 				el.name = name;				
 				el.helpText = description;
+				el.automationId = role;
 
-				if(accesibleStateSet.contains("enabled"))
-					el.enabled = true;
-				else
-					el.enabled = false;
+				el.enabled = accesibleStateSet.contains("enabled");
+				
+				el.blocked = !accesibleStateSet.contains("showing");
 
 				parent.root.hwndMap.put(el.hwnd, el);
 
-				//MenuItems are duplicated with AccessBridge when we open one Menu or combo box
-				if(!role.equals("menu") && !role.equals("combo box")
+				//Sometimes popup menu are duplicated with AccessBridge when we open one Menu or combo box
+				boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
+				
+				if( (!role.equals("popup menu") || correctComboBox)
 						&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 					
-					//TODO: Java 9 Access Bridge API
+					//TODO: Java 9, 10, 11, Access Bridge API
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 						if (cc > 0){
 							el.children = new ArrayList<UIAElement>(cc);
