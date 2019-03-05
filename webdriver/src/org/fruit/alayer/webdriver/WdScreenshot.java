@@ -2,8 +2,9 @@ package org.fruit.alayer.webdriver;
 
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.Rect;
-import org.openqa.selenium.NoSuchSessionException;
+import org.fruit.alayer.exceptions.StateBuildException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.imageio.ImageIO;
@@ -21,7 +22,8 @@ public class WdScreenshot extends AWTCanvas {
     super(1, 1, 1, 1);
   }
 
-  public static WdScreenshot fromScreenshot(RemoteWebDriver webDriver, Rect r) {
+  public static WdScreenshot fromScreenshot(RemoteWebDriver webDriver, Rect r)
+      throws StateBuildException {
     WdScreenshot wdScreenshot = new WdScreenshot();
 
     try {
@@ -33,10 +35,8 @@ public class WdScreenshot extends AWTCanvas {
       int height = (int) Math.min(fullImg.getHeight(),r.height());
       wdScreenshot.img = fullImg.getSubimage(x, y, width, height);
     }
-    catch (NoSuchSessionException nsse) {
-    }
-    catch (IOException ioe) {
-      ioe.printStackTrace();
+    catch (WebDriverException | IOException e) {
+      throw new StateBuildException("WebDriver not reachable");
     }
     return wdScreenshot;
   }

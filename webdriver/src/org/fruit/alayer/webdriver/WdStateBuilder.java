@@ -18,7 +18,7 @@ public class WdStateBuilder implements StateBuilder {
     Assert.isTrue(timeOut > 0);
     this.timeOut = timeOut;
 
-    // Needed to be able to schedule asynchornous tasks conveniently.
+    // Needed to be able to schedule asynchronous tasks conveniently.
     executor = Executors.newFixedThreadPool(defaultThreadPoolCount);
   }
 
@@ -29,15 +29,11 @@ public class WdStateBuilder implements StateBuilder {
       return future.get((long) (timeOut), TimeUnit.SECONDS);
     }
     catch (InterruptedException | ExecutionException e) {
-      e.printStackTrace();
-      throw new StateBuildException(e);
+      throw new StateBuildException(e.getMessage());
     }
     catch (TimeoutException e) {
-      System.out.println();
-      e.printStackTrace();
-      System.out.println();
-
-      WdState wdState = new WdState(WdStateFetcher.buildRoot(system));
+      WdRootElement wdRootElement = WdStateFetcher.buildRoot(system);
+      WdState wdState = new WdState(wdRootElement);
       wdState.set(Tags.Role, Roles.Process);
       wdState.set(Tags.NotResponding, true);
       return wdState;

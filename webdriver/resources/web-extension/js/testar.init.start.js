@@ -60,6 +60,7 @@ var actualCode = '(' + function () {
     window.alert = function () {};
     window.confirm = function () {};
     window.print = function () {};
+    navigator.geolocation.getCurrentPosition = function () {};
 } + ')();';
 
 var script = document.createElement('script');

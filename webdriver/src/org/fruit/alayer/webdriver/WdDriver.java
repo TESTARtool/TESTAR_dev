@@ -5,15 +5,19 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.fruit.alayer.*;
+import org.fruit.alayer.AutomationCache;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.SUTBase;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
-import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -37,7 +41,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -109,6 +116,10 @@ public class WdDriver extends SUTBase
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
+
+    Map<String, Object> prefs = new HashMap<>();
+    prefs.put("profile.default_content_setting_values.notifications", 2);
+    options.setExperimentalOption("prefs", prefs);
 
     return new ChromeDriver(service, options);
   }
@@ -268,7 +279,7 @@ public class WdDriver extends SUTBase
   @Override
   public String getStatus ()
   {
-    return "WebDriver : " + webDriver.getCurrentUrl();
+    return "WebDriver : " + WdDriver.getCurrentUrl();
   }
 
   @Override
@@ -371,12 +382,22 @@ public class WdDriver extends SUTBase
 
   public static Set<String> getWindowHandles ()
   {
-    return webDriver.getWindowHandles();
+    try {
+      return webDriver.getWindowHandles();
+    }
+    catch (WebDriverException ignored) {
+      return new HashSet<>();
+    }
   }
 
   public static String getCurrentUrl ()
   {
-    return webDriver.getCurrentUrl();
+    try {
+      return webDriver.getCurrentUrl();
+    }
+    catch (WebDriverException ignored) {
+      return "";
+    }
   }
 
   public static Object executeScript (String script, Object... args)
@@ -385,10 +406,15 @@ public class WdDriver extends SUTBase
       return null;
     }
 
-    // Update the list with window handles
-    updateHandlesList();
-    // Choose first or last tab, depending on user prefs
-    activate();
+    try {
+      // Update the list with window handles
+      updateHandlesList();
+      // Choose first or last tab, depending on user prefs
+      activate();
+    }
+    catch (WebDriverException wde) {
+      return null;
+    }
 
     // Wait until document is ready for script
     waitDocumentReady();
@@ -406,11 +432,7 @@ public class WdDriver extends SUTBase
       }
       // Methods from the extension not available : no way to add them now
       if (wde.getMessage().contains(" is not defined")) {
-        System.out.println();
-        System.out.println("TESTAR JS functions not available on this page!");
-        System.out.println("URL : " + webDriver.getCurrentUrl());
-        System.out.println();
-        System.exit(1);
+        return null;
       }
       // At the end of the sequence the browser is already closed
       if (wde.getMessage().contains("target window already closed")) {
