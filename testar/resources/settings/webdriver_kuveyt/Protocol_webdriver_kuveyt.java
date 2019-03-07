@@ -52,7 +52,7 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
   // Disallow links and pages with these extensions
   // Set to null to ignore this feature
   private static List<String> deniedExtensions = Arrays.asList(
-      "pdf", "jpg", "png");
+      "pdf", "jpg", "png", "vsf");
 
   // Define a whitelist of allowed domains for links and pages
   // An empty list will be filled with the domain from the sut connector
@@ -62,7 +62,7 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
 
   // If true, follow links opened in new tabs
   // If false, stay with the original (ignore links opened in new tabs)
-  private static boolean followLinks = true;
+  private static boolean followLinks = false;
 
   // URL + form name, username input id + value, password input id + value
   // Set login to null to disable this feature

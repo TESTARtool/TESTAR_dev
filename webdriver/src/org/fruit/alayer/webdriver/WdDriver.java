@@ -5,11 +5,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.fruit.alayer.AutomationCache;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.SUTBase;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
+import org.fruit.alayer.*;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
@@ -40,12 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class WdDriver extends SUTBase
@@ -118,7 +110,7 @@ public class WdDriver extends SUTBase
     options.addArguments("disable-infobars");
 
     Map<String, Object> prefs = new HashMap<>();
-    prefs.put("profile.default_content_setting_values.notifications", 2);
+    prefs.put("profile.default_content_setting_values.notifications", 1);
     options.setExperimentalOption("prefs", prefs);
 
     return new ChromeDriver(service, options);
@@ -139,11 +131,11 @@ public class WdDriver extends SUTBase
         .build();
 
     FirefoxProfile profile = new FirefoxProfile();
-    // profile.setPreference("xpinstall.signatures.required", false);
+    profile.setPreference("dom.webnotifications.enabled", false);
     FirefoxOptions options = new FirefoxOptions();
     options.setProfile(profile);
 
-    RemoteWebDriver webDriver = new FirefoxDriver(service);
+    RemoteWebDriver webDriver = new FirefoxDriver(service, options);
     loadGeckoExtension(webDriver, extensionPath);
 
     return webDriver;
