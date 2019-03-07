@@ -231,7 +231,7 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 		
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w))
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					
 					}
 				}

@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,9 +29,6 @@
 *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.actions;
 
 import java.util.List;
@@ -112,7 +110,7 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 
@@ -133,7 +131,7 @@ public class StdActionCompiler {
 	public Action rightClickAt(Widget w, double relX, double relY){
 		Finder wf = abstractor.apply(w);
 		Action ret = rightClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
-		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
+		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'");
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
@@ -181,11 +179,10 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = leftDoubleClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
-	
-	//begin mimarmu1 & fraalpe2
+
 	public Action dropDownAt(Position position){
 		Assert.notNull(position);
 		
@@ -201,14 +198,13 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Action ret = dropDownAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda		
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
 	
 	public Action dropDownAt(Widget w){
 		return dropDownAt(w, 0.5, 0.5);
 	}
-	//end by mimarmu1 & fraalpe2	
 
 	public Action dragFromTo(Widget from, Widget to){
 		return dragFromTo(from, 0.5, 0.5, to, 0.5, 0.5);
@@ -225,44 +221,84 @@ public class StdActionCompiler {
 				.add(LMouseUp, 0).build();		
 	}
 	
-	// by urueda
 	public Action slideFromTo(Position from, Position to){
 		Action action = dragFromTo(from,to);
 		action.set(Tags.Slider, new Position[]{from,to});
 		return action;
 	}
 
-	public Action clickTypeInto(final Position position, final String text){
-		Assert.notNull(position, text);
-		//return new CompoundAction.Builder().add(leftClickAt(position), 1).add(new Type(text), 1).build();
-		// begin by urueda (from text additions to text replacements)
-		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
-        //Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_NUM_LOCK, false); // VK_SHIFT bug fix (did not work)
-		Builder builder = new CompoundAction.Builder()
-			.add(leftClickAt(position), 1)
-			//.add(new KeyDown(KBKeys.VK_END), 1).add(new KeyUp(KBKeys.VK_END), 1)
-			//.add(new KeyDown(KBKeys.VK_SHIFT), 1)
-			.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
-			//.add(new KeyUp(KBKeys.VK_SHIFT), 1);
-		for ( int i=0; i<TEXT_REMOVE_TRIES; i++)
-			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
-		builder.add(new Type(text), 1);
-		return builder.build();
-		// end by urueda
+
+	/**
+	 *
+	 * @param w, widget that allows inserting text
+	 * @param text, text to be inserted
+	 * @param replaceText, true = replace, false = append
+	 * @return Action that inserts text into the widget
+	 */
+	public Action clickTypeInto(Widget w, String text, boolean replaceText){
+		return clickTypeInto(w, 0.5, 0.5, text, replaceText);
 	}
 
-	public Action clickTypeInto(Widget w, String text){
-		return clickTypeInto(w, 0.5, 0.5, text);
-	}
-
-	public Action clickTypeInto(Widget w, double relX, double relY, String text){
+	/**
+	 * This could be private function?
+	 *
+	 * Translates the relative position of the click into absolute coordinates
+	 *
+	 * @param w
+	 * @param relX
+	 * @param relY
+	 * @param text
+	 * @param replaceText
+	 * @return
+	 */
+	public Action clickTypeInto(Widget w, double relX, double relY, String text, boolean replaceText){
 		Finder wf = abstractor.apply(w);
-		Action ret = clickTypeInto(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		Action ret = null;
+		if(replaceText){
+			ret = clickAndReplaceText(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		}else{
+			ret = clickAndAppendText(new WidgetPosition(wf, Tags.Shape, relX, relY, true), text);
+		}
 		ret.set(Tags.Targets, Util.newArrayList(wf));
-		ret.set(Tags.TargetID, w.get(Tags.ConcreteID)); // by urueda
+		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
 		return ret;
 	}
-	
+
+	public Action clickAndReplaceText(final Position position, final String text){
+		Assert.notNull(position, text);
+		// clicking the widget to select it:
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+		// pressing Cntr + A keys to select all text:
+		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
+		/*
+		// old text replacements by pressing delete multiple times:
+		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
+		//Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_NUM_LOCK, false); // VK_SHIFT bug fix (did not work)
+		Builder builder = new CompoundAction.Builder()
+				.add(leftClickAt(position), 1)
+				//.add(new KeyDown(KBKeys.VK_END), 1).add(new KeyUp(KBKeys.VK_END), 1)
+				//.add(new KeyDown(KBKeys.VK_SHIFT), 1)
+				.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
+		//.add(new KeyUp(KBKeys.VK_SHIFT), 1);
+		for ( int i=0; i<TEXT_REMOVE_TRIES; i++)
+			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
+		*/
+		// Typing the new text:
+		builder.add(new Type(text), 1);
+		return builder.build();
+	}
+
+	public Action clickAndAppendText(final Position position, final String text){
+		Assert.notNull(position, text);
+		// clicking the widget to select it:
+		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
+		// pressing End key to append into the end of the text:
+		builder.add(new KeyDown(KBKeys.VK_END), 0.1).add(new KeyUp(KBKeys.VK_END), 0.1);
+		//inserting text:
+		builder.add(new Type(text), 1);
+		return builder.build();
+	}
+
 	public Action hitKey(KBKeys key) {
 		return new CompoundAction.Builder().add(new KeyDown(key), .0)
 				.add(new KeyUp(key), 1.0).add(NOP, 1.0).build();
