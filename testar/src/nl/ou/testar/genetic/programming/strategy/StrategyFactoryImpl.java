@@ -50,6 +50,7 @@ import java.util.Queue;
 
 public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
+    private StrategyActionSelector strategyActionSelector;
 
     public StrategyFactoryImpl(final String strategy) {
         if (strategy.endsWith(".txt")) {
@@ -79,9 +80,13 @@ public class StrategyFactoryImpl implements StrategyFactory {
     @Override
     public StrategyActionSelector getStrategyActionSelector() {
         final StrategyNode main = getStrategyNode();
-        final StrategyActionSelector selector = new StrategyActionSelectorImpl(main);
-        selector.print();
-        return selector;
+        this.strategyActionSelector = new StrategyActionSelectorImpl(main);
+        this.strategyActionSelector.print();
+        return this.strategyActionSelector;
+    }
+
+    public void printMetrics() {
+        this.strategyActionSelector.getMetrics();
     }
 
     private void makeQueue(final String strategy) {

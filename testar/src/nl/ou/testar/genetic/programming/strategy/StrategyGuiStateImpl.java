@@ -3,6 +3,7 @@ package nl.ou.testar.genetic.programming.strategy;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
@@ -24,9 +25,15 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private List<String> previousStates = new ArrayList<>();
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
-    private State state;
 
-    StrategyGuiStateImpl() { }
+    private static final Tag<String> ACTION_ID = Tags.AbstractID;
+    private static final Tag<String> STATE_ID = Tags.Abstract_R_T_P_ID;
+
+
+    StrategyGuiStateImpl() {
+    }
+
+//    public int previousStates
 
     public boolean isAvailable(final Role actionType) {
         return actions.stream().anyMatch(action -> action.get(Tags.Role) == actionType);
@@ -42,7 +49,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public int getNumberOfUnexecutedActionsOfRole(final Role actionType) {
         return (int) actions.stream()
-                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(Tags.Abstract_R_T_P_ID))))
+                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(STATE_ID))))
                 .count();
     }
 
@@ -81,7 +88,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             i = 0;
         } else if (LEAST == actionExecutionStatus) {
             final boolean notExecutedAction = actions.stream()
-                    .anyMatch(action -> !(executed.containsKey(action.get(Tags.AbstractID))));
+                    .anyMatch(action -> !(executed.containsKey(action.get(ACTION_ID))));
             if (notExecutedAction) {
                 i = 0;
             } else {
@@ -93,11 +100,11 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
         if (i == 0) {
             providedListOfActions.stream()
-                    .filter(action -> !executed.containsKey(action.get(Tags.AbstractID)))
+                    .filter(action -> !executed.containsKey(action.get(ACTION_ID)))
                     .forEach(filteredListOfActions::add);
         } else {
             providedListOfActions.stream()
-                    .filter(action -> executed.containsKey(action.get(Tags.AbstractID)) && executed.get(action.get(Tags.AbstractID)) == i)
+                    .filter(action -> executed.containsKey(action.get(ACTION_ID)) && executed.get(action.get(ACTION_ID)) == i)
                     .forEach(filteredListOfActions::add);
         }
         return (filteredListOfActions.size() == 0) ? null : filteredListOfActions.get(rnd.nextInt(filteredListOfActions.size()));
@@ -157,7 +164,6 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
 
     public void updateState(final State state, final Set<Action> acts) {
-        this.state = state;
         this.actions = new ArrayList<>(acts);
     }
 
@@ -173,7 +179,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     private void incrementPreviousExecutedActions(final Action previousAction) {
-        final String pa = previousAction.get(Tags.AbstractID);
+        final String pa = previousAction.get(ACTION_ID);
         if (executed.containsKey(pa)) {
             executed.put(pa, executed.get(pa) + 1);
         } else {
@@ -185,7 +191,23 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1).equals(previousStates.get(previousStates.size() - 2));
     }
 
+    public int getTotalNumberOfActions() {
+        return this.previousActions.size();
+    }
+
+    public int getTotalNumberOfUniqueExecutedActions() {
+        return this.executed.size();
+    }
+
+    public void printActionWithTimeExecuted() {
+        this.executed.forEach((actionId, noOfExecutions) ->
+                actions.stream()
+                        .filter(action -> action.get(ACTION_ID).equals(actionId))
+                        .forEach(action -> System.out.println("Action of type: " + action.get(Tags.Role) + " executed " + noOfExecutions + " times"))
+        );
+    }
+
     public void addStateToPreviousStates(final State st) {
-        previousStates.add(st.get(Tags.Abstract_R_T_P_ID));
+        previousStates.add(st.get(STATE_ID));
     }
 }

@@ -20,4 +20,9 @@ public interface StrategyActionSelector {
      * Print the strategy tree
      */
     void print();
+
+    /**
+     * Print the gathered metrics
+     */
+    void getMetrics();
 }

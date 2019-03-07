@@ -26,6 +26,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
+ * @author Sebastian Bauersfeld
  */
 
 
@@ -62,11 +63,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 import static org.fruit.monkey.ConfigTags.AccessBridgeEnabled;
 import static org.fruit.monkey.ConfigTags.ActionDuration;
 import static org.fruit.monkey.ConfigTags.AlgorithmFormsFilling;
 import static org.fruit.monkey.ConfigTags.AlwaysCompile;
 import static org.fruit.monkey.ConfigTags.ClickFilter;
+import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
 import static org.fruit.monkey.ConfigTags.CopyFromTo;
 import static org.fruit.monkey.ConfigTags.Delete;
 import static org.fruit.monkey.ConfigTags.Discount;
@@ -179,7 +182,7 @@ public class Main {
                     newSettings.ifPresent(Main::setSettings);
                 }
             } else {
-               Main.setSettings(setting);
+                Main.setSettings(setting);
             }
         });
 
@@ -305,8 +308,6 @@ public class Main {
             System.out.println("Exception creating <" + sseFile + "> file");
         }
     }
-    SSE_ACTIVATED = null;
-  }
 
     //TODO: After know what overrideWithUserProperties does, unify this method with loadSettings
 
@@ -402,11 +403,11 @@ public class Main {
         int i;
 
         // first the attributes for the concrete state id
-        if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+        if (!settings.get(ConcreteStateAttributes).isEmpty()) {
             i = 0;
 
-            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
-            for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConcreteStateAttributes).size()];
+            for (String concreteStateAttribute : settings.get(ConcreteStateAttributes)) {
                 concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
             }
 
@@ -414,11 +415,11 @@ public class Main {
         }
 
         // then the attributes for the abstract state id
-        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+        if (!settings.get(AbstractStateAttributes).isEmpty()) {
             i = 0;
 
-            Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
-            for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+            Tag<?>[] abstractTags = new Tag<?>[settings.get(AbstractStateAttributes).size()];
+            for (String abstractStateAttribute : settings.get(AbstractStateAttributes)) {
                 abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
             }
 
@@ -480,7 +481,6 @@ public class Main {
             TestSerialiser.exit();
             ScreenshotSerialiser.exit();
             LogSerialiser.exit();
-            Grapher.exit();
         }
     }
 
@@ -558,36 +558,36 @@ public class Main {
             defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
             defaults.add(Pair.from(ProcessLogs, ".*.*"));
 
-      defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
-      defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
-        {
-          add("Role");
+            defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
+            defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+                {
+                    add("Role");
+                }
+            }));
+
+            //Overwrite the default settings with those from the file
+            Settings settings = Settings.fromFile(defaults, file);
+            //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
+            //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
+            //PrologActivated is ALWAYS false.
+            //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
+            settings.set(ConfigTags.PrologActivated, false);
+
+            // check that the abstract state properties and the abstract action properties have at least 1 value
+            if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
+                throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
+            }
+
+            // check that the abstract state properties and the abstract action properties have at least 1 value
+            if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+                throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+            }
+
+            return settings;
+        } catch (IOException ioe) {
+            throw new ConfigException("Unable to load configuration file!", ioe);
         }
-      }));
-
-      //Overwrite the default settings with those from the file
-      Settings settings = Settings.fromFile(defaults, file);
-      //Make sure that Prolog is ALWAYS false, even if someone puts it to true in their test.settings file
-      //Need this during refactoring process of getting Prolog code out. Refactoring will assume that
-      //PrologActivated is ALWAYS false.
-      //Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
-      settings.set(ConfigTags.PrologActivated, false);
-
-      // check that the abstract state properties and the abstract action properties have at least 1 value
-      if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
-        throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
-      }
-
-      // check that the abstract state properties and the abstract action properties have at least 1 value
-      if ((settings.get(AbstractStateAttributes)).isEmpty()) {
-        throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
-      }
-
-      return settings;
-    } catch (IOException ioe) {
-      throw new ConfigException("Unable to load configuration file!", ioe);
     }
-  }
 
     /**
      * This method creates a sse file to change TESTAR protocol if sett param matches an existing protocol

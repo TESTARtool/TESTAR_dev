@@ -31,10 +31,20 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         stateManager.updateState(state, actions);
         final Action action = strategyTree.getAction(stateManager)
                 .orElse(stateManager.getRandomAction());
-        stateManager.addActionToPreviousActions(action);
-        stateManager.addStateToPreviousStates(state);
+        this.updateState(action, state);
         System.out.printf("The selected action is of type %s", action.get(Tags.Role));
 
         return action;
+    }
+
+    public void getMetrics() {
+        System.out.printf("Total number of actions %d", stateManager.getTotalNumberOfActions());
+        System.out.printf("Total number of unique actions %d", stateManager.getTotalNumberOfUniqueExecutedActions());
+        stateManager.printActionWithTimeExecuted();
+    }
+
+    private void updateState(final Action action, final State state) {
+        stateManager.addActionToPreviousActions(action);
+        stateManager.addStateToPreviousStates(state);
     }
 }

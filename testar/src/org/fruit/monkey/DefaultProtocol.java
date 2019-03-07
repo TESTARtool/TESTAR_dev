@@ -813,8 +813,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     /**
      * Method to run TESTAR on Spy Mode.
-     *
-     * @param system
      */
     protected void runSpyLoop() {
 
