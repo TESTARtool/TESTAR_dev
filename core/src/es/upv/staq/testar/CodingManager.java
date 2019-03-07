@@ -30,6 +30,7 @@
 
 package es.upv.staq.testar;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.zip.CRC32;
 
@@ -52,8 +53,10 @@ public class CodingManager {
 	public static final int ID_LENTGH = 24; // 2 (prefixes) + 7 (MAX_RADIX) + 5 (max expected text length) + 10 (CRC32)
 	
 	public static final String CONCRETE_ID = "ConcreteID";
+	public static final String CONCRETE_ID_CUSTOM = "ConcreteIDCustom";
 	// actions abstraction
 	public static final String ABSTRACT_ID = "AbstractID";
+	public static final String ABSTRACT_ID_CUSTOM = "AbstractIDCustom";
 	// widgets abstraction
 	public static final String ABSTRACT_R_ID = "Abs(R)ID"; // ROLE
 	public static final String ABSTRACT_R_T_ID = "Abs(R,T)ID"; // ROLE, TITLE
@@ -79,6 +82,39 @@ public class CodingManager {
 		ActionRoles.Type,
 		ActionRoles.KeyDown,
 		ActionRoles.KeyUp
+	};
+
+	// two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
+	private static Tag<?>[] customTagsForConcreteId = new Tag<?>[]{};
+	private static Tag<?>[] customTagsForAbstractId = new Tag<?>[]{};
+
+    /**
+     * Set the array of tags that should be used in constructing the concrete state id's.
+     *
+     * @param tags array
+     */
+	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
+		customTagsForConcreteId = tags;
+	}
+
+    /**
+     * Set the array of tags that should be used in constructing the abstract state id's.
+     *
+     * @param tags
+     */
+	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
+		customTagsForAbstractId = tags;
+	}
+
+	// this map holds the state tags that should be provided to the coding manager
+    // for use in constructing concrete and abstract state id's
+	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
+		{
+			put("Role", Tags.Role);
+			put("Title", Tags.Title);
+			put("Path", Tags.Path);
+			put("Enabled", Tags.Enabled);
+		}
 	};
 	
 	// ###########################################
@@ -107,8 +143,11 @@ public class CodingManager {
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
+			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, customTagsForConcreteId));
+			widget.set(Tags.AbstractIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT + CodingManager.codify(widget, false, customTagsForAbstractId));
 		} else if (widget instanceof State) { // UI root
-			String cid = "", a_R_id = "", a_R_T_id = "", a_R_T_P_id = "";
+			String cid, a_R_id, a_R_T_id, a_R_T_P_id, concreteIdCustom, abstractIdCustom;
+			cid = a_R_id = a_R_T_id = a_R_T_P_id = concreteIdCustom = abstractIdCustom = "";
 			for (Widget w : (State) widget){
 				if (w != widget){
 					buildIDs(w);
@@ -116,12 +155,16 @@ public class CodingManager {
 					a_R_id += w.get(Tags.Abstract_R_ID);
 					a_R_T_id += w.get(Tags.Abstract_R_T_ID);
 					a_R_T_P_id += w.get(Tags.Abstract_R_T_P_ID);
+					concreteIdCustom += w.get(Tags.ConcreteIDCustom);
+					abstractIdCustom += w.get(Tags.AbstractIDCustom);
 				}
 			}
 			widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(cid));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.toID(a_R_id));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.toID(a_R_T_id));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.toID(a_R_T_P_id));
+			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(concreteIdCustom));
+			widget.set(Tags.AbstractIDCustom, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT + CodingManager.toID(abstractIdCustom));
 		}	
 	}
 	
@@ -278,19 +321,26 @@ public class CodingManager {
 	public static Widget find(State state, String widgetID, String idType){
 		Tag<String> t = null;
 		switch(idType){
-		case CodingManager.CONCRETE_ID:
-			t = Tags.ConcreteID;
-			break;
-		case CodingManager.ABSTRACT_R_ID:
-			t = Tags.Abstract_R_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_ID:
-			t = Tags.Abstract_R_T_ID;
-			break;
-		case CodingManager.ABSTRACT_R_T_P_ID:
-			t = Tags.Abstract_R_T_P_ID;
-			break;
+			case CodingManager.CONCRETE_ID:
+				t = Tags.ConcreteID;
+				break;
+			case CodingManager.ABSTRACT_R_ID:
+				t = Tags.Abstract_R_ID;
+				break;
+			case CodingManager.ABSTRACT_R_T_ID:
+				t = Tags.Abstract_R_T_ID;
+				break;
+			case CodingManager.ABSTRACT_R_T_P_ID:
+				t = Tags.Abstract_R_T_P_ID;
+				break;
+			case CodingManager.CONCRETE_ID_CUSTOM:
+				t = Tags.ConcreteIDCustom;
+				break;
+			case CodingManager.ABSTRACT_ID_CUSTOM:
+				t = Tags.AbstractIDCustom;
+				break;
 		}
+
 		for (Widget w : state){
 			if (widgetID.equals(w.get(t)))
 				return w;
