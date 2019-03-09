@@ -14,6 +14,7 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import java.util.Set;
@@ -71,6 +72,10 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     protected void initialize(Settings settings) {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
+        settings().get(ConfigTags.AbstractStateAttributes);
+        settings().get(ConfigTags.ConcreteStateAttributes);
+
+
         // initializing simple GUI state graph:
         //stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
         strategyFactory = new StrategyFactoryImpl("RandomAction:RandomMostExecutedAction:RandomLeastExecutedAction:");

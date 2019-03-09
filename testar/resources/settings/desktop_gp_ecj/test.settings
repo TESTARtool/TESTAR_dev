@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 20
-SequenceLength = 100
+Sequences = 1
+SequenceLength = 25
 
 #################################################################
 # Oracles based on suspicious titles
@@ -133,6 +133,7 @@ DrawWidgetTree = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 AlgorithmFormsFilling = false
+StrategyFile = strategy.txt
 FaultThreshold = 1.0E-9
 DrawWidgetInfo = false
 MaxReward = 9999999.0
