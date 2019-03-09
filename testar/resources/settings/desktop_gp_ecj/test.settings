@@ -111,6 +111,16 @@ GraphDBUser =
 GraphDBPassword = 
 
 #################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+# Allowed value are: Role,Path,Title,Enabled
+#################################################################
+ConcreteStateAttributes = Role,Path,Title,Enabled
+AbstractStateAttributes = Role,Title
+
+#################################################################
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
@@ -137,7 +147,7 @@ ForceToSequenceLength = true
 OutputDir = ./testar/resources/output
 UnattendedTests = false
 TestGenerator = strategy
-StartupTime = 10.0
+StartupTime = 3.0
 ActionDuration = 0.0
 NonReactingUIThreshold = 100
 GraphsActivated = true

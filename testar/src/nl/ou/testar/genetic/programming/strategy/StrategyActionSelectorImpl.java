@@ -38,9 +38,11 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     public void getMetrics() {
-        System.out.printf("Total number of actions %d", stateManager.getTotalNumberOfActions());
-        System.out.printf("Total number of unique actions %d", stateManager.getTotalNumberOfUniqueExecutedActions());
+        System.out.printf("Total number of actions %d \n", stateManager.getTotalNumberOfActions());
+        System.out.printf("Total number of unique actions %d \n", stateManager.getTotalNumberOfUniqueExecutedActions());
         stateManager.printActionWithTimeExecuted();
+        System.out.printf("Total number of states visited %d \n", stateManager.getTotalVisitedStates());
+        System.out.printf("Total number of unique states %d \n", stateManager.getUniqueStates());
     }
 
     private void updateState(final Action action, final State state) {

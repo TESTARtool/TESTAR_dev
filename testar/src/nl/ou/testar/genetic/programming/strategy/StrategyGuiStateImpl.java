@@ -7,13 +7,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static nl.ou.testar.genetic.programming.strategy.ActionExecutionStatus.LEAST;
@@ -26,7 +20,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    private static final Tag<String> ACTION_ID = Tags.AbstractID;
+    private static final Tag<String> ACTION_ID = Tags.Desc;
     private static final Tag<String> STATE_ID = Tags.Abstract_R_T_P_ID;
 
 
@@ -49,7 +43,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public int getNumberOfUnexecutedActionsOfRole(final Role actionType) {
         return (int) actions.stream()
-                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(STATE_ID))))
+                .filter(action -> action.get(Tags.Role) == actionType && !(executed.keySet().contains(action.get(ACTION_ID))))
                 .count();
     }
 
@@ -168,7 +162,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public void addActionToPreviousActions(final Action action) {
-        System.out.println("Adding the selected action of type '" + action.get(Tags.Role) + " ' to the history...");
+        System.out.println("Adding the selected action of type '" + action.get(Tags.Role) + "' to the history...");
         try {
             previousActions.add(action);
             this.incrementPreviousExecutedActions(action);
@@ -191,20 +185,32 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return previousStates.size() >= 2 && previousStates.get(previousStates.size() - 1).equals(previousStates.get(previousStates.size() - 2));
     }
 
-    public int getTotalNumberOfActions() {
+    int getTotalNumberOfActions() {
         return this.previousActions.size();
     }
 
-    public int getTotalNumberOfUniqueExecutedActions() {
+    int getTotalNumberOfUniqueExecutedActions() {
         return this.executed.size();
     }
 
-    public void printActionWithTimeExecuted() {
+    void printActionWithTimeExecuted() {
         this.executed.forEach((actionId, noOfExecutions) ->
-                actions.stream()
-                        .filter(action -> action.get(ACTION_ID).equals(actionId))
-                        .forEach(action -> System.out.println("Action of type: " + action.get(Tags.Role) + " executed " + noOfExecutions + " times"))
+            this.previousActions.stream()
+                    .filter(action -> action.get(ACTION_ID).equals(actionId))
+                    .findFirst()
+                    .ifPresent(action -> System.out.printf("%s executed %d times \n", action.get(ACTION_ID), noOfExecutions))
         );
+    }
+
+    int getTotalVisitedStates() {
+        return this.previousStates.size();
+    }
+
+    int getUniqueStates() {
+        return (int) this.previousStates
+                .stream()
+                .distinct()
+                .count();
     }
 
     public void addStateToPreviousStates(final State st) {

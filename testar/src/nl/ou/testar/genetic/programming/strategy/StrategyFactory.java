@@ -8,4 +8,9 @@ public interface StrategyFactory {
      * @return StrategyActionSelector
      */
     StrategyActionSelector getStrategyActionSelector();
+
+    /**
+     * Print metrics
+     */
+    void printMetrics();
 }
