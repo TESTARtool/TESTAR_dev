@@ -20,8 +20,8 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    private static final Tag<String> ACTION_ID = Tags.Desc;
-    private static final Tag<String> STATE_ID = Tags.Abstract_R_T_P_ID;
+    private static Tag<String> ACTION_ID;
+    private static Tag<String> STATE_ID;
 
 
     StrategyGuiStateImpl() {
@@ -215,5 +215,15 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public void addStateToPreviousStates(final State st) {
         previousStates.add(st.get(STATE_ID));
+    }
+
+    @Override
+    public void setStateTag(final Tag<String> stateTag) {
+        STATE_ID = stateTag;
+    }
+
+    @Override
+    public void setActionTag(Tag<String> actionTag) {
+        ACTION_ID = actionTag;
     }
 }

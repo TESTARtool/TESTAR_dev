@@ -3,6 +3,7 @@ package nl.ou.testar.genetic.programming.strategy;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 
 import java.util.List;
 import java.util.Set;
@@ -47,4 +48,8 @@ public interface StrategyGuiState {
     boolean hasStateNotChanged();
 
     void addStateToPreviousStates(final State state);
+
+    void setStateTag(final Tag<String> stateTag);
+
+    void setActionTag(final Tag<String> actionTag);
 }

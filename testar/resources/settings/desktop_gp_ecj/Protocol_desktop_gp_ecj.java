@@ -1,14 +1,10 @@
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -17,10 +13,13 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
+import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
 
 /***************************************************************************************************
  *
@@ -69,18 +68,33 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      * @param settings the current TESTAR settings as specified by the user.
      */
     @Override
-    protected void initialize(Settings settings) {
+    protected void initialize(final Settings settings) {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
-        settings().get(ConfigTags.AbstractStateAttributes);
-        settings().get(ConfigTags.ConcreteStateAttributes);
 
+        final Tag<String> stateTag = this.getStateTag(settings);
+        final Tag<String> actionTag = this.getActionTag(settings);
 
-        // initializing simple GUI state graph:
-        //stateGraph = new GuiStateGraphForQlearning(settings().get(ConfigTags.MaxReward),settings().get(ConfigTags.Discount));
-        strategyFactory = new StrategyFactoryImpl("RandomAction:RandomMostExecutedAction:RandomLeastExecutedAction:");
+        strategyFactory = new StrategyFactoryImpl(settings().get(ConfigTags.StrategyFile));
         strategyActionSelector = strategyFactory.getStrategyActionSelector();
+        strategyActionSelector.setTags(stateTag, actionTag);
         super.initialize(settings);
+    }
+
+    private Tag<String> getStateTag(final Settings settings) {
+        if (!settings.get(AbstractStateAttributes).isEmpty()) {
+            CodingManager.setCustomTagsForAbstractId(new Tag<?>[settings.get(AbstractStateAttributes).size()]);
+            return Tags.AbstractIDCustom;
+        }
+        return  Tags.Abstract_R_T_P_ID;
+    }
+
+    private Tag<String> getActionTag(final Settings settings) {
+        if (!settings.get(ConcreteStateAttributes).isEmpty()) {
+            CodingManager.setCustomTagsForConcreteId(new Tag<?>[settings.get(ConcreteStateAttributes).size()]);
+            return Tags.ConcreteIDCustom;
+        }
+        return Tags.Desc;
     }
 
     /**

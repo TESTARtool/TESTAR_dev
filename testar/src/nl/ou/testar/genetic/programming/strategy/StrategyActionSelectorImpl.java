@@ -4,8 +4,10 @@ import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
+import java.util.List;
 import java.util.Set;
 
 public class StrategyActionSelectorImpl implements StrategyActionSelector {
@@ -43,6 +45,12 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         stateManager.printActionWithTimeExecuted();
         System.out.printf("Total number of states visited %d \n", stateManager.getTotalVisitedStates());
         System.out.printf("Total number of unique states %d \n", stateManager.getUniqueStates());
+    }
+
+    @Override
+    public void setTags(final Tag<String> stateTag, final Tag<String> actionTag) {
+        stateManager.setStateTag(stateTag);
+        stateManager.setActionTag(actionTag);
     }
 
     private void updateState(final Action action, final State state) {
