@@ -74,8 +74,8 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
 
-        final Tag<String> stateTag = this.getStateTag(settings);
-        final Tag<String> actionTag = this.getActionTag(settings);
+        final Tag<String> stateTag = this.getStateTag();
+        final Tag<String> actionTag = this.getActionTag();
         strategyFactory = new StrategyFactoryImpl(settings().get(ConfigTags.StrategyFile));
 
         this.inputText = Optional.ofNullable(strategyFactory.getTextInputsFromFile(settings().get(InputFileText)));
@@ -85,15 +85,15 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         super.initialize(settings);
     }
 
-    private Tag<String> getStateTag(final Settings settings) {
-        if (!settings.get(AbstractStateAttributes).isEmpty()) {
+    private Tag<String> getStateTag() {
+        if (!settings().get(AbstractStateAttributes).isEmpty()) {
             return Tags.AbstractIDCustom;
         }
         return  Tags.Abstract_R_T_P_ID;
     }
 
-    private Tag<String> getActionTag(final Settings settings) {
-        if (!settings.get(ConcreteStateAttributes).isEmpty()) {
+    private Tag<String> getActionTag() {
+        if (!settings().get(ConcreteStateAttributes).isEmpty()) {
             return Tags.ConcreteIDCustom;
         }
         return Tags.Desc;
