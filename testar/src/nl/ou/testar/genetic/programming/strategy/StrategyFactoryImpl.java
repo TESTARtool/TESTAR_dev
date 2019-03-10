@@ -38,15 +38,18 @@ import nl.ou.testar.genetic.programming.strategy.actions.SnTypeActionsAvailable;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeOfActionOf;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.stream.Stream;
 
 public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
@@ -75,6 +78,15 @@ public class StrategyFactoryImpl implements StrategyFactory {
         }
         System.out.println("Strategy from file: " + strategyFromFile);
         return strategyFromFile;
+    }
+
+    public String[] getTextInputsFromFile(final String inputFile) {
+        try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
+            return lines.filter(line -> !line.startsWith("#")).toArray(String[]::new);
+        } catch (IOException e) {
+            System.out.println("Error while reading text input file!");
+        }
+        throw new RuntimeException("The content of the input file seems to be corrupt!");
     }
 
     @Override

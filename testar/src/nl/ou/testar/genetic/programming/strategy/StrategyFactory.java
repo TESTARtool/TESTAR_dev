@@ -13,4 +13,13 @@ public interface StrategyFactory {
      * Print metrics
      */
     void printMetrics();
+
+
+    /**
+     * Returns inputs for
+     *
+     * @param inputFile - File to read inputs from. If a line starts with a # it is considered a comment
+     * @return inputs for type actions
+     */
+    String[] getTextInputsFromFile(final String inputFile);
 }

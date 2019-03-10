@@ -1,4 +1,3 @@
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
@@ -13,13 +12,15 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
+import static org.fruit.monkey.ConfigTags.InputFileText;
 
 /***************************************************************************************************
  *
@@ -60,6 +61,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     private HtmlSequenceReport htmlReport;
     private StrategyFactory strategyFactory;
     private StrategyActionSelector strategyActionSelector;
+    private Optional<String[]> inputText;
 
     /**
      * Called once during the life time of TESTAR
@@ -74,8 +76,10 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
 
         final Tag<String> stateTag = this.getStateTag(settings);
         final Tag<String> actionTag = this.getActionTag(settings);
-
         strategyFactory = new StrategyFactoryImpl(settings().get(ConfigTags.StrategyFile));
+
+        this.inputText = Optional.ofNullable(strategyFactory.getTextInputsFromFile(settings().get(InputFileText)));
+
         strategyActionSelector = strategyFactory.getStrategyActionSelector();
         strategyActionSelector.setTags(stateTag, actionTag);
         super.initialize(settings);
@@ -226,8 +230,16 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
                     if (isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Store the widget in the Graphdatabase
                         storeWidget(state.get(Tags.ConcreteID), w);
+
+                        String text;
+                        if (this.inputText.isPresent()) {
+                            final String[] inputs = this.inputText.get();
+                            text = inputs[new Random().nextInt(inputs.length)];
+                        } else {
+                            text = this.getRandomText(w);
+                        }
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        actions.add(ac.clickTypeInto(w, text, true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.

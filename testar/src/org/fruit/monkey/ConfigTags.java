@@ -114,4 +114,5 @@ public final class ConfigTags {
     public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
     public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
     public static final Tag<String> StrategyFile = Tag.from("StrategyFile", String.class);
+    public static final Tag<String> InputFileText = Tag.from("InputFileText", String.class);
 }
