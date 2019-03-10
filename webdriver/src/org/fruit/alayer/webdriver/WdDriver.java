@@ -98,8 +98,8 @@ public class WdDriver extends SUTBase
     CanvasDimensions.startThread();
   }
 
-  private static RemoteWebDriver startChromeDriver (
-      String chromeDriverPath, String extensionPath)
+  private static RemoteWebDriver startChromeDriver (String chromeDriverPath,
+                                                    String extensionPath)
   {
     ChromeDriverService service = new ChromeDriverService.Builder()
         .usingDriverExecutable(new File(chromeDriverPath))
@@ -329,7 +329,7 @@ public class WdDriver extends SUTBase
     return null;
   }
 
-  public RemoteWebDriver getRemoteWebDriver ()
+  public static RemoteWebDriver getRemoteWebDriver ()
   {
     return webDriver;
   }

@@ -91,6 +91,9 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
 
     // Propagate followLinks setting
     WdDriver.followLinks = followLinks;
+
+    // Override ProtocolUtil to allow WebDriver screenshots
+    protocolUtil = new WdProtocolUtil();
   }
 
   /**
@@ -110,9 +113,6 @@ public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
 
     // See remarks in WdMouse
     mouse = sut.get(Tags.StandardMouse);
-
-    // Override ProtocolUtil to allow WebDriver screenshots
-    protocolUtil = new WdProtocolUtil(sut);
 
     return sut;
   }
