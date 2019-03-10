@@ -20,8 +20,8 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    private static Tag<String> ACTION_ID;
-    private static Tag<String> STATE_ID;
+    private Tag<String> ACTION_ID;
+    private Tag<String> STATE_ID;
 
 
     StrategyGuiStateImpl() {
@@ -224,6 +224,6 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     @Override
     public void setActionTag(Tag<String> actionTag) {
-        ACTION_ID = actionTag;
+        ACTION_ID = Tags.Desc;
     }
 }
