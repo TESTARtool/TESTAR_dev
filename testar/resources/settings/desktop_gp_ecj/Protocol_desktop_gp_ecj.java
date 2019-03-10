@@ -83,7 +83,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
 
     private Tag<String> getStateTag(final Settings settings) {
         if (!settings.get(AbstractStateAttributes).isEmpty()) {
-            CodingManager.setCustomTagsForAbstractId(new Tag<?>[settings.get(AbstractStateAttributes).size()]);
             return Tags.AbstractIDCustom;
         }
         return  Tags.Abstract_R_T_P_ID;
@@ -91,7 +90,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
 
     private Tag<String> getActionTag(final Settings settings) {
         if (!settings.get(ConcreteStateAttributes).isEmpty()) {
-            CodingManager.setCustomTagsForConcreteId(new Tag<?>[settings.get(ConcreteStateAttributes).size()]);
             return Tags.ConcreteIDCustom;
         }
         return Tags.Desc;
