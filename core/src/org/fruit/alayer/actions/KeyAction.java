@@ -76,11 +76,11 @@ public abstract class KeyAction extends TaggableBase implements Action {
 		try{
 			Assert.notNull(system);
 			Util.pause(duration);
-			if (key.code() ==VK_EXCLAMATION_MARK ||
-				key.code() == VK_UNDERSCORE) // java.awt.Robot throwing "Invalid key code"
-				altNumpad(system, Integer.toString(key.code()));
-			else
+			try {
 				performKeyAction(system,key);
+			} catch (IllegalArgumentException e) {
+				altNumpad(system, Integer.toString(key.code()));
+			}
 		}catch(NoSuchTagException tue){
 			throw new ActionFailedException(tue);
 		}
