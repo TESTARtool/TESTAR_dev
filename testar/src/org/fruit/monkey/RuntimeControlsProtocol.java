@@ -39,6 +39,7 @@ import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import static java.awt.event.KeyEvent.VK_0;
@@ -70,7 +71,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     }
 
     protected Modes mode;
-    private Set<KBKeys> pressed;
+    private Set<KBKeys> pressed = new HashSet<>();
 
     public EventHandler initializeEventHandler() {
         return new EventHandler(this);
