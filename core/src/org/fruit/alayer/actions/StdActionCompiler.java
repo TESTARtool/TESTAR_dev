@@ -48,6 +48,11 @@ import org.fruit.alayer.actions.CompoundAction.Builder;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 
+import static java.awt.event.KeyEvent.VK_A;
+import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_END;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+
 public class StdActionCompiler {
 	Abstractor abstractor;
 	private final Action LMouseDown = new MouseDown(MouseButtons.BUTTON1);
@@ -187,7 +192,7 @@ public class StdActionCompiler {
 		Assert.notNull(position);
 		
 		return new CompoundAction.Builder().add(new MouseMove(position), 1)
-				.add(LMouseDown, 0).add(LMouseUp, 0).add(NOP, 0.2).add(new KeyDown(KBKeys.VK_RIGHT),0).build();
+				.add(LMouseDown, 0).add(LMouseUp, 0).add(NOP, 0.2).add(new KeyDown(new KBKeys(VK_RIGHT)),0).build();
 	}
 	
 	public Action dropDownAt(double absX, double absY){
@@ -269,19 +274,19 @@ public class StdActionCompiler {
 		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing Cntr + A keys to select all text:
-		builder.add(new KeyDown(KBKeys.VK_CONTROL), 0.1).add(new KeyDown(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_A), 0.1).add(new KeyUp(KBKeys.VK_CONTROL), 0.1);
+		builder.add(new KeyDown(new KBKeys(VK_CONTROL)), 0.1).add(new KeyDown(new KBKeys(VK_A)), 0.1).add(new KeyUp(new KBKeys(VK_A)), 0.1).add(new KeyUp(new KBKeys(VK_CONTROL)), 0.1);
 		/*
 		// old text replacements by pressing delete multiple times:
 		final int TEXT_REMOVE_TRIES = 16; // VK_BACK_SPACE @web applications => back-history issue (pressing BACKSPACE) <- when? typing outside text-boxes
 		//Toolkit.getDefaultToolkit().setLockingKeyState(KeyEvent.VK_NUM_LOCK, false); // VK_SHIFT bug fix (did not work)
 		Builder builder = new CompoundAction.Builder()
 				.add(leftClickAt(position), 1)
-				//.add(new KeyDown(KBKeys.VK_END), 1).add(new KeyUp(KBKeys.VK_END), 1)
-				//.add(new KeyDown(KBKeys.VK_SHIFT), 1)
-				.add(new KeyDown(KBKeys.VK_HOME), 1).add(new KeyUp(KBKeys.VK_HOME), 1);
-		//.add(new KeyUp(KBKeys.VK_SHIFT), 1);
+				//.add(new KeyDown(new KBKeys(VK_END), 1).add(new KeyUp(new KBKeys(VK_END), 1)
+				//.add(new KeyDown(new KBKeys(VK_SHIFT), 1)
+				.add(new KeyDown(new KBKeys(VK_HOME), 1).add(new KeyUp(new KBKeys(VK_HOME), 1);
+		//.add(new KeyUp(new KBKeys(VK_SHIFT), 1);
 		for ( int i=0; i<TEXT_REMOVE_TRIES; i++)
-			builder.add(new KeyDown(KBKeys.VK_DELETE), 1).add(new KeyUp(KBKeys.VK_DELETE), 1);
+			builder.add(new KeyDown(new KBKeys(VK_DELETE), 1).add(new KeyUp(new KBKeys(VK_DELETE), 1);
 		*/
 		// Typing the new text:
 		builder.add(new Type(text), 1);
@@ -293,7 +298,7 @@ public class StdActionCompiler {
 		// clicking the widget to select it:
 		Builder builder = new CompoundAction.Builder().add(leftClickAt(position), 1);
 		// pressing End key to append into the end of the text:
-		builder.add(new KeyDown(KBKeys.VK_END), 0.1).add(new KeyUp(KBKeys.VK_END), 0.1);
+		builder.add(new KeyDown(new KBKeys(VK_END)), 0.1).add(new KeyUp(new KBKeys(VK_END)), 0.1);
 		//inserting text:
 		builder.add(new Type(text), 1);
 		return builder.build();

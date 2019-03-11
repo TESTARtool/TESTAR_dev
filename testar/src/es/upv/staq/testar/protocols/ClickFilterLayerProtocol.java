@@ -31,7 +31,6 @@
 package es.upv.staq.testar.protocols;
 
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import nl.ou.testar.SutVisualization;
@@ -45,9 +44,15 @@ import org.fruit.monkey.DefaultProtocol;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
 
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_CAPS_LOCK;
+import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_SHIFT;
+import static java.awt.event.KeyEvent.VK_TAB;
+
 /**
  * Testing protocol enhancements to ease tester work.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  * To be developed: actions ordering
  *
@@ -60,16 +65,16 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	//pressing CAPS-LOCK + SHIFT and clicking on the widget
 
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
-    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
     private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
 
     private double mouseX = Double.MIN_VALUE, mouseY = Double.MIN_VALUE;
     private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
-    
+
     private FilteringManager filteringManager;
     private DataManager dataManager;
-    
+
     /**
      * Constructor.
      */
@@ -78,7 +83,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 		filteringManager = new FilteringManager();
 		dataManager = new DataManager();
 		filteringManager.loadFilters();
-		dataManager.loadInputValues();		
+		dataManager.loadInputValues();
 	}
 
 	/**
@@ -86,21 +91,21 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	 * @param key
 	 */
     @Override
-    public void keyDown(KBKeys key) {    	
-        super.keyDown(key);        
-        if (mode() == Modes.Spy){ 
-        	if (key == KBKeys.VK_CAPS_LOCK)
+    public void keyDown(KBKeys key) {
+        super.keyDown(key);
+        if (mode() == Modes.Spy){
+        	if (key.code() == VK_CAPS_LOCK)
         		displayWhiteTabu = !displayWhiteTabu;
-        	else if (key == KBKeys.VK_TAB)
+        	else if (key.code() == VK_TAB)
         		preciseCoding = !preciseCoding;
-        	else if (key == KBKeys.VK_SHIFT)
+        	else if (key.code() == VK_SHIFT)
         		shiftPressed = true;
-	    	else if (key == KBKeys.VK_CONTROL){
+	    	else if (key.code() == VK_CONTROL){
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
 	    	}
-	    	else if (key == KBKeys.VK_ALT){
+	    	else if (key.code() ==VK_ALT){
 	    		altPressed = true;
 			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
 //	    		if (!ctrlPressed && !shiftPressed)
@@ -110,21 +115,21 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     }
 
     @Override
-    public void keyUp(KBKeys key) {    	
+    public void keyUp(KBKeys key) {
     	super.keyUp(key);
         if (mode() == Modes.Spy){
-        	if (key == KBKeys.VK_SHIFT)
+        	if (key.code() == VK_SHIFT)
 	    		shiftPressed = false;
-        	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
+        	else if (key.code() == VK_CONTROL && displayWhiteTabu){
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == KBKeys.VK_ALT)
+	    	} else if (key.code() == VK_ALT)
 	    		altPressed = false;
         }
     }
-    	
+
 	@Override
 	public void mouseMoved(double x, double y) {
 		mouseX = x;
@@ -145,7 +150,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     protected boolean whiteListed(Widget w){
     	return filteringManager.whiteListed(w);
     }
-    
+
     @Override
     protected String getRandomText(Widget w){
     	String randomText = filteringManager.getRandomText(w);
@@ -154,5 +159,5 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     	else
     		return randomText;
     }
-        
+
 }

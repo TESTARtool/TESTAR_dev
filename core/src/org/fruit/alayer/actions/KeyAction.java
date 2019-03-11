@@ -43,6 +43,20 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_EXCLAMATION_MARK;
+import static java.awt.event.KeyEvent.VK_NUMPAD0;
+import static java.awt.event.KeyEvent.VK_NUMPAD1;
+import static java.awt.event.KeyEvent.VK_NUMPAD2;
+import static java.awt.event.KeyEvent.VK_NUMPAD3;
+import static java.awt.event.KeyEvent.VK_NUMPAD4;
+import static java.awt.event.KeyEvent.VK_NUMPAD5;
+import static java.awt.event.KeyEvent.VK_NUMPAD6;
+import static java.awt.event.KeyEvent.VK_NUMPAD7;
+import static java.awt.event.KeyEvent.VK_NUMPAD8;
+import static java.awt.event.KeyEvent.VK_NUMPAD9;
+import static java.awt.event.KeyEvent.VK_UNDERSCORE;
+
 /**
  * An action which presses a given Key on the Keyboard.
  * @author Urko Rueda
@@ -62,10 +76,9 @@ public abstract class KeyAction extends TaggableBase implements Action {
 		try{
 			Assert.notNull(system);
 			Util.pause(duration);
-			if (key.equals(KBKeys.VK_ARROBA) ||
-				key.equals(KBKeys.VK_EXCLAMATION_MARK) ||
-				key.equals(KBKeys.VK_UNDERSCORE)) // java.awt.Robot throwing "Invalid key code"
-				altNumpad(system,new Integer(key.code()).toString());
+			if (key.code() ==VK_EXCLAMATION_MARK ||
+				key.code() == VK_UNDERSCORE) // java.awt.Robot throwing "Invalid key code"
+				altNumpad(system, Integer.toString(key.code()));
 			else
 				performKeyAction(system,key);
 		}catch(NoSuchTagException tue){
@@ -81,7 +94,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
 			return;
 		}               
 		Keyboard keyb = system.get(Tags.StandardKeyboard);
-		keyb.press(KBKeys.VK_ALT);
+		keyb.press(new KBKeys(VK_ALT));
 		for (char charater : numpadCodes.toCharArray()){
 			KBKeys NUMPAD_KEY = getNumpad(charater);
 			if (NUMPAD_KEY != null){
@@ -89,21 +102,21 @@ public abstract class KeyAction extends TaggableBase implements Action {
 				keyb.release(NUMPAD_KEY);
 			}
 		}
-		keyb.release(KBKeys.VK_ALT);        
+		keyb.release(new KBKeys(VK_ALT));
 	}	
 
 	private KBKeys getNumpad(char numberChar){
 		switch (numberChar){
-		  case '0' : return KBKeys.VK_NUMPAD0;
-		  case '1' : return KBKeys.VK_NUMPAD1;
-		  case '2' : return KBKeys.VK_NUMPAD2;
-		  case '3' : return KBKeys.VK_NUMPAD3;
-		  case '4' : return KBKeys.VK_NUMPAD4;
-		  case '5' : return KBKeys.VK_NUMPAD5;
-		  case '6' : return KBKeys.VK_NUMPAD6;
-		  case '7' : return KBKeys.VK_NUMPAD7;
-		  case '8' : return KBKeys.VK_NUMPAD8;
-		  case '9' : return KBKeys.VK_NUMPAD9;
+		  case '0' : return new KBKeys(VK_NUMPAD0);
+		  case '1' : return new KBKeys(VK_NUMPAD1);
+		  case '2' : return new KBKeys(VK_NUMPAD2);
+		  case '3' : return new KBKeys(VK_NUMPAD3);
+		  case '4' : return new KBKeys(VK_NUMPAD4);
+		  case '5' : return new KBKeys(VK_NUMPAD5);
+		  case '6' : return new KBKeys(VK_NUMPAD6);
+		  case '7' : return new KBKeys(VK_NUMPAD7);
+		  case '8' : return new KBKeys(VK_NUMPAD8);
+		  case '9' : return new KBKeys(VK_NUMPAD9);
   		default  : System.out.println("AltNumpad - not a number 0-9: " + numberChar);
 		return null;
 		}

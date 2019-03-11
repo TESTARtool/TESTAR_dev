@@ -33,6 +33,7 @@
  */
 package org.fruit.alayer.actions;
 
+import java.awt.event.KeyEvent;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -53,7 +54,7 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 public final class Type extends TaggableBase implements Action {
 
 	private static final long serialVersionUID = 2555715152455716781L;
-	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
+	private static final CharsetEncoder asciiEncoder = Charset.forName("UTF-32").newEncoder();
 	private final String text;
 	
 	public Type(String text){
@@ -67,8 +68,8 @@ public final class Type extends TaggableBase implements Action {
 		Assert.notNull(system);
 		
 		double d = duration / text.length();
-		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
-		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
+		Action shiftDown = new KeyDown(new KBKeys(KeyEvent.VK_SHIFT));
+		Action shiftUp = new KeyUp(new KBKeys(KeyEvent.VK_SHIFT));
 		for(int i = 0; i < text.length(); i++){
 			char c = text.charAt(i);
 			boolean shift = false;
@@ -80,7 +81,7 @@ public final class Type extends TaggableBase implements Action {
 					shift = true;
 			}
 			
-			KBKeys key = getKey(c);
+			KBKeys key = new KBKeys(c);
 						
 			if(shift)
 				shiftDown.run(system, state, .0);
@@ -96,16 +97,6 @@ public final class Type extends TaggableBase implements Action {
 	    if (!asciiEncoder.canEncode(text))
 	    	throw new IllegalArgumentException("This string is not an ascii string!");
 	}
-	
-	private KBKeys getKey(char c) {
-        for (KBKeys key : KBKeys.values()) {
-            if (key.code() == (int) c) {
-                return key;
-            }
-        }
-
-        throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
-    }
 	
 	public String toString(){ return "Type text '" + text + "'"; }
 	

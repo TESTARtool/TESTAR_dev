@@ -30,6 +30,8 @@
 
 package nl.ou.testar.a11y.windows;
 
+import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -136,12 +138,13 @@ public final class AccessibilityUtil {
 			keyString = keyString.toUpperCase();
 			if (AlternativeKeyNames.map.containsKey(keyString))
 				keyString = AlternativeKeyNames.map.get(keyString);
-			String vkString = VIRTUAL_KEY_PREFIX + keyString;
-			if (!KBKeys.contains(vkString)) {
-				logA11y("Failed to parse part <" + keyString + "> of shortcut key <" + combination + ">");
-				return null;
+			Field vkString;
+			try {
+				vkString = KeyEvent.class.getField(keyString);
+				keys.add((KBKeys) vkString.get(null));
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				e.printStackTrace();
 			}
-			keys.add(KBKeys.valueOf(vkString));
 		}
 		return compiler.hitShortcutKey(keys);
 	}

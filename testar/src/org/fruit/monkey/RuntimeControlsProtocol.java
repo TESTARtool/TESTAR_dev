@@ -41,6 +41,15 @@ import org.fruit.alayer.devices.MouseButtons;
 import java.util.EnumSet;
 import java.util.Set;
 
+import static java.awt.event.KeyEvent.VK_0;
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_LEFT;
+import static java.awt.event.KeyEvent.VK_RIGHT;
+import static java.awt.event.KeyEvent.VK_SHIFT;
+import static java.awt.event.KeyEvent.VK_SPACE;
+import static java.awt.event.KeyEvent.VK_UP;
+
 
 public abstract class RuntimeControlsProtocol extends AbstractProtocol implements IEventListener {
 
@@ -61,7 +70,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     }
 
     protected Modes mode;
-    private Set<KBKeys> pressed = EnumSet.noneOf(KBKeys.class);
+    private Set<KBKeys> pressed;
 
     public EventHandler initializeEventHandler() {
         return new EventHandler(this);
@@ -74,7 +83,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
      * Implement the SHIFT + ARROW-LEFT or SHIFT + ARROW-RIGHT toggling mode feature
      * Show the flashfeedback in the upperleft corner of the screen
      *
-     * @param forward is set in keyDown method
      */
     private synchronized void nextMode() {
         switch (mode) {
@@ -179,7 +187,7 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         pressed.add(key);
 
         //  SHIFT + SPACE are pressed --> Toggle slow motion test
-        if (pressed.contains(KBKeys.VK_SHIFT) && key == KBKeys.VK_SPACE) {
+        if (pressed.contains(new KBKeys(VK_SHIFT)) && key == new KBKeys(VK_SPACE)) {
             if (this.delay == Double.MIN_VALUE) {
                 this.delay = settings().get(ConfigTags.TimeToWaitAfterAction).doubleValue();
                 settings().set(ConfigTags.TimeToWaitAfterAction, SLOW_MOTION);
@@ -190,25 +198,25 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
         }
 
         // SHIFT + ARROW-RIGHT --> go to the next mode
-        else if (key == KBKeys.VK_RIGHT && pressed.contains(KBKeys.VK_SHIFT)) {
+        else if (key == new KBKeys(VK_RIGHT) && pressed.contains(new KBKeys(VK_SHIFT))) {
             if (mode.equals(Modes.Record) || mode.equals(Modes.Generate))
                 nextMode();
         }
 
         // SHIFT + ARROW-LEFT --> go to the previous mode
-        else if (key == KBKeys.VK_LEFT && pressed.contains(KBKeys.VK_SHIFT)) {
+        else if (key == new KBKeys(VK_LEFT) && pressed.contains(new KBKeys(VK_SHIFT))) {
             if (mode.equals(Modes.Record) || mode.equals(Modes.Generate))
                 nextMode();
         }
 
         // SHIFT + ARROW-DOWN --> stop TESTAR run
-        else if (key == KBKeys.VK_DOWN && pressed.contains(KBKeys.VK_SHIFT)) {
+        else if (key == new KBKeys(VK_DOWN) && pressed.contains(new KBKeys(VK_SHIFT))) {
             LogSerialiser.log("User requested to stop monkey!\n", LogSerialiser.LogLevel.Info);
             mode = Modes.Quit;
         }
 
         // SHIFT + ARROW-UP --> toggle visualization on / off
-        else if (key == KBKeys.VK_UP && pressed.contains(KBKeys.VK_SHIFT)) {
+        else if (key == new KBKeys(VK_UP) && pressed.contains(new KBKeys(VK_SHIFT))) {
             if (visualizationOn) {
                 visualizationOn = false;
             } else {
@@ -218,27 +226,27 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
 
         //Disabled and replaced with Shift + Arrow Up to toggle visualization on/off:
 //        // SHIFT + 1 --> toggle action visualization
-//        else if(key == KBKeys.VK_1 && pressed.contains(KBKeys.VK_SHIFT))
+//        else if(key == new KBKeys(VK_1 && pressed.contains(new KBKeys(VK_SHIFT))
 //            settings().set(ConfigTags.VisualizeActions, !settings().get(ConfigTags.VisualizeActions));
 //
 //            // SHIFT + 2 --> toggle showing accessibility properties of the widget
-//        else if(key == KBKeys.VK_2 && pressed.contains(KBKeys.VK_SHIFT))
+//        else if(key == new KBKeys(VK_2 && pressed.contains(new KBKeys(VK_SHIFT))
 //            settings().set(ConfigTags.DrawWidgetUnderCursor, !settings().get(ConfigTags.DrawWidgetUnderCursor));
 //
 //            // SHIFT + 3 --> toggle basic or all accessibility properties of the widget
-//        else if(key == KBKeys.VK_3 && pressed.contains(KBKeys.VK_SHIFT))
+//        else if(key == new KBKeys(VK_3 && pressed.contains(new KBKeys(VK_SHIFT))
 //            settings().set(ConfigTags.DrawWidgetInfo, !settings().get(ConfigTags.DrawWidgetInfo));
 //
 //            // SHIFT + 4 --> toggle the widget tree
-//        else if (key == KBKeys.VK_4  && pressed.contains(KBKeys.VK_SHIFT))
+//        else if (key == new KBKeys(VK_4  && pressed.contains(new KBKeys(VK_SHIFT))
 //            settings().set(ConfigTags.DrawWidgetTree, !settings.get(ConfigTags.DrawWidgetTree));
 
         // SHIFT + 0 --> undocumented feature
-        else if (key == KBKeys.VK_0 && pressed.contains(KBKeys.VK_SHIFT))
+        else if (key == new KBKeys(VK_0) && pressed.contains(new KBKeys(VK_SHIFT)))
             System.setProperty("DEBUG_WINDOWS_PROCESS_NAMES", "true");
 
             // TODO: Find out if this commented code is anything useful
-		/*else if (key == KBKeys.VK_ENTER && pressed.contains(KBKeys.VK_SHIFT)){
+		/*else if (key == new KBKeys(VK_ENTER && pressed.contains(new KBKeys(VK_SHIFT)){
 			AdhocServer.startAdhocServer();
 			mode = Modes.AdhocTest;
 			LogSerialiser.log("'" + mode + "' mode active.\n", LogSerialiser.LogLevel.Info);
@@ -248,13 +256,13 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
             // This is because SHIFT is used for the TESTAR shortcuts
             // This is not ideal, because now special characters and capital letters and other events that needs SHIFT
             // cannot be recorded as an user event in GenerateManual....
-        else if (!pressed.contains(KBKeys.VK_SHIFT) && mode() == Modes.Record && userEvent == null) {
+        else if (!pressed.contains(new KBKeys(VK_SHIFT)) && mode() == Modes.Record && userEvent == null) {
             //System.out.println("USER_EVENT key_down! " + key.toString());
             userEvent = new Object[]{key}; // would be ideal to set it up at keyUp
         }
 
         // SHIFT + ALT --> Toggle widget-tree hieracrhy display
-        if (pressed.contains(KBKeys.VK_ALT) && pressed.contains(KBKeys.VK_SHIFT))
+        if (pressed.contains(new KBKeys(VK_ALT)) && pressed.contains(new KBKeys(VK_SHIFT)))
             markParentWidget = !markParentWidget;
     }
 

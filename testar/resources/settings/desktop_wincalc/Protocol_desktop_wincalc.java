@@ -73,7 +73,7 @@ import static org.fruit.monkey.ConfigTags.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.CodingManager;
 
 import org.fruit.monkey.Settings;

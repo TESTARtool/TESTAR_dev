@@ -79,7 +79,7 @@ import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
 import es.upv.staq.testar.NativeLinker;
 import org.fruit.monkey.ConfigTags;

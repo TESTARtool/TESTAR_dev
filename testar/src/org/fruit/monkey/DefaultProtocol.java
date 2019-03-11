@@ -111,7 +111,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -119,6 +118,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 import static org.fruit.alayer.Tags.ActionDelay;
 import static org.fruit.alayer.Tags.ActionDuration;
 import static org.fruit.alayer.Tags.ActionSet;
@@ -697,7 +697,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 // THERE MUST ALMOST BE ONE ACTION!
                 //----------------------------------
                 // if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+                Action escAction = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
                 CodingManager.buildIDs(state, escAction);
                 actions.add(escAction);
                 escAttempts++;
@@ -914,7 +914,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 // THERE MUST ALMOST BE ONE ACTION!
                 //----------------------------------
                 // if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+                Action escAction = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
                 CodingManager.buildIDs(state, escAction);
                 actions.add(escAction);
                 escAttempts++;
@@ -1508,7 +1508,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         else if (this.forceNextActionESC) {
             System.out.println("DEBUG: Forcing ESC action in preActionSelection");
             LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-            Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+            Action a = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
             CodingManager.buildIDs(state, a);
             this.forceNextActionESC = false;
             return a;

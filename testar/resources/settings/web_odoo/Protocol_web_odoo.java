@@ -72,9 +72,10 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.Type;
 import org.fruit.alayer.devices.KBKeys;
 
+import static java.awt.event.KeyEvent.VK_ENTER;
 import static org.fruit.monkey.ConfigTags.*;
 
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import es.upv.staq.testar.NativeLinker;
 
 import org.fruit.monkey.ConfigTags;
@@ -159,7 +160,7 @@ public class Protocol_web_odoo extends ClickFilterLayerProtocol {
 		Util.pause(2);
 			
 		new CompoundAction.Builder()
-			.add(new KeyDown(KBKeys.VK_ENTER),1.0).build() // assume the login is performed by hitting ENTER
+			.add(new KeyDown(new KBKeys(VK_ENTER)),1.0).build() // assume the login is performed by hitting ENTER
 			.run(sut, null, 1.0);
 
 		Util.pause(2);

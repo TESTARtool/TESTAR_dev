@@ -57,6 +57,9 @@ import org.fruit.alayer.exceptions.SystemStopException;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_TAB;
+
 public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = ""; // by wcoux
@@ -71,13 +74,13 @@ public final class WinProcess extends SUTBase {
 		int cnt = 0;
 		while(!isForeground(pid) && cnt < maxTries && isRunning(pid)){
 			cnt++;
-			kb.press(KBKeys.VK_ALT);
+			kb.press(new KBKeys(VK_ALT));
 
 			for(int i = 0; i < cnt && isRunning(pid); i++){
-				kb.press(KBKeys.VK_TAB);
-				kb.release(KBKeys.VK_TAB);
+				kb.press(new KBKeys(VK_TAB));
+				kb.release(new KBKeys(VK_TAB));
 			}
-			kb.release(KBKeys.VK_ALT);
+			kb.release(new KBKeys(VK_ALT));
 			Util.pause(foregroundEstablishTime);
 		}	
 
