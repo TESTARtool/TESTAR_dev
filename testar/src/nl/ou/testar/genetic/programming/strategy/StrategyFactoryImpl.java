@@ -82,7 +82,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
 
     public String[] getTextInputsFromFile(final String inputFile) {
         try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
-            return lines.filter(line -> !line.startsWith("#")).toArray(String[]::new);
+            return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
         } catch (IOException e) {
             System.out.println("Error while reading text input file!");
         }

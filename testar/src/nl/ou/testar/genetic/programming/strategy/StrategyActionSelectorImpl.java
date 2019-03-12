@@ -34,7 +34,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         final Action action = strategyTree.getAction(stateManager)
                 .orElse(stateManager.getRandomAction());
         this.updateState(action, state);
-        System.out.printf("The selected action is of type %s", action.get(Tags.Role));
+        System.out.printf("The selected action is of type %s \n", action.get(Tags.Role));
 
         return action;
     }

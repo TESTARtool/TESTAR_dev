@@ -12,6 +12,8 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -62,6 +64,8 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     private StrategyFactory strategyFactory;
     private StrategyActionSelector strategyActionSelector;
     private Optional<String[]> inputText;
+    private Date startDate;
+    private Date endDate;
 
     /**
      * Called once during the life time of TESTAR
@@ -89,7 +93,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         if (!settings().get(AbstractStateAttributes).isEmpty()) {
             return Tags.AbstractIDCustom;
         }
-        return  Tags.Abstract_R_T_P_ID;
+        return Tags.Abstract_R_T_P_ID;
     }
 
     private Tag<String> getActionTag() {
@@ -105,6 +109,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
+        this.startDate = new Date();
     }
 
     /**
@@ -119,6 +124,12 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     protected void postSequenceProcessing() {
         super.postSequenceProcessing();
         this.strategyFactory.printMetrics();
+        this.endDate = new Date();
+        printDate();
+    }
+
+    private void printDate() {
+        System.out.printf("It took %d seconds to execute", (endDate.getTime() - startDate.getTime()) / 1000);
     }
 
     /**
