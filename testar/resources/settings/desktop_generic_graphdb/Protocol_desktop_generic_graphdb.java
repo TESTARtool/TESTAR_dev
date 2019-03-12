@@ -178,14 +178,12 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 						//storeWidget(state.get(Tags.ConcreteID), w);
 						// left clicks
 						if(whiteListed(w) || isClickable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.leftClickAt(w));
 						}
 
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
 						}
 						// slides
 						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
@@ -208,6 +206,24 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//using the action selector of the state model:
+		String abstractActionId = stateModelManager.getAbstractActionIdToExecute();
+		System.out.println("ID from the model: "+abstractActionId);
+		Action retAction = null;
+		for(Action action:actions){
+//			System.out.println("Action IDs, abstractCustom="+action.get(Tags.AbstractIDCustom, "not available")+
+//					"abstract="+action.get(Tags.AbstractID, "not available"));
+			if(action.get(Tags.AbstractIDCustom , "not available").equals(abstractActionId)){
+				retAction = action;
+				break;
+			}
+		}
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
 		return super.selectAction(state, actions);
 
 	}

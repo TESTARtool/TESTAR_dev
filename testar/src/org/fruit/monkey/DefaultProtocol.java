@@ -187,7 +187,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     protected List<ProcessInfo> contextRunningProcesses = null;
     protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AbstractProtocol.class);
     protected double passSeverity = Verdict.SEVERITY_OK;
     protected static int generatedSequenceNumber = -1;
 
@@ -221,6 +221,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     }
 
     protected GraphDB graphDB;
+    protected StateModelManager stateModelManager;
     private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
     protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -267,32 +268,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //initialize TESTAR with the given settings:
         initialize(settings);
 
-        try {
-
-            if (mode() == Modes.View && isValidFile()) {
-                new SequenceViewer(settings);
-            } else if (mode() == Modes.Replay && isValidFile()) {
-                runReplayLoop();
-            } else if (mode() == Modes.Spy) {
-                runSpyLoop();
-            } else if (mode() == Modes.Record) {
-                runRecordLoop(system);
-            } else if (mode() == Modes.Generate) {
-                runGenerateOuterLoop(system);
-            }
-
-        } catch (SystemStartException SystemStartException) {
-            SystemStartException.printStackTrace();
-            DEBUGLOG.error("Exception: ", SystemStartException);
-            this.mode = Modes.Quit;
-        } catch (Exception e) {
-            e.printStackTrace();
-            DEBUGLOG.error("Exception: ", e);
-            this.mode = Modes.Quit;
-        }
-
-        //Closing TESTAR EventHandler
-        closeTestarTestSession();
+        //Call the principal loop to work with different loop-modes
+        detectModeLoop(system);
     }
 
     /**
@@ -310,7 +287,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         eventHandler = initializeEventHandler();
 
         //Initializing Graph Database:
-        graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
+        graphDB = new GraphDB(false,
                 settings.get(ConfigTags.GraphDBUrl),
                 settings.get(ConfigTags.GraphDBUser),
                 settings.get(ConfigTags.GraphDBPassword));
@@ -320,6 +297,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 settings.get(ConfigTags.AccessBridgeEnabled),
                 settings.get(ConfigTags.SUTProcesses)
         );
+
+        // new state model manager
+        if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
+        		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -350,6 +331,51 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     /**
      * Check if the selected file to Replay or View contains a valid fragment object
      */
+    protected void detectModeLoop(SUT system) {
+
+    	do {
+    		//initialize TESTAR with the given settings:
+    		initialize(settings);
+
+    		try {
+    			
+    			if (mode() == Modes.View) {
+    				new SequenceViewer(settings).run();
+    			} else if (mode() == Modes.Replay) {
+    				replay();
+    			} else if (mode() == Modes.Spy) {
+    				runSpyLoop(system);
+    			} else if(mode() == Modes.Record) {
+    				runRecordLoop(system);
+    			} else if (mode() == Modes.Generate) {
+    				runGenerateOuterLoop(system);
+    			}
+    			
+    		}catch(SystemStartException SystemStartException) {
+    			SystemStartException.printStackTrace();
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    			this.mode = Modes.Quit;
+    			stopSystem(system);
+    			system = null;
+    		}
+    		
+    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+    		    System.out.println(ste);
+    		}*/
+    		
+    		if (mode() == Modes.Quit) {
+				stopSystem(system);
+			}
+    		
+    		//Closing TESTAR EventHandler
+            closeTestarTestSession();
+    	}
+    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
+    	while(startTestarSettingsDialog());
     public boolean isValidFile() {
         try {
 
@@ -401,11 +427,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     settings.get(LogLevel));
         } catch (NoSuchTagException e3) {
             // TODO Auto-generated catch block
-            DEBUGLOG.error("Exception: ", e3);
             e3.printStackTrace();
         } catch (FileNotFoundException e3) {
             // TODO Auto-generated catch block
-            DEBUGLOG.error("Exception: ", e3);
             e3.printStackTrace();
         }
         ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
@@ -426,14 +450,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.delete(currentSeq);
         } catch (IOException e2) {
             LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
-            DEBUGLOG.error("Exception: ", e2);
         }
         try {
             TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
             LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
         } catch (IOException e) {
             LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-            DEBUGLOG.error("Exception: ", e);
         }
         return currentSeq;
     }
@@ -477,7 +499,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     private void startTestSequence(SUT system) {
         //for measuring the time of one sequence:
         tStart = System.currentTimeMillis();
-        DEBUGLOG.info("Starting test sequence {}", sequenceCount());
+        LOGGER.info("Starting test sequence {}", sequenceCount());
 
         actionCount = 1;
         this.testFailTimes = 0;
@@ -486,6 +508,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
         this.cv = buildCanvas();
+        // notify the statemodelmanager
+        stateModelManager.notifyTestSequencedStarted();
     }
 
     /**
@@ -503,7 +527,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.flush();
         LogSerialiser.finish();
         LogSerialiser.exit();
-        DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+        LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
+        // notify the statemodelmanager
+        stateModelManager.notifyTestSequenceStopped();
     }
 
     /**
@@ -572,14 +598,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
-                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
 
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
+
+                // notify the state model manager of the initial state
+                Set<Action> actions = deriveActions(system, state);
+                CodingManager.buildIDs(state, actions);
+                stateModelManager.notifyNewStateReached(state, actions);
 
                 /*
                  ***** starting the INNER LOOP:
@@ -588,6 +617,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
+
+                // notify the state model manager of the sequence end
+                stateModelManager.notifySequenceEnded();
 
                 writeAndCloseFragmentForReplayableSequence();
 
@@ -619,7 +651,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } catch (Exception e) {
                 System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
                 e.printStackTrace();
-                DEBUGLOG.error("Exception: ", e);
                 emergencyTerminateTestSequence(system, e);
             }
         }
@@ -642,10 +673,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
             } catch (NoSuchTagException e) {
                 LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-                DEBUGLOG.error("Exception: ", e);
             } catch (IOException e) {
                 LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-                DEBUGLOG.error("Exception: ", e);
             }
             FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
         }
@@ -687,7 +716,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
-
             CodingManager.buildIDs(state, actions);
             if (actions.isEmpty()) {
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS) {
@@ -711,10 +739,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Showing the red dot if visualization is on:
             if (visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
+            //before action execution, pass it to the state model manager
+            stateModelManager.notifyActionExecution(action);
+
             //Executing the selected action:
             executeAction(system, state, action);
             lastExecutedAction = action;
             actionCount++;
+
+            // notify the state model manager of the newly reached state
+            actions = deriveActions(system, state);
+            CodingManager.buildIDs(state, actions);
+            stateModelManager.notifyNewStateReached(state, actions);
 
             //Saving the actions and the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
@@ -795,18 +831,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //Obtain action information
         String[] actionRepresentation = Action.getActionRepresentation(state, action, "\t");
 
-        //Output/logs folder
-        LogSerialiser.log(String.format(actionMode + " [%d]: %s\n%s",
-                actionCount,
-                "action = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
-                        " (" + action.get(Tags.AbstractID, "AbstractID not available") + ") @state = " +
-                        state.get(Tags.ConcreteID, "ConcreteID not available") + " (" + state.get(Tags.Abstract_R_ID, "Abstract_R_ID not available") + ")\n",
-                actionRepresentation[0]) + "\n",
-                LogSerialiser.LogLevel.Info);
+		//Output/logs folder
+		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
+				actionCount,
 
-        //bin folder
-        DEBUGLOG.info(actionMode + " number {} Widget {} finished in {} ms",
-                actionCount, actionRepresentation[1], System.currentTimeMillis() - tStart);
+				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID,"ConcreteID not available") +
+				" AbstractID = " + action.get(Tags.AbstractID,"AbstractID not available") +"\n"+
+				" ConcreteID CUSTOM = " +  action.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
+				" AbstractID CUSTOM = " +  action.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n"+
+
+				" @State ConcreteID = " + state.get(Tags.ConcreteID,"ConcreteID not available") +
+				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
+				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
+				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
+				actionRepresentation[0]) + "\n",
+				LogSerialiser.LogLevel.Info);
+
+		//bin folder 
+		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
+				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
 
 
     }
@@ -864,7 +907,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     /**
      * Method to run TESTAR on Record User Actions Mode.
-     *
      * @param system
      */
     protected void runRecordLoop(SUT system) {
@@ -890,8 +932,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             if (enabledProcessListener)
                 processListener.startListeners(system, settings);
 
-            //initializing fragment for recording replayable test sequence:
-            initFragmentForReplayableSequence(getState(system));
+        	//initializing fragment for recording replayable test sequence:
+        	initFragmentForReplayableSequence(getState(system));
+
+        	// notify the statemodelmanager
+            stateModelManager.notifyTestSequencedStarted();
         }
         //else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
 
@@ -906,6 +951,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             Set<Action> actions = deriveActions(system, state);
             CodingManager.buildIDs(state, actions);
+
+            //notify the state model manager of the new state
+            stateModelManager.notifyNewStateReached(state, actions);
+
             if (actions.isEmpty()) {
                 if (escAttempts >= MAX_ESC_ATTEMPTS) {
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -932,6 +981,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
                 lastExecutedAction = actionStatus.getAction();
                 actionCount++;
+    			//notify the state model manager of the executed action
+                stateModelManager.notifyActionExecution(actionStatus.getAction());
             }
 
             /**
@@ -962,16 +1013,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             this.mode = Modes.Quit;
         }
 
-        if (startedRecordMode && mode() == Modes.Quit) {
-            //Closing fragment for recording replayable test sequence:
-            writeAndCloseFragmentForReplayableSequence();
+        if(startedRecordMode && mode() == Modes.Quit){
 
-            //Copy sequence file into proper directory:
-            classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK, generatedSequence, currentSeq);
+        	// notify the state model manager of the sequence end
+            stateModelManager.notifySequenceEnded();
 
-            Util.clear(cv);
-            cv.end();
+        	//Closing fragment for recording replayable test sequence:
+        	writeAndCloseFragmentForReplayableSequence();
 
+        	//Copy sequence file into proper directory:
+        	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
+
+        	// notify the statemodelmanager
+            stateModelManager.notifyTestSequenceStopped();
+            
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
         }

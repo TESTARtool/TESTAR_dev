@@ -159,8 +159,9 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
 		// first store all relevant widgets to the graph database
 		String concreteID = state.get(Tags.ConcreteID);
-		for (Widget w : relevantWidgets)
-			storeWidget(concreteID, w);
+//		for (Widget w : relevantWidgets)
+//			storeWidget(concreteID, w);
+			//FIXME use the new graphDB implementation
 		
 		Set<Action> actions = super.deriveActions(system, state);
 		if (actions.isEmpty()) {

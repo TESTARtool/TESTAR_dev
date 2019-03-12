@@ -373,6 +373,27 @@ public class Main {
 
         System.out.println("Existe " + outputDir + File.separator + "logs" + " resultado: " + logsDir.exists());
 
+	private static void startLogs(Settings settings) {
+		// Starting the logs
+		try {
+			// TODO: The date format is not consistent everywhere (see DATE-FORMAT comments)
+			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
+			File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
+			if (logFile.exists()) {
+				logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
+			}
+			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel)); // by urueda
+		} catch (Throwable t) {
+			System.out.println("Cannot initialize log file!");
+			t.printStackTrace(System.out);
+			exit(-1);
+		}
+		//TODO: DATE-FORMAT not consistent
+		LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
+		LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
+		LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
+		LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
+	}
         // Starting the logs
         try {
             String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
@@ -732,6 +753,42 @@ public class Main {
             settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
             LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
         }
+    }
+
+    /**
+     * This method initializes the coding manager with custom tags to use for constructing
+     * concrete and abstract state id's, if provided of course.
+     * @param settings
+     */
+    private static void initCodingManager(Settings settings) {
+        // we look if there are user-provided custom state tags in the settings
+        // if so, we provide these to the coding manager
+        int i;
+
+        // first the attributes for the concrete state id
+        if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+            i = 0;
+
+            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+            for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+                concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+            }
+
+            CodingManager.setCustomTagsForConcreteId(concreteTags);
+        }
+
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            i = 0;
+
+            Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+            for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+                abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+            }
+
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+
     }
 
 }

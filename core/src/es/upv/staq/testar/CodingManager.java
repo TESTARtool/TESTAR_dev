@@ -30,6 +30,7 @@
 
 package es.upv.staq.testar;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.zip.CRC32;
@@ -104,6 +105,14 @@ public class CodingManager {
      */
 	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
 		customTagsForAbstractId = tags;
+	}
+
+	/**
+	 * Returns the tags that are currently being used to create a custom abstract state id
+	 * @return
+	 */
+	public static Tag<?>[] getCustomTagsForAbstractId() {
+		return customTagsForAbstractId;
 	}
 
 	// this map holds the state tags that should be provided to the coding manager
@@ -187,6 +196,8 @@ public class CodingManager {
 				   CodingManager.codify(state.get(Tags.ConcreteID), action));
 		action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
 				   CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
+		action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+					CodingManager.codify(state.get(Tags.AbstractIDCustom), action, ROLES_ABSTRACT_ACTION));
 	}
 	
 	// ###############
@@ -313,7 +324,29 @@ public class CodingManager {
 		} else*/
 			return lowCollisionID(text);
 	}
-	
+
+	// #####################################
+	// ## New abstract state model coding ##
+	// #####################################
+
+	/**
+	 * This method will return the unique hash to identify the abstract state model
+	 * @return String A unique hash
+	 */
+	public static String getAbstractStateModelHash() {
+		// we calculate the hash using the tags that are used in constructing the custom abstract state id
+		// for now, an easy way is to order them alphabetically by name
+		Tag<?>[] abstractTags = getCustomTagsForAbstractId().clone();
+		Arrays.sort(abstractTags, (Tag<?> tagA, Tag<?> tagB) -> {
+			return tagA.name().compareTo(tagB.name());
+		});
+		String hashInput = "";
+		for (Tag<?> tag : abstractTags) {
+			hashInput += tag.name();
+		}
+		return lowCollisionID(hashInput);
+	}
+
 	// #################
 	//  Utility methods
 	// #################
@@ -347,5 +380,7 @@ public class CodingManager {
 		}
 		return null; // not found
 	}
+
+
 	
 }

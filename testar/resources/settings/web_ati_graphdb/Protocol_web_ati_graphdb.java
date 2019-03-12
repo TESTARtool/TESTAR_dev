@@ -243,14 +243,12 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
             continue;
           }
 
-          storeWidget(state.get(Tags.ConcreteID), widget);
           actions.add(ac.leftClickAt(widget));
         }
 
         // type into text boxes
         if (whiteListed(widget) || isTypeable(widget)) {
-          storeWidget(state.get(Tags.ConcreteID), widget);
-          actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+          actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
         }
 
         // slides
@@ -365,13 +363,11 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     // This assumes the user/pass is auto-filled by the browser
     if (currentAddress.startsWith(loginUrl) && loginWidget != null) {
       actions.add(ac.leftClickAt(loginWidget));
-      storeWidget(state.get(Tags.ConcreteID), loginWidget);
     }
 
     // Don't get caught in a PDFs etc. (no action back)
     else if (isExtensionDenied()) {
       actions.add(ac.leftClickAt(backWidget));
-      storeWidget(state.get(Tags.ConcreteID), backWidget);
     }
 
     // Back action didn't succeed, probably opened in new tab
@@ -379,13 +375,11 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
         isUrlDenied(oldAddress) &&
         isUrlDenied(currentAddress)) {
       actions.add(ac.leftClickAt(closeWidget));
-      storeWidget(state.get(Tags.ConcreteID), closeWidget);
     }
 
     // Try back action first, might have opened in same tab
     else if (isUrlDenied(currentAddress)) {
       actions.add(ac.leftClickAt(backWidget));
-      storeWidget(state.get(Tags.ConcreteID), backWidget);
     }
 
     oldAddress = currentAddress;
