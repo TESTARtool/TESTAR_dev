@@ -63,67 +63,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
-import static org.fruit.monkey.ConfigTags.AccessBridgeEnabled;
-import static org.fruit.monkey.ConfigTags.ActionDuration;
-import static org.fruit.monkey.ConfigTags.AlgorithmFormsFilling;
-import static org.fruit.monkey.ConfigTags.AlwaysCompile;
-import static org.fruit.monkey.ConfigTags.ClickFilter;
-import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
-import static org.fruit.monkey.ConfigTags.CopyFromTo;
-import static org.fruit.monkey.ConfigTags.Delete;
-import static org.fruit.monkey.ConfigTags.Discount;
-import static org.fruit.monkey.ConfigTags.DrawWidgetInfo;
-import static org.fruit.monkey.ConfigTags.DrawWidgetTree;
-import static org.fruit.monkey.ConfigTags.DrawWidgetUnderCursor;
-import static org.fruit.monkey.ConfigTags.ExecuteActions;
-import static org.fruit.monkey.ConfigTags.ExplorationSampleInterval;
-import static org.fruit.monkey.ConfigTags.FaultThreshold;
-import static org.fruit.monkey.ConfigTags.ForceForeground;
-import static org.fruit.monkey.ConfigTags.ForceToSequenceLength;
-import static org.fruit.monkey.ConfigTags.GraphDBEnabled;
-import static org.fruit.monkey.ConfigTags.GraphDBPassword;
-import static org.fruit.monkey.ConfigTags.GraphDBUrl;
-import static org.fruit.monkey.ConfigTags.GraphDBUser;
-import static org.fruit.monkey.ConfigTags.GraphResuming;
-import static org.fruit.monkey.ConfigTags.GraphsActivated;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.MaxReward;
-import static org.fruit.monkey.ConfigTags.MaxTime;
-import static org.fruit.monkey.ConfigTags.Mode;
-import static org.fruit.monkey.ConfigTags.MyClassPath;
-import static org.fruit.monkey.ConfigTags.NonReactingUIThreshold;
-import static org.fruit.monkey.ConfigTags.OfflineGraphConversion;
-import static org.fruit.monkey.ConfigTags.OnlySaveFaultySequences;
-import static org.fruit.monkey.ConfigTags.OutputDir;
-import static org.fruit.monkey.ConfigTags.PathToReplaySequence;
-import static org.fruit.monkey.ConfigTags.ProcessListenerEnabled;
-import static org.fruit.monkey.ConfigTags.ProcessLogs;
-import static org.fruit.monkey.ConfigTags.ProcessesToKillDuringTest;
-import static org.fruit.monkey.ConfigTags.PrologActivated;
-import static org.fruit.monkey.ConfigTags.ProtocolClass;
-import static org.fruit.monkey.ConfigTags.ReplayRetryTime;
-import static org.fruit.monkey.ConfigTags.SUTConnector;
-import static org.fruit.monkey.ConfigTags.SUTConnectorValue;
-import static org.fruit.monkey.ConfigTags.SUTProcesses;
-import static org.fruit.monkey.ConfigTags.SequenceLength;
-import static org.fruit.monkey.ConfigTags.Sequences;
-import static org.fruit.monkey.ConfigTags.ShowSettingsAfterTest;
-import static org.fruit.monkey.ConfigTags.ShowVisualSettingsDialogOnStartup;
-import static org.fruit.monkey.ConfigTags.StartupTime;
-import static org.fruit.monkey.ConfigTags.StateScreenshotSimilarityThreshold;
-import static org.fruit.monkey.ConfigTags.StopGenerationOnFault;
-import static org.fruit.monkey.ConfigTags.SuspiciousProcessOutput;
-import static org.fruit.monkey.ConfigTags.SuspiciousTitles;
-import static org.fruit.monkey.ConfigTags.TempDir;
-import static org.fruit.monkey.ConfigTags.TestGenerator;
-import static org.fruit.monkey.ConfigTags.TimeToFreeze;
-import static org.fruit.monkey.ConfigTags.TimeToWaitAfterAction;
-import static org.fruit.monkey.ConfigTags.TypingTextsForExecutedAction;
-import static org.fruit.monkey.ConfigTags.UnattendedTests;
-import static org.fruit.monkey.ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay;
-import static org.fruit.monkey.ConfigTags.VisualizeActions;
-import static org.fruit.monkey.ConfigTags.VisualizeSelectedAction;
+import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
@@ -134,7 +74,7 @@ public class Main {
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     //Default paths
-    private static String testarDir = "." + File.separator;
+    private static String testarDir = "." + File.separator + "testar" + File.separator + "resources" + File.separator;
     public static String settingsDir = testarDir + "settings" + File.separator;
     private static String outputDir = testarDir + "output" + File.separator;
     private static String tempDir = outputDir + "temp" + File.separator;
@@ -373,7 +313,6 @@ public class Main {
 
         System.out.println("Existe " + outputDir + File.separator + "logs" + " resultado: " + logsDir.exists());
 
-	private static void startLogs(Settings settings) {
 		// Starting the logs
 		try {
 			// TODO: The date format is not consistent everywhere (see DATE-FORMAT comments)
@@ -386,67 +325,13 @@ public class Main {
 		} catch (Throwable t) {
 			System.out.println("Cannot initialize log file!");
 			t.printStackTrace(System.out);
-			exit(-1);
+			System.exit(-1);
 		}
 		//TODO: DATE-FORMAT not consistent
 		LogSerialiser.log(Util.dateString("dd.MMMMM.yyyy HH:mm:ss") + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running" + /*Util.lineSep() + Util.lineSep() +*/ " with the next settings:\n", LogSerialiser.LogLevel.Critical);
 		LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
 		LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
 		LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
-	}
-        // Starting the logs
-        try {
-            String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
-            File logFile = new File(outputDir + File.separator + "logs" + File.separator + logFileName);
-            if (logFile.exists()) {
-                logFile = Util.generateUniqueFile(outputDir, logFileName);
-            }
-            LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel));
-        } catch (Throwable t) {
-            System.out.println("Cannot initialize log file!");
-            t.printStackTrace(System.out);
-            System.exit(-1);
-        }
-        LogSerialiser.log(Util.dateString(DATE_FORMAT) + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running with the next settings:\n", LogSerialiser.LogLevel.Critical);
-        LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
-        LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
-        LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
-    }
-
-    /**
-     * This method initializes the coding manager with custom tags to use for constructing
-     * concrete and abstract state id's, if provided of course.
-     * @param settings
-     */
-    private static void initCodingManager(Settings settings) {
-        // we look if there are user-provided custom state tags in the settings
-        // if so, we provide these to the coding manager
-        int i;
-
-        // first the attributes for the concrete state id
-        if (!settings.get(ConcreteStateAttributes).isEmpty()) {
-            i = 0;
-
-            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConcreteStateAttributes).size()];
-            for (String concreteStateAttribute : settings.get(ConcreteStateAttributes)) {
-                concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
-            }
-
-            CodingManager.setCustomTagsForConcreteId(concreteTags);
-        }
-
-        // then the attributes for the abstract state id
-        if (!settings.get(AbstractStateAttributes).isEmpty()) {
-            i = 0;
-
-            Tag<?>[] abstractTags = new Tag<?>[settings.get(AbstractStateAttributes).size()];
-            for (String abstractStateAttribute : settings.get(AbstractStateAttributes)) {
-                abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
-            }
-
-            CodingManager.setCustomTagsForAbstractId(abstractTags);
-        }
-
     }
 
     /**
@@ -578,6 +463,16 @@ public class Main {
             defaults.add(Pair.from(ProcessListenerEnabled, false));
             defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
             defaults.add(Pair.from(ProcessLogs, ".*.*"));
+
+            defaults.add(Pair.from(StateModelEnabled, false));
+            defaults.add(Pair.from(DataStore, ""));
+            defaults.add(Pair.from(DataStoreType, ""));
+            defaults.add(Pair.from(DataStoreServer, ""));
+            defaults.add(Pair.from(DataStoreDB, ""));
+            defaults.add(Pair.from(DataStoreUser, ""));
+            defaults.add(Pair.from(DataStorePassword, ""));
+            defaults.add(Pair.from(DataStoreMode, ""));
+            defaults.add(Pair.from(ResetDataStore, false));
 
             defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
             defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
