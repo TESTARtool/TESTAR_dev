@@ -46,6 +46,8 @@ import nl.ou.testar.FileHandling;
 import nl.ou.testar.GraphDB;
 import nl.ou.testar.ProcessInfo;
 import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.StateModel.StateModelManager;
+import nl.ou.testar.StateModel.StateModelManagerFactory;
 import nl.ou.testar.SutVisualization;
 import nl.ou.testar.SystemProcessHandling;
 import org.fruit.Assert;
@@ -263,13 +265,44 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //Associate start settings of the first TESTAR dialog
         this.settings = settings;
 
+        // WTF?
         SUT system = null;
 
         //initialize TESTAR with the given settings:
         initialize(settings);
 
-        //Call the principal loop to work with different loop-modes
+        //Call the principal loop to work with different loop-modes, system is always null?!
+        // Too much WTFs per minute.. :(
         detectModeLoop(system);
+    }
+
+    private void detectModeLoop(final SUT system) {
+        try {
+
+            if (mode() == Modes.View && isValidFile()) {
+                new SequenceViewer(settings);
+            } else if (mode() == Modes.Replay && isValidFile()) {
+                runReplayLoop();
+            } else if (mode() == Modes.Spy) {
+                runSpyLoop();
+            } else if (mode() == Modes.Record) {
+                runRecordLoop(system);
+            } else if (mode() == Modes.Generate) {
+                runGenerateOuterLoop(system);
+            }
+
+        } catch (SystemStartException SystemStartException) {
+            SystemStartException.printStackTrace();
+            LOGGER.error("Exception: ", SystemStartException);
+            this.mode = Modes.Quit;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.error("Exception: ", e);
+            this.mode = Modes.Quit;
+        }
+
+        //Closing TESTAR EventHandler
+        closeTestarTestSession();
     }
 
     /**
@@ -299,8 +332,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         );
 
         // new state model manager
-        if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
-        		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+        if (mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay)
+            stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -331,51 +364,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     /**
      * Check if the selected file to Replay or View contains a valid fragment object
      */
-    protected void detectModeLoop(SUT system) {
-
-    	do {
-    		//initialize TESTAR with the given settings:
-    		initialize(settings);
-
-    		try {
-    			
-    			if (mode() == Modes.View) {
-    				new SequenceViewer(settings).run();
-    			} else if (mode() == Modes.Replay) {
-    				replay();
-    			} else if (mode() == Modes.Spy) {
-    				runSpyLoop(system);
-    			} else if(mode() == Modes.Record) {
-    				runRecordLoop(system);
-    			} else if (mode() == Modes.Generate) {
-    				runGenerateOuterLoop(system);
-    			}
-    			
-    		}catch(SystemStartException SystemStartException) {
-    			SystemStartException.printStackTrace();
-    			this.mode = Modes.Quit;
-    			stopSystem(system);
-    			system = null;
-    		} catch (Exception e) {
-    			e.printStackTrace();
-    			this.mode = Modes.Quit;
-    			stopSystem(system);
-    			system = null;
-    		}
-    		
-    		/*for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-    		    System.out.println(ste);
-    		}*/
-    		
-    		if (mode() == Modes.Quit) {
-				stopSystem(system);
-			}
-    		
-    		//Closing TESTAR EventHandler
-            closeTestarTestSession();
-    	}
-    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-    	while(startTestarSettingsDialog());
     public boolean isValidFile() {
         try {
 
@@ -392,7 +380,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         } catch (ClassNotFoundException | IOException e) {
 
             System.out.println("ERROR: File is not a readable, please select a correct file");
-            DEBUGLOG.error("Exception: ", e);
+            LOGGER.error("Exception: ", e);
 
             return false;
         }
@@ -427,9 +415,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                     settings.get(LogLevel));
         } catch (NoSuchTagException e3) {
             // TODO Auto-generated catch block
+            LOGGER.error("Exception: ", e3);
             e3.printStackTrace();
         } catch (FileNotFoundException e3) {
             // TODO Auto-generated catch block
+            LOGGER.error("Exception: ", e3);
             e3.printStackTrace();
         }
         ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
@@ -450,12 +440,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.delete(currentSeq);
         } catch (IOException e2) {
             LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+            LOGGER.error("Exception: ", e2);
         }
         try {
             TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
             LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
         } catch (IOException e) {
             LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
+            LOGGER.error("Exception: ", e);
         }
         return currentSeq;
     }
@@ -598,6 +590,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
+                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
+
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
@@ -651,6 +645,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             } catch (Exception e) {
                 System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
                 e.printStackTrace();
+                LOGGER.error("Exception: ", e);
                 emergencyTerminateTestSequence(system, e);
             }
         }
@@ -673,8 +668,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
             } catch (NoSuchTagException e) {
                 LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                LOGGER.error("Exception: ", e);
             } catch (IOException e) {
                 LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
+                LOGGER.error("Exception: ", e);
             }
             FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
         }
@@ -716,6 +713,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
+
             CodingManager.buildIDs(state, actions);
             if (actions.isEmpty()) {
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS) {
@@ -831,25 +829,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //Obtain action information
         String[] actionRepresentation = Action.getActionRepresentation(state, action, "\t");
 
-		//Output/logs folder
-		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
-				actionCount,
+        //Output/logs folder
+        LogSerialiser.log(String.format(actionMode + " [%d]: %s\n%s",
+                actionCount,
 
-				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + action.get(Tags.AbstractID,"AbstractID not available") +"\n"+
-				" ConcreteID CUSTOM = " +  action.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = " +  action.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n"+
+                "\n @Action ConcreteID = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
+                        " AbstractID = " + action.get(Tags.AbstractID, "AbstractID not available") + "\n" +
+                        " ConcreteID CUSTOM = " + action.get(Tags.ConcreteIDCustom, "ConcreteID CUSTOM not available") +
+                        " AbstractID CUSTOM = " + action.get(Tags.AbstractIDCustom, "AbstractID CUSTOM not available") + "\n" +
 
-				" @State ConcreteID = " + state.get(Tags.ConcreteID,"ConcreteID not available") +
-				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
-				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
-				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
-				actionRepresentation[0]) + "\n",
-				LogSerialiser.LogLevel.Info);
+                        " @State ConcreteID = " + state.get(Tags.ConcreteID, "ConcreteID not available") +
+                        " AbstractID = " + state.get(Tags.Abstract_R_ID, "Abstract_R_ID not available") + "\n" +
+                        " ConcreteID CUSTOM = " + state.get(Tags.ConcreteIDCustom, "ConcreteID CUSTOM not available") +
+                        " AbstractID CUSTOM = " + state.get(Tags.AbstractIDCustom, "AbstractID CUSTOM not available") + "\n",
+                actionRepresentation[0]) + "\n",
+                LogSerialiser.LogLevel.Info);
 
-		//bin folder 
-		LOGGER.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+        //bin folder
+        LOGGER.info(actionMode + " number {} Widget {} finished in {} ms",
+                actionCount, actionRepresentation[1], System.currentTimeMillis() - tStart);
 
 
     }
@@ -907,6 +905,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     /**
      * Method to run TESTAR on Record User Actions Mode.
+     *
      * @param system
      */
     protected void runRecordLoop(SUT system) {
@@ -932,10 +931,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             if (enabledProcessListener)
                 processListener.startListeners(system, settings);
 
-        	//initializing fragment for recording replayable test sequence:
-        	initFragmentForReplayableSequence(getState(system));
+            //initializing fragment for recording replayable test sequence:
+            initFragmentForReplayableSequence(getState(system));
 
-        	// notify the statemodelmanager
+            // notify the statemodelmanager
             stateModelManager.notifyTestSequencedStarted();
         }
         //else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
@@ -981,7 +980,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
                 lastExecutedAction = actionStatus.getAction();
                 actionCount++;
-    			//notify the state model manager of the executed action
+                //notify the state model manager of the executed action
                 stateModelManager.notifyActionExecution(actionStatus.getAction());
             }
 
@@ -1013,20 +1012,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             this.mode = Modes.Quit;
         }
 
-        if(startedRecordMode && mode() == Modes.Quit){
+        if (startedRecordMode && mode() == Modes.Quit) {
 
-        	// notify the state model manager of the sequence end
+            // notify the state model manager of the sequence end
             stateModelManager.notifySequenceEnded();
 
-        	//Closing fragment for recording replayable test sequence:
-        	writeAndCloseFragmentForReplayableSequence();
+            //Closing fragment for recording replayable test sequence:
+            writeAndCloseFragmentForReplayableSequence();
 
-        	//Copy sequence file into proper directory:
-        	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
+            //Copy sequence file into proper directory:
+            classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK, generatedSequence, currentSeq);
 
-        	// notify the statemodelmanager
+            Util.clear(cv);
+            cv.end();
+
+            // notify the statemodelmanager
             stateModelManager.notifyTestSequenceStopped();
-            
+
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
         }
@@ -1120,10 +1122,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
         } catch (IOException ioe) {
-            DEBUGLOG.error("Exception: ", ioe);
+            LOGGER.error("Exception: ", ioe);
             throw new RuntimeException("Cannot read file.", ioe);
         } catch (ClassNotFoundException cnfe) {
-            DEBUGLOG.error("Exception: ", cnfe);
+            LOGGER.error("Exception: ", cnfe);
             throw new RuntimeException("Cannot read file.", cnfe);
         } finally {
             if (ois != null) {
@@ -1804,7 +1806,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected void closeTestSession() {
     }
 
-	//TODO move to ManualRecording helper class??
+    //TODO move to ManualRecording helper class??
 //	/**
 //	 * Records user action (for example for Generate-Manual)
 //	 *
@@ -1930,5 +1932,4 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             }
         }
     }
-
 }
