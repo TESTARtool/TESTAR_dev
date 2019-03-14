@@ -37,6 +37,11 @@ public interface StrategyActionSelector {
     void setTags(final Tag<String> stateTag, final Tag<String> actionTag);
 
     /**
+     * Reset the metrics
+     */
+    void clear();
+
+    /**
      * Save the gathered metrics to a file
      */
     void saveMetrics();

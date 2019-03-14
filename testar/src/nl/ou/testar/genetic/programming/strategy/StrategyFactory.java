@@ -24,6 +24,11 @@ public interface StrategyFactory {
     String[] getTextInputsFromFile(final String inputFile);
 
     /**
+     * Reset the metrics
+     */
+    void clear();
+
+    /**
      * Save the metrics to a file
      */
     void saveMetrics();

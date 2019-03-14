@@ -23,11 +23,8 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Tag<String> ACTION_ID;
     private Tag<String> STATE_ID;
 
-
     StrategyGuiStateImpl() {
     }
-
-//    public int previousStates
 
     public boolean isAvailable(final Role actionType) {
         return actions.stream().anyMatch(action -> action.get(Tags.Role) == actionType);
@@ -225,5 +222,29 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     @Override
     public void setActionTag(Tag<String> actionTag) {
         ACTION_ID = Tags.Desc;
+    }
+
+    private void setActions(final List<Action> actions) {
+        this.actions = actions;
+    }
+
+    private void setPreviousActions(final List<Action> previousActions) {
+        this.previousActions = previousActions;
+    }
+
+    private void setPreviousStates(final List<String> previousStates) {
+        this.previousStates = previousStates;
+    }
+
+    private void setExecuted(final Map<String, Integer> executed) {
+        this.executed = executed;
+    }
+
+    @Override
+    public void clear() {
+        this.setActions(new ArrayList<>());
+        this.setExecuted(new TreeMap<>());
+        this.setPreviousActions(new ArrayList<>());
+        this.setPreviousStates(new ArrayList<>());
     }
 }

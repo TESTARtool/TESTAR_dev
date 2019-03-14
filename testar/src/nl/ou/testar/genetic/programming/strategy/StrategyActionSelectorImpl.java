@@ -80,6 +80,11 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         stateManager.setActionTag(actionTag);
     }
 
+    @Override
+    public void clear() {
+        stateManager.clear();
+    }
+
     private void updateState(final Action action, final State state) {
         stateManager.addActionToPreviousActions(action);
         stateManager.addStateToPreviousStates(state);

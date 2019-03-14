@@ -102,6 +102,11 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     @Override
+    public void clear() {
+        this.strategyActionSelector.clear();
+    }
+
+    @Override
     public StrategyActionSelector getStrategyActionSelector() {
         final StrategyNode main = getStrategyNode();
         this.strategyActionSelector = new StrategyActionSelectorImpl(main);

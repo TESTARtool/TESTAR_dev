@@ -52,4 +52,6 @@ public interface StrategyGuiState {
     void setStateTag(final Tag<String> stateTag);
 
     void setActionTag(final Tag<String> actionTag);
+
+    void clear();
 }
