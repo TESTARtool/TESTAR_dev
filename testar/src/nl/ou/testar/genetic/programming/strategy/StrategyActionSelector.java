@@ -35,4 +35,9 @@ public interface StrategyActionSelector {
      * @param actionTag - tag to identify actions
      */
     void setTags(final Tag<String> stateTag, final Tag<String> actionTag);
+
+    /**
+     * Save the gathered metrics to a file
+     */
+    void saveMetrics();
 }

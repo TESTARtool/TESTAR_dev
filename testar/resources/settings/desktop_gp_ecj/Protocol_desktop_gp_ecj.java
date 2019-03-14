@@ -124,6 +124,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     protected void postSequenceProcessing() {
         super.postSequenceProcessing();
         this.strategyFactory.printMetrics();
+        this.strategyFactory.saveMetrics();
         this.endDate = new Date();
         printDate();
     }

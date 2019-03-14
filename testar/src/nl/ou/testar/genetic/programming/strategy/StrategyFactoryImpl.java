@@ -1,5 +1,6 @@
 package nl.ou.testar.genetic.programming.strategy;
 
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actions.SnAnd;
 import nl.ou.testar.genetic.programming.strategy.actions.SnClickAction;
@@ -36,12 +37,16 @@ import nl.ou.testar.genetic.programming.strategy.actions.SnStateHasNotChanged;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeAction;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeActionsAvailable;
 import nl.ou.testar.genetic.programming.strategy.actions.SnTypeOfActionOf;
+import org.fruit.alayer.exceptions.NoSuchTagException;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +55,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.stream.Stream;
+
+import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
@@ -87,6 +94,11 @@ public class StrategyFactoryImpl implements StrategyFactory {
             System.out.println("Error while reading text input file!");
         }
         throw new RuntimeException("The content of the input file seems to be corrupt!");
+    }
+
+    @Override
+    public void saveMetrics() {
+        this.strategyActionSelector.saveMetrics();
     }
 
     @Override

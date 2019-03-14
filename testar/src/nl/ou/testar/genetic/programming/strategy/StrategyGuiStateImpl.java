@@ -206,7 +206,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         return this.previousStates.size();
     }
 
-    int getUniqueStates() {
+    int getTotalNumberOfUniqueStates() {
         return (int) this.previousStates
                 .stream()
                 .distinct()

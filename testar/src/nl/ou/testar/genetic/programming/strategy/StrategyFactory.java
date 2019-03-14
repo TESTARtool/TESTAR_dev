@@ -22,4 +22,9 @@ public interface StrategyFactory {
      * @return inputs for type actions
      */
     String[] getTextInputsFromFile(final String inputFile);
+
+    /**
+     * Save the metrics to a file
+     */
+    void saveMetrics();
 }
