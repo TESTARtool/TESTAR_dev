@@ -1915,7 +1915,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (userEvent != null){
 				
 				//if the state is not correct and we want to update him. Using num_lock button (can be replaced)
-				if(userEvent[0] instanceof KBKeys && userEvent[0].equals(KBKeys.VK_NUM_LOCK)) {
+				if(userEvent[0] instanceof KBKeys && 
+						( userEvent[0].equals(KBKeys.VK_NUM_LOCK) || userEvent[0].equals(KBKeys.KEY_LOCATION_NUMPAD) ) ) {
 					state = getState(system);
 					userEvent = null;
 				}
