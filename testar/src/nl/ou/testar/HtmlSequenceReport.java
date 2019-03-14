@@ -5,10 +5,10 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
+import org.fruit.monkey.Main;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.Map;
 import java.util.Set;
 
 public class HtmlSequenceReport {
@@ -25,18 +25,27 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_PRE = "TESTAR_sequence_";
+    private static File htmlFile;
+	private static String htmlDirectory = Main.outputDir + File.separator +"html"+ File.separator;
+	private static final String REPORT_FILENAME_PRE = "TESTAR_sequence";
     private static final String REPORT_FILENAME_AFT = ".html";
 
     public HtmlSequenceReport() {
         try{
+        	
+        	//If html directory doesn't exist, create it
+        	File htmlDir = new File(htmlDirectory);
+    		if(!htmlDir.exists())
+    			htmlDir.mkdirs();
+    		
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
-            String filename = "TESTAR_sequence.txt"; // will be replaced
+            String filename = htmlDirectory + "TESTAR_sequence.txt";
+            
             int i = 1;
             boolean newFilenameFound = false;
             while(!newFilenameFound){
-                filename = REPORT_FILENAME_PRE+i+REPORT_FILENAME_AFT;
+                filename = htmlDirectory + REPORT_FILENAME_PRE+i+REPORT_FILENAME_AFT;
                 File file = new File(filename);
                 if(file.exists()){
                     i++;
@@ -44,24 +53,29 @@ public class HtmlSequenceReport {
                     newFilenameFound = true;
                 }
             }
+            
+            setHtmlFileName(new File(filename));
+            
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
             }
             write("<h1>TESTAR execution sequence report</h1>");
         }catch (Exception e){
-            e.printStackTrace();
+        	e.printStackTrace();
         }
     }
 
     public void addState(State state, Set<Action> actions){
-        write("<h2>State "+sequenceCounter+"</h2>");
-        write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
-        try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
-        write("<p><img src=\""+state.get(Tags.ScreenshotPath)+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+    	write("<h2>State "+sequenceCounter+"</h2>");
+    	write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
+    	try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
+    	try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
+    	try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
+    	try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
+       
+    	write("<p><img src=\""+state.get(Tags.ScreenshotPath).replace("./output", "..")+"\"></p>");
+    	
         sequenceCounter++;
 
         write("<h4>Set of widgets:</h4><ul>");
@@ -94,7 +108,9 @@ public class HtmlSequenceReport {
     public void addState(State state, Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
-        write("<p><img src=\""+state.get(Tags.ScreenshotPath)+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+       
+        write("<p><img src=\""+state.get(Tags.ScreenshotPath).replace("./output", "..")+"\"></p>");
+        
         sequenceCounter++;
         if(actions.size()==concreteIdsOfUnvisitedActions.size()){
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
@@ -139,7 +155,8 @@ public class HtmlSequenceReport {
         write("<h4>concreteID="+action.get(Tags.ConcreteID));
         try{if(action.get(Tags.Desc)!=null) write(" || "+action.get(Tags.Desc));}catch(Exception e){}
         write("</h4>");
-        write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+        
+        write("<p><img src=\""+actionPath.replace("./output", "..")+"\"></p>");
     }
     
     public void close() {
@@ -161,4 +178,21 @@ public class HtmlSequenceReport {
     private String end(String tag) {
         return "</" + tag + ">";
     }
+    
+    public static File getHtmlFileName() {
+		return htmlFile;
+	}
+
+	public static void setHtmlFileName(File htmlFile) {
+		HtmlSequenceReport.htmlFile = htmlFile;
+	}
+
+	public static String getHtmlDirectory() {
+		return htmlDirectory;
+	}
+
+	public static void setHtmlDirectory(String htmlDirectory) {
+		HtmlSequenceReport.htmlDirectory = htmlDirectory;
+	}
+
 }

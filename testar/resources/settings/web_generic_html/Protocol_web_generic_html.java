@@ -126,8 +126,6 @@ public class Protocol_web_generic_html extends ClickFilterLayerProtocol {
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
@@ -170,6 +168,10 @@ public class Protocol_web_generic_html extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void beginSequence(SUT system, State state){
+		
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
+		
 		super.beginSequence(system, state);
 	}
 
@@ -537,6 +539,14 @@ public class Protocol_web_generic_html extends ClickFilterLayerProtocol {
 		String replayedSequence = "";
 		if(initialMode.contains("Replay"))
 			replayedSequence = new File(settings.get(ConfigTags.PathToReplaySequence)).getName();
+		
+		//Rename html file name with the number of current sequence
+		File oldHtmlFileName = HtmlSequenceReport.getHtmlFileName();
+		String pathHtmlFile = HtmlSequenceReport.getHtmlDirectory();
+		htmlReport.close(); //Close PrintWriter
+		
+		//output/html/sequencex.html
+		oldHtmlFileName.renameTo(new File(pathHtmlFile + getCurrentSequence() + ".html"));
 		
 		//Timestamp SequenceID Mode SequenceFileName "TestCaseName" Status "StatusInfo" "ReplayedSequence"
 		DEBUGLOG.info("sequence"+sequenceCount()+" "+initialMode+" "+ getCurrentSequence()+" \""+testCaseName+"\" "+status+" \""+statusInfo+"\" \""+replayedSequence+"\"");
