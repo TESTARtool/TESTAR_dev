@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 25
+Sequences = 2
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -83,7 +83,7 @@ ProcessLogs = .*.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[oO]pen.*|.*[sS]how more fonts.*|.*[vV]iew Help.*|.*[mM]icrosoft Software Licence.*|.*[sS]ave [aA]s.*|.*[iI]nput Values.*
 
 #################################################################
 # Processfilter
@@ -92,7 +92,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = 
+SUTProcesses = .*notepad.exe.*
 
 #################################################################
 # Protocolclass
@@ -105,27 +105,39 @@ ProtocolClass = desktop_gp_ecj/Protocol_desktop_gp_ecj
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl = 
-GraphDBUser = 
-GraphDBPassword = 
+GraphDBEnabled = true
+GraphDBUrl = remote:/localhost/notepad
+GraphDBUser = root
+GraphDBPassword = root
 
 #################################################################
-# State Tags
+# State model inference settings
+#################################################################
+StateModelEnabled = false
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = notepad
+DataStoreUser = root
+DataStorePassword = root
+DataStoreMode = instant
+
+#################################################################
+# State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
-# ConcreteStateAttributes are used to identify actions
-# AbstractStateAttributes are used to identify states
+# Allowed value are: Role,Path,Title,Enabled
 #################################################################
 ConcreteStateAttributes = Role,Path,Title
-AbstractStateAttributes = Role, Desc
+AbstractStateAttributes = Role,Path,Enabled
 
 #################################################################
 # Other more advanced settings
 #################################################################
 TypingTextsForExecutedAction = 10
 Discount = 0.95
+InputFileText = blns.txt
 TempDir = ./testar/resources/output/temp
 MaxTime = 3.1536E7
 StopGenerationOnFault = false
@@ -158,6 +170,7 @@ CopyFromTo =
 TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
+ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true

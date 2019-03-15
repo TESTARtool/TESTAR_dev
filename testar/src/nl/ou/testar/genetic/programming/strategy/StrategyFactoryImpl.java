@@ -2,65 +2,20 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
-import nl.ou.testar.genetic.programming.strategy.actions.SnAnd;
-import nl.ou.testar.genetic.programming.strategy.actions.SnClickAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnDragAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnDragActionsAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEquals;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEqualsType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEscape;
-import nl.ou.testar.genetic.programming.strategy.actions.SnGreaterThan;
-import nl.ou.testar.genetic.programming.strategy.actions.SnHitKeyAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnIfThenElse;
-import nl.ou.testar.genetic.programming.strategy.actions.SnLeftClicksAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNot;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfActionsOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfDragActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfLeftClicks;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfPreviousActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfTypeActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedDragActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedLeftClicks;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedTypeActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnOr;
-import nl.ou.testar.genetic.programming.strategy.actions.SnPreviousAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomActionOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomActionOfTypeOtherThan;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomLeastExecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomMostExecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomNumber;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomUnexecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomUnexecutedActionOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnStateHasNotChanged;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeActionsAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeOfActionOf;
+import nl.ou.testar.genetic.programming.strategy.actions.*;
 import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Stream;
-
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
     private StrategyActionSelector strategyActionSelector;
+    private List<Metric> metrics = new ArrayList<>();
 
     public StrategyFactoryImpl(final String strategy) {
         if (strategy.endsWith(".txt")) {
@@ -74,7 +29,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     private String getStrategyFromFile(String strategyFile) {
         String strategyFromFile = "";
         try {
-            final BufferedReader br = new BufferedReader(new FileReader("settings/" + strategyFile));
+            final BufferedReader br = new BufferedReader(new FileReader(strategyFile));
             strategyFromFile = br.readLine();
             br.close();
         } catch (FileNotFoundException e) {
@@ -97,8 +52,24 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     @Override
+    public void writeMetricsToFile(final Settings settings) {
+        try {
+            final String filename = this.getFileName();
+            final PrintStream ps = this.getPrintStream(settings, filename);
+            final String headers = this.getHeaders();
+            final String metrics = this.getContent();
+            ps.println(headers);
+            ps.print(metrics);
+            ps.close();
+            System.out.println(headers + "\n" + metrics);
+        } catch (NoSuchTagException | FileNotFoundException e) {
+            LogSerialiser.log("Metric serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
+        }
+    }
+
+    @Override
     public void saveMetrics() {
-        this.strategyActionSelector.saveMetrics();
+        this.metrics.add(this.strategyActionSelector.getMetrics());
     }
 
     @Override
@@ -115,7 +86,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     public void printMetrics() {
-        this.strategyActionSelector.getMetrics();
+        this.strategyActionSelector.printMetrics();
     }
 
     private void makeQueue(final String strategy) {
@@ -124,6 +95,33 @@ public class StrategyFactoryImpl implements StrategyFactory {
                 .replace(")", "")
                 .split(":"))
                 .forEach(s -> queue.add(AvailableReturnTypes.valueOf(s.replace("-", "").toUpperCase())));
+    }
+
+    private String getHeaders() {
+        return "States," +  // # of abstract states visited
+                "Actions," + // # of actions executed
+                "UniqueStates," + // # of unique states visited
+                "UniqueActions,"; // # of unique actions executed
+    }
+
+    private String getContent() {
+        final StringBuilder sb = new StringBuilder();
+        this.metrics.forEach(metric -> {
+            sb.append(metric.getVisitedStates()).append(',')
+                    .append(metric.getExecutedActions()).append(',')
+                    .append(metric.getUniqueStates()).append(',')
+                    .append(metric.getUniqueActions()).append('\n');
+        });
+        return sb.toString();
+    }
+
+    private PrintStream getPrintStream(final Settings settings, final String filename) throws FileNotFoundException {
+        return new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
+                settings.get(ConfigTags.OutputDir) + File.separator + "metrics" + File.separator + filename + ".csv"))));
+    }
+
+    private String getFileName() {
+        return (System.getProperty("Dcounter") == null) ? "ecj_" + "test" : "ecj_sequence" + System.getProperty("Dcounter");
     }
 
     private StrategyNode getStrategyNode() {

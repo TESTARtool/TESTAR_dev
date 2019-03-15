@@ -1,5 +1,7 @@
 package nl.ou.testar.genetic.programming.strategy;
 
+import org.fruit.monkey.Settings;
+
 public interface StrategyFactory {
 
     /**
@@ -13,7 +15,6 @@ public interface StrategyFactory {
      * Print metrics
      */
     void printMetrics();
-
 
     /**
      * Returns inputs for
@@ -29,7 +30,14 @@ public interface StrategyFactory {
     void clear();
 
     /**
-     * Save the metrics to a file
+     * Write the metrics to a file
+     *
+     * @param settings - Current settings
+     */
+    void writeMetricsToFile(final Settings settings);
+
+    /**
+     * Save the metrics of a sequence
      */
     void saveMetrics();
 }
