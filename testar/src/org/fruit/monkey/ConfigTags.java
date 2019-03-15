@@ -27,16 +27,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  * @author Sebastian Bauersfeld
  */
+
 package org.fruit.monkey;
 
+import java.util.List;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
-
-import java.util.List;
 
 public final class ConfigTags {
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
@@ -64,19 +63,21 @@ public final class ConfigTags {
   public static final Tag<Double> ReplayRetryTime = Tag.from("ReplayRetryTime", Double.class);
   public static final Tag<Double> MaxTime = Tag.from("MaxTime", Double.class);
   public static final Tag<Double> StartupTime = Tag.from("StartupTime", Double.class);
-  @SuppressWarnings("unchecked")
+
+ @SuppressWarnings("unchecked")
   public static final Tag<List<String>> Delete = Tag.from("Delete", (Class<List<String>>) (Class<?>) List.class);
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<Pair<String, String>>> CopyFromTo = Tag.from("CopyFromTo", (Class<List<Pair<String, String>>>) (Class<?>) List.class);
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> MyClassPath = Tag.from("MyClassPath", (Class<List<String>>) (Class<?>) List.class);
+
   public static final Tag<String> ProtocolClass = Tag.from("ProtocolClass", String.class);
   public static final Tag<Boolean> UseRecordedActionDurationAndWaitTimeDuringReplay = Tag.from("UseRecordedActionDurationAndWaitTimeDuringReplay", Boolean.class);
   public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class);
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
-
-  // begin by urueda
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
   public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);
@@ -95,16 +96,29 @@ public final class ConfigTags {
   public static final Tag<Boolean> UnattendedTests = Tag.from("UnattendedTests", Boolean.class);
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
-
-  // begin by florendegier
   public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
   public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
   public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);
   public static final Tag<String> GraphDBPassword = Tag.from("GraphDBPassword", String.class);
-
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
-  
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
+  public static final Tag<String> TgherkinDocument = Tag.from("TgherkinDocument", String.class);
+  public static final Tag<Boolean> ApplyDefaultOnMismatch = Tag.from("ApplyDefaultOnMismatch", Boolean.class);
+  public static final Tag<Boolean> ContinueToApplyDefault = Tag.from("ContinueToApplyDefault", Boolean.class);
+  public static final Tag<Boolean> RepeatTgherkinScenarios = Tag.from("RepeatTgherkinScenarios", Boolean.class);
+  public static final Tag<Boolean> GenerateTgherkinReport = Tag.from("GenerateTgherkinReport", Boolean.class);
+  public static final Tag<Boolean> StoreTgherkinReport = Tag.from("StoreTgherkinReport", Boolean.class);
+  public static final Tag<Boolean> ReportDerivedGestures = Tag.from("ReportDerivedGestures", Boolean.class);
+  public static final Tag<Boolean> ReportState = Tag.from("ReportState", Boolean.class);
+  public static final Tag<Double> ConfidenceThreshold = Tag.from("ConfidenceThreshold", Double.class);
+  public static final Tag<Boolean> TgherkinReportIncludeOCR = Tag.from("TgherkinReportIncludeOCR", Boolean.class);
+  public static final Tag<Boolean> TgherkinReportIncludeImageRecognition = Tag.from("TgherkinReportIncludeImageRecognition", Boolean.class);
+  public static final Tag<Integer> TgherkinNrOfNOPRetries = Tag.from("TgherkinNrOfNOPRetries", Integer.class);
+  public static final Tag<String> TgherkinExecutionMode = Tag.from("TgherkinExecutionMode", String.class);
+  public static final Tag<Double> MinimumPercentageForImageRecognition = Tag.from("MinimumPercentageForImageRecognition", Double.class);
+  // subroutine tags
+  public static final Tag<String> TgherkinFileData = Tag.from("TgherkinFileData", String.class);
+  public static final Tag<String> CompoundActionData = Tag.from("CompoundActionData", String.class);
 }

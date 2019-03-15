@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -38,21 +38,22 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  *
  */
 public final class TimeBasedMediaGuideline extends AbstractGuideline {
-	
-	private static final long serialVersionUID = 277505674566380437L;
 
-	TimeBasedMediaGuideline(AbstractPrinciple parent) {
-		super(2, "Time-based Media", parent);
-		criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)",
-				this, Level.A, "media-equiv-av-only-alt"));
-		criteria.add(new SuccessCriterion(2, "Captions (Prerecorded)",
-				this, Level.A, "media-equiv-captions"));
-		criteria.add(new SuccessCriterion(3, "Audio Description or Media Alternative (Prerecorded)",
-				this, Level.A, "media-equiv-audio-desc"));
-		criteria.add(new SuccessCriterion(4, "Captions (Live)",
-				this, Level.AA, "media-equiv-real-time-captions"));
-		criteria.add(new SuccessCriterion(5, "Audio Description (Prerecorded)",
-				this, Level.AA, "media-equiv-audio-desc-only"));
-	}
+  private static final long serialVersionUID = 277505674566380437L;
 
+  TimeBasedMediaGuideline(AbstractPrinciple parent) {
+    super(2, "Time-based Media", parent);
+    List<SuccessCriterion> criteria = getCriteria();
+    criteria.add(new SuccessCriterion(1, "Audio-only and Video-only (Prerecorded)",
+        this, Level.A, "media-equiv-av-only-alt"));
+    criteria.add(new SuccessCriterion(2, "Captions (Prerecorded)",
+        this, Level.A, "media-equiv-captions"));
+    criteria.add(new SuccessCriterion(3, "Audio Description or Media Alternative (Prerecorded)",
+        this, Level.A, "media-equiv-audio-desc"));
+    criteria.add(new SuccessCriterion(4, "Captions (Live)",
+        this, Level.AA, "media-equiv-real-time-captions"));
+    criteria.add(new SuccessCriterion(5, "Audio Description (Prerecorded)",
+        this, Level.AA, "media-equiv-audio-desc-only"));
+    setCriteria(criteria);
+  }
 }

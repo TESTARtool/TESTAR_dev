@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -52,53 +51,57 @@ import org.fruit.alayer.exceptions.ActionFailedException;
  */
 public final class Type extends TaggableBase implements Action {
 
-	private static final long serialVersionUID = 2555715152455716781L;
-	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
-	private final String text;
-	
-	public Type(String text){
-		Assert.hasText(text);
-		checkAscii(text);
-		this.text = text;
-	}
-	
-	public void run(SUT system, State state, double duration) throws ActionFailedException {
-		Assert.isTrue(duration >= 0);
-		Assert.notNull(system);
-		
-		double d = duration / text.length();
-		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
-		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
-		for(int i = 0; i < text.length(); i++){
-			char c = text.charAt(i);
-			boolean shift = false;
+  private static final long serialVersionUID = 2555715152455716781L;
+  private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
+  private final String text;
 
-			if(Character.isLetter(c)){
-				if(Character.isLowerCase(c))
-					c = Character.toUpperCase(c);
-				else
-					shift = true;
-			}
-			
-			KBKeys key = getKey(c);
-						
-			if(shift)
-				shiftDown.run(system, state, .0);
-			new KeyDown(key).run(system, state, .0);
-			new KeyUp(key).run(system, state, .0);
-			if(shift)
-				shiftUp.run(system, state, .0);
-			Util.pause(d);
-		}
-	}
-		
-	public static void checkAscii(String text){
-	    if (!asciiEncoder.canEncode(text))
-	    	throw new IllegalArgumentException("This string is not an ascii string!");
-	}
-	
-	private KBKeys getKey(char c) {
-        for (KBKeys key : KBKeys.values()) {
+  public Type(String text) {
+    Assert.hasText(text);
+    checkAscii(text);
+    this.text = text;
+  }
+
+  public void run(SUT system, State state, double duration) throws ActionFailedException {
+    Assert.isTrue(duration >= 0);
+    Assert.notNull(system);
+
+    double d = duration / text.length();
+    Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
+    Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      boolean shift = false;
+
+      if (Character.isLetter(c)) {
+        if (Character.isLowerCase(c)) {
+          c = Character.toUpperCase(c);
+        } else {
+          shift = true;
+        }
+      }
+
+      KBKeys key = getKey(c);
+
+      if (shift) {
+        shiftDown.run(system, state, .0);
+      }
+      new KeyDown(key).run(system, state, .0);
+      new KeyUp(key).run(system, state, .0);
+      if (shift) {
+        shiftUp.run(system, state, .0);
+      }
+      Util.pause(d);
+    }
+  }
+
+  public static void checkAscii(String text) {
+      if (!asciiEncoder.canEncode(text)) {
+        throw new IllegalArgumentException("This string is not an ascii string!");
+      }
+  }
+
+  private KBKeys getKey(char c) {
+        for (KBKeys key: KBKeys.values()) {
             if (key.code() == (int) c) {
                 return key;
             }
@@ -106,33 +109,33 @@ public final class Type extends TaggableBase implements Action {
 
         throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
     }
-	
-	public String toString(){ return "Type text '" + text + "'"; }
-	
-	// by urueda
-	@Override
-	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters){
-			if (r.name().equals(ActionRoles.Type.name()))
-				return "Text typed";
-		}
-		return toString();
-	}	
 
-	// by urueda
-	@Override
-	public String toShortString() {
-		Role r = get(Tags.Role, null);
-		if (r != null)
-			return r.toString();
-		else
-			return toString();
-	}
+  public String toString() {
+    return "Type text '" + text + "'";
+  }
 
-	// by urueda
-	@Override
-	public String toParametersString() {
-		return "(" + text + ")";
-	}
-	
+  @Override
+  public String toString(Role... discardParameters) {
+    for (Role r: discardParameters) {
+      if (r.name().equals(ActionRoles.Type.name())) {
+        return "Text typed";
+      }
+    }
+    return toString();
+  }
+
+  @Override
+  public String toShortString() {
+    Role r = get(Tags.Role, null);
+    if (r != null) {
+      return r.toString();
+    } else {
+      return toString();
+    }
+  }
+
+  @Override
+  public String toParametersString() {
+    return "(" + text + ")";
+  }
 }

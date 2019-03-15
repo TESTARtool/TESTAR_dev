@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
 
 import org.fruit.alayer.devices.ProcessHandle;
@@ -38,18 +37,13 @@ import org.fruit.alayer.exceptions.SystemStopException;
  */
 public class LinuxProcessHandle implements ProcessHandle {
 
-
     //region Global variables
-
 
     private LinuxProcess _process;
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Creates a new Linux process representation from another Linux process representation.
@@ -59,19 +53,17 @@ public class LinuxProcessHandle implements ProcessHandle {
         _process = lp;
     }
 
-	/**
+  /**
      * Creates a new Linux process representation from another Linux process representation.
      * @param pid The PID of the linux process to create a LinuxProcessHandle representation for.
      */
     public LinuxProcessHandle(long pid) {
         _process = LinuxProcess.fromPid(pid);
     }
-	
+
     //endregion
 
-
     //region ProcessHandle implementation
-
 
     /**
      * Stops the process.
@@ -82,7 +74,6 @@ public class LinuxProcessHandle implements ProcessHandle {
         _process.stop();
     }
 
-
     /**
      * Determines whether or not the process is currently running.
      * @return True if the process is running; False otherwise.
@@ -92,12 +83,10 @@ public class LinuxProcessHandle implements ProcessHandle {
         return _process.isRunning();
     }
 
-
     @Override
     public String name() {
         return _process.getProcessName();
     }
-
 
     /**
      * The unique identifier of the Linux process.
@@ -108,8 +97,6 @@ public class LinuxProcessHandle implements ProcessHandle {
         return _process.get_pid();
     }
 
-
     //endregion
-
 
 }

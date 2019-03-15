@@ -33,15 +33,12 @@ import org.fruit.alayer.Rect;
 
 import java.util.Comparator;
 
-
 /**
  * Compares two AtSpiElements - used when sorting a list of AtSpiElements.
  */
 public class AtSpiElementComparer implements Comparator<AtSpiElement> {
 
-
-    private final static int WORSE = 1, BETTER = -1, EVEN = 0;
-
+    private static final int WORSE = 1, BETTER = -1, EVEN = 0;
 
     /**
      * Compares two AtSpiElements and returns a result to be able to sort the elements in a list.
@@ -51,24 +48,22 @@ public class AtSpiElementComparer implements Comparator<AtSpiElement> {
      */
     @Override
     public int compare(AtSpiElement o1, AtSpiElement o2) {
-        if(o1.zIndex < o2.zIndex){
+        if (o1.zIndex < o2.zIndex) {
             return WORSE;
-        }else if (o1.zIndex > o2.zIndex){
+        } else if (o1.zIndex > o2.zIndex) {
             return BETTER;
-        }else{
-            if(o1.boundingBoxOnScreen != null){
-                if(o2.boundingBoxOnScreen != null){
+        } else {
+            if (o1.boundingBoxOnScreen != null) {
+                if (o2.boundingBoxOnScreen != null) {
                     double area1 = Rect.area(o1.boundingBoxOnScreen);
                     double area2 = Rect.area(o2.boundingBoxOnScreen);
-                    return area1 < area2 ? BETTER : (area1 > area2 ? WORSE : EVEN);
-                }else{
+                    return area1 < area2 ? BETTER: (area1 > area2 ? WORSE: EVEN);
+                } else {
                     return BETTER;
                 }
-            }else{
+            } else {
                 return WORSE;
             }
         }
     }
-
-
 }

@@ -36,18 +36,21 @@ import org.fruit.UnFunc;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 public final class YieldFirst implements UnFunc<Widget, SearchFlag> {
-	private Widget result = null;
-	
-	public SearchFlag apply(Widget widget) {
-		result = widget;
-		return SearchFlag.Stop;
-	}
-	
-	public Widget result() throws WidgetNotFoundException{
-		if(result == null)
-			throw new WidgetNotFoundException();
-		return result;
-	}
+  private Widget result = null;
 
-	public boolean hasResult(){ return result != null; }
+  public SearchFlag apply(Widget widget) {
+    result = widget;
+    return SearchFlag.Stop;
+  }
+
+  public Widget result() throws WidgetNotFoundException{
+    if (result == null) {
+      throw new WidgetNotFoundException();
+    }
+    return result;
+  }
+
+  public boolean hasResult() {
+    return result != null;
+  }
 }

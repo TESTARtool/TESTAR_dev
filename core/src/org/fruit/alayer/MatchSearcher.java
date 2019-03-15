@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -39,25 +38,28 @@ import org.fruit.Util;
 
 public final class MatchSearcher implements Searcher {
 
-	private static final long serialVersionUID = -4983358364829251061L;
-	private final UnFunc<Widget, Boolean> matcher;
-	
-	public MatchSearcher(UnFunc<Widget, Boolean> matcher){
-		Assert.notNull(matcher);
-		this.matcher = matcher;
-	}
-		
-	public SearchFlag apply(Widget start, UnFunc<Widget, SearchFlag> visitor) {
-		Assert.notNull(start);
-		
-		for(Widget w : Util.makeIterable(start)){
-			if(matcher.apply(w)){
-				if(visitor.apply(w) == SearchFlag.Stop)
-					return SearchFlag.Stop;
-			}
-		}
-		return SearchFlag.OK;
-	}
-	
-	public String toString(){ return "MatchSearcher " + matcher.toString(); }
+  private static final long serialVersionUID = -4983358364829251061L;
+  private final UnFunc<Widget, Boolean> matcher;
+
+  public MatchSearcher(UnFunc<Widget, Boolean> matcher) {
+    Assert.notNull(matcher);
+    this.matcher = matcher;
+  }
+
+  public SearchFlag apply(Widget start, UnFunc<Widget, SearchFlag> visitor) {
+    Assert.notNull(start);
+
+    for (Widget w: Util.makeIterable(start)) {
+      if (matcher.apply(w)) {
+        if (visitor.apply(w) == SearchFlag.Stop) {
+          return SearchFlag.Stop;
+        }
+      }
+    }
+    return SearchFlag.OK;
+  }
+
+  public String toString() {
+    return "MatchSearcher " + matcher.toString();
+  }
 }

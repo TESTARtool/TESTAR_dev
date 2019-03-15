@@ -27,28 +27,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
-
 
 import org.fruit.alayer.linux.atspi.enums.AtSpiComponentLayers;
 import org.fruit.alayer.linux.atspi.enums.AtSpiCoordTypes;
-
 
 /**
  * Java implementation of an AtSpiComponent object - An interface implemented by objects which have onscreen visual representations.
  */
 public class AtSpiComponent {
 
-
     //region Properties
-
 
     private long _componentPtr;
     public long componentPtr() {
         return _componentPtr;
     }
-
 
     private AtSpiRect _extentsOnScreen;
     /**
@@ -59,7 +53,6 @@ public class AtSpiComponent {
         return AtSpiRect.CreateInstance(LibAtSpi.atspi_component_get_extents(_componentPtr, AtSpiCoordTypes.Screen.ordinal(), 0));
     }
 
-
     private AtSpiRect _extentsOnWindow;
     /**
      * The bounding box of the component relative to the window.
@@ -68,7 +61,6 @@ public class AtSpiComponent {
     public AtSpiRect extentsOnWindow() {
         return AtSpiRect.CreateInstance(LibAtSpi.atspi_component_get_extents(_componentPtr, AtSpiCoordTypes.Window.ordinal(), 0));
     }
-
 
     private AtSpiPoint _positionOnScreen;
     /**
@@ -79,7 +71,6 @@ public class AtSpiComponent {
         return AtSpiPoint.CreateInstance(LibAtSpi.atspi_component_get_position(_componentPtr, AtSpiCoordTypes.Screen.ordinal(), 0));
     }
 
-
     private AtSpiPoint _positionOnWindow;
     /**
      * Gets the position of the AtspiComponent in window coordinates.
@@ -88,7 +79,6 @@ public class AtSpiComponent {
     public AtSpiPoint positionOnWindow() {
         return AtSpiPoint.CreateInstance(LibAtSpi.atspi_component_get_position(_componentPtr, AtSpiCoordTypes.Window.ordinal(), 0));
     }
-
 
     private AtSpiPoint _size;
     /**
@@ -99,7 +89,6 @@ public class AtSpiComponent {
         return AtSpiPoint.CreateInstance(LibAtSpi.atspi_component_get_size(_componentPtr, 0));
     }
 
-
     private AtSpiComponentLayers _layer;
     /**
      * Queries which layer the component is painted into, to help determine its visibility in terms of stacking order.
@@ -109,7 +98,6 @@ public class AtSpiComponent {
 
         int val = LibAtSpi.atspi_component_get_layer(_componentPtr, 0);
 
-
         // Sometimes an invalid value gets returned - link it to the Invalid enum value.
         if (val == -1) {
             val = 0;
@@ -118,7 +106,6 @@ public class AtSpiComponent {
         return AtSpiComponentLayers.values()[val];
 
     }
-
 
     private short _mdiZOrder;
     /**
@@ -131,12 +118,9 @@ public class AtSpiComponent {
         return LibAtSpi.atspi_component_get_mdi_z_order(_componentPtr, 0);
     }
 
-
     //endregion
 
-
     //region Constructors + Initialization
-
 
     /**
      * Default empty constructor.
@@ -145,7 +129,6 @@ public class AtSpiComponent {
 
     }
 
-
     /**
      * Creates a new instance of an AtSpiComponent object from a pointer.
      * @param componentPtr Pointer to the AtSpiComponent object.
@@ -153,24 +136,19 @@ public class AtSpiComponent {
      */
     public static AtSpiComponent CreateInstance(long componentPtr) {
 
-
         if (componentPtr == 0) {
             return null;
         }
 
-
         // Create a new instance.
         AtSpiComponent cObj = new AtSpiComponent();
-
 
         // Fill the instance's properties.
         cObj._componentPtr = componentPtr;
 
-
         return cObj;
 
     }
-
 
     /**
      * Fills an AtSpiComponent object's information.
@@ -179,10 +157,8 @@ public class AtSpiComponent {
      */
     private static void fillInstance(long componentPtr, AtSpiComponent cObj, boolean light) {
 
-
         // Fill the properties with the information.
         //cObj._componentPtr = componentPtr;
-
 
         // These operations are quite heavy so better only do them if explicitly asked.
         if (!light) {
@@ -197,9 +173,7 @@ public class AtSpiComponent {
 
         }
 
-
         int val = LibAtSpi.atspi_component_get_layer(componentPtr, 0);
-
 
         // Sometimes an invalid value gets returned - link it to the Invalid enum value.
         if (val == -1) {
@@ -208,18 +182,13 @@ public class AtSpiComponent {
 
         cObj._layer = AtSpiComponentLayers.values()[val];
 
-
         cObj._mdiZOrder = LibAtSpi.atspi_component_get_mdi_z_order(componentPtr, 0);
-
 
     }
 
-
     //endregion
 
-
     //region Component functionality
-
 
     /**
      * Fills the instance with data for debug purposes.
@@ -228,7 +197,6 @@ public class AtSpiComponent {
         fillInstance(_componentPtr, this, light);
     }
 
-
     /**
      * Attempts to set the keyboard input focus to the specified AtspiComponent.
      * @return TRUE if successful, FALSE otherwise.
@@ -236,15 +204,11 @@ public class AtSpiComponent {
     public boolean grabFocus() {
         return LibAtSpi.atspi_component_grab_focus(_componentPtr, 0);
 
-
     }
-
 
     //endregion
 
-
     //region Object overrides
-
 
     /**
      * Returns a string representation of an AtSpiComponent object.
@@ -260,8 +224,6 @@ public class AtSpiComponent {
         return "Layer: " + layer().toString();
     }
 
-
     //endregion
-
 
 }

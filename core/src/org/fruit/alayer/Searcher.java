@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -38,5 +37,5 @@ import java.io.Serializable;
 import org.fruit.UnFunc;
 
 public interface Searcher extends Serializable {
-	SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor);
+  SearchFlag apply(Widget widget, UnFunc<Widget, SearchFlag> visitor);
 }

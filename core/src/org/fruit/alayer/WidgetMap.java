@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,5 +35,5 @@ package org.fruit.alayer;
 import java.io.Serializable;
 
 public interface WidgetMap extends Serializable {
-	Widget apply(double x, double y);
+  Widget apply(double x, double y);
 }

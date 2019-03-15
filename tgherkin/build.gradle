@@ -1,0 +1,33 @@
+apply plugin: 'antlr'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['generated-src','src']			
+            exclude 'antlr/**'
+        }
+		antlr{
+            srcDirs = ['src/antlr']
+        }		
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	antlr("org.antlr:antlr4:4.5") 
+}
+
+generateGrammarSource {
+	exclude ('**/*Variables.g4')
+	exclude ('**/*Constants.g4')
+	arguments += ['-visitor', '-no-listener', '-long-messages']	
+	outputDirectory = new File(projectDir,'/generated-src/nl/ou/testar/tgherkin/gen')
+}

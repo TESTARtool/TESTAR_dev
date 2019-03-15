@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.SpyMode;
-
 
 import org.fruit.alayer.Pen;
 
@@ -40,9 +38,7 @@ import java.awt.*;
  */
 public abstract class DrawableObject {
 
-
     //region Properties
-
 
     protected Point _location;
     /**
@@ -53,7 +49,6 @@ public abstract class DrawableObject {
         return _location;
     }
 
-
     protected Pen _defaultPen;
     /**
      * The DefaultPen with which this object will be drawn as backup.
@@ -62,7 +57,6 @@ public abstract class DrawableObject {
     public Pen getDefaultPen() {
         return _defaultPen;
     }
-
 
     protected Pen _pen;
     /**
@@ -73,12 +67,9 @@ public abstract class DrawableObject {
         return _pen;
     }
 
-
     //endregion
 
-
     //region Abstract methods
-
 
     /**
      * Draws the object on the graphic context supplied.
@@ -86,12 +77,9 @@ public abstract class DrawableObject {
      */
     public abstract void draw(Graphics2D g2d);
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Creates a new DrawableObject.
@@ -105,8 +93,6 @@ public abstract class DrawableObject {
         _defaultPen = dp;
     }
 
-
     //endregion
-
 
 }

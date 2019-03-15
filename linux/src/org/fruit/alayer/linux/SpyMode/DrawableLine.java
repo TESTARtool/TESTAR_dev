@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.SpyMode;
 
 import org.fruit.alayer.Pen;
@@ -39,9 +38,7 @@ import java.awt.*;
  */
 public class DrawableLine extends DrawableObject {
 
-
     //region DrawableObject implementation
-
 
     @Override
     public void draw(Graphics2D g2d) {
@@ -51,12 +48,9 @@ public class DrawableLine extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Properties
-
 
     private Point _target;
     /**
@@ -67,12 +61,9 @@ public class DrawableLine extends DrawableObject {
         return _target;
     }
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Creates a new DrawableRect object.
@@ -88,20 +79,15 @@ public class DrawableLine extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
         return "(" + _location.x + ", " + _location.y + ") to (" + _location.x + ", " + _location.y + ")";
     }
 
-
     //endregion
-
 
 }

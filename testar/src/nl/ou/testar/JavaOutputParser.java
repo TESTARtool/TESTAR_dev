@@ -45,8 +45,7 @@ public class JavaOutputParser extends PrintStream{
     }
 
     @Override
-    public void print(String s)
-    {
+    public void print(String s) {
         // Still writing to the StdOut / Error as implemented in super
         super.print(s);
         // checking if the StdOut / Error contains the String we are looking for:
@@ -55,7 +54,7 @@ public class JavaOutputParser extends PrintStream{
             setStringToLookFound(true);
         }
         //if constructor with filename was used, writing all the content of the OutputStream into the file:
-        if(fileOut!=null){
+        if (fileOut!=null) {
             fileOut.println(s);
             fileOut.flush();
         }
@@ -64,7 +63,7 @@ public class JavaOutputParser extends PrintStream{
     /**
      * Closes the output file, if constructor with filename has been used
      */
-    public void close(){
+    public void close() {
         fileOut.close();
     }
 
@@ -82,12 +81,12 @@ public class JavaOutputParser extends PrintStream{
     }
 
     /**
-     * Setter for stringToLookFound boolean
+     * Setter for stringToLookFound boolean.
      *
-     * @param stringToLookFound
+     * @param stringToLookFound true if string to look for is found
      */
     public void setStringToLookFound(boolean stringToLookFound) {
-        System.out.println("DEBUG: set stringToLookFound="+stringToLookFound);
+        System.out.println("DEBUG: set stringToLookFound=" + stringToLookFound);
         this.stringToLookFound = stringToLookFound;
     }
 

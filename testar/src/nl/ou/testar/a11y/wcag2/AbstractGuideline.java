@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.ArrayList;
@@ -51,95 +50,105 @@ import nl.ou.testar.a11y.reporting.EvaluationResults;
  *
  */
 public abstract class AbstractGuideline extends ItemBase implements Evaluator {
-	
-	private static final long serialVersionUID = -2941524827644792263L;
-	
-	/**
-	 * The list of all the success criteria in this guideline
-	 */
-	protected final List<SuccessCriterion> criteria = new ArrayList<>();
-	
-	/**
-	 * Constructs a new guideline
-	 * @param nr The number of the guideline.
-	 * @param name The name of the guideline.
-	 * @param parent The principle (parent) this guideline belongs to.
-	 */
-	protected AbstractGuideline(int nr, String name, AbstractPrinciple parent) {
-		super(nr, name, Assert.notNull(parent));
-	}
-	
-	/**
-	 * Gets all success criteria in this guideline
-	 * @return The list of success criteria.
-	 */
-	public List<SuccessCriterion> getSuccessCriteria() {
-		return Collections.unmodifiableList(criteria);
-	}
-	
-	/**
-	 * Gets a success criterion by its name (case-insensitive)
-	 * @param name The name.
-	 * @return The success criterion, or null if not found.
-	 */
-	protected SuccessCriterion getSuccessCriterionByName(String name) {
-		Assert.notNull(name);
-		for (SuccessCriterion criterion : criteria)
-			if (criterion.getName().equalsIgnoreCase(name))
-				return criterion;
-		return null;
-	}
-	
-	/**
-	 * Evaluates the accessibility of the given state
-	 * This will include zero or more evaluation results for each success criterion in this guideline.
-	 * This method executes oracles in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The results of the evaluation.
-	 */
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		return new EvaluationResults();
-	}
-	
-	/**
-	 * Derives the possible actions from the given state
-	 * This will include zero or more actions for each success criterion in this guideline.
-	 * The actions are specific to accessibility.
-	 * This method derives actions in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The set of actions.
-	 */
-	@Override
-	public Set<Action> deriveActions(List<Widget> widgets) {
-		return new HashSet<>();
-	}
-	
-	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database
-	 * This will include zero or more evaluation results for each success criterion in this guideline.
-	 * This method executes oracles in offline evaluation.
-	 * @param graphDB The graph database.
-	 * @return The results of the evaluation.
-	 */
-	@Override
-	public EvaluationResults query(GraphDB graphDB) {
-		return new EvaluationResults();
-	}
-	
-	@Override
-	public String getImplementationVersion() {
-		return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
-	}
-	
-	/**
-	 * Constructs a new EvaluationResult indicating that the given success criterion was passed
-	 * @param criterion The success criterion.
-	 * @return A new EvaluationResult.
-	 */
-	protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
-		return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK,
-				"Evaluation passed");
-	}
-	
+
+  private static final long serialVersionUID = -2941524827644792263L;
+
+  /**
+   * The list of all the success criteria in this guideline
+   */
+  private List<SuccessCriterion> criteria = new ArrayList<>();
+
+  public void setCriteria(List<SuccessCriterion> criteria) {
+    this.criteria = criteria;
+  }
+
+  public List<SuccessCriterion> getCriteria() {
+    return criteria;
+  }
+
+  /**
+   * Constructs a new guideline
+   * @param nr The number of the guideline.
+   * @param name The name of the guideline.
+   * @param parent The principle (parent) this guideline belongs to.
+   */
+  protected AbstractGuideline(int nr, String name, AbstractPrinciple parent) {
+    super(nr, name, Assert.notNull(parent));
+  }
+
+  /**
+   * Gets all success criteria in this guideline
+   * @return The list of success criteria.
+   */
+  public List<SuccessCriterion> getSuccessCriteria() {
+    return Collections.unmodifiableList(criteria);
+  }
+
+  /**
+   * Gets a success criterion by its name (case-insensitive)
+   * @param name The name.
+   * @return The success criterion, or null if not found.
+   */
+  protected SuccessCriterion getSuccessCriterionByName(String name) {
+    Assert.notNull(name);
+    for (SuccessCriterion criterion: criteria) {
+      if (criterion.getName().equalsIgnoreCase(name)) {
+        return criterion;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Evaluates the accessibility of the given state
+   * This will include zero or more evaluation results for each success criterion in this guideline.
+   * This method executes oracles in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The results of the evaluation.
+   */
+  @Override
+  public EvaluationResults evaluate(List<Widget> widgets) {
+    return new EvaluationResults();
+  }
+
+  /**
+   * Derives the possible actions from the given state
+   * This will include zero or more actions for each success criterion in this guideline.
+   * The actions are specific to accessibility.
+   * This method derives actions in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The set of actions.
+   */
+  @Override
+  public Set<Action> deriveActions(List<Widget> widgets) {
+    return new HashSet<>();
+  }
+
+  /**
+   * Evaluates the overall accessibility of the SUT by querying the given graph database
+   * This will include zero or more evaluation results for each success criterion in this guideline.
+   * This method executes oracles in offline evaluation.
+   * @param graphDB The graph database.
+   * @return The results of the evaluation.
+   */
+  @Override
+  public EvaluationResults query(GraphDB graphDB) {
+    return new EvaluationResults();
+  }
+
+  @Override
+  public String getImplementationVersion() {
+    return "WCAG2ICT-guideline-" + WCAG2ICT.VERSION;
+  }
+
+  /**
+   * Constructs a new EvaluationResult indicating that the given success criterion was passed
+   * @param criterion The success criterion.
+   * @return A new EvaluationResult.
+   */
+  protected WCAG2EvaluationResult evaluationPassed(SuccessCriterion criterion) {
+    return new WCAG2EvaluationResult(criterion, WCAG2EvaluationResult.Type.OK,
+        "Evaluation passed");
+  }
+
 }

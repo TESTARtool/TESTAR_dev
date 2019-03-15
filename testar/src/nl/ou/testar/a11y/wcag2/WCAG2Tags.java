@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import org.fruit.alayer.Tag;
@@ -39,12 +38,12 @@ import org.fruit.alayer.TagsBase;
  *
  */
 public final class WCAG2Tags extends TagsBase {
-	
-	private WCAG2Tags() {}
-	
-	public static final Tag<Boolean> WCAG2KeyboardVisited = from("WCAG2KeyboardVisited", Boolean.class);
-	public static final Tag<Boolean> WCAG2IsWindow = from("WCAG2IsWindow", Boolean.class);
-	public static final Tag<Boolean> WCAG2IsInWindowNavigation = from("WCAG2IsInWindowNavigation", Boolean.class);
-	public static final Tag<String> WCAG2Violations = from("WCAG2Violations", String.class);
+
+  private WCAG2Tags() {}
+
+  public static final Tag<Boolean> WCAG2KeyboardVisited = from("WCAG2KeyboardVisited", Boolean.class);
+  public static final Tag<Boolean> WCAG2IsWindow = from("WCAG2IsWindow", Boolean.class);
+  public static final Tag<Boolean> WCAG2IsInWindowNavigation = from("WCAG2IsInWindowNavigation", Boolean.class);
+  public static final Tag<String> WCAG2Violations = from("WCAG2Violations", String.class);
 
 }

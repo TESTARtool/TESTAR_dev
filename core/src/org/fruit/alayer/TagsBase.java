@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -39,17 +38,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class TagsBase {
-	
-	protected static final Set<Tag<?>> tagSet = new HashSet<>();
-	
-	protected static <T> Tag<T> from(String name, Class<T> valueType) {
-		Tag<T> ret = Tag.from(name, valueType);
-		tagSet.add(ret);
-		return ret;
-	}
-		
-	public static Set<Tag<?>> tagSet() {
-		return Collections.unmodifiableSet(tagSet);
-	}
+
+  protected static final Set<Tag<?>> tagSet = new HashSet<>();
+
+  protected static <T> Tag<T> from(String name, Class<T> valueType) {
+    Tag<T> ret = Tag.from(name, valueType);
+    tagSet.add(ret);
+    return ret;
+  }
+
+  public static Set<Tag<?>> tagSet() {
+    return Collections.unmodifiableSet(tagSet);
+  }
 
 }

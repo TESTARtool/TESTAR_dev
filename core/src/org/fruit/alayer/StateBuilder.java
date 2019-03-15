@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -42,6 +41,6 @@ import org.fruit.alayer.exceptions.StateBuildException;
  */
 public interface StateBuilder extends Serializable{
 
-	State apply(SUT system) throws StateBuildException;
-    	
+  State apply(SUT system) throws StateBuildException;
+
 }

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
 
 /**
@@ -35,15 +34,12 @@ package org.fruit.alayer.linux.atspi;
  */
 public class AtSpiActionInfo {
 
-
     public String name;
     public String description;
     public String keyBinding;
     public int index;
 
-
     //region Object overrides
-
 
     /**
      * Returns a string representation of an AtSpiAccessible object.
@@ -54,8 +50,6 @@ public class AtSpiActionInfo {
         return "Action: " + name + " - Description: " + description;
     }
 
-
     //endregion
-
 
 }

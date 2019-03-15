@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -41,36 +40,41 @@ import org.fruit.alayer.devices.KBKeys;
 /**
  * An action which presses a given Key on the Keyboard.
  */
-public final class KeyDown extends //TaggableBase 
-		KeyAction { // by urueda 
+public final class KeyDown extends //TaggableBase
+    KeyAction { // by urueda
 
-	private static final long serialVersionUID = -462251384755779329L;
-		
-	public KeyDown(KBKeys key){
-		super(key);
-	}
-	
-	public String toString() { return "Press Key " + key; }
+  private static final long serialVersionUID = -462251384755779329L;
 
-	// by urueda
-	@Override
-	public String toString(Role... discardParameters) {
-		for (Role r : discardParameters){
-			if (r.name().equals(ActionRoles.KeyDown.name()))
-				return "Key pressed";
-		}
-		return toString();
-	}
-	
-	// by urueda
-	@Override
-	protected void performKeyAction(SUT system, KBKeys key) {		
-		system.get(Tags.StandardKeyboard).press(key);		
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		return o == this || (o instanceof KeyDown && this.key.equals(((KeyDown)o).key));
-	}
-	
+  public KeyDown(KBKeys key) {
+    super(key);
+  }
+
+  public String toString() {
+    return "Press Key " + key;
+  }
+
+  @Override
+  public String toString(Role... discardParameters) {
+    for (Role r: discardParameters) {
+      if (r.name().equals(ActionRoles.KeyDown.name())) {
+        return "Key pressed";
+      }
+    }
+    return toString();
+  }
+
+  @Override
+  protected void performKeyAction(SUT system, KBKeys key) {
+    system.get(Tags.StandardKeyboard).press(key);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o == this || (o instanceof KeyDown && this.key.equals(((KeyDown)o).key));
+  }
+
+  @Override
+  public int hashCode() {
+    return key.hashCode();
+  }
 }

@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,13 +47,13 @@ public class GraphDB implements GraphDBRepository {
 
     public GraphDB(final boolean enabled, final String url, final String userName, final String password) {
         this.enabled = enabled;
-        if(enabled) {
+        if (enabled) {
             repository = new OrientDBRepository(url, userName, password);
         }
     }
 
     public void addState(final State state) {
-       if(enabled) {
+       if (enabled) {
           repository.addState(state,false);
        }
     }
@@ -67,11 +65,10 @@ public class GraphDB implements GraphDBRepository {
      */
     @Override
     public void addState(final State state, final boolean isInitial) {
-        if(enabled) {
+        if (enabled) {
             repository.addState(state,isInitial);
         }
     }
-
 
     /**
      * Add Widget to the graph database. A widget will be identified by it's concrete id.
@@ -80,7 +77,7 @@ public class GraphDB implements GraphDBRepository {
      */
     @Override
     public void addWidget(final String statedID, final Widget widget) {
-        if(enabled) {
+        if (enabled) {
             repository.addWidget(statedID,widget);
         }
     }
@@ -92,7 +89,7 @@ public class GraphDB implements GraphDBRepository {
      */
     @Override
     public void addAction(final Action action, final String toStateId) {
-        if(enabled) {
+        if (enabled) {
             repository.addAction(action, toStateId);
         }
     }
@@ -106,14 +103,14 @@ public class GraphDB implements GraphDBRepository {
      */
     @Override
     public void addActionOnState(final String fromSateID, final Action action, final String toStateID) {
-        if(enabled) {
+        if (enabled) {
             repository.addActionOnState(fromSateID, action, toStateID);
         }
     }
-    
+
     @Override
     public List<Object> getObjectsFromGremlinPipe(String gremlin, GremlinStart start) {
-        if(enabled) {
+        if (enabled) {
             return repository.getObjectsFromGremlinPipe(gremlin, start);
         }
         return new ArrayList<>();
@@ -121,21 +118,21 @@ public class GraphDB implements GraphDBRepository {
 
     @Override
     public void addCustomType(Action action, String relation, CustomType instance) {
-        if(enabled) {
+        if (enabled) {
             repository.addCustomType(action,relation,instance);
         }
     }
 
     @Override
     public void addCustomType(State state, String relation, CustomType instance) {
-        if(enabled) {
+        if (enabled) {
             repository.addCustomType(state,relation,instance);
         }
     }
 
     @Override
     public void addCustomType(Widget widget, String relation, CustomType instance) {
-        if(enabled) {
+        if (enabled) {
             repository.addCustomType(widget,relation,instance);
         }
     }

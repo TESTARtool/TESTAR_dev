@@ -35,9 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DrawingPane extends JPanel {
 
-	private static final long serialVersionUID = 5078094486379747059L;
-	private CopyOnWriteArrayList<DrawableObject> _content = new CopyOnWriteArrayList<>();
-
+  private static final long serialVersionUID = 5078094486379747059L;
+  private CopyOnWriteArrayList<DrawableObject> _content = new CopyOnWriteArrayList<>();
 
     /**
      * Adds an object to draw on the pane.
@@ -52,7 +51,6 @@ public class DrawingPane extends JPanel {
 
     }
 
-
     /**
      * Clears the pane from content.
      */
@@ -60,17 +58,14 @@ public class DrawingPane extends JPanel {
         _content.clear();
     }
 
-
     DrawingPane() {
         setOpaque(false);
     }
-
 
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(1920, 1080);
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -78,10 +73,8 @@ public class DrawingPane extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g.create();
 
-
         g2d.setColor(Color.RED);
         g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-
 
         for (DrawableObject c: _content) {
             c.draw(g2d);

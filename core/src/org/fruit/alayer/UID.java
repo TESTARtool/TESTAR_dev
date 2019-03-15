@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -44,6 +43,6 @@ import java.io.Serializable;
  *
  */
 public interface UID extends Serializable{
-	int hashCode();
-	boolean equals(Object o);
+  int hashCode();
+  boolean equals(Object o);
 }

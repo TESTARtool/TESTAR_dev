@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -39,20 +39,22 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class DistinguishableGuideline extends AbstractGuideline {
 
-	private static final long serialVersionUID = 4930832964961139602L;
+  private static final long serialVersionUID = 4930832964961139602L;
 
-	DistinguishableGuideline(AbstractPrinciple parent) {
-		super(4, "Distinguishable", parent);
-		criteria.add(new SuccessCriterion(1, "Use of Color",
-				this, Level.A, "visual-audio-contrast-without-color"));
-		criteria.add(new SuccessCriterion(2, "Audio Control",
-				this, Level.A, "visual-audio-contrast-dis-audio"));
-		criteria.add(new SuccessCriterion(3, "Contrast (Minimum)",
-				this, Level.AA, "visual-audio-contrast-contrast"));
-		criteria.add(new SuccessCriterion(4, "Resize Text",
-				this, Level.AA, "visual-audio-contrast-scale"));
-		criteria.add(new SuccessCriterion(5, "Images of Text",
-				this, Level.AA, "visual-audio-contrast-text-presentation"));
-	}
+  DistinguishableGuideline(AbstractPrinciple parent) {
+    super(4, "Distinguishable", parent);
+    List<SuccessCriterion> criteria = getCriteria();
+    criteria.add(new SuccessCriterion(1, "Use of Color",
+        this, Level.A, "visual-audio-contrast-without-color"));
+    criteria.add(new SuccessCriterion(2, "Audio Control",
+        this, Level.A, "visual-audio-contrast-dis-audio"));
+    criteria.add(new SuccessCriterion(3, "Contrast (Minimum)",
+        this, Level.AA, "visual-audio-contrast-contrast"));
+    criteria.add(new SuccessCriterion(4, "Resize Text",
+        this, Level.AA, "visual-audio-contrast-scale"));
+    criteria.add(new SuccessCriterion(5, "Images of Text",
+        this, Level.AA, "visual-audio-contrast-text-presentation"));
+    setCriteria(criteria);
+  }
 
 }

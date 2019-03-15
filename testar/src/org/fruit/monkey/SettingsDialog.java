@@ -26,23 +26,26 @@
 * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
-
+***************************************************************************************************/
 
 /**
  * @author Sebastian Bauersfeld
  */
 package org.fruit.monkey;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDBPanel;
-import org.fruit.Util;
-import org.fruit.monkey.dialog.*;
+import static java.util.logging.Logger.getLogger;
+import static javax.swing.GroupLayout.DEFAULT_SIZE;
+import static javax.swing.GroupLayout.PREFERRED_SIZE;
+import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
+import static javax.swing.UIManager.*;
+import static org.fruit.Util.compileProtocol;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
+import es.upv.staq.testar.serialisation.LogSerialiser;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -52,15 +55,15 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import static java.util.logging.Logger.getLogger;
-import static javax.swing.GroupLayout.DEFAULT_SIZE;
-import static javax.swing.GroupLayout.PREFERRED_SIZE;
-import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
-import static javax.swing.UIManager.*;
-import static org.fruit.Util.compileProtocol;
-import static org.fruit.monkey.dialog.ToolTipTexts.*;
-
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import nl.ou.testar.GraphDBPanel;
+import nl.ou.testar.subroutine.CleanUpPanel;
+import nl.ou.testar.subroutine.CompoundActionPanel;
+import nl.ou.testar.subroutine.TgherkinFilePanel;
+import org.fruit.Util;
+import org.fruit.monkey.dialog.*;
 
 /**
  * This class takes care of the SettingsDialogue of TESTAR (the TESTAR GUI).
@@ -73,7 +76,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private String settingsFile;
   private Settings settings;
-  //TODO: what is this ret variable. Can´t you just return settings in the run method?
+  //TODO: what is this ret variable. Can't you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -82,12 +85,17 @@ public class SettingsDialog extends JFrame implements Observer {
   private JButton btnView;
   private JButton btnRecord;
 
+  private JTabbedPane jtabsPane;
   private GeneralPanel generalPanel;
   private FilterPanel filterPanel;
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
+  private CleanUpPanel cleanUpPanel;
   private GraphDBPanel graphDBPanel;
+  private TgherkinPanel tgherkinPanel;
+  private TgherkinFilePanel tg_panel;
+  private CompoundActionPanel ca_panel;
 
   /**
    * Starts the settings Dialog.
@@ -96,13 +104,14 @@ public class SettingsDialog extends JFrame implements Observer {
   SettingsDialog() throws IOException {
     getContentPane().setBackground(Color.WHITE);
     try {
-      for (LookAndFeelInfo info : getInstalledLookAndFeels()) {
+      for (LookAndFeelInfo info: getInstalledLookAndFeels()) {
         if ("Nimbus".equals(info.getName())) {
           setLookAndFeel(info.getClassName());
           break;
         }
       }
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+    } catch (ClassNotFoundException | InstantiationException
+        | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       getLogger(SettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
     this.setIconImage(loadIcon("/icons/logos/TESTAR.jpg"));
@@ -120,10 +129,10 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   *
-   * @param settings
-   * @param settingsFile
-   * @return
+   * run method.
+   * @param settings The settings to load
+   * @param settingsFile   filename of file containing settings
+   * @return null
    */
   public Settings run(Settings settings, String settingsFile) {
     this.settings = settings;
@@ -132,8 +141,9 @@ public class SettingsDialog extends JFrame implements Observer {
     this.setVisible(true);
     populateInformation(settings);
 
-    while (this.isShowing())
+    while (this.isShowing()) {
       Util.pause(0.1);
+    }
 
     return ret;
   }
@@ -143,7 +153,8 @@ public class SettingsDialog extends JFrame implements Observer {
   }
 
   /**
-   * This is the method that is called when you click on one of the big mode buttons in TESTAR dialog
+   * This is the method that is called when you click on one of the big mode buttons
+   * in TESTAR dialog.
    * @param mode indicates the MODE button that was clicked.
    */
   private void start(RuntimeControlsProtocol.Modes mode) {
@@ -154,11 +165,12 @@ public class SettingsDialog extends JFrame implements Observer {
       saveCurrentSettings();
       ret = settings;
       if (settings.get(ConfigTags.AlwaysCompile)) {
-        compileProtocol(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+        compileProtocol(Main.getSettingsDir(), settings.get(ConfigTags.ProtocolClass));
       }
       this.dispose();
     } catch (IllegalStateException ise) {
-      JOptionPane.showMessageDialog(this, ise.getMessage(), "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, ise.getMessage(),
+          "Invalid Settings!", JOptionPane.ERROR_MESSAGE);
     }
   }
 
@@ -196,6 +208,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   private void saveCurrentSettings() {
     extractInformation(settings);
+
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
       Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
@@ -207,7 +220,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   /**
    * This replaces the original test.settings file with a complete settings file
-   * @param sutSettings
+   * @param sutSettings settings of the SUT
    */
   private void switchSettings(String sutSettings) {
     String previousSSE = Main.getSSE()[0];
@@ -216,15 +229,14 @@ public class SettingsDialog extends JFrame implements Observer {
       return;
     }
     saveCurrentSettings();
-    String settingsDir = Main.settingsDir;
+    String settingsDir = Main.getSettingsDir();
     new File(settingsDir + previousSSE).renameTo(new File(settingsDir + sse));
     try {
       settingsFile = settingsDir + sutSettings + File.separator + Main.SETTINGS_FILE;
       settings = Main.loadSettings(new String[0], settingsFile);
       populateInformation(settings);
       System.out.println("Switched to <" + settingsFile + ">");
-      Main.SSE_ACTIVATED = sutSettings;
-      
+      Main.setSseActivated(sutSettings);
     } catch (ConfigException cfe) {
       LogSerialiser.log("Unable to switch to <" + sutSettings + "> settings!\n");
     }
@@ -236,7 +248,53 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
+    cleanUpPanel.populateFrom(settings);
     graphDBPanel.populateFrom(settings);
+    tgherkinPanel.populateFrom(settings);
+
+    // only show Tgherkin tab if the protocol is a DocumentProtocol
+    if (tgherkinPanel.isDocumentProtocol()) {
+
+      if (!tgherkinPanel.isActive()) {
+        jtabsPane.addTab("Tgherkin", tgherkinPanel);
+        tgherkinPanel.setActive(true);
+      }
+    } else {
+      if (tgherkinPanel.isActive()) {
+        jtabsPane.remove(tgherkinPanel);
+        tgherkinPanel.setActive(false);
+      }
+    }
+    
+    tg_panel.populateFrom(settings);
+
+    // only show Tgherkin File tab if the protocol is a TgherkinFileProtocol
+    if (tg_panel.isClassBoolean()) {
+      if (!tg_panel.isActive()) {
+        jtabsPane.addTab("Tgherkin File", tg_panel);
+        tg_panel.setActive(true);
+      }
+    } else {
+      if (tg_panel.isActive()) {
+        jtabsPane.remove(tg_panel);
+        tg_panel.setActive(false);
+      }
+    }
+
+    ca_panel.populateFrom(settings);
+
+    // only show Compound Action tab if the protocol is a CompoundActionProtocol
+    if (ca_panel.isClassBoolean()) {
+      if (!ca_panel.isActive()) {
+        jtabsPane.addTab("Compound Action", ca_panel);
+        ca_panel.setActive(true);
+      }
+    } else {
+      if (ca_panel.isActive()) {
+        jtabsPane.remove(ca_panel);
+        ca_panel.setActive(false);
+      }
+    }
   }
 
   private void extractInformation(Settings settings) {
@@ -246,6 +304,9 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     graphDBPanel.extractInformation(settings);
+    tgherkinPanel.extractInformation(settings);
+    tg_panel.extractInformation(settings);
+    ca_panel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -256,29 +317,33 @@ public class SettingsDialog extends JFrame implements Observer {
     btnView = getBtnView();
     btnRecord = getBtnRecord();
 
-
-    JTabbedPane jTabsPane = new JTabbedPane();
-    jTabsPane.addTab("About", new AboutPanel());
+    jtabsPane = new JTabbedPane();
+    jtabsPane.addTab("About", new AboutPanel());
     generalPanel = new GeneralPanel(this);
-    jTabsPane.addTab("General Settings", generalPanel);
+    jtabsPane.addTab("General Settings", generalPanel);
     filterPanel = new FilterPanel();
-    jTabsPane.addTab("Filters", filterPanel);
+    jtabsPane.addTab("Filters", filterPanel);
     oraclePanel = new OraclePanel();
-    jTabsPane.addTab("Oracles", oraclePanel);
+    jtabsPane.addTab("Oracles", oraclePanel);
     timingPanel = new TimingPanel();
-    jTabsPane.addTab("Time Settings", timingPanel);
+    jtabsPane.addTab("Time Settings", timingPanel);
     miscPanel = new MiscPanel();
-    jTabsPane.addTab("Misc", miscPanel);
+    jtabsPane.addTab("Misc", miscPanel);
     graphDBPanel = GraphDBPanel.createGraphDBPanel();
-    jTabsPane.addTab("GraphDB", graphDBPanel);
+    jtabsPane.addTab("GraphDB", graphDBPanel);
+    cleanUpPanel = new CleanUpPanel();
+    jtabsPane.addTab("Clean Up", cleanUpPanel);
+    tgherkinPanel = new TgherkinPanel();
+    tg_panel = new TgherkinFilePanel();
+    ca_panel = new CompoundActionPanel();
 
-    setLayout(jTabsPane);
+    setLayout(jtabsPane);
     pack();
     setCentreScreen();
   }
 
   /**
-   * Make the window appear centre screen
+   * Make the window appear center screen.
    */
   private void setCentreScreen() {
     Dimension scrDim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -292,8 +357,8 @@ public class SettingsDialog extends JFrame implements Observer {
     setBounds(bounds);
   }
 
-  private void setLayout(JTabbedPane jTabsPane) {
-    jTabsPane.setSelectedComponent(generalPanel);
+  private void setLayout(JTabbedPane jtabsPane) {
+    jtabsPane.setSelectedComponent(generalPanel);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("TESTAR " + TESTAR_VERSION);
@@ -308,7 +373,7 @@ public class SettingsDialog extends JFrame implements Observer {
         layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(jTabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
+                    .addComponent(jtabsPane, PREFERRED_SIZE, 620, PREFERRED_SIZE)
                     .addGroup(getStartGroup(layout)))
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -317,14 +382,14 @@ public class SettingsDialog extends JFrame implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                            .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
-                            .addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                         .addComponent(btnGenerate, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                         .addComponent(btnSpy, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                         .addComponent(btnReplay, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                         .addComponent(btnView, PREFERRED_SIZE, 129, PREFERRED_SIZE)
+                         .addComponent(btnRecord, PREFERRED_SIZE, 129, PREFERRED_SIZE)
                     )
                 .addPreferredGap(RELATED)
-                .addComponent(jTabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
+                .addComponent(jtabsPane, PREFERRED_SIZE, 400, PREFERRED_SIZE)
                 .addContainerGap())
     );
   }
@@ -349,7 +414,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_generate.png")));
-    btn.setToolTipText(btnGenerateTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnGenerateTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnGenerateActionPerformed);
     return btn;
@@ -363,7 +428,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_spy.png")));
-    btn.setToolTipText(btnSpyTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnSpyTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnSpyActionPerformed);
     return btn;
@@ -377,7 +442,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_replay.png")));
-    btn.setToolTipText(btnReplayTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnReplayTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnReplayActionPerformed);
     return btn;
@@ -399,7 +464,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_view.png")));
-    btn.setToolTipText(btnViewTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnViewTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnViewActionPerformed);
     return btn;
@@ -421,7 +486,7 @@ public class SettingsDialog extends JFrame implements Observer {
     JButton btn = new JButton();
     btn.setBackground(new Color(255, 255, 255));
     btn.setIcon(new ImageIcon(loadIcon("/icons/button_record.png")));
-    btn.setToolTipText(btnRecordTTT);
+    btn.setToolTipText(ToolTipTexts.getBtnRecordTTT());
     btn.setFocusPainted(false);
     btn.addActionListener(this::btnRecordActionPerformed);
     return btn;

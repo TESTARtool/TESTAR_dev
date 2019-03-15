@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar.serialisation;
 
 import java.io.IOException;
@@ -41,135 +40,135 @@ import es.upv.staq.testar.serialisation.LogSerialiser.LogLevel;
 
 /**
  * Tests serialiser..
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class TestSerialiser extends Thread {
 
-	private static ObjectOutputStream test;
-	private static int fragmentTimes;
-	private static final int FLUSH_INTERVAL = 16;
-	private static LinkedList<Taggable> testSavingQueue =  new LinkedList<Taggable>();
-	private static final int QUEUE_LIMIT = 16;
-	private static TestSerialiser singletonTestSerialiser;
-	private static boolean alive, queueBoost;
+  private static ObjectOutputStream test;
+  private static int fragmentTimes;
+  private static final int FLUSH_INTERVAL = 16;
+  private static LinkedList<Taggable> testSavingQueue =  new LinkedList<Taggable>();
+  private static final int QUEUE_LIMIT = 16;
+  private static TestSerialiser singletonTestSerialiser;
+  private static boolean alive, queueBoost;
 
-	private TestSerialiser(){}
-	
-	public static void start(ObjectOutputStream test){
-		Assert.isTrue(!alive);
-		Assert.isTrue(testSavingQueue.isEmpty());
-		TestSerialiser.test = test;
-		fragmentTimes = 0;
-		alive = true; queueBoost = false;
-		//ExecutorService exeSrv = Executors.newFixedThreadPool(1);
-		//exeSrv.execute(singletonTestSerialisationManager);
-		singletonTestSerialiser = new TestSerialiser();
-		singletonTestSerialiser.setPriority(Thread.MIN_PRIORITY);
-		singletonTestSerialiser.start();		
-	}
-	
-	public static void finish(){
-		alive = false;
-	}
-	
-	public static boolean isSavingQueueEmpty() {
-		if(testSavingQueue.isEmpty())
-			return true;
-		return false;
-	}
-	
-	@Override
-	public void run(){
-		while (alive || !testSavingQueue.isEmpty()){
-			while(alive && testSavingQueue.isEmpty()){
-				try {
-					Thread.sleep(1000); // 1 second
-				} catch (InterruptedException e1) {}
-			}
-			if (!testSavingQueue.isEmpty()){
-				if (!queueBoost && testSavingQueue.size() > QUEUE_LIMIT){
-					this.setPriority(NORM_PRIORITY);
-					queueBoost = true;
-				} else if (queueBoost && testSavingQueue.size() < QUEUE_LIMIT/2){
-					this.setPriority(MIN_PRIORITY);
-					queueBoost = false;
-				}				
-				Taggable fragment;
-				synchronized(testSavingQueue){
-					fragment = testSavingQueue.removeFirst();
-				}
-				writethis(fragment);
-			}
-		}
-		try {
-			test.flush();
-			test.close();
-		} catch (IOException e) {
-			LogSerialiser.log("I/O exception serialising test file!\n", LogSerialiser.LogLevel.Critical);
-		} finally{
-			try {
-				test.close();
-			} catch (IOException e) {
-				LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);				
-			}
-		}
-		synchronized(test){
-			//System.out.println("TestSerialiser finished");
-			singletonTestSerialiser = null;
-			test.notifyAll();
-		}
-	}
-	
-	public static void write(Taggable fragment){
-		if (alive){
-			synchronized(testSavingQueue){
-				testSavingQueue.add(fragment);
-			}
-		}
-	}
+  private TestSerialiser() {}
 
-	private static void writethis(Taggable fragment){
-		Assert.notNull(fragment);
-		try {
-			test.writeObject(fragment);
-		} catch (IOException e) {
-			LogSerialiser.log("TestSerialiser - exception writing fragment: " + e.getMessage(),LogLevel.Critical);
-		}
-		fragmentTimes++;
-		if (fragmentTimes >= FLUSH_INTERVAL){
-			fragmentTimes = 0;
-			try {
-				test.flush();
-				test.reset();
-			} catch (IOException e) {
-				LogSerialiser.log("TestSerialiser - flushing exception: " + e.getMessage(),LogLevel.Critical);
-			}
-		}
-	}
+  public static void start(ObjectOutputStream test) {
+    Assert.isTrue(!alive);
+    Assert.isTrue(testSavingQueue.isEmpty());
+    TestSerialiser.test = test;
+    fragmentTimes = 0;
+    alive = true; queueBoost = false;
+    //ExecutorService exeSrv = Executors.newFixedThreadPool(1);
+    //exeSrv.execute(singletonTestSerialisationManager);
+    singletonTestSerialiser = new TestSerialiser();
+    singletonTestSerialiser.setPriority(Thread.MIN_PRIORITY);
+    singletonTestSerialiser.start();
+  }
 
-	public static void exit(){
-		if (singletonTestSerialiser != null){
-			TestSerialiser.finish();
-			try {
-				synchronized(test){
-					while (singletonTestSerialiser != null){
-						try {
-							test.wait();
-						} catch (InterruptedException e) {
-							System.out.println("TestSerialiser exit interrupted");
-						}
-					}
-				}
-			} catch (Exception e) {} // test may be set to null when we try to sync on it		
-			//System.out.println("TestSerialisationManager exited");
-			test = null;
-		}
-	}
+  public static void finish() {
+    alive = false;
+  }
 
-	public static int queueLength(){
-		return testSavingQueue.size();
-	}
+  public static boolean isSavingQueueEmpty() {
+    if (testSavingQueue.isEmpty()) {
+      return true;
+    }
+    return false;
+  }
 
+  @Override
+  public void run() {
+    while (alive || !testSavingQueue.isEmpty()) {
+      while (alive && testSavingQueue.isEmpty()) {
+        try {
+          Thread.sleep(1000); // 1 second
+        } catch (InterruptedException e1) {}
+      }
+      if (!testSavingQueue.isEmpty()) {
+        if (!queueBoost && testSavingQueue.size() > QUEUE_LIMIT) {
+          this.setPriority(NORM_PRIORITY);
+          queueBoost = true;
+        } else if (queueBoost && testSavingQueue.size() < QUEUE_LIMIT/2) {
+          this.setPriority(MIN_PRIORITY);
+          queueBoost = false;
+        }
+        Taggable fragment;
+        synchronized(testSavingQueue) {
+          fragment = testSavingQueue.removeFirst();
+        }
+        writethis(fragment);
+      }
+    }
+    try {
+      test.flush();
+      test.close();
+    } catch (IOException e) {
+      LogSerialiser.log("I/O exception serialising test file!\n", LogSerialiser.LogLevel.Critical);
+    } finally{
+      try {
+        test.close();
+      } catch (IOException e) {
+        LogSerialiser.log("I/O exception closing serialisation of test file!\n", LogSerialiser.LogLevel.Critical);
+      }
+    }
+    synchronized(test) {
+      //System.out.println("TestSerialiser finished");
+      singletonTestSerialiser = null;
+      test.notifyAll();
+    }
+  }
+
+  public static void write(Taggable fragment) {
+    if (alive) {
+      synchronized(testSavingQueue) {
+        testSavingQueue.add(fragment);
+      }
+    }
+  }
+
+  private static void writethis(Taggable fragment) {
+    Assert.notNull(fragment);
+    try {
+      test.writeObject(fragment);
+    } catch (IOException e) {
+      LogSerialiser.log("TestSerialiser - exception writing fragment: " + e.getMessage(),LogLevel.Critical);
+    }
+    fragmentTimes++;
+    if (fragmentTimes >= FLUSH_INTERVAL) {
+      fragmentTimes = 0;
+      try {
+        test.flush();
+        test.reset();
+      } catch (IOException e) {
+        LogSerialiser.log("TestSerialiser - flushing exception: " + e.getMessage(),LogLevel.Critical);
+      }
+    }
+  }
+
+  public static void exit() {
+    if (singletonTestSerialiser != null) {
+      TestSerialiser.finish();
+      try {
+        synchronized(test) {
+          while (singletonTestSerialiser != null) {
+            try {
+              test.wait();
+            } catch (InterruptedException e) {
+              System.out.println("TestSerialiser exit interrupted");
+            }
+          }
+        }
+      } catch (Exception e) {} // test may be set to null when we try to sync on it
+      //System.out.println("TestSerialisationManager exited");
+      test = null;
+    }
+  }
+
+  public static int queueLength() {
+    return testSavingQueue.size();
+  }
 }

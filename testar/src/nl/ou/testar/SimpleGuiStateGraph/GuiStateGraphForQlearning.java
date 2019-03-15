@@ -24,7 +24,7 @@ public class GuiStateGraphForQlearning {
     /**
      * Resetting the last action and last state to null for a new test sequence
      */
-    public void startANewTestSequence(){
+    public void startANewTestSequence() {
         previousActionConcreteId=null;
         previousStateConcreteId=null;
     }
@@ -36,12 +36,12 @@ public class GuiStateGraphForQlearning {
      * @param concreteActionId
      * @return
      */
-    protected Action getActionWithConcreteId(Set<Action> actions, String concreteActionId){
+    protected Action getActionWithConcreteId(Set<Action> actions, String concreteActionId) {
         System.out.println("DEBUG: trying to find action with a matching ID:");
-        for(Action action:actions){
+        for (Action action:actions) {
             System.out.println("DEBUG: action.ConcreteID="+action.get(Tags.ConcreteID)+", idToMatch="+concreteActionId);
             // find the action with concreteId:
-            if(action.get(Tags.ConcreteID).equals(concreteActionId)){
+            if (action.get(Tags.ConcreteID).equals(concreteActionId)) {
                 System.out.println("DEBUG: match found!");
                 return action;
             }
@@ -56,9 +56,9 @@ public class GuiStateGraphForQlearning {
      * @param concreteStateId
      * @return
      */
-    protected QlearningGuiState getStateByConcreteId(String concreteStateId){
-        for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getConcreteStateId().equals(concreteStateId)){
+    protected QlearningGuiState getStateByConcreteId(String concreteStateId) {
+        for (QlearningGuiState state: qlearningGuiStates) {
+            if (state.getConcreteStateId().equals(concreteStateId)) {
                 return state;
             }
         }
@@ -66,17 +66,17 @@ public class GuiStateGraphForQlearning {
         return null;
     }
 
-    protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions){
+    protected QlearningGuiState createQlearningGuiState(State state, Set<Action> actions) {
         HashMap<String, Double> actionIds = new HashMap<String, Double>();
-        for(Action action:actions){
+        for (Action action:actions) {
             actionIds.put(action.get(Tags.ConcreteID), R_MAX);
         }
         return new QlearningGuiState(state.get(Tags.ConcreteID),actionIds);
     }
 
-    protected boolean containsStateId(String stateId){
-        for(QlearningGuiState state: qlearningGuiStates){
-            if(state.getConcreteStateId().equals(stateId)){
+    protected boolean containsStateId(String stateId) {
+        for (QlearningGuiState state: qlearningGuiStates) {
+            if (state.getConcreteStateId().equals(stateId)) {
                 return true;
             }
         }

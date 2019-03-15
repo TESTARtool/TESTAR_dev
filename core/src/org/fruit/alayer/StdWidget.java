@@ -37,49 +37,49 @@ import java.io.Serializable;
 import org.fruit.Drag;
 
 public class StdWidget extends TaggableBase implements Widget, Serializable {
-	private static final long serialVersionUID = -1508666976791323005L;
-		
-	public State root() {
-		return null;
-	}
+  private static final long serialVersionUID = -1508666976791323005L;
 
-	public Widget parent() {
-		return null;
-	}
+  public State root() {
+    return null;
+  }
 
-	public Widget child(int i) {
-		return null;
-	}
+  public Widget parent() {
+    return null;
+  }
 
-	public int childCount() {
-		return 0;
-	}
+  public Widget child(int i) {
+    return null;
+  }
 
-	public void remove() {
-	}
+  public int childCount() {
+    return 0;
+  }
 
-	public void moveTo(Widget p, int idx) {
-	}
+  public void remove() {
+  }
 
-	public Widget addChild() {
-		return null;
-	}
+  public void moveTo(Widget p, int idx) {
+  }
 
-	// by urueda
-	@Override
-	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
-		return null;
-	}
-	
-	// by urueda
-	@Override
-	public String getRepresentation(String tab){
-		return tab + "???";
-	}
+  public Widget addChild() {
+    return null;
+  }
 
-	@Override
-	public String toString(Tag<?>... tags) {
-		return "???";
-	}
-	
+  // by urueda
+  @Override
+  public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {
+    return null;
+  }
+
+  // by urueda
+  @Override
+  public String getRepresentation(String tab) {
+    return tab + "???";
+  }
+
+  @Override
+  public String toString(Tag<?>... tags) {
+    return "???";
+  }
+
 }

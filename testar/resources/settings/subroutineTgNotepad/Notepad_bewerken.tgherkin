@@ -1,0 +1,17 @@
+  Feature: Notepad Bewerken
+
+  Scenario: Replace substring with new text
+    Step: Select Bewerken
+    When  $Role="UIAMenuItem" and $Title="Bewerken" doubleClick(true)
+    Step: Select Lettertype
+    When  $Role="UIAMenuItem" and $Title="Vervangen...	Ctrl+H" click(true)
+    Step: Select Arial
+    When  $Role="UIAEdit" and $Title="Zoeken naar:" type("t")
+    Step: Select Vet
+    When  $Role="UIAEdit" and $Title="Vervangen door:" type("T")
+    Step: Accept lettertype
+    When  $Role="UIAButton" and $Title="Alles vervangen" click(true)
+    Step: Exit
+    While state($Title="Vervangen")
+    When  $Role="UIAButton" and $Title="Sluiten" click(true)    
+    

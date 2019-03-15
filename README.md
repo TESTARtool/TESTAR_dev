@@ -63,36 +63,6 @@ Optionally you can build TESTAR (.\gradlew -DDBEBUG=true distZip ), copy the res
 the machine where you want to run TESTAR and run TESTAR on the target machine. This allows
 the user to debug TESTAR from a different machine. 
 
-#### Running TESTAR binaries (obtained with gradlew build) from command line
-
-TESTAR allow its execution and settings configuration from the command line. By default is executed with the selected protocol (.sse file) and the test.settings values of that protocol.
-
-From the command line it is also possible to select the desired protocol to execute TESTAR and change the values of the test.settings.
-
-The protocol to be executed can be selected using the "sse" parameter next to the name of the desired protocol. Ex: testar sse=desktop_generic
-
-Other settings are input using the pairs "parameterX=valueX" separated by space. Ex: testar ShowVisualSettingsDialogOnStartup=false Mode=Generate
-
-Certain characters such the slashes or the quotation marks must be entered in a double way to respect the treaty of special characters.
-
-Some of the most interesting parameters that can help to integrate TESTAR as an CI tool are:
-
-		sse -> to change the protocol
-
-		ShowVisualSettingsDialogOnStartup -> To run TESTAR without the GUI
-
-		Mode -> TESTAR execution Mode (Spy, Generate, Record, Replay, View)
-
-		SUTConnector & SUTConnectorValue -> The way to link with the desired application to be tested
-
-		Sequences & SequenceLength -> The number of iterations and actions that TESTAR will execute
-
-		SuspiciousTitles -> The errors that TESTAR will search in the execution
-
-Example: 
-testar sse=desktop_generic ShowVisualSettingsDialogOnStartup=false Sequences=5 SequenceLength=100 Mode=Generate SUTConnectorValue=" ""C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"" " SuspiciousTitles=".*[eE]rror.*|.*[eE]xcep[ct]ion.*"
-
-
 ## Known issue
 - Currently, only the protocols ``Protocol_desktop_generic``, ``Protocol_desktop_generic`` and ``accessibility_wcag2ict``
 support the graph database. Other protocols need to be adapted  (see issue #52)

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import org.fruit.monkey.ConfigTags;
@@ -41,8 +40,8 @@ import javax.swing.*;
  */
 public class GraphDBPanel extends JPanel {
 
-	private static final long serialVersionUID = -2815422165938356237L;
-	private JCheckBox graphDBEnabledChkBox = new JCheckBox();
+  private static final long serialVersionUID = -2815422165938356237L;
+  private JCheckBox graphDBEnabledChkBox = new JCheckBox();
     private JLabel label1 = new JLabel("Enabled");
     private JLabel label2 = new JLabel("url");
     private JLabel label3 = new JLabel("username");
@@ -52,7 +51,7 @@ public class GraphDBPanel extends JPanel {
     private JTextField userTextField = new JTextField();
     private JPasswordField passwordField = new JPasswordField();
 
-    private GraphDBPanel(){
+    private GraphDBPanel() {
         super();
     }
 
@@ -91,7 +90,7 @@ public class GraphDBPanel extends JPanel {
 
     /**
      * Populate GraphDBFields from Settings structure.
-     * @param settings The settings to load.
+     * @param settings The settings to load
      */
     public void populateFrom(final Settings settings) {
         graphDBEnabledChkBox.setSelected(settings.get(ConfigTags.GraphDBEnabled));
@@ -102,7 +101,7 @@ public class GraphDBPanel extends JPanel {
 
     /**
      * Retrieve information from the GraphDB GUI.
-     * @param settings reference to the object where the settings will be stored.
+     * @param settings reference to the object where the settings will be stored
      */
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.GraphDBEnabled, graphDBEnabledChkBox.isSelected());
@@ -117,10 +116,9 @@ public class GraphDBPanel extends JPanel {
      */
     private String getPassword() {
         StringBuilder result= new StringBuilder();
-        for(char c : passwordField.getPassword()) {
+        for (char c: passwordField.getPassword()) {
             result.append(c);
         }
         return  result.toString();
     }
-
 }

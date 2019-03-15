@@ -27,12 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit;
 
 public interface BinProc<L, R> {
-	void run(L left, R right);
+  void run(L left, R right);
 }

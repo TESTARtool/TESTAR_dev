@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,5 +35,5 @@ package org.fruit.alayer;
 import java.io.Serializable;
 
 public interface Visualizer extends Serializable {
-	void run(State state, Canvas canvas, Pen pen);
+  void run(State state, Canvas canvas, Pen pen);
 }

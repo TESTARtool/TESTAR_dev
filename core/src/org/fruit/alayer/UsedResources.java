@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer;
 
 /**
@@ -43,7 +42,7 @@ public class UsedResources {
     /**
      * Constructs new instance of a UsedResources object
      * @param userCPU cpu time spent in user space.
-     * @param systemCPU cpu time spent in system space
+     * @param systemCPU CPU time spent in system space
      * @param ramBase minimum used memory.
      * @param ramPeak Max Memory usage of the SUT during test execution.
      */

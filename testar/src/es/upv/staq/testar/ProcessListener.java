@@ -28,7 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import java.io.BufferedReader;
@@ -50,208 +49,208 @@ import org.fruit.monkey.Settings;
 
 public class ProcessListener{
 
-	/**
-	 * Check the settings parameters to see if the conditions to activate the process listener are correct
-	 * 
-	 * @param settings
-	 * @return true or false
-	 */
-	public boolean enableProcessListeners(Settings settings){
+  /**
+   * Check the settings parameters to see if the conditions to activate the process listener are correct
+   *
+   * @param settings
+   * @return true or false
+   */
+  public boolean enableProcessListeners(Settings settings) {
 
-		//User doesn't want to enable
-		if(!settings.get(ConfigTags.ProcessListenerEnabled))
-			return false;
+    //User doesn't want to enable
+    if (!settings.get(ConfigTags.ProcessListenerEnabled))
+      return false;
 
-		//Only for SUTs executed with command_line
-		if(!settings.get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
-			System.out.println("INFO: Process Listeners only allowed for Desktop Aplications invoked by SUTConnector: COMMAND_LINE");
-			return false;
-		}
+    //Only for SUTs executed with command_line
+    if (!settings.get(ConfigTags.SUTConnector).equals("COMMAND_LINE")) {
+      System.out.println("INFO: Process Listeners only allowed for Desktop Aplications invoked by SUTConnector: COMMAND_LINE");
+      return false;
+    }
 
-		String path = settings.get(ConfigTags.SUTConnectorValue);
+    String path = settings.get(ConfigTags.SUTConnectorValue);
 
-		//Disabled for browsers
-		if(path.contains("chrome.exe") || path.contains("iexplore.exe") || path.contains("firefox.exe") || path.contains("MicrosoftEdge")) {
-			System.out.println("INFO: Process Listeners only allowed for Desktop Aplications not working with web browsers");
-			return false;
-		}
+    //Disabled for browsers
+    if (path.contains("chrome.exe") || path.contains("iexplore.exe") || path.contains("firefox.exe") || path.contains("MicrosoftEdge")) {
+      System.out.println("INFO: Process Listeners only allowed for Desktop Aplications not working with web browsers");
+      return false;
+    }
 
-		System.out.println("Process Listener enabled correctly");
+    System.out.println("Process Listener enabled correctly");
 
-		return true;
-	}
+    return true;
+  }
 
-	/**
-	 * If SUT process is invoked through COMMAND_LINE,
-	 * this method create threads to work with oracles at the process level. 
-	 * 
-	 * @param system
-	 * @param settings
-	 */
-	public synchronized void startListeners(SUT system, Settings settings) {
-		final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  /**
+   * If SUT process is invoked through COMMAND_LINE,
+   * this method create threads to work with oracles at the process level.
+   *
+   * @param system
+   * @param settings
+   */
+  public synchronized void startListeners(SUT system, Settings settings) {
+    final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-		//Process Oracles use SuspiciousProcessOutput regular expression from test settings file
-		Pattern processOracles = Pattern.compile(settings.get(ConfigTags.SuspiciousProcessOutput), Pattern.UNICODE_CHARACTER_CLASS);
-		//Process Logs use ProcessLogs regular expression from test settings file
-		Pattern processLogs= Pattern.compile(settings.get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
+    //Process Oracles use SuspiciousProcessOutput regular expression from test settings file
+    Pattern processOracles = Pattern.compile(settings.get(ConfigTags.SuspiciousProcessOutput), Pattern.UNICODE_CHARACTER_CLASS);
+    //Process Logs use ProcessLogs regular expression from test settings file
+    Pattern processLogs= Pattern.compile(settings.get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
 
-		//Create File to save the logs of these oracles
-		File dir = new File("output/ProcessLogs");
-		if(!dir.exists())
-			dir.mkdirs();
+    //Create File to save the logs of these oracles
+    File dir = new File("output/ProcessLogs");
+    if (!dir.exists())
+      dir.mkdirs();
 
-		//Prepare runnable to read Error buffer
-		Runnable readErrors = new Runnable() {
-			public void run() {
-				try {
+    //Prepare runnable to read Error buffer
+    Runnable readErrors = new Runnable() {
+      public void run() {
+        try {
 
-					PrintWriter writerError;
+          PrintWriter writerError;
 
-					//Get process buffer of the SUT
-					BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
+          //Get process buffer of the SUT
+          BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdErr)));
 
-					String actionId = "unknown";
-					String ch;
-					Matcher matcherOracles, matcherLogs;
+          String actionId = "unknown";
+          String ch;
+          Matcher matcherOracles, matcherLogs;
 
-					while (system.isRunning() && (ch = input.readLine()) != null)
-					{	
-						matcherOracles = processOracles.matcher(ch);
-						matcherLogs= processLogs.matcher(ch);
+          while (system.isRunning() && (ch = input.readLine()) != null)
+          {
+            matcherOracles = processOracles.matcher(ch);
+            matcherLogs= processLogs.matcher(ch);
 
-						//if the process buffer information matches with the Oracles
-						if(processOracles!=null && matcherOracles.matches()) {		
+            //if the process buffer information matches with the Oracles
+            if (processOracles!=null && matcherOracles.matches()) {
 
-							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+              //Prepare Verdict report
+              if (DefaultProtocol.lastExecutedAction()!=null)
+                actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+              Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+                  "Process Listener suspicious title: '" + ch + ", on Action:  '" + actionId + ".");
 
-							//Set that we found an error
-							DefaultProtocol.setProcessVerdict(verdict);
+              //Set that we found an error
+              DefaultProtocol.setProcessVerdict(verdict);
 
-							DefaultProtocol.faultySequence = true;
+              DefaultProtocol.faultySequence = true;
 
-							//Prepare Log report
-							String DateString = Util.dateString(DATE_FORMAT);
-							System.out.println("SUT StdErr:	" +ch);
+              //Prepare Log report
+              String DateString = Util.dateString(DATE_FORMAT);
+              System.out.println("SUT StdErr:  " + ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdErr.log", true));
+              writerError = new PrintWriter(new FileWriter(dir + "/sequence" + DefaultProtocol.generatedSequenceCount() + "_StdErr.log", true));
 
-							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
-							writerError.flush();
-							writerError.close();
+              writerError.println(DateString + "  on Action:  " + actionId + "  SUT StdErr:  " + ch);
+              writerError.flush();
+              writerError.close();
 
-						}
+            }
 
-						//read all the process buffer information (Previous Oracle has priority)
-						else if(processLogs!=null && matcherLogs.matches()) {
-							//Prepare Log report
-							String DateString = Util.dateString(DATE_FORMAT);
-							System.out.println("SUT Log StdErr:	" +ch);
+            //read all the process buffer information (Previous Oracle has priority)
+            else if (processLogs!=null && matcherLogs.matches()) {
+              //Prepare Log report
+              String DateString = Util.dateString(DATE_FORMAT);
+              System.out.println("SUT Log StdErr:  " + ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdErr.log", true));
+              writerError = new PrintWriter(new FileWriter(dir + "/sequence" + DefaultProtocol.generatedSequenceCount() + "_StdErr.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+              if (DefaultProtocol.lastExecutedAction()!=null)
+                actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
 
-							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
-							writerError.flush();
-							writerError.close();
-						}
-					}
+              writerError.println(DateString + "  on Action:  " + actionId + "  SUT StdErr:  " + ch);
+              writerError.flush();
+              writerError.close();
+            }
+          }
 
-					input.close();
+          input.close();
 
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    };
 
-		//Prepare runnable to read Output buffer
-		Runnable readOutput = new Runnable() {
-			public void run() {
-				try {
+    //Prepare runnable to read Output buffer
+    Runnable readOutput = new Runnable() {
+      public void run() {
+        try {
 
-					PrintWriter writerOut;
+          PrintWriter writerOut;
 
-					//Get process buffer of the SUT
-					BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
+          //Get process buffer of the SUT
+          BufferedReader input = new BufferedReader(new InputStreamReader(system.get(Tags.StdOut)));
 
-					String actionId = "unknown";
-					String ch;
-					Matcher matcherOracles, matcherLogs;
+          String actionId = "unknown";
+          String ch;
+          Matcher matcherOracles, matcherLogs;
 
-					while (system.isRunning() && (ch = input.readLine()) != null)
-					{	
-						matcherOracles = processOracles.matcher(ch);
-						matcherLogs = processLogs.matcher(ch);
+          while (system.isRunning() && (ch = input.readLine()) != null)
+          {
+            matcherOracles = processOracles.matcher(ch);
+            matcherLogs = processLogs.matcher(ch);
 
-						//if the process buffer information matches with the Oracles
-						if(processOracles!=null && matcherOracles.matches()) {	
+            //if the process buffer information matches with the Oracles
+            if (processOracles!=null && matcherOracles.matches()) {
 
-							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+              //Prepare Verdict report
+              if (DefaultProtocol.lastExecutedAction()!=null)
+                actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
 
-							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
-									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
+              Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
+                  "Process Listener suspicious title: '" + ch + ", on Action:  '" + actionId + ".");
 
-							//Set that we found an error
-							DefaultProtocol.setProcessVerdict(verdict);
+              //Set that we found an error
+              DefaultProtocol.setProcessVerdict(verdict);
 
-							DefaultProtocol.faultySequence = true;
+              DefaultProtocol.faultySequence = true;
 
-							//Prepare Log report
-							String DateString = Util.dateString(DATE_FORMAT);
-							System.out.println("SUT StdOut:	" +ch);
+              //Prepare Log report
+              String DateString = Util.dateString(DATE_FORMAT);
+              System.out.println("SUT StdOut:  " + ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdOut.log", true));
+              writerOut = new PrintWriter(new FileWriter(dir + "/sequence" + DefaultProtocol.generatedSequenceCount() + "_StdOut.log", true));
 
-							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
-							writerOut.flush();
-							writerOut.close();
-						}
+              writerOut.println(DateString + "  on Action:  " + actionId + "  SUT StdOut:  " + ch);
+              writerOut.flush();
+              writerOut.close();
+            }
 
-						//read all the process buffer information (Previous Oracle has priority)
-						else if(processLogs!=null && matcherLogs.matches()) {
-							//Prepare Log report
-							String DateString = Util.dateString(DATE_FORMAT);
-							System.out.println("SUT Log StdOut:	" +ch);
+            //read all the process buffer information (Previous Oracle has priority)
+            else if (processLogs!=null && matcherLogs.matches()) {
+              //Prepare Log report
+              String DateString = Util.dateString(DATE_FORMAT);
+              System.out.println("SUT Log StdOut:  " + ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdOut.log", true));
+              writerOut = new PrintWriter(new FileWriter(dir + "/sequence" + DefaultProtocol.generatedSequenceCount() + "_StdOut.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+              if (DefaultProtocol.lastExecutedAction()!=null)
+                actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
 
-							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
-							writerOut.flush();
-							writerOut.close();
-						}
-					}
+              writerOut.println(DateString + "  on Action:  " + actionId + "  SUT StdOut:  " + ch);
+              writerOut.flush();
+              writerOut.close();
+            }
+          }
 
-					input.close();
+          input.close();
 
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};  
-		//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
-		//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
-		//ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    };
+    //TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
+    //JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
+    //ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
 
-		new Thread(readErrors).start();
-		new Thread(readOutput).start();
+    new Thread(readErrors).start();
+    new Thread(readOutput).start();
 
-		/*int nbThreads =  Thread.getAllStackTraces().keySet().size();
-				System.out.println("Number of Threads running on VM: "+nbThreads);*/
-	}
+    /*int nbThreads =  Thread.getAllStackTraces().keySet().size();
+        System.out.println("Number of Threads running on VM: " + nbThreads);*/
+  }
 
 }

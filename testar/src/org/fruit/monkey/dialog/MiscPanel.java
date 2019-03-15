@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2018 Open Universiteit - www.ou.nl
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -28,28 +28,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
 package org.fruit.monkey.dialog;
-
-import org.fruit.Pair;
-import org.fruit.Util;
-import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
-
-import javax.swing.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.List;
 
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
 import static javax.swing.LayoutStyle.ComponentPlacement.UNRELATED;
-import static org.fruit.monkey.dialog.ToolTipTexts.copyFilesTTT;
-import static org.fruit.monkey.dialog.ToolTipTexts.deleteFiles;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.List;
+import javax.swing.*;
+import org.fruit.Pair;
+import org.fruit.Util;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
+
 
 public class MiscPanel extends JPanel {
 
@@ -73,11 +68,11 @@ public class MiscPanel extends JPanel {
     jScrollPane5.setViewportView(tblCopyFromTo);
 
     JLabel jLabel16 = new JLabel("Copy Files on SUT Startup:");
-    jLabel16.setToolTipText(copyFilesTTT);
+    jLabel16.setToolTipText(ToolTipTexts.getCopyFilesTTT());
     JLabel jLabel8 = new JLabel("Output Directory:");
     JLabel jLabel9 = new JLabel("Temp Directory:");
     JLabel jLabel20 = new JLabel("Delete Files on SUT Startup:");
-    jLabel20.setToolTipText(deleteFiles);
+    jLabel20.setToolTipText(ToolTipTexts.getDeleteFiles());
 
     JButton btnSetOutputDir = new JButton("Select");
     btnSetOutputDir.addActionListener(this::btnSetOutputDirActionPerformed);
@@ -103,7 +98,7 @@ public class MiscPanel extends JPanel {
                                     .addGroup(gl_jPanelMisc.createSequentialGroup()
                                         .addComponent(jLabel8, PREFERRED_SIZE, 92, PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(txtOutputDir, PREFERRED_SIZE, 346, PREFERRED_SIZE))
+                                        .addComponent(txtOutputDir))
                                     .addGroup(gl_jPanelMisc.createSequentialGroup()
                                         .addComponent(jLabel9, PREFERRED_SIZE, 92, PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
@@ -148,7 +143,7 @@ public class MiscPanel extends JPanel {
     tblDelete.setModel(new javax.swing.table.DefaultTableModel(
         new Object[50][1], new String[]{"File / Directory"}) {
       private static final long serialVersionUID = 1L;
-      Class<?>[] types = new Class<?>[]{String.class};
+      private Class<?>[] types = new Class<?>[]{String.class};
 
       public Class<?> getColumnClass(int columnIndex) {
         return types[columnIndex];
@@ -167,7 +162,7 @@ public class MiscPanel extends JPanel {
         "Source File / Directory", "Destination"}
     ) {
       private static final long serialVersionUID = 1L;
-      Class<?>[] types = new Class<?>[]{String.class, String.class};
+      private Class<?>[] types = new Class<?>[]{String.class, String.class};
 
       public Class<?> getColumnClass(int columnIndex) {
         return types[columnIndex];
@@ -255,7 +250,7 @@ public class MiscPanel extends JPanel {
     }
 
     int i = 0;
-    for (Pair<String, String> fromTo : settings.get(ConfigTags.CopyFromTo)) {
+    for (Pair<String, String> fromTo: settings.get(ConfigTags.CopyFromTo)) {
       tblCopyFromTo.setValueAt(fromTo.left(), i, 0);
       tblCopyFromTo.setValueAt(fromTo.right(), i, 1);
       i++;
@@ -266,7 +261,7 @@ public class MiscPanel extends JPanel {
     }
 
     i = 0;
-    for (String f : settings.get(ConfigTags.Delete)) {
+    for (String f: settings.get(ConfigTags.Delete)) {
       tblDelete.setValueAt(f, i, 0);
       i++;
     }

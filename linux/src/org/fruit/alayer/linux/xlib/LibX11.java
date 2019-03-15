@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.xlib;
 
 import org.bridj.BridJ;
@@ -36,13 +35,11 @@ import org.bridj.ann.Library;
 
 import java.io.IOException;
 
-
 /**
  * Implementation of LibX11.
  */
 @Library("libX11")
 public class LibX11 {
-
 
     static{
         try {
@@ -53,9 +50,7 @@ public class LibX11 {
         BridJ.register();
     }
 
-
     //***           libX11              ***\\
-
 
     /**
      * Opens a connection to the X server that controls a display.
@@ -68,7 +63,6 @@ public class LibX11 {
      */
     public static native long XOpenDisplay(Pointer<Byte> displayName);
 
-
     /**
      * Closes the connection to the X server for the display specified in the Display structure and destroys all
      * windows, resource IDs (Window, Font, Pixmap, Colormap, Cursor, and GContext), or other resources that
@@ -77,7 +71,6 @@ public class LibX11 {
      * @param displayPtr Specifies the connection to the X server in (a pointer to) a Display structure.
      */
     public static native void XCloseDisplay(long displayPtr);
-
 
     /**
      * Returns the string that was passed to XOpenDisplay() when the current display was opened.
@@ -88,7 +81,6 @@ public class LibX11 {
      */
     public static native Pointer<Byte> XDisplayString(long displayPtr);
 
-
     /**
      * Returns an integer that describes the height of the screen in pixels.
      * @param displayPtr Specifies the connection to the X server in (a pointer to) a Display structure.
@@ -96,7 +88,6 @@ public class LibX11 {
      * @return Returns an integer that describes the height of the screen in pixels.
      */
     public static native int XDisplayHeight(long displayPtr, int screenNumber);
-
 
     /**
      * Returns an integer that describes the width of the screen in pixels.
@@ -106,14 +97,12 @@ public class LibX11 {
      */
     public static native int XDisplayWidth(long displayPtr, int screenNumber);
 
-
     /**
      * Returns the number of available screens.
      * @param displayPtr Specifies the connection to the X server in (a pointer to) a Display structure.
      * @return Returns the number of available screens.
      */
     public static native int XScreenCount(long displayPtr);
-
 
     /**
      * Returns the default screen number referenced by the XOpenDisplay() function.
@@ -122,7 +111,6 @@ public class LibX11 {
      */
     public static native int XDefaultScreen(long displayPtr);
 
-
     /**
      * Returns the root window.
      * @param displayPtr Specifies the connection to the X server in (a pointer to) a Display structure.
@@ -130,7 +118,6 @@ public class LibX11 {
      * @return Returns the root window.
      */
     public static native int XRootWindow(long displayPtr, int screenNumber);
-
 
     /**
      * The XInternAtom() function returns the atom identifier associated with the specified atom_name string. If
@@ -145,7 +132,6 @@ public class LibX11 {
      * @return The Atom requested.
      */
     public static native long XInternAtom(long displayPtr, Pointer<Byte> atomName, boolean onlyIfExists);
-
 
     /**
      * The XGetWindowProperty() function returns the actual type of the property; the actual format of the property;
@@ -170,7 +156,6 @@ public class LibX11 {
                                                 int actualFormatReturnPtr, long itemsReturnPtr, long bytesAfterReturnPtr,
                                                 long propReturnPtrToPtr);
 
-
     /**
      * The XRaiseWindow() function raises the specified window to the top of the stack so that no
      * sibling window obscures it.
@@ -179,9 +164,7 @@ public class LibX11 {
      */
     public static native void XRaiseWindow(long displayPtr, long windowId);
 
-
     public static native long XSendEvent(long displaytPtr, long windowId, boolean propagate,
                                          long eventMask, long eventSend);
-
 
 }

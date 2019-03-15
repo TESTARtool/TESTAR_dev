@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.gtk3;
-
 
 import org.bridj.BridJ;
 import org.bridj.Pointer;
@@ -37,13 +35,11 @@ import org.bridj.ann.Library;
 
 import java.io.IOException;
 
-
 /**
  * Implementation of GTK+ 3.
  */
 @Library("libgtk-3")
 public class LibGtk3 {
-
 
     static{
         try {
@@ -54,9 +50,7 @@ public class LibGtk3 {
         BridJ.register();
     }
 
-
     //***             GDK General             ***\\
-
 
     /**
      * Initializes the GDK library and connects to the windowing system. If initialization fails,
@@ -68,10 +62,7 @@ public class LibGtk3 {
      */
     public static native void gdk_init(long argcPointer, long argvPtrToPtrToPtr);
 
-
-
     //***             GTK Main             ***\\
-
 
     /**
      * Checks if any events are pending.
@@ -81,7 +72,6 @@ public class LibGtk3 {
      */
     public static native boolean gtk_events_pending();
 
-
     /**
      * Runs a single iteration of the main loop.
      * If no events are waiting to be processed GTK+ will block until the next event is noticed. If you don't want to
@@ -90,10 +80,7 @@ public class LibGtk3 {
      */
     public static native boolean gtk_main_iteration();
 
-
-
     //***             GDK Display             ***\\
-
 
     /**
      * Opens a display.
@@ -102,14 +89,12 @@ public class LibGtk3 {
      */
     public static native long gdk_display_open(Pointer<Byte> displayName);
 
-
     /**
      * Gets the default GdkDisplay. This is a convenience function for:
      * gdk_display_manager_get_default_display (gdk_display_manager_get()).
      * @return Returns a GdkDisplay, or NULL if there is no default display.
      */
     public static native long gdk_display_get_default();
-
 
     /**
      * Gets the name of the display.
@@ -119,13 +104,11 @@ public class LibGtk3 {
      */
     public static native Pointer<Byte> gdk_display_get_name(long displayPointer);
 
-
     /**
      * Closes the connection to the windowing system for the given display, and cleans up associated resources.
      * @param displayPointer A pointer to a display object.
      */
     public static native void gdk_display_close(long displayPointer);
-
 
     /**
      * Finds out if the display has been closed.
@@ -134,14 +117,12 @@ public class LibGtk3 {
      */
     public static native boolean gdk_display_is_closed(long displayPointer);
 
-
     /**
      * Get the default GdkScreen for display.
      * @param displayPointer A pointer to a display object.
      * @return The default GdkScreen object for display.
      */
     public static native long gdk_display_get_default_screen(long displayPointer);
-
 
 //    /**
 //     * Gets the number of monitors that belong to display.
@@ -160,10 +141,7 @@ public class LibGtk3 {
 //     */
 //    public static native long gdk_display_get_monitor(long displayPointer, int monitorIndex);
 
-
-
     // /***             GDK DisplayManager             ***\
-
 
     /**
      * Gets the singleton GdkDisplayManager object.
@@ -175,7 +153,6 @@ public class LibGtk3 {
      */
     public static native long gdk_display_manager_get();
 
-
     /**
      * Gets the default GdkDisplay.
      * @param displayManagerPointer A pointer to a DisplayManager object.
@@ -183,15 +160,9 @@ public class LibGtk3 {
      */
     public static native long gdk_display_manager_get_default_display(long displayManagerPointer);
 
-
-
     //***             GDK Monitor             ***\\
 
-
-
-
     // **             GDK Screen             ***\\
-
 
     /**
      * Gets the root window of screen.
@@ -199,7 +170,6 @@ public class LibGtk3 {
      * @return Returns (a pointer to) the root window.
      */
     public static native long gdk_screen_get_root_window(long screenPointer);
-
 
     /**
      * Gets the width of screen in pixels. The returned size is in "application pixels", not in "device pixels"
@@ -209,7 +179,6 @@ public class LibGtk3 {
      */
     public static native int gdk_screen_get_width(long screenPointer);
 
-
     /**
      * Gets the height of screen in pixels. The returned size is in "application pixels", not in "device pixels"
      * (see gdk_screen_get_monitor_scale_factor()).
@@ -217,7 +186,6 @@ public class LibGtk3 {
      * @return Returns the height of screen in pixels.
      */
     public static native int gdk_screen_get_height(long screenPointer);
-
 
     /**
      * Obtains a list of all toplevel windows known to GDK on the screen screen . A toplevel window is a child of
@@ -227,6 +195,5 @@ public class LibGtk3 {
      * @return Returns a list of toplevel windows, free with g_list_free().
      */
     public static native long gdk_screen_get_toplevel_windows(long screenPointer);
-
 
 }

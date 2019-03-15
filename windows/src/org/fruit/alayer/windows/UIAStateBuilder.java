@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -49,150 +48,121 @@ import org.fruit.alayer.exceptions.StateBuildException;
 
 public final class UIAStateBuilder implements StateBuilder {
 
-	private static final long serialVersionUID = 796655140981849818L;
-	final double timeOut; // seconds
-	transient ExecutorService executor;
-	transient long pAutomation, pCondition, pCacheRequest;
-	// begin by urueda
-	boolean accessBridgeEnabled;
-	String SUTProcesses; // regex
-	// end by urueda
+  private static final long serialVersionUID = 796655140981849818L;
+  final double timeOut; // seconds
+  transient ExecutorService executor;
+  transient long pAutomation, pCondition, pCacheRequest;
+  // begin by urueda
+  boolean accessBridgeEnabled;
+  String SUTProcesses; // regex
+  // end by urueda
 
-	public UIAStateBuilder(){ this(10/*seconds*/,false,"");	}
+  public UIAStateBuilder() {
+    this(10/*seconds*/,false,"");
+  }
 
-	public UIAStateBuilder(double timeOut, boolean accessBridgeEnabled, String SUTProcesses){ // seconds
-		Assert.isTrue(timeOut > 0);
-		this.timeOut = timeOut;
-		initialize();
-		// begin by urueda
-		this.accessBridgeEnabled = accessBridgeEnabled;
-		this.SUTProcesses = SUTProcesses;
-		if (accessBridgeEnabled)
-			new Thread(){ public void run(){ Windows.InitializeAccessBridge(); } }.start(); // based on ferpasri
-		// end by urueda
-		executor = Executors.newFixedThreadPool(1);
-	}
+  public UIAStateBuilder(double timeOut, boolean accessBridgeEnabled, String SUTProcesses) { // seconds
+    Assert.isTrue(timeOut > 0);
+    this.timeOut = timeOut;
+    initialize();
+    // begin by urueda
+    this.accessBridgeEnabled = accessBridgeEnabled;
+    this.SUTProcesses = SUTProcesses;
+    if (accessBridgeEnabled) {
+      new Thread() {
+        public void run() {
+          Windows.InitializeAccessBridge();
+        }
+      }.start();
+    }
+    executor = Executors.newFixedThreadPool(1);
+  }
 
-	private void initialize(){
+  private void initialize() {
 
-		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
-		//System.out.println(Windows.Get_CLSID_CUIAutomation_Ptr());
-		pAutomation = Windows.CoCreateInstance(Windows.Get_CLSID_CUIAutomation_Ptr(), 0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IUIAutomation_Ptr());
+    Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);
+    pAutomation = Windows.CoCreateInstance(Windows.Get_CLSID_CUIAutomation_Ptr(), 0, Windows.CLSCTX_INPROC_SERVER, Windows.Get_IID_IUIAutomation_Ptr());
 
-		// scope and filter settings
-		//long pFirstCondition = Windows.IUIAutomation_CreateTrueCondition(pAutomation);
-		long pFirstCondition = Windows.IUIAutomation_get_ControlViewCondition(pAutomation);	
+    // scope and filter settings
+    long pFirstCondition = Windows.IUIAutomation_get_ControlViewCondition(pAutomation);
+    pCondition = Windows.IUIAutomation_CreateAndCondition(pAutomation, Windows.IUIAutomation_CreatePropertyCondition(pAutomation, Windows.UIA_IsOffscreenPropertyId, false), pFirstCondition);
+    pCacheRequest = Windows.IUIAutomation_CreateCacheRequest(pAutomation);
+    Windows.IUIAutomationCacheRequest_put_TreeFilter(pCacheRequest, pCondition);
+    Windows.IUIAutomationCacheRequest_put_TreeScope(pCacheRequest, Windows.TreeScope_Subtree);
+    Windows.IUIAutomationCacheRequest_put_AutomationElementMode(pCacheRequest, Windows.AutomationElementMode_Full);
 
+    // cache patterns
+    Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_WindowPatternId);
+    Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_ValuePatternId);
 
-		//pCondition = Windows.IUIAutomation_CreateTrueCondition(pAutomation);
-		pCondition = Windows.IUIAutomation_CreateAndCondition(pAutomation, Windows.IUIAutomation_CreatePropertyCondition(pAutomation, Windows.UIA_IsOffscreenPropertyId, false), pFirstCondition);
-		//Windows.IUnknown_Release(pFirstCondition);
+    // cache properties
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NamePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AcceleratorKeyPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AccessKeyPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AutomationIdPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_BoundingRectanglePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClassNamePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControlTypePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_CulturePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FrameworkIdPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HasKeyboardFocusPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HelpTextPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsContentElementPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsControlElementPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsEnabledPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsKeyboardFocusablePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NativeWindowHandlePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ProviderDescriptionPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_OrientationPropertyId);
 
-		pCacheRequest = Windows.IUIAutomation_CreateCacheRequest(pAutomation);
-		Windows.IUIAutomationCacheRequest_put_TreeFilter(pCacheRequest, pCondition);
-		Windows.IUIAutomationCacheRequest_put_TreeScope(pCacheRequest, Windows.TreeScope_Subtree);
-		Windows.IUIAutomationCacheRequest_put_AutomationElementMode(pCacheRequest, Windows.AutomationElementMode_Full);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsScrollPatternAvailablePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticallyScrollablePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalViewSizePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalViewSizePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
 
+    // window role properties
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsTopmostPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowCanMaximizePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowCanMinimizePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsModalPropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowWindowInteractionStatePropertyId);
+    Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowWindowVisualStatePropertyId);
 
-		// cache patterns
-		Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_WindowPatternId);
-		Windows.IUIAutomationCacheRequest_AddPattern(pCacheRequest, Windows.UIA_ValuePatternId);
+  }
 
+  public void release() {
+    if (pAutomation != 0) {
+      Windows.IUnknown_Release(pCondition);
+      Windows.IUnknown_Release(pCacheRequest);
+      Windows.IUnknown_Release(pAutomation);
+      Windows.CoUninitialize();
+      pAutomation = 0;
+      executor.shutdown();
+    }
+  }
 
-		// cache properties
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NamePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AcceleratorKeyPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AccessKeyPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_AutomationIdPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_BoundingRectanglePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClassNamePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ClickablePointPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControllerForPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ControlTypePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_CulturePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_DescribedByPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FlowsToPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_FrameworkIdPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HasKeyboardFocusPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_HelpTextPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsContentElementPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsControlElementPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsDataValidForFormPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsEnabledPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsKeyboardFocusablePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsOffscreenPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsPasswordPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsRequiredForFormPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ItemStatusPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ItemTypePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_LabeledByPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_LocalizedControlTypePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_NativeWindowHandlePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ProviderDescriptionPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_OrientationPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_RuntimeIdPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsWindowPatternAvailablePropertyId);
+  public void finalize() {
+    release();
+  }
 
-		// begin by urueda
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_IsScrollPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticallyScrollablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalViewSizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalViewSizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
-		// end by urueda
-
-		// window role properties
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsTopmostPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowCanMaximizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowCanMinimizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowIsModalPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowWindowInteractionStatePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(pCacheRequest, Windows.UIA_WindowWindowVisualStatePropertyId);
-
-	}
-
-	public void release(){
-		if(pAutomation != 0){
-			Windows.IUnknown_Release(pCondition);
-			Windows.IUnknown_Release(pCacheRequest);
-			Windows.IUnknown_Release(pAutomation);
-			Windows.CoUninitialize();
-			pAutomation = 0;
-			executor.shutdown();
-		}
-	}
-
-	public void finalize(){ release(); }
-
-	public UIAState apply(SUT system) throws StateBuildException {
-		try {
-			Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
-																	   this.accessBridgeEnabled, this.SUTProcesses));
-			return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			throw new StateBuildException(e);
-		} catch (ExecutionException e) {
-			e.printStackTrace(); // make the exception traceable
-			throw new StateBuildException(e);
-		} catch (TimeoutException e) {
-			//UIAState ret = new UIAState(uiaRoot);
-			UIAState ret = new UIAState(StateFetcher.buildRoot(system)); // by urueda
-			ret.set(Tags.Role, Roles.Process);
-			ret.set(Tags.NotResponding, true);
-			return ret;
-		}
-	}
-
-	/*private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-		initialize();
-		executor = Executors.newFixedThreadPool(1);
-	}
-
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}*/
-
+  public UIAState apply(SUT system) throws StateBuildException {
+    try {
+      Future<UIAState> future = executor.submit(new StateFetcher(system,pAutomation,pCacheRequest,
+                                     this.accessBridgeEnabled, this.SUTProcesses));
+      return future.get((long)(timeOut * 1000.0), TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new StateBuildException(e);
+    } catch (ExecutionException e) {
+      e.printStackTrace(); // make the exception traceable
+      throw new StateBuildException(e);
+    } catch (TimeoutException e) {
+      UIAState ret = new UIAState(StateFetcher.buildRoot(system)); // by urueda
+      ret.set(Tags.Role, Roles.Process);
+      ret.set(Tags.NotResponding, true);
+      return ret;
+    }
+  }
 }

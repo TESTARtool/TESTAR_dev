@@ -40,9 +40,7 @@ import java.awt.geom.Ellipse2D;
  */
 public class DrawableEllipse extends DrawableObject {
 
-
     //region DrawableObject implementation
-
 
     @Override
     public void draw(Graphics2D g2d) {
@@ -63,12 +61,9 @@ public class DrawableEllipse extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Properties
-
 
     private Rectangle _boundingBox;
     /**
@@ -79,12 +74,9 @@ public class DrawableEllipse extends DrawableObject {
         return _boundingBox;
     }
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Creates a new DrawableRect object.
@@ -100,20 +92,15 @@ public class DrawableEllipse extends DrawableObject {
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
         return "(" + _location.x + ", " + _location.y + ") - '" + _boundingBox.width + " x " + _boundingBox.height + "'";
     }
 
-
     //endregion
-
 
 }

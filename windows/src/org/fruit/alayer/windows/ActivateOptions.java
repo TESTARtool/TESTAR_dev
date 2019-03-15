@@ -40,14 +40,12 @@ public enum ActivateOptions {
      */
     AO_NONE(0), AO_DESIGNMODE(1), AO_NOERRORUI(2), AO_NOSPLASHSCREEN(3), AO_PRELAUNCH(33554432);
 
-
     // Internal value of the enum.
     private int value;
 
     public int getValue() {
         return value;
     }
-
 
     /**
      * Enum constructor.
@@ -56,7 +54,6 @@ public enum ActivateOptions {
     ActivateOptions(int value) {
         this.value = value;
     }
-
 
     /**
      * String representation of the enumeration type.
@@ -78,6 +75,5 @@ public enum ActivateOptions {
             return super.toString();
         }
     }
-
 
 }

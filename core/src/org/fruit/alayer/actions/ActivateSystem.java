@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -46,44 +45,43 @@ import org.fruit.alayer.exceptions.ActionFailedException;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
 public class ActivateSystem extends TaggableBase implements Action {
-	private static final long serialVersionUID = 4023460564018645348L;
+  private static final long serialVersionUID = 4023460564018645348L;
 
-	public void run(SUT system, State state, double duration) throws ActionFailedException {
-		Assert.notNull(system);
-		Assert.isTrue(duration >= 0);
-		
-		try{
-			double start = Util.time();
-			Proc activator = system.get(Tags.SystemActivator);
-			activator.run();
-			Util.pause(duration - (Util.time() - start));
-		}catch(NoSuchTagException nste){
-			throw new ActionFailedException(nste);
-		}
-	}
-	
-	public String toString(){ return "Bring the system to the foreground."; }
+  public void run(SUT system, State state, double duration) throws ActionFailedException {
+    Assert.notNull(system);
+    Assert.isTrue(duration >= 0);
 
-	// by urueda
-	@Override
-	public String toString(Role... discardParameters) {
-		return toString();
-	}
-	
-	// by urueda
-	@Override
-	public String toShortString() {
-		Role r = get(Tags.Role, null);
-		if (r != null)
-			return r.toString();
-		else
-			return toString();
-	}
+    try {
+      double start = Util.time();
+      Proc activator = system.get(Tags.SystemActivator);
+      activator.run();
+      Util.pause(duration - (Util.time() - start));
+    } catch(NoSuchTagException nste) {
+      throw new ActionFailedException(nste);
+    }
+  }
 
-	// by urueda
-	@Override
-	public String toParametersString() {
-		return "";
-	}
+  public String toString() {
+    return "Bring the system to the foreground.";
+  }
 
+  @Override
+  public String toString(Role... discardParameters) {
+    return toString();
+  }
+
+  @Override
+  public String toShortString() {
+    Role r = get(Tags.Role, null);
+    if (r != null) {
+      return r.toString();
+    } else {
+      return toString();
+    }
+  }
+
+  @Override
+  public String toParametersString() {
+    return "";
+  }
 }

@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -37,9 +35,10 @@ package org.fruit.alayer;
 import java.util.LinkedList;
 
 public class DFNavigator implements Navigator {
-	public void run(LinkedList<Widget> buffer) {
-		Widget f = buffer.getFirst();
-		for(int i = f.childCount() - 1; i >= 0; i--)
-			buffer.add(1, f.child(i));
-	}
+  public void run(LinkedList<Widget> buffer) {
+    Widget f = buffer.getFirst();
+    for (int i = f.childCount() - 1; i >= 0; i--) {
+      buffer.add(1, f.child(i));
+    }
+  }
 }

@@ -27,9 +27,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
+import java.util.List;
 import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
 
 /**
@@ -39,18 +39,19 @@ import nl.ou.testar.a11y.wcag2.SuccessCriterion.Level;
  */
 public final class InputAssistanceGuideline extends AbstractGuideline {
 
-	private static final long serialVersionUID = -3766907198803540591L;
+  private static final long serialVersionUID = -3766907198803540591L;
 
-	InputAssistanceGuideline(AbstractPrinciple parent) {
-		super(3, "Input Assistance", parent);
-		criteria.add(new SuccessCriterion(1, "Error Identification",
-				this, Level.A, "minimize-error-identified"));
-		criteria.add(new SuccessCriterion(2, "Labels or Instructions",
-				this, Level.A, "minimize-error-cues"));
-		criteria.add(new SuccessCriterion(3, "Error Suggestion",
-				this, Level.AA, "minimize-error-suggestions"));
-		criteria.add(new SuccessCriterion(4, "Error Prevention (Legal, Financial, Data)",
-				this, Level.AA, "minimize-error-reversible"));
-	}
-
+  InputAssistanceGuideline(AbstractPrinciple parent) {
+    super(3, "Input Assistance", parent);
+    List<SuccessCriterion> criteria = getCriteria();
+    criteria.add(new SuccessCriterion(1, "Error Identification",
+        this, Level.A, "minimize-error-identified"));
+    criteria.add(new SuccessCriterion(2, "Labels or Instructions",
+        this, Level.A, "minimize-error-cues"));
+    criteria.add(new SuccessCriterion(3, "Error Suggestion",
+        this, Level.AA, "minimize-error-suggestions"));
+    criteria.add(new SuccessCriterion(4, "Error Prevention (Legal, Financial, Data)",
+        this, Level.AA, "minimize-error-reversible"));
+    setCriteria(criteria);
+  }
 }

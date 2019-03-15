@@ -27,12 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit;
 
 public interface UnFunc<A, T> {
-	T apply(A argument);
+  T apply(A argument);
 }

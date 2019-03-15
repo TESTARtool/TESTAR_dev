@@ -27,15 +27,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
-
 
 /**
  * Enumeration used by interface AtspiCollection to specify the way AtspiAccesible objects should be sorted.
  */
 public enum AtSpiCollectionSortOrders {
-
 
     Invalid,
     Canonical,
@@ -45,6 +42,5 @@ public enum AtSpiCollectionSortOrders {
     ReverseFlow,
     ReverseTab,
     LastDefined
-
 
 }

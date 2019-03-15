@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.protocols;
 
 import java.util.List;
@@ -46,36 +45,35 @@ import nl.ou.testar.a11y.reporting.EvaluationResults;
  *
  */
 public interface Evaluator {
-	
-	/**
-	 * Evaluates the accessibility of the given state
-	 * This method executes oracles in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The results of the evaluation.
-	 */
-	public EvaluationResults evaluate(List<Widget> widgets);
-	
-	/**
-	 * Derives the possible actions from the given state
-	 * The actions are specific to accessibility.
-	 * This method derives actions in on-the-fly evaluation.
-	 * @param widgets The widgets to consider.
-	 * @return The set of actions.
-	 */
-	public Set<Action> deriveActions(List<Widget> widgets);
-	
-	/**
-	 * Evaluates the overall accessibility of the SUT by querying the given graph database
-	 * This method executes oracles in offline evaluation.
-	 * @param graphDB The graph database.
-	 * @return The results of the evaluation.
-	 */
-	public EvaluationResults query(GraphDB graphDB);
-	
-	/**
-	 * Gets the unique version of the implementation for the guidelines being used
-	 * @return The version as a String.
-	 */
-	public String getImplementationVersion();
 
+  /**
+   * Evaluates the accessibility of the given state
+   * This method executes oracles in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The results of the evaluation.
+   */
+  EvaluationResults evaluate(List<Widget> widgets);
+
+  /**
+   * Derives the possible actions from the given state
+   * The actions are specific to accessibility.
+   * This method derives actions in on-the-fly evaluation.
+   * @param widgets The widgets to consider.
+   * @return The set of actions.
+   */
+  Set<Action> deriveActions(List<Widget> widgets);
+
+  /**
+   * Evaluates the overall accessibility of the SUT by querying the given graph database
+   * This method executes oracles in offline evaluation.
+   * @param graphDB The graph database.
+   * @return The results of the evaluation.
+   */
+  EvaluationResults query(GraphDB graphDB);
+
+  /**
+   * Gets the unique version of the implementation for the guidelines being used
+   * @return The version as a String.
+   */
+  String getImplementationVersion();
 }

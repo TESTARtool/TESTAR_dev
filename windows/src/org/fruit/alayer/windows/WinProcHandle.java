@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,16 +35,24 @@ package org.fruit.alayer.windows;
 import org.fruit.alayer.devices.ProcessHandle;
 
 public final class WinProcHandle implements ProcessHandle {
-	private final long pid;
-	public WinProcHandle(long pid){ this.pid = pid;	}
-	public void kill() { WinProcess.killProcess(pid); }
-	public boolean isRunning() { return WinProcess.isRunning(pid); }
-	public String name() {
-		try{
-			return WinProcess.procName(pid);
-		}catch(WinApiException wae){
-			return null;
-		}
-	}
-	public long pid() { return pid; }
+  private final long pid;
+  public WinProcHandle(long pid) {
+    this.pid = pid;
+  }
+  public void kill() {
+    WinProcess.killProcess(pid);
+  }
+  public boolean isRunning() {
+    return WinProcess.isRunning(pid);
+  }
+  public String name() {
+    try {
+      return WinProcess.procName(pid);
+    } catch(WinApiException wae) {
+      return null;
+    }
+  }
+  public long pid() {
+    return pid;
+  }
 }

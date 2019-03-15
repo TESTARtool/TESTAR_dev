@@ -27,18 +27,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
-package org.fruit.alayer.exceptions; // refactored by urueda
+package org.fruit.alayer.exceptions;
 
 import org.fruit.FruitException;
 
 public class WidgetNotFoundException extends FruitException {
-	private static final long serialVersionUID = 7813610847340484828L;
-	public WidgetNotFoundException(){ super(""); }
-	public WidgetNotFoundException(String message){ this(message, null); }
-	public WidgetNotFoundException(String message, Throwable cause){ super(message, cause); }
-	public WidgetNotFoundException(Throwable cause){ super(cause); }
+  private static final long serialVersionUID = 7813610847340484828L;
+  public WidgetNotFoundException() {
+    super("");
+  }
+  public WidgetNotFoundException(String message) {
+    this(message, null);
+  }
+  public WidgetNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+  public WidgetNotFoundException(Throwable cause) {
+    super(cause);
+  }
 }

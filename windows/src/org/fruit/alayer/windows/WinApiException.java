@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -36,6 +35,8 @@ package org.fruit.alayer.windows;
 import org.fruit.FruitException;
 
 public class WinApiException extends FruitException {
-	private static final long serialVersionUID = 4344611676441793933L;
-	public WinApiException(String message) { super(message); }
+  private static final long serialVersionUID = 4344611676441793933L;
+  public WinApiException(String message) {
+    super(message);
+  }
 }

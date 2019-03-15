@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import org.fruit.alayer.Action;
@@ -40,53 +39,53 @@ import org.fruit.alayer.Action;
  */
 public class ActionStatus {
 
-	private Action action;
-	
-	private boolean actionSucceeded,
-					problems,
-					userEventAction;
-	
-	/**
-	 * Constructor.
-	 */
-	public ActionStatus(){
-		this.action = null;
-		this.actionSucceeded = true;
-		this.problems = false;
-		this.userEventAction = false;		
-	}
+  private Action action;
 
-	public Action getAction() {
-		return action;
-	}
+  private boolean actionSucceeded,
+          problems,
+          userEventAction;
 
-	public void setAction(Action action) {
-		this.action = action;
-	}
+  /**
+   * Constructor.
+   */
+  public ActionStatus() {
+    this.action = null;
+    this.actionSucceeded = true;
+    this.problems = false;
+    this.userEventAction = false;
+  }
 
-	public boolean isActionSucceeded() {
-		return actionSucceeded;
-	}
+  public Action getAction() {
+    return action;
+  }
 
-	public boolean setActionSucceeded(boolean actionSucceeded) {
-		this.actionSucceeded = actionSucceeded;
-		return actionSucceeded;
-	}
+  public void setAction(Action action) {
+    this.action = action;
+  }
 
-	public boolean isProblems() {
-		return problems;
-	}
+  public boolean isActionSucceeded() {
+    return actionSucceeded;
+  }
 
-	public void setProblems(boolean problems) {
-		this.problems = problems;
-	}
+  public boolean setActionSucceeded(boolean actionSucceeded) {
+    this.actionSucceeded = actionSucceeded;
+    return actionSucceeded;
+  }
 
-	public boolean isUserEventAction() {
-		return userEventAction;
-	}
+  public boolean isProblems() {
+    return problems;
+  }
 
-	public void setUserEventAction(boolean userEventAction) {
-		this.userEventAction = userEventAction;
-	}
-					
+  public void setProblems(boolean problems) {
+    this.problems = problems;
+  }
+
+  public boolean isUserEventAction() {
+    return userEventAction;
+  }
+
+  public void setUserEventAction(boolean userEventAction) {
+    this.userEventAction = userEventAction;
+  }
+
 }

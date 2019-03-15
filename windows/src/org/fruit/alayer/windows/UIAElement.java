@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -43,39 +42,42 @@ import java.util.Collections;
 import java.util.List;
 
 class UIAElement implements Serializable {
-	private static final long serialVersionUID = -2561441199642411403L;
-	List<UIAElement> children = Collections.emptyList();
-	UIAElement parent;
-	UIARootElement root;
-	UIAWidget backRef;
-	boolean blocked, enabled, ignore, isModal,
-		isContentElement, isControlElement,
-		hasKeyboardFocus, isKeyboardFocusable,
-		isTopmostWnd, isTopLevelContainer,
-		scrollPattern, hScroll, vScroll; // by urueda
-	long ctrlId, culture, orientation, hwnd, wndInteractionState, wndVisualState;
-	Rect rect;
-	String name, helpText, automationId, className, providerDesc, frameworkId,
-		acceleratorKey, accessKey;
-	String valuePattern;
+  private static final long serialVersionUID = -2561441199642411403L;
+  List<UIAElement> children = Collections.emptyList();
+  UIAElement parent;
+  UIARootElement root;
+  UIAWidget backRef;
+  boolean blocked, enabled, ignore, isModal,
+    isContentElement, isControlElement,
+    hasKeyboardFocus, isKeyboardFocusable,
+    isTopmostWnd, isTopLevelContainer,
+    scrollPattern, hScroll, vScroll; // by urueda
+  long ctrlId, culture, orientation, hwnd, wndInteractionState, wndVisualState;
+  Rect rect;
+  String name, helpText, automationId, className, providerDesc, frameworkId,
+    acceleratorKey, accessKey;
+  String valuePattern;
 
-	double zindex,
-		hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
+  double zindex,
+    hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent; // by urueda
 
-	public UIAElement(){ this(null); }
+  UIAElement() {
+    this(null);
+  }
 
-	public UIAElement(UIAElement parent){
-		this.parent = parent;
-		if(parent != null)
-			root = parent.root;
-		enabled = true;
-	}
+  UIAElement(UIAElement parent) {
+    this.parent = parent;
+    if (parent != null) {
+      root = parent.root;
+    }
+    enabled = true;
+  }
 
-	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
-	}
+  private void writeObject(ObjectOutputStream oos) throws IOException{
+    oos.defaultWriteObject();
+  }
 
-	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
-		ois.defaultReadObject();
-	}
+  private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
+    ois.defaultReadObject();
+  }
 }

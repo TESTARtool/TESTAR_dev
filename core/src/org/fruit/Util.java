@@ -27,18 +27,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  * @author Sebastian Bauersfeld
  */
 package org.fruit;
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.devices.Mouse;
-import org.fruit.alayer.exceptions.SystemStopException;
-import org.fruit.alayer.exceptions.WidgetNotFoundException;
-
-import javax.tools.*;
 import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -48,11 +41,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
+import javax.tools.*;
+import org.fruit.alayer.*;
+import org.fruit.alayer.devices.Mouse;
+import org.fruit.alayer.exceptions.SystemStopException;
+import org.fruit.alayer.exceptions.WidgetNotFoundException;
 
 /**
  * Utility methods.
  */
 public final class Util {
+
+  private static final double PAUSE_TIME = 0.001;
 
   private Util() {
   }
@@ -181,12 +181,17 @@ public final class Util {
   }
 
   public static boolean contains(Shape shape, double x, double y) {
-    return shape == null ? false : shape.contains(x, y);
+    if (shape != null) {
+      return shape.contains(x, y);
+    }
+    return false;
   }
 
   public static boolean containsRel(Shape shape, double relX, double relY) {
-    return shape == null ? false :
-        shape.contains(shape.x() + relX * shape.width(), shape.y() + relY * shape.height());
+    if (shape != null) {
+      return shape.contains(shape.x() + relX * shape.width(), shape.y() + relY * shape.height());
+    }
+    return false;
   }
 
   public static boolean containsRel(Widget widget, double relX, double relY) {
@@ -228,8 +233,17 @@ public final class Util {
     double xDiff = x2 - x1;
     double yDiff = y2 - y1;
     double length = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-    double baseX = length == 0 ? x2 - headLength : x2 - xDiff * headLength / length;
-    double baseY = length == 0 ? y2 - headLength : y2 - yDiff * headLength / length;
+
+    double baseX;
+    double baseY;
+    if (length == 0) {
+      baseX = x2 - headLength;
+      baseY = y2 - headLength;
+    } else {
+      baseX = x2 - xDiff * headLength / length;
+      baseY = y2 - yDiff * headLength / length;
+
+    }
     Point p1 = Util.OrthogonalPoint(baseX, baseY, x2, y2, headWidth * .5);
     Point p2 = Util.OrthogonalPoint(baseX, baseY, x2, y2, -headWidth * .5);
     canvas.line(pen, p1.x(), p1.y(), x2, y2);
@@ -300,7 +314,7 @@ public final class Util {
     while (time < deadline) {
       pos = (deadline - time) / duration;
       mouse.setCursor(x + pos * xDist, y + pos * yDist);
-      pause(0.001);
+      pause(PAUSE_TIME);
       time = time();
     }
     mouse.setCursor(x, y);
@@ -309,29 +323,53 @@ public final class Util {
   public static String abbreviate(String string, int maxLen, String abbreviation) {
     Assert.notNull(string, abbreviation);
     Assert.isTrue(maxLen >= 0);
-    return (string.substring(0, Math.min(maxLen, string.length()))
-        + (string.length() > maxLen ? abbreviation : ""))
-        .replaceAll("\\r\\n|\\n", "_");
+    if (string.length() > maxLen) {
+      return (string.substring(0, Math.min(maxLen, string.length())) +  abbreviation)
+          .replaceAll("\\r\\n|\\n", "_");
+    } else {
+      return (string.substring(0, Math.min(maxLen, string.length())) ).replaceAll("\\r\\n|\\n", "_");
+    }
+
   }
 
   public static Point OrthogonalPoint(double x1, double y1, double x2, double y2, double r) {
     Point ret;
 
     if (x1 == x2) {
-      ret = y1 > y2 ? Point.from(x1 - r, y1) : Point.from(x1 + r, y1);
+      if (y1 > y2) {
+        ret = Point.from(x1 - r, y1);
+      } else {
+        ret = Point.from(x1 + r, y1);
+      }
     }
     else if (y1 == y2) {
-      ret = x1 > x2 ? Point.from(x1, y1 + r) : Point.from(x1, y1 - r);
+      if (x1 > x2 ) {
+        ret = Point.from(x1, y1 + r);
+      } else {
+        ret = Point.from(x1, y1 - r);
+      }
     }
     else {
       double m = -(x1 - x2) / (y1 - y2);
       double n = y1 - m * x1;
       double p = (2 * m * n - 2 * m * y1 - 2 * x1) / (1 + m * m);
       double q = (-2 * n * y1 + y1 * y1 - r * r + n * n + x1 * x1) / (1 + m * m);
-      double s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * (r > 0 ? 1 : -1);
-      double s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * (r > 0 ? 1 : -1);
+      double s1;
+      double s2;
+      if (r > 0) {
+        s1 = -p * .5 + Math.sqrt(p * p * .25 - q);
+        s2 = -p * .5 - Math.sqrt(p * p * .25 - q);
+      } else {
+        s1 = -p * .5 + Math.sqrt(p * p * .25 - q) * -1;
+        s2 = -p * .5 - Math.sqrt(p * p * .25 - q) * -1;
+      }
       double dm = (y1 - y2) / Math.abs(x1 - x2);
-      double s = dm > 0 ? s2 : s1;
+      double s;
+      if (dm > 0) {
+        s = s2;
+      } else {
+        s = s1;
+      }
       ret = Point.from(s, m * s + n);
     }
     return ret;
@@ -367,12 +405,17 @@ public final class Util {
     return depth;
   }
 
+  //TODO Do you need the levels parameter??
   public static List<Widget> ancestors(Widget widget, int levels) {
     Assert.notNull(widget);
     int lvl = 0;
+    Widget w = widget.parent();
     List<Widget> ret = Util.newArrayList();
-    while ((widget = widget.parent()) != null && ++lvl <= levels)
-      ret.add(widget);
+    while (w != null && lvl <= levels) {
+      ret.add(w);
+      lvl++;
+      w = w.parent();
+    }
     return ret;
   }
 
@@ -401,12 +444,12 @@ public final class Util {
   public static String treeDesc(Widget root, int indent, Tag<?>... tags) {
     Assert.notNull(root, tags);
     StringBuilder sb = new StringBuilder();
-    for (Widget w : makeIterable(new WidgetIterator(root, new DFNavigator()))) {
+    for (Widget w: makeIterable(new WidgetIterator(root, new DFNavigator()))) {
       for (int i = 0; i < depth(w) * indent; i++) {
         sb.append(' ');
       }
 
-      for (Tag<?> t : tags) {
+      for (Tag<?> t: tags) {
         sb.append(w.get(t, null)).append(", ");
       }
 
@@ -446,15 +489,33 @@ public final class Util {
     }
 
     Comparator<Widget> comp = new Comparator<Widget>() {
-      final static int WORSE = -1, BETTER = 1, EVEN = 0;
+      static final int WORSE = -1, BETTER = 1, EVEN = 0;
 
       public int compare(Widget w1, Widget w2) {
         Shape s1 = w1.get(Tags.Shape, null);
         Shape s2 = w2.get(Tags.Shape, null);
-        double a1 = s1 == null ? -1 : Util.area(s1);
-        double a2 = s2 == null ? -1 : Util.area(s2);
-        return a1 < a2 ? WORSE : (a1 > a2 ? BETTER : EVEN);
-      }
+        double a1;
+        if (s1 == null) {
+          a1 = -1;
+        } else {
+          a1 = Util.area(s1);
+        }
+        double a2;
+        if (s2 == null) {
+          a2 = -1;
+        } else {
+          a2 = Util.area(s2);
+        }
+        if (a1 < a2) {
+          return WORSE;
+        } else {
+          if (a1 > a2) {
+            return BETTER;
+          } else {
+            return EVEN;
+          }
+        }
+       }
     };
 
     candidates.sort(comp);
@@ -463,7 +524,7 @@ public final class Util {
 
   public static Set<Widget> widgetsFromPoint(State state, double x, double y) {
     Set<Widget> ret = new HashSet<Widget>();
-    for (Widget w : Assert.notNull(state)) {
+    for (Widget w: Assert.notNull(state)) {
       if (w.get(Tags.HitTester, Util.FalseTester).apply(x, y)) {
         ret.add(w);
       }
@@ -476,7 +537,7 @@ public final class Util {
     Set<Widget> ret = new HashSet<Widget>();
     Shape shape;
     Rect rect;
-    for (Widget w : state) {
+    for (Widget w: state) {
       shape = w.get(Tags.Shape);
       if (shape != null) {
         rect = Rect.from(shape.x(), shape.y(), shape.width(), shape.height());
@@ -490,7 +551,8 @@ public final class Util {
 
   public static boolean isAncestorOf(Widget ancestor, Widget of) {
     while (of != null) {
-      if ((of = of.parent()) == ancestor) {
+      of = of.parent();
+      if (of == ancestor) {
         return true;
       }
     }
@@ -509,7 +571,7 @@ public final class Util {
     Assert.notNull(state, action);
     List<Finder> targetFinders = action.get(Tags.Targets, new ArrayList<Finder>());
     List<Widget> ret = Util.newArrayList();
-    for (Finder f : targetFinders) {
+    for (Finder f: targetFinders) {
       ret.add(f.apply(state));
     }
     return ret;
@@ -517,7 +579,7 @@ public final class Util {
 
   public static List<File> getAllFiles(List<File> dirs, String extension) {
     List<File> files = Util.newArrayList();
-    for (File f : dirs) {
+    for (File f: dirs) {
       files.addAll(getAllFiles(f, extension));
     }
     return files;
@@ -530,7 +592,7 @@ public final class Util {
   }
 
   public static void getAllFiles(File dir, String extension, List<File> fileList) {
-    for (File f : dir.listFiles()) {
+    for (File f: dir.listFiles()) {
       if (f.getName().endsWith(extension)) {
         fileList.add(f);
       }
@@ -616,7 +678,6 @@ public final class Util {
     }
   }
 
-
   public static void delete(String fileOrDirectory) throws IOException {
     delete(new File(fileOrDirectory));
   }
@@ -632,7 +693,7 @@ public final class Util {
     if (fileOrDirectory.isDirectory()) {
       File[] files = fileOrDirectory.listFiles();
       if (files != null) {
-        for (File f : files) {
+        for (File f: files) {
           delete(f);
         }
       }
@@ -715,7 +776,7 @@ public final class Util {
 
       File[] files = fileOrDirectory.listFiles();
       if (files != null) {
-        for (File f : files) {
+        for (File f: files) {
           copyToDirectory(f, copyDir, null,
               compress);
         }
@@ -728,7 +789,7 @@ public final class Util {
 
   // refactored from testar -> ProtocolEditor (by urueda)
   public static void compileJava(String destDir, List<File> dir, String classPath) {
-    for (File f : dir) {
+    for (File f: dir) {
       System.out.println("Compile Java: " + f.getAbsolutePath() + " -cp = " + classPath);
     }
     try {
@@ -794,18 +855,16 @@ public final class Util {
             null,
             compilationUnits);
         if (!task.call()) {
-          for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
+          for (Diagnostic<?> diagnostic: diagnostics.getDiagnostics()) {
             System.err.format("Error on line %d in %s",
                 diagnostic.getLineNumber(), diagnostic);
           }
           throw new RuntimeException("compile errors");
         }
-      }
-      finally {
+      } finally {
         fileManager.close();
       }
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException("Exception: " + t.getMessage());
     }
@@ -825,54 +884,59 @@ public final class Util {
     return o1 == o2 || (o1 != null && o1.equals(o2));
   }
 
-  public static int hashCode(Object o) {
-    return o == null ? 0 : o.hashCode();
+  public static int hashCode(Object obj) {
+    if (obj == null) {
+      return 0;
+    } else {
+      return obj.hashCode();
+    }
   }
 
-  public static String toString(Object o) {
-    if (o == null) {
+  public static String toString(Object obj) {
+    if (obj == null) {
       return "null";
     }
 
-    if (o instanceof boolean[]) {
-      return Arrays.toString((boolean[]) o);
+    if (obj instanceof boolean[]) {
+      return Arrays.toString((boolean[]) obj);
     }
-    else if (o instanceof byte[]) {
-      return Arrays.toString((byte[]) o);
+    else if (obj instanceof byte[]) {
+      return Arrays.toString((byte[]) obj);
     }
-    else if (o instanceof char[]) {
-      return Arrays.toString((char[]) o);
+    else if (obj instanceof char[]) {
+      return Arrays.toString((char[]) obj);
     }
-    else if (o instanceof short[]) {
-      return Arrays.toString((short[]) o);
+    else if (obj instanceof short[]) {
+      return Arrays.toString((short[]) obj);
     }
-    else if (o instanceof int[]) {
-      return Arrays.toString((int[]) o);
+    else if (obj instanceof int[]) {
+      return Arrays.toString((int[]) obj);
     }
-    else if (o instanceof long[]) {
-      return Arrays.toString((long[]) o);
+    else if (obj instanceof long[]) {
+      return Arrays.toString((long[]) obj);
     }
-    else if (o instanceof float[]) {
-      return Arrays.toString((float[]) o);
+    else if (obj instanceof float[]) {
+      return Arrays.toString((float[]) obj);
     }
-    else if (o instanceof double[]) {
-      return Arrays.toString((double[]) o);
+    else if (obj instanceof double[]) {
+      return Arrays.toString((double[]) obj);
     }
-    else if (o instanceof Object[]) {
-      return Arrays.toString((Object[]) o);
+    else if (obj instanceof Object[]) {
+      return Arrays.toString((Object[]) obj);
     }
     else {
-      return o.toString();
+      return obj.toString();
     }
   }
 
   public static File generateUniqueFile(String dir, String prefix) {
     Assert.notNull(dir, prefix);
-    //int i = 0;
-    int i = 1; // by urueda
-    File f;
-    while ((f = new File(dir + File.separator + prefix + i)).exists())
+    int i = 1;
+    File f = new File(dir + File.separator + prefix + i);
+    while (f.exists()) {
       i++;
+      f = new File(dir + File.separator + prefix + i);
+    }
     return f;
   }
 
@@ -923,7 +987,7 @@ public final class Util {
   public static <T> ArrayList<T> newArrayList(T... elements) {
     Assert.notNull(elements);
     ArrayList<T> ret = new ArrayList<>();
-    for (T el : elements) {
+    for (T el: elements) {
       ret.add(el);
     }
     return ret;
@@ -948,5 +1012,4 @@ public final class Util {
     System.arraycopy(second, 0, result, first.length, second.length);
     return result;
   }
-
 }

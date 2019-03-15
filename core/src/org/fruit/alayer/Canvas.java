@@ -28,7 +28,6 @@
 
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -40,7 +39,7 @@ import org.fruit.Pair;
  * A Canvas is a surface onto which you can draw e.g. lines, rectangles and circles.
  * It serves as a way to visualize e.g. <code>Action</code>'s and the <code>Shape</code> of
  * <code>Widget</code>'s.
- * 
+ *
  * @see Pen
  * @see Visualizer
  */
@@ -49,8 +48,8 @@ public interface Canvas {
     double height();
     double x();
     double y();
-	void begin();
-	void end();
+  void begin();
+  void end();
     void line(Pen pen, double x1, double y1, double x2, double y2);
     void text(Pen pen, double x, double y, double angle, String text);
     Pair<Double, Double> textMetrics(Pen pen, String text);

@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 /**
@@ -37,13 +36,13 @@ package nl.ou.testar.a11y.wcag2;
  */
 public final class UnderstandablePrinciple extends AbstractPrinciple {
 
-	private static final long serialVersionUID = 3077337682375890558L;
+  private static final long serialVersionUID = 3077337682375890558L;
 
-	UnderstandablePrinciple() {
-		super(3, "Understandable");
-		guidelines.add(new ReadableGuideline(this));
-		guidelines.add(new PredictableGuideline(this));
-		guidelines.add(new InputAssistanceGuideline(this));
-	}
+  UnderstandablePrinciple() {
+    super(3, "Understandable");
+    guidelines.add(new ReadableGuideline(this));
+    guidelines.add(new PredictableGuideline(this));
+    guidelines.add(new InputAssistanceGuideline(this));
+  }
 
 }

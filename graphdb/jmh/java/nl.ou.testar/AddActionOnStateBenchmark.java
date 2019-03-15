@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar;
 
 import org.fruit.alayer.Action;
@@ -40,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class AddActionOnStateBenchmark {
-
 
     OrientDBRepository graphFactory;
 

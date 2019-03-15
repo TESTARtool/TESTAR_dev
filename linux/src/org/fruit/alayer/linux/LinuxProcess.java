@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux;
 
 import java.io.BufferedReader;
@@ -61,18 +60,14 @@ import org.fruit.alayer.linux.util.xdotools;
  */
 public class LinuxProcess extends SUTBase {
 
-
     //region Global variables
-
 
     private static final String Command_AllProcesses = "ps -axo pid,pcpu,size,comm";
     private static final String Command_KillProcess = "kill %1$d";
     private static final String Command_FindProcess = "ps -p %1$d -o pid,pcpu,size,comm";
     private static final String Command_FindProcessName = "ps -p %1$d -o pid,cmd";
 
-
     private static final String EmptyString = "";
-
 
     private static final int PidIndex = 0;
     private static final int CpuIndex = 1;
@@ -82,22 +77,16 @@ public class LinuxProcess extends SUTBase {
     private static final int ProcessInfoNameLength = 2;
     private static final int ProcessInfoLength = 4;
 
-
     private Process _process;
-
 
     private final Keyboard _kbd = AWTKeyboard.build();
     private final Mouse _mouse = AWTMouse.build();
 
-
     //endregion
-
 
     //region Properties
 
-
     private long _pid;
-
 
     /**
      * Gets the PID of the Linux process.
@@ -107,12 +96,9 @@ public class LinuxProcess extends SUTBase {
         return _pid;
     }
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Private constructor.
@@ -123,7 +109,6 @@ public class LinuxProcess extends SUTBase {
         retrievePid(p);
     }
 
-
     /**
      * Creates a Linux process from a PID.
      * @param pid The PID of the Linux process.
@@ -132,12 +117,9 @@ public class LinuxProcess extends SUTBase {
         _pid = pid;
     }
 
-
     //endregion
 
-
     //region Other needed functionality
-
 
     /**
      * Retrieves a LinuxProcess instance from a path.
@@ -147,7 +129,7 @@ public class LinuxProcess extends SUTBase {
      */
     public static LinuxProcess fromExecutable(String path) throws SystemStartException {
 
-        try{
+        try {
 
             Assert.notNull(path);
 
@@ -165,12 +147,11 @@ public class LinuxProcess extends SUTBase {
                 throw new SystemStartException(new FruitException(e.getMessage()));
             }
 
-        }catch(FruitException fe){
+        } catch(FruitException fe) {
             throw new SystemStartException(fe);
         }
 
     }
-
 
     /**
      * Retrieves a list of available running SUT processes on this machine.
@@ -178,41 +159,33 @@ public class LinuxProcess extends SUTBase {
      */
     public static List<SUT> fromAll() {
 
-
         List<SUT> suts = new ArrayList<>();
-
 
         // Get a list of all running processes on this Unix machine by using a terminal command and parsing the output.
         List<String[]> processInfos =  runProcessCommand(Command_AllProcesses);
-
 
         if (processInfos == null) {
             return null;
         }
 
-
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lp = parseProcess(pi);
 
-            if (lp != null){
+            if (lp != null) {
                 suts.add(lp);
             }
 
         }
-
 
         // The calling code expects null when the list is empty.
         if (suts.isEmpty()) {
             return null;
         }
 
-
         return suts;
 
-
     }
-
 
     /**
      * Determines whether the Linux process is active/ in the foreground.
@@ -222,7 +195,6 @@ public class LinuxProcess extends SUTBase {
         return isActive(this);
     }
 
-
     /**
      * Determines whether the Linux process is active/ in the foreground.
      * @param pid The PID of the Linux process which to check the active state for.
@@ -231,7 +203,6 @@ public class LinuxProcess extends SUTBase {
     public static boolean isActive(long pid) {
        return isActive(fromPid(pid));
     }
-
 
     /**
      * Determines whether the Linux process is active/ in the foreground.
@@ -250,7 +221,6 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     /**
      * Tries to activate/ bring to the foreground the window associated with this Linux process.
      * @return True if the process's window got activated/ moved to the foreground successfully; False otherwise.
@@ -258,7 +228,6 @@ public class LinuxProcess extends SUTBase {
     public boolean activate() {
         return activate(this);
     }
-
 
     /**
      * Tries to activate/ bring to the foreground the window associated with the Linux process that hold the specified PID.
@@ -269,7 +238,6 @@ public class LinuxProcess extends SUTBase {
         return activate(fromPid(pid));
     }
 
-
     /**
      * Tries to activate/ bring to the foreground the window associated with the supplied Linux process.
      * @param lp The Linux process of which the window needs to be activated/ brought to the foreground.
@@ -277,45 +245,37 @@ public class LinuxProcess extends SUTBase {
      */
     public static boolean activate(LinuxProcess lp) {
 
-
         if (lp == null) {
             return false;
         } else if (!lp.isRunning()) {
             return false;
         }
 
-
         // Assumptions:
         // - There are window manager on unix systems that don't support Alt+Tab to switch application windows.
         // - Active window is the same as foreground window on Unix systems.
         // - The name of the application is in the LinuxProcess's description which should contain the filepath.
-
 
         // No need to activate if it's already the active window.
         if (lp.isActive()) {
             return true;
         }
 
-
         // To activate the application through AT-SPI we need to know the application's name.
         String applicationName = lp.get(Tags.Desc).substring(lp.get(Tags.Desc).lastIndexOf("/") + 1);
-
 
         // There may be multiple instances of the same application running - therefore a list is returned with
         // application nodes with the same name.
         List<AtSpiAccessible> applicationNodes = TreeWalker.getApplicationNodes(applicationName);
-
 
         if (applicationNodes.size() == 0) {
             System.out.println("Could not find any applications with the name '" + applicationName + "'.");
             return false;
         }
 
-
         // Activate each application through AT-SPI and find the PID for each active application through xdotool.
         // Once verified that the node activated the instance of the application launched by us - stop.
-        for (AtSpiAccessible application : applicationNodes) {
-
+        for (AtSpiAccessible application: applicationNodes) {
 
             // Activate application.
             if (TreeWalker.activateApplication(application)) {
@@ -327,62 +287,51 @@ public class LinuxProcess extends SUTBase {
                     e.printStackTrace();
                 }
 
-
                 // Retrieve PID through xdotool.
                 int pid = xdotools.getPIDFromActiveWindow();
-
 
                 // Check if the PID matches the PID of the process we're supposed to activate.
                 if (pid == lp.get_pid()) {
                     return true;
                 }
 
-
             } else {
                 System.out.println("Cannot activate an application with the same name - continuing loop...");
             }
 
-
         }
-
 
         // Could not find or activate the application we launched.
         System.out.println("Could not find or activate the application!");
         return false;
 
-
     }
-
 
     /**
      * Retrieves the memory usage for a given Linux process.
      * @param lp The Linux process to retrieve the memory usage for.
      * @return The memory the Linux process uses; 0 otherwise.
      */
-    public static long getMemUsage(LinuxProcess lp){
+    public static long getMemUsage(LinuxProcess lp) {
 
-
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("SUT is not running - cannot retrieve RAM usage!");
             return 0;
         }
 
-
         List<String[]> processInfos =  runProcessCommand(String.format(Command_FindProcess, lp.get_pid()));
-
 
         if (processInfos == null || processInfos.isEmpty()) {
             System.out.println("Running command to find process info failed - cannot retrieve RAM usage!");
             return 0;
         }
 
-
         // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the memory usage.
                 if (JavaHelper.tryParseInt(pi[SizeIndex])) {
@@ -392,7 +341,6 @@ public class LinuxProcess extends SUTBase {
                     return 0;
                 }
 
-
             }
 
         }
@@ -400,39 +348,33 @@ public class LinuxProcess extends SUTBase {
         System.out.println("Could not find the process info - cannot retrieve RAM usage!");
         return 0;
 
-
     }
-
 
     /**
      * Retrieves the cpu usage for a given Linux process.
      * @param lp The Linux process to retrieve the cpu usage for.
      * @return The cpu the Linux process uses; 0 otherwise.
      */
-    public static double getCpuUsage(LinuxProcess lp){
+    public static double getCpuUsage(LinuxProcess lp) {
 
-
-        if (!lp.isRunning()){
+        if (!lp.isRunning()) {
             System.out.println("SUT is not running - cannot retrieve CPU usage!");
             return 0;
         }
 
-
         List<String[]> processInfos =  runProcessCommand(String.format(Command_FindProcess, lp.get_pid()));
-
 
         if (processInfos == null || processInfos.isEmpty()) {
             System.out.println("Running command to find process info failed - cannot retrieve CPU usage!");
             return 0;
         }
 
-
         // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-        for(String[] pi : processInfos) {
+        for (String[] pi: processInfos) {
 
             LinuxProcess lpe = parseProcess(pi);
 
-            if (lpe != null && lpe.get_pid() == lp.get_pid()){
+            if (lpe != null && lpe.get_pid() == lp.get_pid()) {
 
                 // Parse the current processInfo and extract the cpu usage.
                 if (JavaHelper.tryParseDouble(pi[CpuIndex])) {
@@ -442,7 +384,6 @@ public class LinuxProcess extends SUTBase {
                     return 0;
                 }
 
-
             }
 
         }
@@ -450,9 +391,7 @@ public class LinuxProcess extends SUTBase {
         System.out.println("Could not find the process info - cannot retrieve CPU usage!");
         return 0;
 
-
     }
-
 
     /**
      * Creates a Linux process from a PID.
@@ -471,7 +410,6 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     /**
      * Gets a name for the Linux process.
      * @return The name of the Linux process.
@@ -479,7 +417,6 @@ public class LinuxProcess extends SUTBase {
     public String getProcessName() {
         return getProcessName(_pid);
     }
-
 
     /**
      * Most likely called when garbage collected.
@@ -489,12 +426,9 @@ public class LinuxProcess extends SUTBase {
         //stop();
     }
 
-
     //endregion
 
-
     //region Helper functions
-
 
     /**
      * Retrieve the PID on unix/linux systems
@@ -502,8 +436,7 @@ public class LinuxProcess extends SUTBase {
      */
     private void retrievePid(Process p) {
 
-
-        if(p.getClass().getName().equals("java.lang.UNIXProcess")) {
+        if (p.getClass().getName().equals("java.lang.UNIXProcess")) {
 
             try {
                 Field f = p.getClass().getDeclaredField("pid");
@@ -515,9 +448,7 @@ public class LinuxProcess extends SUTBase {
 
         }
 
-
     }
-
 
     /**
      * Parses a process info String array into a Linux Process.
@@ -526,21 +457,17 @@ public class LinuxProcess extends SUTBase {
      */
     private static LinuxProcess parseProcess(String[] processInfo) {
 
-
         if (processInfo.length != ProcessInfoLength) {
             // Missing process info - can't be certain to parse correctly.
             return null;
         }
-
 
         if (!JavaHelper.tryParseInt(processInfo[PidIndex])) {
             // Can't parse the first entry as the PID.
             return null;
         }
 
-
         int pid = Integer.parseInt(processInfo[PidIndex]);
-
 
         if (pid <= 0) {
             //Invalid PID.
@@ -548,9 +475,7 @@ public class LinuxProcess extends SUTBase {
         }
         return new LinuxProcess(pid);
 
-
     }
-
 
     /**
      * Runs a (process) command and returns the received process infos as a String array.
@@ -559,26 +484,21 @@ public class LinuxProcess extends SUTBase {
      */
     private static List<String[]> runProcessCommand(String command) {
 
-
         ArrayList<String[]> processInfos = new ArrayList<>();
 
         try {
 
-
             // Run the command.
             Process p = Runtime.getRuntime().exec(command);
 
-
             // Get the stream to read the command output from.
             BufferedReader commandOutputReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
 
             // Read the output as lines - omit the first (header) line.
             String processLine = commandOutputReader.readLine();
 
             if (processLine != null) {
                 while ((processLine = commandOutputReader.readLine()) != null) {
-
 
                     // Remove duplicate whitespace and remove leading and trailing whitespace.
                     processLine = processLine.replaceAll("\\s+", " ");
@@ -589,11 +509,9 @@ public class LinuxProcess extends SUTBase {
 
                     processInfos.add(processInfo);
 
-
                 }
             }
             return processInfos;
-
 
         } catch (IOException e) {
             // Can ignore the error - return null.
@@ -602,35 +520,28 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     /**
      * Creates a list of running Linux processes in a different kind of representation.
      * @return A list of Linux process representations of type LinuxProcessHandle.
      */
-    private static List<LinuxProcessHandle> runningProcesses(){
-
+    private static List<LinuxProcessHandle> runningProcesses() {
 
         // Retrieve a list of LinuxProcesses.
         List<SUT> linuxProcesses = fromAll();
         List<LinuxProcessHandle> linuxProcessHandles = new ArrayList<>();
 
-
         if (linuxProcesses == null) {
             return linuxProcessHandles;
         }
 
-
         // Convert the list to a list of LinuxProcessHandles.
-        for (SUT lp : linuxProcesses) {
+        for (SUT lp: linuxProcesses) {
             linuxProcessHandles.add(new LinuxProcessHandle((LinuxProcess)lp));
         }
 
-
         return linuxProcessHandles;
 
-
     }
-
 
     /**
      * Gets a name for the Linux process.
@@ -639,24 +550,18 @@ public class LinuxProcess extends SUTBase {
      */
     private static String getProcessName(long pid) {
 
-
         ArrayList<String[]> processInfos = new ArrayList<>();
 
-
         try {
-
 
             // Run the command
             Process p = Runtime.getRuntime().exec(String.format(Command_FindProcessName, pid));
 
-
             // Get the stream to read the command output from.
             BufferedReader commandOutputReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-
             // Read the output as lines - omit the first (header) line.
             String processLine = commandOutputReader.readLine();
-
 
             if (processLine != null) {
                 while ((processLine = commandOutputReader.readLine()) != null) {
@@ -669,14 +574,11 @@ public class LinuxProcess extends SUTBase {
 
                     processInfos.add(processInfo);
 
-
                 }
             }
 
-
             // Parse the process infos - find the pid and get the name.
-            for (String[] pi : processInfos) {
-
+            for (String[] pi: processInfos) {
 
                 // Ignore all items that don't have the right length.
                 if (pi.length != ProcessInfoNameLength) {
@@ -688,9 +590,7 @@ public class LinuxProcess extends SUTBase {
                     continue;
                 }
 
-
                 int pidInternal = Integer.parseInt(pi[PidIndex]);
-
 
                 if (pidInternal == pid) {
                     // The remainder should be the process name.
@@ -698,7 +598,6 @@ public class LinuxProcess extends SUTBase {
                 }
 
             }
-
 
         } catch (IOException e) {
             // Can ignore the error - return empty string.
@@ -708,24 +607,18 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     @Override
     public String toString() {
         return getStatus();
     }
 
-
     //endregion
 
-
     //region SUT implementation
-
 
     /**
      * Stops the process.
@@ -754,7 +647,6 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     /**
      * Checks whether the process is still running.
      * @return True if the process is running; False otherwise.
@@ -770,18 +662,16 @@ public class LinuxProcess extends SUTBase {
             // Get a list of running processes with the given PID.
             List<String[]> processInfos =  runProcessCommand(String.format(Command_FindProcess, _pid));
 
-
             if (processInfos == null) {
                 return false;
             }
 
-
             // Lets assume that it could happen that multiple lines are returned - parse and find the requested PID.
-            for(String[] pi : processInfos) {
+            for (String[] pi: processInfos) {
 
                 LinuxProcess lp = parseProcess(pi);
 
-                if (lp != null && lp.get_pid() == _pid){
+                if (lp != null && lp.get_pid() == _pid) {
                     return true;
                 }
 
@@ -792,7 +682,6 @@ public class LinuxProcess extends SUTBase {
         return false;
 
     }
-
 
     /**
      * The status of the process.
@@ -809,12 +698,9 @@ public class LinuxProcess extends SUTBase {
 
     }
 
-
     //endregion
 
-
     //region Tag overrides
-
 
     /**
      * Most likely implements the retrieval of the Tags specified in the method tagDomain.
@@ -823,27 +709,26 @@ public class LinuxProcess extends SUTBase {
      * @return The value of the tag to retrieve.
      */
     @SuppressWarnings("unchecked")
-    protected <T> T fetch(Tag<T> tag){
-        if(tag.equals(Tags.StandardKeyboard))
+    protected <T> T fetch(Tag<T> tag) {
+        if (tag.equals(Tags.StandardKeyboard)) {
             return (T)_kbd;
-        else if(tag.equals(Tags.StandardMouse))
+        } else if (tag.equals(Tags.StandardMouse)) {
             return (T)_mouse;
-        else if(tag.equals(Tags.PID))
+        } else if (tag.equals(Tags.PID)) {
             return (T)(Long)_pid;
-        else if(tag.equals(Tags.ProcessHandles))
+        } else if (tag.equals(Tags.ProcessHandles)) {
             return (T)runningProcesses().iterator();
-        else if(tag.equals(Tags.SystemActivator))
+        } else if (tag.equals(Tags.SystemActivator)) {
             return (T) new LinuxProcessActivator(_pid);
+        }
         return null;
     }
-
 
     /**
      * Most likely adds new tags to instances of this class.
      * @return A new set of tags to be added to instances of this class.
      */
-    @SuppressWarnings("Duplicates")
-    protected Set<Tag<?>> tagDomain(){
+    protected Set<Tag<?>> tagDomain() {
         Set<Tag<?>> ret = Util.newHashSet();
         ret.add(Tags.StandardKeyboard);
         ret.add(Tags.StandardMouse);
@@ -853,12 +738,11 @@ public class LinuxProcess extends SUTBase {
         return ret;
     }
 
-
     //endregion
 
     /**
      * @author: urueda
      */
-	@Override public void setNativeAutomationCache() {}
+  @Override public void setNativeAutomationCache() {}
 
 }

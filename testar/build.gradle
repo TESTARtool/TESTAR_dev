@@ -34,18 +34,29 @@ dependencies {
     compile project(':core')
     compile project(':native')
     compile project(':graphdb')
+    compile project(':tgherkin')
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
+    compile files('./lib/jul-to-slf4j-1.7.2.jar')
+    compile files('./lib/asm-3.3.1.jar')
+    compile files('./lib/commons-io-2.6.jar')
+    compile files('./lib/cglib-2.2.2.jar')
+    compile files('./lib/jai_imageio-1.1.jar')
+    compile files('./lib/jai-imageio-core-1.4.0.jar')
+    compile files('./lib/jna-4.2.2.jar')
+    compile group: 'net.sourceforge.tess4j', name: 'tess4j', version: '4.0.0'
     compile 'com.1stleg:jnativehook:2.1.0'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 }
+
 evaluationDependsOn(':windows')
 
 task prepareSettings(type: Copy) {
     from 'resources/settings'
-    into 'target/scripts/settings'
+    into 'target/scripts/resources/settings'
 }
 
 task prepareOracles(type: Copy) {
@@ -55,7 +66,7 @@ task prepareOracles(type: Copy) {
 
 task prepareOutputFolder(type: Copy) {
     from 'resources/output'
-    into 'target/scripts/output'
+    into 'target/scripts/resources/output'
 }
 
 /**
@@ -86,6 +97,7 @@ startScripts {
 startScripts.dependsOn {
     tasks.findAll { task -> task.name.startsWith('prepare')}
 }
+
 
 //running testar requires the distribution to be installed.
 runTestar.dependsOn(installDist)

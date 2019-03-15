@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -46,39 +45,41 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  */
 public final class CompatibleGuideline extends AbstractGuideline {
 
-	private static final long serialVersionUID = -8328191457523354317L;
+  private static final long serialVersionUID = -8328191457523354317L;
 
-	CompatibleGuideline(AbstractPrinciple parent) {
-		super(1, "Compatible", parent);
-		criteria.add(new SuccessCriterion(1, "Parsing",
-				this, Level.A, "ensure-compat-parses"));
-		criteria.add(new SuccessCriterion(2, "Name, Role, Value",
-				this, Level.A, "ensure-compat-rsv"));
-	}
-	
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		SuccessCriterion sc = getSuccessCriterionByName("Name, Role, Value");
-		for (Widget w : widgets) {
-			// exclude images, they are handled by guideline "Text Alternatives"
-			if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
-				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-						"Missing name", w));
-			}
-			else {
-				results.add(evaluationPassed(sc));
-			}
-			if (AccessibilityUtil.isRoleUnknown(w)) {
-				results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-						"Unknown widget role \"" + w.get(Tags.Role).name() +
-						"\" for \"" + w.get(Tags.Title) + "\"", w));
-			}
-			else {
-				results.add(evaluationPassed(sc));
-			}
-		}
-		return results;
-	}
+  CompatibleGuideline(AbstractPrinciple parent) {
+    super(1, "Compatible", parent);
+    List<SuccessCriterion> criteria = getCriteria();
+    criteria.add(new SuccessCriterion(1, "Parsing",
+        this, Level.A, "ensure-compat-parses"));
+    criteria.add(new SuccessCriterion(2, "Name, Role, Value",
+        this, Level.A, "ensure-compat-rsv"));
+    setCriteria(criteria);
+  }
+
+  @Override
+  public EvaluationResults evaluate(List<Widget> widgets) {
+    EvaluationResults results = new EvaluationResults();
+    SuccessCriterion sc = getSuccessCriterionByName("Name, Role, Value");
+    for (Widget w: widgets) {
+      // exclude images, they are handled by guideline "Text Alternatives"
+      if (!AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
+        results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+            "Missing name", w));
+      }
+      else {
+        results.add(evaluationPassed(sc));
+      }
+      if (AccessibilityUtil.isRoleUnknown(w)) {
+        results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+            "Unknown widget role \"" + w.get(Tags.Role).name() +
+            "\" for \"" + w.get(Tags.Title) + "\"", w));
+      }
+      else {
+        results.add(evaluationPassed(sc));
+      }
+    }
+    return results;
+  }
 
 }

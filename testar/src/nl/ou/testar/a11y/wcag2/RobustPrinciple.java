@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 /**
@@ -37,11 +36,11 @@ package nl.ou.testar.a11y.wcag2;
  */
 public final class RobustPrinciple extends AbstractPrinciple {
 
-	private static final long serialVersionUID = -2224829303994308725L;
+  private static final long serialVersionUID = -2224829303994308725L;
 
-	RobustPrinciple() {
-		super(4, "Robust");
-		guidelines.add(new CompatibleGuideline(this));
-	}
+  RobustPrinciple() {
+    super(4, "Robust");
+    guidelines.add(new CompatibleGuideline(this));
+  }
 
 }

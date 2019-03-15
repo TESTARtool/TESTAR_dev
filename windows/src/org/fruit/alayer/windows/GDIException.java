@@ -27,16 +27,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
 package org.fruit.alayer.windows;
 
 public final class GDIException extends WinApiException {
-	private static final long serialVersionUID = 1L;
-	public GDIException(String message) { super(message); }
-	public GDIException(int statusCode) {
-		super(Windows.Gdiplus_Status2String(statusCode));
-	}
+  private static final long serialVersionUID = 1L;
+  public GDIException(String message) {
+    super(message);
+  }
+  public GDIException(int statusCode) {
+    super(Windows.Gdiplus_Status2String(statusCode));
+  }
 }

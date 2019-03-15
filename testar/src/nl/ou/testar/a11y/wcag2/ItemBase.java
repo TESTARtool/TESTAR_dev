@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.io.Serializable;
@@ -40,68 +39,72 @@ import org.fruit.Assert;
  *
  */
 abstract class ItemBase implements Serializable {
-	
-	private static final long serialVersionUID = 3593969061710272565L;
 
-	/**
-	 * This item's numbe
-	 */
-	protected final int nr;
-	
-	/**
-	 * This item's name.
-	 */
-	protected final String name;
-	
-	/**
-	 * This item's parent
-	 * This can be null if the item has no parent.
-	 */
-	protected final ItemBase parent;
-	
-	/**
-	 * Constructs a new item
-	 * @param nr Item number
-	 * @param name Item name
-	 */
-	protected ItemBase(int nr, String name) {
-		this(nr, name, null);
-	}
-	
-	/**
-	 * Constructs a new item
-	 * @param nr Item number
-	 * @param name Item name
-	 * @param parent The parent, may be null
-	 */
-	protected ItemBase(int nr, String name, ItemBase parent) {
-		Assert.hasText(name);
-		this.nr = nr;
-		this.name = name;
-		this.parent = parent;
-	}
+  private static final long serialVersionUID = 3593969061710272565L;
 
-	/**
-	 * Gets the number
-	 * If the item is not at the top of the hierarchy, this will also include the parent's number.
-	 * For example: 1.2.3
-	 * @return This item's number as a String
-	 */
-	public String getNr() {
-		return parent == null ? Integer.toString(nr) : parent.getNr() + "." + nr;
-	}
+  /**
+   * This item's numbe
+   */
+  protected final int nr;
 
-	/**
-	 * Gets the name
-	 * @return The name
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	@Override
-	public String toString() {
-		return getNr() + " " + getName();
-	}
-	
+  /**
+   * This item's name.
+   */
+  protected final String name;
+
+  /**
+   * This item's parent
+   * This can be null if the item has no parent.
+   */
+  protected final ItemBase parent;
+
+  /**
+   * Constructs a new item
+   * @param nr Item number
+   * @param name Item name
+   */
+  protected ItemBase(int nr, String name) {
+    this(nr, name, null);
+  }
+
+  /**
+   * Constructs a new item
+   * @param nr Item number
+   * @param name Item name
+   * @param parent The parent, may be null
+   */
+  protected ItemBase(int nr, String name, ItemBase parent) {
+    Assert.hasText(name);
+    this.nr = nr;
+    this.name = name;
+    this.parent = parent;
+  }
+
+  /**
+   * Gets the number
+   * If the item is not at the top of the hierarchy, this will also include the parent's number.
+   * For example: 1.2.3
+   * @return This item's number as a String
+   */
+  public String getNr() {
+    if (parent == null) {
+      return  Integer.toString(nr) + "." + nr;
+    } else {
+      return parent.getNr() + "." + nr;
+    }
+  }
+
+  /**
+   * Gets the name
+   * @return The name
+   */
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return getNr() + " " + getName();
+  }
+
 }

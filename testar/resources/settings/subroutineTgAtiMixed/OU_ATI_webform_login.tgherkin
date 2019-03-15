@@ -1,0 +1,17 @@
+  Feature: Open University - A user applies for a master program.
+
+  Background: A user successfully logs on the the system.
+    Step: Press login button
+    When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Check whether user is logged on
+    Given $Role="UIAText" and image("resources\settings\subroutineAti\Expand.png")
+    When NOP
+    
+  Scenario: A user successfully clicks on screen.
+    Step: Focus op pagina krijgen
+    When  $Role="UIAText" and $Title="mijnOU" click(true)
+    Step: Scroll down
+    While !state($Role="UIAImage" and ocr() = "Mijn gegevens")
+    When  hitKey(VK_DOWN)
+    Step: Select Mijn Gegevens tile
+    When  $Role="UIAImage" and ocr() = "Mijn gegevens" click(true)   

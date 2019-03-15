@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -40,10 +39,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
-
 import jsyntaxpane.DefaultSyntaxKit;
-
 import org.fruit.Util;
 
 public class ProtocolEditor extends javax.swing.JDialog {
@@ -51,11 +47,11 @@ public class ProtocolEditor extends javax.swing.JDialog {
 
     private String settingsDir;
     private String protocolClass; // by urueda
-    
+
     //public ProtocolEditor() {
     public ProtocolEditor(String settingsDir, String protocolClass) { // by urueda
         this.settingsDir = settingsDir;
-    	this.protocolClass = protocolClass;
+      this.protocolClass = protocolClass;
         DefaultSyntaxKit.initKit();
         initComponents();
         codeEditor.setContentType("text/java");
@@ -71,8 +67,8 @@ public class ProtocolEditor extends javax.swing.JDialog {
         console = new javax.swing.JTextArea();
 
         // by mimarmu1
-        setTitle("Protocol editor");      
-        
+        setTitle("Protocol editor");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -88,7 +84,6 @@ public class ProtocolEditor extends javax.swing.JDialog {
         });
         jScrollPane1.setViewportView(codeEditor);
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(5);
-
 
         btnCompile.setText("Save and Compile");
         btnCompile.addActionListener(new java.awt.event.ActionListener() {
@@ -131,8 +126,7 @@ public class ProtocolEditor extends javax.swing.JDialog {
         );
 
         pack();
-    }                       
-
+    }
 
     private void compile() {
         try {
@@ -143,10 +137,10 @@ public class ProtocolEditor extends javax.swing.JDialog {
             File protocolFile = getProtocolFile();
             Util.saveToFile(codeEditor.getText(), protocolFile.getPath());
             File compileDir = protocolFile.getParentFile();
-			List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
+      List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
             Util.compileJava(settingsDir, fileList,
-            				 System.getProperty("java.class.path")); //";./monkey.jar");
-            // end bu urueda     
+                     System.getProperty("java.class.path")); //";./monkey.jar");
+            // end bu urueda
             console.setText(console.getText() + "OK");
         } catch (Throwable t) {
             console.setText(console.getText() + "\n" + t.getMessage());
@@ -166,36 +160,38 @@ public class ProtocolEditor extends javax.swing.JDialog {
 
     private void btnCompileActionPerformed(java.awt.event.ActionEvent evt) {
         compile();
-    }                                          
+    }
 
-    private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {                                      
+    private void codeEditorKeyPressed(java.awt.event.KeyEvent evt) {
         if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
             if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                 compile();
             }
-        }else if(evt.getKeyCode() == KeyEvent.VK_ESCAPE){
+        } else if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
         }
-    }                                     
+    }
 
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {                                  
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {
         try {
             //Util.saveToFile(codeEditor.getText(), "./CustomProtocol.java");
             Util.saveToFile(codeEditor.getText(), getProtocolFile().getPath()); // by urueda
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
-    }                                 
+    }
 
-    private void consoleKeyPressed(java.awt.event.KeyEvent evt) {                                   
-        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+    private void consoleKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
-    }                                  
+        }
+    }
 
-    private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {                                      
-        if(evt.getKeyCode() == KeyEvent.VK_ESCAPE)
+    private void btnCompileKeyPressed(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.dispose();
-    }                                     
+        }
+    }
 
     private javax.swing.JButton btnCompile;
     private javax.swing.JEditorPane codeEditor;

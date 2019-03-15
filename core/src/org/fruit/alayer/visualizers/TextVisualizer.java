@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 /**
  *  @author Sebastian Bauersfeld
  */
@@ -44,26 +43,26 @@ import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.exceptions.PositionException;
 
 public final class TextVisualizer implements Visualizer {
-	
-	private static final long serialVersionUID = 9156304220974950751L;
-	final Position pos;
-	final String text;
-	final Pen pen;
-	
-	public TextVisualizer(Position pos, String text, Pen pen){
-		Assert.notNull(pos, text, pen);
-		this.pos = pos;
-		this.text = text;
-		this.pen = pen;
-	}
-	
-	public void run(State state, Canvas cv, Pen pen) {
-		Assert.notNull(state, cv, pen);
-		pen = Pen.merge(pen, this.pen);
-		try { // by urueda
-			Point p = pos.apply(state);			
-			Pair<Double, Double> m = cv.textMetrics(pen, text);
-			cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
-		} catch (PositionException pe) {}			
-	}
+
+  private static final long serialVersionUID = 9156304220974950751L;
+  final Position pos;
+  final String text;
+  final Pen pen;
+
+  public TextVisualizer(Position pos, String text, Pen pen) {
+    Assert.notNull(pos, text, pen);
+    this.pos = pos;
+    this.text = text;
+    this.pen = pen;
+  }
+
+  public void run(State state, Canvas cv, Pen pen) {
+    Assert.notNull(state, cv, pen);
+    pen = Pen.merge(pen, this.pen);
+    try { // by urueda
+      Point p = pos.apply(state);
+      Pair<Double, Double> m = cv.textMetrics(pen, text);
+      cv.text(pen, p.x() - m.left() / 2, p.y() - m.right() / 2, 0, text);
+    } catch (PositionException pe) {}
+  }
 }

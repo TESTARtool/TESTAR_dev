@@ -27,9 +27,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
-
 
 import org.bridj.Pointer;
 
@@ -38,21 +36,16 @@ import org.bridj.Pointer;
  */
 public class AtSpiRect {
 
-
     //region Properties
-
 
     public int x = 0;
     public int y = 0;
     public int width = 0;
     public int height = 0;
 
-
     //endregion
 
-
     //region Constructors
-
 
     /**
      * Default empty constructor.
@@ -61,7 +54,6 @@ public class AtSpiRect {
 
     }
 
-
     /**
      * Creates a new instance of an AtSpiRect object from a pointer.
      * @param rectPtr Pointer to the AtSpiRect object.
@@ -69,24 +61,19 @@ public class AtSpiRect {
      */
     public static AtSpiRect CreateInstance(long rectPtr) {
 
-
         if (rectPtr == 0) {
             return null;
         }
 
-
         // Create a new instance.
         AtSpiRect rObj = new AtSpiRect();
-
 
         // Fill the instance's properties.
         fillInstance(rectPtr, rObj);
 
-
         return rObj;
 
     }
-
 
     /**
      * Fills an AtSpiRect object's information.
@@ -95,10 +82,8 @@ public class AtSpiRect {
      */
     private static void fillInstance(long rectPtr, AtSpiRect rObj) {
 
-
         // Fill the properties with the information.
         Pointer<int[]> ptr = Pointer.pointerToAddress(rectPtr, int[].class, null);
-
 
         rObj.x = ptr.getIntAtIndex(0);
         rObj.y = ptr.getIntAtIndex(1);
@@ -107,12 +92,9 @@ public class AtSpiRect {
 
     }
 
-
     //endregion
 
-
     //region Object overrides
-
 
     /**
      * Returns a string representation of an AtSpiRect object.
@@ -123,8 +105,6 @@ public class AtSpiRect {
         return "(" + x + "," + y + ") - " + width + "x" + height;
     }
 
-
     //endregion
-
 
 }

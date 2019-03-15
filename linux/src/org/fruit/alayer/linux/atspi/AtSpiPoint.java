@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi;
 
 import org.bridj.Pointer;
@@ -37,14 +36,10 @@ import org.bridj.Pointer;
  */
 public class AtSpiPoint {
 
-
-
     public int x;
     public int y;
 
-
     //region Constructors
-
 
     /**
      * Default empty constructor.
@@ -53,7 +48,6 @@ public class AtSpiPoint {
 
     }
 
-
     /**
      * Creates a new instance of an AtSpiPoint object from a pointer.
      * @param pointPtr Pointer to the AtSpiPoint object.
@@ -61,24 +55,19 @@ public class AtSpiPoint {
      */
     public static AtSpiPoint CreateInstance(long pointPtr) {
 
-
         if (pointPtr == 0) {
             return null;
         }
 
-
         // Create a new instance.
         AtSpiPoint pObj = new AtSpiPoint();
-
 
         // Fill the instance's properties.
         fillInstance(pointPtr, pObj);
 
-
         return pObj;
 
     }
-
 
     /**
      * Fills an AtSpiPoint object's information.
@@ -87,23 +76,17 @@ public class AtSpiPoint {
      */
     private static void fillInstance(long pointPtr, AtSpiPoint pObj) {
 
-
         // Fill the properties with the information.
         Pointer<int[]> ptr = Pointer.pointerToAddress(pointPtr, int[].class, null);
-
 
         pObj.x = ptr.getIntAtIndex(0);
         pObj.y = ptr.getIntAtIndex(1);
 
-
     }
-
 
     //endregion
 
-
     //region Object overrides
-
 
     /**
      * Returns a string representation of an AtSpiPoint object.
@@ -114,8 +97,6 @@ public class AtSpiPoint {
         return "(" + x + "," + y + ")";
     }
 
-
     //endregion
-
 
 }

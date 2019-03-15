@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package org.fruit.alayer.linux.atspi.enums;
 
 /**
@@ -36,17 +35,14 @@ package org.fruit.alayer.linux.atspi.enums;
  */
 public enum AtSpiCoordTypes {
 
-
     /**
      * Specifies xy coordinates relative to the screen.
      */
     Screen,
 
-
     /**
      * Specifies xy coordinates relative to the widget's top-level window.
      */
     Window
-
 
 }

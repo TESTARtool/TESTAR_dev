@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package es.upv.staq.testar;
 
 import org.fruit.alayer.devices.KBKeys;
@@ -40,77 +39,79 @@ import org.jnativehook.mouse.NativeMouseMotionListener;
 
 /**
  * An event handler for the testing protocol layers.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 
 public class EventHandler implements NativeKeyListener, NativeMouseListener, NativeMouseMotionListener {
 
-	private IEventListener eventListener;
-	
-	public EventHandler(IEventListener eventListener){
-		this.eventListener = eventListener;
-	}
-	
-	// ##############################################
-	//  AbstractProtocol layer handlers (refactored)
-	// ##############################################
+  private IEventListener eventListener;
 
-	@Override
-	public final void nativeKeyPressed (NativeKeyEvent e) {
-        for (KBKeys key : KBKeys.values()) {
+  public EventHandler(IEventListener eventListener) {
+    this.eventListener = eventListener;
+  }
+
+  // ##############################################
+  //  AbstractProtocol layer handlers (refactored)
+  // ##############################################
+
+  @Override
+  public final void nativeKeyPressed (NativeKeyEvent e) {
+        for (KBKeys key: KBKeys.values()) {
             if (key.scanCode() == e.getKeyCode()) {
                 eventListener.keyDown(key);
             }
         }
     }
 
-	@Override
-	public final void nativeKeyReleased (NativeKeyEvent e) {
-        for (KBKeys key : KBKeys.values()) {
+  @Override
+  public final void nativeKeyReleased (NativeKeyEvent e) {
+        for (KBKeys key: KBKeys.values()) {
             if (key.scanCode() == e.getKeyCode()) {
                 eventListener.keyUp(key);
             }
         }
     }
 
-	@Override
-	public final void nativeMouseClicked(NativeMouseEvent arg0) {}
+  @Override
+  public final void nativeMouseClicked(NativeMouseEvent arg0) {}
 
-	@Override
-	public final void nativeMousePressed(NativeMouseEvent arg0) {
-		if(arg0.getButton() == 1)
-			eventListener.mouseDown(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
-		else if(arg0.getButton() == 2)
-			eventListener.mouseDown(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
-		else if(arg0.getButton() == 3)
-			eventListener.mouseDown(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
-	}
+  @Override
+  public final void nativeMousePressed(NativeMouseEvent arg0) {
+    if (arg0.getButton() == 1) {
+      eventListener.mouseDown(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
+    } else if (arg0.getButton() == 2) {
+      eventListener.mouseDown(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
+    } else if (arg0.getButton() == 3) {
+      eventListener.mouseDown(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
+    }
+  }
 
-	@Override
-	public final void nativeMouseReleased(NativeMouseEvent arg0) {
-		if(arg0.getButton() == 1)
-			eventListener.mouseUp(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
-		else if(arg0.getButton() == 2)
-			eventListener.mouseUp(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
-		else if(arg0.getButton() == 3)
-			eventListener.mouseUp(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
-	}
+  @Override
+  public final void nativeMouseReleased(NativeMouseEvent arg0) {
+    if (arg0.getButton() == 1) {
+      eventListener.mouseUp(MouseButtons.BUTTON1, arg0.getX(), arg0.getY());
+    } else if (arg0.getButton() == 2) {
+      eventListener.mouseUp(MouseButtons.BUTTON3, arg0.getX(), arg0.getY());
+    } else if (arg0.getButton() == 3) {
+      eventListener.mouseUp(MouseButtons.BUTTON2, arg0.getX(), arg0.getY());
+    }
+  }
 
-	// #########################################
-	//  ClickFilterLayerProtocol event handlers
-	// #########################################
-	
-	@Override
-	public void nativeMouseMoved(NativeMouseEvent e) {
-		eventListener.mouseMoved(e.getX(),e.getY());
-	}
-	
-	@Override
-	public void nativeMouseDragged(NativeMouseEvent arg0) {}
-	
-	@Override
-	public final void nativeKeyTyped(NativeKeyEvent e) {}
-        
+  // #########################################
+  //  ClickFilterLayerProtocol event handlers
+  // #########################################
+
+  @Override
+  public void nativeMouseMoved(NativeMouseEvent e) {
+    eventListener.mouseMoved(e.getX(),e.getY());
+  }
+
+  @Override
+  public void nativeMouseDragged(NativeMouseEvent arg0) {}
+
+  @Override
+  public final void nativeKeyTyped(NativeKeyEvent e) {}
+
 }

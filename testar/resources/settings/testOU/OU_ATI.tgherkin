@@ -1,0 +1,43 @@
+Feature: Open University - A user applies for a master program.
+
+Selection: $Shape.y >= xpathNumber("//widget[Role='UIAToolBar']/Shape.y + //widget[Role='UIAToolBar']/Shape.height") anyGesture()
+
+  Background: A user successfully logs on the the system.
+    Step: Press log on button
+    When  $Title="Inloggen" and $Role="UIAButton" click()
+    Step: Check whether user is logged on
+    Given $Role="UIAText" and image("resources\settings\testOU\Expand.png")
+    When NOP
+
+   Scenario Outline: A user successfully changes his account details.
+    Step: Focus op pagina krijgen
+    When  $Role="UIAText" and $Title="mijnOU" click(true)
+    Step: Scroll down
+    While !state($Role="UIAImage" and ocr() = "LOCI EVIE")
+    When  hitKey(VK_DOWN)
+    Step: Select Mijn Gegevens tile
+    When  $Role="UIAImage" and ocr() = "LOCI EVIE" click(true)
+    Step: Change voornamen
+    When  $Title="Voornamen" and $Role="UIAEdit" type(<Voornamen>)
+    Step: Change Voorvoegsel_geboortenaam
+    When  $Title="Voorvoegsel geboortenaam" and $Role="UIAEdit" type(<Voorvoegsel_geboortenaam>)
+    Step: Change Geboortenaam
+    When  $Title="Geboortenaam" and $Role="UIAEdit" type(<Geboortenaam>)
+    Step: Change Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" type(<Roepnaam>)
+    Step: Focus on Roepnaam
+    When  $Title="Roepnaam" and $Role="UIAEdit" click(true)
+    Step: scroll down
+    When  hitKey(VK_PAGE_DOWN)
+    Step: Save entered data
+    When  $Role="UIAButton" and $Title="OPSLAAN" click()
+          $Role="UIAButton" and $Title="SAVE" click()
+    Step: Expand user
+    Given $Role="UIAText" and $Title="Uw gegevens zijn opgeslagen."
+    When  $Role="UIAText" and image("resources\settings\testOU\Expand.png") click(true)
+    Step: Signoff user
+    When  $Title="Afmelden" and $Role="UIAText" click(true)
+  Examples: Account data
+|Voornamen|Voorvoegsel_geboortenaam|Geboortenaam|Roepnaam|Voorvoegsel_geboortenaam_partner|Geboortenaam_partner|Naamweergave|Geboortedatum|Geboorteplaats|Geslacht|Taal|
+|AREM || Weijling|Adri || |VK_A|02-07-1963|Druten|VK_M|VK_N|
+|TEST|van|User|Test || Partnernaam|VK_P|01-02-1990|Amsterdam|VK_V|VK_N|

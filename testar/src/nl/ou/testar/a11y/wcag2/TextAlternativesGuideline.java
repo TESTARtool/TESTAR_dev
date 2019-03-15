@@ -27,7 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
 package nl.ou.testar.a11y.wcag2;
 
 import java.util.List;
@@ -45,34 +44,37 @@ import nl.ou.testar.a11y.windows.AccessibilityUtil;
  *
  */
 public final class TextAlternativesGuideline extends AbstractGuideline {
-	
-	private static final long serialVersionUID = -1355000724862045143L;
 
-	TextAlternativesGuideline(AbstractPrinciple parent) {
-		super(1, "Text Alternatives", parent);
-		criteria.add(new SuccessCriterion(1, "Non-text Content",
-				this, Level.A, "text-equiv-all"));
-	}
-	
-	@Override
-	public EvaluationResults evaluate(List<Widget> widgets) {
-		EvaluationResults results = new EvaluationResults();
-		SuccessCriterion sc = getSuccessCriterionByName("Non-text Content");
-		for (Widget w : widgets)
-			if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
-				if (AccessibilityUtil.isKeyboardFocusable(w)) { // focusable images must have a text alternative
-					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
-							"Missing text alternative", w));
-				}
-				else {
-					results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
-							"Possible missing text alternative", w));
-				}
-			}
-			else {
-				results.add(evaluationPassed(sc));
-			}
-		return results;
-	}
+  private static final long serialVersionUID = -1355000724862045143L;
+
+  TextAlternativesGuideline(AbstractPrinciple parent) {
+    super(1, "Text Alternatives", parent);
+    List<SuccessCriterion> criteria = getCriteria();
+    criteria.add(new SuccessCriterion(1, "Non-text Content",
+        this, Level.A, "text-equiv-all"));
+    setCriteria(criteria);
+  }
+
+  @Override
+  public EvaluationResults evaluate(List<Widget> widgets) {
+    EvaluationResults results = new EvaluationResults();
+    SuccessCriterion sc = getSuccessCriterionByName("Non-text Content");
+    for (Widget w: widgets) {
+      if (AccessibilityUtil.isImage(w) && w.get(Tags.Title, "").isEmpty()) {
+        if (AccessibilityUtil.isKeyboardFocusable(w)) { // focusable images must have a text alternative
+          results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.ERROR,
+              "Missing text alternative", w));
+        }
+        else {
+          results.add(new WCAG2EvaluationResult(sc, WCAG2EvaluationResult.Type.WARNING,
+              "Possible missing text alternative", w));
+        }
+      }
+      else {
+        results.add(evaluationPassed(sc));
+      }
+    }
+    return results;
+  }
 
 }

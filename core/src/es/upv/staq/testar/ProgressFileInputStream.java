@@ -27,8 +27,6 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-
 package es.upv.staq.testar;
 
 import java.io.File;
@@ -38,37 +36,38 @@ import java.io.IOException;
 
 /**
  * Adds progress feedback.
- * 
+ *
  * @author Urko Rueda Molina (alias: urueda)
  *
  */
 public class ProgressFileInputStream  extends FileInputStream {
 
-	private String fileName;
-	private long fileLength;
-	
-	private float progress, lastProgress;
-	
-	public ProgressFileInputStream(File file) throws FileNotFoundException {
-		super(file);
-		this.fileName = file.getName();
-		this.fileLength = file.length();
-		this.lastProgress = 0f;
-	}
-	
-	@Override
-	public int available() throws IOException{
-		int remainingBytes = super.available();
-		printStreamProgress(remainingBytes);
-		return remainingBytes;
-	}
+  @SuppressWarnings ("unused")
+  private String fileName;
+  private long fileLength;
 
-	private void printStreamProgress(int remaining){
-    	progress = (float)(this.fileLength - remaining) / (float)this.fileLength * 100f;
-    	if (progress - lastProgress > 1f){
-    		lastProgress = progress;
-    		//System.out.println("<" + this.fileName + "> remaining bytes = <" + remaining + "> progress (%) = <" + progress + ">");
-    	}		
-	}
+  private float progress, lastProgress;
+
+  public ProgressFileInputStream(File file) throws FileNotFoundException {
+    super(file);
+    this.fileName = file.getName();
+    this.fileLength = file.length();
+    this.lastProgress = 0f;
+  }
+
+  @Override
+  public int available() throws IOException{
+    int remainingBytes = super.available();
+    printStreamProgress(remainingBytes);
+    return remainingBytes;
+  }
+
+  private void printStreamProgress(int remaining) {
+      progress = (float)(this.fileLength - remaining) / (float)this.fileLength * 100f;
+      if (progress - lastProgress > 1f) {
+        lastProgress = progress;
+        //System.out.println("<" + this.fileName + "> remaining bytes = <" + remaining + "> progress (%) = <" + progress + ">");
+      }
+  }
 
 }
