@@ -51,8 +51,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
         throw new RuntimeException("The content of the input file seems to be corrupt!");
     }
 
-    @Override
-    public void writeMetricsToFile(final Settings settings) {
+    private void writeMetricsToFile(final Settings settings) {
         try {
             final String filename = this.getFileName();
             final PrintStream ps = this.getPrintStream(settings, filename);
@@ -67,13 +66,28 @@ public class StrategyFactoryImpl implements StrategyFactory {
         }
     }
 
-    @Override
-    public void saveMetrics() {
+    private void saveMetrics() {
         this.metrics.add(this.strategyActionSelector.getMetrics());
     }
 
     @Override
-    public void clear() {
+    public void prepareForSequence() {
+        this.strategyActionSelector.prepareForSequence();
+    }
+
+    @Override
+    public void postSequence(final Settings settings) {
+        this.strategyActionSelector.postSequence();
+        this.strategyActionSelector.printSequenceExecutionDuration();
+        this.saveMetrics();
+        if (settings.get(ConfigTags.Sequences) == this.strategyActionSelector.getCurrentSequence()) {
+            this.writeMetricsToFile(settings);
+        }
+        this.printMetrics();
+        this.clear();
+    }
+
+    private void clear() {
         this.strategyActionSelector.clear();
     }
 
@@ -85,7 +99,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
         return this.strategyActionSelector;
     }
 
-    public void printMetrics() {
+    private void printMetrics() {
         this.strategyActionSelector.printMetrics();
     }
 
@@ -98,20 +112,29 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     private String getHeaders() {
-        return "States," +  // # of abstract states visited
+        return "Sequence," + // Sequence
+                "Duration" +  // Time it took to execute sequence
+                "States," +  // # of abstract states visited
                 "Actions," + // # of actions executed
                 "UniqueStates," + // # of unique states visited
-                "UniqueActions,"; // # of unique actions executed
+                "UniqueActions," + // # of unique actions executed
+                "NotFoundActions," + // # of actions that were selected but not found (eg. click action is selected, only type actions are available)
+                "IrregularActions"; // # of actions where tag type was unavailable
     }
 
     private String getContent() {
         final StringBuilder sb = new StringBuilder();
-        this.metrics.forEach(metric -> {
-            sb.append(metric.getVisitedStates()).append(',')
+        this.metrics.forEach(metric ->
+                sb
+                        .append(metric.getSequenceNo()).append(',')
+                        .append(metric.getSequenceDuration()).append(',')
+                        .append(metric.getVisitedStates()).append(',')
                     .append(metric.getExecutedActions()).append(',')
                     .append(metric.getUniqueStates()).append(',')
-                    .append(metric.getUniqueActions()).append('\n');
-        });
+                        .append(metric.getUniqueActions()).append(',')
+                        .append(metric.getNotFoundActions()).append(',')
+                        .append(metric.getIrregularActions()).append('\n')
+        );
         return sb.toString();
     }
 

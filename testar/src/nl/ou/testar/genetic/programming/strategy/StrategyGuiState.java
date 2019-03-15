@@ -52,4 +52,12 @@ public interface StrategyGuiState {
     void setStateTag(final Tag<String> stateTag);
 
     void clear();
+
+    void updateActionNotSetList();
+
+    int getNumberOfActionsNotFound();
+
+    int getNumberOfIrregularActions();
+
+    Action getAlternativeAction();
 }

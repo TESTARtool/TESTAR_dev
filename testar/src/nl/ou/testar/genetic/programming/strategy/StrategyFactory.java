@@ -12,11 +12,6 @@ public interface StrategyFactory {
     StrategyActionSelector getStrategyActionSelector();
 
     /**
-     * Print metrics
-     */
-    void printMetrics();
-
-    /**
      * Returns inputs for
      *
      * @param inputFile - File to read inputs from. If a line starts with a # it is considered a comment
@@ -25,19 +20,12 @@ public interface StrategyFactory {
     String[] getTextInputsFromFile(final String inputFile);
 
     /**
-     * Reset the metrics
+     * Keep track of current sequence and start time
      */
-    void clear();
+    void prepareForSequence();
 
     /**
-     * Write the metrics to a file
-     *
-     * @param settings - Current settings
+     * Set stop time and print the time it took to execute a sequence
      */
-    void writeMetricsToFile(final Settings settings);
-
-    /**
-     * Save the metrics of a sequence
-     */
-    void saveMetrics();
+    void postSequence(final Settings settings);
 }

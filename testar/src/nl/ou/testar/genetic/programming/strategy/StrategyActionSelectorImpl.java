@@ -7,12 +7,16 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
+import java.util.Date;
 import java.util.Set;
 
 public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     private StrategyNodeAction strategyTree;
     private StrategyGuiStateImpl stateManager;
+    private Date startDate;
+    private Date endDate;
+    private int currentSequence = 0;
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
         System.out.println("DEBUG: creating genetic programming strategy");
@@ -32,8 +36,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     @Override
     public Action selectAction(final State state, final Set<Action> actions) {
         stateManager.updateState(state, actions);
-        final Action action = strategyTree.getAction(stateManager)
-                .orElse(stateManager.getRandomAction());
+        final Action action = strategyTree.getAction(stateManager).orElseGet(() -> this.stateManager.getAlternativeAction());
         this.updateState(action, state);
         System.out.printf("The selected action is of type %s \n", action.get(Tags.Role));
 
@@ -42,21 +45,51 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     @Override
     public void printMetrics() {
+        stateManager.printActionWithTimeExecuted();
         System.out.printf("Total number of actions %d \n", stateManager.getTotalNumberOfActions());
         System.out.printf("Total number of unique actions %d \n", stateManager.getTotalNumberOfUniqueExecutedActions());
-        stateManager.printActionWithTimeExecuted();
         System.out.printf("Total number of states visited %d \n", stateManager.getTotalVisitedStates());
         System.out.printf("Total number of unique states %d \n", stateManager.getTotalNumberOfUniqueStates());
+        System.out.printf("Total number of irregular actions %d \n", stateManager.getNumberOfIrregularActions());
+        System.out.printf("Total number of unavailable actions %d \n", stateManager.getNumberOfActionsNotFound());
     }
 
     @Override
     public Metric getMetrics() {
         return new Metric(
+                this.currentSequence,
+                this.sequenceDuration(),
                 stateManager.getTotalVisitedStates(),
                 stateManager.getTotalNumberOfActions(),
                 stateManager.getTotalNumberOfUniqueStates(),
-                stateManager.getTotalNumberOfUniqueExecutedActions()
+                stateManager.getTotalNumberOfUniqueExecutedActions(),
+                stateManager.getNumberOfActionsNotFound(),
+                stateManager.getNumberOfIrregularActions()
         );
+    }
+
+    public void printSequenceExecutionDuration() {
+        System.out.printf("It took %d seconds to execute \n", this.sequenceDuration());
+    }
+
+    private long sequenceDuration() {
+        return (endDate.getTime() - startDate.getTime()) / 1000;
+    }
+
+    @Override
+    public void prepareForSequence() {
+        this.startDate = new Date();
+        currentSequence++;
+    }
+
+    @Override
+    public void postSequence() {
+        this.endDate = new Date();
+    }
+
+    @Override
+    public int getCurrentSequence() {
+        return this.currentSequence;
     }
 
     @Override

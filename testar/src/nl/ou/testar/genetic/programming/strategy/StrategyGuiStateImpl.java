@@ -14,6 +14,8 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private List<Action> previousActions = new ArrayList<>();
     private List<String> previousStates = new ArrayList<>();
     private Map<String, Integer> executed = new TreeMap<>();
+    private int actionNotFound = 0;
+    private List<Action> irregularActions = new ArrayList<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
     private Tag<String> ACTION_ID = Tags.Desc;
@@ -160,6 +162,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             previousActions.add(action);
             this.incrementPreviousExecutedActions(action);
         } catch (NoSuchTagException e) {
+            this.irregularActions.add(action);
             System.out.println("This was an irregular action, I've not added it to the history.");
         }
 
@@ -231,11 +234,39 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
         this.executed = executed;
     }
 
+    private void setIrregularActions(final List<Action> irregularActions) {
+        this.irregularActions = irregularActions;
+    }
+
     @Override
     public void clear() {
         this.setActions(new ArrayList<>());
         this.setExecuted(new TreeMap<>());
         this.setPreviousActions(new ArrayList<>());
         this.setPreviousStates(new ArrayList<>());
+        this.setIrregularActions(new ArrayList<>());
+        this.actionNotFound = 0;
+    }
+
+    @Override
+    public int getNumberOfIrregularActions() {
+        return this.irregularActions.size();
+    }
+
+    @Override
+    public Action getAlternativeAction() {
+        System.out.println("Could not select action, provide alternative action");
+        this.updateActionNotSetList();
+        return this.getRandomAction();
+    }
+
+    @Override
+    public void updateActionNotSetList() {
+        this.actionNotFound++;
+    }
+
+    @Override
+    public int getNumberOfActionsNotFound() {
+        return this.actionNotFound;
     }
 }

@@ -12,7 +12,6 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -62,9 +61,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     private StrategyFactory strategyFactory;
     private StrategyActionSelector strategyActionSelector;
     private Optional<String[]> inputText;
-    private Date startDate;
-    private Date endDate;
-    private int currentSequence = 0;
 
     /**
      * Called once during the life time of TESTAR
@@ -100,8 +96,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     @Override
     protected void beginSequence(SUT system, State state) {
         super.beginSequence(system, state);
-        this.startDate = new Date();
-        currentSequence++;
+        this.strategyFactory.prepareForSequence();
     }
 
     /**
@@ -115,18 +110,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     @Override
     protected void postSequenceProcessing() {
         super.postSequenceProcessing();
-        this.strategyFactory.printMetrics();
-        this.endDate = new Date();
-        printDate();
-        this.strategyFactory.saveMetrics();
-        if (settings().get(ConfigTags.Sequences) == currentSequence) {
-            this.strategyFactory.writeMetricsToFile(settings());
-        }
-        this.strategyFactory.clear();
-    }
-
-    private void printDate() {
-        System.out.printf("It took %d seconds to execute \n", (endDate.getTime() - startDate.getTime()) / 1000);
+        this.strategyFactory.postSequence(settings());
     }
 
     /**

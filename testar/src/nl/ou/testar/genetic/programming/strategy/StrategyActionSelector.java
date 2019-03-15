@@ -44,4 +44,24 @@ public interface StrategyActionSelector {
      * Reset the metrics
      */
     void clear();
+
+    /**
+     * Print sequence execution duration
+     */
+    void printSequenceExecutionDuration();
+
+    /**
+     * Prepare for new sequence
+     */
+    void prepareForSequence();
+
+    /**
+     * Post sequence actions
+     */
+    void postSequence();
+
+    /**
+     * Get current sequence no
+     */
+    int getCurrentSequence();
 }
