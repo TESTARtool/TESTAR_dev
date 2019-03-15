@@ -1,0 +1,347 @@
+Date format is:
+	YYYY-MM-DD
+
+--
+
+
+#TESTAR v1.3 (2017-04-06)
+------------------------
+
+Enhancements:
+	- Platforms support (base: Windows7 x64)
+		-> Windows 10: manual binding (automation pending) to UWP applications 
+		-> Linux/Gnome: SpyMode missing and slow tests performance
+	- Headless mode:
+		-> How-to enable: test.settings -> ShowVisualSettingsDialogOnStartup = false
+		-> Command line properties that will override the defaults at test.settings:
+			--> -DShowVisualSettingsDialogOnStartup=true/false or -Dheadless=false/true
+			--> -DTestGenerator or -DTG=random/qlearning/qlearning+/maxcoverage/prolog/evolutionary
+			--> -DSequenceLength=X or -DSL=X (X = number of actions for each test sequence)
+			--> -DGrahResuming=true/false or -DGRA=true/false
+			--> -DForceToSequenceLength=true/false or -DF2SL=true/false (continues testing in presence of FAIL)
+			--> -DTypingTextsForExecutedAction=1.. or -DTT=1.. (number of typing actions with different texts for executed action)
+			--> -DStateScreenshotSimilarityThreshold=0.0..1.0 or -DSST=0.0..1.0 (widget-tree build cache by screenshots similarity) -> use with caution: it is unstable; symptom: unable to access the SUT UI at future SUT runs
+	- Prolog:
+		-> Facts are automatically calculated based on execution information (states, actions, graphs)
+		-> actions rules to build feasible UI actions
+		-> queries can be performed (e.g. UI actions filtering and selection, oracles definition)
+	- Testing protocol 
+		-> protocol can now be selected from a default set
+		-> SUT monitoring:
+			--> When?: for SUTs that are started through other applications (i.e. jnlp for Java applications)
+			--> Engage based on Process Name
+				--> How?: startSystem("SUT_PROCESS_NAME:My SUT process name must contain this")
+			--> Engage based on Window Title
+				---> How?: startSystem("SUT_WINDOW_TITLE:My SUT window title must contain this")				
+		-> OracleLayerProtocol
+			--> Semi-automated specification of oracles
+			--> shortcuts/process:
+				---> CTRL + S: Start new oracle specification
+					----> Human perform UI actions until a verification point is reached
+				---> CTRL + O: Mark an oracle verification point (widget under cursor)
+				---> CTRL + E: Finish the oracle specification
+			--> Automated oracles inference (alpha development):
+				---> TITLE property UPDATE based predicate
+					----> the predicate infers a dependency from a list of executed Actions to a Verification point TITLE property
+					----> sandbox: calculator with bugs
+			--> Human exercised oracle is interpreted as correct behaviour
+				---> not correct behaviour is reported by the oracle
+		-> EventHandler for the testing protocol layers (Abstract, Default, Oracle, ClickFilter)
+		-> ClickFilterLayerProtocol refactored
+			--> Filtering and data(input values) managers
+				---> Data is loaded from input_values.xml
+				---> Default data types:
+					----> Primitive: regular texts and numbers
+					----> Basic: dates, emails, weburls
+			--> Toggle TAB to switch widgets IDs coding between ABSTRACT_R_T_ID (enabled) and ABSTRACT_R_T_P_ID (disabled)
+		-> ProtocolFilter.idx changed to protocol_filter.xml
+		-> Filter several widgets at once
+			--> Tabu list: ctrl + area
+			--> White list: shift + ctrl + area
+			--> how to define the area: move mouse to opposing area corners between (shift+)ctrl press/release
+			--> now, the shortcuts only work while in CAPS_LOCK mode (viewing widgets white/tabu matching status)
+		-> Text-fields - valid input values
+			--> keyboard shortcut: ALT
+			--> A popup dialog is displayed with a list of input types
+		-> New available action: StdActionCompiler -> mouseMove(Widget)
+		-> Slow-motion mode (shortcut = SHIFT+SPACE): delay between actions is increased notably
+			--> pressing the shortcut again will deactivate the slow-motion
+		-> new methods:
+			--> stopSystem(SUT system)
+			--> getRandomText(widget): calculates a random text from feasible input values (input_values.xml specification):
+				1) specific data type (e.g. numbers): random selection from that specific data type (e.g. a random number)
+				2) unrestricted data type: random selection from all the available input data types (e.g. texts, numbers, dates, emails, weburls, etc)
+			--> getTopWidgets(state): retrieves the widgets on top of others (highest Z-INDEX property)
+				---> Where to use? for example, in deriveActions method
+				---> Resolves:
+					a) hidden screen widgets at UI background might acquire test focus
+					b) a popup window (e.g. modal) will have its widgets on top; thus, actions could be restricted to such window
+					c) for menus, it would help to filter actions to the submenu items
+			--> addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w):
+				---> for a scrollable widget 'w' adds to 'actions' sliding actions
+			--> isUnfiltered(widget): checks disabled action by regex and hitTest
+	- Spy mode
+		-> widget and state IDs are visible if Shift+2 is enabled
+		-> Protocol cycle interval is dynamically adjusted for improved performance (e.g. Widget Tree construction)
+		-> New mode SHIFT+4: fullscreen display of the widget tree
+			--> widget under cursor and ancestors are marked in the widget tree
+			--> widget under cursor ancestors IDs are displayed
+			--> widget under cursor information is displayed
+			--> SUT information is displayed as widget tree root
+			--> widget tree is collapsed for children > 8 (single child displayed)
+				---> collapse rendering: BEFORE_CHILDREN_COUNT < > AFTER_CHILDREN_COUNT
+		-> SHIFT+1 actions feedback
+			--> green color: available and not executed UI action
+				---> alpha degraded green color: feedback about the target widgets zindex
+			--> blue color: executed action
+				---> alpha degraded blue color: feedback about how many times an action was executed in the corresponding widget
+	- GenerateManual mode
+		-> Inherited SHIFT + 2..4 shortcuts from Spy mode
+	- Graphs
+		-> XML version
+		-> Previous test sequence graph can be automatically resumed
+		-> Resumed graphs are marked with
+			----- dashed style for known states/actions
+			\---/ diagonals style for (known)revisited states
+			..... dot style for (known)revisited actions
+		-> Directed pseudographs (loops and multiple edges between vertexes)
+		-> Edges can now lead to different vertexes (no more "MUTATED" edges)
+	- Metrics: metrics/*.csv files for each test sequence
+		-> graph resuming metrics (known states, revisited states, new states)
+		-> test duration in seconds/minutes/hours
+	- Feedback dialogs
+		-> Displayed (short-time) when TESTAR changes working mode: Spy, Generate, Oracle specification, etc.
+		
+Improvements:
+	- test.settings:
+		-> SUTConnector (COMMAND_LINE, SUT_PROCESS_NAME, SUT_WINDOW_TITLE)
+		-> Executable renamed to SUTConnectorValue
+		-> TestGenerator (random, qlearning, maxcoverage) can now be selected from TESTAR UI
+		-> algorithms
+			--> refactors, cleanup and qlearning improvements
+			--> State restarter utility: periodically jump to less explored states
+				---> jump target states must be reachable from current UI exploration graph
+			--> random+ is new: random + state restarts
+			--> qlearning+ is new: qlearning + state restarts
+			--> maxcoverage is new: taboo actions + state restarts
+				---> taboo actions: those already executed
+				---> state restarts: when all the current state actions have been executed
+		-> Forms-filling algorithm:
+			--> activation now at test.settings (AlgorithmFormsFilling = true/false)
+			--> refactored from AbstractProtocol to "graph" project
+		-> TypingTextsForExecutedAction (number of typing actions with different texts for executed action)
+		-> GraphResuming property (true/false)
+		-> OfflineGraphConversion property (true/false)
+		-> NonReactingUIThreshold property (int)
+			--> Threshold on the number of executed actions that did not achieve a UI reaction
+			--> Default = 100 executed actions
+			--> Once threshold is reached, an ESC action is forced
+		-> SUTProcesses property (regex)
+			-> spawn tests to several windows, which conform to SUT processes
+			-> Shift+0 shortcut to debug process names at STDOUT
+	- CodingManager:
+		-> all widgets/states and actions IDs calculated once from widget-tree information:
+			--> ConcreteID <- ROLE, TITLE, SHAPE, ENABLED properties
+			--> Abs(R)ID <- ROLE property
+			--> Abs(R,T)ID <- ROLE, TITLE properties
+			--> Abs(R,T,P)ID <- ROLE; TITLE, PATH properties
+	- Test efficiency
+		- Test information serialisation through threads to avoid test efficiency penalty:
+			-> Logs:
+				--> Widgets information reporting has been extended with additional fields
+				--> A log file for each test sequence
+			-> Screenshots: png files for UI states and actions
+			-> Tests sequences: compressed, at test sequence end (RAM optimisation), to reduce disk size
+		- Widget-tree building cache throughout test:
+			-> factors for cache hit:
+				--> equal UI window handle
+				--> equal UI window size
+				--> similar (e.g. >95%) UI window screenshot
+	- TESTAR UI:
+		-> Changed Generate-button to Test-button
+		-> Changed Selection tab to UI-Walker tab
+		-> Move some General-settings tab options to UI-Walker tab
+		-> New available options:
+			--> General settings: Force to sequence length
+			--> Algorithms - Exploration sample interval
+			--> Algorithms - Graphs activated and Graphs resuming
+			--> Algorithms - Prolog activated
+		-> "Path to SUT" switched to "SUT connector":
+			--> COMMAND_LINE: A command line that starts the SUT
+			--> SUT_PROCESS_NAME: The process name of the SUT (e.g. check running processes in your OS)
+			--> SUT_WINDOW_TITLE: The SUT UI main window TITLE (note: it might be empty => N/A)
+	- SUT startup time:
+		-> before: a delay
+			1. SUT was started
+			2. waited xx seconds (startup time)
+			3. the test task started
+		-> now: a threshold
+			1. SUT is started
+			2. wait for xx seconds (startup time) until the SUT UI is ready
+			3. do the test task
+	- Graphs:
+		-> Populating graphs now in sync with TESTAR test execution (graph was updated with an action lag)
+	- Disk space:
+		-> No more temporal libraries creation (dll files are now loaded as external resources)
+	- Stability
+		-> SUT UI synchronization: NOP actions are executed waiting for the SUT UI to be ready
+		-> Batch robustness: any process started during test is killed at sequence end
+	- Other minor adjustements
+
+Reporting:
+	- test sequences classification:
+		-> PASS: OK, WARNING, SUSPICIOUSTITLE
+		-> FAIL: UNRESPONSIVE, UNEXPECTEDCLOSE, FAIL
+		-> OTHER: can be PASS or FAIL depending on the verdict severity used
+	- test reports as individual *_report_*.log files
+	- Longest path in the UI exploration (how far a test did go into the UI?)
+		-> marked at graphs (CONCRETE/non-ABSTRACT versions) with thick nodes outlines
+	- Minimum and maximum (<1.0 as UI actions space is unknown) coverage for all explored states
+	- SUT resource usage before each executed action
+		-> memory usage (in KB)
+		-> cpu usage
+			--> ms for user & system modes
+			--> CPU % (user + system)
+	- TESTAR monitoring (@console)
+		- KCVG = % CVG of Known UI space
+		- Test UI actions delay (CPU)
+		- Java heap (RAM)
+		- Logs, test artefacts and SUT UI screenshots serialisation queues
+	
+Refactors:
+	- core package
+		-> visualizers and exceptions
+
+Reconfigurations:
+	- Keyboard shortcuts:
+		-> Alt switched to Shift+Alt to display hierarchical relationships
+	- Action visualisation in Spy-mode
+		-> Widget under cursor mark changed from green to yellow
+	
+Fixes:
+	- Action visualisation in Spy-mode
+		-> Left double click changed from red-circle to green-circle (red color is reserved to action execution visualisation)
+	- Memory leaks resolved (screenshots serialisation and test fragments serialisation)
+	- KNOWN_ISSUES
+		-> "System is offline! I assume it crashed": automatic detection/kill of running SUT processes
+		-> Swing for Java (light-weight widgets) is now supported
+			--> How to:
+				- add the line "AccessBridgeEnabled = true" to test.settings
+				- Activate native Java Access Bridge (e.g. Windows: Control panel -> Accessibility -> Accessibility center -> Help to use the machine -> Activate Java Access Bridge at page bottom)
+			
+	- General stability fixes
+			
+#TESTAR v1.2 (2016-02-04)
+-------------------------
+
+Enhancements:
+	- Sequence viewer:
+		-> Begin, Previous and End buttons added
+	- Testing protocol:
+		-> SUT monitoring: engage based on specific title on titlebar
+			--> How?: startSystem("My SUT must contain this title")
+			--> When?: for SUTs that are started through other applications (i.e. jnlp for Java applications)
+		-> Experimental: Actions priorisation to enable forms filling (text-input fields and slides)
+			(i.e. new database user creation: name/surname, phone, direction, etc.)
+		-> Protocol helpers through direct GUI manipulation (no programming) based on lists of widgets (identified by IDs) matched to:
+			--> Actions filtering (white and tabu lists)
+				---> Shift + Ctrl => switch widget under cursor to White list
+				---> Ctrl => switch widget under cursor to Black/Tabu list
+			--> Text-fields - valid input values
+				---> Date fields: Shift + Ctrl + D => switch between date values and regular texts
+			--> Requirements: ClickFilterLayerProtocol and Spy mode; recommended: Shift+2 deactivated, Shift+1 activated
+			--> Toggle CAPS_LOCK for viewing widgets matching status
+			--> General rule at protocol is applied whenever widgets are not present in any list
+			--> Matching is saved to "ProtocolFilter.idx"
+	- Widgets hierarchy (Spy mode):
+		-> which are the parents widgets? ... Shortcut replaced from: Ctrl ... to: Alt		
+	- Reporting
+		-> Exploration curve with the number of unique/abstract states/actions (sampled every 100 executed actions)
+		
+Improvements:
+	- graphs: actions ORDER (i.e. [1][5][21]...) broken in lines for readability due to long orders
+	- CodingManager now accepts parameters for:
+		-> Coding States: which widget properties to take into account?
+			(i.e. Title and Shape could be good for debug, but might expand graphs too much even to oo)
+		-> Coding Actions: which action types should discard parameters?
+			(i.e. typing could produce oo different actions)
+	- States and Actions clustering:
+		-> Abstraction due to <Title,Shape> for States and <MouseMove,Type> parameters discarding for Actions
+		-> Clusters of related States and Actions (equal abstractions)
+		-> Clusters are reported:
+			@console/logs
+			@graphs: abstract version for minimal, tiny and screenshoted .dot/.svg
+	- Verdicts
+		-> WARNING verdict (oracle found something?) in addition to OK/PASS and FAIL
+		-> WARNING oracles behave like an OK/PASS, but they are marked @graphs (yellow); abstract graphs do not mark this feature
+	- test.settings (Q-Learning)
+		-> TestGenerator = random | qlearning
+		-> MaxReward = 1 .. 9999999
+		-> Discount = 0.001 .. 1.0
+		
+Refactoring
+	- testar->windows package independence
+		-> middle package native providing a native connector
+
+Fixes
+	- GenerateManual
+		-> wait time between actions was missing (impact: widget-trees might have been retrieved incomplete)
+	- TESTAR logs
+		-> Keep saving along test sequences (waiting for end of tests might return empty log due to unexpected errors)
+	- Graphs
+		-> Keep graph connected when the same action moves to different states
+	- Test sequence screenshots
+		-> dump may throw exception if SUT is suddenly closed (i.e. SUT close, SUT crash, etc.)
+	- Running TESTAR (testar.bat)
+		-> java executable at a path with blank spaces (i.e. Program Files)
+		-> print Java version requirement & detected version (feedback for unsupported java versions)
+	- Minor bug fixes
+
+#TESTAR v1.1a (2015-09-22)
+--------------------------
+
+Enhancements:
+	- Widgets hierarchy (Spy mode):
+		-> which are the parents widgets? ... Shortcut: Ctrl
+	- Test sequence graphs:
+		-> Which SUT UI States did a test sequence traversed?
+		-> Which SUT UI Actions were executed?
+		-> .dot/.svg graphs:
+			--> minimal: states/actions repetition number
+			--> tiny: states/actions identificators (+ minimal info)
+			--> screenshoted (+ tiny info)
+		-> Test sequence reporting (including #states, #actions, verdict)
+	- Test sequence generators:
+		-> Q-Learning (more clever action selection than Random)
+	- GenerateManual mode (Shortcut: Shift + Left/Right arrow from Spy/Generate modes):
+		-> Blended testing: let TESTAR do it automatically or take the control at any time!
+		
+Improvements
+	- Widgets recognition ("Internet Explorer" browser):
+		-> scrollbars
+		-> modal windows
+	- Widgets filtering helper (by Title):
+		-> ClickFilterLayerProtocol enables to (under Spy mode):
+			--> add widget title to a filter list (displayed at console) ... Shortcut: Shift + Left click
+			--> remove widget title from a filter list (displayed at console) ... Shortcut: Shift + Right click
+	- Performance:
+		-> Disk space
+			-> GZIP streams for test sequence serialisation
+			-> Test sequence UI screenshots moved from the serialisation to a shared repository for TESTAR and Graphs (.png format)
+			
+Fixes
+	- Widgets properties (Spy mode ... Shortcut: Shift + 3):
+		-> Properties window displayed inside Screen (sometimes it was outside)
+		-> Parent Roles property displayed multi-line (single line truncated roles)
+	- Test sequence logs:
+		-> Detailed action execution (widgets without Title made hard to manually reproduce a sequence from the log)
+	- Manual testing:
+		-> User events (Left/Right clicks and typing) are captured by TESTAR (user events were lost in the test sequence, hence non replayable)
+	- Minor bugs fixes
+
+Experimental:
+	- AdhocTest mode (Shortcut: Shift + Enter from Spy/Generate modes):
+		-> activates a server to listen to test sequences (port 47357)
+			--> format (one action per line): <action_type(parameters*)>\r\n (i.e. LC(100.0,50,5))
+
+--

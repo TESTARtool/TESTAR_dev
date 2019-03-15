@@ -1,0 +1,47 @@
+<project name="Calc" default="jar">
+    
+    <!-- properties -->
+    <property name="src" location="src/"/>
+    <property name="bin" location="bin/"/>	
+	<property name="targetdir" location="target/"/>
+    <property name="jarfile" value="calc.jar"/>
+    <property name="swtjar" value="lib/swtwin64.jar"/>
+    <target name="all" depends="jar"/>
+
+
+    <!-- compile -->
+    <target name="compile">
+        <mkdir dir="${bin}"/>
+    	<javac classpath="${swtjar}" sourcepath="" srcdir="${src}" destdir="${bin}" failonerror="true" verbose="no" listfiles="no"
+        	includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+
+	<!-- jar -->
+    <target name="jar" depends="compile">    	
+        <mkdir dir="${targetdir}"/>
+        <jar basedir="${bin}" destfile="${targetdir}/intermediate.jar">
+            <manifest>
+                <attribute name="Main-Class" value="Calc"/>
+            </manifest>
+        </jar>
+    	<zip destfile="${targetdir}/${jarfile}">
+    	    <zipfileset src="${swtjar}"/>
+    	    <zipfileset src="${targetdir}/intermediate.jar"/>
+		</zip>
+    	<delete file="${targetdir}/intermediate.jar"/>
+    </target>
+
+	<!-- run -->
+    <target name="run" depends="jar">
+        <java classname="Calc" dir="${bin}" classpath="${targetdir}/${jarfile}" failonerror="true" fork="true">
+        	<jvmarg value="-server"/>
+        	<jvmarg value="-ea"/>
+        </java>
+    </target>
+	
+	<!-- clean -->
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${targetdir}"/>
+    </target>
+</project>

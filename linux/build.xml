@@ -1,0 +1,45 @@
+<project name="linux" default="jar"> <!-- by wcoux -->
+
+    <!-- properties -->
+    <property name="src" 			 location="src/"/>
+    <property name="bin" 			 location="bin/"/>
+    <property name="target" 		 location="target/"/>
+    <property name="coreJarFile" 	 location="../core/target/core.jar"/>
+    <property name="junitJarFile" 	 location="lib/junit-jupiter-api-5.0.0-M3.jar"/>
+    <property name="libatspiJarFile" location="lib/libatspi.jar"/>
+    <property name="libgtk3JarFile"  location="lib/libgtk-3.jar"/>
+    <property name="libwnck3JarFile" location="lib/libwnck-3.jar"/>
+    <property name="libx11JarFile" 	 location="lib/libX11.jar"/>
+    <property name="test4jJarFile" 	 location="lib/opentest4j-1.0.0-M1.jar"/>
+    <property name="jarfile" 		 value="linux.jar"/>
+
+	<!-- dependencies -->
+    <target name="dependencies">
+        <depend srcdir="${src}" destdir="${bin}" closure="yes"
+                classpath = "${coreJarFile};${junitJarFile};${libatspiJarFile};${libgtk3JarFile};${libwnck3JarFile};${libx11JarFile};${test4jJarFile}" />
+    </target>
+	
+	<!-- compile -->
+    <target name="compile" depends="dependencies">
+        <ant antfile="build.xml" dir="../core" target="jar" inheritAll="false"/>
+        <mkdir dir="${bin}"/>
+        <javac classpath="${target}/${jarfile};${coreJarFile};${junitJarFile};${libatspiJarFile};${libgtk3JarFile};${libwnck3JarFile};${libx11JarFile};${test4jJarFile}"
+               sourcepath="" srcdir="${src}" destdir="${bin}"
+               failonerror="true" verbose="no" listfiles="no"
+               includeantruntime="false" debug="on" debuglevel="lines,vars,source"/>
+    </target>
+	
+	<!-- jar -->
+    <target name="jar" depends="compile">
+        <mkdir dir="${target}"/>
+        <jar basedir="${bin}" destfile="${target}/${jarfile}"/>
+    </target>
+
+	<!-- clean (by urueda) -->
+    <target name="clean">
+        <delete dir="${bin}"/>
+        <delete dir="${target}"/>
+    </target>
+
+</project>
+

@@ -1,0 +1,24 @@
+.functionToggle, .constantToggle, #otherConstants {
+    width: 100%;
+    margin-top: 0.5em;
+}
+section {
+    margin-top: 4em;
+}
+article, aside, details, figcaption, figure, footer, header, menu, nav, section {
+  display: block;
+}
+body {
+  background-color: #ffffff;
+}
+h1 {
+  font-size: 24px;
+}
+h1, p {
+  color: #000;
+  text-align: left;
+}
+#graph{
+    width: 1070px;
+    height: 500px;
+}
