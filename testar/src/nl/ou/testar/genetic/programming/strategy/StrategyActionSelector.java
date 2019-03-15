@@ -37,9 +37,8 @@ public interface StrategyActionSelector {
      * to identify states and actions are identified by Desc
      *
      * @param stateTag  - tag to identify states
-     * @param actionTag - tag to identify actions
      */
-    void setTags(final Tag<String> stateTag, final Tag<String> actionTag);
+    void setTags(final Tag<String> stateTag);
 
     /**
      * Reset the metrics

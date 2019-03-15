@@ -60,9 +60,8 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     @Override
-    public void setTags(final Tag<String> stateTag, final Tag<String> actionTag) {
+    public void setTags(final Tag<String> stateTag) {
         stateManager.setStateTag(stateTag);
-        stateManager.setActionTag(actionTag);
     }
 
     @Override

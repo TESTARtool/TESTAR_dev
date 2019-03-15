@@ -1,10 +1,6 @@
 package nl.ou.testar.genetic.programming.strategy;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
 import java.util.*;
@@ -20,7 +16,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     private Map<String, Integer> executed = new TreeMap<>();
     private Random rnd = new Random(System.currentTimeMillis());
 
-    private Tag<String> ACTION_ID;
+    private Tag<String> ACTION_ID = Tags.Desc;
     private Tag<String> STATE_ID;
 
     StrategyGuiStateImpl() {
@@ -217,11 +213,6 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     @Override
     public void setStateTag(final Tag<String> stateTag) {
         STATE_ID = stateTag;
-    }
-
-    @Override
-    public void setActionTag(Tag<String> actionTag) {
-        ACTION_ID = Tags.Desc;
     }
 
     private void setActions(final List<Action> actions) {

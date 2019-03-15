@@ -19,7 +19,8 @@ import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.monkey.ConfigTags.*;
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
+import static org.fruit.monkey.ConfigTags.InputFileText;
 
 /***************************************************************************************************
  *
@@ -77,13 +78,12 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         htmlReport = new HtmlSequenceReport();
 
         final Tag<String> stateTag = this.getStateTag();
-        final Tag<String> actionTag = this.getActionTag();
         strategyFactory = new StrategyFactoryImpl(settings().get(ConfigTags.StrategyFile));
 
         this.inputText = Optional.ofNullable(strategyFactory.getTextInputsFromFile(settings().get(InputFileText)));
 
         strategyActionSelector = strategyFactory.getStrategyActionSelector();
-        strategyActionSelector.setTags(stateTag, actionTag);
+        strategyActionSelector.setTags(stateTag);
         super.initialize(settings);
     }
 
@@ -92,13 +92,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
             return Tags.AbstractIDCustom;
         }
         return Tags.Abstract_R_T_P_ID;
-    }
-
-    private Tag<String> getActionTag() {
-        if (!settings().get(ConcreteStateAttributes).isEmpty()) {
-            return Tags.ConcreteIDCustom;
-        }
-        return Tags.Desc;
     }
 
     /**
