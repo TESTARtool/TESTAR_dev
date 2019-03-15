@@ -1,3 +1,0 @@
-include 'core', 'native', 'windows','testar', 'linux','graphdb', 'tgherkin'
-
-
