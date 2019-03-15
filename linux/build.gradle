@@ -1,5 +1,0 @@
-dependencies {
-    compile files('./lib/libatspi.jar')
-    compile files('./lib/junit-jupiter-api-5.0.0-M3.jar')
-    compile project(':core')
-}

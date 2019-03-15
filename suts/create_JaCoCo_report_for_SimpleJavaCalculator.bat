@@ -1,1 +1,0 @@
-java -jar Simple-Java-Calculator-master/jacococli.jar report Simple-Java-Calculator-master/calculator.exec --classfiles Simple-Java-Calculator-master/SimpleJavaCalculator.jar --html Simple-Java-Calculator-master/jacoco-report --name calculatorReport --sourcefiles Simple-Java-Calculator-master/src/main/simplejavacalculator"

@@ -1,7 +1,0 @@
-dependencies {
-    compile project(':core')
-    compile project(':windows')
-    compile project(':linux')
-    compile files('../linux/lib/libatspi.jar')
-}
-
