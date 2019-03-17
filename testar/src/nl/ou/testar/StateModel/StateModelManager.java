@@ -150,6 +150,7 @@ public class StateModelManager {
             this.actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
         }
         catch (ActionNotFoundException ex) {
+            System.out.println("Action not found in state model");
             this.actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
@@ -165,14 +166,21 @@ public class StateModelManager {
      * This method uses the abstract state model to return the abstract id of an action to execute
      * @return
      */
-    public String getAbstractActionIdToExecute() {
+    public Action getAbstractActionToExecute(Set<Action> actions) {
         //@todo we will probably want to replace this method with one that returns the actual actions to execute
 
         if (currentAbstractState == null) {
             return null;
         }
         try {
-            return actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
+            String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
+            System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
+            for(Action action : actions) {
+                if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
+                    return action;
+                }
+            }
+            System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
         } catch (ActionNotFoundException e) {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
         }

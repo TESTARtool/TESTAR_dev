@@ -58,14 +58,9 @@ public class UnvisitedActionsSelector implements ActionSelector {
         //@todo Ideally the algorithm should go one level at a time
         // it's meant as a demo of what is possible
         for (AbstractStateTransition transition:abstractStateModel.getOutgoingTransitionsForState(state.getStateId())) {
-            try {
-                AbstractState targetState = abstractStateModel.getState(transition.getTargetStateId());
-                if (getUnvisitedActions(targetState, abstractStateModel, nrOfHopsLeft - 1).size() > 0) {
-                    AbstractState sourceState = abstractStateModel.getState(transition.getSourceStateId());
-                    actions.add(sourceState.getAction(transition.getActionId()));
-                }
-            } catch (StateModelException e) {
-                // no need to do anything in this case
+            AbstractState targetState = transition.getTargetState();
+            if (getUnvisitedActions(targetState, abstractStateModel, nrOfHopsLeft - 1).size() > 0) {
+                actions.add(transition.getAction());
             }
         }
         return actions;

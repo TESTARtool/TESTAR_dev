@@ -230,6 +230,10 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 			return a;
 		} else
 			//if no preSelected actions are needed, then implement your own strategy
+			System.out.println("Asking state model manager for action");
+			Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
+			if (modelAction != null) return modelAction;
+			System.out.println("StateModelManager did not return an action. Returning random");
 			return RandomActionSelector.selectAction(actions);
 	}
 
