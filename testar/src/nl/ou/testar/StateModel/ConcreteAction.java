@@ -4,7 +4,7 @@ import org.fruit.alayer.Tag;
 
 import java.util.Set;
 
-public class ConcreteAction {
+public class ConcreteAction extends Widget {
 
     /**
      * The concrete action id.
@@ -21,6 +21,7 @@ public class ConcreteAction {
      * @param actionId
      */
     public ConcreteAction(String actionId, AbstractAction abstractAction) {
+        super(actionId);
         this.actionId = actionId;
         this.abstractAction = abstractAction;
     }

@@ -51,17 +51,7 @@ public final class Tags extends TagsBase {
 	
 	private Tags() {}
 
-	//public static final Tag<Boolean> Checked = from("Checked", Boolean.class);
-	//public static final Tag<String> RoleDesc = from("RoleDesc", String.class);
-	//public static final Tag<Shape> ThumbShape = from("ThumbShape", Shape.class);
-	//public static final Tag<Shape> TrackShape = from("TrackShape", Shape.class);
-	//public static final Tag<Boolean> Selected = from("Selected", Boolean.class);
-//	@SuppressWarnings("unchecked")
-//	public static final Tag<UnProc<Widget>> WindowActivator = from("WindowActivator", (Class<UnProc<Widget>>)(Class<?>)UnProc.class);
-//	@SuppressWarnings("unchecked")
-//	public static final Tag<UnProc<Widget>> WindowCloser = from("WindowCloser", (Class<UnProc<Widget>>)(Class<?>)UnProc.class);
-
-	/** Usually attached to widgets. Returns a <code>HitTester</code> object which allows to 
+	/** Usually attached to widgets. Returns a <code>HitTester</code> object which allows to
 	 * is visible at a specific location determine whether the widget */
 	public static final Tag<HitTester> HitTester = from("HitTester", HitTester.class);
 	
@@ -222,5 +212,10 @@ public final class Tags extends TagsBase {
 	 * the SystemActivator makes sure that the SUT gets focused again. */
 	@SuppressWarnings("unchecked")
 	public static final Tag<Proc> SystemActivator = from("SystemActivator", (Class<Proc>)(Class<?>)Proc.class);
+
+	/**
+	 * The original widget that can be attached to things like actions
+	 */
+	public static final Tag<Widget> OriginWidget = from("OriginWidget", Widget.class);
 	
 }

@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel;
 
 import org.fruit.alayer.Tag;
-import org.fruit.alayer.TaggableBase;
 
 import java.util.Set;
 

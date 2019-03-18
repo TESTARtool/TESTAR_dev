@@ -136,6 +136,7 @@ public class StdActionCompiler {
 		ret.set(Tags.Desc, "Right Click at '" + w.get(Tags.Desc, "<no description>") + "'"); // by urueda		
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 
@@ -231,6 +232,14 @@ public class StdActionCompiler {
 		action.set(Tags.Slider, new Position[]{from,to});
 		return action;
 	}
+
+    // by urueda
+    public Action slideFromTo(Position from, Position to, Widget widget){
+        Action action = dragFromTo(from,to);
+        action.set(Tags.Slider, new Position[]{from,to});
+        action.set(Tags.OriginWidget, widget);
+        return action;
+    }
 
 	public Action clickTypeInto(final Position position, final String text){
 		Assert.notNull(position, text);
