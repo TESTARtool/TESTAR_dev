@@ -6,21 +6,28 @@ The software can be build as described in the README of the master folder.
 ### The subroutine specific software
 
 The files for this framework are located in
- framework
-– /testar/src/nl.ou.testar.subroutine
- examples
-– /testar/resources/settings
- tgherkin
-– /testar/src/nl.ou.testar.tgherkin
+- framework
+  * /testar/src/nl.ou.testar.subroutine
+  
+- examples
+  * /testar/resources/settings
+  
+- tgherkin
+  * /testar/src/nl.ou.testar.tgherkin
+  
 – /tgherkin
-– /native/src/.ou.testar.tgherkin.grammar
+  * /native/src/.ou.testar.tgherkin.grammar
+  
+### Options
 
 There are currently two options within the framework to implement a subroutine
 for a specific site:
- TG Tgherkin option
-The subroutine is using a Tgherkin file to run the subprocess.
- CA Compound Action option
-The subroutine is using compound actions to run the subprocess.
+
+- TG Tgherkin option
+  The subroutine is using a Tgherkin file to run the subprocess.
+  
+- CA Compound Action option
+  The subroutine is using compound actions to run the subprocess.
 
 ### The TG option
 
@@ -37,19 +44,20 @@ the way it is handled within the Tgherkin environment. In practice, the Tgherkin
 environment is at this moment, not a stable factor.
 
 Building steps for the TG option are:
- Implement a subclass of TgherkinFileProtocol
- Create an input data file tgherkinFileData.csv. Define URL, Tgherkin file and exit action for each subroutine
- Change the settings of tag TgherkinFileData and the usual tags ProtocolClass
-and SUTConnectorValue.
- Create a Tgherkin file to run the subprocess
- Optional: adapt methods startState, startSubroutine, finishState and finishSubroutine
+  - Implement a subclass of TgherkinFileProtocol
+  - Create an input data file tgherkinFileData.csv. 
+    Define URL, Tgherkin file and exit action for each subroutine
+  - Change the settings of tag TgherkinFileData and the usual tags 
+    ProtocolClassand SUTConnectorValue.
+  - Create a Tgherkin file to run the subprocess
+  - Optional: adapt methods startState, startSubroutine, finishState and finishSubroutine
 
 With this option, multiple URLs can be triggered each with its Tgherkin file.
 
 ### The CA option
 
 If using the CA option, selecting a subroutine for a form depends on:
- the actual number of editable widgets on the first screen being equal or larger
+  - the actual number of editable widgets on the first screen being equal or larger
 than an arbitrary number of editable widgets (see method setMinNoOfEditWidgets(
 int)).
 The CA option counts the number of editable widgets on the first web page. If this
@@ -63,12 +71,15 @@ of screens. Default the CA option scrolls to the next screen. The remainder of t
 sequence is random TESTAR actions.
 
 Building steps are:
- Implement a subclass of CompoundActionProtocol
- Create an input data file compoundActionData.csv. Define role, title and optional input text for individual widgets
- Change the settings of tag CompoundActionData and the usual tags ProtocolClass and SUTConnectorValue.
- Select the compound actions using method startSubroutine(State state). Default startSubroutine selects all widgets with role UIAEdit, UIARadioButton,
-UIACheckBox, UIASpinner, UIACustomControl and UIAButton.
- Optional: adapt methods startState and startSubroutine
+  - Implement a subclass of CompoundActionProtocol
+  - Create an input data file compoundActionData.csv. 
+    Define role, title and optional input text for individual widgets
+  - Change the settings of tag CompoundActionData and the usual tags 
+    ProtocolClass and SUTConnectorValue.
+  - Select the compound actions using method startSubroutine(State state).
+    Default startSubroutine selects all widgets with role UIAEdit, UIARadioButton,
+    UIACheckBox, UIASpinner, UIACustomControl and UIAButton.
+  - Optional: adapt methods startState and startSubroutine
 
 The input data file contains data for only one form. In contrast with the TG option,
 the CA option can trigger only one subroutine for one specific form.
