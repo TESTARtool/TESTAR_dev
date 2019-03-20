@@ -88,7 +88,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistSequenceNode(SequenceNode sequenceNode) {
-        delegateManager.persistSequenceNode(sequenceNode);
+        queue.add(() -> delegateManager.persistSequenceNode(sequenceNode));
     }
 
     @Override

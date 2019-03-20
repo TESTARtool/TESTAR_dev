@@ -63,7 +63,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.BlackHole,
             EntityClassFactory.EntityClassName.UnvisitedAbstractAction,
             EntityClassFactory.EntityClassName.TestSequence,
-            EntityClassFactory.EntityClassName.SequenceNode
+            EntityClassFactory.EntityClassName.SequenceNode,
+            EntityClassFactory.EntityClassName.Accessed
     ));
 
     /**
@@ -454,22 +455,49 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void persistSequenceNode(SequenceNode sequenceNode) {
-        EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceNode);
-        VertexEntity vertexEntity = new VertexEntity(entityClass);
+        // we save the node as an edge, from sequence node to concrete state
+        EntityClass nodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceNode);
+        VertexEntity nodeEntity = new VertexEntity(nodeClass);
 
         try {
             EntityHydrator sequenceNodeHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE_NODE);
-            sequenceNodeHydrator.hydrate(vertexEntity, sequenceNode);
+            sequenceNodeHydrator.hydrate(nodeEntity, sequenceNode);
         } catch (HydrationException e) {
             e.printStackTrace();
         }
 
-        entityManager.saveEntity(vertexEntity);
+        // get the concrete state and make a vertex out of it
+        EntityClass concreteStateClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
+        VertexEntity stateEntity = new VertexEntity(concreteStateClass);
+
+        // hydrate the entity to a format the orient database can store
+        try {
+            EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_CONCRETE_STATE);
+            hydrator.hydrate(stateEntity, sequenceNode.getConcreteState());
+        }
+        catch (HydrationException e) {
+            e.printStackTrace();
+            System.out.println("Encountered a problem while saving concrete state with id " + sequenceNode.getConcreteState().getId() + " to the orient database");
+        }
+
+        // we have to add an edge from sequence node to the concrete state it accessed
+        EntityClass accessedClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Accessed);
+        EdgeEntity accessedEdge = new EdgeEntity(accessedClass, nodeEntity, stateEntity);
+        try {
+            EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ACCESSED);
+            hydrator.hydrate(accessedEdge, null);
+        }
+        catch (HydrationException e) {
+            e.printStackTrace();
+            System.out.println("Encountered a problem while hydrating the accessed relation for sequence node " + sequenceNode.getNodeId());
+        }
+
+        entityManager.saveEntity(accessedEdge);
     }
 
     @Override
     public void initSequenceManager(SequenceManager sequenceManager) {
-
+        // the aim is
     }
 
     @Override

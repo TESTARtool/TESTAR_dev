@@ -10,7 +10,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -36,6 +36,7 @@ public class EntityClassFactory {
         classNameMap.put("TestSequence", EntityClassName.TestSequence);
         classNameMap.put("SequenceNode", EntityClassName.SequenceNode);
         classNameMap.put("SequenceStep", EntityClassName.SequenceStep);
+        classNameMap.put("Accessed", EntityClassName.Accessed);
     }
 
     /**
@@ -96,6 +97,9 @@ public class EntityClassFactory {
 
             case SequenceNode:
                 return createSequenceNodeClass();
+
+            case Accessed:
+                return createAccessedClass();
 
             default:
                 return null;
@@ -266,6 +270,18 @@ public class EntityClassFactory {
         return entityClass;
     }
 
+    private static EntityClass createAccessedClass() {
+        EntityClass entityClass = new EntityClass("Accessed", EntityClass.EntityType.Edge);
+        Property accessId = new Property("accessId", OType.STRING);
+        accessId.setMandatory(true);
+        accessId.setNullable(false);
+        accessId.setIdentifier(true);
+        accessId.setIndexAble(true);
+        entityClass.addProperty(accessId);
+        entityClasses.put(EntityClassName.Accessed, entityClass);
+        return entityClass;
+    }
+
     private static EntityClass createBlackHoleClass() {
         EntityClass entityClass = new EntityClass("BlackHole", EntityClass.EntityType.Vertex);
         Property blackHoleId = new Property("blackHoleId", OType.STRING);
@@ -347,6 +363,12 @@ public class EntityClassFactory {
         timestamp.setMandatory(true);
         timestamp.setIndexAble(false);
         entityClass.addProperty(timestamp);
+        Property stateId = new Property("concreteStateId", OType.STRING);
+        stateId.setMandatory(true);
+        stateId.setNullable(false);
+        stateId.setIdentifier(false);
+        stateId.setIndexAble(true);
+        entityClass.addProperty(stateId);
         entityClasses.put(EntityClassName.SequenceNode, entityClass);
         return entityClass;
     }

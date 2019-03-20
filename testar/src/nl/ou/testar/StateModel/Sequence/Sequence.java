@@ -113,11 +113,11 @@ public class Sequence {
     }
 
     /**
-     * Add a new note to the sequence.
+     * Add a new node to the sequence.
      * @param concreteState
      */
     public void addNode(ConcreteState concreteState) {
-        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr);
+        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState);
         nodes.add(node);
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
