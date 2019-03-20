@@ -43,7 +43,7 @@ The success of this option merely depends on the contents of the Tgherkin file a
 the way it is handled within the Tgherkin environment. In practice, the Tgherkin
 environment is at this moment, not a stable factor.
 
-Building steps for the TG option are:
+Building steps are:
   - Implement a subclass of TgherkinFileProtocol
   - Create an input data file tgherkinFileData.csv. 
     Define URL, Tgherkin file and exit action for each subroutine
