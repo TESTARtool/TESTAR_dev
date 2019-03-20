@@ -50,6 +50,8 @@ public class StateModelPanel extends JPanel {
     private JLabel label7 = new JLabel("DataStorePassword");
     private JLabel label8 = new JLabel("DataStoreMode");
     private JLabel label9 = new JLabel("Reset database");
+    private JLabel label10 = new JLabel("Application name");
+    private JLabel label11 = new JLabel("Application version");
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
@@ -60,6 +62,8 @@ public class StateModelPanel extends JPanel {
     private JPasswordField dataStorePasswordfield = new JPasswordField();
     private JTextField dataStoreModefield = new JTextField();
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
+    private JTextField applicationNameField = new JTextField();
+    private JTextField applicationVersionField = new JTextField();
 
     private StateModelPanel(){
         super();
@@ -80,42 +84,52 @@ public class StateModelPanel extends JPanel {
      */
     private void initialize() {
         setLayout(null);
-        label1.setBounds(10,14,180,27);
+        label1.setBounds(10,14,150,27);
         add(label1);
-        stateModelEnabledChkBox.setBounds(190,14,50,27);
+        stateModelEnabledChkBox.setBounds(160,14,50,27);
         add(stateModelEnabledChkBox);
-        label2.setBounds(10,52,180,27);
+        label2.setBounds(10,52,150,27);
         add(label2);
-        dataStoreTextfield.setBounds(190,52,200,27);
+        dataStoreTextfield.setBounds(160,52,125,27);
         add(dataStoreTextfield);
-        label3.setBounds(10,90,180,27);
+        label3.setBounds(10,90,150,27);
         add(label3);
-        dataStoreTypeTextfield.setBounds(190,90,200,27);
+        dataStoreTypeTextfield.setBounds(160,90,125,27);
         add(dataStoreTypeTextfield);
-        label4.setBounds(10,128,180,27);
+        label4.setBounds(10,128,150,27);
         add(label4);
-        dataStoreServerTextfield.setBounds(190,128,200,27);
+        dataStoreServerTextfield.setBounds(160,128,125,27);
         add(dataStoreServerTextfield);
-        label5.setBounds(10,166,180,27);
+        label5.setBounds(10,166,150,27);
         add(label5);
-        dataStoreDBTextfield.setBounds(190,166,200,27);
+        dataStoreDBTextfield.setBounds(160,166,125,27);
         add(dataStoreDBTextfield);
-        label6.setBounds(10,204,180,27);
+        label6.setBounds(10,204,150,27);
         add(label6);
-        dataStoreUserTextfield.setBounds(190,204,200,27);
+        dataStoreUserTextfield.setBounds(160,204,125,27);
         add(dataStoreUserTextfield);
-        label7.setBounds(10,242,180,27);
+        label7.setBounds(10,242,150,27);
         add(label7);
-        dataStorePasswordfield.setBounds(190,242,200,27);
+        dataStorePasswordfield.setBounds(160,242,125,27);
         add(dataStorePasswordfield);
-        label8.setBounds(10,280,180,27);
+        label8.setBounds(10,280,150,27);
         add(label8);
-        dataStoreModefield.setBounds(190,280,200,27);
+        dataStoreModefield.setBounds(160,280,125,27);
         add(dataStoreModefield);
-        label9.setBounds(10,318,180,27);
+        label9.setBounds(10,318,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(190, 318, 50, 27);
+        resetDatabaseCheckbox.setBounds(160, 318, 50, 27);
         add(resetDatabaseCheckbox);
+
+        label10.setBounds(300,52,150,27);
+        add(label10);
+        applicationNameField.setBounds(450, 52, 125, 27);
+        add(applicationNameField);
+
+        label11.setBounds(300,80,150,27);
+        add(label11);
+        applicationVersionField.setBounds(450, 80, 125, 27);
+        add(applicationVersionField);
     }
 
     /**
@@ -131,6 +145,8 @@ public class StateModelPanel extends JPanel {
         dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
         dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
         dataStoreModefield.setText(settings.get(ConfigTags.DataStoreMode));
+        applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
+        applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     }
 
     /**
@@ -147,6 +163,8 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.DataStorePassword, getPassword());
         settings.set(ConfigTags.DataStoreMode, dataStoreModefield.getText());
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
+        settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
+        settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
     }
 
     /**

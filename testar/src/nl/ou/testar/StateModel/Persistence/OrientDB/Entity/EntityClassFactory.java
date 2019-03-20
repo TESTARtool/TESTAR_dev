@@ -169,6 +169,16 @@ public class EntityClassFactory {
         abstractionAttributes.setMandatory(true);
         abstractionAttributes.setNullable(false);
         abstractStateModelClass.addProperty(abstractionAttributes);
+        Property applicationName = new Property("applicationName", OType.STRING);
+        applicationName.setMandatory(false);
+        applicationName.setNullable(true);
+        applicationName.setIdentifier(false);
+        abstractStateModelClass.addProperty(applicationName);
+        Property applicationVersion = new Property("applicationVersion", OType.STRING);
+        applicationVersion.setMandatory(false);
+        applicationVersion.setNullable(true);
+        applicationVersion.setIdentifier(false);
+        abstractStateModelClass.addProperty(applicationVersion);
         entityClasses.put(EntityClassName.AbstractStateModel, abstractStateModelClass);
         return abstractStateModelClass;
     }

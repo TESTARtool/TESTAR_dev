@@ -388,6 +388,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStoreUser =" + Util.lineSep()
 					+"DataStorePassword =" + Util.lineSep()
 					+"DataStoreMode = instant" + Util.lineSep()
+					+"ApplicationName = Buggy calculator" + Util.lineSep()
+					+"ApplicationVersion = 1.0.0" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"

@@ -19,6 +19,12 @@ public class AbstractStateModel {
     // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
     private String abstractionLevelIdentifier;
 
+    // the name of the application that is being modelled
+    private String applicationName;
+
+    // the version of the application that is being modelled
+    private String applicationVersion;
+
     // a set of tags that was used to `form` the abstract state model
     private Set<Tag<?>> tags;
 
@@ -47,8 +53,14 @@ public class AbstractStateModel {
      * constructor
      * @param abstractionLevelIdentifier
      */
-    public AbstractStateModel(String abstractionLevelIdentifier, Set<Tag<?>> tags, StateModelEventListener ...eventListeners) {
+    public AbstractStateModel(String abstractionLevelIdentifier,
+                              String applicationName,
+                              String applicationVersion,
+                              Set<Tag<?>> tags,
+                              StateModelEventListener ...eventListeners) {
         this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        this.applicationName = applicationName;
+        this.applicationVersion = applicationVersion;
         this.tags = tags;
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
@@ -280,5 +292,21 @@ public class AbstractStateModel {
      */
     private void activateEvents() {
         emitEvents = true;
+    }
+
+    /**
+     * This method returns the name of the application that is being modelled.
+     * @return
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    /**
+     * This method returns the version of the application that is being modelled.
+     * @return
+     */
+    public String getApplicationVersion() {
+        return applicationVersion;
     }
 }

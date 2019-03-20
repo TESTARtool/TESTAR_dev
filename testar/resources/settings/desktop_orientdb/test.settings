@@ -110,6 +110,8 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
+ApplicationName = Buggy calculator
+ApplicationVersion = 1.0.0
 
 #################################################################
 # State identifier attributes
