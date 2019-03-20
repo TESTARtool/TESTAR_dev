@@ -129,7 +129,7 @@ public abstract class TgherkinFileProtocol
    */
   @Override
   public void startSubroutine(State state) {
-    System.out.println("Start action subroutine");
+    System.out.println("Start subroutine");
     initializeDocument();
     if (subroutine != null) {
       shuffleSubroutine(state);
@@ -156,7 +156,7 @@ public abstract class TgherkinFileProtocol
    */
   @Override
   public void finishSubroutine(State state) {
-    System.out.println("Finish action subroutine");
+    System.out.println("Finish subroutine");
     sourceCode = null;
     subroutine = null;
     int index = getActualIndex();
@@ -183,7 +183,7 @@ public abstract class TgherkinFileProtocol
    * @throws ActionBuildException
    */
   @Override
-  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
+  public Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
    Set<Action> actions = new HashSet<Action>();
 
     if (subroutine == null) {
@@ -197,7 +197,7 @@ public abstract class TgherkinFileProtocol
       }
     } else {
       if (!moreSubroutineActions(state)) {
-        System.out.println("Finish state subroutine");
+        System.out.println("Finish state for subroutine");
         finishSubroutine(state);
         actions = finishState(sut, state);
       } else {

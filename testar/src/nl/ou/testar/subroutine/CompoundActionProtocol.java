@@ -1,7 +1,6 @@
 package nl.ou.testar.subroutine;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import org.fruit.alayer.Action;
@@ -174,13 +173,14 @@ public abstract class CompoundActionProtocol
     return actions;
   }
 
-  /** Derive action according to subroutine principle.
+  /** Derive actions to run the subroutine.
    * @param state the SUT's current state
+   * @param sut the system under testing
    * @param state the SUT's current state
    * @return action set
    */
   @Override
-  protected Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
+  public Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
     Set<Action> actions = new HashSet<Action>();
     int n = listOfCaActions.size();
     if (n == 0) {

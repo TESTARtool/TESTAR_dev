@@ -1,9 +1,9 @@
 package nl.ou.testar.subroutine;
 
 import java.util.Set;
-
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.SUT;
 
 /**
@@ -39,4 +39,12 @@ public interface SubroutineProxy {
    * @param state the SUT's current state
    */
   void finishSubroutine(State state);
+  
+  /** Derive action according to subroutine principle.
+   * @param state the SUT's current state
+   * @param sut the system under testing
+   * @param state the SUT's current state
+   * @return action set
+   */
+ Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException;
 }

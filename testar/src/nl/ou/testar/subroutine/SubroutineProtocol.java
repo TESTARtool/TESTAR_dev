@@ -5,6 +5,7 @@ import static org.fruit.alayer.Tags.Enabled;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import org.fruit.alayer.Action;
@@ -13,6 +14,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.Settings;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 
@@ -146,6 +148,38 @@ public abstract class SubroutineProtocol
       e.printStackTrace();
     }
     return outputData;
+  }
+  
+  /** Derive action according to subroutine principle.
+   * @param state the SUT's current state
+   * @param sut the system under testing
+   * @param state the SUT's current state
+   * @return action set
+   */
+  @Override
+  public Set<Action> deriveActions(SUT sut, State state) throws ActionBuildException {
+    Set<Action> actions = new HashSet<Action>();
+    if (startState(state)) {
+        System.out.println("Start state subroutine");
+        System.out.println("Start subroutine");
+        startSubroutine(state);
+    }
+      // define the way the subroutine implements actions and 
+      // controls the end of the subroutine
+    /*
+    else { 
+      if (end_condition_of_subroutine) {
+        System.out.println("Finish state subroutine");
+        finishSubroutine(state);
+        System.out.println("Finish subroutine");
+        actions = finishState(sut, state);
+    }
+    */
+    else {
+        System.out.println("Continue TESTAR");
+        actions = defaultDeriveActions(sut, state);
+    }
+    return actions;
   }
   
   /**
