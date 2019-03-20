@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Sequence;
 
+import nl.ou.testar.StateModel.ConcreteAction;
 import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -50,6 +51,11 @@ public class Sequence {
      * The starting date and time for this sequence.
      */
     private Instant startDateTime;
+
+    /**
+     * The current node in the run.
+     */
+    private SequenceNode currentNode;
 
     /**
      * A set of event listeners to notify of changes in the sequence.
@@ -114,13 +120,31 @@ public class Sequence {
 
     /**
      * Add a new node to the sequence.
-     * @param concreteState
+     * @param concreteState the state that was reached and has to be connected to the node
+     * @param concreteAction (Optionally) the action that was executed to reach the node
      */
-    public void addNode(ConcreteState concreteState) {
+    public void addNode(ConcreteState concreteState, ConcreteAction concreteAction) {
+        if (concreteAction == null) {
+            addNode(concreteState);
+        }
+        else {
+            addStep(concreteState, concreteAction);
+        }
+    }
+
+    private void addNode(ConcreteState concreteState) {
         SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState);
+        currentNode = node;
         nodes.add(node);
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
 
+    private void addStep(ConcreteState concreteState, ConcreteAction concreteAction) {
+        SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState);
+        SequenceStep sequenceStep = new SequenceStep(concreteAction, currentNode, targetNode);
+        nodes.add(targetNode);
+        currentNode = targetNode;
+        emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_STEP_ADDED, sequenceStep));
+    }
 
 }

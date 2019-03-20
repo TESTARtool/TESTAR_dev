@@ -98,6 +98,9 @@ public class EntityClassFactory {
             case SequenceNode:
                 return createSequenceNodeClass();
 
+            case SequenceStep:
+                return createSequenceStepClass();
+
             case Accessed:
                 return createAccessedClass();
 
@@ -370,6 +373,29 @@ public class EntityClassFactory {
         stateId.setIndexAble(true);
         entityClass.addProperty(stateId);
         entityClasses.put(EntityClassName.SequenceNode, entityClass);
+        return entityClass;
+    }
+
+    private static EntityClass createSequenceStepClass() {
+        EntityClass entityClass = new EntityClass("SequenceStep", EntityClass.EntityType.Edge);
+        Property identifier = new Property("stepId", OType.STRING);
+        identifier.setIdentifier(true);
+        identifier.setNullable(false);
+        identifier.setMandatory(true);
+        identifier.setIndexAble(true);
+        Property timestamp = new Property("timestamp", OType.DATETIME);
+        timestamp.setIdentifier(false);
+        timestamp.setNullable(false);
+        timestamp.setMandatory(true);
+        timestamp.setIndexAble(false);
+        entityClass.addProperty(timestamp);
+        Property concreteActionId = new Property("concreteActionId", OType.STRING);
+        concreteActionId.setMandatory(true);
+        concreteActionId.setNullable(false);
+        concreteActionId.setIdentifier(false);
+        concreteActionId.setIndexAble(true);
+        entityClass.addProperty(concreteActionId);
+        entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
     }
 

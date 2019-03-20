@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
+import nl.ou.testar.StateModel.Sequence.SequenceStep;
 
 public interface PersistenceManager {
 
@@ -70,5 +71,11 @@ public interface PersistenceManager {
      * @param sequenceNode
      */
     void persistSequenceNode(SequenceNode sequenceNode);
+
+    /**
+     * This method persists a sequence step to the data store.
+     * @param sequenceStep
+     */
+    void persistSequenceStep(SequenceStep sequenceStep);
 
 }

@@ -1,5 +1,6 @@
 package nl.ou.testar.StateModel.Sequence;
 
+import nl.ou.testar.StateModel.ConcreteAction;
 import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -75,15 +76,15 @@ public class SequenceManager {
     }
 
     /**
-     * Use this method to pass in the first concrete state that was reached in the run.
-     * @param concreteState
+     * Use this method to notify the sequence manager that a new state was reached in the sequence.
+     * @param concreteState the concrete state reached
+     * @param concreteAction (Optionally) a concrete action that was executed.
      */
-    public void notifyFirstState(ConcreteState concreteState) {
+    public void notifyStateReached(ConcreteState concreteState, ConcreteAction concreteAction) {
         if (concreteState == null || currentSequence == null || !currentSequence.isRunning()) {
             return;
         }
-
-        currentSequence.addNode(concreteState);
+        currentSequence.addNode(concreteState, concreteAction);
     }
 
 

@@ -19,6 +19,7 @@ import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
+import nl.ou.testar.StateModel.Sequence.SequenceStep;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Widget;
 import org.fruit.Pair;
@@ -64,6 +65,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.UnvisitedAbstractAction,
             EntityClassFactory.EntityClassName.TestSequence,
             EntityClassFactory.EntityClassName.SequenceNode,
+            EntityClassFactory.EntityClassName.SequenceStep,
             EntityClassFactory.EntityClassName.Accessed
     ));
 
@@ -497,7 +499,37 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     @Override
     public void initSequenceManager(SequenceManager sequenceManager) {
-        // the aim is
+    }
+
+    @Override
+    public void persistSequenceStep(SequenceStep sequenceStep) {
+        // the assumption is that the source node has already been saved
+        // so first we save the target node
+        persistSequenceNode(sequenceStep.getTargetNode());
+
+        // next, we hydrate the source and target nodes, and then the step
+        EntityClass nodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceNode);
+        VertexEntity sourceNode = new VertexEntity(nodeClass);
+        VertexEntity targetNode = new VertexEntity(nodeClass);
+
+        try {
+            EntityHydrator sequenceNodeHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE_NODE);
+            sequenceNodeHydrator.hydrate(sourceNode, sequenceStep.getSourceNode());
+            sequenceNodeHydrator.hydrate(targetNode, sequenceStep.getTargetNode());
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        EntityClass stepClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceStep);
+        EdgeEntity step = new EdgeEntity(stepClass, sourceNode, targetNode);
+        try {
+            EntityHydrator entityHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE_STEP);
+            entityHydrator.hydrate(step, sequenceStep);
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        entityManager.saveEntity(step);
     }
 
     @Override
@@ -537,6 +569,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case SEQUENCE_NODE_ADDED:
+                persistSequenceNode((SequenceNode) event.getPayload());
+                break;
+
+            case SEQUENCE_STEP_ADDED:
+                persistSequenceStep((SequenceStep) event.getPayload());
 
         }
 
