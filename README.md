@@ -13,10 +13,8 @@ The files for this framework are located in
   * /testar/resources/settings
   
 - tgherkin
-  * /testar/src/nl.ou.testar.tgherkin
-  
-– /tgherkin
-  * /native/src/.ou.testar.tgherkin.grammar
+  * /testar/src/nl.ou.testar.tgherkin 
+  * /tgherkin/native/src/.ou.testar.tgherkin.grammar
   
 ### Options
 
