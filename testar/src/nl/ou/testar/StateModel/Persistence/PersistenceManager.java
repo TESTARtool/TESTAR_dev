@@ -17,6 +17,9 @@ public interface PersistenceManager {
     // some data will be stored instantly and some will be stored after the sequence has finished
     String DATA_STORE_MODE_HYBRID = "hybrid";
 
+    // sometimes we do not want to persist data
+    String DATA_STORE_MODE_NONE = "none";
+
     /**
      * This method persists an entire state model.
      * @param abstractStateModel
