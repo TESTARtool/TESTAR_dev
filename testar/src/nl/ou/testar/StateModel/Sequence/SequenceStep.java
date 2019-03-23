@@ -1,10 +1,11 @@
 package nl.ou.testar.StateModel.Sequence;
 
 import nl.ou.testar.StateModel.ConcreteAction;
+import nl.ou.testar.StateModel.Persistence.Persistable;
 
 import java.time.Instant;
 
-public class SequenceStep {
+public class SequenceStep implements Persistable {
 
     /**
      * The action that was executed and is attached to this step.
@@ -47,5 +48,10 @@ public class SequenceStep {
 
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return true;
     }
 }

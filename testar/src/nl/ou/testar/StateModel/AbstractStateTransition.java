@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel;
 
-public class AbstractStateTransition {
+import nl.ou.testar.StateModel.Persistence.Persistable;
+
+public class AbstractStateTransition implements Persistable {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
     private AbstractState sourceState;
@@ -89,5 +91,10 @@ public class AbstractStateTransition {
      */
     public AbstractAction getAction() {
         return action;
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return false;
     }
 }

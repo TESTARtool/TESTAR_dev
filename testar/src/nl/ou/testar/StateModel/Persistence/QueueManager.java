@@ -34,10 +34,25 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
      */
     private boolean listening = true;
 
-    public QueueManager(PersistenceManager persistenceManager, EventHelper eventHelper) {
+    /**
+     * Is the queue manager running in hybrid mode?
+     */
+    private boolean hybridMode;
+
+    public QueueManager(PersistenceManager persistenceManager, EventHelper eventHelper, boolean hybridMode) {
         delegateManager = persistenceManager;
         queue = new ArrayDeque<>();
         this.eventHelper = eventHelper;
+        this.hybridMode = hybridMode;
+    }
+
+    private void processRequest(Runnable runnable, Persistable persistable) {
+        if (!hybridMode || persistable.canBeDelayed()) {
+            queue.add(runnable);
+        }
+        else {
+            runnable.run();
+        }
     }
 
     @Override
@@ -49,27 +64,27 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistAbstractState(AbstractState abstractState) {
-        queue.add(() -> delegateManager.persistAbstractState(abstractState));
+        processRequest(() -> delegateManager.persistAbstractState(abstractState), abstractState);
     }
 
     @Override
     public void persistAbstractAction(AbstractAction abstractAction) {
-        queue.add(() -> delegateManager.persistAbstractAction(abstractAction));
+        processRequest(() -> delegateManager.persistAbstractAction(abstractAction), abstractAction);
     }
 
     @Override
     public void persistAbstractStateTransition(AbstractStateTransition abstractStateTransition) {
-        queue.add(() -> delegateManager.persistAbstractStateTransition(abstractStateTransition));
+        processRequest(() -> delegateManager.persistAbstractStateTransition(abstractStateTransition), abstractStateTransition);
     }
 
     @Override
     public void persistConcreteState(ConcreteState concreteState) {
-        queue.add(() -> delegateManager.persistConcreteState(concreteState));
+        processRequest(() -> delegateManager.persistConcreteState(concreteState), concreteState);
     }
 
     @Override
     public void persistConcreteStateTransition(ConcreteStateTransition concreteStateTransition) {
-        queue.add(() -> delegateManager.persistConcreteStateTransition(concreteStateTransition));
+        processRequest(() -> delegateManager.persistConcreteStateTransition(concreteStateTransition), concreteStateTransition);
     }
 
     @Override
@@ -79,7 +94,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistSequence(Sequence sequence) {
-        queue.add(() -> delegateManager.persistSequence(sequence));
+        processRequest(() -> delegateManager.persistSequence(sequence), sequence);
     }
 
     @Override
@@ -89,12 +104,12 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistSequenceNode(SequenceNode sequenceNode) {
-        queue.add(() -> delegateManager.persistSequenceNode(sequenceNode));
+        processRequest(() -> delegateManager.persistSequenceNode(sequenceNode), sequenceNode);
     }
 
     @Override
     public void persistSequenceStep(SequenceStep sequenceStep) {
-        queue.add(() -> delegateManager.persistSequenceStep(sequenceStep));
+        processRequest(() -> delegateManager.persistSequenceStep(sequenceStep), sequenceStep);
     }
 
     @Override

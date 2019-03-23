@@ -1,10 +1,11 @@
 package nl.ou.testar.StateModel.Sequence;
 
 import nl.ou.testar.StateModel.ConcreteState;
+import nl.ou.testar.StateModel.Persistence.Persistable;
 
 import java.time.Instant;
 
-public class SequenceNode {
+public class SequenceNode implements Persistable {
 
     /**
      * The date and time of creation for this node.
@@ -47,5 +48,10 @@ public class SequenceNode {
 
     public ConcreteState getConcreteState() {
         return concreteState;
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return true;
     }
 }

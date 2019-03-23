@@ -1,9 +1,11 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Persistence.Persistable;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractAction extends AbstractEntity {
+public class AbstractAction extends AbstractEntity implements Persistable {
 
     // collection of concrete actions that are abstracted by this action
     private Set<String> concreteActionIds;
@@ -39,5 +41,10 @@ public class AbstractAction extends AbstractEntity {
      */
     public Set<String> getConcreteActionIds() {
         return concreteActionIds;
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return false;
     }
 }

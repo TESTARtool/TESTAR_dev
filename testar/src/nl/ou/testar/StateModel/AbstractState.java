@@ -3,13 +3,14 @@ package nl.ou.testar.StateModel;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
+import nl.ou.testar.StateModel.Persistence.Persistable;
 import nl.ou.testar.StateModel.Util.ActionHelper;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AbstractState extends AbstractEntity {
+public class AbstractState extends AbstractEntity implements Persistable {
 
     // list of possible actions that can be executed from this state
     private Map<String, AbstractAction> actions;
@@ -174,5 +175,10 @@ public class AbstractState extends AbstractEntity {
             actions.put(action.getActionId(), action);
             unvisitedActions.put(action.getActionId(), action);
         }
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return false;
     }
 }

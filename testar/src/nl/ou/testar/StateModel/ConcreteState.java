@@ -1,10 +1,11 @@
 package nl.ou.testar.StateModel;
 
+import nl.ou.testar.StateModel.Persistence.Persistable;
 import org.fruit.alayer.Tag;
 
 import java.util.Set;
 
-public class ConcreteState extends Widget{
+public class ConcreteState extends Widget implements Persistable {
 
     // a set of tags that was used in creating the concrete state id
     private Set<Tag<?>> tags;
@@ -46,5 +47,10 @@ public class ConcreteState extends Widget{
      */
     public AbstractState getAbstractState() {
         return abstractState;
+    }
+
+    @Override
+    public boolean canBeDelayed() {
+        return true;
     }
 }

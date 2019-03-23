@@ -5,6 +5,7 @@ import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Event.StateModelEventType;
+import nl.ou.testar.StateModel.Persistence.Persistable;
 import org.fruit.alayer.Tag;
 
 import java.time.Instant;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class Sequence {
+public class Sequence implements Persistable {
 
     private boolean active = false;
 
@@ -147,4 +148,8 @@ public class Sequence {
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_STEP_ADDED, sequenceStep));
     }
 
+    @Override
+    public boolean canBeDelayed() {
+        return true;
+    }
 }

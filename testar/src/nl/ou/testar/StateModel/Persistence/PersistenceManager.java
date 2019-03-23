@@ -8,9 +8,14 @@ import nl.ou.testar.StateModel.Sequence.SequenceStep;
 
 public interface PersistenceManager {
 
+    // the data will be stored instantly as requests reach the  persistence manager
     String DATA_STORE_MODE_INSTANT = "instant";
 
+    // the data will not be stored until a test sequence has finished
     String DATA_STORE_MODE_DELAYED = "delayed";
+
+    // some data will be stored instantly and some will be stored after the sequence has finished
+    String DATA_STORE_MODE_HYBRID = "hybrid";
 
     /**
      * This method persists an entire state model.

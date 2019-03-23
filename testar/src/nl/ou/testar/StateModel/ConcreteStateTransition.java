@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel;
 
-public class ConcreteStateTransition {
+import nl.ou.testar.StateModel.Persistence.Persistable;
+
+public class ConcreteStateTransition implements Persistable {
 
     // a transition is a trinity consisting of two states as endpoints and an action to tie these together
     private ConcreteState sourceState;
@@ -91,4 +93,8 @@ public class ConcreteStateTransition {
         return action;
     }
 
+    @Override
+    public boolean canBeDelayed() {
+        return true;
+    }
 }

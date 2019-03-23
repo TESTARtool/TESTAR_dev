@@ -30,7 +30,11 @@ public class OrientDBManagerFactory implements PersistenceManagerFactory {
         PersistenceManager persistenceManager;
         switch (settings.get(ConfigTags.DataStoreMode)) {
             case PersistenceManager.DATA_STORE_MODE_DELAYED:
-                persistenceManager = new QueueManager(new OrientDBManager(eventHelper, entityManager), new EventHelper());
+                persistenceManager = new QueueManager(new OrientDBManager(eventHelper, entityManager), new EventHelper(), false);
+                break;
+
+            case PersistenceManager.DATA_STORE_MODE_HYBRID:
+                persistenceManager = new QueueManager(new OrientDBManager(eventHelper, entityManager), new EventHelper(), true);
                 break;
 
             case PersistenceManager.DATA_STORE_MODE_INSTANT:
