@@ -88,37 +88,47 @@ public class StateModelPanel extends JPanel {
         add(label1);
         stateModelEnabledChkBox.setBounds(160,14,50,27);
         add(stateModelEnabledChkBox);
+
         label2.setBounds(10,52,150,27);
         add(label2);
         dataStoreTextfield.setBounds(160,52,125,27);
         add(dataStoreTextfield);
+
         label3.setBounds(10,90,150,27);
         add(label3);
         dataStoreTypeTextfield.setBounds(160,90,125,27);
         add(dataStoreTypeTextfield);
+
         label4.setBounds(10,128,150,27);
         add(label4);
         dataStoreServerTextfield.setBounds(160,128,125,27);
         add(dataStoreServerTextfield);
+
         label5.setBounds(10,166,150,27);
         add(label5);
         dataStoreDBTextfield.setBounds(160,166,125,27);
         add(dataStoreDBTextfield);
+
         label6.setBounds(10,204,150,27);
         add(label6);
         dataStoreUserTextfield.setBounds(160,204,125,27);
         add(dataStoreUserTextfield);
+
         label7.setBounds(10,242,150,27);
         add(label7);
         dataStorePasswordfield.setBounds(160,242,125,27);
         add(dataStorePasswordfield);
+
         label8.setBounds(10,280,150,27);
         add(label8);
         dataStoreModefield.setBounds(160,280,125,27);
+        dataStoreModefield.setToolTipText("Valid options: none, instant, delayed, hybrid");
         add(dataStoreModefield);
+
         label9.setBounds(10,318,150,27);
         add(label9);
         resetDatabaseCheckbox.setBounds(160, 318, 50, 27);
+        resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
         label10.setBounds(300,52,150,27);
