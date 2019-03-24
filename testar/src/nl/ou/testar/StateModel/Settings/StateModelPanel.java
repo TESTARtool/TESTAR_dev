@@ -60,10 +60,10 @@ public class StateModelPanel extends JPanel {
     private JTextField dataStoreDBTextfield = new JTextField();
     private JTextField dataStoreUserTextfield = new JTextField();
     private JPasswordField dataStorePasswordfield = new JPasswordField();
-    private JTextField dataStoreModefield = new JTextField();
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
     private JTextField applicationNameField = new JTextField();
     private JTextField applicationVersionField = new JTextField();
+    private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
 
     private StateModelPanel(){
         super();
@@ -121,9 +121,8 @@ public class StateModelPanel extends JPanel {
 
         label8.setBounds(10,280,150,27);
         add(label8);
-        dataStoreModefield.setBounds(160,280,125,27);
-        dataStoreModefield.setToolTipText("Valid options: none, instant, delayed, hybrid");
-        add(dataStoreModefield);
+        dataStoreModeBox.setBounds(160,280,125,27);
+        add(dataStoreModeBox);
 
         label9.setBounds(10,318,150,27);
         add(label9);
@@ -154,7 +153,12 @@ public class StateModelPanel extends JPanel {
         dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
         dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
         dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
-        dataStoreModefield.setText(settings.get(ConfigTags.DataStoreMode));
+        for (int i =0; i < dataStoreModeBox.getItemCount(); i++) {
+            if (dataStoreModeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreMode))) {
+                dataStoreModeBox.setSelectedIndex(i);
+                break;
+            }
+        }
         applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
         applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
     }
@@ -171,7 +175,7 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.DataStoreDB, dataStoreDBTextfield.getText());
         settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
         settings.set(ConfigTags.DataStorePassword, getPassword());
-        settings.set(ConfigTags.DataStoreMode, dataStoreModefield.getText());
+        settings.set(ConfigTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
         settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
