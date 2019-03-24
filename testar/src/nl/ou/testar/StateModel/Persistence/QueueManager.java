@@ -57,8 +57,17 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void persistAbstractStateModel(AbstractStateModel abstractStateModel) {
-        while (!queue.isEmpty()) {
-            queue.remove().run();
+        if (!queue.isEmpty()) {
+            int nrOfItemsProcessed = 0;
+            int totalNrOfItems = queue.size();
+            QueueVisualizer visualizer = new QueueVisualizer("Processing persistence queue");
+            visualizer.updateMessage(nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
+            while (!queue.isEmpty()) {
+                queue.remove().run();
+                nrOfItemsProcessed++;
+                visualizer.updateMessage(nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
+            }
+            visualizer.stop();
         }
     }
 
