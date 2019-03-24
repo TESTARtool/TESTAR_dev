@@ -16,6 +16,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
     private StrategyActionSelector strategyActionSelector;
     private List<Metric> metrics = new ArrayList<>();
+    private Date startDate = new Date();
 
     public StrategyFactoryImpl(final String strategy) {
         if (strategy.endsWith(".txt")) {
@@ -113,7 +114,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
 
     private String getHeaders() {
         return "Sequence," + // Sequence
-                "Duration" +  // Time it took to execute sequence
+                "Duration," +  // Time it took to execute sequence
                 "States," +  // # of abstract states visited
                 "Actions," + // # of actions executed
                 "UniqueStates," + // # of unique states visited
@@ -129,8 +130,8 @@ public class StrategyFactoryImpl implements StrategyFactory {
                         .append(metric.getSequenceNo()).append(',')
                         .append(metric.getSequenceDuration()).append(',')
                         .append(metric.getVisitedStates()).append(',')
-                    .append(metric.getExecutedActions()).append(',')
-                    .append(metric.getUniqueStates()).append(',')
+                        .append(metric.getExecutedActions()).append(',')
+                        .append(metric.getUniqueStates()).append(',')
                         .append(metric.getUniqueActions()).append(',')
                         .append(metric.getNotFoundActions()).append(',')
                         .append(metric.getIrregularActions()).append('\n')
@@ -144,7 +145,14 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     private String getFileName() {
-        return (System.getProperty("Dcounter") == null) ? "ecj_" + "test" : "ecj_sequence" + System.getProperty("Dcounter");
+        final Calendar now = Calendar.getInstance();
+        final int year = now.get(Calendar.YEAR);
+        final int month = now.get(Calendar.MONTH) + 1; // Note: zero based!
+        final int day = now.get(Calendar.DAY_OF_MONTH);
+        final int hour = now.get(Calendar.HOUR_OF_DAY);
+        final int minute = now.get(Calendar.MINUTE);
+
+        return String.format("%d-%02d-%02dT%02d_%02d", year, month, day, hour, minute);
     }
 
     private StrategyNode getStrategyNode() {
