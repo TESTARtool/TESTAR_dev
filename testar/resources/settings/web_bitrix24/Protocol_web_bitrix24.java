@@ -295,7 +295,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 					// type into text boxes
 					if(isTypeable(w)){
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));					
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 					
 					// slides

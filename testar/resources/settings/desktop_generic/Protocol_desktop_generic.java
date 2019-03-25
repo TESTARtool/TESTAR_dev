@@ -183,7 +183,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 						//Store the widget in the Graphdatabase
 						storeWidget(state.get(Tags.ConcreteID), w);
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
