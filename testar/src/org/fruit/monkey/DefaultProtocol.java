@@ -564,11 +564,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
 
-                // notify the state model manager of the initial state
-                Set<Action> actions = deriveActions(system, state);
-                CodingManager.buildIDs(state, actions);
-                stateModelManager.notifyNewStateReached(state, actions);
-
                 /*
                  ***** starting the INNER LOOP:
                  */
@@ -675,6 +670,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
             CodingManager.buildIDs(state, actions);
+			// notify to state model the current state
+            stateModelManager.notifyNewStateReached(state, actions);
+			
+			
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -704,11 +703,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             executeAction(system, state, action);
             actionCount++;
 
-            // notify the state model manager of the newly reached state
-            actions = deriveActions(system, state);
-            CodingManager.buildIDs(state, actions);
-            stateModelManager.notifyNewStateReached(state, actions);
-
             //Saving the actions and the executed action into replayable test sequence:
             saveActionIntoFragmentForReplayableSequence(action, state, actions);
 
@@ -716,6 +710,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.clear(cv);
             cv.end();
         }
+        
+        // notify to state model the last state
+        Set<Action> actions = deriveActions(system, state);
+        CodingManager.buildIDs(state, actions);
+        stateModelManager.notifyNewStateReached(state, actions);
     }
 
     /**
@@ -1335,7 +1334,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			};  
 			//TODO: When a Thread ends its code, it still existing in our TESTAR VM like Thread.State.TERMINATED
 			//JVM GC should optimize the memory, but maybe we should implement a different way to create this Threads
-			//¿ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
+			//ThreadPool? ExecutorService processListenerPool = Executors.newFixedThreadPool(2); ?
 			
 			new Thread(readErrors).start();
 			new Thread(readOutput).start();
