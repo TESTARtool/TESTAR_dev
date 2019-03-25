@@ -1180,8 +1180,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							state = builder.apply(sut);
 							if (state != null && state.childCount() > 0){
 								long extraTime = tryToKillIfRunning ? 0 : ENGAGE_TIME;
-								System.out.println("SUT accessible after <"
-								 + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
+								System.out.println("SUT accessible after <" + (extraTime + (System.currentTimeMillis() - now)) + "> ms");
 								return sut;
 							}
 						}else {
