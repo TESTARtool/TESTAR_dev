@@ -1,9 +1,5 @@
 package nl.ou.testar.StateModel;
 
-import org.fruit.alayer.Tag;
-
-import java.util.Set;
-
 public class ConcreteAction extends Widget {
 
     /**
