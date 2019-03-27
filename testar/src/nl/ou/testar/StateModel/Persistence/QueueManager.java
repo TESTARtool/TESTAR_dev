@@ -61,11 +61,11 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
             int nrOfItemsProcessed = 0;
             int totalNrOfItems = queue.size();
             QueueVisualizer visualizer = new QueueVisualizer("Processing persistence queue");
-            visualizer.updateMessage(nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
+            visualizer.updateMessage("Processing persistence queue : " + nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
             while (!queue.isEmpty()) {
                 queue.remove().run();
                 nrOfItemsProcessed++;
-                visualizer.updateMessage(nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
+                visualizer.updateMessage("Processing persistence queue : " + nrOfItemsProcessed + " / " + totalNrOfItems + " processed");
             }
             visualizer.stop();
         }

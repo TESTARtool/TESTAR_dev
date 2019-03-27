@@ -19,6 +19,11 @@ public abstract class DocumentEntity {
      */
     private Map<String, PropertyValue> entityProperties;
 
+    /**
+     * Should the entity be updated if it already exists?
+     */
+    private boolean updateEnabled = true;
+
     public DocumentEntity(EntityClass entityClass) {
         this.entityClass = entityClass;
         entityProperties = new HashMap<>();
@@ -52,6 +57,22 @@ public abstract class DocumentEntity {
      */
     public Set<String> getPropertyNames() {
         return entityProperties.keySet();
+    }
+
+    /**
+     * Specify whether or not the entity can be updated if it already exists.
+     * @param updateEnabled
+     */
+    public void enableUpdate(boolean updateEnabled) {
+        this.updateEnabled = updateEnabled;
+    }
+
+    /**
+     * This method returns true if the entity can be updated when it already exists in the datastore.
+     * @return
+     */
+    public boolean updateEnabled() {
+        return  updateEnabled;
     }
 
 }

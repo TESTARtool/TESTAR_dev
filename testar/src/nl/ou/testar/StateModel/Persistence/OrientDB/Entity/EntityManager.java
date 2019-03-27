@@ -299,6 +299,7 @@ public class EntityManager {
      */
     private void saveVertexEntity(VertexEntity entity, ODatabaseSession db) {
         OVertex oVertex;
+        boolean newVertex = false;
         // check to see if the vertex already exists in the database
         try {
             oVertex = retrieveVertex(entity, db);
@@ -306,7 +307,11 @@ public class EntityManager {
         catch (EntityNotFoundException e) {
             // vertex doesn't exist yet. No problemo. We'll create one.
             oVertex = db.newVertex(entity.getEntityClass().getClassName());
+            newVertex = true;
         }
+
+        // check if we should process the properties
+        if (!(newVertex || entity.updateEnabled())) return;
 
         // now we have to add or update properties!
         for (String propertyName : entity.getPropertyNames()) {
@@ -328,32 +333,61 @@ public class EntityManager {
             //@todo we could at some point implement some error handling here, but for now we simply do not store the edge
         }
 
-        // make sure the edge's endpoints exist in the database and are updated!
-        if (!vertexExists(entity.getSourceEntity(), db)) {
-            saveVertexEntity(entity.getSourceEntity(), db);
-        }
-        if (!vertexExists(entity.getTargetEntity(), db)) {
-            saveVertexEntity(entity.getTargetEntity(), db);
-        }
-
-        // check if the edge entity already exists
+        // first we check if the edge already exists..this saves a lot of overhead.
         OEdge edge;
         try {
             edge = retrieveEdge(entity, db);
-        } catch (EntityNotFoundException e) {
-            // edge doesn't exist yet. Let's create a new one
-            try {
-                OVertex sourceVertex = retrieveVertex(entity.getSourceEntity(), db);
-                OVertex targetVertex = retrieveVertex(entity.getTargetEntity(), db);
-                edge = sourceVertex.addEdge(targetVertex, entity.getEntityClass().getClassName());
-            } catch (EntityNotFoundException e1) {
-                // should not happen at this point
-                e1.printStackTrace();
-                return;
+            // the edge exists. Check if we have to update properties
+            if (entity.updateEnabled()) {
+                for (String propertyName : entity.getPropertyNames()) {
+                    setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
+                }
             }
+            // that's all we need to do. An edge has a unique identifier, no need to continue processing.
+            return;
+
+        } catch (EntityNotFoundException e) {
+            // we don't do anything here. If the edge does not exist, we just want to continue with method execution
         }
 
-        // now we have to add or update properties!
+        // retrieve and/or update/save the source vertex
+        OVertex sourceVertex;
+        boolean newSourceVertex = false;
+        try {
+            sourceVertex = retrieveVertex(entity.getSourceEntity(), db);
+        }
+        catch (EntityNotFoundException e) {
+            sourceVertex = db.newVertex(entity.getSourceEntity().getEntityClass().getClassName());
+            newSourceVertex = true;
+        }
+
+        if (newSourceVertex || entity.getSourceEntity().updateEnabled()) {
+            for (String propertyName : entity.getSourceEntity().getPropertyNames()) {
+                setProperty(sourceVertex, propertyName, entity.getSourceEntity().getPropertyValue(propertyName).getValue(), db);
+            }
+            sourceVertex.save();
+        }
+
+        // retrieve and/or update/save the target vertex
+        OVertex targetVertex;
+        boolean newTargetVertex = false;
+        try {
+            targetVertex = retrieveVertex(entity.getTargetEntity(), db);
+        }
+        catch (EntityNotFoundException e) {
+            targetVertex = db.newVertex(entity.getTargetEntity().getEntityClass().getClassName());
+            newTargetVertex = true;
+        }
+
+        if (newTargetVertex || entity.getTargetEntity().updateEnabled()) {
+            for (String propertyName : entity.getTargetEntity().getPropertyNames()) {
+                setProperty(targetVertex, propertyName, entity.getTargetEntity().getPropertyValue(propertyName).getValue(), db);
+            }
+            targetVertex.save();
+        }
+
+        // now create the new edge, set the properties and save
+        edge = sourceVertex.addEdge(targetVertex, entity.getEntityClass().getClassName());
         for (String propertyName : entity.getPropertyNames()) {
             setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
@@ -399,7 +433,7 @@ public class EntityManager {
                 return;
             }
 
-            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " = " + identifier.getPropertyName();
+            String stmt = "DELETE " + typeName + " " + entityClass.getClassName() + " WHERE " + identifier.getPropertyName() + " IN :" + identifier.getPropertyName();
             Map<String, Object> params = new HashMap<>();
             params.put(identifier.getPropertyName(), idValues);
             db.command(stmt, params);

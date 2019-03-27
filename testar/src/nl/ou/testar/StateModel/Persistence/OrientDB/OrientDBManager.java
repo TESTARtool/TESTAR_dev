@@ -106,12 +106,12 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public void persistAbstractState(AbstractState abstractState) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        VertexEntity vertexEntity = new VertexEntity(entityClass);
+        VertexEntity abstractStateEntity = new VertexEntity(entityClass);
 
         // hydrate the entity to a format the orient database can store
         try {
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
-            hydrator.hydrate(vertexEntity, abstractState);
+            hydrator.hydrate(abstractStateEntity, abstractState);
         } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + abstractState.getStateId() + " to the orient database");
@@ -119,13 +119,14 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         // save the entity!
-        entityManager.saveEntity(vertexEntity);
+        entityManager.saveEntity(abstractStateEntity);
 
         // deal with the unvisited actions on the states
-        persistUnvisitedActions(abstractState, vertexEntity);
+        persistUnvisitedActions(abstractState, abstractStateEntity);
     }
 
-    private void persistUnvisitedActions(AbstractState abstractState, VertexEntity vertexEntity) {
+    private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
+        abstractStateEntity.enableUpdate(false);
         // 1) delete the unvisited actions that are no longer unvisited
         // 2) save the unvisited actions (for newly saved states)
 
@@ -140,6 +141,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // all unvisited actions go to the black hole vertex!
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.BlackHole);
         VertexEntity blackHole = new VertexEntity(targetEntityClass);
+        blackHole.enableUpdate(false);
         try {
             EntityHydrator blackHoleHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_BLACKHOLE);
             blackHoleHydrator.hydrate(blackHole, null);
@@ -153,7 +155,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {
-                EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, vertexEntity, blackHole);
+                EdgeEntity actionEntity = new EdgeEntity(unvisitedActionEntityClass, abstractStateEntity, blackHole);
+                actionEntity.enableUpdate(false);
                 actionHydrator.hydrate(actionEntity, unvisitedAction);
                 entityManager.saveEntity(actionEntity);
             }
@@ -177,12 +180,12 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public void persistConcreteState(ConcreteState concreteState) {
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
-        VertexEntity vertexEntity = new VertexEntity(entityClass);
+        VertexEntity concreteStateEntity = new VertexEntity(entityClass);
 
         // hydrate the entity to a format the orient database can store
         try {
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_CONCRETE_STATE);
-            hydrator.hydrate(vertexEntity, concreteState);
+            hydrator.hydrate(concreteStateEntity, concreteState);
         }
         catch (HydrationException e) {
             e.printStackTrace();
@@ -191,30 +194,35 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         // save the entity!
-        entityManager.saveEntity(vertexEntity);
+        entityManager.saveEntity(concreteStateEntity);
 
         // store the widgettree attached to this concrete state
-        persistWidgetTree(concreteState, vertexEntity);
+        persistWidgetTree(concreteState, concreteStateEntity);
 
         // optional: if an abstract state is provided, we connect the concrete state to it using an isAbstractedBy relation
         if (concreteState.getAbstractState() == null) {
             return;
         }
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractState);
-        VertexEntity targetVertexEntity = new VertexEntity(targetEntityClass);
+        VertexEntity abstractStateEntity = new VertexEntity(targetEntityClass);
         // hydrate the entity to a format the orient database can store
         try {
             EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_STATE);
-            hydrator.hydrate(targetVertexEntity, concreteState.getAbstractState());
+            hydrator.hydrate(abstractStateEntity, concreteState.getAbstractState());
         } catch (HydrationException e) {
             e.printStackTrace();
             System.out.println("Encountered a problem while saving abstract state with id " + concreteState.getAbstractState().getStateId() + " to the orient database");
             return;
         }
 
+        // set the concretestate and abstractstate entities to not update anymore. That is not required for this relation
+        concreteStateEntity.enableUpdate(false);
+        abstractStateEntity.enableUpdate(false);
+
         // create the edge entity and persist it
         EntityClass edgeEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.isAbstractedBy);
-        EdgeEntity edgeEntity = new EdgeEntity(edgeEntityClass, vertexEntity, targetVertexEntity);
+        EdgeEntity edgeEntity = new EdgeEntity(edgeEntityClass, concreteStateEntity, abstractStateEntity);
+        edgeEntity.enableUpdate(false);
 
         try {
             EntityHydrator entityHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACTED_BY);
@@ -231,22 +239,22 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
      * @param widget
      */
     private void persistWidgetTree(Widget widget, VertexEntity widgetEntity) {
+        widgetEntity.enableUpdate(false);
         // we assume the root widget of the tree has already been stored, as this will be the concrete state
         // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
         for (Widget childWidget : widget.getChildren()) {
             VertexEntity childWidgetEntity = persistWidget(childWidget);
+            childWidgetEntity.enableUpdate(false);
 
             // with the widget saved, we need to also store parent and child relationships between the two widgets
             EntityClass isChildEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.isChildOf);
-            EntityClass isParentEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.isParentOf);
             EdgeEntity isChildEntity = new EdgeEntity(isChildEntityClass, childWidgetEntity, widgetEntity);
-            EdgeEntity isParentEntity = new EdgeEntity(isParentEntityClass, widgetEntity, childWidgetEntity);
+            isChildEntity.enableUpdate(false);
 
             // hydrate the entities
             try {
                 EntityHydrator hydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_WIDGET_RELATION);
                 hydrator.hydrate(isChildEntity, null);
-                hydrator.hydrate(isParentEntity, null);
             }
             catch (HydrationException e) {
                 e.printStackTrace();
@@ -254,7 +262,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 return;
             }
             entityManager.saveEntity(isChildEntity);
-            entityManager.saveEntity(isParentEntity);
 
             // go down the widget tree and do it again
             persistWidgetTree(childWidget, childWidgetEntity);
@@ -313,6 +320,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             return;
         }
 
+        // no need to update the abstract states anymore
+        sourceVertexEntity.enableUpdate(false);
+        targetVertexEntity.enableUpdate(false);
+
         // now we create an action entity that will link our two state entities
         entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.AbstractAction);
         EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
@@ -353,6 +364,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             return;
         }
 
+        // no need to update the concrete states anymore
+        sourceVertexEntity.enableUpdate(false);
+        targetVertexEntity.enableUpdate(false);
+
         // now we create an action entity that will link our two state entities
         entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteAction);
         EdgeEntity actionEntity = new EdgeEntity(entityClass, sourceVertexEntity, targetVertexEntity);
@@ -364,6 +379,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         catch (HydrationException ex) {
             //@todo add some meaningful logging here as well
         }
+        actionEntity.enableUpdate(false);
         entityManager.saveEntity(actionEntity);
     }
 
@@ -387,6 +403,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         // step 1: persist the state model entity to the database. if it already exists, nothing will happen
+        stateModelEntity.enableUpdate(false);
         entityManager.saveEntity(stateModelEntity);
 
         // step 2: see if there are abstract states present in the data store that are tied to this abstract state model
@@ -500,6 +517,9 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // if this is the first node in the sequence, we also have to create a relation between the sequence and this node to indicate this
         if (!sequenceNode.isFirstNode() || sequenceNode.getSequence() == null) return;
 
+        // no need to update the node again
+        nodeEntity.enableUpdate(false);
+
         // create a vertex entity for the test sequence
         EntityClass sequenceClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.TestSequence);
         VertexEntity sequenceEntity = new VertexEntity(sequenceClass);
@@ -509,6 +529,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         } catch (HydrationException e) {
             e.printStackTrace();
         }
+        // no need to update the sequence either
+        sequenceEntity.enableUpdate(false);
 
         // now an edge entity for the relation
         EntityClass firstNodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.FirstNode);
@@ -545,6 +567,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         } catch (HydrationException e) {
             e.printStackTrace();
         }
+
+        // no need to update the source and target nodes
+        sourceNode.enableUpdate(false);
+        targetNode.enableUpdate(false);
 
         EntityClass stepClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.SequenceStep);
         EdgeEntity step = new EdgeEntity(stepClass, sourceNode, targetNode);
