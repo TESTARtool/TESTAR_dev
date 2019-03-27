@@ -34,6 +34,10 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Panel with settings for the state model inference module.
@@ -64,6 +68,7 @@ public class StateModelPanel extends JPanel {
     private JTextField applicationNameField = new JTextField();
     private JTextField applicationVersionField = new JTextField();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
+    private Set<JComponent> components;
 
     private StateModelPanel(){
         super();
@@ -83,10 +88,30 @@ public class StateModelPanel extends JPanel {
      * Initialize panel.
      */
     private void initialize() {
+        // add the components that can be enabled/disabled to the set
+        components = new HashSet<>();
+        components.add(dataStoreTextfield);
+        components.add(dataStoreTypeTextfield);
+        components.add(dataStoreServerTextfield);
+        components.add(dataStoreDBTextfield);
+        components.add(dataStoreUserTextfield);
+        components.add(dataStorePasswordfield);
+        components.add(resetDatabaseCheckbox);
+        components.add(applicationNameField);
+        components.add(applicationVersionField);
+        components.add(dataStoreModeBox);
+
+        // add the components to the panel
         setLayout(null);
         label1.setBounds(10,14,150,27);
         add(label1);
         stateModelEnabledChkBox.setBounds(160,14,50,27);
+        stateModelEnabledChkBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
+            }
+        });
         add(stateModelEnabledChkBox);
 
         label2.setBounds(10,52,150,27);
@@ -161,6 +186,8 @@ public class StateModelPanel extends JPanel {
         }
         applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
         applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
+        // check if the fields should be enabled or not
+        components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
     }
 
     /**
@@ -192,4 +219,5 @@ public class StateModelPanel extends JPanel {
         }
         return  result.toString();
     }
+
 }
