@@ -488,7 +488,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.exit();
         LOGGER.info("Test sequence {} finished in {} ms", sequenceCount() - 1, System.currentTimeMillis() - tStart);
         // notify the statemodelmanager
-        stateModelManager.notifyTestSequenceStopped();
+        stateModelManager.notifySequenceEnded();
     }
 
     /**
@@ -573,7 +573,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 finishSequence();
 
                 // notify the state model manager of the sequence end
-                stateModelManager.notifySequenceEnded();
+                stateModelManager.notifyTestSequenceStopped();
 
                 writeAndCloseFragmentForReplayableSequence();
 

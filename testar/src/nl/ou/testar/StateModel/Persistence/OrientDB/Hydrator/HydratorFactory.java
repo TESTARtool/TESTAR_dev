@@ -33,6 +33,8 @@ public abstract class HydratorFactory {
 
     public static final int HYDRATOR_SEQUENCE_STEP = 13;
 
+    public static final int HYDRATOR_FIRST_NODE = 14;
+
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<Integer, EntityHydrator> hydrators = new HashMap<>();
 
@@ -80,6 +82,9 @@ public abstract class HydratorFactory {
 
             case HYDRATOR_SEQUENCE_STEP:
                 return createSequenceStepHydrator();
+
+            case HYDRATOR_FIRST_NODE:
+                return createFirstNodeHydrator();
 
             default:
                 throw new HydrationException("Invalid hydrator type provided to the hydrator factory");
@@ -162,6 +167,12 @@ public abstract class HydratorFactory {
         SequenceStepHydrator sequenceStepHydrator = new SequenceStepHydrator();
         hydrators.put(HYDRATOR_SEQUENCE_STEP, sequenceStepHydrator);
         return sequenceStepHydrator;
+    }
+
+    private static FirstNodeHydrator createFirstNodeHydrator() {
+        FirstNodeHydrator firstNodeHydrator = new FirstNodeHydrator();
+        hydrators.put(HYDRATOR_FIRST_NODE, firstNodeHydrator);
+        return firstNodeHydrator;
     }
 
 }

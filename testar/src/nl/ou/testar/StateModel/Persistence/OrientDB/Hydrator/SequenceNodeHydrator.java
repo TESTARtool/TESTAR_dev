@@ -29,5 +29,6 @@ public class SequenceNodeHydrator implements EntityHydrator<VertexEntity> {
         entity.addPropertyValue("timestamp", new PropertyValue(OType.DATETIME, date));
         entity.addPropertyValue("nodeNr", new PropertyValue(OType.INTEGER, ((SequenceNode) source).getNodeNr()));
         entity.addPropertyValue("concreteStateId", new PropertyValue(OType.STRING, ((SequenceNode) source).getConcreteState().getId()));
+        entity.addPropertyValue("sequenceId", new PropertyValue(OType.STRING, ((SequenceNode) source).getSequenceId()));
     }
 }

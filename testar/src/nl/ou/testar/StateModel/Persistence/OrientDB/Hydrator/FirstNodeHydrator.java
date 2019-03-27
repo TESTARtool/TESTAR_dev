@@ -6,19 +6,11 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
-import nl.ou.testar.StateModel.Sequence.SequenceNode;
-import nl.ou.testar.StateModel.Sequence.SequenceStep;
 
-import java.util.Date;
-
-public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
+public class FirstNodeHydrator implements EntityHydrator<EdgeEntity> {
 
     @Override
     public void hydrate(EdgeEntity edgeEntity, Object source) throws HydrationException {
-        if (!(source instanceof SequenceStep)) {
-            throw new HydrationException();
-        }
-
         // first make sure the identity property is set
         Property identifier = edgeEntity.getEntityClass().getIdentifier();
         if (identifier == null) {
@@ -39,12 +31,5 @@ public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
             throw new HydrationException();
         }
         edgeEntity.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), edgeId));
-
-        // add the timestamp
-        Date date = new Date(((SequenceStep) source).getTimestamp().toEpochMilli());
-        edgeEntity.addPropertyValue("timestamp", new PropertyValue(OType.DATETIME, date));
-
-        // add the concrete action id
-        edgeEntity.addPropertyValue("concreteActionId", new PropertyValue(OType.STRING, ((SequenceStep) source).getConcreteAction()));
     }
 }

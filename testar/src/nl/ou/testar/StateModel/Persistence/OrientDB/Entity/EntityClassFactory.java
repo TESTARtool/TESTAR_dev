@@ -10,7 +10,7 @@ import java.util.Map;
 public class EntityClassFactory {
 
     public enum EntityClassName {AbstractState, AbstractAction, AbstractStateModel, Widget, ConcreteState, ConcreteAction, isParentOf, isChildOf, isAbstractedBy,
-        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed}
+        BlackHole, UnvisitedAbstractAction, TestSequence, SequenceNode, SequenceStep, Accessed, FirstNode}
 
     // a repo for generated classes, so we don't execute the same generation code over and over if not needed
     private static Map<EntityClassName, EntityClass> entityClasses = new HashMap<>();
@@ -37,6 +37,7 @@ public class EntityClassFactory {
         classNameMap.put("SequenceNode", EntityClassName.SequenceNode);
         classNameMap.put("SequenceStep", EntityClassName.SequenceStep);
         classNameMap.put("Accessed", EntityClassName.Accessed);
+        classNameMap.put("FirstNode", EntityClassName.FirstNode);
     }
 
     /**
@@ -103,6 +104,9 @@ public class EntityClassFactory {
 
             case Accessed:
                 return createAccessedClass();
+
+            case FirstNode:
+                return createFirstNodeClass();
 
             default:
                 return null;
@@ -354,7 +358,13 @@ public class EntityClassFactory {
         identifier.setMandatory(true);
         identifier.setIndexAble(true);
         entityClass.addProperty(identifier);
-        Property nodeNr = new Property("NodeNr", OType.INTEGER);
+        Property sequenceId = new Property("sequenceId", OType.STRING);
+        sequenceId.setIdentifier(false);
+        sequenceId.setNullable(false);
+        identifier.setMandatory(true);
+        identifier.setIndexAble(true);
+        entityClass.addProperty(sequenceId);
+        Property nodeNr = new Property("nodeNr", OType.INTEGER);
         nodeNr.setIdentifier(false);
         nodeNr.setNullable(false);
         nodeNr.setMandatory(true);
@@ -383,6 +393,7 @@ public class EntityClassFactory {
         identifier.setNullable(false);
         identifier.setMandatory(true);
         identifier.setIndexAble(true);
+        entityClass.addProperty(identifier);
         Property timestamp = new Property("timestamp", OType.DATETIME);
         timestamp.setIdentifier(false);
         timestamp.setNullable(false);
@@ -397,6 +408,18 @@ public class EntityClassFactory {
         entityClass.addProperty(concreteActionId);
         entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
+    }
+
+    private static EntityClass createFirstNodeClass() {
+        EntityClass childClass = new EntityClass("FirstNode", EntityClass.EntityType.Edge);
+        Property edgeId = new Property("firstNodeId", OType.STRING);
+        edgeId.setMandatory(true);
+        edgeId.setNullable(false);
+        edgeId.setIdentifier(true);
+        edgeId.setIndexAble(true);
+        childClass.addProperty(edgeId);
+        entityClasses.put(EntityClassName.FirstNode, childClass);
+        return childClass;
     }
 
 }

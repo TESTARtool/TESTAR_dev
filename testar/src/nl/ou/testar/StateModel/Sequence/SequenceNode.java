@@ -18,6 +18,11 @@ public class SequenceNode implements Persistable {
     private String nodeId;
 
     /**
+     * The id of the sequence this node is part of.
+     */
+    private String sequenceId;
+
+    /**
      * The concrete state accessed in this node of the sequence.
      */
     private ConcreteState concreteState;
@@ -27,11 +32,18 @@ public class SequenceNode implements Persistable {
      */
     private int nodeNr;
 
-    public SequenceNode(String sequenceId, int nodeNr, ConcreteState concreteState) {
+    /**
+     * The sequence this node is part of.
+     */
+    private Sequence sequence;
+
+    public SequenceNode(String sequenceId, int nodeNr, ConcreteState concreteState, Sequence sequence) {
         timestamp = Instant.now();
         this.nodeNr = nodeNr;
         nodeId = sequenceId + '-' + nodeNr;
+        this.sequenceId = sequenceId;
         this.concreteState = concreteState;
+        this.sequence = sequence;
     }
 
     public Instant getTimestamp() {
@@ -53,5 +65,29 @@ public class SequenceNode implements Persistable {
     @Override
     public boolean canBeDelayed() {
         return true;
+    }
+
+    /**
+     * Method returns true if this is the first node in the run.
+     * @return
+     */
+    public boolean isFirstNode() {
+        return nodeNr == 1;
+    }
+
+    /**
+     * Method returns the sequence id for this node.
+     * @return
+     */
+    public String getSequenceId() {
+        return sequenceId;
+    }
+
+    /**
+     * Method returns the sequence for this node.
+     * @return
+     */
+    public Sequence getSequence() {
+        return sequence;
     }
 }

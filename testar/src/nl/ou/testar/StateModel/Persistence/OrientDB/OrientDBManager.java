@@ -66,7 +66,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             EntityClassFactory.EntityClassName.TestSequence,
             EntityClassFactory.EntityClassName.SequenceNode,
             EntityClassFactory.EntityClassName.SequenceStep,
-            EntityClassFactory.EntityClassName.Accessed
+            EntityClassFactory.EntityClassName.Accessed,
+            EntityClassFactory.EntityClassName.FirstNode
     ));
 
     /**
@@ -495,6 +496,31 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
 
         entityManager.saveEntity(accessedEdge);
+
+        // if this is the first node in the sequence, we also have to create a relation between the sequence and this node to indicate this
+        if (!sequenceNode.isFirstNode() || sequenceNode.getSequence() == null) return;
+
+        // create a vertex entity for the test sequence
+        EntityClass sequenceClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.TestSequence);
+        VertexEntity sequenceEntity = new VertexEntity(sequenceClass);
+        try {
+            EntityHydrator sequenceHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_SEQUENCE);
+            sequenceHydrator.hydrate(sequenceEntity, sequenceNode.getSequence());
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        // now an edge entity for the relation
+        EntityClass firstNodeClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.FirstNode);
+        EdgeEntity firstNodeEntity = new EdgeEntity(firstNodeClass, sequenceEntity, nodeEntity);
+        try {
+            EntityHydrator firstNodeHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_FIRST_NODE);
+            firstNodeHydrator.hydrate(firstNodeEntity, null);
+        } catch (HydrationException e) {
+            e.printStackTrace();
+        }
+
+        entityManager.saveEntity(firstNodeEntity);
     }
 
     @Override

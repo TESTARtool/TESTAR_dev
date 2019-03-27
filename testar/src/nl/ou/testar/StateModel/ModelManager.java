@@ -135,6 +135,7 @@ public class ModelManager implements StateModelManager {
             ConcreteStateTransition concreteStateTransition = new ConcreteStateTransition(currentConcreteState, newConcreteState, concreteActionUnderExecution);
             persistenceManager.persistConcreteStateTransition(concreteStateTransition);
         }
+        sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution);
         currentConcreteState = newConcreteState;
         concreteActionUnderExecution = null;
     }

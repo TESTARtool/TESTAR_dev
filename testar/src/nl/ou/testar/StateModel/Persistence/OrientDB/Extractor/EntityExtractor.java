@@ -6,6 +6,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.DocumentEntity;
 
 public interface EntityExtractor<T> {
 
-    public T extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException;
+    T extract(DocumentEntity entity, AbstractStateModel abstractStateModel) throws ExtractionException;
 
 }

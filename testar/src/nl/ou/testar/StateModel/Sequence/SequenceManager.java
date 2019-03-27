@@ -87,5 +87,4 @@ public class SequenceManager {
         currentSequence.addNode(concreteState, concreteAction);
     }
 
-
 }

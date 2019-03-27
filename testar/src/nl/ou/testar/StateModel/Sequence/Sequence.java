@@ -126,22 +126,22 @@ public class Sequence implements Persistable {
      */
     public void addNode(ConcreteState concreteState, ConcreteAction concreteAction) {
         if (concreteAction == null) {
-            addNode(concreteState);
+            addFirstNode(concreteState);
         }
         else {
             addStep(concreteState, concreteAction);
         }
     }
 
-    private void addNode(ConcreteState concreteState) {
-        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState);
+    private void addFirstNode(ConcreteState concreteState) {
+        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, this);
         currentNode = node;
         nodes.add(node);
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
 
     private void addStep(ConcreteState concreteState, ConcreteAction concreteAction) {
-        SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState);
+        SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, null);
         SequenceStep sequenceStep = new SequenceStep(concreteAction, currentNode, targetNode);
         nodes.add(targetNode);
         currentNode = targetNode;
@@ -151,5 +151,13 @@ public class Sequence implements Persistable {
     @Override
     public boolean canBeDelayed() {
         return true;
+    }
+
+    /**
+     * Method returns the first sequence node in the sequence;
+     * @return
+     */
+    public SequenceNode getFirstNode() {
+        return nodes.get(0);
     }
 }
