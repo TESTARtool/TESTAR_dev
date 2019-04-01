@@ -1,37 +1,33 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- *  @author Urko Rueda (refactor from UIAStateBuilder)
- */
 package org.fruit.alayer.windows;
 
 import org.fruit.Util;
@@ -45,33 +41,68 @@ import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 public class StateFetcher implements Callable<UIAState>{
-	
+
 	private final SUT system;
 
 	transient long pAutomation, pCacheRequest;
-	// begin by urueda
+
 	private boolean releaseCachedAutomatinElement;
-	
+
 	private boolean accessBridgeEnabled;
-	
+
 	private static Pattern sutProcessesMatcher;
-	// end by urueda
-	
+
+	//PID of Running OS processes
+	private static List<Long> OSProcesses = Util.newArrayList();
+	//PID of Running processes of the SUT, allow TESTAR to work with multiple processes apps
+	private static List<Long> runningSUTProcesses = Util.newArrayList();
+	//Current number of Windows that make up the SUT
+	private static List<Long> currentVisibleSUTWindows = Util.newArrayList();
+
 	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
-						boolean accessBridgeEnabled, String SUTProcesses){		
+			boolean accessBridgeEnabled, String SUTProcesses){		
 		this.system = system;
 		this.pAutomation = pAutomation;
 		this.pCacheRequest = pCacheRequest;
-		// begin by urueda
+
 		this.accessBridgeEnabled = accessBridgeEnabled;
 		if (SUTProcesses == null || SUTProcesses.isEmpty())
 			StateFetcher.sutProcessesMatcher = null;
 		else
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);		
-		// end by urueda
 	}
-	
-	// by urueda (refactor)
+
+	/**
+	 * Update the different PID processes of the SUT and the OS
+	 */
+	private static void updateProcesses() {
+
+		List<Long> newOSProcesses = Util.newArrayList();
+		List<Long> newSUTProcesses = Util.newArrayList();
+
+		for(long pid : Windows.EnumProcesses()){
+			if(pid != 0) {
+				newOSProcesses.add(pid);
+			}
+		}
+
+		//Check if the running SUT processes still existing
+		for(long pid : runningSUTProcesses)
+			if(newOSProcesses.contains(pid))
+				newSUTProcesses.add(pid);
+
+		//Compare last OSProcesses with the currents running processes to update running SUT processes
+		for(long pid : newOSProcesses) {
+			if(!OSProcesses.contains(pid))
+				newSUTProcesses.add(pid);
+		}
+
+		//Update the running SUT processes
+		runningSUTProcesses = newSUTProcesses;
+		//Update the old OS running processes
+		OSProcesses = newOSProcesses;
+	}
+
 	public static UIARootElement buildRoot(SUT system){
 		UIARootElement uiaRoot = new UIARootElement();	
 		uiaRoot.isRunning = system.isRunning();
@@ -82,41 +113,38 @@ public class StateFetcher implements Callable<UIAState>{
 		uiaRoot.timeStamp = System.currentTimeMillis();
 		uiaRoot.hasStandardKeyboard = system.get(Tags.StandardKeyboard, null) != null;
 		uiaRoot.hasStandardMouse = system.get(Tags.StandardMouse, null) != null;		
-		
+
 		return uiaRoot;
 	}
 
 	public UIAState call() throws Exception {				
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
-		
+
 		UIARootElement uiaRoot = buildSkeletton(system);
-				
+
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
 		root.set(Tags.NotResponding, false);
-		// begin by urueda
 		for (Widget w : root)
 			w.set(Tags.Path,Util.indexString(w));
 		if (system != null && (root == null || root.childCount() == 0) && system.getNativeAutomationCache() != null)
 			system.getNativeAutomationCache().releaseCachedAutomationElements(); // prevent SUT UI not ready due to caching
-		// end by urueda
 		Windows.CoUninitialize();
-		
+
 		return root;
 	}
-	
+
 	/**
 	 * Checks whether a window conforms to the SUT.
 	 * @param hwnd A window.
 	 * @return true if the window conforms to the SUT, false otherwise.
-	 * @author urueda
 	 */
 	private boolean isSUTProcess(long hwnd){
 		if (StateFetcher.sutProcessesMatcher == null)
 			return false;
-		
+
 		String processName = Windows.GetProcessNameFromHWND(hwnd);
-		
+
 		if (processName != null && !(processName.isEmpty()) && StateFetcher.sutProcessesMatcher.matcher(processName).matches())
 			return true;
 		else
@@ -135,12 +163,22 @@ public class StateFetcher implements Callable<UIAState>{
 			return uiaRoot;
 
 		uiaRoot.pid = system.get(Tags.PID);
-		//uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
-		
-		// find all visible top level windows on the desktop
-		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();		
-		
-		UIAElement modalElement = null; // by urueda
+
+		// find all visible top level windows on the desktop, and update currentVisibleSUTWindows List
+		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();
+
+		//Update the visible SUT windows if his PID is one of the running processes
+		List<Long> newVisibleSUTWindows = Util.newArrayList();
+
+		for(long p : visibleTopLevelWindows)
+			if(WinProcess.startSUTProcesses.contains(Windows.GetWindowProcessId(p))) {
+				newVisibleSUTWindows.add(p);
+			}
+
+		currentVisibleSUTWindows = newVisibleSUTWindows;
+
+
+		UIAElement modalElement = null;
 
 		// descend the root windows which belong to our process, using UIAutomation
 		uiaRoot.children = new ArrayList<UIAElement>();
@@ -151,28 +189,38 @@ public class StateFetcher implements Callable<UIAState>{
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
 			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
-			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){ // by urueda	
-				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); // by urueda ( SUT as a set of windows/processes )				
+			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
+				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); //( SUT as a set of windows/processes )				
 				if(!owned){
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
-					// by urueda
 					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-															  uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
+						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
 				} else
 					ownedWindows.add(hwnd);
 			}
 		}
-		
+
 		// if UIAutomation missed an owned window, we'll collect it here
 		for(long hwnd : ownedWindows){				
 			if(!uiaRoot.hwndMap.containsKey(hwnd)){
 				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 				UIAElement modalE;
-				// begin by urueda
 				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-														 uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 					modalElement = modalE;
-				// end by urueda
+			}
+		}
+
+		// Associate multi processes windows/elements into the current uiaRoot Element
+		for(long hwnd : currentVisibleSUTWindows){				
+			if(!uiaRoot.hwndMap.containsKey(hwnd)){
+
+				UIAElement modalE;
+
+				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
+					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+					modalElement = modalE;
+
 			}
 		}
 
@@ -192,12 +240,10 @@ public class StateFetcher implements Callable<UIAState>{
 			// the HitTest function will not work properly: it doesn't actually hit test, it checks if windows are
 			// on top of the SUT and the Java implementation of the Spy mode drawing is an invisible always on top window.
 			/*String windowTitle = Windows.GetWindowText(hwnd);
-
 				if (windowTitle != null && Objects.equals(windowTitle, "Testar - Spy window")) {
 					continue;
 				}*/
-			// end by wcoux
-			
+
 			if(wnd == null){
 				wnd = new UIAElement(uiaRoot);
 				uiaRoot.children.add(wnd);
@@ -209,19 +255,19 @@ public class StateFetcher implements Callable<UIAState>{
 				wnd.ctrlId = Windows.UIA_WindowControlTypeId;
 				uiaRoot.hwndMap.put(hwnd, wnd);
 			}
-						
+
 			wnd.zindex = z++;
-						
+
 			if(wnd.ctrlId == Windows.UIA_MenuControlTypeId || wnd.ctrlId == Windows.UIA_WindowControlTypeId || wnd.parent == uiaRoot)
 				wnd.isTopLevelContainer = true;				
-				
+
 		}
-		
+
 		calculateZIndices(uiaRoot);
 		buildTLCMap(uiaRoot);
 		markBlockedElements(uiaRoot);
 
-		markBlockedElements(uiaRoot,modalElement); // by urueda		
+		markBlockedElements(uiaRoot,modalElement);		
 
 		return uiaRoot;
 	}
@@ -236,24 +282,21 @@ public class StateFetcher implements Callable<UIAState>{
 				long exStyle = Windows.GetWindowLong(hwnd, Windows.GWL_EXSTYLE);				
 				if((exStyle & Windows.WS_EX_TRANSPARENT) == 0 && (exStyle & Windows.WS_EX_NOACTIVATE) == 0){
 					ret.addFirst(hwnd);
-					// begin by urueda
 					if (System.getProperty("DEBUG_WINDOWS_PROCESS_NAMES") != null)
-						System.out.println("<" + hwnd + "> window' process name <" + Windows.GetProcessNameFromHWND(hwnd) + ">");
-					// end by urueda					
+						System.out.println("<" + hwnd + "> window' process name <" + Windows.GetProcessNameFromHWND(hwnd) + ">");				
 				}				
 			}
 			hwnd = Windows.GetNextWindow(hwnd, Windows.GW_HWNDNEXT);
 		}
-		
-		System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES"); // by urueda
-		
+
+		System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES");
+
 		return ret;
 	}
-	
+
 	/* fire up the cache request */
 	private long uiaCacheWindowTree(long hwnd){
 		//return Windows.IUIAutomation_ElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
-		// begin by urueda
 		long aep = Long.MIN_VALUE;
 		if (system.getNativeAutomationCache() != null)
 			aep = system.getNativeAutomationCache().getCachedAutomationElement(hwnd, pAutomation, pCacheRequest);
@@ -262,7 +305,6 @@ public class StateFetcher implements Callable<UIAState>{
 			return Windows.IUIAutomation_ElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
 		else
 			return aep;
-		// end by urueda
 	}
 
 	private void buildTLCMap(UIARootElement root){
@@ -279,12 +321,12 @@ public class StateFetcher implements Callable<UIAState>{
 			buildTLCMap(builder, el.children.get(i));
 	}
 
-	private UIAElement uiaDescend(long hwnd, long uiaPtr, UIAElement parent){ // by urueda (returns a modal widget if detected)
+	private UIAElement uiaDescend(long hwnd, long uiaPtr, UIAElement parent){ // (returns a modal widget if detected)
 		if(uiaPtr == 0)
 			//return;
-			return null; // by urueda
+			return null;
 
-		UIAElement modalElement = null; // by urueda
+		UIAElement modalElement = null;
 
 		UIAElement el = new UIAElement(parent);
 		parent.children.add(el);
@@ -318,7 +360,7 @@ public class StateFetcher implements Callable<UIAState>{
 		// get extra infos from windows
 		if(el.ctrlId == Windows.UIA_WindowControlTypeId){
 			//long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
-			long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true); // by urueda
+			long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
 			if(uiaWndPtr != 0){
 				el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWndPtr, true);
 				el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
@@ -329,7 +371,6 @@ public class StateFetcher implements Callable<UIAState>{
 			el.culture = Windows.IUIAutomationElement_get_Culture(uiaPtr, true);
 		}
 
-		// begin by urueda
 		if (!el.isModal && el.automationId != null &&
 				(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
 			modalElement = markModal(el);
@@ -352,13 +393,12 @@ public class StateFetcher implements Callable<UIAState>{
 			el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
 			el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-		}
-		// end by urueda	
+		}	
 
 		// descend children
-				
+
 		long uiaChildrenPtr = Windows.IUIAutomationElement_GetCachedChildren(uiaPtr);
-		if (releaseCachedAutomatinElement) // by urueda
+		if (releaseCachedAutomatinElement)
 			Windows.IUnknown_Release(uiaPtr);
 
 		if(uiaChildrenPtr != 0){
@@ -370,21 +410,19 @@ public class StateFetcher implements Callable<UIAState>{
 				for(int i = 0; i < count; i++){
 					long ptrChild = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPtr, i);
 					if(ptrChild != 0){
-						// begin by urueda
 						UIAElement modalE = uiaDescend(hwnd, ptrChild, el);
 						if (modalE != null && modalElement == null) // parent-modal is preferred to child-modal
-							modalElement = modalE;
-						// end by urueda							
+							modalElement = modalE;						
 					}
 				}
 			}
 			Windows.IUnknown_Release(uiaChildrenPtr);
 		}
-		
-		return modalElement; // by urueda
+
+		return modalElement;
 	}
-	
-	// by urueda (through AccessBridge)
+
+	//(through AccessBridge)
 	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
 
@@ -397,19 +435,19 @@ public class StateFetcher implements Callable<UIAState>{
 			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
 			if (props != null){
 				String role 		 = (String) props[0],
-					   name 		 = (String) props[1],
-					   description 	 = (String) props[2],
-					   x 			 = (String) props[3],
-					   y 			 = (String) props[4],
-					   width 		 = (String) props[5],
-					   height 		 = (String) props[6],
-					   indexInParent = (String) props[7],
-					   childrenCount = (String) props[8];
+						name 		 = (String) props[1],
+						description 	 = (String) props[2],
+						x 			 = (String) props[3],
+						y 			 = (String) props[4],
+						width 		 = (String) props[5],
+						height 		 = (String) props[6],
+						indexInParent = (String) props[7],
+						childrenCount = (String) props[8];
 
 				Rect rect = null;
 				try {
 					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									 new Double(width).doubleValue(), new Double(height).doubleValue());
+							new Double(width).doubleValue(), new Double(height).doubleValue());
 					//if (parent.parent == null)
 					//	parent.rect = el.rect; // fix UI actions at root widget
 				} catch (Exception e){
@@ -434,11 +472,11 @@ public class StateFetcher implements Callable<UIAState>{
 				el.helpText = description;
 				// el.enabled = true;
 				parent.root.hwndMap.put(el.hwnd, el);
-				
-				
+
+
 				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
 				if(!role.equals("menu") && !role.equals("combo box")
-					&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+						&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
 					if (cc > 0){
 						el.children = new ArrayList<UIAElement>(cc);
@@ -446,24 +484,24 @@ public class StateFetcher implements Callable<UIAState>{
 						for (int i=0; i<children.length; i++)
 							abDescend(hwnd,el,vmidAC[0],children[i]);
 					}*/
-					
-						long childAC;
-						int c = new Integer(childrenCount).intValue();
-						el.children = new ArrayList<UIAElement>(c);
-						for (int i=0; i<c; i++){
-							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							abDescend(hwnd,el,vmidAC[0],childAC);
-						}
+
+					long childAC;
+					int c = new Integer(childrenCount).intValue();
+					el.children = new ArrayList<UIAElement>(c);
+					for (int i=0; i<c; i++){
+						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+						abDescend(hwnd,el,vmidAC[0],childAC);
+					}
 				}
 
 			}
 		}
-				
+
 		return modalElement;
-		
+
 	}
 
-	// by urueda (mark a proper widget as modal)
+	//(mark a proper widget as modal)
 	private UIAElement markModal(UIAElement element){
 		if (element == null)
 			return null; // no proper widget found to mark as modal
@@ -485,7 +523,6 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 	}
 
-	// by urueda
 	private void markBlockedElements(UIAElement element, UIAElement modalElement){
 		if (modalElement != null){
 			for(UIAElement c : element.children){
@@ -504,7 +541,7 @@ public class StateFetcher implements Callable<UIAState>{
 			else if (!el.isTopLevelContainer)		
 				el.zindex = el.parent.zindex;
 		}
-									
+
 		for(int i = 0; i < el.children.size(); i++)
 			calculateZIndices(el.children.get(i));
 	}
@@ -525,5 +562,5 @@ public class StateFetcher implements Callable<UIAState>{
 		for(UIAElement child : element.children)
 			createWidgetTree(w, child);
 	}
-	
+
 }
