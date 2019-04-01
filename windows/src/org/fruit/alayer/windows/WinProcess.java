@@ -57,11 +57,227 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = "";
+	
+	long hProcess;
+	final boolean stopProcess;
+	final Keyboard kbd = AWTKeyboard.build();
+	final Mouse mouse = AWTMouse.build();
+	final long pid;
+	String pName = "";
+	static List<Long> SUTProcesses = Util.newArrayList();
+	static List<Long> startOSPidProcesses = Util.newArrayList();
+	static transient long pApplicationActivationManager;
 
+	/**
+	 * Constructor
+	 * 
+	 * Create a WinProcess with a process handle and boolean variable
+	 * @param hProcess
+	 * @param stopProcess
+	 */
+	private WinProcess(long hProcess, boolean stopProcess){
+		this.hProcess = hProcess;
+		this.stopProcess = stopProcess;
+		pid = pid();
+		pName = new WinProcHandle(pid).name();
+	}
+	
+	/**
+	 * Get the description of current WinProcess, or use the default value if not exist
+	 */
+	public String toString(){
+		return this.get(Tags.Desc, "Windows Process");
+	}
+
+	/**
+	 * From the current process handle use a native Windows call to obtain process pid
+	 * 
+	 * @return pid of current WinProcess
+	 */
+	public long pid(){
+		if(!isRunning())
+			throw new IllegalStateException();
+		return Windows.GetProcessId(hProcess);
+	}
+	
+	/**
+	 * Return information about current WinProcess object
+	 */
+	public String getStatus(){
+		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] & " +" NAME [ "+ pName+" ] ... "+ this.get(Tags.Desc,"");
+	}
+	
+	/**
+	 * From a introduced process pid obtain the handle of these process and check if still active
+	 * 
+	 * @param pid
+	 * @return boolean condition if process still active
+	 */
+	public static boolean isRunning(long pid){
+		long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pid);
+		boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+		Windows.CloseHandle(hProcess);
+		if(ret)
+			return true;
+		
+		return oneSUTprocessIsRunning();
+	}
+
+	private static boolean oneSUTprocessIsRunning() {
+		for(long pidSUT : SUTProcesses) {
+			long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pidSUT);
+			boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+			Windows.CloseHandle(hProcess);
+			if(ret)
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Use the process handle of current WinProcess to check if his process still active
+	 */
+	public boolean isRunning() {
+		if(hProcess != 0 && Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE)
+			return true;
+		
+		return oneSUTprocessIsRunning();
+	}
+
+	/**
+	 * From a introduced process pid obtain the handle of these process and make him a Terminate call
+	 * 
+	 * @param pid
+	 * @throws SystemStopException
+	 */
+	public static void killProcess(long pid) throws SystemStopException{
+		try{
+			long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pid);
+			Windows.TerminateProcess(hProcess, -1);
+			Windows.CloseHandle(hProcess);	
+		}catch(WinApiException wae){
+			throw new SystemStopException(wae);
+		}
+	}
+	
+	/**
+	 * Stop and release current WinProcess
+	 */
+	public void finalize(){
+		stop();
+		release();
+	}
+
+	//TODO: pApplicationActivationManager, what is this?
+	public void release(){
+		if(pApplicationActivationManager != 0){
+			Windows.IUnknown_Release(pApplicationActivationManager);
+			Windows.CoUninitialize();
+			pApplicationActivationManager = 0;
+		}
+		if (this.getNativeAutomationCache() != null)
+			this.getNativeAutomationCache().releaseCachedAutomationElements();
+	}
+
+	/**
+	 * Terminate the process of current WinProcess, using a Windows native call
+	 */
+	public void stop() throws SystemStopException {
+		try{
+			if(hProcess != 0){
+				if(stopProcess)
+					Windows.TerminateProcess(hProcess, 0);
+				Windows.CloseHandle(hProcess);
+				hProcess = 0;
+				
+				//Close all processes of SUT
+				for(Long pidSUT : SUTProcesses) {
+					System.out.println("Process pid to kill: "+pidSUT);
+					long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pidSUT);
+					Windows.TerminateProcess(hProcess, -1);
+					Windows.CloseHandle(hProcess);
+					SUTProcesses.remove(pidSUT);
+				}
+			}
+		}catch(WinApiException wae){
+			throw new SystemStopException(wae);
+		}
+	}
+	
+	/**
+	 * From the pid of a process make a Windows native call to GetModuleBaseName and obtain the name of desired process
+	 * 
+	 * @param pid
+	 * @return process name
+	 * @throws WinApiException
+	 */
+	public static String procName(long pid) throws WinApiException{
+		long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION | Windows.PROCESS_VM_READ, false, pid);
+		long[] hm = Windows.EnumProcessModules(hProcess);
+		String ret = null;
+		if(hm.length == 0)
+			throw new WinApiException("Unable to retrieve process name!");
+		ret = Windows.GetModuleBaseName(hProcess, hm[0]);
+		Windows.CloseHandle(hProcess);
+		return ret;
+	}
+	
+	/**
+	 * Compare the process identifier of foreground windows with the introduced pid
+	 * 
+	 * @param pid
+	 * @return boolean foreground condition
+	 */
+	public static boolean isForeground(long pid){
+		long hwnd = Windows.GetForegroundWindow();
+		long wpid = Windows.GetWindowProcessId(hwnd);
+		if(!Windows.IsIconic(hwnd) && (wpid == pid))
+			return true;
+		
+		return oneSUTprocessIsForeground();
+	}
+	
+	private static boolean oneSUTprocessIsForeground() {
+		long hwnd = Windows.GetForegroundWindow();
+		long wpid = Windows.GetWindowProcessId(hwnd);
+		for(long pidSUT : SUTProcesses)
+			if(!Windows.IsIconic(hwnd) && (wpid == pidSUT))
+				return true;
+		return false;
+	}
+	
+	/**
+	 * Call the current WinProcess object to check if is on foreground
+	 * @return boolean foreground condition
+	 */
+	public boolean isForeground(){
+		
+		if (isForeground(pid()))
+			return true;
+		
+		return oneSUTprocessIsForeground();
+	}
+
+	/**
+	 * Call toForeground method with harcoded settings (TODO: remove this)
+	 * 
+	 * @param pid
+	 * @throws WinApiException
+	 */
 	public static void toForeground(long pid) throws WinApiException{
 		toForeground(pid, 0.3, 100);
 	}
+	
+	public void toForeground(){ toForeground(pid()); }
 
+	/**
+	 * Use ALT + TAB combination until the pid of our SUT will be on foreground or we try the maxTries count
+	 * 
+	 * @param pid
+	 * @param foregroundEstablishTime
+	 * @param maxTries
+	 * @throws WinApiException
+	 */
 	public static void toForeground(long pid, double foregroundEstablishTime, int maxTries) throws WinApiException{
 		Keyboard kb = AWTKeyboard.build();
 
@@ -82,17 +298,51 @@ public final class WinProcess extends SUTBase {
 			throw new WinApiException("Unable to bring process to foreground!");
 	}
 
+	/**
+	 * From a process pid create a WinProcess object and return it
+	 * 
+	 * @param pid
+	 * @return WinProcess
+	 * @throws SystemStartException
+	 */
 	public static WinProcess fromPID(long pid) throws SystemStartException{
 		try{
 			long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pid);
 			WinProcess ret = new WinProcess(hProcess, false);
-			ret.set(Tags.Desc, procName(pid)); // + " (pid: " + pid + ")");
+			ret.set(Tags.Desc, procName(pid));
 			return ret;
 		}catch(FruitException fe){
 			throw new SystemStartException(fe);
 		}
 	}
+	
+	/**
+	 * Read all Windows running processes, create a List of WinProcHandle objects that represent this processes
+	 * and return this List
+	 * 
+	 * @return List<WinProcHandle>
+	 */
+	public static List<WinProcHandle> runningProcesses(){
+		List<WinProcHandle> ret = Util.newArrayList();
+		for(long pid : Windows.EnumProcesses()){
+			if(pid != 0) {
+				ret.add(new WinProcHandle(pid));
+				startOSPidProcesses.add(pid);
+			}
+		}
+		return ret;
+	}
 
+	/**
+	 * From a String that represents a process name, search into existing running processes if exists.
+	 * If we found the WinProcHandle with the input process name,
+	 * 		create a WinProcess object from the founded process pid and return it.
+	 * If doesn't exist throw an error
+	 * 
+	 * @param processName
+	 * @return WinProcess
+	 * @throws SystemStartException
+	 */
 	public static WinProcess fromProcName(String processName) throws SystemStartException{
 		Assert.notNull(processName);
 		for(WinProcHandle wph : runningProcesses()){
@@ -102,6 +352,11 @@ public final class WinProcess extends SUTBase {
 		throw new SystemStartException("Process '" + processName + "' not found!");
 	}
 
+	/**
+	 * Read all running processesReturn a list of all running Applications as if they were SUTs
+	 * 
+	 * @return List<SUT>
+	 */
 	public static List<SUT> fromAll(){
 		List<WinProcHandle> processes = runningProcesses();
 		if (processes == null || processes.isEmpty())
@@ -115,14 +370,16 @@ public final class WinProcess extends SUTBase {
 		return suts;
 	}
 
-	public static WinProcess fromExecutable(String path, boolean ProcessListenerEnabled) throws SystemStartException{
+	public static WinProcess fromExecutable(String path, boolean processListenerEnabled) throws SystemStartException{
 		try{
 			Assert.notNull(path);
 
 			//Disabled with browsers, only allow it with desktop applications executed with command_line
-			if(!ProcessListenerEnabled) {
+			if(!processListenerEnabled) {
 
-				startSUTProcesses = Util.newArrayList();
+				startOSPidProcesses = Util.newArrayList();
+				SUTProcesses = Util.newArrayList();
+				
 				//PID of running processes before the execution of the SUT
 				List<WinProcHandle> beforeProcesses = runningProcesses();
 				List<Long> beforePID = Util.newArrayList();
@@ -150,12 +407,12 @@ public final class WinProcess extends SUTBase {
 				List<WinProcHandle> runningProcesses = runningProcesses();
 				for(WinProcHandle winp : runningProcesses) {
 					if(!beforePID.contains(winp.pid()))
-						startSUTProcesses.add(winp.pid());
+						SUTProcesses.add(winp.pid());
 				}
 
 				//TODO: Think about create extra conditions to make sure that we are working with SUT process
-				if(startSUTProcesses!=null) {
-					for(Long info : startSUTProcesses)
+				if(SUTProcesses!=null) {
+					for(Long info : SUTProcesses)
 						System.out.println("Potential SUT PID: "+info);
 				}
 
@@ -249,53 +506,13 @@ public final class WinProcess extends SUTBase {
 			throw new SystemStartException(fe);
 		}
 	}
-
-	public static boolean isForeground(long pid){
-		long hwnd = Windows.GetForegroundWindow();
-		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
-		return !Windows.IsIconic(hwnd) && (wpid == pid);
-	}
-
-	public static boolean isRunning(long pid){
-		long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pid);
-		boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
-		Windows.CloseHandle(hProcess);
-		return ret;
-	}
-
-	public static void killProcess(long pid) throws SystemStopException{
-		try{
-			long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pid);
-			Windows.TerminateProcess(hProcess, -1);
-			Windows.CloseHandle(hProcess);	
-		}catch(WinApiException wae){
-			throw new SystemStopException(wae);
-		}
-	}
-
-	public static String procName(long pid) throws WinApiException{
-		long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION | Windows.PROCESS_VM_READ, false, pid);
-		long[] hm = Windows.EnumProcessModules(hProcess);
-		String ret = null;
-		if(hm.length == 0)
-			throw new WinApiException("Unable to retrieve process name!");
-		ret = Windows.GetModuleBaseName(hProcess, hm[0]);
-		Windows.CloseHandle(hProcess);
-		return ret;
-	}
-
-	public static List<WinProcHandle> runningProcesses(){
-		List<WinProcHandle> ret = Util.newArrayList();
-		for(long pid : Windows.EnumProcesses()){
-			if(pid != 0) {
-				ret.add(new WinProcHandle(pid));
-				startOSPidProcesses.add(pid);
-			}
-		}
-		return ret;
-	}
-
+	
+	/**
+	 * Obtain the memory usage info of the WinProcess introduced, using a Windows native call
+	 * 
+	 * @param wp
+	 * @return MemoryInfo
+	 */
 	public static long getMemUsage(WinProcess wp){
 		long pid = -1;
 		try{
@@ -307,6 +524,12 @@ public final class WinProcess extends SUTBase {
 		return Windows.GetProcessMemoryInfo(pid);
 	}
 
+	/**
+	 * Obtain the CPU usage info of the WinProcess introduced, using a Windows native call
+	 * 
+	 * @param wp
+	 * @return CPU Info
+	 */
 	public static long[] getCPUsage(WinProcess wp){
 		long pid = -1;
 		try{
@@ -318,76 +541,7 @@ public final class WinProcess extends SUTBase {
 		return Windows.GetProcessTimes(pid);
 	}
 
-	long hProcess;
-	final boolean stopProcess;
-	final Keyboard kbd = AWTKeyboard.build();
-	final Mouse mouse = AWTMouse.build();
-	final long pid;
-	static String pName;
-	static List<Long> startSUTProcesses = Util.newArrayList();
-	static List<Long> startOSPidProcesses = Util.newArrayList();
-	transient static long pApplicationActivationManager; // by wcoux
-
-	private WinProcess(long hProcess, boolean stopProcess){
-		this.hProcess = hProcess;
-		this.stopProcess = stopProcess;
-		pid = pid();
-		pName = new WinProcHandle(pid).name();
-	}
-
-	public void finalize(){
-		stop();
-		release();
-	}
-
-	public void release(){
-		if(pApplicationActivationManager != 0){
-			Windows.IUnknown_Release(pApplicationActivationManager);
-			Windows.CoUninitialize();
-			pApplicationActivationManager = 0;
-		}
-		if (this.getNativeAutomationCache() != null)
-			this.getNativeAutomationCache().releaseCachedAutomationElements();
-	}
-
-
-	public void stop() throws SystemStopException {
-		try{
-			if(hProcess != 0){
-				if(stopProcess)
-					Windows.TerminateProcess(hProcess, 0);
-				Windows.CloseHandle(hProcess);
-				hProcess = 0;
-				for(Long pidSUT : startSUTProcesses) {
-					System.out.println("Process pid to kill: "+pidSUT);
-					hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pidSUT);
-					Windows.TerminateProcess(hProcess, -1);
-					Windows.CloseHandle(hProcess);
-				}
-			}
-		}catch(WinApiException wae){
-			throw new SystemStopException(wae);
-		}
-	}
-
-	public boolean isRunning() {
-		return hProcess != 0 && 
-				Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
-	}
-
-	public String toString(){
-		return this.get(Tags.Desc, "Windows Process");
-	}
-
-	public long pid(){
-		if(!isRunning())
-			throw new IllegalStateException();
-		return Windows.GetProcessId(hProcess);
-	}
-
-	public boolean isForeground(){ return isForeground(pid()); }
-	public void toForeground(){ toForeground(pid()); }
-
+	@Override
 	@SuppressWarnings("unchecked")
 	protected <T> T fetch(Tag<T> tag){		
 		if(tag.equals(Tags.StandardKeyboard))
@@ -405,6 +559,7 @@ public final class WinProcess extends SUTBase {
 		return null;
 	}
 
+	@Override
 	protected Set<Tag<?>> tagDomain(){
 		Set<Tag<?>> ret = Util.newHashSet();
 		ret.add(Tags.StandardKeyboard);
@@ -415,17 +570,12 @@ public final class WinProcess extends SUTBase {
 		return ret;
 	}
 
-	public String getStatus(){
-		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] & " +" NAME [ "+ pName+" ] ... "+ this.get(Tags.Desc,"");
-	}
-
 	@Override
 	public void setNativeAutomationCache() {
 		this.nativeAutomationCache = new AutomationCache(){
 			@Override
 			public void nativeReleaseAutomationElement(long elementPtr){
-				/*long refCount =*/ Windows.IUnknown_Release(elementPtr);
-				//System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
+				Windows.IUnknown_Release(elementPtr);
 			}
 			@Override
 			public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr){

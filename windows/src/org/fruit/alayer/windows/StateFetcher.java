@@ -53,11 +53,11 @@ public class StateFetcher implements Callable<UIAState>{
 	private static Pattern sutProcessesMatcher;
 
 	//PID of Running OS processes
-	private static List<Long> OSProcesses = Util.newArrayList();
+	private List<Long> OSProcesses = Util.newArrayList();
 	//PID of Running processes of the SUT, allow TESTAR to work with multiple processes apps
-	private static List<Long> runningSUTProcesses = Util.newArrayList();
+	private List<Long> runningSUTProcesses = Util.newArrayList();
 	//Current number of Windows that make up the SUT
-	private static List<Long> currentVisibleSUTWindows = Util.newArrayList();
+	private List<Long> currentVisibleSUTWindows = Util.newArrayList();
 
 	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
 			boolean accessBridgeEnabled, String SUTProcesses){		
@@ -69,13 +69,20 @@ public class StateFetcher implements Callable<UIAState>{
 		if (SUTProcesses == null || SUTProcesses.isEmpty())
 			StateFetcher.sutProcessesMatcher = null;
 		else
-			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);		
+			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+		
+		/*if(runningSUTProcesses.isEmpty()) {
+			runningSUTProcesses = WinProcess.SUTProcesses;
+			OSProcesses = WinProcess.startOSPidProcesses;
+		}*/
+		
+		//updateProcesses();
 	}
 
 	/**
 	 * Update the different PID processes of the SUT and the OS
 	 */
-	private static void updateProcesses() {
+	private void updateProcesses() {
 
 		List<Long> newOSProcesses = Util.newArrayList();
 		List<Long> newSUTProcesses = Util.newArrayList();
@@ -86,12 +93,13 @@ public class StateFetcher implements Callable<UIAState>{
 			}
 		}
 
-		//Check if the running SUT processes still existing
+		//Check if the running SUT processes still existing into the OS
 		for(long pid : runningSUTProcesses)
 			if(newOSProcesses.contains(pid))
 				newSUTProcesses.add(pid);
 
 		//Compare last OSProcesses with the currents running processes to update running SUT processes
+		//Think extra condition, this could add non desirable applications
 		for(long pid : newOSProcesses) {
 			if(!OSProcesses.contains(pid))
 				newSUTProcesses.add(pid);
@@ -171,7 +179,7 @@ public class StateFetcher implements Callable<UIAState>{
 		List<Long> newVisibleSUTWindows = Util.newArrayList();
 
 		for(long p : visibleTopLevelWindows)
-			if(WinProcess.startSUTProcesses.contains(Windows.GetWindowProcessId(p))) {
+			if(WinProcess.SUTProcesses.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
 			}
 

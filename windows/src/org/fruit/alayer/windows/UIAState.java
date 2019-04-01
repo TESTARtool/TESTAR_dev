@@ -141,7 +141,7 @@ final class UIAState extends UIAWidget implements State {
 		}else if(t.equals(Tags.TimeStamp)){
 			ret = w == this ? ((UIARootElement)element).timeStamp : null;
 		}else if(t.equals(Tags.Foreground)){
-			ret = w == this ? ((UIARootElement)element).isForeground : null;
+			ret = w == this ? WinProcess.isForeground(w.get(Tags.PID)) : null;
 		}else if(t.equals(Tags.HasStandardKeyboard)){
 			ret = w == this ? ((UIARootElement)element).hasStandardKeyboard : null;	
 		}else if(t.equals(Tags.HasStandardMouse)){
