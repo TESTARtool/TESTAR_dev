@@ -60,7 +60,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     private HtmlSequenceReport htmlReport;
     private StrategyFactory strategyFactory;
     private StrategyActionSelector strategyActionSelector;
-    private Optional<String[]> inputText;
+    private Optional<String[]> inputText = Optional.empty();
 
     /**
      * Called once during the life time of TESTAR
