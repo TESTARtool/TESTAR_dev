@@ -275,6 +275,15 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	protected boolean moreSequences() {
 		return super.moreSequences();
 	}
+	
+	/** 
+	 * This method is invoked each time after TESTAR finished the generation of a sequence.
+	 */
+	protected void finishSequence(SUT system){
+		
+		super.finishSequence(system);
+		
+	}
 
 	/**
 	 * Here you can put graceful shutdown sequence for your SUT

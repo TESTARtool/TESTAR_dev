@@ -171,8 +171,8 @@ public class AccessibilityProtocol extends DefaultProtocol {
 	}
 	
 	@Override
-	protected void finishSequence() {
-		super.finishSequence();
+	protected void finishSequence(SUT system) {
+		super.finishSequence(system);
 		if (settings().get(ConfigTags.GraphDBEnabled)) {
 			writeGraphDBResults();
 			offlineEvaluation();

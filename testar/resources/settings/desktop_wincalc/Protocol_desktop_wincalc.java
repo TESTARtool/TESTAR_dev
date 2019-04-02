@@ -290,9 +290,9 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void finishSequence(){
+	protected void finishSequence(SUT system){
 		
-		super.finishSequence();
+		super.finishSequence(system);
 		
 	}
 

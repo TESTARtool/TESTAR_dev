@@ -1,31 +1,31 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 import java.util.Set;
@@ -81,9 +81,9 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 	protected SUT startSystem() throws SystemStartException{
 
 		SUT sut = super.startSystem();
-		
+
 		State state = getState(sut);
-		
+
 		boolean recovery = false;
 		for(Widget w : getState(sut)) {
 			if(w.get(Tags.Title,"").contains("Document Recovery")) {
@@ -101,7 +101,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 				}
 			}
 		}
-			
+
 
 		return sut;
 
@@ -113,7 +113,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	 @Override
+	@Override
 	protected void beginSequence(SUT system, State state){
 		super.beginSequence(system, state);
 	}
@@ -148,7 +148,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 
 		//--------------------------------------------------------
 		// MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
-        //--------------------------------------------------------
+		//--------------------------------------------------------
 
 		return verdict;
 	}
@@ -241,7 +241,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
 						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
+						));
 
 			}
 		}
@@ -302,17 +302,15 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		return super.moreSequences();
 	}
 
-	/**
-	 * Here you can put graceful shutdown sequence for your SUT
-	 * @param system
+	/** 
+	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
-	protected void stopSystem(SUT system) {
-		
+	protected void finishSequence(SUT system) {
 		//TODO: This is the right method? 
-		
+
 		System.out.println("Trying to Close gracefully...");
-		
+
 		//Lets try to close gracefully the Libre Office app
 		State state = getState(system);
 		for(Widget w: state) {
@@ -324,11 +322,11 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 					System.out.println("Close founded");
 				}
 			}
-			
+
 		}
-		
-		Util.pause(2);
-		
+
+		Util.pause(1);
+
 		if(system.isRunning()) {
 			state = getState(system);
 			for(Widget w: state) {
@@ -340,10 +338,19 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 						System.out.println("Dont save founded");
 					}
 				}
-				
+
 			}
 		}
-			
+		
+		super.finishSequence(system);
+	}
+
+	/**
+	 * Here you can put graceful shutdown sequence for your SUT
+	 * @param system
+	 */
+	@Override
+	protected void stopSystem(SUT system) {
 		super.stopSystem(system);
 	}
 

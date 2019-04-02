@@ -328,12 +328,14 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     return super.moreActions(state);
   }
 
-  /**
+  /** 
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
   @Override
-  protected void finishSequence() {
-    super.finishSequence();
+  protected void finishSequence(SUT system){
+
+	  super.finishSequence(system);
+
   }
 
   /**
