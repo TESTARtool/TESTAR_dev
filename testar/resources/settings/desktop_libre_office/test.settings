@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\Program Files\LibreOffice\program\soffice.exe"
+SUTConnectorValue = "C:\\Program Files\\LibreOffice\\program\\soffice.exe"
 
 #################################################################
 # Sequences

@@ -179,7 +179,7 @@ public class StateFetcher implements Callable<UIAState>{
 		List<Long> newVisibleSUTWindows = Util.newArrayList();
 
 		for(long p : visibleTopLevelWindows)
-			if(WinProcess.SUTProcesses.contains(Windows.GetWindowProcessId(p))) {
+			if(WinProcess.sutProcessesPid.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
 			}
 

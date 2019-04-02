@@ -57,14 +57,14 @@ import es.upv.staq.testar.serialisation.LogSerialiser;
 public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = "";
-	
+
 	long hProcess;
 	final boolean stopProcess;
 	final Keyboard kbd = AWTKeyboard.build();
 	final Mouse mouse = AWTMouse.build();
-	final long pid;
+	final long mainPid;
 	String pName = "";
-	static List<Long> SUTProcesses = Util.newArrayList();
+	static List<Long> sutProcessesPid = Util.newArrayList();
 	static List<Long> startOSPidProcesses = Util.newArrayList();
 	static transient long pApplicationActivationManager;
 
@@ -78,10 +78,10 @@ public final class WinProcess extends SUTBase {
 	private WinProcess(long hProcess, boolean stopProcess){
 		this.hProcess = hProcess;
 		this.stopProcess = stopProcess;
-		pid = pid();
-		pName = new WinProcHandle(pid).name();
+		mainPid = mainPid();
+		pName = new WinProcHandle(mainPid).name();
 	}
-	
+
 	/**
 	 * Get the description of current WinProcess, or use the default value if not exist
 	 */
@@ -94,19 +94,19 @@ public final class WinProcess extends SUTBase {
 	 * 
 	 * @return pid of current WinProcess
 	 */
-	public long pid(){
+	public long mainPid(){
 		if(!isRunning())
 			throw new IllegalStateException();
 		return Windows.GetProcessId(hProcess);
 	}
-	
+
 	/**
 	 * Return information about current WinProcess object
 	 */
 	public String getStatus(){
-		return "PID[ " + this.pid + " ] & HANDLE[ " + this.hProcess + " ] & " +" NAME [ "+ pName+" ] ... "+ this.get(Tags.Desc,"");
+		return "PID[ " + this.mainPid + " ] & HANDLE[ " + this.hProcess + " ] & " +" NAME [ "+ pName+" ] ... "+ this.get(Tags.Desc,"");
 	}
-	
+
 	/**
 	 * From a introduced process pid obtain the handle of these process and check if still active
 	 * 
@@ -119,12 +119,12 @@ public final class WinProcess extends SUTBase {
 		Windows.CloseHandle(hProcess);
 		if(ret)
 			return true;
-		
+
 		return oneSUTprocessIsRunning();
 	}
 
 	private static boolean oneSUTprocessIsRunning() {
-		for(long pidSUT : SUTProcesses) {
+		for(long pidSUT : sutProcessesPid) {
 			long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pidSUT);
 			boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
 			Windows.CloseHandle(hProcess);
@@ -140,7 +140,7 @@ public final class WinProcess extends SUTBase {
 	public boolean isRunning() {
 		if(hProcess != 0 && Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE)
 			return true;
-		
+
 		return oneSUTprocessIsRunning();
 	}
 
@@ -159,7 +159,7 @@ public final class WinProcess extends SUTBase {
 			throw new SystemStopException(wae);
 		}
 	}
-	
+
 	/**
 	 * Stop and release current WinProcess
 	 */
@@ -183,27 +183,34 @@ public final class WinProcess extends SUTBase {
 	 * Terminate the process of current WinProcess, using a Windows native call
 	 */
 	public void stop() throws SystemStopException {
+
+		//Windows.ExitProcess(0)
+		//Windows.CloseMainWindows
+		//Runtime rt = Runtime.getRuntime();
+		//String closeGracefully = "taskkill /pid ";
+		//Process pr = rt.exec(closeGracefully+mainPid);
+
 		try{
 			if(hProcess != 0){
-				if(stopProcess)
+				if(stopProcess) 
 					Windows.TerminateProcess(hProcess, 0);
 				Windows.CloseHandle(hProcess);
 				hProcess = 0;
-				
-				//Close all processes of SUT
-				for(Long pidSUT : SUTProcesses) {
+
+				for(Long pidSUT : sutProcessesPid) {
 					System.out.println("Process pid to kill: "+pidSUT);
 					long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pidSUT);
 					Windows.TerminateProcess(hProcess, -1);
 					Windows.CloseHandle(hProcess);
-					SUTProcesses.remove(pidSUT);
+					sutProcessesPid.remove(pidSUT);
+
 				}
 			}
 		}catch(WinApiException wae){
 			throw new SystemStopException(wae);
 		}
 	}
-	
+
 	/**
 	 * From the pid of a process make a Windows native call to GetModuleBaseName and obtain the name of desired process
 	 * 
@@ -221,7 +228,7 @@ public final class WinProcess extends SUTBase {
 		Windows.CloseHandle(hProcess);
 		return ret;
 	}
-	
+
 	/**
 	 * Compare the process identifier of foreground windows with the introduced pid
 	 * 
@@ -233,28 +240,28 @@ public final class WinProcess extends SUTBase {
 		long wpid = Windows.GetWindowProcessId(hwnd);
 		if(!Windows.IsIconic(hwnd) && (wpid == pid))
 			return true;
-		
+
 		return oneSUTprocessIsForeground();
 	}
-	
+
 	private static boolean oneSUTprocessIsForeground() {
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		for(long pidSUT : SUTProcesses)
+		for(long pidSUT : sutProcessesPid)
 			if(!Windows.IsIconic(hwnd) && (wpid == pidSUT))
 				return true;
 		return false;
 	}
-	
+
 	/**
 	 * Call the current WinProcess object to check if is on foreground
 	 * @return boolean foreground condition
 	 */
 	public boolean isForeground(){
-		
-		if (isForeground(pid()))
+
+		if (isForeground(mainPid()))
 			return true;
-		
+
 		return oneSUTprocessIsForeground();
 	}
 
@@ -267,8 +274,8 @@ public final class WinProcess extends SUTBase {
 	public static void toForeground(long pid) throws WinApiException{
 		toForeground(pid, 0.3, 100);
 	}
-	
-	public void toForeground(){ toForeground(pid()); }
+
+	public void toForeground(){ toForeground(mainPid()); }
 
 	/**
 	 * Use ALT + TAB combination until the pid of our SUT will be on foreground or we try the maxTries count
@@ -315,7 +322,7 @@ public final class WinProcess extends SUTBase {
 			throw new SystemStartException(fe);
 		}
 	}
-	
+
 	/**
 	 * Read all Windows running processes, create a List of WinProcHandle objects that represent this processes
 	 * and return this List
@@ -378,8 +385,8 @@ public final class WinProcess extends SUTBase {
 			if(!processListenerEnabled) {
 
 				startOSPidProcesses = Util.newArrayList();
-				SUTProcesses = Util.newArrayList();
-				
+				sutProcessesPid = Util.newArrayList();
+
 				//PID of running processes before the execution of the SUT
 				List<WinProcHandle> beforeProcesses = runningProcesses();
 				List<Long> beforePID = Util.newArrayList();
@@ -407,12 +414,12 @@ public final class WinProcess extends SUTBase {
 				List<WinProcHandle> runningProcesses = runningProcesses();
 				for(WinProcHandle winp : runningProcesses) {
 					if(!beforePID.contains(winp.pid()))
-						SUTProcesses.add(winp.pid());
+						sutProcessesPid.add(winp.pid());
 				}
 
 				//TODO: Think about create extra conditions to make sure that we are working with SUT process
-				if(SUTProcesses!=null) {
-					for(Long info : SUTProcesses)
+				if(sutProcessesPid!=null) {
+					for(Long info : sutProcessesPid)
 						System.out.println("Potential SUT PID: "+info);
 				}
 
@@ -506,7 +513,7 @@ public final class WinProcess extends SUTBase {
 			throw new SystemStartException(fe);
 		}
 	}
-	
+
 	/**
 	 * Obtain the memory usage info of the WinProcess introduced, using a Windows native call
 	 * 
@@ -516,7 +523,7 @@ public final class WinProcess extends SUTBase {
 	public static long getMemUsage(WinProcess wp){
 		long pid = -1;
 		try{
-			pid = wp.pid();
+			pid = wp.mainPid();
 		} catch(IllegalStateException e){
 			System.out.println("SUT is not running - cannot retrieve RAM usage");
 			return -1;
@@ -533,7 +540,7 @@ public final class WinProcess extends SUTBase {
 	public static long[] getCPUsage(WinProcess wp){
 		long pid = -1;
 		try{
-			pid = wp.pid();
+			pid = wp.mainPid();
 		} catch(IllegalStateException e){
 			System.out.println("SUT is not running - cannot retrieve CPU usage");
 			return new long[]{-1,-1};
@@ -549,13 +556,13 @@ public final class WinProcess extends SUTBase {
 		else if(tag.equals(Tags.StandardMouse))
 			return (T)mouse;
 		else if(tag.equals(Tags.PID))
-			return (T)(Long)pid;
+			return (T)(Long)mainPid;
 		else if (tag.equals(Tags.HANDLE))
 			return (T)(Long)hProcess;
 		else if(tag.equals(Tags.ProcessHandles))
 			return (T)runningProcesses().iterator();
 		else if(tag.equals(Tags.SystemActivator))
-			return (T) new WinProcessActivator(pid);
+			return (T) new WinProcessActivator(mainPid);
 		return null;
 	}
 

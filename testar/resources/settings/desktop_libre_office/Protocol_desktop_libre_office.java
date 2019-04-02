@@ -81,6 +81,27 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 	protected SUT startSystem() throws SystemStartException{
 
 		SUT sut = super.startSystem();
+		
+		State state = getState(sut);
+		
+		boolean recovery = false;
+		for(Widget w : getState(sut)) {
+			if(w.get(Tags.Title,"").contains("Document Recovery")) {
+				recovery = true;
+			}
+		}
+		if(recovery) {
+			for(Widget w : getState(sut)) {
+				if(w.get(Tags.Title,"").contains("Close")) {
+					Role role = w.get(Tags.Role, Roles.Widget);
+					if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+						StdActionCompiler ac = new AnnotatingActionCompiler();
+						executeAction(sut, state, ac.leftClickAt(w));
+					}
+				}
+			}
+		}
+			
 
 		return sut;
 
@@ -288,7 +309,9 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 	@Override
 	protected void stopSystem(SUT system) {
 		
-		System.out.println("Close gracefully");
+		//TODO: This is the right method? 
+		
+		System.out.println("Trying to Close gracefully...");
 		
 		//Lets try to close gracefully the Libre Office app
 		State state = getState(system);
@@ -307,14 +330,14 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		Util.pause(2);
 		
 		if(system.isRunning()) {
-			System.out.println("Dont save random text writed");
 			state = getState(system);
 			for(Widget w: state) {
-				if(w.get(Tags.Title,"").contains("Don't save")) {
+				if(w.get(Tags.Title,"").contains("Don") && w.get(Tags.Title,"").contains("Sav")) {
 					Role role = w.get(Tags.Role, Roles.Widget);
 					if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 						StdActionCompiler ac = new AnnotatingActionCompiler();
 						executeAction(system, state, ac.leftClickAt(w));
+						System.out.println("Dont save founded");
 					}
 				}
 				
