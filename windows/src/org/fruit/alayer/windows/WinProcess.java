@@ -67,7 +67,7 @@ public final class WinProcess extends SUTBase {
 	static List<Long> sutProcessesPid = Util.newArrayList();
 	static List<Long> startOSPidProcesses = Util.newArrayList();
 	static transient long pApplicationActivationManager;
-
+	
 	/**
 	 * Constructor
 	 * 
@@ -125,11 +125,13 @@ public final class WinProcess extends SUTBase {
 
 	private static boolean oneSUTprocessIsRunning() {
 		for(long pidSUT : sutProcessesPid) {
-			long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pidSUT);
-			boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
-			Windows.CloseHandle(hProcess);
-			if(ret)
-				return true;
+			try {
+				long hProcess = Windows.OpenProcess(Windows.PROCESS_QUERY_INFORMATION, false, pidSUT);
+				boolean ret = Windows.GetExitCodeProcess(hProcess) == Windows.STILL_ACTIVE;
+				Windows.CloseHandle(hProcess);
+				if(ret)
+					return true;
+			}catch(Exception e) {} //If this throws an error, probably process was closed
 		}
 		return false;
 	}
@@ -164,7 +166,6 @@ public final class WinProcess extends SUTBase {
 	 * Stop and release current WinProcess
 	 */
 	public void finalize(){
-		stop();
 		release();
 	}
 
@@ -183,13 +184,11 @@ public final class WinProcess extends SUTBase {
 	 * Terminate the process of current WinProcess, using a Windows native call
 	 */
 	public void stop() throws SystemStopException {
-
 		//Windows.ExitProcess(0)
 		//Windows.CloseMainWindows
 		//Runtime rt = Runtime.getRuntime();
 		//String closeGracefully = "taskkill /pid ";
 		//Process pr = rt.exec(closeGracefully+mainPid);
-
 		try{
 			if(hProcess != 0){
 				if(stopProcess) 
@@ -198,7 +197,7 @@ public final class WinProcess extends SUTBase {
 				hProcess = 0;
 
 				for(Long pidSUT : sutProcessesPid) {
-					System.out.println("Process pid to kill: "+pidSUT);
+					//System.out.println("Process pid to kill: "+pidSUT);
 					long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pidSUT);
 					Windows.TerminateProcess(hProcess, -1);
 					Windows.CloseHandle(hProcess);
@@ -418,10 +417,10 @@ public final class WinProcess extends SUTBase {
 				}
 
 				//TODO: Think about create extra conditions to make sure that we are working with SUT process
-				if(sutProcessesPid!=null) {
+				/*if(sutProcessesPid!=null) {
 					for(Long info : sutProcessesPid)
 						System.out.println("Potential SUT PID: "+info);
-				}
+				}*/
 
 				ret.set(Tags.Desc, path);
 				return ret;

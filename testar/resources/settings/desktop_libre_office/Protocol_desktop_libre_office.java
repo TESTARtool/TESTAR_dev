@@ -307,9 +307,8 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void finishSequence(SUT system) {
-		//TODO: This is the right method? 
 
-		System.out.println("Trying to Close gracefully...");
+		//System.out.println("Trying to Close gracefully...");
 
 		//Lets try to close gracefully the Libre Office app
 		State state = getState(system);
@@ -319,7 +318,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
 					executeAction(system, state, ac.leftClickAt(w));
-					System.out.println("Close founded");
+					//System.out.println("Close founded");
 				}
 			}
 
@@ -335,12 +334,14 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 					if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 						StdActionCompiler ac = new AnnotatingActionCompiler();
 						executeAction(system, state, ac.leftClickAt(w));
-						System.out.println("Dont save founded");
+						//System.out.println("Dont save founded");
 					}
 				}
 
 			}
 		}
+		
+		Util.pause(1);
 		
 		super.finishSequence(system);
 	}
