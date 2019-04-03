@@ -101,6 +101,26 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 				}
 			}
 		}
+		
+		//Wait a bit
+		Util.pause(2);
+		
+		//Update the state
+		state = getState(sut);
+		for(Widget w : getState(sut)) {
+			
+			//Here u can choose a libreOffice document type
+			if(w.get(Tags.Title,"").contains("Writer Document")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(sut, state, ac.leftClickAt(w));
+				}
+			}
+		}
+		
+		//Wait a bit
+		Util.pause(2);
 
 
 		return sut;
@@ -311,6 +331,7 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		//System.out.println("Trying to Close gracefully...");
 
 		//Lets try to close gracefully the Libre Office app
+		// More than one Close button could exist, should we use a while? with maxAttempts?
 		State state = getState(system);
 		for(Widget w: state) {
 			if(w.get(Tags.Title,"").contains("Close")) {

@@ -834,9 +834,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     	Util.clear(cv);
     	cv.end();
+    	
+    	/**
+    	 * TODO: Spy mode doesn't use sequences, but the content of SystemProcessHandling
+    	 * kills correctly the SUT with shift down in SPy mode.
+    	 * Study this before the pull request with master branch
+    	 */
+    	finishSequence(system);
 
     	//Stop and close the SUT before return to the detectModeLoop
     	stopSystem(system);
+    	
+    	if (system != null && system.isRunning())
+            system.stop();
 
     }
 
