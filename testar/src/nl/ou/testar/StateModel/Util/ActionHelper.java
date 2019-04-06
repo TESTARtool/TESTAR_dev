@@ -39,7 +39,7 @@ public class ActionHelper {
         for (String abstractActionId : actionMap.keySet()) {
             AbstractAction abstractAction = new AbstractAction(abstractActionId);
             for (Action action : actionMap.get(abstractActionId)) {
-                abstractAction.addConcreteActionId(action.get(Tags.ConcreteID));
+                abstractAction.addConcreteActionId(action.get(Tags.ConcreteIDCustom));
             }
             abstractActions.add(abstractAction);
         }
