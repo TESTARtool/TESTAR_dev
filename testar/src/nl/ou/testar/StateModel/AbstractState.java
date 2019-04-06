@@ -16,6 +16,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
     private Map<String, AbstractAction> actions;
     // list of possible actions that have not yet been executed from this state
     private Map<String, AbstractAction> unvisitedActions;
+    // a list of actions that have been visited in this state
+    private Map<String, AbstractAction> visitedActions;
     // a set of strings containing the concrete state ids that correspond to this abstract state
     private Set<String> concreteStateIds;
     // is this an initial state?
@@ -30,6 +32,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
         super(stateId);
         this.actions = new HashMap<>();
         unvisitedActions = new HashMap<>();
+        visitedActions = new HashMap<>();
         if (actions != null) {
             for(AbstractAction action:actions) {
                 this.actions.put(action.getActionId(), action);
@@ -60,7 +63,8 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param action the visited action
      */
     public void addVisitedAction(AbstractAction action) {
-            unvisitedActions.remove(action.getActionId());
+        unvisitedActions.remove(action.getActionId());
+        visitedActions.put(action.getActionId(), action);
     }
 
     /**
@@ -113,12 +117,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @return
      */
     public Set<AbstractAction> getVisitedActions() {
-        Set<AbstractAction> visitedActions = new HashSet<>();
-        for (AbstractAction action : actions.values()) {
-            visitedActions.add(action);
-        }
-        visitedActions.removeAll(getUnvisitedActions());
-        return visitedActions;
+        return new HashSet<>(visitedActions.values());
     }
 
     /**
