@@ -80,21 +80,6 @@ public class AbstractState extends AbstractEntity implements Persistable {
     }
 
     /**
-     * This method returns all the state's executable actions for a given set of ids
-     * @param actionIds
-     * @return
-     */
-    public Set<AbstractAction> getActions(Set<String> actionIds) {
-        Set<AbstractAction> abstractActions = new HashSet<AbstractAction>();
-        for (String actionId:actionIds) {
-            if (actions.containsKey(actionId)) {
-                abstractActions.add(actions.get(actionId));
-            }
-        }
-        return abstractActions;
-    }
-
-    /**
      * This method returns the action for a given action identifier
      * @param actionId
      * @return
