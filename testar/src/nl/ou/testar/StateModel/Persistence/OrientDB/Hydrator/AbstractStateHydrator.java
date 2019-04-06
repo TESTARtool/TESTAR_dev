@@ -1,7 +1,6 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import nl.ou.testar.StateModel.AbstractAction;
 import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
@@ -11,9 +10,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
 
@@ -42,12 +38,12 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 stateId = ((AbstractState) source).getStateId();
             }
             else if (prop.getPropertyName().equals("abstractionLevelIdentifier")) {
-                OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getAbstractionLevelIdentifier().getClass());
+                OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getModelIdentifier().getClass());
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
-                target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getAbstractionLevelIdentifier()));
-                abstractionLevelIdentifier = ((AbstractState) source).getAbstractionLevelIdentifier();
+                target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getModelIdentifier()));
+                abstractionLevelIdentifier = ((AbstractState) source).getModelIdentifier();
             }
         }
 

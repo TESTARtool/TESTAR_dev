@@ -24,11 +24,11 @@ public class AbstractStateModelHydrator implements EntityHydrator<VertexEntity> 
         }
 
         // make sure the java and orientdb property types are compatible
-        OType identifierType = TypeConvertor.getInstance().getOrientDBType(((AbstractStateModel) source).getAbstractionLevelIdentifier().getClass());
+        OType identifierType = TypeConvertor.getInstance().getOrientDBType(((AbstractStateModel) source).getModelIdentifier().getClass());
         if (identifierType != identifier.getPropertyType()) {
             throw new HydrationException();
         }
-        vertexEntity.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), ((AbstractStateModel) source).getAbstractionLevelIdentifier()));
+        vertexEntity.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), ((AbstractStateModel) source).getModelIdentifier()));
 
         // add the tags that were used in the creation of the unique states of the state model
         Property abstractionAttributes = HydrationHelper.getProperty(vertexEntity.getEntityClass().getProperties(), "abstractionAttributes");

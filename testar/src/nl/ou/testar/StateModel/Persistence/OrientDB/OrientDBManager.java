@@ -1,6 +1,5 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
-import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -13,7 +12,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.EntityExtractor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Extractor.ExtractorFactory;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.EntityHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.HydratorFactory;
-import nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator.SequenceHydrator;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
 import nl.ou.testar.StateModel.Sequence.Sequence;
@@ -23,11 +21,8 @@ import nl.ou.testar.StateModel.Sequence.SequenceStep;
 import nl.ou.testar.StateModel.Util.EventHelper;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import nl.ou.testar.StateModel.Widget;
-import org.fruit.Pair;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
@@ -155,7 +150,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             String sourceId = (String)abstractStateEntity.getPropertyValue("uid").getValue();
             String targetId = (String)blackHole.getPropertyValue("blackHoleId").getValue();
             String actionId = action.getActionId();
-            String modelIdentifier = abstractState.getAbstractionLevelIdentifier();
+            String modelIdentifier = abstractState.getModelIdentifier();
             visitedActionIds.add(HydrationHelper.createOrientDbActionId(sourceId, targetId, actionId, modelIdentifier));
         }
         // then do a batch delete from the database

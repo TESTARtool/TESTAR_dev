@@ -1,10 +1,8 @@
 package nl.ou.testar.StateModel;
 
-import nl.ou.testar.StateModel.Event.StateModelEvent;
-import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Persistence.Persistable;
-import nl.ou.testar.StateModel.Util.ActionHelper;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -136,13 +134,13 @@ public class AbstractState extends AbstractEntity implements Persistable {
     }
 
     @Override
-    public void setAbstractionLevelIdentifier(String abstractionLevelIdentifier) {
-        super.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+    public void setModelIdentifier(String modelIdentifier) {
+        super.setModelIdentifier(modelIdentifier);
         // set the identifier on the abstract actions for this state
         for (String key : actions.keySet()) {
-            actions.get(key).setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+            actions.get(key).setModelIdentifier(modelIdentifier);
             if (unvisitedActions.containsKey(key)) {
-                unvisitedActions.get(key).setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+                unvisitedActions.get(key).setModelIdentifier(modelIdentifier);
             }
         }
     }
@@ -153,7 +151,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      */
     public void addNewAction(AbstractAction action) {
         if (!this.actions.containsKey(action.getActionId())) {
-            action.setAbstractionLevelIdentifier(this.getAbstractionLevelIdentifier());
+            action.setModelIdentifier(this.getModelIdentifier());
             actions.put(action.getActionId(), action);
             unvisitedActions.put(action.getActionId(), action);
         }

@@ -3,7 +3,6 @@ package nl.ou.testar.StateModel;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Event.StateModelEventType;
-import nl.ou.testar.StateModel.Exception.ElementAlreadyExistsException;
 import nl.ou.testar.StateModel.Exception.InvalidStateIdException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Exception.StateNotFoundException;
@@ -17,7 +16,7 @@ import java.util.Set;
 public class AbstractStateModel {
 
     // this should contain a hash to uniquely identify the elements that were `used` in the abstraction level of the model
-    private String abstractionLevelIdentifier;
+    private String modelIdentifier;
 
     // the name of the application that is being modelled
     private String applicationName;
@@ -48,14 +47,14 @@ public class AbstractStateModel {
 
     /**
      * constructor
-     * @param abstractionLevelIdentifier
+     * @param modelIdentifier
      */
-    public AbstractStateModel(String abstractionLevelIdentifier,
+    public AbstractStateModel(String modelIdentifier,
                               String applicationName,
                               String applicationVersion,
                               Set<Tag<?>> tags,
                               StateModelEventListener ...eventListeners) {
-        this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        this.modelIdentifier = modelIdentifier;
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
         this.tags = tags;
@@ -148,7 +147,7 @@ public class AbstractStateModel {
         checkStateId(newState.getStateId());
         if (!containsState(newState.getStateId())) {
             // provide the state with this state model's abstract identifier
-            newState.setAbstractionLevelIdentifier(abstractionLevelIdentifier);
+            newState.setModelIdentifier(modelIdentifier);
             // provide the state with the event listeners from this state model
             for (StateModelEventListener eventListener: eventListeners) {
                 newState.addEventListener(eventListener);
@@ -253,8 +252,8 @@ public class AbstractStateModel {
      * THis method returns the unique hash that was calculated to identify this abstract state model
      * @return
      */
-    public String getAbstractionLevelIdentifier() {
-        return abstractionLevelIdentifier;
+    public String getModelIdentifier() {
+        return modelIdentifier;
     }
 
     /**

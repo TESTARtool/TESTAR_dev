@@ -18,7 +18,7 @@ public class BlackHoleHydrator implements EntityHydrator<VertexEntity> {
         // there is only one black hole vertex in the data store
         // we always use the same id value for a given abstraction level
         Property identifier = target.getEntityClass().getIdentifier();
-        String blackholeId = HydrationHelper.lowCollisionID(((AbstractState) source).getAbstractionLevelIdentifier() + "--THERE_CAN_BE_ONLY_ONE");
+        String blackholeId = HydrationHelper.lowCollisionID(((AbstractState) source).getModelIdentifier() + "--THERE_CAN_BE_ONLY_ONE");
         target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(OType.STRING, blackholeId));
     }
 }

@@ -2,7 +2,6 @@ package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import nl.ou.testar.StateModel.AbstractAction;
-import nl.ou.testar.StateModel.AbstractState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.EdgeEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
@@ -11,8 +10,6 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
-
-import java.util.Set;
 
 public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
 
@@ -29,7 +26,7 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         }
 
         // fetch the abstract level identifier for the current state model
-        String abstractionLevelIdentifier = ((AbstractAction) source).getAbstractionLevelIdentifier();
+        String abstractionLevelIdentifier = ((AbstractAction) source).getModelIdentifier();
         edgeEntity.addPropertyValue("abstractionLevelIdentifier", new PropertyValue(OType.STRING, abstractionLevelIdentifier));
 
         // because an abstract action might have multiple concrete actions tied to it, it is possible that the target
