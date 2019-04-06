@@ -40,9 +40,6 @@ public class AbstractStateModel {
     // set of initial states
     private Map<String, AbstractState> initialStates;
 
-    // set of executed actions
-    private Map<String, AbstractAction> executedActions;
-
     // a set of event listeners
     private Set<StateModelEventListener> eventListeners;
 
@@ -68,7 +65,6 @@ public class AbstractStateModel {
         stateTransitionsByTarget = new HashMap<>();
         states = new HashMap<>();
         initialStates = new HashMap<>();
-        executedActions = new HashMap<>();
         this.eventListeners = new HashSet<>();
         for (int i = 0; i < eventListeners.length;i++) {
             this.eventListeners.add(eventListeners[i]);
@@ -119,7 +115,6 @@ public class AbstractStateModel {
         addTransition(newStateTransition);
         addState(sourceState);
         addState(targetState);
-        addAction(executedAction);
 
         activateEvents();
         emitEvent(new StateModelEvent(StateModelEventType.ABSTRACT_STATE_TRANSITION_ADDED, newStateTransition));
@@ -203,16 +198,6 @@ public class AbstractStateModel {
         if (!initialStates.containsKey(initialState.getStateId())) {
             initialState.setInitial(true);
             initialStates.put(initialState.getStateId(), initialState);
-        }
-    }
-
-    /**
-     * This method adds an action to the list of executed actions
-     * @param executedAction
-     */
-    public void addAction(AbstractAction executedAction) {
-        if (!executedActions.containsKey(executedAction.getActionId())) {
-            executedActions.put(executedAction.getActionId(), executedAction);
         }
     }
 
