@@ -21,6 +21,7 @@ import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Sequence.SequenceNode;
 import nl.ou.testar.StateModel.Sequence.SequenceStep;
 import nl.ou.testar.StateModel.Util.EventHelper;
+import nl.ou.testar.StateModel.Util.HydrationHelper;
 import nl.ou.testar.StateModel.Widget;
 import org.fruit.Pair;
 
@@ -127,18 +128,8 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
 
     private void persistUnvisitedActions(AbstractState abstractState, VertexEntity abstractStateEntity) {
         abstractStateEntity.enableUpdate(false);
-        // 1) delete the unvisited actions that are no longer unvisited
-        // 2) save the unvisited actions (for newly saved states)
 
-        // step 1:
-        Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
-        // we need the ids
-        Set<Object> visitedActionIds = visitedActions.stream().map(action -> action.getActionId()).collect(Collectors.toSet());
-        EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
-        entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
-
-        // step 2:
-        // all unvisited actions go to the black hole vertex!
+        // prepare the black hole entity that is needed for the unvisited actions
         EntityClass targetEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.BlackHole);
         VertexEntity blackHole = new VertexEntity(targetEntityClass);
         blackHole.enableUpdate(false);
@@ -152,6 +143,27 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             return;
         }
 
+        // Steps:
+        // 1) delete the unvisited actions that are no longer unvisited
+        // 2) save the unvisited actions (for newly saved states)
+
+        // step 1:
+        Set<AbstractAction> visitedActions = abstractState.getVisitedActions();
+        // we need to prepare the unique action id's that are used in orientdb, so that we can delete them.
+        Set<Object> visitedActionIds = new HashSet<>();
+        for (AbstractAction action : visitedActions) {
+            String sourceId = (String)abstractStateEntity.getPropertyValue("uid").getValue();
+            String targetId = (String)blackHole.getPropertyValue("blackHoleId").getValue();
+            String actionId = action.getActionId();
+            String modelIdentifier = abstractState.getAbstractionLevelIdentifier();
+            visitedActionIds.add(HydrationHelper.createOrientDbActionId(sourceId, targetId, actionId, modelIdentifier));
+        }
+        // then do a batch delete from the database
+        EntityClass unvisitedActionEntityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.UnvisitedAbstractAction);
+        entityManager.deleteEntities(unvisitedActionEntityClass, visitedActionIds);
+
+        // step 2:
+        // all unvisited actions go to the black hole vertex!
         try {
             EntityHydrator actionHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_ABSTRACT_ACTION);
             for (AbstractAction unvisitedAction : abstractState.getUnvisitedActions()) {

@@ -60,4 +60,17 @@ public abstract class HydrationHelper {
                 crc32.getValue();
     }
 
+    /**
+     * This method returns a unique id for an action/transition that can be used in OrientDB.
+     * @param sourceId
+     * @param targetId
+     * @param actionId
+     * @param modelIdentifier
+     * @return
+     */
+    public static String createOrientDbActionId(String sourceId, String targetId, String actionId, String modelIdentifier) {
+        // this creates a unique id that is needed for OrientDB storage
+        return lowCollisionID(sourceId + "-" + actionId + "-" + targetId + "-" + modelIdentifier);
+    }
+
 }
