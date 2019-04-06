@@ -56,6 +56,7 @@ public class StateModelPanel extends JPanel {
     private JLabel label9 = new JLabel("Reset database");
     private JLabel label10 = new JLabel("Application name");
     private JLabel label11 = new JLabel("Application version");
+    private JLabel label12 = new JLabel("AccessBridge enabled");
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
@@ -69,6 +70,7 @@ public class StateModelPanel extends JPanel {
     private JTextField applicationVersionField = new JTextField();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
     private Set<JComponent> components;
+    private JCheckBox accessBridgeEnabledBox = new JCheckBox();
 
     private StateModelPanel(){
         super();
@@ -100,6 +102,7 @@ public class StateModelPanel extends JPanel {
         components.add(applicationNameField);
         components.add(applicationVersionField);
         components.add(dataStoreModeBox);
+        components.add(accessBridgeEnabledBox);
 
         // add the components to the panel
         setLayout(null);
@@ -164,6 +167,11 @@ public class StateModelPanel extends JPanel {
         add(label11);
         applicationVersionField.setBounds(450, 80, 125, 27);
         add(applicationVersionField);
+
+        label12.setBounds(300, 108, 150, 27);
+        add(label12);
+        accessBridgeEnabledBox.setBounds(450, 108, 50, 27);
+        add(accessBridgeEnabledBox);
     }
 
     /**
@@ -172,6 +180,7 @@ public class StateModelPanel extends JPanel {
      */
     public void populateFrom(final Settings settings) {
         stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
+        accessBridgeEnabledBox.setSelected(settings.get(ConfigTags.AccessBridgeEnabled));
         dataStoreTextfield.setText(settings.get(ConfigTags.DataStore));
         dataStoreTypeTextfield.setText(settings.get(ConfigTags.DataStoreType));
         dataStoreServerTextfield.setText(settings.get(ConfigTags.DataStoreServer));
@@ -206,6 +215,7 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
         settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
+        settings.set(ConfigTags.AccessBridgeEnabled, accessBridgeEnabledBox.isSelected());
     }
 
     /**
