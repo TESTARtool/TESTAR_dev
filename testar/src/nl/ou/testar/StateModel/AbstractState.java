@@ -44,9 +44,7 @@ public class AbstractState extends AbstractEntity implements Persistable {
      * @param concreteStateId the concrete id to add
      */
     public void addConcreteStateId(String concreteStateId) {
-        if (!concreteStateIds.contains(concreteStateId)) {
-            this.concreteStateIds.add(concreteStateId);
-        }
+        this.concreteStateIds.add(concreteStateId);
     }
 
     /**
