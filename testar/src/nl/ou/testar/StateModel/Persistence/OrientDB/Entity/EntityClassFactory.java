@@ -170,7 +170,7 @@ public class EntityClassFactory {
 
     private static EntityClass createAbstractStateModelClass() {
         EntityClass abstractStateModelClass = new EntityClass("AbstractStateModel", EntityClass.EntityType.Vertex);
-        Property id = new Property("abstractionLevelIdentifier", OType.STRING);
+        Property id = new Property("modelIdentifier", OType.STRING);
         id.setMandatory(true);
         id.setNullable(false);
         id.setIdentifier(true);
