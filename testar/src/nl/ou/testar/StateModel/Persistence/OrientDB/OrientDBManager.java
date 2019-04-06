@@ -144,7 +144,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         blackHole.enableUpdate(false);
         try {
             EntityHydrator blackHoleHydrator = HydratorFactory.getHydrator(HydratorFactory.HYDRATOR_BLACKHOLE);
-            blackHoleHydrator.hydrate(blackHole, null);
+            blackHoleHydrator.hydrate(blackHole, abstractState);
         }
         catch (HydrationException ex) {
             ex.printStackTrace();
