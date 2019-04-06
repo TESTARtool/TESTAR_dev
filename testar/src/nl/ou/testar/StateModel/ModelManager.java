@@ -149,19 +149,23 @@ public class ModelManager implements StateModelManager {
         // the action that is executed should always be traceable to an action on the current abstract state
         // in other words, we should be able to find the action on the current abstract state
         try {
-            this.actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
+            actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
         }
         catch (ActionNotFoundException ex) {
             System.out.println("Action not found in state model");
-            this.actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
+            actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
-        this.actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
+        actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
     }
 
     @Override
     public void notifySequenceEnded() {
+        currentAbstractState = null;
+        currentConcreteState = null;
+        actionUnderExecution = null;
+        concreteActionUnderExecution = null;
         persistenceManager.persistAbstractStateModel(abstractStateModel);
     }
 
