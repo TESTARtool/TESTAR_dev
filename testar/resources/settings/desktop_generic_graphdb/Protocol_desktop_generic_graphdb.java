@@ -175,7 +175,6 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 			for(Widget w : getTopWidgets(state)){
 				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						//storeWidget(state.get(Tags.ConcreteID), w);
 						// left clicks
 						if(whiteListed(w) || isClickable(w)) {
 							actions.add(ac.leftClickAt(w));
@@ -183,7 +182,6 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 						}
 						// slides
