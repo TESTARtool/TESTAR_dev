@@ -194,7 +194,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends ClickFilterLayer
 					// We want to create actions that consist of typing into them
 					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.

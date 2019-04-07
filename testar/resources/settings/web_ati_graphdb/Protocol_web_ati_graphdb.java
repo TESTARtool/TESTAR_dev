@@ -248,7 +248,8 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
         // type into text boxes
         if (whiteListed(widget) || isTypeable(widget)) {
-          actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
+          storeWidget(state.get(Tags.ConcreteID), widget);
+          actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
         }
 
         // slides

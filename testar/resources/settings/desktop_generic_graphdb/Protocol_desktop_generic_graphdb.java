@@ -183,7 +183,8 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+							storeWidget(state.get(Tags.ConcreteID), w);
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 						}
 						// slides
 						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
@@ -250,9 +251,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-
 		return super.moreActions(state);
-
 	}
 
 	/** 
@@ -260,9 +259,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void finishSequence(){
-		
 		super.finishSequence();
-		
 	}
 
 	/**
@@ -272,9 +269,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * @return  if <code>true</code> continue test, else stop	 */
 	@Override
 	protected boolean moreSequences() {
-
 		return super.moreSequences();
-
 	}
 
 	private class ButtonColor extends CustomType {
@@ -290,7 +285,6 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	}
 	
 }
-
 
  class ButtonColorTags extends TagsBase {
 	 public static Tag<Integer> RED_VALUE = from("red", Integer.class);
