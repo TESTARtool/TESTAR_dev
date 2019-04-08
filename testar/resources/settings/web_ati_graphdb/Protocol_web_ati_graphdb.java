@@ -46,8 +46,9 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -248,7 +249,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
 
         // type into text boxes
         if (whiteListed(widget) || isTypeable(widget)) {
-          actions.add(ac.clickTypeInto(widget, this.getRandomText(widget)));
+            actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
         }
 
         // slides

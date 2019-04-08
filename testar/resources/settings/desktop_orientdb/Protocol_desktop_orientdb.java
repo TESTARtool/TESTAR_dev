@@ -28,22 +28,19 @@
  *******************************************************************************************************/
 
 
-import java.util.Set;
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
+import java.util.Set;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -179,7 +176,7 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 					// We want to create actions that consist of typing into them
 					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.

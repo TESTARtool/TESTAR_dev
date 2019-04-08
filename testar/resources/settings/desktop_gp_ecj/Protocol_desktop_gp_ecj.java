@@ -1,5 +1,4 @@
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import nl.ou.testar.HtmlSequenceReport;
 import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
@@ -57,9 +56,9 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     //Attributes for adding slide actions
     static double scrollArrowSize = 36; // sliding arrows
     static double scrollThick = 16; //scroll thickness
-    private HtmlSequenceReport htmlReport;
     private StrategyFactory strategyFactory;
     private StrategyActionSelector strategyActionSelector;
+    private Verdict verdict;
     private Optional<String[]> inputText = Optional.empty();
 
     /**
@@ -70,9 +69,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      */
     @Override
     protected void initialize(final Settings settings) {
-        //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
-
         final Tag<String> stateTag = this.getStateTag();
         strategyFactory = new StrategyFactoryImpl(settings().get(ConfigTags.StrategyFile));
 
@@ -110,7 +106,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
     @Override
     protected void postSequenceProcessing() {
         super.postSequenceProcessing();
-        this.strategyFactory.postSequence(settings());
+        this.strategyFactory.postSequence(settings(), this.verdict);
     }
 
     /**
@@ -158,7 +154,7 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
         // non-responsiveness
         // suspicious titles
         Verdict verdict = super.getVerdict(state);
-
+        this.verdict = verdict;
         //--------------------------------------------------------
         // MORE SOPHISTICATED STATE ORACLES CAN BE PROGRAMMED HERE
         //--------------------------------------------------------
@@ -252,13 +248,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      */
     @Override
     protected Action selectAction(State state, Set<Action> actions) {
-        //adding state to the HTML sequence report:
-        try {
-            htmlReport.addState(state, actions);
-        } catch (Exception e) {
-            // catching null for the first state or any new state, when unvisited actions is still null
-            htmlReport.addState(state, actions);
-        }
         //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
         //unwanted processes are killed and SUT is put into foreground.
         Action a = preSelectAction(state, actions);
@@ -270,7 +259,6 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
             a = strategyActionSelector.selectAction(state, actions);
             //a = RandomActionSelector.selectAction(actions);
         }
-        htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
         return a;
     }
 

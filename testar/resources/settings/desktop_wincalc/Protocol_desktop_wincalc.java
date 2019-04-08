@@ -33,61 +33,23 @@
  * @author Urko Rueda Molina
  */
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.Assert;
-import org.fruit.Drag;
-import org.fruit.Pair;
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.Util;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
-import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
-import org.fruit.alayer.actions.KeyUp;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.DefaultProtocol;
-
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import es.upv.staq.testar.CodingManager;
-
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
 
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
+import java.util.Set;
+
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
-import es.upv.staq.testar.NativeLinker;
 
 public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // DefaultProtocol {
 
@@ -134,16 +96,16 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 		// begin by urueda
 		if (mode() != Modes.Spy){
 			// bring the calculator to an initial state
-	        new CompoundAction.Builder()				
-	            .add(new KeyDown(KBKeys.VK_ALT),0.2)
-	            .add(new KeyDown(KBKeys.VK_1),0.1)
-	            .add(new KeyUp(KBKeys.VK_1),0.0)
-	            .add(new KeyUp(KBKeys.VK_ALT),0.0)
-	            .add(new NOP(),0.1)
-	            .add(new KeyDown(KBKeys.VK_CONTROL),0.2)
-	            .add(new KeyDown(KBKeys.VK_F4),0.1)
-	            .add(new KeyUp(KBKeys.VK_F4),0.0)
-	            .add(new KeyUp(KBKeys.VK_CONTROL),0.0)
+	        new CompoundAction.Builder()
+//	            .add(new KeyDown(VK_ALT),0.2)
+//	            .add(new KeyDown(KBKeys.VK_1),0.1)
+//	            .add(new KeyUp(KBKeys.VK_1),0.0)
+//	            .add(new KeyUp(KBKeys.VK_ALT),0.0)
+//	            .add(new NOP(),0.1)
+//	            .add(new KeyDown(KBKeys.VK_CONTROL),0.2)
+//	            .add(new KeyDown(KBKeys.VK_F4),0.1)
+//	            .add(new KeyUp(KBKeys.VK_F4),0.0)
+//	            .add(new KeyUp(KBKeys.VK_CONTROL),0.0)
 	            .add(new NOP(),0.1)
 	            .build()
 	            .run(sut, null, 0.8);

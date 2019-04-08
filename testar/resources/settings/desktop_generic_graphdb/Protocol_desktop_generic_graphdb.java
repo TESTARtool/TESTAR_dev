@@ -33,24 +33,18 @@
  * @author Urko Rueda Molina
  */
 
-import java.io.File;
-import java.util.Set;
-
+import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.CustomType;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.TagsBase;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
+import java.util.Set;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -183,7 +177,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w)));
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 						}
 						// slides
 						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
