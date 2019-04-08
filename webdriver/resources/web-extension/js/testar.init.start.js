@@ -1,3 +1,8 @@
+/*
+ * Inject and run this code before anything from the page is loaded
+ * If this were to be done via a <script> it might be after other
+ * scripts or inline declarations
+ */
 var actualCode = '(' + function () {
     Element.prototype._addEventListener = Element.prototype.addEventListener;
     Element.prototype.addEventListener = function (a, b, c) {
@@ -63,6 +68,7 @@ var actualCode = '(' + function () {
     navigator.geolocation.getCurrentPosition = function () {};
 } + ')();';
 
+// Inject into the document
 var script = document.createElement('script');
 script.textContent = actualCode;
 (document.head || document.documentElement).appendChild(script);

@@ -1,5 +1,13 @@
+/*
+ * Keep a map with all labels client-side
+ */
 var labelMap;
 
+/*
+ * Get the widget tree (Chrome, Firefox) or flattened tree (Edge)
+ * @param {Array} array of tags that can be skipped, like <style>, <script> etc.
+ * @return {(Object | Array)}
+ */
 var getStateTreeTestar = function (ignoredTags) {
     var body = document.body;
     var bodyWrapped = wrapElementTestar(body, 0, 0);
@@ -9,11 +17,11 @@ var getStateTreeTestar = function (ignoredTags) {
     // Find all labels on the page
     getLabelMapTestar();
 
-    // For Edge we return a flattened tree (as list), see comment in WdStateFetcher
+    // For Edge we return a flattened tree (as array), see comment in WdStateFetcher
     if (window.navigator.userAgent.indexOf("Edge") > -1) {
-        var treeList = [];
-        traverseElementListTestar(treeList, bodyWrapped, body, -1, ignoredTags);
-        return treeList;
+        var treeArray = [];
+        traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags);
+        return treeArray;
     } 
     else {
         traverseElementTestar(bodyWrapped, body, ignoredTags);
@@ -21,6 +29,12 @@ var getStateTreeTestar = function (ignoredTags) {
     }
 };
 
+/*
+ * Traverse the children from the parent element
+ * @param {object} parentWrapped, the (wrapped) parent object
+ * @param {node} rootElement, the body element
+ * @param {object} ignoredTags, list of tags to skip, <style>, <script> etc.
+ */
 function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
     var childNodes = getChildNodesTestar(parentWrapped);
     for (var i = 0; i < childNodes.length; i++) {
@@ -43,11 +57,19 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
     }
 }
 
-function traverseElementListTestar(treeList, parentWrapped, rootElement, parentId, ignoredTags) {
+/*
+ * Flattened version of traverseElementTestar for Edge
+ * @param {Array} treeArray, array of wrapped elements
+ * @param {object} parentWrapped, the (wrapped) parent object
+ * @param {node} rootElement, the body element
+ * @param {integer} parentId, index of the parent in the flattened array
+ * @param {object} ignoredTags, array of tags to skip, <style>, <script> etc.
+ */
+function traverseElementArrayTestar(treeArray, parentWrapped, rootElement, parentId, ignoredTags) {
     parentWrapped['parentId'] = parentId;
-    treeList.push(parentWrapped);
+    treeArray.push(parentWrapped);
 
-    parentId = treeList.length - 1;
+    parentId = treeArray.length - 1;
 
     var childNodes = getChildNodesTestar(parentWrapped);
     for (var i = 0; i < childNodes.length; i++) {
@@ -65,10 +87,16 @@ function traverseElementListTestar(treeList, parentWrapped, rootElement, parentI
         }
 
         var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
-        traverseElementListTestar(treeList, childWrapped, rootElement, parentId, ignoredTags);
+        traverseElementArrayTestar(treeArray, childWrapped, rootElement, parentId, ignoredTags);
     }
 }
 
+/*
+ * Get all the childnodes of an (wrapped) element
+ * Anticipate the use of iFrames
+ * @param {object} parentWrapped, the parent element
+ * @return {Array} array of the child nodes
+ */
 function getChildNodesTestar(parentWrapped) {
     var childNodes = parentWrapped.element.childNodes;
 
@@ -93,6 +121,10 @@ function getChildNodesTestar(parentWrapped) {
 /*
  * Wrapping all required properties in a struct
  * This minimizes the roundtrips between Java and webdriver
+ * @param {node} element, the parent HTML element
+ * @param {object} xOffset, offset off the iFrame (if applicable)
+ * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @return {object} array element and attributes
  */
 function wrapElementTestar(element, xOffset, yOffset) {
     var computedStyle = getComputedStyle(element);
@@ -121,6 +153,11 @@ function wrapElementTestar(element, xOffset, yOffset) {
     };
 }
 
+/*
+ * Determine the name for the element, optionally taken from the label
+ * @param {node} the HTML element
+ * @return {string} the name
+ */
 function getNameTestar(element) {
     var name = element.getAttribute("name");
     var id = element.getAttribute("id");
@@ -142,6 +179,11 @@ function getNameTestar(element) {
     return "";
 }
 
+/*
+ * Calculate the z-index of an element
+ * @param {node} the HTML element
+ * @return {number} the z-index
+ */
 function getZIndexTestar(element) {
     if (element === document.body) {
         return 0;
@@ -160,6 +202,13 @@ function getZIndexTestar(element) {
     return zIndex * 1;
 }
 
+/*
+ * Get the position and dimensions of the element
+ * @param {node} element, the parent HTML element
+ * @param {object} xOffset, offset off the iFrame (if applicable)
+ * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @return {array} array with the position and dimensions
+ */
 function getRectTestar(element, xOffset, yOffset) {
     var rect = element.getBoundingClientRect();
     if (element === document.body) {
@@ -174,6 +223,12 @@ function getRectTestar(element, xOffset, yOffset) {
     ];
 }
 
+/*
+ * Get all appropriate dimensions of the element
+ * Used to determine if a scrollbar is present
+ * @param {node} element, the parent HTML element
+ * @return {array} array with the dimensions
+ */
 function getDimensionsTestar(element) {
     if (element === document.body) {
         scrollLeft = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
@@ -201,6 +256,14 @@ function getDimensionsTestar(element) {
     };
 }
 
+/*
+ * Determin if an element is blocked by another element,
+ * but does not contain said element (e.g. <img> inside <a>)
+ * @param {node} element, the parent HTML element
+ * @param {object} xOffset, offset off the iFrame (if applicable)
+ * @param {object} yOffset, offset off the iFrame (if applicable)
+ * @return {bool} true if the element is blocked by another element
+ */
 function getIsBlockedTestar(element, xOffset, yOffset) {
     // get element at element's (click) position
     var rect = element.getBoundingClientRect();
@@ -233,9 +296,19 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
         return false;
     }
 
+    // Ignore "label for"
+    if (elem.tagName === "LABEL") {
+        return false;
+    }
+
     return elem.parentNode !== element.parentNode;
 }
 
+/*
+ * Determine if an element is clickable
+ * @param {node} element, the parent HTML element
+ * @return {bool} true if the element is clickable
+ */
 function isClickableTestar(element) {
     // onClick defined as tag attribute
     if (element.getAttribute("onclick") !== null) {
@@ -250,6 +323,9 @@ function isClickableTestar(element) {
     return arr !== undefined && arr.length > 0;
 }
 
+/*
+ * Fill the labelMap for all HTML elements on the page that have labels
+ */
 function getLabelMapTestar() {
     labelMap = {};
     var labelList = document.getElementsByTagName("LABEL");
@@ -261,6 +337,11 @@ function getLabelMapTestar() {
     }
 }
 
+/*
+ * Get all the attributes for an HTML element
+ * @param {node} element, the parent HTML element
+ * @return {array} array of name, value pairs
+ */
 function getAttributeMapTestar(element) {
     return Array.from(element.attributes).reduce(function (map, att) {
         map[att.name] = att.nodeValue;

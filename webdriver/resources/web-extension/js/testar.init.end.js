@@ -1,3 +1,8 @@
+/*
+ * Load and append the 2 scripts at 'document end'
+ * Configured in manifest.json
+ */
+
 var s1 = document.createElement('script');
 var s2 = document.createElement('script');
 if (typeof browser != 'undefined') {
