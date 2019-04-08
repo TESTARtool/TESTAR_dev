@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://testar.bitrix24.com/"
+SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://onedrive.live.com/about/gb-en/signin/"
 
 #################################################################
 # Sequences
@@ -66,7 +66,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_bitrix24/Protocol_web_bitrix24
+ProtocolClass = web_one_drive/Protocol_web_one_drive
 
 #################################################################
 # Graphdatabase settings (experimental)
