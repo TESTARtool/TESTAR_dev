@@ -36,15 +36,13 @@ package org.fruit.alayer.windows;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
 import java.util.Map;
 
 import org.fruit.Util;
 
 final class UIARootElement extends UIAElement {
 	private static final long serialVersionUID = -2561441199642411403L;
-	long mainPid, timeStamp;
-	private List<Long> pids = Util.newArrayList();
+	long pid, timeStamp;
 	boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;	
 	transient Map<Long, UIAElement> hwndMap;
 	ElementMap tlc;
@@ -61,14 +59,6 @@ final class UIARootElement extends UIAElement {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void addRunningPid(long pid) {
-		pids.add(pid);
-	}
-	
-	public List<Long> getRunningPids(){
-		return pids;
-	}
-
 	public boolean visibleAt(UIAElement el, double x, double y){		
 		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
 			return false;

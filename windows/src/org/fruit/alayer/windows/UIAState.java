@@ -135,7 +135,7 @@ final class UIAState extends UIAWidget implements State {
 		}else if(t.equals(Tags.ToolTipText)){
 			ret = w.element.helpText;
 		}else if(t.equals(Tags.PID)){
-			ret = w == this ? ((UIARootElement)element).mainPid : null;
+			ret = w == this ? ((UIARootElement)element).pid : null;
 		}else if(t.equals(Tags.IsRunning)){
 			ret = w == this ? ((UIARootElement)element).isRunning : null;
 		}else if(t.equals(Tags.TimeStamp)){

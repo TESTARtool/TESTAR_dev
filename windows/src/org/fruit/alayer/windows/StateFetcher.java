@@ -170,8 +170,7 @@ public class StateFetcher implements Callable<UIAState>{
 		if(!uiaRoot.isRunning)
 			return uiaRoot;
 
-		uiaRoot.mainPid = system.get(Tags.PID);
-		uiaRoot.addRunningPid(system.get(Tags.PID));
+		uiaRoot.pid = system.get(Tags.PID);
 		
 		System.out.println("Main SUT PID: "+system.get(Tags.PID));
 
@@ -189,8 +188,6 @@ public class StateFetcher implements Callable<UIAState>{
 			
 			if(WinProcess.sutProcessesPid.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
-				if(!uiaRoot.getRunningPids().contains(Windows.GetWindowProcessId(p)))
-					uiaRoot.addRunningPid(Windows.GetWindowProcessId(p));
 				
 				System.out.println("-  HWND SUT windows id: "+p);
 				System.out.println("-  PID SUT windows id: "+Windows.GetWindowProcessId(p));
@@ -210,11 +207,11 @@ public class StateFetcher implements Callable<UIAState>{
 		boolean owned;
 		long hwndPID;
 		List<Long> ownedWindows = new ArrayList<Long>();
-		for(long hwnd : currentVisibleSUTWindows){
+		for(long hwnd : visibleTopLevelWindows){
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
 			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
-			if (uiaRoot.getRunningPids().contains(hwndPID) || isSUTProcess(hwnd)){
+			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
 				
 				System.out.println("*********** MAIN HWND SUT windows id: "+hwnd+" WITH PROCESS PID: "+ hwndPID);
 				
