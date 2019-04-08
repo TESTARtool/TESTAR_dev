@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package org.fruit.alayer.webdriver;
 
 import org.apache.http.client.HttpClient;
@@ -40,8 +70,7 @@ import java.util.List;
 import java.util.*;
 
 
-public class WdDriver extends SUTBase
-{
+public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
   private static List<String> windowHandles = new ArrayList<>();
   // TODO Make settable via settings or protocol
@@ -50,8 +79,7 @@ public class WdDriver extends SUTBase
   private final Keyboard kbd = AWTKeyboard.build();
   private final Mouse mouse = WdMouse.build();
 
-  private WdDriver (String sutConnector)
-  {
+  private WdDriver(String sutConnector) {
     String[] parts = sutConnector.split(" ");
     String driverPath = parts[0].replace("\"", "");
     String url = parts[parts.length - 1].replace("\"", "");
@@ -98,9 +126,8 @@ public class WdDriver extends SUTBase
     CanvasDimensions.startThread();
   }
 
-  private static RemoteWebDriver startChromeDriver (String chromeDriverPath,
-                                                    String extensionPath)
-  {
+  private static RemoteWebDriver startChromeDriver(String chromeDriverPath,
+                                                   String extensionPath) {
     ChromeDriverService service = new ChromeDriverService.Builder()
         .usingDriverExecutable(new File(chromeDriverPath))
         .usingAnyFreePort()
@@ -116,9 +143,8 @@ public class WdDriver extends SUTBase
     return new ChromeDriver(service, options);
   }
 
-  private static RemoteWebDriver startGeckoDriver (String geckoDriverPath,
-                                                   String extensionPath)
-  {
+  private static RemoteWebDriver startGeckoDriver(String geckoDriverPath,
+                                                  String extensionPath) {
     String nullPath = "/dev/null";
     if (System.getProperty("os.name").toLowerCase().contains("windows")) {
       nullPath = "NUL";
@@ -141,13 +167,12 @@ public class WdDriver extends SUTBase
     return webDriver;
   }
 
-  private static void loadGeckoExtension (RemoteWebDriver webDriver,
-                                          String extensionPath)
-  {
+  private static void loadGeckoExtension(RemoteWebDriver webDriver,
+                                         String extensionPath) {
     // Create payload
     String payload = "{" +
-        "\"path\": \"" + extensionPath.replace("\\", "\\\\") + "\", " +
-        "\"temporary\": true }";
+                     "\"path\": \"" + extensionPath.replace("\\", "\\\\") + "\", " +
+                     "\"temporary\": true }";
     StringEntity entity = new StringEntity(payload,
         ContentType.APPLICATION_FORM_URLENCODED);
 
@@ -170,9 +195,8 @@ public class WdDriver extends SUTBase
     }
   }
 
-  private static RemoteWebDriver startEdgeDriver (
-      String edgeDriverPath, String extensionPath)
-  {
+  private static RemoteWebDriver startEdgeDriver(
+      String edgeDriverPath, String extensionPath) {
     // Edge can only load extensions from a system path
     String edgeSideLoadPath = copyExtension(extensionPath);
 
@@ -190,8 +214,7 @@ public class WdDriver extends SUTBase
     return webDriver;
   }
 
-  private static String copyExtension (String extensionPath)
-  {
+  private static String copyExtension(String extensionPath) {
     String appDataDir = System.getenv("LOCALAPPDATA");
     String extensionDir = new File(extensionPath).getName();
     String subDirs = "Packages\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\LocalState";
@@ -210,8 +233,7 @@ public class WdDriver extends SUTBase
     return edgeSideLoadPath;
   }
 
-  private static void copyFolder (File sourceFolder, File targetFolder) throws IOException
-  {
+  private static void copyFolder(File sourceFolder, File targetFolder) throws IOException {
     if (sourceFolder.isDirectory()) {
       if (!targetFolder.exists()) {
         targetFolder.mkdir();
@@ -232,8 +254,7 @@ public class WdDriver extends SUTBase
    * Edge has an annoying bug during the loading of the extension
    * This method closes the dialog without user action
    */
-  private static void closeDialog (RemoteWebDriver webDriver)
-  {
+  private static void closeDialog(RemoteWebDriver webDriver) {
     // Fix window size/position, so we don't have to look for the button
     Dimension screenDimensions = new Dimension(800, 400);
     webDriver.manage().window().setSize(screenDimensions);
@@ -252,8 +273,7 @@ public class WdDriver extends SUTBase
   }
 
   @Override
-  public void stop () throws SystemStopException
-  {
+  public void stop() throws SystemStopException {
     if (webDriver != null) {
       webDriver.quit();
       webDriver = null;
@@ -263,40 +283,32 @@ public class WdDriver extends SUTBase
   }
 
   @Override
-  public boolean isRunning ()
-  {
+  public boolean isRunning() {
     return webDriver != null;
   }
 
   @Override
-  public String getStatus ()
-  {
+  public String getStatus() {
     return "WebDriver : " + WdDriver.getCurrentUrl();
   }
 
   @Override
-  public AutomationCache getNativeAutomationCache ()
-  {
+  public AutomationCache getNativeAutomationCache() {
     return null;
   }
 
   @Override
-  public void setNativeAutomationCache ()
-  {
+  public void setNativeAutomationCache() {
   }
 
-  public static List<SUT> fromAll ()
-  {
+  public static List<SUT> fromAll() {
     List<SUT> suts = new ArrayList<>();
-
-    // TODO GB
 
     return suts;
   }
 
-  public static WdDriver fromExecutable (String sutConnector)
-      throws SystemStartException
-  {
+  public static WdDriver fromExecutable(String sutConnector)
+      throws SystemStartException {
     if (webDriver != null) {
       webDriver.quit();
     }
@@ -305,8 +317,7 @@ public class WdDriver extends SUTBase
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T fetch (Tag<T> tag)
-  {
+  protected <T> T fetch(Tag<T> tag) {
     if (tag.equals(Tags.StandardKeyboard)) {
       return (T) kbd;
     }
@@ -329,8 +340,7 @@ public class WdDriver extends SUTBase
     return null;
   }
 
-  public static RemoteWebDriver getRemoteWebDriver ()
-  {
+  public static RemoteWebDriver getRemoteWebDriver() {
     return webDriver;
   }
 
@@ -338,8 +348,7 @@ public class WdDriver extends SUTBase
    * Update the list of handles with added handles (new tabs)
    * Remove handles from closed tabs
    */
-  private static void updateHandlesList ()
-  {
+  private static void updateHandlesList() {
     Set<String> currentHandles = webDriver.getWindowHandles();
 
     // Remove handles not present anymore (closed tabs)
@@ -359,8 +368,7 @@ public class WdDriver extends SUTBase
   /*
    * Make sure the last tab has focus
    */
-  public static void activate ()
-  {
+  public static void activate() {
     // Nothing to activate
     if (windowHandles.size() < 1) {
       return;
@@ -372,8 +380,7 @@ public class WdDriver extends SUTBase
     }
   }
 
-  public static Set<String> getWindowHandles ()
-  {
+  public static Set<String> getWindowHandles() {
     try {
       return webDriver.getWindowHandles();
     }
@@ -382,8 +389,7 @@ public class WdDriver extends SUTBase
     }
   }
 
-  public static String getCurrentUrl ()
-  {
+  public static String getCurrentUrl() {
     try {
       return webDriver.getCurrentUrl();
     }
@@ -392,8 +398,7 @@ public class WdDriver extends SUTBase
     }
   }
 
-  public static Object executeScript (String script, Object... args)
-  {
+  public static Object executeScript(String script, Object... args) {
     if (webDriver == null) {
       return null;
     }
@@ -436,8 +441,7 @@ public class WdDriver extends SUTBase
     }
   }
 
-  public static void waitDocumentReady ()
-  {
+  public static void waitDocumentReady() {
     WebDriverWait wait = new WebDriverWait(webDriver, 60);
     ExpectedCondition<Boolean> documentReady = driver -> {
       Object result = webDriver.executeScript("return document.readyState");

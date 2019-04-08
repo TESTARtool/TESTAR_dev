@@ -1,9 +1,10 @@
 /*
  * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
- * <p>
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * <p>
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -12,7 +13,7 @@
  * 3. Neither the name of the copyright holder nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- * <p>
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -81,7 +82,7 @@ public class WdStateFetcher implements Callable<WdState> {
     return wdRoot;
   }
 
-@SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   private static Map<String, Object> unflattenTree(List<Map<String, Object>> flatTree) {
     for (int idx = flatTree.size() - 1; idx > 0; idx--) {
       Map<String, Object> node = flatTree.remove(idx);
@@ -95,8 +96,8 @@ public class WdStateFetcher implements Callable<WdState> {
     return flatTree.get(0);
   }
 
-  private static Map<String, Object> getParent (int parentId,
-                                                List<Map<String, Object>> flatTree) {
+  private static Map<String, Object> getParent(int parentId,
+                                               List<Map<String, Object>> flatTree) {
     Map<String, Object> parent = flatTree.remove(parentId);
     Map<String, Object> newParent = new HashMap<>();
     for (String key : parent.keySet()) {
