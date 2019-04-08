@@ -183,7 +183,10 @@ public class StateFetcher implements Callable<UIAState>{
 
 		System.out.println("-----------------------------------------------------");
 		
-		for(long p : visibleTopLevelWindows)
+		for(long p : visibleTopLevelWindows) {
+			
+			System.out.println("Im one HWND Random Window: "+p+" with PID: "+Windows.GetWindowProcessId(p));
+			
 			if(WinProcess.sutProcessesPid.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
 				if(!uiaRoot.getRunningPids().contains(Windows.GetWindowProcessId(p)))
@@ -192,6 +195,7 @@ public class StateFetcher implements Callable<UIAState>{
 				System.out.println("-  HWND SUT windows id: "+p);
 				System.out.println("-  PID SUT windows id: "+Windows.GetWindowProcessId(p));
 			}
+		}
 		System.out.println("-----------------------------------------------------");
 		System.out.println("-  Number of visible SUT windows: "+newVisibleSUTWindows.size());
 		System.out.println("-----------------------------------------------------");
