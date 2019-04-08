@@ -170,7 +170,10 @@ public class StateFetcher implements Callable<UIAState>{
 		if(!uiaRoot.isRunning)
 			return uiaRoot;
 
-		uiaRoot.pid = system.get(Tags.PID);
+		uiaRoot.mainPid = system.get(Tags.PID);
+		uiaRoot.addRunningPid(system.get(Tags.PID));
+		
+		System.out.println("Main SUT PID: "+system.get(Tags.PID));
 
 		// find all visible top level windows on the desktop, and update currentVisibleSUTWindows List
 		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();
@@ -183,6 +186,8 @@ public class StateFetcher implements Callable<UIAState>{
 		for(long p : visibleTopLevelWindows)
 			if(WinProcess.sutProcessesPid.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
+				if(!uiaRoot.getRunningPids().contains(Windows.GetWindowProcessId(p)))
+					uiaRoot.addRunningPid(Windows.GetWindowProcessId(p));
 				
 				System.out.println("-  HWND SUT windows id: "+p);
 				System.out.println("-  PID SUT windows id: "+Windows.GetWindowProcessId(p));
@@ -201,11 +206,14 @@ public class StateFetcher implements Callable<UIAState>{
 		boolean owned;
 		long hwndPID;
 		List<Long> ownedWindows = new ArrayList<Long>();
-		for(long hwnd : visibleTopLevelWindows){
+		for(long hwnd : currentVisibleSUTWindows){
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
 			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
-			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
+			if (uiaRoot.getRunningPids().contains(hwndPID) || isSUTProcess(hwnd)){
+				
+				System.out.println("*********** MAIN HWND SUT windows id: "+hwnd+" WITH PROCESS PID: "+ hwndPID);
+				
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); //( SUT as a set of windows/processes )				
 				if(!owned){
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
@@ -219,6 +227,9 @@ public class StateFetcher implements Callable<UIAState>{
 		// if UIAutomation missed an owned window, we'll collect it here
 		for(long hwnd : ownedWindows){				
 			if(!uiaRoot.hwndMap.containsKey(hwnd)){
+				
+				System.out.println("*********** OWNED HWND SUT windows id: "+hwnd);
+				
 				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 				UIAElement modalE;
 				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
@@ -230,6 +241,8 @@ public class StateFetcher implements Callable<UIAState>{
 		// Associate multi processes windows/elements into the current uiaRoot Element
 		for(long hwnd : currentVisibleSUTWindows){				
 			if(!uiaRoot.hwndMap.containsKey(hwnd)){
+				
+				System.out.println("*********** SECONDARY HWND SUT windows id: "+hwnd);
 
 				UIAElement modalE;
 
