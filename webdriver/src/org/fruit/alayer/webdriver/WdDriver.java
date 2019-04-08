@@ -73,7 +73,6 @@ import java.util.*;
 public class WdDriver extends SUTBase {
   private static RemoteWebDriver webDriver = null;
   private static List<String> windowHandles = new ArrayList<>();
-  // TODO Make settable via settings or protocol
   public static boolean followLinks = true;
 
   private final Keyboard kbd = AWTKeyboard.build();

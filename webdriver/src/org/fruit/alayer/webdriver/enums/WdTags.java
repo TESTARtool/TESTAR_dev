@@ -34,8 +34,6 @@ import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TagsBase;
 
-// TODO Check which are needed, update comments
-
 /**
  * Creates and holds tags specific to WEB info.
  */

@@ -45,7 +45,6 @@ import static org.fruit.alayer.webdriver.enums.WdTags.*;
 public class WdWidget implements Widget, Serializable {
   private static final long serialVersionUID = 1194546788417258853L;
 
-  // TODO Fix access
   WdState root;
   WdWidget parent;
   Map<Tag<?>, Object> tags = new HashMap<>();

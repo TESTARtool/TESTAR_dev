@@ -179,22 +179,26 @@ public class WdRoles {
     return tagToRole.values();
   }
 
-  // TODO Check if correct
+  /*
+   * These are the 'native' HTML interactive elements
+   */
   public static Role[] nativeClickableRoles() {
     return new Role[]{
         WdA, WdBUTTON, WdINPUT, WdLINK, WdMENU, WdOPTION, WdSELECT, WdDATALIST
     };
   }
 
-  // TODO Or make separate roles, e.g. WdINPUT_RADIO?
-  // TODO date- and number-fields needs work, only partially clickable
-  // TODO Idem for WdDATALIST
+  /*
+   * These are the HTML input types that are clickable
+   */
   public static List<String> clickableInputTypes() {
     return Arrays.asList("submit", "reset", "button", "radio", "checkbox",
         "color", "date", "datetime-local", "month", "number");
   }
 
-  // TODO Check if correct
+  /*
+   * These are the native typeable HTML elements
+   */
   public static Role[] nativeTypeableRoles() {
     return new Role[]{WdINPUT, WdTEXTAREA, WdDATALIST};
   }

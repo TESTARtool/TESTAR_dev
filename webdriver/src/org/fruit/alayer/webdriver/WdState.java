@@ -42,9 +42,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-// TODO Access
-// TODO Check needed
-
 public final class WdState extends WdWidget implements State {
   private static final long serialVersionUID = 661696260972010052L;
 
@@ -121,9 +118,7 @@ public final class WdState extends WdWidget implements State {
       ret = w.element.name;
     }
     else if (t.equals(Tags.Role)) {
-      // TODO
       ret = WdRoles.fromTypeId(w.element.tagName);
-      //ret = w.element.tagName;
     }
     else if (t.equals(Tags.HitTester)) {
       ret = new WdHitTester(w.element);
@@ -168,9 +163,7 @@ public final class WdState extends WdWidget implements State {
       ret = w.element.name;
     }
     else if (t.equals(WdTags.WebOrientation)) {
-      // TODO
       ret = 0;
-      // ret = w.element.orientation;
     }
     else if (t.equals(Tags.ZIndex)) {
       ret = w.element.zindex;
@@ -179,9 +172,7 @@ public final class WdState extends WdWidget implements State {
       ret = w.element.isModal;
     }
     else if (t.equals(WdTags.WebIsTopmostWindow)) {
-      // TODO
       ret = true;
-      // ret = w.element.isTopmostWnd;
     }
     else if (t.equals(WdTags.WebIsContentElement)) {
       ret = w.element.isContentElement;
@@ -217,16 +208,13 @@ public final class WdState extends WdWidget implements State {
       ret = w.element.tagName;
     }
     else if (t.equals(WdTags.WebControlType)) {
-      // TODO
-      ret = 50025;
-      // ret = w.element.ctrlId;
+      ret = null;
     }
     else if (t.equals(WdTags.WebCulture)) {
       ret = w.element.culture;
     }
     else if (t.equals(WdTags.WebFrameworkId)) {
-      // TODO
-      // ret = w.element.frameworkId;
+      ret = null;
     }
     else if (t.equals(WdTags.WebHasKeyboardFocus)) {
       ret = w.element.hasKeyboardFocus;

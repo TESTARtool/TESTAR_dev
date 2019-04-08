@@ -134,7 +134,6 @@ public class WdCanvas implements Canvas {
   @Override
   public void image(Pen pen, double x, double y, double width, double height,
                     int[] image, int imageWidth, int imageHeight) {
-    // TODO
     throw new UnsupportedOperationException("Not implemented");
   }
 
