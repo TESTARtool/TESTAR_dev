@@ -197,7 +197,7 @@ public final class WinProcess extends SUTBase {
 				hProcess = 0;
 
 				for(Long pidSUT : sutProcessesPid) {
-					//System.out.println("Process pid to kill: "+pidSUT);
+					System.out.println("Process pid to kill: "+pidSUT);
 					long hProcess = Windows.OpenProcess(Windows.PROCESS_TERMINATE, false, pidSUT);
 					Windows.TerminateProcess(hProcess, -1);
 					Windows.CloseHandle(hProcess);
@@ -271,6 +271,7 @@ public final class WinProcess extends SUTBase {
 	 * @throws WinApiException
 	 */
 	public static void toForeground(long pid) throws WinApiException{
+		//friendlyToForeground(pid);
 		toForeground(pid, 0.3, 100);
 	}
 
@@ -303,6 +304,13 @@ public final class WinProcess extends SUTBase {
 		if(!isForeground(pid) && isRunning(pid))
 			throw new WinApiException("Unable to bring process to foreground!");
 	}
+	
+	/*public static void friendlyToForeground(long pid) throws WinApiException{
+		
+
+		if(!isForeground(pid) && isRunning(pid))
+			throw new WinApiException("Unable to bring process to foreground!");
+	}*/
 
 	/**
 	 * From a process pid create a WinProcess object and return it
@@ -406,7 +414,7 @@ public final class WinProcess extends SUTBase {
 
 				WinProcess ret = new WinProcess(hProcess, true);
 
-				//System.out.println("WinProcess Status: "+ret.getStatus());
+				System.out.println("WinProcess Status: "+ret.getStatus());
 
 				//Read the running processes after the execution of the SUT
 				//This allow us to obtain the potential PID of SUT running processes
@@ -417,10 +425,10 @@ public final class WinProcess extends SUTBase {
 				}
 
 				//TODO: Think about create extra conditions to make sure that we are working with SUT process
-				/*if(sutProcessesPid!=null) {
+				if(sutProcessesPid!=null) {
 					for(Long info : sutProcessesPid)
 						System.out.println("Potential SUT PID: "+info);
-				}*/
+				}
 
 				ret.set(Tags.Desc, path);
 				return ret;

@@ -83,6 +83,10 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		SUT sut = super.startSystem();
 
 		State state = getState(sut);
+		
+		System.out.println("***********************************************");
+		System.out.println("**************** START SYTEM ******************");
+		System.out.println("***********************************************");
 
 		boolean recovery = false;
 		for(Widget w : getState(sut)) {
@@ -121,6 +125,8 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		
 		//Wait a bit
 		Util.pause(2);
+		
+		visualizationOn = true;
 
 
 		return sut;
@@ -193,6 +199,8 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
+		int numberWidgets = 0;
+		
 		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
 		for(Widget w : state){
 			//optional: iterate through top level widgets based on Z-index:
@@ -236,7 +244,13 @@ public class Protocol_desktop_libre_office extends ClickFilterLayerProtocol {
 					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
 				}
 			}
+			
+			numberWidgets ++;
 		}
+		
+		System.out.println("SUT running pids: "+system.get(Tags.PID));
+		System.out.println("Number of widgets detected at current state: "+numberWidgets);
+		
 		//return the set of derived actions
 		return actions;
 	}

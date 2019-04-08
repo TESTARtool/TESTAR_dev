@@ -178,11 +178,19 @@ public class StateFetcher implements Callable<UIAState>{
 		//Update the visible SUT windows if his PID is one of the running processes
 		List<Long> newVisibleSUTWindows = Util.newArrayList();
 
+		System.out.println("-----------------------------------------------------");
+		
 		for(long p : visibleTopLevelWindows)
 			if(WinProcess.sutProcessesPid.contains(Windows.GetWindowProcessId(p))) {
 				newVisibleSUTWindows.add(p);
+				
+				System.out.println("-  HWND SUT windows id: "+p);
+				System.out.println("-  PID SUT windows id: "+Windows.GetWindowProcessId(p));
 			}
-
+		System.out.println("-----------------------------------------------------");
+		System.out.println("-  Number of visible SUT windows: "+newVisibleSUTWindows.size());
+		System.out.println("-----------------------------------------------------");
+		
 		currentVisibleSUTWindows = newVisibleSUTWindows;
 
 
