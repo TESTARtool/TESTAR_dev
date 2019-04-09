@@ -208,8 +208,7 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 				//Create a slide action with the Action Compiler, and add it to the set of derived actions
 				actions.add(ac.slideFromTo(
 						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-						w
+						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
 				));
 
 			}
