@@ -5,8 +5,11 @@ public class Config {
     // type of orientdb installation, could be remote, integrated, etc
     private String connectionType;
 
-    // server location
+    // server location (for remote connections)
     private String server;
+
+    // local database directory (for local connections)
+    private String databaseDirectory;
 
     // database name
     private String database;
@@ -66,5 +69,13 @@ public class Config {
 
     public void setResetDataStore(boolean resetDataStore) {
         this.resetDataStore = resetDataStore;
+    }
+
+    public String getDatabaseDirectory() {
+        return databaseDirectory;
+    }
+
+    public void setDatabaseDirectory(String databaseDirectory) {
+        this.databaseDirectory = databaseDirectory;
     }
 }

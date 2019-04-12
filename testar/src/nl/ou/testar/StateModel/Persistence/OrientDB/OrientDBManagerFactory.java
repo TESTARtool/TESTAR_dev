@@ -24,6 +24,7 @@ public class OrientDBManagerFactory implements PersistenceManagerFactory {
         config.setUser(settings.get(ConfigTags.DataStoreUser));
         config.setPassword(settings.get(ConfigTags.DataStorePassword));
         config.setResetDataStore(settings.get(ConfigTags.ResetDataStore));
+        config.setDatabaseDirectory(settings.get(ConfigTags.DataStoreDirectory));
         EntityManager entityManager = new EntityManager(config);
 
         // check if the data needs to be stored instantaneously or delayed (after sequence).
