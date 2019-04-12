@@ -44,18 +44,14 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -472,8 +468,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         passSeverity = Verdict.SEVERITY_OK;
         setProcessVerdict(Verdict.OK);
         this.cv = buildCanvas();
-        // notify the statemodelmanager
-        stateModelManager.notifyTestSequencedStarted();
     }
 
     /**
@@ -491,8 +485,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.flush();
         LogSerialiser.finish();
         LogSerialiser.exit();
-        // notify the statemodelmanager
-        stateModelManager.notifySequenceEnded();
         DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
     }
 
@@ -569,6 +561,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
 
+                // notify the statemodelmanager
+                stateModelManager.notifyTestSequencedStarted();
+
                 /*
                  ***** starting the INNER LOOP:
                  */
@@ -614,6 +609,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 emergencyTerminateTestSequence(system, e);
             }
         }
+        // notify the statemodelmanager that the testing has finished
+        stateModelManager.notifyTestingEnded();
         //allowing close-up in the end of test session:
         closeTestSession();
         //Closing TESTAR internal test session:
@@ -979,19 +976,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
 
         if(startedRecordMode && mode() == Modes.Quit){
-        	
+            // notify the statemodelmanager
+            stateModelManager.notifyTestSequenceStopped();
+
         	// notify the state model manager of the sequence end
-            stateModelManager.notifySequenceEnded();
+            stateModelManager.notifyTestingEnded();
         	
         	//Closing fragment for recording replayable test sequence:
         	writeAndCloseFragmentForReplayableSequence();
 
         	//Copy sequence file into proper directory:
         	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-        	
-        	// notify the statemodelmanager
-            stateModelManager.notifyTestSequenceStopped();
-            
+
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
         }

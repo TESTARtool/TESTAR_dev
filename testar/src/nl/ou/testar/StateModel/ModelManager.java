@@ -161,11 +161,7 @@ public class ModelManager implements StateModelManager {
     }
 
     @Override
-    public void notifySequenceEnded() {
-        currentAbstractState = null;
-        currentConcreteState = null;
-        actionUnderExecution = null;
-        concreteActionUnderExecution = null;
+    public void notifyTestingEnded() {
         persistenceManager.persistAbstractStateModel(abstractStateModel);
     }
 
@@ -202,6 +198,10 @@ public class ModelManager implements StateModelManager {
 
     @Override
     public void notifyTestSequenceStopped() {
+        currentAbstractState = null;
+        currentConcreteState = null;
+        actionUnderExecution = null;
+        concreteActionUnderExecution = null;
         sequenceManager.stopSequence();
     }
 

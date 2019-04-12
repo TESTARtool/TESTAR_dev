@@ -10,7 +10,7 @@ public interface StateModelManager {
 
     void notifyActionExecution(Action action);
 
-    void notifySequenceEnded();
+    void notifyTestingEnded();
 
     Action getAbstractActionToExecute(Set<Action> actions);
 

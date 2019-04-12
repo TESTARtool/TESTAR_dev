@@ -18,7 +18,7 @@ public class DummyModelManager implements StateModelManager{
     }
 
     @Override
-    public void notifySequenceEnded() {
+    public void notifyTestingEnded() {
 
     }
 
