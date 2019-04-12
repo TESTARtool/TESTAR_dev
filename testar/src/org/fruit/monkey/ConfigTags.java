@@ -112,6 +112,7 @@ public final class ConfigTags {
   public static final Tag<String> DataStoreUser = Tag.from("DataStoreUser", String.class);
   public static final Tag<String> DataStorePassword = Tag.from("DataStorePassword", String.class);
   public static final Tag<String> DataStoreMode = Tag.from("DataStoreMode", String.class);
+  public static final Tag<String> DataStoreDirectory = Tag.from("DataStoreDirectory", String.class);
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);

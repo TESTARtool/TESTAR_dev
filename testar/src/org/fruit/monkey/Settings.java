@@ -384,6 +384,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStore = OrientDB" + Util.lineSep()
 					+"DataStoreType = remote" + Util.lineSep()
 					+"DataStoreServer = localhost" + Util.lineSep()
+					+"DataStoreDirectory =" + Util.lineSep()
 					+"DataStoreDB =" + Util.lineSep()
 					+"DataStoreUser =" + Util.lineSep()
 					+"DataStorePassword =" + Util.lineSep()

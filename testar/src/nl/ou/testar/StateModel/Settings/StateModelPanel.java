@@ -34,8 +34,10 @@ import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,10 +59,11 @@ public class StateModelPanel extends JPanel {
     private JLabel label10 = new JLabel("Application name");
     private JLabel label11 = new JLabel("Application version");
     private JLabel label12 = new JLabel("AccessBridge enabled");
+    private JLabel label13 = new JLabel("DataStoreDirectory");
+
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
-    private JTextField dataStoreTypeTextfield = new JTextField();
     private JTextField dataStoreServerTextfield = new JTextField();
     private JTextField dataStoreDBTextfield = new JTextField();
     private JTextField dataStoreUserTextfield = new JTextField();
@@ -69,8 +72,11 @@ public class StateModelPanel extends JPanel {
     private JTextField applicationNameField = new JTextField();
     private JTextField applicationVersionField = new JTextField();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
+    private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
     private Set<JComponent> components;
     private JCheckBox accessBridgeEnabledBox = new JCheckBox();
+    private JTextField dataStoreDirectoryField = new JTextField();
+    private JButton dirButton = new JButton("..");
 
     private StateModelPanel(){
         super();
@@ -93,8 +99,9 @@ public class StateModelPanel extends JPanel {
         // add the components that can be enabled/disabled to the set
         components = new HashSet<>();
         components.add(dataStoreTextfield);
-        components.add(dataStoreTypeTextfield);
+        components.add(dataStoreTypeBox);
         components.add(dataStoreServerTextfield);
+        components.add(dataStoreDirectoryField);
         components.add(dataStoreDBTextfield);
         components.add(dataStoreUserTextfield);
         components.add(dataStorePasswordfield);
@@ -103,6 +110,7 @@ public class StateModelPanel extends JPanel {
         components.add(applicationVersionField);
         components.add(dataStoreModeBox);
         components.add(accessBridgeEnabledBox);
+        components.add(dirButton);
 
         // add the components to the panel
         setLayout(null);
@@ -113,6 +121,9 @@ public class StateModelPanel extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
+                if (stateModelEnabledChkBox.isSelected()) {
+                    checkDataType();
+                }
             }
         });
         add(stateModelEnabledChkBox);
@@ -124,54 +135,73 @@ public class StateModelPanel extends JPanel {
 
         label3.setBounds(10,90,150,27);
         add(label3);
-        dataStoreTypeTextfield.setBounds(160,90,125,27);
-        add(dataStoreTypeTextfield);
+        dataStoreTypeBox.setBounds(160,90,125,27);
+        dataStoreTypeBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                checkDataType();
+            }
+        });
+        add(dataStoreTypeBox);
 
         label4.setBounds(10,128,150,27);
         add(label4);
         dataStoreServerTextfield.setBounds(160,128,125,27);
         add(dataStoreServerTextfield);
 
-        label5.setBounds(10,166,150,27);
+        label13.setBounds(10,166,150,27);
+        add(label13);
+        dataStoreDirectoryField.setBounds(160,166,125,27);
+        dataStoreDirectoryField.setEditable(false);
+        add(dataStoreDirectoryField);
+
+        dirButton.setBounds(290, 166, 20, 27);
+        dirButton.addActionListener(this::chooseFileActionPerformed);
+        dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation");
+        add(dirButton);
+
+        label5.setBounds(10,204,150,27);
         add(label5);
-        dataStoreDBTextfield.setBounds(160,166,125,27);
+        dataStoreDBTextfield.setBounds(160,204,125,27);
         add(dataStoreDBTextfield);
 
-        label6.setBounds(10,204,150,27);
+        label6.setBounds(10,242,150,27);
         add(label6);
-        dataStoreUserTextfield.setBounds(160,204,125,27);
+        dataStoreUserTextfield.setBounds(160,242,125,27);
         add(dataStoreUserTextfield);
 
-        label7.setBounds(10,242,150,27);
+        label7.setBounds(10,280,150,27);
         add(label7);
-        dataStorePasswordfield.setBounds(160,242,125,27);
+        dataStorePasswordfield.setBounds(160,280,125,27);
         add(dataStorePasswordfield);
 
-        label8.setBounds(10,280,150,27);
+        label8.setBounds(10,318,150,27);
         add(label8);
-        dataStoreModeBox.setBounds(160,280,125,27);
+        dataStoreModeBox.setBounds(160,318,125,27);
         add(dataStoreModeBox);
 
-        label9.setBounds(10,318,150,27);
-        add(label9);
-        resetDatabaseCheckbox.setBounds(160, 318, 50, 27);
-        resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
-        add(resetDatabaseCheckbox);
+        // NEW COLUMN
 
-        label10.setBounds(300,52,150,27);
+        label10.setBounds(330,52,150,27);
         add(label10);
-        applicationNameField.setBounds(450, 52, 125, 27);
+        applicationNameField.setBounds(480, 52, 125, 27);
         add(applicationNameField);
 
-        label11.setBounds(300,80,150,27);
+        label11.setBounds(330,90,150,27);
         add(label11);
-        applicationVersionField.setBounds(450, 80, 125, 27);
+        applicationVersionField.setBounds(480, 90, 125, 27);
         add(applicationVersionField);
 
-        label12.setBounds(300, 108, 150, 27);
+        label12.setBounds(330, 128, 150, 27);
         add(label12);
-        accessBridgeEnabledBox.setBounds(450, 108, 50, 27);
+        accessBridgeEnabledBox.setBounds(480, 128, 50, 27);
         add(accessBridgeEnabledBox);
+
+        label9.setBounds(330,166,150,27);
+        add(label9);
+        resetDatabaseCheckbox.setBounds(480, 166, 50, 27);
+        resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
+        add(resetDatabaseCheckbox);
     }
 
     /**
@@ -182,8 +212,8 @@ public class StateModelPanel extends JPanel {
         stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
         accessBridgeEnabledBox.setSelected(settings.get(ConfigTags.AccessBridgeEnabled));
         dataStoreTextfield.setText(settings.get(ConfigTags.DataStore));
-        dataStoreTypeTextfield.setText(settings.get(ConfigTags.DataStoreType));
         dataStoreServerTextfield.setText(settings.get(ConfigTags.DataStoreServer));
+        dataStoreDirectoryField.setText(settings.get(ConfigTags.DataStoreDirectory));
         dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
         dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
         dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
@@ -193,10 +223,16 @@ public class StateModelPanel extends JPanel {
                 break;
             }
         }
+        for (int i=0; i < dataStoreTypeBox.getItemCount(); i++) {
+            if (dataStoreTypeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreType))) {
+                dataStoreTypeBox.setSelectedIndex(i);
+            }
+        }
         applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
         applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
         // check if the fields should be enabled or not
         components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
+        checkDataType();
     }
 
     /**
@@ -206,12 +242,13 @@ public class StateModelPanel extends JPanel {
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
         settings.set(ConfigTags.DataStore, dataStoreTextfield.getText());
-        settings.set(ConfigTags.DataStoreType, dataStoreTypeTextfield.getText());
         settings.set(ConfigTags.DataStoreServer, dataStoreServerTextfield.getText());
+        settings.set(ConfigTags.DataStoreDirectory, dataStoreDirectoryField.getText());
         settings.set(ConfigTags.DataStoreDB, dataStoreDBTextfield.getText());
         settings.set(ConfigTags.DataStoreUser, dataStoreUserTextfield.getText());
         settings.set(ConfigTags.DataStorePassword, getPassword());
         settings.set(ConfigTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
+        settings.set(ConfigTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
         settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
@@ -228,6 +265,25 @@ public class StateModelPanel extends JPanel {
             result.append(c);
         }
         return  result.toString();
+    }
+
+    private void checkDataType() {
+        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote"));
+        dataStoreDirectoryField.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
+        dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
+    }
+
+    private void chooseFileActionPerformed(ActionEvent evt) {
+        JFileChooser fd = new JFileChooser();
+        fd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fd.setCurrentDirectory(new File(dataStoreDirectoryField.getText()).getParentFile());
+
+        if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String file = fd.getSelectedFile().getAbsolutePath();
+
+            // Set the text from settings in txtSutPath
+            dataStoreDirectoryField.setText(file);
+        }
     }
 
 }
