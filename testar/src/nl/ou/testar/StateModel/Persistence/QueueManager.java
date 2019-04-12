@@ -98,7 +98,9 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void initAbstractStateModel(AbstractStateModel abstractStateModel) {
+        setListening(false);
         delegateManager.initAbstractStateModel(abstractStateModel);
+        setListening(true);
     }
 
     @Override
@@ -108,7 +110,9 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
 
     @Override
     public void initSequenceManager(SequenceManager sequenceManager) {
+        setListening(false);
         delegateManager.initSequenceManager(sequenceManager);
+        setListening(true);
     }
 
     @Override
