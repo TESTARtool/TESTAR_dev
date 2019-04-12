@@ -157,7 +157,7 @@ public class StateModelPanel extends JPanel {
 
         dirButton.setBounds(290, 166, 20, 27);
         dirButton.addActionListener(this::chooseFileActionPerformed);
-        dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation");
+        dirButton.setToolTipText("Select the 'databases' folder in your orientdb installation. Make sure the OrientDB server is not running.");
         add(dirButton);
 
         label5.setBounds(10,204,150,27);
