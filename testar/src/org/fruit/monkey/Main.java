@@ -115,6 +115,8 @@ public class Main {
 
 			setTestarDirectory(settings);
 
+			initCodingManager(settings);
+
 			startTestar(settings, testSettingsFileName);
 		}
 
