@@ -162,7 +162,7 @@ public class ModelManager implements StateModelManager {
 
     @Override
     public void notifyTestingEnded() {
-        persistenceManager.persistAbstractStateModel(abstractStateModel);
+        persistenceManager.shutdown();
     }
 
     /**

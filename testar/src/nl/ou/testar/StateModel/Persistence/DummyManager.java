@@ -20,7 +20,7 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
-    public void persistAbstractStateModel(AbstractStateModel abstractStateModel) {
+    public void shutdown() {
 
     }
 

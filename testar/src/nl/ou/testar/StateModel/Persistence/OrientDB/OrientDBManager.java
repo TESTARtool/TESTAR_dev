@@ -94,8 +94,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     }
 
     @Override
-    public void persistAbstractStateModel(AbstractStateModel abstractStateModel) {
-
+    public void shutdown() {
+        // tell the entity manager to release its connections
+        entityManager.releaseConnection();
+        entityManager = null;
     }
 
     @Override

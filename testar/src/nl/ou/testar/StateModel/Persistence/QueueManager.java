@@ -56,7 +56,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
-    public void persistAbstractStateModel(AbstractStateModel abstractStateModel) {
+    public void shutdown() {
         if (!queue.isEmpty()) {
             int nrOfItemsProcessed = 0;
             int totalNrOfItems = queue.size();
@@ -69,6 +69,7 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
             }
             visualizer.stop();
         }
+        delegateManager.shutdown();
     }
 
     @Override

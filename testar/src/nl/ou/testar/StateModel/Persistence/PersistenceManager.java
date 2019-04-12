@@ -22,9 +22,8 @@ public interface PersistenceManager {
 
     /**
      * This method persists an entire state model.
-     * @param abstractStateModel
      */
-    void persistAbstractStateModel(AbstractStateModel abstractStateModel);
+    void shutdown();
 
     /**
      * This method persists an abstract state.

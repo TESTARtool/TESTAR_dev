@@ -38,13 +38,18 @@ public class EntityManager {
         String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-//        orientDB = new OrientDB("plocal:/c:/orientdb/databases/", OrientDBConfig.defaultConfig());
         dbConfig = config;
         init();
+    }
 
-//        try (ODatabaseSession db = orientDB.open("testar", "testar", "testar")) {
-//            System.out.println("Success!");
-//        }
+    /**
+     * This method tells the Entity Manager to close its connection.
+     * Should be called before the entity manager itself becomes unused.
+     */
+    public void releaseConnection() {
+        if (orientDB.isOpen()) {
+            orientDB.close();
+        }
     }
 
     /**
