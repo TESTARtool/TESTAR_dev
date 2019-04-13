@@ -23,7 +23,7 @@ public class SequenceManager {
     /**
      * The abstraction level identifier that indicates the state model that we are testing against.
      */
-    private String abstractionLevelIdentifier;
+    private String modelIdentifier;
 
     /**
      * A set of event listeners to notify of changes in the sequence.
@@ -34,9 +34,9 @@ public class SequenceManager {
      * Constructor
      * @param eventListeners
      */
-    public SequenceManager(Set<StateModelEventListener> eventListeners, String abstractionLevelIdentifier) {
+    public SequenceManager(Set<StateModelEventListener> eventListeners, String modelIdentifier) {
         this.eventListeners = eventListeners;
-        this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        this.modelIdentifier = modelIdentifier;
         init();
     }
 
@@ -64,7 +64,7 @@ public class SequenceManager {
             currentSequence.stop();
         }
 
-        currentSequence = new Sequence(++currentSequenceNr, eventListeners, abstractionLevelIdentifier);
+        currentSequence = new Sequence(++currentSequenceNr, eventListeners, modelIdentifier);
         currentSequence.start();
     }
 

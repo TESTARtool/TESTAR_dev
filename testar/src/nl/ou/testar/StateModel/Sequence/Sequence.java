@@ -41,7 +41,7 @@ public class Sequence implements Persistable {
     /**
      * The identifier for the abstract state model version that we are currently testing in.
      */
-    private String abstractionLevelIdentifier;
+    private String modelIdentifier;
 
     /**
      * Tags containing the attributes that were used in creating the concrete state ID.
@@ -63,11 +63,11 @@ public class Sequence implements Persistable {
      */
     private Set<StateModelEventListener> eventListeners;
 
-    public Sequence(int currentSequenceNr, Set<StateModelEventListener> eventListeners, String abstractionLevelIdentifier) {
+    public Sequence(int currentSequenceNr, Set<StateModelEventListener> eventListeners, String modelIdentifier) {
         currentSequenceId = UUID.randomUUID().toString();
         this.eventListeners = eventListeners;
         this.currentSequenceNr = currentSequenceNr;
-        this.abstractionLevelIdentifier = abstractionLevelIdentifier;
+        this.modelIdentifier = modelIdentifier;
         nodes = new ArrayList<>();
     }
 
@@ -98,8 +98,8 @@ public class Sequence implements Persistable {
         return currentSequenceNr;
     }
 
-    public String getAbstractionLevelIdentifier() {
-        return abstractionLevelIdentifier;
+    public String getModelIdentifier() {
+        return modelIdentifier;
     }
 
     public Set<Tag<?>> getConcreteStateTags() {

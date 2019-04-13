@@ -26,8 +26,8 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         }
 
         // fetch the abstract level identifier for the current state model
-        String abstractionLevelIdentifier = ((AbstractAction) source).getModelIdentifier();
-        edgeEntity.addPropertyValue("abstractionLevelIdentifier", new PropertyValue(OType.STRING, abstractionLevelIdentifier));
+        String modelIdentifier = ((AbstractAction) source).getModelIdentifier();
+        edgeEntity.addPropertyValue("modelIdentifier", new PropertyValue(OType.STRING, modelIdentifier));
 
         // because an abstract action might have multiple concrete actions tied to it, it is possible that the target
 
@@ -38,7 +38,7 @@ public class AbstractActionHydrator implements EntityHydrator<EdgeEntity> {
         Property targetIdentifier = edgeEntity.getTargetEntity().getEntityClass().getIdentifier();
         String targetId = (String)edgeEntity.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).getValue();
 
-        String edgeId = HydrationHelper.createOrientDbActionId(sourceId, targetId, ((AbstractAction) source).getActionId(), abstractionLevelIdentifier);
+        String edgeId = HydrationHelper.createOrientDbActionId(sourceId, targetId, ((AbstractAction) source).getActionId(), modelIdentifier);
         // make sure the java and orientdb property types are compatible
         OType identifierType = TypeConvertor.getInstance().getOrientDBType(edgeId.getClass());
         if (identifierType != identifier.getPropertyType()) {

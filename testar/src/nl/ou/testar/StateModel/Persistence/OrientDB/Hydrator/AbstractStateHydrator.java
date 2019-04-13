@@ -27,7 +27,7 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
 
         // add the two identifying properties
         String stateId = null;
-        String abstractionLevelIdentifier = null;
+        String modelIdentifier = null;
         for (Property prop : target.getEntityClass().getProperties()) {
             if (prop.getPropertyName().equals("stateId")) {
                 OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getStateId().getClass());
@@ -37,21 +37,21 @@ public class AbstractStateHydrator implements EntityHydrator<VertexEntity> {
                 target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getStateId()));
                 stateId = ((AbstractState) source).getStateId();
             }
-            else if (prop.getPropertyName().equals("abstractionLevelIdentifier")) {
+            else if (prop.getPropertyName().equals("modelIdentifier")) {
                 OType propertyType = TypeConvertor.getInstance().getOrientDBType(((AbstractState) source).getModelIdentifier().getClass());
                 if (propertyType != prop.getPropertyType()) {
                     throw new HydrationException();
                 }
                 target.addPropertyValue(prop.getPropertyName(), new PropertyValue(prop.getPropertyType(), ((AbstractState) source).getModelIdentifier()));
-                abstractionLevelIdentifier = ((AbstractState) source).getModelIdentifier();
+                modelIdentifier = ((AbstractState) source).getModelIdentifier();
             }
         }
 
         // we need to combine the stateId and the abstractionLevelidentifier into a unique id
-        if (stateId == null || abstractionLevelIdentifier == null) {
+        if (stateId == null || modelIdentifier == null) {
             throw new HydrationException("Missing identity property in abstract state hydrator");
         }
-        String uniqueId = HydrationHelper.lowCollisionID(abstractionLevelIdentifier + "--" + stateId);
+        String uniqueId = HydrationHelper.lowCollisionID(modelIdentifier + "--" + stateId);
         target.addPropertyValue(identifier.getPropertyName(), new PropertyValue(identifier.getPropertyType(), uniqueId));
 
         // loop through the tagged attributes for this state and add them

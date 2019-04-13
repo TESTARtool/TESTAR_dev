@@ -31,7 +31,7 @@ public class SequenceHydrator implements EntityHydrator<VertexEntity> {
         entity.addPropertyValue("startDateTime", new PropertyValue(OType.DATETIME, date));
 
         // fetch the abstract level identifier for the current state model
-        String abstractionLevelIdentifier = ((Sequence) source).getAbstractionLevelIdentifier();
-        entity.addPropertyValue("abstractionLevelIdentifier", new PropertyValue(OType.STRING, abstractionLevelIdentifier));
+        String modelIdentifier = ((Sequence) source).getModelIdentifier();
+        entity.addPropertyValue("modelIdentifier", new PropertyValue(OType.STRING, modelIdentifier));
     }
 }

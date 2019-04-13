@@ -423,7 +423,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         Map<String, PropertyValue> entityProperties = new HashMap<>();
         Property stateModelClassIdentifier = stateModelClass.getIdentifier();
         if (stateModelClassIdentifier == null) throw new RuntimeException("Error occurred: abstract state model does not have an id property set.");
-        entityProperties.put("abstractionLevelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
+        entityProperties.put("modelIdentifier", stateModelEntity.getPropertyValue(stateModelClassIdentifier.getPropertyName()));
 
         Set<DocumentEntity> retrievedDocuments = entityManager.retrieveAllOfClass(abstractStateClass, entityProperties);
         if (retrievedDocuments.isEmpty()) {

@@ -55,16 +55,16 @@ public class StateModelManagerFactory {
         PersistenceManager persistenceManager = persistenceManagerFactory.getPersistenceManager(settings);
 
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
-        String abstractionLevelIdentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
+        String modelIdentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion));
 
         // we need a sequence manager to record the sequences
         Set<StateModelEventListener> eventListeners = new HashSet<>();
         eventListeners.add((StateModelEventListener) persistenceManager);
-        SequenceManager sequenceManager = new SequenceManager(eventListeners, abstractionLevelIdentifier);
+        SequenceManager sequenceManager = new SequenceManager(eventListeners, modelIdentifier);
 
         // create the abstract state model and then the state model manager
-        AbstractStateModel abstractStateModel = new AbstractStateModel(abstractionLevelIdentifier,
+        AbstractStateModel abstractStateModel = new AbstractStateModel(modelIdentifier,
                 settings.get(ConfigTags.ApplicationName),
                 settings.get(ConfigTags.ApplicationVersion),
                 concreteStateTags,
