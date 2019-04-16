@@ -2,61 +2,15 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
-import nl.ou.testar.genetic.programming.strategy.actions.SnAnd;
-import nl.ou.testar.genetic.programming.strategy.actions.SnClickAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnDragAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnDragActionsAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEquals;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEqualsType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnEscape;
-import nl.ou.testar.genetic.programming.strategy.actions.SnGreaterThan;
-import nl.ou.testar.genetic.programming.strategy.actions.SnHitKeyAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnIfThenElse;
-import nl.ou.testar.genetic.programming.strategy.actions.SnLeftClicksAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNot;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfActionsOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfDragActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfLeftClicks;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfPreviousActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfTypeActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedDragActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedLeftClicks;
-import nl.ou.testar.genetic.programming.strategy.actions.SnNumberOfUnexecutedTypeActions;
-import nl.ou.testar.genetic.programming.strategy.actions.SnOr;
-import nl.ou.testar.genetic.programming.strategy.actions.SnPreviousAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomActionOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomActionOfTypeOtherThan;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomLeastExecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomMostExecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomNumber;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomUnexecutedAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnRandomUnexecutedActionOfType;
-import nl.ou.testar.genetic.programming.strategy.actions.SnStateHasNotChanged;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeAction;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeActionsAvailable;
-import nl.ou.testar.genetic.programming.strategy.actions.SnTypeOfActionOf;
+import nl.ou.testar.genetic.programming.strategy.actions.*;
+import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class StrategyFactoryImpl implements StrategyFactory {
@@ -95,7 +49,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
         } catch (IOException e) {
             System.out.println("Error while reading text input file!");
         }
-        throw new RuntimeException("The content of the input file seems to be corrupt!");
+        throw new RuntimeException("The content of the input file (" + inputFile + ") seems to be corrupt!");
     }
 
     private void writeMetricsToFile(final Settings settings) {
@@ -123,7 +77,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     @Override
-    public void postSequence(final Settings settings) {
+    public void postSequence(final Settings settings, final Verdict verdict) {
         this.strategyActionSelector.postSequence();
         this.strategyActionSelector.printSequenceExecutionDuration();
         this.saveMetrics();
@@ -198,7 +152,13 @@ public class StrategyFactoryImpl implements StrategyFactory {
         final int hour = now.get(Calendar.HOUR_OF_DAY);
         final int minute = now.get(Calendar.MINUTE);
 
-        return String.format("%d-%02d-%02dT%02d_%02d", year, month, day, hour, minute);
+        int counter = this.strategyActionSelector.getCurrentSequence();
+
+        if (System.getProperty("Dcounter") != null) {
+            counter = Integer.parseInt(System.getProperty("Dcounter"));
+        }
+
+        return String.format("%d-%02d-%02dT%02d_%02d_(%d)", year, month, day, hour, minute, counter);
     }
 
     private StrategyNode getStrategyNode() {

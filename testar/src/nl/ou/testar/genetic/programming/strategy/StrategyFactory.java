@@ -1,5 +1,6 @@
 package nl.ou.testar.genetic.programming.strategy;
 
+import org.fruit.alayer.Verdict;
 import org.fruit.monkey.Settings;
 
 public interface StrategyFactory {
@@ -25,7 +26,7 @@ public interface StrategyFactory {
     void prepareForSequence();
 
     /**
-     * Set stop time and print the time it took to execute a sequence
+     * Execute post sequence actions like setting stop time and print the time it took to execute a sequence
      */
-    void postSequence(final Settings settings);
+    void postSequence(final Settings settings, final Verdict verdict);
 }

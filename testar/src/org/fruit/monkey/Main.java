@@ -46,21 +46,11 @@ import org.fruit.Util;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.FileSystems;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.fruit.monkey.ConfigTags.*;
@@ -73,10 +63,11 @@ public class Main {
     static String SSE_ACTIVATED = null;
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    public static String resourcesDir = "resources" + File.separator;
     //Default paths
-    private static String testarDir = "." + File.separator + "testar" + File.separator + "resources" + File.separator;
-    public static String settingsDir = testarDir + "settings" + File.separator;
-    private static String outputDir = testarDir + "output" + File.separator;
+    private static String testarDir = FileSystems.getDefault().getPath("").toAbsolutePath() + File.separator; // + "testar" + File.separator + "resources" + File.separator;
+    public static String settingsDir = testarDir + resourcesDir + "settings" + File.separator;
+    private static String outputDir = testarDir + resourcesDir + "output" + File.separator;
     private static String tempDir = outputDir + "temp" + File.separator;
 
 
@@ -107,6 +98,12 @@ public class Main {
     public static void main(String[] args) {
 
         initTestarSSE(args);
+
+        Arrays.stream(args).forEach(arg -> System.out.println("Arguments: " + arg));
+        System.out.println("TESTAR dir: " + testarDir);
+        System.out.println("Settings dir: " + settingsDir);
+        System.out.println("Output dir: " + outputDir);
+        System.out.println("Temp dir: " + tempDir);
 
         String testSettingsFileName = getTestSettingsFile();
         System.out.println("Test settings is <" + testSettingsFileName + ">");
@@ -513,7 +510,6 @@ public class Main {
     private static void protocolFromCmd(final String sett) throws IOException {
         final String sseName = sett.substring(sett.indexOf("=") + 1);
         boolean existSSE = false;
-
         //Check if choose protocol exist
         for (File f : new File(settingsDir).listFiles()) {
             if (new File(settingsDir + sseName + File.separator + SETTINGS_FILE).exists()) {
