@@ -1,31 +1,32 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 /**
@@ -51,6 +52,7 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.windows.UIATags;
 import org.fruit.alayer.State;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.StrokePattern;
@@ -82,7 +84,7 @@ import static org.fruit.alayer.Tags.Enabled;
 
 
 
-public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // DefaultProtocol {
+public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 
 
 	/** 
@@ -97,7 +99,7 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
 	}
 
-	
+
 
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
@@ -117,10 +119,10 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 	 *      the SUT's configuratio files etc.)
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
+	 * @return  a started SUT, ready to be tested.
 	 */
 	protected SUT startSystem() throws SystemStartException{
-		
+
 		return super.startSystem();
 
 	}
@@ -148,15 +150,15 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
-		
+
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-        //-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-		
+
 		return verdict;
-		
+
 	}
 
 
@@ -178,46 +180,53 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
+
 		//----------------------
 		// BUILD CUSTOM ACTIONS
 		//----------------------
-		
+
 		// iterate through all widgets
 		for(Widget w : getTopWidgets(state)){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-				
+
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
-					
+
 					// left clicks
 					if(whiteListed(w) || isClickable(w))
 						actions.add(ac.leftClickAt(w));
-	
+
 					// type into text boxes
 					if(isTypeable(w))
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					
+
 					//Force actions on some widgets with a wrong accessibility
 					//Optional, comment this changes if your Swing applications doesn't need it
 
 					if(w.get(Tags.Role).toString().contains("Tree") ||
-						w.get(Tags.Role).toString().contains("ComboBox") ||
-						w.get(Tags.Role).toString().contains("List")) {
+							w.get(Tags.Role).toString().contains("ComboBox") ||
+							w.get(Tags.Role).toString().contains("List")) {
 						widgetTree(w, actions);
+					}
+
+					if(w.get(UIATags.UIAAutomationId,"").contains("internal frame")) {
+						createActionsForJInternalFrame(w, actions);
+					}
+					if(w.get(UIATags.UIAAutomationId,"").contains("spinbox")) {
+						createActionsForSpinbox(w, actions);
 					}
 					//End of Force action
 
 				}
-				
+
 			}
 
 		}
-		
+
 		return actions;
 
 	}
-	
+
 	//Force actions on Tree widgets with a wrong accessibility
 	public void widgetTree(Widget w, Set<Action> actions) {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -228,7 +237,44 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 			widgetTree(w.child(i), actions);
 		}
 	}
-	
+
+	//Force close, maximize and minimize actions into JInternalFrames elements
+	public void createActionsForJInternalFrame(Widget w, Set<Action> actions) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+
+		double posY = w.get(Tags.Shape).y() + (15);
+
+		double closePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 16);
+		double maximizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 45);
+		double minimizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 65);
+
+		Action close = ac.leftClickAt(closePosX, posY);
+		Action maximise = ac.leftClickAt(maximizePosX, posY);
+		Action minimise = ac.leftClickAt(minimizePosX, posY);
+
+		actions.add(close);
+		actions.add(maximise);
+		actions.add(minimise);
+		w.set(Tags.ActionSet, actions);
+	}
+
+	//Force increase and decrease actions into Spinbox elements
+	public void createActionsForSpinbox(Widget w, Set<Action> actions) {
+		StdActionCompiler ac = new AnnotatingActionCompiler();
+
+		double posX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 9) ;
+
+		double increaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 20);
+		double decreaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 6);
+
+		Action increase = ac.leftClickAt(posX, increaseY);
+		Action decrease = ac.leftClickAt(posX, decreaseY);
+
+		actions.add(increase);
+		actions.add(decrease);
+		w.set(Tags.ActionSet, actions);
+	}
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 * @param state the SUT's current state
@@ -251,11 +297,11 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 	 * @return whether or not the execution succeeded
 	 */
 	protected boolean executeAction(SUT system, State state, Action action){
-		
+
 		return super.executeAction(system, state, action);
-		
+
 	}
-	
+
 
 	/**
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
@@ -275,9 +321,9 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	protected void finishSequence(){
-		
+
 		super.finishSequence();
-		
+
 	}
 
 
