@@ -2,10 +2,7 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
-import org.fruit.alayer.Action;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
+import org.fruit.alayer.*;
 
 import java.util.Date;
 import java.util.Set;
@@ -17,6 +14,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     private Date startDate;
     private Date endDate;
     private int currentSequence = 0;
+    private Verdict verdict;
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
         System.out.println("DEBUG: creating genetic programming strategy");
@@ -54,6 +52,10 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         System.out.printf("Total number of unavailable actions %d \n", stateManager.getNumberOfActionsNotFound());
     }
 
+    public void setVerdict(final Verdict verdict) {
+        this.verdict = verdict;
+    }
+
     @Override
     public Metric getMetrics() {
         return new Metric(
@@ -64,7 +66,8 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
                 stateManager.getTotalNumberOfUniqueStates(),
                 stateManager.getTotalNumberOfUniqueExecutedActions(),
                 stateManager.getNumberOfActionsNotFound(),
-                stateManager.getNumberOfIrregularActions()
+                stateManager.getNumberOfIrregularActions(),
+                verdict.severity()
         );
     }
 

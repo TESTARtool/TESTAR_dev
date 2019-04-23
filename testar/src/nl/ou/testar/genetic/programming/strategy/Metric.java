@@ -9,8 +9,9 @@ class Metric {
     private int uniqueActions;
     private int notFoundActions;
     private int irregularActions;
+    private double severity;
 
-    Metric(final int sequenceNo, final long sequenceDuration, final int visitedStates, final int executedActions, final int uniqueStates, final int uniqueActions, final int notFoundActions, final int irregularActions) {
+    Metric(final int sequenceNo, final long sequenceDuration, final int visitedStates, final int executedActions, final int uniqueStates, final int uniqueActions, final int notFoundActions, final int irregularActions, final double severity) {
         this.sequenceNo = sequenceNo;
         this.sequenceDuration = sequenceDuration;
         this.visitedStates = visitedStates;
@@ -19,6 +20,7 @@ class Metric {
         this.uniqueActions = uniqueActions;
         this.notFoundActions = notFoundActions;
         this.irregularActions = irregularActions;
+        this.severity = severity;
     }
 
     int getSequenceNo() {
@@ -51,5 +53,9 @@ class Metric {
 
     int getIrregularActions() {
         return irregularActions;
+    }
+
+    double getSeverity() {
+        return this.severity;
     }
 }

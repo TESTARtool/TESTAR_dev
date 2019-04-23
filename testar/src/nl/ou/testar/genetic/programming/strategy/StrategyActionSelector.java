@@ -3,6 +3,7 @@ package nl.ou.testar.genetic.programming.strategy;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Verdict;
 
 import java.util.Set;
 
@@ -64,4 +65,9 @@ public interface StrategyActionSelector {
      * Get current sequence no
      */
     int getCurrentSequence();
+
+    /**
+     * Set Verdict
+     */
+    void setVerdict(final Verdict verdict);
 }

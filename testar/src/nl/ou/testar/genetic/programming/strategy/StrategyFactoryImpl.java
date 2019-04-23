@@ -79,6 +79,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     @Override
     public void postSequence(final Settings settings, final Verdict verdict) {
         this.strategyActionSelector.postSequence();
+        this.strategyActionSelector.setVerdict(verdict);
         this.strategyActionSelector.printSequenceExecutionDuration();
         this.saveMetrics();
         if (settings.get(ConfigTags.Sequences) == this.strategyActionSelector.getCurrentSequence()) {
@@ -120,7 +121,8 @@ public class StrategyFactoryImpl implements StrategyFactory {
                 "UniqueStates," + // # of unique states visited
                 "UniqueActions," + // # of unique actions executed
                 "NotFoundActions," + // # of actions that were selected but not found (eg. click action is selected, only type actions are available)
-                "IrregularActions"; // # of actions where tag type was unavailable
+                "IrregularActions," +
+                "Severity"; // # of possible oracles - an oracle can be [0, 1]
     }
 
     private String getContent() {
@@ -134,7 +136,8 @@ public class StrategyFactoryImpl implements StrategyFactory {
                         .append(metric.getUniqueStates()).append(',')
                         .append(metric.getUniqueActions()).append(',')
                         .append(metric.getNotFoundActions()).append(',')
-                        .append(metric.getIrregularActions()).append('\n')
+                        .append(metric.getIrregularActions()).append(',')
+                        .append(metric.getSeverity()).append('\n')
         );
         return sb.toString();
     }
@@ -145,20 +148,13 @@ public class StrategyFactoryImpl implements StrategyFactory {
     }
 
     private String getFileName() {
-        final Calendar now = Calendar.getInstance();
-        final int year = now.get(Calendar.YEAR);
-        final int month = now.get(Calendar.MONTH) + 1; // Note: zero based!
-        final int day = now.get(Calendar.DAY_OF_MONTH);
-        final int hour = now.get(Calendar.HOUR_OF_DAY);
-        final int minute = now.get(Calendar.MINUTE);
-
         int counter = this.strategyActionSelector.getCurrentSequence();
 
         if (System.getProperty("Dcounter") != null) {
             counter = Integer.parseInt(System.getProperty("Dcounter"));
         }
 
-        return String.format("%d-%02d-%02dT%02d_%02d_(%d)", year, month, day, hour, minute, counter);
+        return String.format("ecj_sequence_%d", counter);
     }
 
     private StrategyNode getStrategyNode() {
