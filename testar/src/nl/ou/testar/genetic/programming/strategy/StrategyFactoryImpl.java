@@ -82,9 +82,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
         this.strategyActionSelector.setVerdict(verdict);
         this.strategyActionSelector.printSequenceExecutionDuration();
         this.saveMetrics();
-        if (settings.get(ConfigTags.Sequences) == this.strategyActionSelector.getCurrentSequence()) {
-            this.writeMetricsToFile(settings);
-        }
+        this.writeMetricsToFile(settings);
         this.printMetrics();
         this.clear();
     }
@@ -150,8 +148,8 @@ public class StrategyFactoryImpl implements StrategyFactory {
     private String getFileName() {
         int counter = this.strategyActionSelector.getCurrentSequence();
 
-        if (System.getProperty("Dcounter") != null) {
-            counter = Integer.parseInt(System.getProperty("Dcounter"));
+        if (System.getProperty("counter") != null) {
+            counter = Integer.parseInt(System.getProperty("counter"));
         }
 
         return String.format("ecj_sequence_%d", counter);
