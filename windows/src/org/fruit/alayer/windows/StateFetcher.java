@@ -146,7 +146,7 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); //( SUT as a set of windows/processes )				
 				if(!owned){
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
+					modalElement = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
 						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
 				} else
 					ownedWindows.add(hwnd);
@@ -159,7 +159,7 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
+				if ((modalE = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
 					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 					modalElement = modalE;
 			}
@@ -364,8 +364,11 @@ public class StateFetcher implements Callable<UIAState>{
 		return modalElement;
 	}
 
-	//Descend through AccessBridge
-	private UIAElement abDescend(long hwnd, UIAElement parent, long vmid, long ac){
+	/**
+	 * From a windows HWND use the Java Access Bridge API to build an UIAElement
+	 * that represents the element hierarchy of Java applications
+	 */
+	private UIAElement accessBridgeDescend(long hwnd, UIAElement parent, long vmid, long ac){
 		UIAElement modalElement = null;
 
 		long[] vmidAC;
@@ -373,7 +376,8 @@ public class StateFetcher implements Callable<UIAState>{
 			vmidAC = Windows.GetAccessibleContext(hwnd);
 		else
 			vmidAC = new long[]{ vmid,ac };
-		if (vmidAC != null){			
+
+		if (vmidAC != null){
 			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
 			if (props != null){
 				String name = (String) props[0];
@@ -416,45 +420,67 @@ public class StateFetcher implements Callable<UIAState>{
 					el.isTopLevelContainer = true;
 				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
 					el.isKeyboardFocusable = true;
-				
+
 				el.name = name;				
 				el.helpText = description;
 				el.automationId = role;
 
 				el.enabled = accesibleStateSet.contains("enabled");
-				
+
 				el.blocked = !accesibleStateSet.contains("showing");
 
 				parent.root.hwndMap.put(el.hwnd, el);
 
 				//Sometimes popup menu are duplicated with AccessBridge when we open one Menu or combo box
-				boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
-				
-				if( (!role.equals("popup menu") || correctComboBox)
-						&& childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
-					
-					//TODO: Java 9, 10, 11, Access Bridge API
+				//boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
+				//if( (!role.equals("popup menu") || correctComboBox)
+
+				if(role.contains("table")) {
+					javaTableDescend(hwnd, el, vmid, ac);
+				}
+
+				if(childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+
+					//Bug ID 4944762- getVisibleChildren for list-like components needed
+
 					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
-						if (cc > 0){
-							el.children = new ArrayList<UIAElement>(cc);
-							long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
-							for (int i=0; i<children.length; i++)
-								abDescend(hwnd,el,vmidAC[0],children[i]);
-						}*/
+					if (cc > 0){
+						el.children = new ArrayList<UIAElement>(cc);
+						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
+						for (int i=0; i<children.length; i++)
+							accessBridgeDescend(hwnd,el,vmidAC[0],children[i]);
+					}*/
 
 					long childAC;
 					int c = new Integer(childrenCount).intValue();
 					el.children = new ArrayList<UIAElement>(c);
 					for (int i=0; i<c; i++){
 						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-						abDescend(hwnd,el,vmidAC[0],childAC);
+						accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
 					}
 				}
 
 			}
+
 		}
 
 		return modalElement;
+
+	}
+
+	private void javaTableDescend (long hwnd, UIAElement el, long vmid, long ac) {
+		
+		long[] acTable = Windows.GetAccessibleTable(vmid, ac);
+
+		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
+
+		Object[] props = Windows.GetTableCellProperties(vmid, ac, 1, 1);
+
+		/*for (int i=0; i<tableRowColumn[0]; i++){
+			for(int j=0; j<tableRowColumn[1]; j++) {
+				Object[] props = Windows.GetTableCellProperties(vmid, ac, i, j);
+			}
+		}*/
 
 	}
 

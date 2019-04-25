@@ -29,9 +29,6 @@
  *******************************************************************************************************/
 
 
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.alayer.windows;
 
 import java.io.BufferedOutputStream;
@@ -722,21 +719,26 @@ public final class Windows{
 	public static native long Gdiplus_FontFamily_Create(String name) throws GDIException;
 	public static native void Gdiplus_FontFamily_Destroy(long pFontFamily) throws GDIException;
 
-	// begin by urueda
 	public static native long   GetProcessMemoryInfo(long processID);
 	public static native long[] GetProcessTimes(long processID);
 	public static native String	GetProcessNameFromHWND(long hwnd);
-	// end by urueda
 
-	public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
-	// begin by urueda
+	/**
+	 * Java AccessBridge
+	 */
+	public static native boolean InitializeAccessBridge();
 	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
 	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
-	//public static native int	  GetVisibleChildrenCount(long vmid, long ac);
-	//public static native long[]   GetVisibleChildren(long vmid, long ac);
 	public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);
 	public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
-	// end by urueda
+	//public static native int	  GetVisibleChildrenCount(long vmid, long ac);
+	//public static native long[]   GetVisibleChildren(long vmid, long ac);
+
+	//Table Cell Properties
+	public static native long[] GetAccessibleTable(long vmid, long ac); // accessibleContext x accessibleTable
+	public static native int[] GetNumberOfTableRowColumn(long vmid, long ac); // row x column
+	public static native Object[] GetTableCellProperties(long vmid, long ac, int row, int column);
+	
 
 	public static String Gdiplus_Status2String(int statusCode){
 		switch(statusCode){
@@ -777,10 +779,10 @@ public final class Windows{
 	public static native long CoCreateInstance(long pClsid, long pUnkOuter, long dwClsContext, long pIId);
 	public static native long Get_CLSID_CUIAutomation_Ptr();
 	public static native long Get_IID_IUIAutomation_Ptr();
-	// begin by wcoux
+
 	public static native long Get_CLSID_ApplicationActivationManager_Ptr();
 	public static native long Get_IID_IApplicationActivationManager_Ptr();
-	// end by wcoux
+
 	public static native long IUnknown_QueryInterface(long pIUnknown, long pIID);
 	public static native long IUnknown_AddRef(long pIUnknown);
 	public static native long IUnknown_Release(long pIUnknown);
@@ -837,7 +839,7 @@ public final class Windows{
 	public static native boolean IUIAutomationElement_get_IsOffscreen(long pElement, boolean fromCache);
 	public static native long[] IUIAutomationElement_get_BoundingRectangle(long pElement, boolean fromCache);	
 	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);
-	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda	
+	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache);
 	public static native Object IUIAutomationElement_GetPropertyValueEx(long pElement, long propertyId, boolean ignoreDefaultValue, boolean fromCache);
 	public static native long IUIAutomationElement_GetCachedChildren(long pElement);	
 	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition) throws UIAException;
@@ -892,7 +894,6 @@ public final class Windows{
 		}
 	}
 
-	// by urueda
 	private static void loadExternalLib(String name) throws IOException {
 		File f = new File(name);
 		if (f.exists()){

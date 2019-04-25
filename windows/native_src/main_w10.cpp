@@ -2497,8 +2497,50 @@ std::wstring Java_To_WStr(JNIEnv *env, jstring string)
 }
 
 /**
+  * GetProcessNameFromHWND
+  * (copy from Windows 7) */
+JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
+
+	HWND window = (HWND) hwnd;
+	DWORD  pid;
+	HANDLE handle;
+	
+	TCHAR processName[256];	
+	jstring ret = 0;
+
+	GetWindowThreadProcessId(window, &pid);
+	handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+
+	if (handle) {
+
+		DWORD nameSize = ARRAYSIZE(processName);
+		
+		if (QueryFullProcessImageName(handle, 0, processName, &nameSize)){
+
+			ret = env->NewStringUTF(processName);
+		
+		}	
+		
+		CloseHandle(handle);
+	
+	}
+	
+	return ret;
+
+}
+
+
+/**
+*
+*	Java Access Bridge Implementation
+*
+**/
+
+
+/**
   * InitializeAccessBridge
-  *(copy from Windows 7) */
+  *(copy from Windows 7) 
+  */
 JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 	MSG msg;
@@ -2520,7 +2562,8 @@ JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 
 /**
   * GetAccessibleContext
-  * (copy from Windows 7) */
+  * (copy from Windows 7) 
+  */
 JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlong hwnd){
 	
 	HWND window = (HWND)hwnd;
@@ -2551,7 +2594,8 @@ JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleContext)) (JNIEnv * env, jclass, jlon
 
 /**
   * GetHWNDFromAccessibleContext
-  * (copy from Windows 7) */
+  * (copy from Windows 7) 
+  */
 JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
 
     HWND window = getHWNDFromAccessibleContext((long) vmid, (long) ac);
@@ -2562,12 +2606,44 @@ JNI_SIG(jlong, WINAPI_NS(GetHWNDFromAccessibleContext)) (JNIEnv * env, jclass, j
 
 /**
   * GetAccessibleChildFromContext
-  * (copy from Windows 7) */
+  * (copy from Windows 7) 
+  */
 JNI_SIG(jlong, WINAPI_NS(GetAccessibleChildFromContext)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint i){
 
 	AccessibleContext child = GetAccessibleChildFromContext(vmid, ac, (int)i);
 		
 	return (jlong) child;
+
+}
+
+ /**
+  * GetVisibleChildrenCount
+  * (copy from Windows 7) 
+  */
+JNI_SIG(jint, WINAPI_NS(GetVisibleChildrenCount)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+	
+	return (jint) getVisibleChildrenCount((long)vmid, (AccessibleContext)ac);
+	
+}
+
+/**
+  * GetVisibleChildren
+  * (copy from Windows 7) 
+  */
+JNI_SIG(jlongArray, WINAPI_NS(GetVisibleChildren)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	VisibleChildrenInfo visibleChildrenInfo;
+	
+	jlongArray ret = 0;
+	
+	if (getVisibleChildren((long)vmid, (AccessibleContext)ac, 0, &visibleChildrenInfo)){
+				
+		ret = env->NewLongArray(2); // visibleChildren
+		env->SetLongArrayRegion(ret, (jsize)0, (jsize)1, (jlong*)visibleChildrenInfo.children);
+		
+	}
+	
+	return ret;
 
 }
 
@@ -2630,35 +2706,104 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetAccessibleContextProperties)) (JNIEnv * env, 
 	
 }
 
+
 /**
-  * GetProcessNameFromHWND
-  * (copy from Windows 7) */
-JNI_SIG(jstring, WINAPI_NS(GetProcessNameFromHWND)) (JNIEnv * env, jclass, jlong hwnd){
+*
+*	Table Cells Properties
+*
+**/
 
-	HWND window = (HWND) hwnd;
-	DWORD  pid;
-	HANDLE handle;
+/** GetAccessibleTable */
+JNI_SIG(jlongArray, WINAPI_NS(GetAccessibleTable)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	jlongArray ret = 0;
+
+	AccessibleTableInfo tableInfo;
 	
-	TCHAR processName[256];	
-	jstring ret = 0;
-
-	GetWindowThreadProcessId(window, &pid);
-	handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-
-	if (handle) {
-
-		DWORD nameSize = ARRAYSIZE(processName);
+	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
 		
-		if (QueryFullProcessImageName(handle, 0, processName, &nameSize)){
+		jlong accessibleId[2];
+		
+		accessibleId[0] = (long)tableInfo.accessibleContext;
+		accessibleId[1] = (long)tableInfo.accessibleTable;
+	
+		ret = env->NewLongArray(2);
+		env->SetLongArrayRegion(ret, (jsize)0, (jsize)2, (jlong*)&accessibleId[0]);
+		
+	}
+	
+    return ret;
+	
+}
 
-			ret = env->NewStringUTF(processName);
+/** GetNumberOfTableRowColumn  */
+JNI_SIG(jintArray, WINAPI_NS(GetNumberOfTableRowColumn)) (JNIEnv * env, jclass, jlong vmid, jlong ac){
+
+	jintArray ret = 0;
+
+	AccessibleTableInfo tableInfo;
+	
+	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
 		
-		}	
+		jint tableRowColumn[2];
 		
-		CloseHandle(handle);
+		tableRowColumn[0] = tableInfo.rowCount;
+		tableRowColumn[1] = tableInfo.columnCount;
+		
+		ret = env->NewIntArray(2);
+		env->SetIntArrayRegion(ret, (jsize)0, (jsize)2, (jint*)&tableRowColumn[0]);
+		
+	}
+	
+    return ret;
+}
+
+/** GetTableCellProperties */
+JNI_SIG(jobjectArray, WINAPI_NS(GetTableCellProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
+	
+	jobjectArray ret = 0;
+	
+	AccessibleTableInfo tableInfo;
+	
+	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
+		
+		JOBJECT64 accessibleTable;
+		
+		accessibleTable = (long)tableInfo.accessibleTable;
+	
+		AccessibleTableCellInfo tableCellInfo;
+		getAccessibleTableCellInfo((long)vmid, (AccessibleTable)accessibleTable, row, column, &tableCellInfo);
+		
+		JOBJECT64 accessibleCellContext = tableCellInfo.accessibleContext;
+		
+		AccessibleContextInfo info;
+		
+		if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)accessibleCellContext, &info)){
+			
+			const int ACCESSIBLE_PROPERTIES = 15;
+			
+			ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
+			
+			env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.name)));
+			env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.description)));
+			env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.role)));
+			env->SetObjectArrayElement(ret, 3, env->NewStringUTF(wchart2String(env, info.states)));
+			env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.indexInParent)));
+			env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.childrenCount)));
+			env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.x)));
+			env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.y)));
+			env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.width)));
+			env->SetObjectArrayElement(ret, 9, env->NewStringUTF(jint2String(env, info.height)));
+			env->SetObjectArrayElement(ret, 10, env->NewStringUTF(jint2String(env, info.accessibleComponent)));
+			env->SetObjectArrayElement(ret, 11, env->NewStringUTF(jint2String(env, info.accessibleAction)));
+			env->SetObjectArrayElement(ret, 12, env->NewStringUTF(jint2String(env, info.accessibleSelection)));
+			env->SetObjectArrayElement(ret, 13, env->NewStringUTF(jint2String(env, info.accessibleText)));
+			env->SetObjectArrayElement(ret, 14, env->NewStringUTF(jint2String(env, info.accessibleInterfaces)));
+
+		}
 	
 	}
 	
 	return ret;
-
+	
 }
