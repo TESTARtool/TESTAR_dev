@@ -35,16 +35,16 @@ public class AnalysisManager {
 
     private String outputDir;
 
+    /**
+     * Constructor
+     * @param config
+     * @param outputDir
+     */
     public AnalysisManager(final Config config, String outputDir) {
         String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         dbConfig = config;
-//        // check if the output directory has a trailing line separator
-//        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-//            outputDir += File.separator;
-//        }
-//        this.outputDir = outputDir + "graphs" + File.separator;
         this.outputDir = outputDir;
 
         // check if the credentials are valid
@@ -53,15 +53,17 @@ public class AnalysisManager {
         }
     }
 
-    private void init() {
-
-    }
-
-
+    /**
+     * Shuts down the orientDB connection.
+     */
     public void shutdown() {
         orientDB.close();
     }
 
+    /**
+     * This method fetches a list of the abstract state models in the current OrientDB data store.
+     * @return
+     */
     public List<AbstractStateModel> fetchModels() {
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
@@ -91,6 +93,12 @@ public class AnalysisManager {
         return abstractStateModels;
     }
 
+    /**
+     * This method fetches the test sequences for a given abstract state model.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<TestSequence> fetchTestSequences(String modelIdentifier, ODatabaseSession db) {
         List<TestSequence> sequenceList = new ArrayList<>();
         String sequenceStmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier ORDER BY startDateTime ASC";
@@ -127,6 +135,14 @@ public class AnalysisManager {
         return sequenceList;
     }
 
+    /**
+     * This model generates graph data for a given abstract state model and writes it to a json file.
+     * @param modelIdentifier the abstract state model identifier
+     * @param abstractLayerRequired true if the abstract state layer needs to be exported
+     * @param concreteLayerRequired true if the concrete state layer needs to be exported
+     * @param sequenceLayerRequired true if the sequence layer needs to be exported
+     * @return
+     */
     public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired) {
         ArrayList<Element> elements = new ArrayList<>();
         if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
@@ -182,6 +198,12 @@ public class AnalysisManager {
         return filename;
     }
 
+    /**
+     * This method fetches the elements in the abstract state layer for a given abstract state model.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -211,6 +233,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method fetches the elements in the concrete state layer for a given abstract state model.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -229,6 +257,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method fetches the elements in the sequence layer for a given abstract state model.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -257,6 +291,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method fetches the edges between the abstract and concrete layers.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<Element> fetchAbstractConcreteConnectors(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -270,6 +310,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method fetches the edges between the concrete and sequence layers.
+     * @param modelIdentifier
+     * @param db
+     * @return
+     */
     private List<Element> fetchConcreteSequenceConnectors(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -283,6 +329,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method transforms a resultset of nodes into elements.
+     * @param resultSet
+     * @param className
+     * @return
+     */
     private ArrayList<Element> fetchNodes(OResultSet resultSet, String className) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -318,6 +370,12 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method transforms a resultset of edges into elements.
+     * @param resultSet
+     * @param className
+     * @return
+     */
     private ArrayList<Element> fetchEdges(OResultSet resultSet, String className) {
         ArrayList<Element> elements = new ArrayList<>();
         while (resultSet.hasNext()) {
@@ -343,7 +401,12 @@ public class AnalysisManager {
         return elements;
     }
 
-    public void processScreenShot(ORecordBytes recordBytes, String identifier) {
+    /**
+     * This method saves screenshots to disk.
+     * @param recordBytes
+     * @param identifier
+     */
+    private void processScreenShot(ORecordBytes recordBytes, String identifier) {
         // save the file to disk
         File screenshotFile = new File(outputDir + identifier + ".png");
         try {
