@@ -164,7 +164,7 @@ public class AnalysisManager {
                 }
 
                 if (concreteLayerRequired && sequenceLayerRequired) {
-                    fetchConcreteSequenceConnectors(modelIdentifier, db);
+                    elements.addAll(fetchConcreteSequenceConnectors(modelIdentifier, db));
                 }
             }
         }
@@ -207,12 +207,16 @@ public class AnalysisManager {
     private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
+        // add a parent node for the abstract layer
+        Vertex abstractStateParent = new Vertex("A1");
+        elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
+
         // abstract states
         String stmt = "SELECT FROM AbstractState WHERE modelIdentifier = :identifier";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState"));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", "A1"));
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
@@ -222,7 +226,7 @@ public class AnalysisManager {
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole"));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", "A1"));
 
 
         // unvisited abstract actions
@@ -242,12 +246,16 @@ public class AnalysisManager {
     private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
+        // add a parent node for the concrete layer
+        Vertex concreteStateParent = new Vertex("C1");
+        elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
+
         // concrete states
         String stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState"));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", "C1"));
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
@@ -266,17 +274,21 @@ public class AnalysisManager {
     private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db) {
         ArrayList<Element> elements = new ArrayList<>();
 
+        // add a parent node for the sequence layer
+        Vertex sequenceParent = new Vertex("S1");
+        elements.add(new Element(Element.GROUP_NODES, sequenceParent, "Parent"));
+
         // test sequence
         String stmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence"));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", "S1"));
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode"));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", "S1"));
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
@@ -335,7 +347,7 @@ public class AnalysisManager {
      * @param className
      * @return
      */
-    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className) {
+    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent) {
         ArrayList<Element> elements = new ArrayList<>();
 
         while (resultSet.hasNext()) {
@@ -357,6 +369,10 @@ public class AnalysisManager {
                         continue;
                     }
                     jsonVertex.addProperty(propertyName, stateVertex.getProperty(propertyName).toString());
+                }
+                // optionally add a parent
+                if (parent != null) {
+                    jsonVertex.addProperty("parent", parent);
                 }
                 Element element = new Element(Element.GROUP_NODES, jsonVertex, className);
                 if(stateVertex.getPropertyNames().contains("isInitial")) {
