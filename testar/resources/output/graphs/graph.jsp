@@ -83,7 +83,7 @@
             {
                 selector: 'edge',
                 style: {
-                    'width': 3,
+                    'width': 2,
                     'line-color': '#ccc',
                     'target-arrow-color': '#ccc',
                     'target-arrow-shape': 'triangle',
@@ -93,7 +93,8 @@
             {
                 selector: '.AbstractAction',
                 style: {
-                    'line-color': '#ad1a66'
+                    'line-color': '#ad1a66',
+                    'target-arrow-color': '#ad1a66'
                 }
 
             },
@@ -119,7 +120,7 @@
             {
                 selector: '.ConcreteState',
                 style: {
-                    'background-color': '#4be2ff',
+                    'background-color': '#ffa44b',
                     'background-image': function (ele) {
                         return "${modelIdentifier}/" + ele.data('id') + ".png"
                     },
@@ -130,7 +131,16 @@
             {
                 selector: '.ConcreteAction',
                 style: {
-                    'line-color': '#4be2ff'
+                    'line-color': '#ffa44b',
+                    'target-arrow-color': '#ffa44b'
+                }
+            },
+
+            {
+                selector: '.isAbstractedBy',
+                style: {
+                    'line-color': '#bdbf8f',
+                    'target-arrow-color': '#bdbf8f'
                 }
             },
 
@@ -167,7 +177,18 @@
                 selector: '.BlackHole',
                 style: {
                     'background-color': '#000000',
-                    'label': 'data(id)'
+                    'label': 'data(id)',
+                    'background-image' : "img/blackhole-bg.jpg",
+                    'background-fit': 'contain'
+                }
+            },
+
+            {
+                selector: '.UnvisitedAbstractAction',
+                style: {
+                    'line-color': "#999989",
+                    'target-arrow-color': "#999989",
+                    'width': 1
                 }
             },
 
@@ -181,7 +202,9 @@
 
         layout: {
             name: 'grid'
-        }
+        },
+
+        wheelSensitivity: 0.5
 
 
     });
@@ -234,13 +257,14 @@
             {type: "image"}
         );
 
-        // add the screenshot full image
-        let nodeImage = document.createElement("img");
-        nodeImage.alt = "Image for node " + targetNode.id();
-        nodeImage.src = "${modelIdentifier}/" + targetNode.id() + ".png";
-        nodeImage.classList.add("node-img-full");
-        popupAnchor.appendChild(nodeImage);
-        contentPanel.appendChild(popupAnchor);
+        if (targetNode.hasClass("ConcreteState")) { // add the screenshot full image
+            let nodeImage = document.createElement("img");
+            nodeImage.alt = "Image for node " + targetNode.id();
+            nodeImage.src = "${modelIdentifier}/" + targetNode.id() + ".png";
+            nodeImage.classList.add("node-img-full");
+            popupAnchor.appendChild(nodeImage);
+            contentPanel.appendChild(popupAnchor);
+        }
 
         let data = targetNode.data();
         for (let item in data) {

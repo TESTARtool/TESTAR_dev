@@ -19,7 +19,7 @@ public class GraphServlet  extends HttpServlet {
         abstractLayerRequired = request.getParameter("abstractoption") != null;
         concreteLayerRequired = request.getParameter("concreteoption") != null;
         sequenceLayerRequired = request.getParameter("sequenceoption") != null;
-        showCompoundGraph = request.getParameter("compoundgraph") != null;
+        showCompoundGraph = request.getParameter("compoundoption") != null;
         String modelIdentifier = request.getParameter("modelIdentifier");
 
         if (modelIdentifier == null || (!abstractLayerRequired && !concreteLayerRequired && !sequenceLayerRequired)) {
