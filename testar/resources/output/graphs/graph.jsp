@@ -9,6 +9,9 @@
     <script src="js/cytoscape-cose-bilkent.js"></script>
     <script src="js/cytoscape-cola.js"></script>
     <script src="js/cytoscape-euler.js"></script>
+    <script src="js/jquery-3.2.1.slim.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <link rel="stylesheet" href="css/magnific-popup.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -118,7 +121,7 @@
                 style: {
                     'background-color': '#4be2ff',
                     'background-image': function (ele) {
-                        return ele.data('id') + ".png"
+                        return "${modelIdentifier}/" + ele.data('id') + ".png"
                     },
                     'background-fit': 'contain'
                 }
@@ -224,6 +227,21 @@
             contentPanel.removeChild(child);
             child = contentPanel.lastChild;
         }
+        // create a popup anchor
+        let popupAnchor = document.createElement("a");
+        popupAnchor.href = "${modelIdentifier}/" + targetNode.id() + ".png";
+        $(popupAnchor).magnificPopup(
+            {type: "image"}
+        );
+
+        // add the screenshot full image
+        let nodeImage = document.createElement("img");
+        nodeImage.alt = "Image for node " + targetNode.id();
+        nodeImage.src = "${modelIdentifier}/" + targetNode.id() + ".png";
+        nodeImage.classList.add("node-img-full");
+        popupAnchor.appendChild(nodeImage);
+        contentPanel.appendChild(popupAnchor);
+
         let data = targetNode.data();
         for (let item in data) {
             if (data.hasOwnProperty(item)) {

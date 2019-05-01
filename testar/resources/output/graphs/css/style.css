@@ -36,7 +36,7 @@ div.layout > div {
     /*...*/
     visibility: hidden;
     transition: visibility 0s 0.6s;
-    z-index: 9999;
+    z-index: 999;
 }
 
 .cd-panel.cd-panel--is-visible {
@@ -52,7 +52,7 @@ div.layout > div {
     height: 50px;
     transition: transform 0.3s 0s;
     transform: translateY(-50px);
-    z-index: 9999;
+    z-index: 999;
 }
 
 .cd-panel--from-right .cd-panel__header {
@@ -75,7 +75,7 @@ div.layout > div {
     height: 100%;
     top: 0;
     transition: transform 0.3s 0.3s;
-    z-index: 9999;
+    z-index: 999;
     background-color: white;
     border-left: #9E9E9E;
     border-left-width: 2px;
@@ -101,4 +101,10 @@ div.layout > div {
 
 #close-panel {
     float: right;
+}
+
+img.node-img-full {
+    width: 750px;
+    height: inherit;
+    margin-bottom: 20px;
 }

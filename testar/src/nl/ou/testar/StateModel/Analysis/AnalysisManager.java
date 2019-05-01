@@ -218,7 +218,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null, modelIdentifier));
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
@@ -228,7 +228,7 @@ public class AnalysisManager {
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null, modelIdentifier));
 
 
         // unvisited abstract actions
@@ -259,7 +259,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null, modelIdentifier));
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
@@ -289,12 +289,12 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "S1" : null));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "S1" : null, modelIdentifier));
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "S1" : null));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "S1" : null, modelIdentifier));
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
@@ -353,7 +353,7 @@ public class AnalysisManager {
      * @param className
      * @return
      */
-    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent) {
+    private ArrayList<Element> fetchNodes(OResultSet resultSet, String className, String parent, String modelIdentifier) {
         ArrayList<Element> elements = new ArrayList<>();
 
         while (resultSet.hasNext()) {
@@ -371,7 +371,7 @@ public class AnalysisManager {
                     }
                     if (propertyName.equals("screenshot")) {
                         // process the screenshot separately
-                        processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()));
+                        processScreenShot(stateVertex.getProperty("screenshot"), "n" + formatId(stateVertex.getIdentity().toString()), modelIdentifier);
                         continue;
                     }
                     jsonVertex.addProperty(propertyName, stateVertex.getProperty(propertyName).toString());
@@ -428,9 +428,20 @@ public class AnalysisManager {
      * @param recordBytes
      * @param identifier
      */
-    private void processScreenShot(ORecordBytes recordBytes, String identifier) {
+    private void processScreenShot(ORecordBytes recordBytes, String identifier, String modelIdentifier) {
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+
+        // see if we have a directory for the screenshots yet
+        File screenshotDir = new File(outputDir + modelIdentifier + File.separator);
+
+        if (!screenshotDir.exists()) {
+            screenshotDir.mkdir();
+        }
+
         // save the file to disk
-        File screenshotFile = new File(outputDir + identifier + ".png");
+        File screenshotFile = new File( screenshotDir, identifier + ".png");
         try {
             FileOutputStream outputStream = new FileOutputStream(screenshotFile);
             outputStream.write(recordBytes.toStream());

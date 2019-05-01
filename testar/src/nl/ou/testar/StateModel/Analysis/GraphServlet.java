@@ -34,6 +34,7 @@ public class GraphServlet  extends HttpServlet {
 
         try {
             request.setAttribute("graphContentFile", jsonFileName);
+            request.setAttribute("modelIdentifier", modelIdentifier);
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher("/graph.jsp");
             dispatcher.forward(request, response);
         } catch (Exception e) {
