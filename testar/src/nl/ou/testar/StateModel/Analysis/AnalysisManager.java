@@ -143,20 +143,20 @@ public class AnalysisManager {
      * @param sequenceLayerRequired true if the sequence layer needs to be exported
      * @return
      */
-    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired) {
+    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
         ArrayList<Element> elements = new ArrayList<>();
         if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
             try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
                 if (abstractLayerRequired) {
-                    elements.addAll(fetchAbstractLayer(modelIdentifier, db));
+                    elements.addAll(fetchAbstractLayer(modelIdentifier, db, showCompoundGraph));
                 }
 
                 if (concreteLayerRequired) {
-                    elements.addAll(fetchConcreteLayer(modelIdentifier, db));
+                    elements.addAll(fetchConcreteLayer(modelIdentifier, db, showCompoundGraph));
                 }
 
                 if (sequenceLayerRequired) {
-                    elements.addAll(fetchSequenceLayer(modelIdentifier, db));
+                    elements.addAll(fetchSequenceLayer(modelIdentifier, db, showCompoundGraph));
                 }
 
                 if (abstractLayerRequired && concreteLayerRequired) {
@@ -204,19 +204,21 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db) {
+    private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
         ArrayList<Element> elements = new ArrayList<>();
 
-        // add a parent node for the abstract layer
-        Vertex abstractStateParent = new Vertex("A1");
-        elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
+        // optionally add a parent node for the abstract layer
+        if (showCompoundGraph) {
+            Vertex abstractStateParent = new Vertex("A1");
+            elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
+        }
 
         // abstract states
         String stmt = "SELECT FROM AbstractState WHERE modelIdentifier = :identifier";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", "A1"));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null));
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
@@ -226,7 +228,7 @@ public class AnalysisManager {
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", "A1"));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null));
 
 
         // unvisited abstract actions
@@ -243,19 +245,21 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db) {
+    private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
         ArrayList<Element> elements = new ArrayList<>();
 
-        // add a parent node for the concrete layer
-        Vertex concreteStateParent = new Vertex("C1");
-        elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
+        // optionally add a parent node for the concrete layer
+        if (showCompoundGraph) {
+            Vertex concreteStateParent = new Vertex("C1");
+            elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
+        }
 
         // concrete states
         String stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", "C1"));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null));
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
@@ -271,24 +275,26 @@ public class AnalysisManager {
      * @param db
      * @return
      */
-    private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db) {
+    private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
         ArrayList<Element> elements = new ArrayList<>();
 
-        // add a parent node for the sequence layer
-        Vertex sequenceParent = new Vertex("S1");
-        elements.add(new Element(Element.GROUP_NODES, sequenceParent, "Parent"));
+        // optionally add a parent node for the sequence layer
+        if (showCompoundGraph) {
+            Vertex sequenceParent = new Vertex("S1");
+            elements.add(new Element(Element.GROUP_NODES, sequenceParent, "Parent"));
+        }
 
         // test sequence
         String stmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence", "S1"));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "S1" : null));
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode", "S1"));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "S1" : null));
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";

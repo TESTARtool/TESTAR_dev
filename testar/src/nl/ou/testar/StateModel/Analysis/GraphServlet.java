@@ -15,10 +15,11 @@ public class GraphServlet  extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        boolean abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired = false;
+        boolean abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired, showCompoundGraph = false;
         abstractLayerRequired = request.getParameter("abstractoption") != null;
         concreteLayerRequired = request.getParameter("concreteoption") != null;
         sequenceLayerRequired = request.getParameter("sequenceoption") != null;
+        showCompoundGraph = request.getParameter("compoundgraph") != null;
         String modelIdentifier = request.getParameter("modelIdentifier");
 
         if (modelIdentifier == null || (!abstractLayerRequired && !concreteLayerRequired && !sequenceLayerRequired)) {
@@ -29,7 +30,7 @@ public class GraphServlet  extends HttpServlet {
         // todo: this needs proper error handling
         AnalysisManager analysisManager = (AnalysisManager)servletContext.getAttribute("analysisManager");
 
-        String jsonFileName = analysisManager.fetchGraphForModel(modelIdentifier, abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired);
+        String jsonFileName = analysisManager.fetchGraphForModel(modelIdentifier, abstractLayerRequired, concreteLayerRequired, sequenceLayerRequired, showCompoundGraph);
 
         try {
             request.setAttribute("graphContentFile", jsonFileName);
