@@ -34,7 +34,9 @@
  */
 package org.fruit.alayer.devices;
 
-public class KBKeys {
+import java.io.Serializable;
+
+public class KBKeys implements Serializable {
 
     private int keyCode;
 
