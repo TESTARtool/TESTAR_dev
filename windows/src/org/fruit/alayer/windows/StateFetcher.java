@@ -435,10 +435,6 @@ public class StateFetcher implements Callable<UIAState>{
 				//boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
 				//if( (!role.equals("popup menu") || correctComboBox)
 
-				if(role.contains("table")) {
-					javaTableDescend(hwnd, el, vmid, ac);
-				}
-
 				if(childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
 
 					//Bug ID 4944762- getVisibleChildren for list-like components needed
@@ -454,9 +450,17 @@ public class StateFetcher implements Callable<UIAState>{
 					long childAC;
 					int c = new Integer(childrenCount).intValue();
 					el.children = new ArrayList<UIAElement>(c);
-					for (int i=0; i<c; i++){
-						childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-						accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
+
+					if(role.contains("table")) {
+						javaTableDescend(hwnd, el, vmid, ac);
+					}
+					else {
+
+						for (int i=0; i<c; i++){
+							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
+							accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
+						}
+
 					}
 				}
 
@@ -467,63 +471,79 @@ public class StateFetcher implements Callable<UIAState>{
 		return modalElement;
 	}
 
-	private void javaTableDescend (long hwnd, UIAElement el, long vmid, long ac) {
-
-		System.out.println("AccessibleContext: "+ac);
-		
-		long[] acTable = Windows.GetAccessibleTable(vmid, ac);
-
-		System.out.println("AccessibleContext: "+acTable[0]+" AccessibleTable: "+acTable[1]);
+	private UIAElement javaTableDescend (long hwnd, UIAElement parent, long vmid, long ac) {
 
 		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
 
-		System.out.println("Rows: "+tableRowColumn[0]+" Columns: "+tableRowColumn[1]);
+		//for (int i=0; i<tableRowColumn[0]; i++){
 
-		Object[] props = Windows.GetTableCellProperties(vmid, ac, 1, 1);
+		//Harcoded to 5 rows to test
+		for (int i=0; i<5; i++){
 
-		if (props != null){
-			String name = (String) props[0];
-			String description = (String) props[1];
-			String role = (String) props[2];
-			String accesibleStateSet = (String) props[3];
-			String indexInParent = (String) props[4];
-			String childrenCount = (String) props[5];
-			String x = (String) props[6];
-			String y = (String) props[7];
-			String width = (String) props[8];
-			String height = (String) props[9];
-			String accessibleComponent = (String) props[10];
-			String accessibleAction = (String) props[11];
-			String accessibleSelection = (String) props[12];
-			String accessibleText = (String) props[13];
-			String accessibleInterfaces = (String) props[14];
+			//Select one row of the table to access properly to the cell element properties
+			Windows.SelectTableRow(vmid, ac, i);
 
-			System.out.println("------- CELL item --------");
+			long[] vmidAC;
+			if (vmid == 0)
+				vmidAC = Windows.GetAccessibleContext(hwnd);
+			else
+				vmidAC = new long[]{ vmid,ac };
 
-			System.out.println("name: "+name);
-			System.out.println("description: "+description);
-			System.out.println("role: "+role);
-			System.out.println("accesibleStateSet: "+accesibleStateSet);
-			System.out.println("indexInParent: "+indexInParent);
-			System.out.println("childrenCount: "+childrenCount);
-			System.out.println("x: "+x);
-			System.out.println("y: "+y);
-			System.out.println("width: "+width);
-			System.out.println("height: "+height);
-			System.out.println("accessibleComponent: "+accessibleComponent);
-			System.out.println("accessibleAction: "+accessibleAction);
-			System.out.println("accessibleSelection: "+accessibleSelection);
-			System.out.println("accessibleText: "+accessibleText);
-			System.out.println("accessibleInterfaces: "+accessibleInterfaces);
+			if (vmidAC != null){
+				for(int j=0; j<tableRowColumn[1]; j++) {
+					Object[] props = Windows.GetTableCellProperties(vmid, ac, 0, j);
 
+					if (props != null){
+						String name = (String) props[0];
+						String description = (String) props[1];
+						String role = (String) props[2];
+						String accesibleStateSet = (String) props[3];
+						String indexInParent = (String) props[4];
+						String childrenCount = (String) props[5];
+						String x = (String) props[6];
+						String y = (String) props[7];
+						String width = (String) props[8];
+						String height = (String) props[9];
+						String accessibleComponent = (String) props[10];
+						String accessibleAction = (String) props[11];
+						String accessibleSelection = (String) props[12];
+						String accessibleText = (String) props[13];
+						String accessibleInterfaces = (String) props[14];
+
+						Rect rect = null;
+						try {
+							rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
+									new Double(width).doubleValue(), new Double(height).doubleValue());
+						} catch (Exception e){}
+
+						UIAElement el = new UIAElement(parent);
+						parent.children.add(el);
+						el.rect = rect;
+
+						el.hwnd = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+
+						el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
+						if (el.ctrlId == Windows.UIA_MenuControlTypeId)
+							el.isTopLevelContainer = true;
+						else if (el.ctrlId == Windows.UIA_EditControlTypeId)
+							el.isKeyboardFocusable = true;
+
+						el.name = name;				
+						el.helpText = description;
+						el.automationId = role;
+
+						el.enabled = accesibleStateSet.contains("enabled");
+
+						el.blocked = !accesibleStateSet.contains("showing");
+
+						parent.root.hwndMap.put(el.hwnd, el);
+
+					}
+				}
+			}
 		}
 
-		/*for (int i=0; i<tableRowColumn[0]; i++){
-			for(int j=0; j<tableRowColumn[1]; j++) {
-				Object[] props = Windows.GetTableCellProperties(vmid, ac, i, j);
-			}
-		}*/
-
+		return parent;
 	}
 
 	//(mark a proper widget as modal)

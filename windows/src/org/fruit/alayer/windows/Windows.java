@@ -737,6 +737,7 @@ public final class Windows{
 	//Table Cell Properties
 	public static native long[] GetAccessibleTable(long vmid, long ac); // accessibleContext x accessibleTable
 	public static native int[] GetNumberOfTableRowColumn(long vmid, long ac); // row x column
+	public static native void SelectTableRow(long vmid, long ac, int row);
 	public static native Object[] GetTableCellProperties(long vmid, long ac, int row, int column);
 	
 

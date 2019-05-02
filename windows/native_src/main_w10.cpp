@@ -2758,94 +2758,48 @@ JNI_SIG(jintArray, WINAPI_NS(GetNumberOfTableRowColumn)) (JNIEnv * env, jclass, 
     return ret;
 }
 
+/** SelectTableRow */
+JNI_SIG(void, WINAPI_NS(SelectTableRow)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row){
+
+		int index = getAccessibleTableIndex((long)vmid, ac, row, 0);
+		
+		ClearAccessibleSelectionFromContext((long)vmid, ac);
+		
+		AddAccessibleSelectionFromContext((long)vmid, ac, index);
+}
+
 /** GetTableCellProperties */
 JNI_SIG(jobjectArray, WINAPI_NS(GetTableCellProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
 	
 	jobjectArray ret = 0;
 	
-	AccessibleTableInfo tableInfo;
+	AccessibleContext cellContext = GetAccessibleSelectionFromContext((long)vmid, ac, column);
 	
-	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
-		
-		/*AccessibleTable accessibleTable;
-		
-		accessibleTable = tableInfo.accessibleTable;
-		
-		
-		AccessibleContext accessibleTableContext;
-		
-		accessibleTableContext = tableInfo.accessibleContext;*/
-		
-		
-		
-		int index = getAccessibleTableIndex((long)vmid, accessibleTable, row, column);
-		
-		printf("index with method: %d \n", index);
-		
-		//Calculate index maths
-		int mathIndex = row * tableInfo.columnCount + column;
-		
-		printf("index maths: %d \n", mathIndex);
-		
-		ClearAccessibleSelectionFromContext((long)vmid, ac);
-		AddAccessibleSelectionFromContext((long)vmid, ac, index);
-		
-		int selectionCount = GetAccessibleSelectionCountFromContext((long)vmid, ac);
-		
-		printf("Selection Count: %d \n", selectionCount);
-		
-		
-		AccessibleContext accessibleSelectionContext;
-		AccessibleContextInfo nodeInfo;
-		
-		for (int selIndex = 0; selIndex < selectionCount; selIndex++) {
-			accessibleSelectionContext = GetAccessibleSelectionFromContext((long)vmid, (AccessibleSelection)ac, selIndex);
-			if(GetAccessibleContextInfo((long)vmid, accessibleSelectionContext, &nodeInfo)){
-				if(nodeInfo.indexInParent == index){
-					
-					printf("Founded cell node child \n");
-					
-					break;
-				}
-			}
-		}
-		
-		//SelectAllAccessibleSelectionFromContext((long)vmid, ac);
-		//GetAccessibleSelectionFromContext((long)vmid, ac, index);
-
+	AccessibleContextInfo info;
 	
-		/*AccessibleTableCellInfo tableCellInfo;
-		getAccessibleTableCellInfo((long)vmid, (AccessibleTable)accessibleTable, row, column, &tableCellInfo);
+	if (GetAccessibleContextInfo((long)vmid, cellContext, &info)){
 		
-		JOBJECT64 accessibleCellContext = tableCellInfo.accessibleContext;*/
+		const int ACCESSIBLE_PROPERTIES = 15;
 		
-		AccessibleContextInfo info;
+		ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
 		
-		if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)accessibleSelectionContext, &info)){
-			
-			const int ACCESSIBLE_PROPERTIES = 15;
-			
-			ret = env->NewObjectArray(ACCESSIBLE_PROPERTIES, env->FindClass("java/lang/String"), nullptr);
-			
-			env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.name)));
-			env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.description)));
-			env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.role)));
-			env->SetObjectArrayElement(ret, 3, env->NewStringUTF(wchart2String(env, info.states)));
-			env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.indexInParent)));
-			env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.childrenCount)));
-			env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.x)));
-			env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.y)));
-			env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.width)));
-			env->SetObjectArrayElement(ret, 9, env->NewStringUTF(jint2String(env, info.height)));
-			env->SetObjectArrayElement(ret, 10, env->NewStringUTF(jint2String(env, info.accessibleComponent)));
-			env->SetObjectArrayElement(ret, 11, env->NewStringUTF(jint2String(env, info.accessibleAction)));
-			env->SetObjectArrayElement(ret, 12, env->NewStringUTF(jint2String(env, info.accessibleSelection)));
-			env->SetObjectArrayElement(ret, 13, env->NewStringUTF(jint2String(env, info.accessibleText)));
-			env->SetObjectArrayElement(ret, 14, env->NewStringUTF(jint2String(env, info.accessibleInterfaces)));
-
-		}
-	
+		env->SetObjectArrayElement(ret, 0, env->NewStringUTF(wchart2String(env, info.name)));
+		env->SetObjectArrayElement(ret, 1, env->NewStringUTF(wchart2String(env, info.description)));
+		env->SetObjectArrayElement(ret, 2, env->NewStringUTF(wchart2String(env, info.role)));
+		env->SetObjectArrayElement(ret, 3, env->NewStringUTF(wchart2String(env, info.states)));
+		env->SetObjectArrayElement(ret, 4, env->NewStringUTF(jint2String(env, info.indexInParent)));
+		env->SetObjectArrayElement(ret, 5, env->NewStringUTF(jint2String(env, info.childrenCount)));
+		env->SetObjectArrayElement(ret, 6, env->NewStringUTF(jint2String(env, info.x)));
+		env->SetObjectArrayElement(ret, 7, env->NewStringUTF(jint2String(env, info.y)));
+		env->SetObjectArrayElement(ret, 8, env->NewStringUTF(jint2String(env, info.width)));
+		env->SetObjectArrayElement(ret, 9, env->NewStringUTF(jint2String(env, info.height)));
+		env->SetObjectArrayElement(ret, 10, env->NewStringUTF(jint2String(env, info.accessibleComponent)));
+		env->SetObjectArrayElement(ret, 11, env->NewStringUTF(jint2String(env, info.accessibleAction)));
+		env->SetObjectArrayElement(ret, 12, env->NewStringUTF(jint2String(env, info.accessibleSelection)));
+		env->SetObjectArrayElement(ret, 13, env->NewStringUTF(jint2String(env, info.accessibleText)));
+		env->SetObjectArrayElement(ret, 14, env->NewStringUTF(jint2String(env, info.accessibleInterfaces)));
 	}
+		
 	
 	return ret;
 	

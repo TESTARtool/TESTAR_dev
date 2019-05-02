@@ -205,7 +205,8 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 
 					if(w.get(Tags.Role).toString().contains("Tree") ||
 							w.get(Tags.Role).toString().contains("ComboBox") ||
-							w.get(Tags.Role).toString().contains("List")) {
+							w.get(Tags.Role).toString().contains("List") ||
+							w.get(Tags.Role).toString().contains("Table")) {
 						widgetTree(w, actions);
 					}
 
