@@ -30,7 +30,6 @@
 
 package es.upv.staq.testar;
 
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -59,14 +58,12 @@ public class EventHandler implements NativeKeyListener, NativeMouseListener, Nat
 
 	@Override
 	public final void nativeKeyPressed (final NativeKeyEvent key) {
-		final KBKeys press = new KBKeys(key.getKeyCode());
-		eventListener.keyDown(press);
+		eventListener.keyDown(key.getKeyCode());
     }
 
 	@Override
 	public final void nativeKeyReleased (NativeKeyEvent key) {
-		final KBKeys press = new KBKeys(key.getKeyCode());
-		eventListener.keyUp(press);
+		eventListener.keyUp(key.getKeyCode());
     }
 
 	@Override
