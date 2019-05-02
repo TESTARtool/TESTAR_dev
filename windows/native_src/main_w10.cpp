@@ -2767,18 +2767,61 @@ JNI_SIG(jobjectArray, WINAPI_NS(GetTableCellProperties)) (JNIEnv * env, jclass, 
 	
 	if(getAccessibleTableInfo((long)vmid, (AccessibleContext)ac, &tableInfo)){
 		
-		JOBJECT64 accessibleTable;
+		/*AccessibleTable accessibleTable;
 		
-		accessibleTable = (long)tableInfo.accessibleTable;
+		accessibleTable = tableInfo.accessibleTable;
+		
+		
+		AccessibleContext accessibleTableContext;
+		
+		accessibleTableContext = tableInfo.accessibleContext;*/
+		
+		
+		
+		int index = getAccessibleTableIndex((long)vmid, accessibleTable, row, column);
+		
+		printf("index with method: %d \n", index);
+		
+		//Calculate index maths
+		int mathIndex = row * tableInfo.columnCount + column;
+		
+		printf("index maths: %d \n", mathIndex);
+		
+		ClearAccessibleSelectionFromContext((long)vmid, ac);
+		AddAccessibleSelectionFromContext((long)vmid, ac, index);
+		
+		int selectionCount = GetAccessibleSelectionCountFromContext((long)vmid, ac);
+		
+		printf("Selection Count: %d \n", selectionCount);
+		
+		
+		AccessibleContext accessibleSelectionContext;
+		AccessibleContextInfo nodeInfo;
+		
+		for (int selIndex = 0; selIndex < selectionCount; selIndex++) {
+			accessibleSelectionContext = GetAccessibleSelectionFromContext((long)vmid, (AccessibleSelection)ac, selIndex);
+			if(GetAccessibleContextInfo((long)vmid, accessibleSelectionContext, &nodeInfo)){
+				if(nodeInfo.indexInParent == index){
+					
+					printf("Founded cell node child \n");
+					
+					break;
+				}
+			}
+		}
+		
+		//SelectAllAccessibleSelectionFromContext((long)vmid, ac);
+		//GetAccessibleSelectionFromContext((long)vmid, ac, index);
+
 	
-		AccessibleTableCellInfo tableCellInfo;
+		/*AccessibleTableCellInfo tableCellInfo;
 		getAccessibleTableCellInfo((long)vmid, (AccessibleTable)accessibleTable, row, column, &tableCellInfo);
 		
-		JOBJECT64 accessibleCellContext = tableCellInfo.accessibleContext;
+		JOBJECT64 accessibleCellContext = tableCellInfo.accessibleContext;*/
 		
 		AccessibleContextInfo info;
 		
-		if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)accessibleCellContext, &info)){
+		if (GetAccessibleContextInfo((long)vmid, (AccessibleContext)accessibleSelectionContext, &info)){
 			
 			const int ACCESSIBLE_PROPERTIES = 15;
 			

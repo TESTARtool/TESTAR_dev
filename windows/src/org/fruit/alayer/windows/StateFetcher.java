@@ -465,16 +465,58 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 
 		return modalElement;
-
 	}
 
 	private void javaTableDescend (long hwnd, UIAElement el, long vmid, long ac) {
+
+		System.out.println("AccessibleContext: "+ac);
 		
 		long[] acTable = Windows.GetAccessibleTable(vmid, ac);
 
+		System.out.println("AccessibleContext: "+acTable[0]+" AccessibleTable: "+acTable[1]);
+
 		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
 
+		System.out.println("Rows: "+tableRowColumn[0]+" Columns: "+tableRowColumn[1]);
+
 		Object[] props = Windows.GetTableCellProperties(vmid, ac, 1, 1);
+
+		if (props != null){
+			String name = (String) props[0];
+			String description = (String) props[1];
+			String role = (String) props[2];
+			String accesibleStateSet = (String) props[3];
+			String indexInParent = (String) props[4];
+			String childrenCount = (String) props[5];
+			String x = (String) props[6];
+			String y = (String) props[7];
+			String width = (String) props[8];
+			String height = (String) props[9];
+			String accessibleComponent = (String) props[10];
+			String accessibleAction = (String) props[11];
+			String accessibleSelection = (String) props[12];
+			String accessibleText = (String) props[13];
+			String accessibleInterfaces = (String) props[14];
+
+			System.out.println("------- CELL item --------");
+
+			System.out.println("name: "+name);
+			System.out.println("description: "+description);
+			System.out.println("role: "+role);
+			System.out.println("accesibleStateSet: "+accesibleStateSet);
+			System.out.println("indexInParent: "+indexInParent);
+			System.out.println("childrenCount: "+childrenCount);
+			System.out.println("x: "+x);
+			System.out.println("y: "+y);
+			System.out.println("width: "+width);
+			System.out.println("height: "+height);
+			System.out.println("accessibleComponent: "+accessibleComponent);
+			System.out.println("accessibleAction: "+accessibleAction);
+			System.out.println("accessibleSelection: "+accessibleSelection);
+			System.out.println("accessibleText: "+accessibleText);
+			System.out.println("accessibleInterfaces: "+accessibleInterfaces);
+
+		}
 
 		/*for (int i=0; i<tableRowColumn[0]; i++){
 			for(int j=0; j<tableRowColumn[1]; j++) {

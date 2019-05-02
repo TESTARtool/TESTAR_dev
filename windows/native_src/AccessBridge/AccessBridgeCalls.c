@@ -931,13 +931,13 @@ extern "C" {
     /**
      * Accessible Selection routines
      */
-    void addAccessibleSelectionFromContext(long vmID, AccessibleSelection as, int i) {
+    void AddAccessibleSelectionFromContext(long vmID, AccessibleSelection as, int i) {
         if (theAccessBridgeInitializedFlag == TRUE) {
             theAccessBridge.AddAccessibleSelectionFromContext(vmID, as, i);
         }
     }
 
-    void clearAccessibleSelectionFromContext(long vmID, AccessibleSelection as) {
+    void ClearAccessibleSelectionFromContext(long vmID, AccessibleSelection as) {
         if (theAccessBridgeInitializedFlag == TRUE) {
             theAccessBridge.ClearAccessibleSelectionFromContext(vmID, as);
         }
