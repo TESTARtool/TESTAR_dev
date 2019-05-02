@@ -49,6 +49,8 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean releaseCachedAutomatinElement;
 
 	private boolean accessBridgeEnabled;
+	
+	private boolean existTopJavaInternalFrame;
 
 	private static Pattern sutProcessesMatcher;
 
@@ -415,6 +417,12 @@ public class StateFetcher implements Callable<UIAState>{
 					el.isTopLevelContainer = true;
 					modalElement = el;
 				}
+				
+				if(role.contains("internal frame") && !existTopJavaInternalFrame) {
+					existTopJavaInternalFrame = true;
+					el.isTopJavaInternalFrame = true;
+				}
+				
 				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
 				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
 					el.isTopLevelContainer = true;
@@ -582,7 +590,7 @@ public class StateFetcher implements Callable<UIAState>{
 	private void calculateZIndices(UIAElement el){
 		if (el.parent != null){
 			if (this.accessBridgeEnabled) // TLC are not exposed as visible desktop controls
-				el.zindex = el.parent.zindex + (el.parent.isTopLevelContainer ? 1 : 0);
+				el.zindex = el.parent.zindex + (el.parent.isTopLevelContainer ? 1 : 0) + (el.isTopJavaInternalFrame ? 1 : 0);
 			else if (!el.isTopLevelContainer)		
 				el.zindex = el.parent.zindex;
 		}

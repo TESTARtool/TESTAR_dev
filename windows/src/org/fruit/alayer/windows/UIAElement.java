@@ -51,8 +51,8 @@ class UIAElement implements Serializable {
 	boolean blocked, enabled, ignore, isModal,
 		isContentElement, isControlElement,
 		hasKeyboardFocus, isKeyboardFocusable,
-		isTopmostWnd, isTopLevelContainer,
-		scrollPattern, hScroll, vScroll; // by urueda
+		isTopmostWnd, isTopLevelContainer, isTopJavaInternalFrame,
+		scrollPattern, hScroll, vScroll;
 	long ctrlId, culture, orientation, hwnd, wndInteractionState, wndVisualState;
 	Rect rect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
