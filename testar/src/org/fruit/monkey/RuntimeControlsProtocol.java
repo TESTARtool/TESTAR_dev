@@ -176,7 +176,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     @Override
     public void keyDown(int keyCode) {
         pressedKeyCodes.add(keyCode);
-        pressedKeyCodes.forEach(System.out::println);
 
         //  SHIFT + SPACE are pressed --> Toggle slow motion test
         if (pressedKeyCodes.contains(VC_SHIFT) && keyCode == VC_SPACE) {
