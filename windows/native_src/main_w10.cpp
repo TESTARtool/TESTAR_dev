@@ -2560,6 +2560,16 @@ JNI_SIG(jboolean, WINAPI_NS(InitializeAccessBridge)) (JNIEnv * env, jclass){
 	
 }
 
+/** isJavaWindow */
+JNI_SIG(jboolean, WINAPI_NS(isJavaWindow)) (JNIEnv * env, jclass, jlong hwnd){
+	
+	HWND window = (HWND)hwnd;
+	
+	BOOL result = IsJavaWindow(window);
+
+	return result;
+}
+
 /**
   * GetAccessibleContext
   * (copy from Windows 7) 

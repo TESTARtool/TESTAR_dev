@@ -727,6 +727,7 @@ public final class Windows{
 	 * Java AccessBridge
 	 */
 	public static native boolean InitializeAccessBridge();
+	public static native boolean isJavaWindow(long hwnd);
 	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
 	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
 	public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);

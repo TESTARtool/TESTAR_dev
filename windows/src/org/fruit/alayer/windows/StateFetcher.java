@@ -49,7 +49,7 @@ public class StateFetcher implements Callable<UIAState>{
 	private boolean releaseCachedAutomatinElement;
 
 	private boolean accessBridgeEnabled;
-	
+
 	private boolean existTopJavaInternalFrame;
 
 	private static Pattern sutProcessesMatcher;
@@ -131,7 +131,11 @@ public class StateFetcher implements Callable<UIAState>{
 		//uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
 
 		// find all visible top level windows on the desktop
-		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();		
+		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();
+
+		Iterable<Long> allJavaWindows = visibleTopLevelWindows;
+		if(this.accessBridgeEnabled)
+			allJavaWindows = this.allJavaWindows();	
 
 		UIAElement modalElement = null;
 
@@ -164,6 +168,21 @@ public class StateFetcher implements Callable<UIAState>{
 				if ((modalE = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
 					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 					modalElement = modalE;
+			}
+		}
+
+		// Associate multiple Java windows hwnd into the current uiaRoot Element
+		if(this.accessBridgeEnabled) {
+			for(long hwnd : allJavaWindows){
+				if(!uiaRoot.hwndMap.containsKey(hwnd)){
+
+					UIAElement modalE;
+
+					if ((modalE = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
+						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+						modalElement = modalE;
+
+				}
 			}
 		}
 
@@ -236,6 +255,22 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 
 		System.clearProperty("DEBUG_WINDOWS_PROCESS_NAMES");
+
+		return ret;
+	}
+
+	/* list all Java existing windows of running JVMs */
+	private Iterable<Long> allJavaWindows(){
+		Deque<Long> ret = new ArrayDeque<Long>();
+		long hwnd = Windows.GetWindow(Windows.GetDesktopWindow(), Windows.GW_CHILD);
+
+		while(hwnd != 0){
+
+			if(Windows.isJavaWindow(hwnd))
+				ret.addFirst(hwnd);
+
+			hwnd = Windows.GetNextWindow(hwnd, Windows.GW_HWNDNEXT);
+		}
 
 		return ret;
 	}
@@ -417,12 +452,12 @@ public class StateFetcher implements Callable<UIAState>{
 					el.isTopLevelContainer = true;
 					modalElement = el;
 				}
-				
+
 				if(role.contains("internal frame") && !existTopJavaInternalFrame) {
 					existTopJavaInternalFrame = true;
 					el.isTopJavaInternalFrame = true;
 				}
-				
+
 				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
 				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
 					el.isTopLevelContainer = true;

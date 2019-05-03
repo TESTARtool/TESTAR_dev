@@ -210,6 +210,7 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 						widgetTree(w, actions);
 					}
 
+					//Force actions into JInternalFrame and SpinBox swing components
 					if(w.get(UIATags.UIAAutomationId,"").contains("internal frame")) {
 						createActionsForJInternalFrame(w, actions);
 					}
