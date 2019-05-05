@@ -33,9 +33,6 @@
  */
 package org.fruit.alayer.actions;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-
 import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -44,16 +41,20 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.exceptions.ActionFailedException;
+
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
+import static java.awt.event.KeyEvent.VK_SHIFT;
 
 /**
  * An action that types a given text on the StandardKeyboard of the SUT.
  */
 public final class Type extends TaggableBase implements Action {
 
-	private static final long serialVersionUID = 2555715152455716781L;
-	private static final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder();
+    private static final long serialVersionUID = 2555715152455716781L;
+	private static final CharsetEncoder asciiEncoder = Charset.forName("UTF-32").newEncoder();
 	private final String text;
 	
 	public Type(String text){
@@ -67,8 +68,8 @@ public final class Type extends TaggableBase implements Action {
 		Assert.notNull(system);
 		
 		double d = duration / text.length();
-		Action shiftDown = new KeyDown(KBKeys.VK_SHIFT);
-		Action shiftUp = new KeyUp(KBKeys.VK_SHIFT);
+        Action shiftDown = new KeyDown(VK_SHIFT);
+        Action shiftUp = new KeyUp(VK_SHIFT);
 		for(int i = 0; i < text.length(); i++){
 			char c = text.charAt(i);
 			boolean shift = false;
@@ -80,33 +81,23 @@ public final class Type extends TaggableBase implements Action {
 					shift = true;
 			}
 			
-			KBKeys key = getKey(c);
-						
-			if(shift)
-				shiftDown.run(system, state, .0);
-			new KeyDown(key).run(system, state, .0);
-			new KeyUp(key).run(system, state, .0);
-			if(shift)
-				shiftUp.run(system, state, .0);
-			Util.pause(d);
-		}
-	}
-		
-	public static void checkAscii(String text){
-	    if (!asciiEncoder.canEncode(text))
-	    	throw new IllegalArgumentException("This string is not an ascii string!");
-	}
-	
-	private KBKeys getKey(char c) {
-        for (KBKeys key : KBKeys.values()) {
-            if (key.code() == (int) c) {
-                return key;
-            }
-        }
+            int key = c;
 
-        throw new IllegalArgumentException("Unable to find the corresponding keycode for character '" + c + "(" + ((int)c) +  ")'!");
+            if (shift)
+                shiftDown.run(system, state, .0);
+            new KeyDown(key).run(system, state, .0);
+            new KeyUp(key).run(system, state, .0);
+            if (shift)
+                shiftUp.run(system, state, .0);
+            Util.pause(d);
+        }
     }
-	
+
+    public static void checkAscii(String text) {
+        if (!asciiEncoder.canEncode(text))
+            throw new IllegalArgumentException("This string is not an ascii string!");
+    }
+
 	public String toString(){ return "Type text '" + text + "'"; }
 	
 	// by urueda

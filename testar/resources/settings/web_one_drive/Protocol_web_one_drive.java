@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
+*
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  * 3. Neither the name of the copyright holder nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- *
+*
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,7 +37,6 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
@@ -53,6 +52,7 @@ import org.testar.protocols.DesktopProtocol;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Enabled;
+import static org.fruit.alayer.Tags.Title;
 
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
@@ -62,11 +62,11 @@ import static org.fruit.alayer.Tags.Enabled;
 public class Protocol_web_one_drive extends DesktopProtocol {
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-	static final int BROWSER_IEXPLORER = 1;
-	static final int BROWSER_FIREFOX = 2;
-	static int browser; // BROWSER_*
-	static Role webController, webText; // browser dependent
-	static double browser_toolbar_filter;	
+    static final int BROWSER_IEXPLORER = 1;
+    static final int BROWSER_FIREFOX = 2;
+    static int browser; // BROWSER_*
+    static Role webController, webText; // browser dependent
+    static double browser_toolbar_filter;
 
 	// check browser
 	private void initBrowser(){
@@ -103,7 +103,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		Keyboard kb = AWTKeyboard.build();
 
 		/**
-		 * START Option 1: 
+		 * START Option 1:
 		 * read the widgets of the current state and execute action based on them
 		 */
 		State state = getState(sut);
@@ -172,8 +172,8 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		 * START Option2:
 		 *  Work doing keyboard actions, without check the state and widgets
 		 */
-		/*new CompoundAction.Builder()   
-		.add(new Type("testarhandson"),0.5).build() //assume keyboard focus is on the user field   
+		/*new CompoundAction.Builder()
+		.add(new Type("testarhandson"),0.5).build() //assume keyboard focus is on the user field
 		.run(sut, null, 0.5);
 
 		kb.press(KBKeys.VK_SHIFT);
@@ -181,7 +181,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		kb.release(KBKeys.VK_2);
 		kb.release(KBKeys.VK_SHIFT);
 
-		new CompoundAction.Builder()  
+		new CompoundAction.Builder()
 		.add(new Type("gmail.com"),0.5)
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
 		.run(sut, null, 1);
@@ -189,8 +189,8 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		Util.pause(8);
 
 		new CompoundAction.Builder()
-		.add(new Type("0neDrivetestar"),0.5)   
-		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
+		.add(new Type("0neDrivetestar"),0.5)
+		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER
 		.run(sut, null, 1);
 
 		//Wait a bit
@@ -252,7 +252,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			shape = w.get(Tags.Shape, null);
 
 			// Check that all images have an alternate textual description (accessibility, W3C WAI)
-			verdict = verdict.join(getW3CWAIVerdict(state, w, role, title));				
+			verdict = verdict.join(getW3CWAIVerdict(state, w, role, title));
 
 			// check for too small texts to be legible
 			verdict = verdict.join(getSmallTextVerdict(state, w, role, shape));
@@ -262,7 +262,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		}
 
-		return verdict;		
+        return verdict;
 
 	}
 
@@ -280,7 +280,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
 					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
 		else
-			return Verdict.OK;	
+			return Verdict.OK;
 	}
 
 	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
@@ -289,12 +289,14 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
+							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
+							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));
 			}
-		} catch (NoSuchTagException nste) { return Verdict.OK; }
+        } catch (NoSuchTagException nste) {
+            return Verdict.OK;
+        }
 		return Verdict.OK;
 	}
 
@@ -311,7 +313,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		Set<Action> actions = super.deriveActions(system,state);
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
+        // unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -353,10 +355,10 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		}
 
-		return actions;
-	}
+        return actions;
+    }
 
-	private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
+    private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
 
 	@Override
 	protected boolean isClickable(Widget w){		
