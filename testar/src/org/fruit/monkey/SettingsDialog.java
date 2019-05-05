@@ -35,8 +35,8 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
-import nl.ou.testar.GraphDBPanel;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
+import nl.ou.testar.tl.TemporalPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -89,6 +89,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private StateModelPanel stateModelPanel;
+  private TemporalPanel temporalPanel;
 
   /**
    * Starts the settings Dialog.
@@ -271,6 +272,8 @@ public class SettingsDialog extends JFrame implements Observer {
     miscPanel = new MiscPanel();
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
+    jTabsPane.addTab("State Model", stateModelPanel);
+    temporalPanel = TemporalPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
 
     setLayout(jTabsPane);
