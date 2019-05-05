@@ -83,7 +83,6 @@ import org.fruit.alayer.actions.KillProcess;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.AWTMouse;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -723,7 +722,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 // THERE MUST ALMOST BE ONE ACTION!
                 //----------------------------------
                 // if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
+                Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
                 CodingManager.buildIDs(state, escAction);
                 actions.add(escAction);
                 escAttempts++;
@@ -962,7 +961,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 // THERE MUST ALMOST BE ONE ACTION!
                 //----------------------------------
                 // if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
+                Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
                 CodingManager.buildIDs(state, escAction);
                 actions.add(escAction);
                 escAttempts++;
@@ -1565,7 +1564,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         else if (this.forceNextActionESC) {
             System.out.println("DEBUG: Forcing ESC action in preActionSelection");
             LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-            Action a = new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE));
+            Action a = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
             CodingManager.buildIDs(state, a);
             this.forceNextActionESC = false;
             return a;
@@ -1831,8 +1830,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
                 return null;
             }
-        } else if (userEvent[0] instanceof KBKeys) // key events
-            return (new AnnotatingActionCompiler()).hitKey((KBKeys) userEvent[0]);
+        } else if (userEvent[0] instanceof Integer) // key events
+            return (new AnnotatingActionCompiler()).hitKey((int) userEvent[0]);
         else if (userEvent[0] instanceof String) { // type events
             if (lastExecutedAction == null)
                 return null;

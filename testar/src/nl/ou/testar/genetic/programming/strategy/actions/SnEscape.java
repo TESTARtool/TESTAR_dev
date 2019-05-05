@@ -5,7 +5,6 @@ import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.devices.KBKeys;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +19,7 @@ public class SnEscape extends StrategyNodeAction {
 
     @Override
     public Optional<Action> getAction(final StrategyGuiState state) {
-        return Optional.of(new AnnotatingActionCompiler().hitKey(new KBKeys(VK_ESCAPE)));
+        return Optional.of(new AnnotatingActionCompiler().hitKey(VK_ESCAPE));
     }
 
 }

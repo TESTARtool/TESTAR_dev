@@ -38,6 +38,8 @@ import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.CompoundAction;
+import org.fruit.alayer.actions.KeyDown;
+import org.fruit.alayer.actions.KeyUp;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -48,6 +50,10 @@ import org.fruit.monkey.Settings;
 
 import java.util.Set;
 
+import static java.awt.event.KeyEvent.VK_1;
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_F4;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -97,15 +103,15 @@ public class Protocol_desktop_wincalc extends ClickFilterLayerProtocol { // Defa
 		if (mode() != Modes.Spy){
 			// bring the calculator to an initial state
 	        new CompoundAction.Builder()
-//	            .add(new KeyDown(VK_ALT),0.2)
-//	            .add(new KeyDown(KBKeys.VK_1),0.1)
-//	            .add(new KeyUp(KBKeys.VK_1),0.0)
-//	            .add(new KeyUp(KBKeys.VK_ALT),0.0)
-//	            .add(new NOP(),0.1)
-//	            .add(new KeyDown(KBKeys.VK_CONTROL),0.2)
-//	            .add(new KeyDown(KBKeys.VK_F4),0.1)
-//	            .add(new KeyUp(KBKeys.VK_F4),0.0)
-//	            .add(new KeyUp(KBKeys.VK_CONTROL),0.0)
+	            .add(new KeyDown(VK_ALT),0.2)
+	            .add(new KeyDown(VK_1),0.1)
+	            .add(new KeyUp(VK_1),0.0)
+	            .add(new KeyUp(VK_ALT),0.0)
+	            .add(new NOP(),0.1)
+	            .add(new KeyDown(VK_CONTROL),0.2)
+	            .add(new KeyDown(VK_F4),0.1)
+	            .add(new KeyUp(VK_F4),0.0)
+	            .add(new KeyUp(VK_CONTROL),0.0)
 	            .add(new NOP(),0.1)
 	            .build()
 	            .run(sut, null, 0.8);

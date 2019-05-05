@@ -51,10 +51,10 @@ public final class AWTKeyboard implements Keyboard {
 	}
 	
 	public String toString() { return "AWT Keyboard"; }
-	public void press(KBKeys k) { robot.keyPress(k.code());	}	
-	public void release(KBKeys k) { robot.keyRelease(k.code());	}
+	public void press(int k) { robot.keyPress(k);	}
+	public void release(int k) { robot.keyRelease(k);	}
 
-	public void isPressed(KBKeys k) {
+	public void isPressed(int k) {
 		throw new UnsupportedOperationException("Unfortunately AWT Keyboard cannot poll the keyboard's state!");
 	}
 }
