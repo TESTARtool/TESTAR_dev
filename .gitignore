@@ -10,3 +10,4 @@ doc/
 */.classpath
 .settings
 build.bat
+/graph

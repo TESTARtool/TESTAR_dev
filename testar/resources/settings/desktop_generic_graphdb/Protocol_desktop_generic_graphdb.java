@@ -175,16 +175,13 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 			for(Widget w : getTopWidgets(state)){
 				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						//storeWidget(state.get(Tags.ConcreteID), w);
 						// left clicks
 						if(whiteListed(w) || isClickable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.leftClickAt(w));
 						}
 
 						// type into text boxes
 						if(whiteListed(w) || isTypeable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
 							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 						}
 						// slides
@@ -208,6 +205,15 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
 		return super.selectAction(state, actions);
 
 	}
@@ -243,9 +249,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-
 		return super.moreActions(state);
-
 	}
 
 	/** 
@@ -253,9 +257,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void finishSequence(){
-		
 		super.finishSequence();
-		
 	}
 
 	/**
@@ -265,9 +267,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * @return  if <code>true</code> continue test, else stop	 */
 	@Override
 	protected boolean moreSequences() {
-
 		return super.moreSequences();
-
 	}
 
 	private class ButtonColor extends CustomType {
@@ -283,7 +283,6 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	}
 	
 }
-
 
  class ButtonColorTags extends TagsBase {
 	 public static Tag<Integer> RED_VALUE = from("red", Integer.class);

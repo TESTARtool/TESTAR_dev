@@ -38,6 +38,7 @@ dependencies {
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
     compile 'com.1stleg:jnativehook:2.1.0'
+    compile 'com.google.guava:guava:26.0-jre'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
