@@ -22,6 +22,8 @@ img.logo {
     padding-top: 10px;
 }
 div.layout {
+    margin-top: 50px;
+    margin-left: 50px;
     display: inline-block;
     vertical-align: top;
 }
@@ -99,8 +101,9 @@ div.layout > div {
     transition-delay: 0s;
 }
 
-#close-panel {
+#close-panel, #toggle-visible, #highlight {
     float: right;
+    margin-right: 10px;
 }
 
 img.node-img-full {

@@ -34,6 +34,9 @@
         <div>
             <label for="show-labels"><input type="checkbox" id="show-labels" checked> Show node labels</label>
         </div>
+        <div>
+            <button id="show-all" type="button">Show all nodes</button>
+        </div>
     </div>
 </div>
 
@@ -197,6 +200,24 @@
                 style: {
                     'label': ''
                 }
+            },
+
+            {
+                selector: '.invisible',
+                style: {
+                    'display' : 'none'
+                }
+            },
+
+            {
+                selector: '.dim',
+                style: {
+                    'line-color': "#FFFFFF",
+                    'target-arrow-color': "#FFFFFF",
+                    'background-color': '#FFFFFF',
+                    'border-color': '#FFFFFF',
+                    'background-image-opacity': 0.05
+                }
             }
         ],
 
@@ -245,11 +266,46 @@
         let targetNode = evt.target;
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
+
+        // remove all the current child elements
         let child = contentPanel.lastChild;
         while (child) {
             contentPanel.removeChild(child);
             child = contentPanel.lastChild;
         }
+
+        // add a visibility button
+        let visButton = document.createElement("button");
+        visButton.id = "toggle-visible";
+        visButton.appendChild(document.createTextNode("Make invisible"));
+        visButton.addEventListener("click", function () {
+            targetNode.addClass("invisible");
+        });
+        contentPanel.appendChild(visButton);
+
+        // add a highlight button
+        let highlightButton = document.createElement("button");
+        highlightButton.id = "highlight";
+        highlightButton.appendChild(document.createTextNode("Highlight"));
+        highlightButton.addEventListener("click", function () {
+            // let selectedItems = cy.collection();
+            // console.log(selectedItems.size());
+            // selectedItems = selectedItems.union(targetNode);
+            // console.log(selectedItems.size());
+            //
+            // let nbh = selectedItems.neighborhood();
+            // console.log(nbh);
+            // selectedItems = selectedItems.union(selectedItems.neighborhood());
+            // console.log(selectedItems.size());
+            // let otherItems = cy.$("*").difference(selectedItems);
+            // console.log(cy.$("*").size());
+            // console.log(otherItems.size());
+            // otherItems.addClass("invisible");
+
+            cy.$("*").difference(cy.$(targetNode).closedNeighborhood()).addClass("dim");
+        });
+        contentPanel.appendChild(highlightButton);
+
         // create a popup anchor
         let popupAnchor = document.createElement("a");
         popupAnchor.href = "${modelIdentifier}/" + targetNode.id() + ".png";
@@ -257,6 +313,7 @@
             {type: "image"}
         );
 
+        // add the screenshot image if the node is a concrete state
         if (targetNode.hasClass("ConcreteState")) { // add the screenshot full image
             let nodeImage = document.createElement("img");
             nodeImage.alt = "Image for node " + targetNode.id();
@@ -269,8 +326,6 @@
         let data = targetNode.data();
         for (let item in data) {
             if (data.hasOwnProperty(item)) {
-
-                console.log(item);
                 let nodeContent = document.createElement("div");
                 let textContent = document.createTextNode(item + " : " + data[item]);
                 nodeContent.appendChild(textContent);
@@ -280,8 +335,13 @@
 
         sidePanel.classList.add("cd-panel--is-visible");
         // console.log( 'tapped ' + node.id() );
-        console.log(targetNode.data());
     });
+
+    let showAllButton = document.getElementById("show-all");
+    showAllButton.addEventListener("click", function () {
+        cy.$('.invisible').removeClass('invisible');
+        cy.$('.dim').removeClass('dim');
+    })
 
 </script>
 </body>
