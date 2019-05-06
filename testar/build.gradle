@@ -56,6 +56,11 @@ task prepareSettings(type: Copy) {
     into 'target/scripts/settings'
 }
 
+task prepareSUTs(type: Copy) {
+    from 'distributionSUTs'
+    into 'target/scripts/suts'
+}
+
 task prepareOracles(type: Copy) {
     from 'target/classes/java/oracle'
     into 'target/scripts/settings'

@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "suts/calc.jar"
+SUTConnectorValue = java -jar "suts/calculator.jar"
 
 #################################################################
 # Sequences
