@@ -33,8 +33,10 @@ package nl.ou.testar.tl;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -206,20 +208,24 @@ public class TemporalPanel extends JPanel {
                webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
                logCheckResult.append("Visualizer Started. goto http://localhost:8050");
                logCheckResult.append("\n");
+               Desktop desktop = java.awt.Desktop.getDesktop();
+               URI uri = new URI("http://localhost:8050");
+               desktop.browse(uri);
                // any error message?
                try
                {
-               StreamConsumer errorGobbler = new
+               StreamConsumer errorConsumer = new
                        StreamConsumer (webAnalyzerProcess.getErrorStream(), "ERROR");
 
+
                // any output?
-                   StreamConsumer  outputGobbler = new
+                   StreamConsumer  outputConsumer = new
                            StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
 
 
                // kick them off
-               errorGobbler.start();
-               outputGobbler.start();
+               errorConsumer.start();
+               outputConsumer.start();
 
                // any error???
            } catch (Throwable t)
@@ -233,7 +239,7 @@ public class TemporalPanel extends JPanel {
                logCheckResult.append("\n");
            }
         }
-        catch(IOException e)
+        catch(Exception e)
         {
             System.err.println("Error on exec() method");
             logCheckResult.append("Error on exec() method");
