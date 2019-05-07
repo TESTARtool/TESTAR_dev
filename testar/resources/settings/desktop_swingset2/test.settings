@@ -36,6 +36,11 @@ SUTConnectorValue = java -jar "suts/SwingSet2.jar"
 
 AccessBridgeEnabled = true
 
+VisualizeJavaTable = true
+NumberRowVisualizeJavaTable = 1
+
+MaxJavaTableCellsToGenerate = 50
+
 #################################################################
 # Sequences
 #

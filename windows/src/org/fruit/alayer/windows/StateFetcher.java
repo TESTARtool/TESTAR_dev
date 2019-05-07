@@ -46,20 +46,20 @@ public class StateFetcher implements Callable<UIAState>{
 
 	transient long pAutomation, pCacheRequest;
 
-	private boolean releaseCachedAutomatinElement;
+	public static boolean releaseCachedAutomatinElement;
 
 	private boolean accessBridgeEnabled;
-
-	private boolean existTopJavaInternalFrame;
 
 	private static Pattern sutProcessesMatcher;
 
 	public StateFetcher(SUT system, long pAutomation, long pCacheRequest,
 			boolean accessBridgeEnabled, String SUTProcesses){		
+		
 		this.system = system;
 		this.pAutomation = pAutomation;
 		this.pCacheRequest = pCacheRequest;
 		this.accessBridgeEnabled = accessBridgeEnabled;
+		
 		if (SUTProcesses == null || SUTProcesses.isEmpty())
 			StateFetcher.sutProcessesMatcher = null;
 		else
@@ -128,32 +128,29 @@ public class StateFetcher implements Callable<UIAState>{
 			return uiaRoot;
 
 		uiaRoot.pid = system.get(Tags.PID);
-		//uiaRoot.isForeground = WinProcess.isForeground(uiaRoot.pid);
 
 		// find all visible top level windows on the desktop
 		Iterable<Long> visibleTopLevelWindows = this.visibleTopLevelWindows();
-
-		Iterable<Long> allJavaWindows = visibleTopLevelWindows;
-		if(this.accessBridgeEnabled)
-			allJavaWindows = this.allJavaWindows();	
 
 		UIAElement modalElement = null;
 
 		// descend the root windows which belong to our process, using UIAutomation
 		uiaRoot.children = new ArrayList<UIAElement>();
+		
 		boolean owned;
 		long hwndPID;
-		List<Long> ownedWindows = new ArrayList<Long>();
+		List<Long> ownedWindows = new ArrayList<>();
+		
 		for(long hwnd : visibleTopLevelWindows){
+			
 			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
-			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
 			hwndPID = Windows.GetWindowProcessId(hwnd);
 			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){
 				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); //( SUT as a set of windows/processes )				
 				if(!owned){
 					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
-					modalElement = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
-						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
+					modalElement = this.accessBridgeEnabled ? BuilderAccessBridge.accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
+						BuilderUIAutomation.UIAutomationDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
 				} else
 					ownedWindows.add(hwnd);
 			}
@@ -165,21 +162,23 @@ public class StateFetcher implements Callable<UIAState>{
 				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
 				UIAElement modalE;
 
-				if ((modalE = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
-					uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+				if ((modalE = this.accessBridgeEnabled ? BuilderAccessBridge.accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
+					BuilderUIAutomation.UIAutomationDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 					modalElement = modalE;
 			}
 		}
 
 		// Associate multiple Java windows hwnd into the current uiaRoot Element
 		if(this.accessBridgeEnabled) {
+			Iterable<Long> allJavaWindows = this.allJavaWindows();
+			
 			for(long hwnd : allJavaWindows){
 				if(!uiaRoot.hwndMap.containsKey(hwnd)){
 
 					UIAElement modalE;
 
-					if ((modalE = this.accessBridgeEnabled ? accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
-						uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+					if ((modalE = this.accessBridgeEnabled ? BuilderAccessBridge.accessBridgeDescend(hwnd, uiaRoot, 0, 0) :
+						BuilderUIAutomation.UIAutomationDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
 						modalElement = modalE;
 
 				}
@@ -259,7 +258,7 @@ public class StateFetcher implements Callable<UIAState>{
 		return ret;
 	}
 
-	/* list all Java existing windows of running JVMs */
+	/* list all existing Java windows of running JVMs */
 	private Iterable<Long> allJavaWindows(){
 		Deque<Long> ret = new ArrayDeque<Long>();
 		long hwnd = Windows.GetWindow(Windows.GetDesktopWindow(), Windows.GW_CHILD);
@@ -300,307 +299,6 @@ public class StateFetcher implements Callable<UIAState>{
 
 		for(int i = 0; i < el.children.size(); i++)
 			buildTLCMap(builder, el.children.get(i));
-	}
-
-	private UIAElement uiaDescend(long hwnd, long uiaPtr, UIAElement parent){ //(returns a modal widget if detected)
-		if(uiaPtr == 0)
-			return null;
-
-		UIAElement modalElement = null;
-
-		UIAElement el = new UIAElement(parent);
-		parent.children.add(el);
-
-		el.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaPtr, true);			
-		el.hwnd = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaPtr, true);
-
-		// bounding rectangle
-		long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaPtr, true);
-		if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
-			el.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
-
-		el.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaPtr, true);
-		el.name = Windows.IUIAutomationElement_get_Name(uiaPtr, true);
-		el.helpText = Windows.IUIAutomationElement_get_HelpText(uiaPtr, true); 
-		el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaPtr, true);
-		el.className = Windows.IUIAutomationElement_get_ClassName(uiaPtr, true); 
-		el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaPtr, true); 
-		el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaPtr, true); 
-		el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaPtr, true);
-		el.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaPtr, true);
-		el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaPtr, true);
-		el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaPtr, true); 
-		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaPtr, true);
-		el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaPtr, true);
-		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
-		el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaPtr, Windows.UIA_ValuePatternId);
-
-		parent.root.hwndMap.put(el.hwnd, el);
-
-		// get extra infos from windows
-		if(el.ctrlId == Windows.UIA_WindowControlTypeId){
-			//long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
-			long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
-			if(uiaWndPtr != 0){
-				el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWndPtr, true);
-				el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
-				el.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWndPtr, true);
-				el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWndPtr, true);
-				Windows.IUnknown_Release(uiaWndPtr);
-			}
-			el.culture = Windows.IUIAutomationElement_get_Culture(uiaPtr, true);
-		}
-
-		if (!el.isModal && el.automationId != null &&
-				(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
-			modalElement = markModal(el);
-		}
-		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true); 
-		el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-		if (el.scrollPattern){
-			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_CLIENT);
-			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_HSCROLL);
-			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_VSCROLL);
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
-			el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
-			el.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
-			el.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
-			el.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
-			el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
-			el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-		}	
-
-		// descend children
-		long uiaChildrenPtr = Windows.IUIAutomationElement_GetCachedChildren(uiaPtr);
-		if (releaseCachedAutomatinElement)
-			Windows.IUnknown_Release(uiaPtr);
-
-		if(uiaChildrenPtr != 0){
-			long count = Windows.IUIAutomationElementArray_get_Length(uiaChildrenPtr);
-
-			if(count > 0){
-				el.children = new ArrayList<UIAElement>((int)count);
-
-				for(int i = 0; i < count; i++){
-					long ptrChild = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPtr, i);
-					if(ptrChild != 0){
-						UIAElement modalE = uiaDescend(hwnd, ptrChild, el);
-						if (modalE != null && modalElement == null) // parent-modal is preferred to child-modal
-							modalElement = modalE;						
-					}
-				}
-			}
-			Windows.IUnknown_Release(uiaChildrenPtr);
-		}
-
-		return modalElement;
-	}
-
-	/**
-	 * From a windows HWND use the Java Access Bridge API to build an UIAElement
-	 * that represents the element hierarchy of Java applications
-	 */
-	private UIAElement accessBridgeDescend(long hwnd, UIAElement parent, long vmid, long ac){
-		UIAElement modalElement = null;
-
-		long[] vmidAC;
-		if (vmid == 0)
-			vmidAC = Windows.GetAccessibleContext(hwnd);
-		else
-			vmidAC = new long[]{ vmid,ac };
-
-		if (vmidAC != null){
-			Object[] props = Windows.GetAccessibleContextProperties(vmidAC[0],vmidAC[1]);
-			if (props != null){
-				String name = (String) props[0];
-				String description = (String) props[1];
-				String role = (String) props[2];
-				String accesibleStateSet = (String) props[3];
-				String indexInParent = (String) props[4];
-				String childrenCount = (String) props[5];
-				String x = (String) props[6];
-				String y = (String) props[7];
-				String width = (String) props[8];
-				String height = (String) props[9];
-				String accessibleComponent = (String) props[10];
-				String accessibleAction = (String) props[11];
-				String accessibleSelection = (String) props[12];
-				String accessibleText = (String) props[13];
-				String accessibleInterfaces = (String) props[14];
-
-				Rect rect = null;
-				try {
-					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-							new Double(width).doubleValue(), new Double(height).doubleValue());
-					//if (parent.parent == null)
-					//	parent.rect = el.rect; // fix UI actions at root widget
-				} catch (Exception e){
-					return null;
-				}
-
-				UIAElement el = new UIAElement(parent);
-				parent.children.add(el);
-				el.rect = rect;
-
-				el.hwnd = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
-				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
-					el.isTopLevelContainer = true;
-					modalElement = el;
-				}
-
-				if(role.contains("internal frame") && !existTopJavaInternalFrame) {
-					existTopJavaInternalFrame = true;
-					el.isTopJavaInternalFrame = true;
-				}
-
-				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
-				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
-					el.isTopLevelContainer = true;
-				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
-					el.isKeyboardFocusable = true;
-
-				el.name = name;				
-				el.helpText = description;
-				el.automationId = role;
-
-				el.enabled = accesibleStateSet.contains("enabled");
-
-				el.blocked = !accesibleStateSet.contains("showing");
-
-				parent.root.hwndMap.put(el.hwnd, el);
-
-				//Sometimes popup menu are duplicated with AccessBridge when we open one Menu or combo box
-				//boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
-				//if( (!role.equals("popup menu") || correctComboBox)
-
-				if(childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
-
-					//Bug ID 4944762- getVisibleChildren for list-like components needed
-
-					/*int cc = Windows.GetVisibleChildrenCount(vmidAC[0], vmidAC[1]);					
-					if (cc > 0){
-						el.children = new ArrayList<UIAElement>(cc);
-						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
-						for (int i=0; i<children.length; i++)
-							accessBridgeDescend(hwnd,el,vmidAC[0],children[i]);
-					}*/
-
-					long childAC;
-					int c = new Integer(childrenCount).intValue();
-					el.children = new ArrayList<UIAElement>(c);
-
-					if(role.contains("table")) {
-						javaTableDescend(hwnd, el, vmid, ac);
-					}
-					else {
-
-						for (int i=0; i<c; i++){
-							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
-							accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
-						}
-
-					}
-				}
-
-			}
-
-		}
-
-		return modalElement;
-	}
-
-	private UIAElement javaTableDescend (long hwnd, UIAElement parent, long vmid, long ac) {
-
-		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
-
-		//for (int i=0; i<tableRowColumn[0]; i++){
-
-		//Harcoded to 5 rows to test
-		for (int i=0; i<5; i++){
-
-			//Select one row of the table to access properly to the cell element properties
-			Windows.SelectTableRow(vmid, ac, i);
-
-			long[] vmidAC;
-			if (vmid == 0)
-				vmidAC = Windows.GetAccessibleContext(hwnd);
-			else
-				vmidAC = new long[]{ vmid,ac };
-
-			if (vmidAC != null){
-				for(int j=0; j<tableRowColumn[1]; j++) {
-					Object[] props = Windows.GetTableCellProperties(vmid, ac, 0, j);
-
-					if (props != null){
-						String name = (String) props[0];
-						String description = (String) props[1];
-						String role = (String) props[2];
-						String accesibleStateSet = (String) props[3];
-						String indexInParent = (String) props[4];
-						String childrenCount = (String) props[5];
-						String x = (String) props[6];
-						String y = (String) props[7];
-						String width = (String) props[8];
-						String height = (String) props[9];
-						String accessibleComponent = (String) props[10];
-						String accessibleAction = (String) props[11];
-						String accessibleSelection = (String) props[12];
-						String accessibleText = (String) props[13];
-						String accessibleInterfaces = (String) props[14];
-
-						Rect rect = null;
-						try {
-							rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
-									new Double(width).doubleValue(), new Double(height).doubleValue());
-						} catch (Exception e){}
-
-						UIAElement el = new UIAElement(parent);
-						parent.children.add(el);
-						el.rect = rect;
-
-						el.hwnd = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
-
-						el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
-						if (el.ctrlId == Windows.UIA_MenuControlTypeId)
-							el.isTopLevelContainer = true;
-						else if (el.ctrlId == Windows.UIA_EditControlTypeId)
-							el.isKeyboardFocusable = true;
-
-						el.name = name;				
-						el.helpText = description;
-						el.automationId = role;
-
-						el.enabled = accesibleStateSet.contains("enabled");
-
-						el.blocked = !accesibleStateSet.contains("showing");
-
-						parent.root.hwndMap.put(el.hwnd, el);
-
-					}
-				}
-			}
-		}
-
-		return parent;
-	}
-
-	//(mark a proper widget as modal)
-	private UIAElement markModal(UIAElement element){
-		if (element == null)
-			return null; // no proper widget found to mark as modal
-		else if (element.ctrlId != Windows.UIA_WindowControlTypeId && element.ctrlId != Windows.UIA_PaneControlTypeId &&
-				element.ctrlId != Windows.UIA_GroupControlTypeId){
-			return markModal(element.parent);
-		}
-		else {
-			element.isModal = true;
-			return element;
-		}
 	}
 
 	private void markBlockedElements(UIAElement element){

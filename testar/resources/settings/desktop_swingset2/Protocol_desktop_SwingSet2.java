@@ -28,12 +28,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- *  @author Urko Rueda Molina (protocol refactor & cleanup)
- */
-
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,12 +60,13 @@ import org.fruit.alayer.devices.KBKeys;
 
 import static org.fruit.monkey.ConfigTags.*;
 
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import es.upv.staq.testar.protocols.JavaSwingProtocol;
 
 import static org.fruit.alayer.Tags.NotResponding;
 import static org.fruit.alayer.Tags.IsRunning;
@@ -82,24 +77,18 @@ import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
-
-
-public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
-
+public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
-
 	protected void initialize(Settings settings){
 
 		super.initialize(settings);
 
 	}
-
-
 
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
@@ -185,8 +174,10 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
+		//for(Widget w : getTopWidgets(state)){
+		
 		// iterate through all widgets
-		for(Widget w : getTopWidgets(state)){
+		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -207,7 +198,7 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 							w.get(Tags.Role).toString().contains("ComboBox") ||
 							w.get(Tags.Role).toString().contains("List") ||
 							w.get(Tags.Role).toString().contains("Table")) {
-						widgetTree(w, actions);
+						forceActionsIntoChildsWidgetTree(w, actions);
 					}
 
 					//Force actions into JInternalFrame and SpinBox swing components
@@ -223,58 +214,16 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol {
 
 			}
 
+			//Force actions into Widgets that are potentially Calendar
+			// Think a better condition?
+			/*if(w.parent()!=null && w.parent().childCount()>30) {
+				forceActionsIntoChildsWidgetTree(w.root(), actions);
+			}*/
+
 		}
 
 		return actions;
 
-	}
-
-	//Force actions on Tree widgets with a wrong accessibility
-	public void widgetTree(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-		if(w.get(Enabled, true) && !w.get(Blocked, false))
-			actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
-		for(int i = 0; i<w.childCount(); i++) {
-			widgetTree(w.child(i), actions);
-		}
-	}
-
-	//Force close, maximize and minimize actions into JInternalFrames elements
-	public void createActionsForJInternalFrame(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		double posY = w.get(Tags.Shape).y() + (15);
-
-		double closePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 16);
-		double maximizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 45);
-		double minimizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 65);
-
-		Action close = ac.leftClickAt(closePosX, posY);
-		Action maximise = ac.leftClickAt(maximizePosX, posY);
-		Action minimise = ac.leftClickAt(minimizePosX, posY);
-
-		actions.add(close);
-		actions.add(maximise);
-		actions.add(minimise);
-		w.set(Tags.ActionSet, actions);
-	}
-
-	//Force increase and decrease actions into Spinbox elements
-	public void createActionsForSpinbox(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		double posX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 9) ;
-
-		double increaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 20);
-		double decreaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 6);
-
-		Action increase = ac.leftClickAt(posX, increaseY);
-		Action decrease = ac.leftClickAt(posX, decreaseY);
-
-		actions.add(increase);
-		actions.add(decrease);
-		w.set(Tags.ActionSet, actions);
 	}
 
 	/**

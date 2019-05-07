@@ -2778,6 +2778,16 @@ JNI_SIG(void, WINAPI_NS(SelectTableRow)) (JNIEnv * env, jclass, jlong vmid, jlon
 		AddAccessibleSelectionFromContext((long)vmid, ac, index);
 }
 
+/** SelectTableCell */
+JNI_SIG(void, WINAPI_NS(SelectTableCell)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
+
+		int index = getAccessibleTableIndex((long)vmid, ac, row, column);
+		
+		ClearAccessibleSelectionFromContext((long)vmid, ac);
+		
+		AddAccessibleSelectionFromContext((long)vmid, ac, index);
+}
+
 /** GetTableCellProperties */
 JNI_SIG(jobjectArray, WINAPI_NS(GetTableCellProperties)) (JNIEnv * env, jclass, jlong vmid, jlong ac, jint row, jint column){
 	

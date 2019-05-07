@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -39,6 +40,7 @@ import org.fruit.alayer.Tag;
 import java.util.List;
 
 public final class ConfigTags {
+	
   public static final Tag<String> ProcessesToKillDuringTest = Tag.from("ProcessesToKillDuringTest", String.class);
   public static final Tag<Boolean> ShowVisualSettingsDialogOnStartup = Tag.from("ShowVisualSettingsDialogOnStartup", Boolean.class);
   public static final Tag<Integer> LogLevel = Tag.from("LogLevel", Integer.class);
@@ -76,7 +78,6 @@ public final class ConfigTags {
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);
   public static final Tag<Boolean> ShowSettingsAfterTest = Tag.from("ShowSettingsAfterTest", Boolean.class);
 
-  // begin by urueda
   public static final Tag<String> SUTConnector = Tag.from("SUTConnector", String.class);
   public static final Tag<String> TestGenerator = Tag.from("TestGenerator", String.class);
   public static final Tag<Double> MaxReward = Tag.from("MaxReward", Double.class);
@@ -93,10 +94,15 @@ public final class ConfigTags {
   public static final Tag<Boolean> OfflineGraphConversion = Tag.from("OfflineGraphConversion", Boolean.class);
   public static final Tag<Float> StateScreenshotSimilarityThreshold = Tag.from("StateScreenshotSimilarityThreshold", Float.class);
   public static final Tag<Boolean> UnattendedTests = Tag.from("UnattendedTests", Boolean.class);
-  public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
   public static final Tag<String> SUTProcesses = Tag.from("SUTProcesses", String.class); // Shift+0 shortcut to debug (STDOUT) windows' process names
 
-  // begin by florendegier
+  // AccessBridge Tags
+  public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
+  public static final Tag<Boolean> VisualizeJavaTable = Tag.from("VisualizeJavaTable", Boolean.class);
+  public static final Tag<Integer> NumberRowVisualizeJavaTable = Tag.from("NumberRowVisualizeJavaTable", Integer.class);
+  public static final Tag<Integer> MaxJavaTableCellsToGenerate = Tag.from("MaxJavaTableCellsToGenerate", Integer.class);
+  
+  // Graph DB Tags
   public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);
   public static final Tag<String> GraphDBUrl = Tag.from("GraphDBUrl", String.class);
   public static final Tag<String> GraphDBUser = Tag.from("GraphDBUser", String.class);

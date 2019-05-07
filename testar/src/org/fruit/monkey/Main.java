@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,10 +29,6 @@
  *******************************************************************************************************/
 
 
-
-/**
- *  @author Sebastian Bauersfeld
- */
 package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -443,13 +439,20 @@ public class Main {
 			defaults.add(Pair.from(OfflineGraphConversion, true));
 			defaults.add(Pair.from(StateScreenshotSimilarityThreshold, Float.MIN_VALUE)); // disabled
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
+			
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(VisualizeJavaTable, false)); // disabled
+			defaults.add(Pair.from(NumberRowVisualizeJavaTable, 1));
+			defaults.add(Pair.from(MaxJavaTableCellsToGenerate, 50));
+			
 			defaults.add(Pair.from(SUTProcesses, ""));
 			defaults.add(Pair.from(GraphDBEnabled, false));
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
+			
 			defaults.add(Pair.from(AlwaysCompile, true));
+			
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));

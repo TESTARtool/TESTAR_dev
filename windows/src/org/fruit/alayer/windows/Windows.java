@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -739,6 +739,7 @@ public final class Windows{
 	public static native long[] GetAccessibleTable(long vmid, long ac); // accessibleContext x accessibleTable
 	public static native int[] GetNumberOfTableRowColumn(long vmid, long ac); // row x column
 	public static native void SelectTableRow(long vmid, long ac, int row);
+	public static native void SelectTableCell(long vmid, long ac, int row, int column);
 	public static native Object[] GetTableCellProperties(long vmid, long ac, int row, int column);
 	
 
