@@ -35,9 +35,7 @@ import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import nl.ou.testar.RandomActionSelector;
-import nl.ou.testar.ScreenshotWidgetJsonObject;
-import nl.ou.testar.WidgetJsonObject;
+import nl.ou.testar.*;
 import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -115,17 +113,19 @@ public class Protocol_desktop_generic_json extends ClickFilterLayerProtocol {
 			String role = widget.get(Tags.Role, null).toString();
 			boolean blocked = widget.get(Tags.Blocked, null);
 			Rect rect = (Rect) widget.get(Tags.Shape, null);
-			double upperLeftX = rect.x();
-			double upperLeftY = rect.y();
-			double width = rect.width();
-			double height = rect.height();
+			Set<Vertice> vertices = new HashSet<Vertice>();
+			vertices.add(new Vertice(rect.x(), rect.y()));
+			vertices.add(new Vertice(rect.x()+rect.width(), rect.y()));
+			vertices.add(new Vertice(rect.x(), rect.y()+rect.height()));
+			vertices.add(new Vertice(rect.x()+rect.width(), rect.y()+rect.height()));
+			BoundingPoly boundingPoly = new BoundingPoly(vertices);
 			String className= widget.get(UIATags.UIAClassName, "");
 			String title= widget.get(Tags.Title, "");
 			String desc= widget.get(Tags.Desc, "");
 			String name= widget.get(UIATags.UIAName, "");
 			String toolTipText= widget.get(Tags.ToolTipText, "");
 			String valuePattern= widget.get(Tags.ValuePattern, "");
-			WidgetJsonObject widgetJsonObject = new WidgetJsonObject(enabled, role, blocked, upperLeftX, upperLeftY, width, height, className, title, desc, name, toolTipText, valuePattern);
+			WidgetJsonObject widgetJsonObject = new WidgetJsonObject(enabled, role, blocked, boundingPoly, className, title, desc, name, toolTipText, valuePattern);
 			widgetJsonObjects.add(widgetJsonObject);
 //			for(Tag tag:widget.tags()){
 //				System.out.println("Tag:"+tag.toString()+"="+widget.get(tag));
