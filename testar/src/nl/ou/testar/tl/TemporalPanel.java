@@ -35,6 +35,7 @@ import org.fruit.monkey.Settings;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Panel with settings for the state model inference module.
@@ -43,7 +44,7 @@ public class TemporalPanel extends JPanel {
 
     private static final long serialVersionUID = -2815422165938359999L;
 
-
+    private Process webAnalyzerProcess = null;
     private JLabel label00 = new JLabel("Temporal property");
     private JTextField temporalProperty = new JTextField("G(a->Fb)");
     private JButton modelcheckButton = new JButton("Check property");
@@ -51,7 +52,8 @@ public class TemporalPanel extends JPanel {
     private JTextArea logCheckResult = new JTextArea("...");
     private JPanel logPanel;
     private JScrollPane resultsScrollPane;
-    private JButton temporalButton = new JButton("<html>Start Temporal<br>WebAnalyzer</html>");
+    private JButton startTLWebAnalyzerButton = new JButton("<html>Start Temporal<br>WebAnalyzer</html>");
+    private JButton stopTLWebAnalyzerButton = new JButton("<html>Stop Temporal<br>WebAnalyzer</html>");
 
 
     private TemporalPanel() {
@@ -105,12 +107,19 @@ public class TemporalPanel extends JPanel {
 
         add(logCheckResult);
 
-        temporalButton.setBounds(10, 316, 120, 54);
-        temporalButton.setSize(temporalButton.getWidth(), 45);
+        startTLWebAnalyzerButton.setBounds(10, 216, 120, 45);
+        startTLWebAnalyzerButton.setSize(startTLWebAnalyzerButton.getWidth(), 45);
 
-        temporalButton.addActionListener(this::startTemporalWebAnalyzer);
-        temporalButton.setToolTipText("Visual Analytics of the temporal property on the current State Model.\n Gto: http\\localhost:8050");
-        add(temporalButton);
+        startTLWebAnalyzerButton.addActionListener(this::startTemporalWebAnalyzer);
+        startTLWebAnalyzerButton.setToolTipText("Visual Analytics of the temporal property on the current State Model.\n Gto: http\\localhost:8050");
+        add(startTLWebAnalyzerButton);
+
+        stopTLWebAnalyzerButton.setBounds(10, 276, 120, 45);
+        stopTLWebAnalyzerButton.setSize(startTLWebAnalyzerButton.getWidth(), 45);
+
+        stopTLWebAnalyzerButton.addActionListener(this::stopTemporalWebAnalyzer);
+        add(stopTLWebAnalyzerButton);
+
 
 
         // NEW COLUMN
@@ -180,20 +189,49 @@ public class TemporalPanel extends JPanel {
         // code goes here
 
 
-        Process theProcess = null;
+
         BufferedReader inStream = null;
-        String cli_part1 = "C:\\Users\\c\\git\\Testar_viz\\run.py";
-        String cli = "C:\\Users\\c\\git\\TESTAR_dev\\testar\\src\\nl\\ou\\testar\\tl\\Start_Python.bat "+cli_part1;
+        String cli_part1 = "python C:\\Users\\c\\git\\Testar_viz\\run.py";
+        String cli = "C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate"+ " && " +cli_part1;
 
         String response;
         logCheckResult.setText("invoking : ");
         logCheckResult.append("\n");
-        logCheckResult.setText(cli);
+        logCheckResult.append(cli_part1);
         logCheckResult.append("\n");
         // call the external program
         try
         {
-            theProcess = Runtime.getRuntime().exec(cli);
+           if (webAnalyzerProcess==null) {
+               webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
+               logCheckResult.append("Visualizer Started. goto http://localhost:8050");
+               logCheckResult.append("\n");
+               // any error message?
+               try
+               {
+               StreamConsumer errorGobbler = new
+                       StreamConsumer (webAnalyzerProcess.getErrorStream(), "ERROR");
+
+               // any output?
+                   StreamConsumer  outputGobbler = new
+                           StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
+
+
+               // kick them off
+               errorGobbler.start();
+               outputGobbler.start();
+
+               // any error???
+           } catch (Throwable t)
+            {
+                t.printStackTrace();
+            }
+           }
+
+           else {
+               logCheckResult.append("Visualizer was already running. goto http://localhost:8050");
+               logCheckResult.append("\n");
+           }
         }
         catch(IOException e)
         {
@@ -202,27 +240,28 @@ public class TemporalPanel extends JPanel {
             logCheckResult.append("\n");
             e.printStackTrace();
         }
-
-        // read from the called program's standard output stream
+    }
+    private void stopTemporalWebAnalyzer(ActionEvent evt) {
         try
         {
-            inStream = new BufferedReader(new InputStreamReader
-                    (theProcess.getInputStream()));
-            while ((response = inStream.readLine()) != null) {
-                System.out.println("response: " + response);
-                logCheckResult.append(response);
+            if(webAnalyzerProcess!=null) {
+                webAnalyzerProcess.destroyForcibly();
+                logCheckResult.append("Forcing Visualizer  to Stop.");
+                boolean ret = webAnalyzerProcess.waitFor(5,  TimeUnit.SECONDS);  //gently wait
+                if (ret){ webAnalyzerProcess=null; }
+                logCheckResult.append("Visualizer Stopped. (exitcode was : "+ret+")");
                 logCheckResult.append("\n");
             }
-
-            logCheckResult.append("------------Action completed---------------"+"\n");
         }
-        catch(IOException e)
+        catch(Exception e)
         {
-            System.err.println("Error on inStream.readLine()");
-            logCheckResult.append("Error on inStream.readLine()");
+            System.err.println("Error on stopping");
+            logCheckResult.append("Error on stopping");
             logCheckResult.append("\n");
             e.printStackTrace();
         }
+
     }
+
 
 }

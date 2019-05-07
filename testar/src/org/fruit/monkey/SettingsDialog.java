@@ -274,7 +274,7 @@ public class SettingsDialog extends JFrame implements Observer {
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
     temporalPanel = TemporalPanel.createStateModelPanel();
-    jTabsPane.addTab("State Model", stateModelPanel);
+    jTabsPane.addTab("Temporal Analysis", temporalPanel);
 
     setLayout(jTabsPane);
     pack();
