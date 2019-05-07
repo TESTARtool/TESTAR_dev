@@ -206,8 +206,9 @@ public class TemporalPanel extends JPanel {
         {
            if (webAnalyzerProcess==null) {
                webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
-               logCheckResult.append("Visualizer Started. goto http://localhost:8050");
+               logCheckResult.append("Visualizer Starting at http://localhost:8050");
                logCheckResult.append("\n");
+
                Desktop desktop = java.awt.Desktop.getDesktop();
                URI uri = new URI("http://localhost:8050");
                desktop.browse(uri);
