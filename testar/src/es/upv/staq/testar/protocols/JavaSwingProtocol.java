@@ -61,7 +61,11 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	protected void initialize(Settings settings){
 
 		super.initialize(settings);
+		
+		BuilderAccessBridge.customJavaSwingButtons = settings.get(ConfigTags.CustomJavaSwingButtons);
+		BuilderAccessBridge.searchNonVisibleJavaWindows = settings.get(ConfigTags.SearchNonVisibleJavaWindows);
 
+		//Some options are only to SUT visualization
 		if(settings.get(ConfigTags.Mode).toString().contains("Spy")) {
 			//This allows to run some internal method to show the widgets of a Java Table
 			BuilderAccessBridge.visualizeJavaTable = settings.get(ConfigTags.VisualizeJavaTable);
@@ -72,8 +76,8 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 		}
 
 	}
-	
-	
+
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 * @param state the SUT's current state
@@ -82,54 +86,39 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){ 
-			
-		//System.out.println("*********** SELECT ACTION *********** ");
-		
 		Assert.isTrue(actions != null && !actions.isEmpty());
-		
+
 		int numberOfCellsJavaTable = 0;
-		
-		//System.out.println("Before priorityTable: "+ priorityTable);
-		
+
 		for(Widget w : state) {
-			
+
 			//If exist some table into the Java Swing SUT, read how many childs cells exist
 			if(w.get(Tags.Role).toString().contains("Table")) {
 				numberOfCellsJavaTable = BuilderAccessBridge.childsOfJavaTable;
 			}
 		}
-		
+
 		//Allow to the user define a maximum number of cells (By default could be high)
 		if(numberOfCellsJavaTable > settings.get(ConfigTags.MaxJavaTableCellsToGenerate))
 			numberOfCellsJavaTable = settings.get(ConfigTags.MaxJavaTableCellsToGenerate);
-		
-		//System.out.println("After priorityTable: "+ priorityTable);
-		
+
 		Action a = preSelectAction(state, actions);
 		if (a != null){
 			return a;
 		} else {
-			
+
 			//Coinflip using the number of cells of existing table
 			int random = new Random().nextInt(actions.size() + numberOfCellsJavaTable);
-			
+
 			//Check if coinflip determines we are going to execute an action into the table
 			if(random < numberOfCellsJavaTable)
 				BuilderAccessBridge.updateActionJavaTable = true;
-			
-			//System.out.println("number of cells table: "+ priorityTable);
-			
-			//System.out.println("actions size : "+ actions.size());
-			
-			//System.out.println("random: "+ random);
-			
-			//System.out.println("UpdateActionJavaTable: "+ BuilderAccessBridge.updateActionJavaTable);
-			
+
 			return RandomActionSelector.selectAction(actions);
 		}
 
 	}
-	
+
 	/**
 	 * Execute the selected action.
 	 * @param system the SUT
@@ -138,36 +127,30 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	 * @return whether or not the execution succeeded
 	 */
 	protected boolean executeAction(SUT system, State state, Action action){
-		
-		//System.out.println("*********** EXECUTE ACTION *********** ");
 
 		if(BuilderAccessBridge.updateActionJavaTable) {
 			
-			//System.out.println("UPDATE STATE");
-			
 			//Coinflip determines that we are going to execute an action into the table
 			//We have to update the state making an Access Bridge calls to obtain properly a cell position
-			
+
 			//Update state
 			state = getState(system);
-			
-			//System.out.println("STATE UPDATED");
-			
+
 			//Read the actions of new State (we want to find a TableCell)
 			Set<Action> actions = deriveTableActions(system, state);
-			
+
 			BuilderAccessBridge.updateActionJavaTable = false;
-			
+
 			if(!actions.isEmpty()) {
 				Action tableAction = RandomActionSelector.selectAction(actions);
 				return super.executeAction(system, state, tableAction);
 			}
 		}
-		
+
 		return super.executeAction(system, state, action);
 
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -179,19 +162,15 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	 * @return  a set of actions
 	 */
 	protected Set<Action> deriveTableActions(SUT system, State state) throws ActionBuildException{
-		
-		//System.out.println("*********** DERIVE TABLE ACTIONS *********** ");
 
 		Set<Action> actions = super.deriveActions(system,state);
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
+
 		// iterate through all widgets
 		for(Widget w : state){
-
 			//Save all new widgets created that represents the cells of the tables
 			if(w.get(UIATags.UIAAutomationId,"").toString().contains("TableCell")) {
 				actions.add(ac.leftClickAt(w));
-				//System.out.println("Derive Table Actions, cell founded");
 			}
 		}
 
@@ -208,43 +187,5 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 			forceActionsIntoChildsWidgetTree(w.child(i), actions);
 		}
 	}
-
-	//Force close, maximize and minimize actions into JInternalFrames elements
-	public void createActionsForJInternalFrame(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		double posY = w.get(Tags.Shape).y() + (15);
-
-		double closePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 16);
-		double maximizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 45);
-		double minimizePosX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 65);
-
-		Action close = ac.leftClickAt(closePosX, posY);
-		Action maximise = ac.leftClickAt(maximizePosX, posY);
-		Action minimise = ac.leftClickAt(minimizePosX, posY);
-
-		actions.add(close);
-		actions.add(maximise);
-		actions.add(minimise);
-		w.set(Tags.ActionSet, actions);
-	}
-
-	//Force increase and decrease actions into Spinbox elements
-	public void createActionsForSpinbox(Widget w, Set<Action> actions) {
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		double posX = w.get(Tags.Shape).x() + (w.get(Tags.Shape).width() - 9) ;
-
-		double increaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 20);
-		double decreaseY = w.get(Tags.Shape).y() + (w.get(Tags.Shape).height() - 6);
-
-		Action increase = ac.leftClickAt(posX, increaseY);
-		Action decrease = ac.leftClickAt(posX, decreaseY);
-
-		actions.add(increase);
-		actions.add(decrease);
-		w.set(Tags.ActionSet, actions);
-	}
-
 
 }

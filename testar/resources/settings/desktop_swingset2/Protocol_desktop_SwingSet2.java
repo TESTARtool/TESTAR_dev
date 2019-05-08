@@ -174,10 +174,16 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 		// BUILD CUSTOM ACTIONS
 		//----------------------
 
-		//for(Widget w : getTopWidgets(state)){
-		
-		// iterate through all widgets
+		//Force actions into Widgets that are potentially Calendar
+		// Think a better condition?
 		for(Widget w : state){
+			if(w.parent()!=null && w.parent().childCount()>30) {
+				forceActionsIntoChildsWidgetTree(w.root(), actions);
+			}
+		}
+
+		// iterate through all widgets
+		for(Widget w : getTopWidgets(state)){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
@@ -201,24 +207,9 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 						forceActionsIntoChildsWidgetTree(w, actions);
 					}
 
-					//Force actions into JInternalFrame and SpinBox swing components
-					if(w.get(UIATags.UIAAutomationId,"").contains("internal frame")) {
-						createActionsForJInternalFrame(w, actions);
-					}
-					if(w.get(UIATags.UIAAutomationId,"").contains("spinbox")) {
-						createActionsForSpinbox(w, actions);
-					}
-					//End of Force action
-
 				}
 
 			}
-
-			//Force actions into Widgets that are potentially Calendar
-			// Think a better condition?
-			/*if(w.parent()!=null && w.parent().childCount()>30) {
-				forceActionsIntoChildsWidgetTree(w.root(), actions);
-			}*/
 
 		}
 

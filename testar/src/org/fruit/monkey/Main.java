@@ -441,9 +441,11 @@ public class Main {
 			defaults.add(Pair.from(UnattendedTests, false)); // disabled
 			
 			defaults.add(Pair.from(AccessBridgeEnabled, false)); // disabled
+			defaults.add(Pair.from(CustomJavaSwingButtons, true));
 			defaults.add(Pair.from(VisualizeJavaTable, false)); // disabled
 			defaults.add(Pair.from(NumberRowVisualizeJavaTable, 1));
 			defaults.add(Pair.from(MaxJavaTableCellsToGenerate, 50));
+			defaults.add(Pair.from(SearchNonVisibleJavaWindows, false)); // disabled
 			
 			defaults.add(Pair.from(SUTProcesses, ""));
 			defaults.add(Pair.from(GraphDBEnabled, false));

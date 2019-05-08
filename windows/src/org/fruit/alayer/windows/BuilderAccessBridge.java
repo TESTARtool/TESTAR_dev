@@ -40,11 +40,15 @@ public class BuilderAccessBridge {
 
 	private static boolean existTopJavaInternalFrame;
 
+	public static boolean customJavaSwingButtons;
+
 	public static boolean visualizeJavaTable;
 	public static int numberOfRowsToVisualizeJavaTable = 1;
 
 	public static boolean updateActionJavaTable;
 	public static int childsOfJavaTable = 0;
+
+	public static boolean searchNonVisibleJavaWindows;
 
 	private BuilderAccessBridge() {}
 
@@ -69,7 +73,7 @@ public class BuilderAccessBridge {
 				String role = (String) props[2];
 				String accesibleStateSet = (String) props[3];
 				String indexInParent = (String) props[4];
-				String childrenCount = (String) props[5];
+				int childrenCount = Integer.parseInt((String) props[5]);
 				String x = (String) props[6];
 				String y = (String) props[7];
 				String width = (String) props[8];
@@ -84,8 +88,6 @@ public class BuilderAccessBridge {
 				try {
 					rect = Rect.from(new Double(x).doubleValue(), new Double(y).doubleValue(),
 							new Double(width).doubleValue(), new Double(height).doubleValue());
-					//if (parent.parent == null)
-					//	parent.rect = el.rect; // fix UI actions at root widget
 				} catch (Exception e){
 					return null;
 				}
@@ -100,13 +102,8 @@ public class BuilderAccessBridge {
 					modalElement = el;
 				}
 
-				if(role.contains("internal frame") && !existTopJavaInternalFrame) {
-					existTopJavaInternalFrame = true;
-					el.isTopJavaInternalFrame = true;
-				}
-
 				el.ctrlId = AccessBridgeControlTypes.toUIA(role);				
-				if (el.ctrlId == Windows.UIA_MenuControlTypeId) // || el.ctrlId == Windows.UIA_WindowControlTypeId)
+				if (el.ctrlId == Windows.UIA_MenuControlTypeId)
 					el.isTopLevelContainer = true;
 				else if (el.ctrlId == Windows.UIA_EditControlTypeId)
 					el.isKeyboardFocusable = true;
@@ -119,13 +116,22 @@ public class BuilderAccessBridge {
 
 				el.blocked = !accesibleStateSet.contains("showing");
 
+				if(role.contains("internal frame")){
+					if(customJavaSwingButtons) 
+						childrenCount+=3; //Minimize,Maximize,Close
+					if(!existTopJavaInternalFrame) {
+						existTopJavaInternalFrame = true;
+						el.isTopJavaInternalFrame = true;
+					}
+				}
+
+				if(role.contains("spinbox") && customJavaSwingButtons) {
+					childrenCount+=2; //Increase,Decrease
+				}
+
 				parent.root.hwndMap.put(el.hwnd, el);
 
-				//Sometimes popup menu are duplicated with AccessBridge when we open one Menu or combo box
-				//boolean correctComboBox = (role.equals("popup menu") && parent.automationId.equals("combo box"));
-				//if( (!role.equals("popup menu") || correctComboBox)
-
-				if(childrenCount != null && !childrenCount.isEmpty() && !childrenCount.equals("null")){
+				if(childrenCount != -1 && childrenCount != 0){
 
 					//Bug ID 4944762- getVisibleChildren for list-like components needed
 
@@ -138,9 +144,10 @@ public class BuilderAccessBridge {
 					}*/
 
 					long childAC;
-					int c = new Integer(childrenCount).intValue();
+					int c = childrenCount;
 					el.children = new ArrayList<UIAElement>(c);
 
+					//Swing Java Tables needs a custom descend to obtain properly cells values
 					if(role.contains("table")) {
 
 						int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
@@ -158,6 +165,17 @@ public class BuilderAccessBridge {
 					}
 					else {
 
+						//Remove internal frame childs, we are going to create manually
+						if(role.contains("internal frame") && customJavaSwingButtons) {
+							c -= 3; 
+							createButtonsForJInternalFrame(el);
+						}
+						//Remove internal frame childs, we are going to create manually
+						else if(role.contains("spinbox") && customJavaSwingButtons) {
+							c -= 2;
+							createButtonsForSpinBox(el);
+						}
+
 						for (int i=0; i<c; i++){
 							childAC =  Windows.GetAccessibleChildFromContext(vmidAC[0],vmidAC[1],i);
 							accessBridgeDescend(hwnd,el,vmidAC[0],childAC);
@@ -173,6 +191,9 @@ public class BuilderAccessBridge {
 		return modalElement;
 	}
 
+	/**
+	 * Select randomly a cell of the Swing Java Table, to obtain their properties
+	 */
 	private static UIAElement updateActionJavaTable(long hwnd, UIAElement parent, long vmid, long ac) {
 
 		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
@@ -180,7 +201,7 @@ public class BuilderAccessBridge {
 		int randomRow = new Random().nextInt(tableRowColumn[0]);
 		int randomColumn = new Random().nextInt(tableRowColumn[1]);
 
-		//Select a random cell to generate an action
+		//Select a random cell to obtain the properties and allow to generate an action
 		Windows.SelectTableCell(vmid, ac, randomRow, randomColumn);
 
 		long[] vmidAC;
@@ -230,11 +251,13 @@ public class BuilderAccessBridge {
 
 				el.name = name;				
 				el.helpText = description;
+
+				//Custom name to allow the subsequent search into deriveActions methods
 				el.automationId = "TableCell "+role;
 
-				el.enabled = accesibleStateSet.contains("enabled");
+				el.enabled = true;
 
-				el.blocked = !accesibleStateSet.contains("showing");
+				el.blocked = false;
 
 				parent.root.hwndMap.put(el.hwnd, el);
 
@@ -245,6 +268,10 @@ public class BuilderAccessBridge {
 		return parent;
 	}
 
+	/**
+	 * User can choose the number of rows to visualize into settings protocol
+	 * Then we are going to use that number to select the rows and obtain properly the widget cell properties
+	 */
 	private static UIAElement visualizeJavaTableDescend (long hwnd, UIAElement parent, long vmid, long ac) {
 
 		int[] tableRowColumn = Windows.GetNumberOfTableRowColumn(vmid, ac);
@@ -255,7 +282,7 @@ public class BuilderAccessBridge {
 
 		for (int i=0; i<checkRows; i++){
 
-			//Select one row of the table to access properly to the cell element properties
+			//Select one by one the rows of the table to access properly to the cell element properties
 			Windows.SelectTableRow(vmid, ac, i);
 
 			long[] vmidAC;
@@ -322,5 +349,136 @@ public class BuilderAccessBridge {
 
 	}
 
+	/**
+	 * Create manually 3 buttons to represent the Minimize, Maximize and Close options of JInternalFrames
+	 * TODO: Lazy solution, move or create in other way
+	 */
+	private static UIAElement createButtonsForJInternalFrame(UIAElement parent){
+
+		double posY = parent.rect.y() + (11);
+
+		double minimizePosX = parent.rect.x() + parent.rect.width() - 67;
+		double maximizePosX = parent.rect.x() + parent.rect.width() - 52;
+		double closePosX = parent.rect.x() + parent.rect.width() - 22;
+
+		Rect rectMinimize = null;
+		Rect rectMaximize = null;
+		Rect rectClose = null;
+		try {
+			rectMinimize = Rect.from(new Double(minimizePosX).doubleValue(), new Double(posY).doubleValue(),
+					new Double(10).doubleValue(), new Double(10).doubleValue());
+
+			rectMaximize = Rect.from(new Double(maximizePosX).doubleValue(), new Double(posY).doubleValue(),
+					new Double(10).doubleValue(), new Double(10).doubleValue());
+
+			rectClose = Rect.from(new Double(closePosX).doubleValue(), new Double(posY).doubleValue(),
+					new Double(10).doubleValue(), new Double(10).doubleValue());
+		} catch (Exception e){}
+
+		UIAElement elMinimize = new UIAElement(parent);
+		UIAElement elMaximize = new UIAElement(parent);
+		UIAElement elClose = new UIAElement(parent);
+
+		parent.children.add(elMinimize);
+		parent.children.add(elMaximize);
+		parent.children.add(elClose);
+
+		elMinimize.rect = rectMinimize;
+		elMaximize.rect = rectMaximize;
+		elClose.rect = rectClose;
+
+		elMinimize.hwnd = parent.hwnd;
+		elMaximize.hwnd = parent.hwnd;
+		elClose.hwnd = parent.hwnd;
+
+		elMinimize.ctrlId = Windows.UIA_ButtonControlTypeId;
+		elMaximize.ctrlId = Windows.UIA_ButtonControlTypeId;
+		elClose.ctrlId = Windows.UIA_ButtonControlTypeId;
+
+		elMinimize.name = "Minimize";
+		elMaximize.name = "Maximize";	
+		elClose.name = "Close";	
+
+		elMinimize.automationId ="Button";
+		elMaximize.automationId ="Button";
+		elClose.automationId ="Button";
+
+		if(parent.enabled){
+			elMinimize.enabled = true;
+			elMaximize.enabled = true;
+			elClose.enabled = true;
+		}
+
+		if(!parent.blocked){
+			elMinimize.blocked = false;
+			elMaximize.blocked = false;
+			elClose.blocked = false;
+		}
+
+		parent.root.hwndMap.put(elMinimize.hwnd, elMinimize);
+		parent.root.hwndMap.put(elMaximize.hwnd, elMaximize);
+		parent.root.hwndMap.put(elClose.hwnd, elClose);
+
+
+		return parent;
+	}
+
+	/**
+	 * Create manually 2 buttons to represent the Increase and Decrease options of SpinBoxes
+	 * TODO: Lazy solution, move or create in other way
+	 */
+	private static UIAElement createButtonsForSpinBox(UIAElement parent){
+
+		double posX = parent.rect.x() + parent.rect.width() - 13;
+
+		double IncreaseY = parent.rect.y() + parent.rect.height() - 23;
+		double decreaseY = parent.rect.y() + parent.rect.height() - 9;
+
+		Rect rectIncrease = null;
+		Rect rectDecrease = null;
+		try {
+			rectIncrease = Rect.from(new Double(posX).doubleValue(), new Double(IncreaseY).doubleValue(),
+					new Double(10).doubleValue(), new Double(10).doubleValue());
+
+			rectDecrease = Rect.from(new Double(posX).doubleValue(), new Double(decreaseY).doubleValue(),
+					new Double(10).doubleValue(), new Double(10).doubleValue());
+		} catch (Exception e){}
+
+		UIAElement elIncrease = new UIAElement(parent);
+		UIAElement elDecrease = new UIAElement(parent);
+
+		parent.children.add(elIncrease);
+		parent.children.add(elDecrease);
+
+		elIncrease.rect = rectIncrease;
+		elDecrease.rect = rectDecrease;
+
+		elIncrease.hwnd = parent.hwnd;
+		elDecrease.hwnd = parent.hwnd;
+
+		elIncrease.ctrlId = Windows.UIA_ButtonControlTypeId;
+		elDecrease.ctrlId = Windows.UIA_ButtonControlTypeId;
+
+		elIncrease.name = "Increase";
+		elDecrease.name = "Maximize";
+
+		elIncrease.automationId ="Button";
+		elDecrease.automationId ="Button";
+
+		if(parent.enabled){
+			elIncrease.enabled = true;
+			elDecrease.enabled = true;
+		}
+
+		if(!parent.blocked){
+			elIncrease.blocked = false;
+			elDecrease.blocked = false;
+		}
+
+		parent.root.hwndMap.put(elIncrease.hwnd, elIncrease);
+		parent.root.hwndMap.put(elDecrease.hwnd, elDecrease);
+
+		return parent;
+	}
 
 }

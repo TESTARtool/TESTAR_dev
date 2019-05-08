@@ -169,7 +169,7 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 
 		// Associate multiple Java windows hwnd into the current uiaRoot Element
-		if(this.accessBridgeEnabled) {
+		if(this.accessBridgeEnabled && BuilderAccessBridge.searchNonVisibleJavaWindows) {
 			Iterable<Long> allJavaWindows = this.allJavaWindows();
 			
 			for(long hwnd : allJavaWindows){

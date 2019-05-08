@@ -36,10 +36,14 @@ SUTConnectorValue = java -jar "suts/SwingSet2.jar"
 
 AccessBridgeEnabled = true
 
+CustomJavaSwingButtons = true
+
 VisualizeJavaTable = true
 NumberRowVisualizeJavaTable = 1
 
 MaxJavaTableCellsToGenerate = 50
+
+SearchNonVisibleJavaWindows = true
 
 #################################################################
 # Sequences

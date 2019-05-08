@@ -98,9 +98,11 @@ public final class ConfigTags {
 
   // AccessBridge Tags
   public static final Tag<Boolean> AccessBridgeEnabled = Tag.from("AccessBridgeEnabled", Boolean.class);
+  public static final Tag<Boolean> CustomJavaSwingButtons = Tag.from("CustomJavaSwingButtons", Boolean.class);
   public static final Tag<Boolean> VisualizeJavaTable = Tag.from("VisualizeJavaTable", Boolean.class);
   public static final Tag<Integer> NumberRowVisualizeJavaTable = Tag.from("NumberRowVisualizeJavaTable", Integer.class);
   public static final Tag<Integer> MaxJavaTableCellsToGenerate = Tag.from("MaxJavaTableCellsToGenerate", Integer.class);
+  public static final Tag<Boolean> SearchNonVisibleJavaWindows = Tag.from("SearchNonVisibleJavaWindows", Boolean.class);
   
   // Graph DB Tags
   public static final Tag<Boolean> GraphDBEnabled = Tag.from("GraphDBEnabled", Boolean.class);

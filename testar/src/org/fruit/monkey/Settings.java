@@ -302,10 +302,14 @@ public class Settings extends TaggableBase implements Serializable {
 					+"\n"
 					+"AccessBridgeEnabled = " + Util.lineSep()
 					+"\n"
+					+"CustomJavaSwingButtons = " + Util.lineSep()
+					+"\n"
 					+"VisualizeJavaTable = " + Util.lineSep()
 					+"NumberRowVisualizeJavaTable = " + Util.lineSep()
 					+"\n"
 					+"MaxJavaTableCellsToGenerate = " + Util.lineSep()
+					+"\n"
+					+"SearchNonVisibleJavaWindows = " + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Sequences\n"
