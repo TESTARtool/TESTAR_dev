@@ -38,7 +38,7 @@ import org.fruit.alayer.Rect;
 
 public class BuilderAccessBridge {
 
-	private static boolean existTopJavaInternalFrame;
+	public static boolean existTopJavaInternalFrame;
 
 	public static boolean customJavaSwingButtons;
 
@@ -99,6 +99,7 @@ public class BuilderAccessBridge {
 				el.hwnd = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
 				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
 					el.isTopLevelContainer = true;
+					el.isTopJavaInternalFrame = true; //Same index that an existing java internal frame
 					modalElement = el;
 				}
 

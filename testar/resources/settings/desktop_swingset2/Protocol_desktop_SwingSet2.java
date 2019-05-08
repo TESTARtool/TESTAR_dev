@@ -178,7 +178,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 		// Think a better condition?
 		for(Widget w : state){
 			if(w.parent()!=null && w.parent().childCount()>30) {
-				forceActionsIntoChildsWidgetTree(w.root(), actions);
+				forceActionsIntoChildsWidgetTree(w.parent().parent(), actions);
 			}
 		}
 

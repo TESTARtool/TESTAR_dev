@@ -64,6 +64,8 @@ public class StateFetcher implements Callable<UIAState>{
 			StateFetcher.sutProcessesMatcher = null;
 		else
 			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+		
+		BuilderAccessBridge.existTopJavaInternalFrame = false;
 	}
 
 	public static UIARootElement buildRoot(SUT system){
