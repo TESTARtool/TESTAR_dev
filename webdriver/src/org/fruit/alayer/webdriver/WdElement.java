@@ -207,17 +207,26 @@ public class WdElement implements Serializable {
   @SuppressWarnings("unchecked")
   private void fillDimensions(Map<String, Object> packedElement) {
     Map<String, Object> dims = (Map<String, Object>) packedElement.get("dimensions");
-    overflowX = (String) dims.get("overflowX");
-    overflowY = (String) dims.get("overflowY");
-    clientWidth = (long) dims.get("clientWidth");
-    clientHeight = (long) dims.get("clientHeight");
-    offsetWidth = (long) dims.get("offsetWidth");
-    offsetHeight = (long) dims.get("offsetHeight");
-    scrollWidth = (long) dims.get("scrollWidth");
-    scrollHeight = (long) dims.get("scrollHeight");
-    scrollLeft = (long) dims.get("scrollLeft");
-    scrollTop = (long) dims.get("scrollTop");
-    borderWidth = (long) dims.get("borderWidth");
-    borderHeight = (long) dims.get("borderHeight");
+    overflowX = String.valueOf(dims.get("overflowX"));
+    overflowY = String.valueOf(dims.get("overflowY"));
+    clientWidth = castDimensionsToLong(dims.get("clientWidth"));
+    clientHeight = castDimensionsToLong(dims.get("clientHeight"));
+    offsetWidth = castDimensionsToLong(dims.get("offsetWidth"));
+    offsetHeight = castDimensionsToLong(dims.get("offsetHeight"));
+    scrollWidth = castDimensionsToLong(dims.get("scrollWidth"));
+    scrollHeight = castDimensionsToLong(dims.get("scrollHeight"));
+    scrollLeft = castDimensionsToLong(dims.get("scrollLeft"));
+    scrollTop = castDimensionsToLong(dims.get("scrollTop"));
+    borderWidth = castDimensionsToLong(dims.get("borderWidth"));
+    borderHeight = castDimensionsToLong(dims.get("borderHeight"));
+  }
+  
+  private long castDimensionsToLong(Object o) {
+	  if(o instanceof Double)
+		  return ((Double) o).longValue();
+	  else if(o instanceof Long)
+		  return ((Long) o).longValue();
+	  
+	  return (long)o;
   }
 }
