@@ -40,13 +40,13 @@ public class JsonUtils {
 //				System.out.println("Tag:"+tag.toString()+"="+widget.get(tag));
 //			}
         }
-        System.out.println("Widget size="+widgetJsonObjects.size());
+//        System.out.println("Widget size="+widgetJsonObjects.size());
         String screenshotPath = state.get(Tags.ScreenshotPath);
-        System.out.println("ScreenshotPath="+screenshotPath);
+//        System.out.println("ScreenshotPath="+screenshotPath);
         ScreenshotWidgetJsonObject screenshotWidgetJsonObject = new ScreenshotWidgetJsonObject(widgetJsonObjects, screenshotPath);
-        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
+//        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
-        System.out.println("FilePath="+filePath);
+//        System.out.println("FilePath="+filePath);
         try{
             FileWriter fileWriter = new FileWriter(filePath);
             gson.toJson(screenshotWidgetJsonObject, fileWriter);
