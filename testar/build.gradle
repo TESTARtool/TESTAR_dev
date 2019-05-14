@@ -37,6 +37,7 @@ dependencies {
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
+    compile files('./lib/gson-2.8.5.jar')
     compile 'com.1stleg:jnativehook:2.1.0'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
@@ -46,6 +47,11 @@ evaluationDependsOn(':windows')
 task prepareSettings(type: Copy) {
     from 'resources/settings'
     into 'target/scripts/settings'
+}
+
+task prepareSUTs(type: Copy) {
+    from 'distributionSUTs'
+    into 'target/scripts/suts'
 }
 
 task prepareOracles(type: Copy) {
