@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,12 +29,6 @@
  *******************************************************************************************************/
 
 
-
-/**
- *  @author (base) Sebastian Bauersfeld
- *  @author (Bitrix24 adaptation, protocol refactor & cleanup) Urko Rueda (alias: urueda)
- */
-
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +37,7 @@ import java.util.Set;
 import java.util.Random;
 
 import org.fruit.Assert;
-import org.fruit.Drag; // by urueda
+import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -289,7 +284,7 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 	 */
 	protected Verdict getVerdict(State state){
 
-		Verdict verdict = super.getVerdict(state); // by urueda
+		Verdict verdict = super.getVerdict(state);
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
 
 		//-----------------------------------------------------------------------------
@@ -366,7 +361,7 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
+		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
@@ -455,7 +450,6 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 		return false;
 	}
 
-	// by urueda
 	private boolean isAtBrowserCanvas(Widget w){
 		Shape shape = w.get(Tags.Shape,null);
 		if (shape != null && shape.y() > browser_toolbar_filter)
