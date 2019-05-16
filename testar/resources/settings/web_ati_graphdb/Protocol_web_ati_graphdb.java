@@ -444,7 +444,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
    * Check if the current address has a denied extension (PDF etc.)
    */
   private boolean isExtensionDenied() {
-    // If the current page doesn't have an extsion, always allow
+    // If the current page doesn't have an extension, always allow
     if (!currentAddress.contains(".")) {
       return false;
     }
@@ -487,15 +487,5 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     String[] parts = settings().get(ConfigTags.SUTConnectorValue).split(" ");
     String url = parts[parts.length - 1].replace("\"", "");
     domainsAllowed = new String[]{getDomain(url)};
-  }
-
-  /*
-   * Small convenience function
-   */
-  private static String clean(String field) {
-    field = (field == null) ? "" : field;
-    field = field.toLowerCase();
-    field = field.replace(System.lineSeparator(), " ").replaceAll("\\s", " ");
-    return field.substring(0, Math.min(35, field.length())).trim();
   }
 }

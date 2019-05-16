@@ -72,7 +72,8 @@ public class GeneralPanel extends JPanel {
     cboxSUTconnector.setModel(new DefaultComboBoxModel<>(new String[]{
         Settings.SUT_CONNECTOR_CMDLINE,
         Settings.SUT_CONNECTOR_PROCESS_NAME,
-        Settings.SUT_CONNECTOR_WINDOW_TITLE
+        Settings.SUT_CONNECTOR_WINDOW_TITLE,
+        Settings.SUT_CONNECTOR_WEBDRIVER
     }));
     cboxSUTconnector.setSelectedIndex(0);
     cboxSUTconnector.setBounds(114, 12, 171, 25);

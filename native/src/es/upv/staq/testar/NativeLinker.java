@@ -30,72 +30,32 @@
 
 package es.upv.staq.testar;
 
-import static org.fruit.alayer.windows.UIARoles.UIAButton;
-import static org.fruit.alayer.windows.UIARoles.UIACheckBox;
-import static org.fruit.alayer.windows.UIARoles.UIAComboBox;
-import static org.fruit.alayer.windows.UIARoles.UIACustomControl;
-import static org.fruit.alayer.windows.UIARoles.UIADataItem;
-import static org.fruit.alayer.windows.UIARoles.UIADocument;
-import static org.fruit.alayer.windows.UIARoles.UIAEdit;
-import static org.fruit.alayer.windows.UIARoles.UIAHyperlink;
-import static org.fruit.alayer.windows.UIARoles.UIAList;
-import static org.fruit.alayer.windows.UIARoles.UIAListItem;
-import static org.fruit.alayer.windows.UIARoles.UIAMenu;
-import static org.fruit.alayer.windows.UIARoles.UIAMenuItem;
-import static org.fruit.alayer.windows.UIARoles.UIARadioButton;
-import static org.fruit.alayer.windows.UIARoles.UIAScrollBar;
-import static org.fruit.alayer.windows.UIARoles.UIASlider;
-import static org.fruit.alayer.windows.UIARoles.UIASpinner;
-import static org.fruit.alayer.windows.UIARoles.UIASplitButton;
-import static org.fruit.alayer.windows.UIARoles.UIATabItem;
-import static org.fruit.alayer.windows.UIARoles.UIAText;
-import static org.fruit.alayer.windows.UIARoles.UIATree;
-import static org.fruit.alayer.windows.UIARoles.UIATreeItem;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.fruit.alayer.Canvas;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.StateBuilder;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.devices.ProcessHandle;
 import org.fruit.alayer.exceptions.NoSuchTagException;
-import org.fruit.alayer.linux.AtSpiRolesWrapper;
-import org.fruit.alayer.linux.AtSpiStateBuilder;
-import org.fruit.alayer.linux.AtSpiTags;
-import org.fruit.alayer.linux.GdkScreenCanvas;
-import org.fruit.alayer.linux.LinuxProcess;
-import org.fruit.alayer.linux.LinuxProcessHandle;
-import org.fruit.alayer.windows.GDIScreenCanvas;
-import org.fruit.alayer.windows.UIARoles;
-import org.fruit.alayer.windows.UIAStateBuilder;
-import org.fruit.alayer.windows.UIATags;
-import org.fruit.alayer.windows.WinProcHandle;
-import org.fruit.alayer.windows.WinProcess;
-import static org.fruit.alayer.linux.AtSpiRolesWrapper.*; // by wcoux
+import org.fruit.alayer.linux.*;
+import org.fruit.alayer.webdriver.WdCanvas;
+import org.fruit.alayer.webdriver.WdDriver;
+import org.fruit.alayer.webdriver.WdStateBuilder;
+import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
+import org.fruit.alayer.windows.*;
+
+import java.util.*;
+
+import static org.fruit.alayer.linux.AtSpiRolesWrapper.*;
+import static org.fruit.alayer.windows.UIARoles.*;
 
 /**
  * A native connector.
- * 
- * @author Urko Rueda Molina (alias: urueda)
  *
+ * @author Urko Rueda Molina (alias: urueda)
  */
 public class NativeLinker {
-	
 	private static long lastCPUquery = 0;
 
     private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform(); // by urueda
-	
+
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.
@@ -113,11 +73,17 @@ public class NativeLinker {
 					return EnumSet.of(OperatingSystems.WINDOWS);
 				else if(osName.contains("Linux"))
 					return EnumSet.of(OperatingSystems.UNIX);
+				else if(osName.contains("mac os x"))
+					return EnumSet.of(OperatingSystems.MAC);
 				else
 					return EnumSet.of(OperatingSystems.UNKNOWN);
 		}
 	}
-	
+
+	public static void addWdDriverOS() {
+		PLATFORM_OS.add(OperatingSystems.WEBDRIVER);
+	}
+
 	/**
 	 * Retrieves a StateBuilder instance which will be used to determine the state of the application.
 	 * @param timeToFreeze The time after which requesting the state of an application will time out.
@@ -128,6 +94,8 @@ public class NativeLinker {
 	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
 													 boolean accessBridgeEnabled,
 													 String SUTProcesses){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return new WdStateBuilder(timeToFreeze);
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return new UIAStateBuilder(timeToFreeze, accessBridgeEnabled, SUTProcesses);
@@ -147,6 +115,8 @@ public class NativeLinker {
 	 * @return A Canvas on which Testar can paint elements in Spy mode.
 	 */
 	public static Canvas getNativeCanvas(Pen pen){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return new WdCanvas(pen);
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return GDIScreenCanvas.fromPrimaryMonitor(pen);
 			//return JavaScreenCanvas.fromPrimaryMonitor(pen);
@@ -165,6 +135,8 @@ public class NativeLinker {
 	 * @return A handle to the process in a SUT object.
 	 */
 	public static SUT getNativeSUT(String executableCommand, boolean ProcessListenerEnabled){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdDriver.fromExecutable(executableCommand);
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			if (PLATFORM_OS.contains(OperatingSystems.WINDOWS_7))
 				return WinProcess.fromExecutable(executableCommand, ProcessListenerEnabled);
@@ -185,21 +157,23 @@ public class NativeLinker {
 	 * @return A list of running processes wrapped in a SUT class.
 	 */
 	public static List<SUT> getNativeProcesses(){
-		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdDriver.fromAll();
+		else if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromAll();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return LinuxProcess.fromAll();
 		throw new UnsupportedPlatformException();
 	}
-	
+
 	public static SUT getNativeProcess(String processName){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
-			return WinProcess.fromProcName(processName);		
+			return WinProcess.fromProcName(processName);
 		//else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			// TODO
 		throw new UnsupportedPlatformException();
 	}
-	
+
 	public static ProcessHandle getNativeProcessHandle(long processPID){
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new WinProcHandle(processPID);
@@ -207,29 +181,35 @@ public class NativeLinker {
 			return new LinuxProcessHandle(processPID);
 		throw new UnsupportedPlatformException();
 	}
-	
+
 	/** Gets the memory usage for a SUT.
 	 * @param nativeSUT The SUT to get memory usage for.
 	 * @return Memory usage in KB.
 	 */
 	public static int getMemUsage(SUT nativeSUT){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return 0;
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return (int)(WinProcess.getMemUsage((WinProcess)nativeSUT) / 1024); // byte -> KB
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return (int)(LinuxProcess.getMemUsage((LinuxProcess)nativeSUT) / 1024);
 		throw new UnsupportedPlatformException();
 	}
-	
-	
+
+
 	/** Gets the CPU usage for a SUT.
 	 * @param nativeSUT The SUT to get CPU usage for.
 	 * @return CPU usage in ms: user x system x frame.
 	 */
 	public static long[] getCPUsage(SUT nativeSUT){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+			// TODO Make sure 'runTest' doesn't need this anymore
+			return new long[]{0, 0, 0};
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			long now = System.currentTimeMillis();
 			long cpuFrame = now - lastCPUquery;
-			lastCPUquery = now;			
+			lastCPUquery = now;
 			long[] cpums = WinProcess.getCPUsage((WinProcess)nativeSUT);
 			return new long[]{ cpums[0], cpums[1], cpuFrame };
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
@@ -242,13 +222,16 @@ public class NativeLinker {
 	}
 
 	public static Collection<Role> getNativeRoles(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER)) {
+			return WdRoles.rolesSet();
+		}
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
 		// else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			// TODO
 		throw new UnsupportedPlatformException();
 	}
-	
+
 	public static Role getNativeRole(String roleName){
 		Collection<Role> roles = getNativeRoles();
 		Role role = null, r;
@@ -260,7 +243,7 @@ public class NativeLinker {
 		}
 		return null; // not found
 	}
-	
+
 	public static Collection<Role> getNativeRoles(String... roleNames){
 		Collection<Role> roles = new ArrayList<Role>(roleNames.length);
 		for (String roleName : roleNames){
@@ -286,6 +269,8 @@ public class NativeLinker {
 	 * @return The native Role wrapper for a button.
 	 */
 	public static Role getNativeRole_Button(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdRoles.WdBUTTON;
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAButton;
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -298,6 +283,8 @@ public class NativeLinker {
 	 * @return The native Role wrapper for a menu item.
 	 */
 	public static Role getNativeRole_Menuitem(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdRoles.WdUnknown;
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.UIAMenuItem;
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -310,13 +297,15 @@ public class NativeLinker {
 	 * @return Native tags.
 	 */
 	public static Set<Tag<?>> getNativeTags(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdTags.tagSet();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIATags.tagSet();
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return AtSpiTags.tagSet();
 		throw new UnsupportedPlatformException();
 	}
-	
+
 	/**
 	 * Gets a native tag by its name.
 	 * @param tagName A native tag name.
@@ -328,8 +317,8 @@ public class NativeLinker {
 				return tag;
 		}
 		return null; // not found
-	}	
-	
+	}
+
 	/**
 	 * Gets the value of the native boolean property of a widget.
 	 * @param widget The widget.
@@ -346,13 +335,15 @@ public class NativeLinker {
 		} catch (Exception e) {
 			throw new NoSuchTagException(tag);
 		}
-	}	
+	}
 
 	/**
 	 * Gets all roles that correspond to elements that can be clicked.
 	 * @return All roles that correspond to elements that can be clicked.
 	 */
 	public static Role[] getNativeClickableRoles(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdRoles.nativeClickableRoles();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
 			return new Role[]{UIAMenu, UIAMenuItem, UIAButton, UIACheckBox, UIARadioButton,
 					UIAComboBox, UIAList, UIAListItem,
@@ -372,6 +363,8 @@ public class NativeLinker {
 	 * @return All roles that correspond to elements that can be edited.
 	 */
 	public static Role[] getNativeTypeableRoles(){
+		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
+			return WdRoles.nativeTypeableRoles();
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return new Role[]{UIADocument, UIAEdit, UIAText};
 		else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
@@ -394,5 +387,4 @@ public class NativeLinker {
 			return w.get(AtSpiTags.AtSpiIsFocusable);
 		throw new UnsupportedPlatformException();
 	}
-
 }

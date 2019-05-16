@@ -236,17 +236,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
      * @param settings
      */
     public final void run(final Settings settings) {
-    	
+
     	//Associate start settings of the first TESTAR dialog
     	this.settings = settings;
 
     	SUT system = null;
-    	
-    	//Call the principal loop to work with different loop-modes
-    	detectModeLoop(system);
 
-<<<<<<< HEAD
-=======
     	//initialize TESTAR with the given settings:
     	initialize(settings);
 
@@ -276,7 +271,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     	//Closing TESTAR EventHandler
     	closeTestarTestSession();
->>>>>>> logs & settings refactor, cmd read.me
     }
 
     /**
@@ -331,47 +325,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
     }
 
-    /**
-     * Method to change between the different loops that represent the principal modes of execution on TESTAR
-     *
-     * @param system
-     */
-    protected void detectModeLoop(SUT system) {
-
-    	do {
-    		//initialize TESTAR with the given settings:
-    		initialize(settings);
-
-    		try {
-    			
-    			if (mode() == Modes.View && isValidFile()) {
-    				new SequenceViewer(settings);
-    			} else if (mode() == Modes.Replay && isValidFile()) {
-    				runReplayLoop();
-    			} else if (mode() == Modes.Spy) {
-    				runSpyLoop();
-    			} else if(mode() == Modes.Record) {
-    				runRecordLoop(system);
-    			} else if (mode() == Modes.Generate) {
-    				runGenerateOuterLoop(system);
-    			}
-    			
-    		}catch(SystemStartException SystemStartException) {
-    			System.out.println(SystemStartException);
-    			this.mode = Modes.Quit;
-    		} catch (Exception e) {
-    			System.out.println(e);
-    			this.mode = Modes.Quit;
-    		}
-
-    		//Closing TESTAR EventHandler
-            closeTestarTestSession();
-    	}
-    	//start again the TESTAR Settings Dialog, if it was used to start TESTAR:
-    	while(startTestarSettingsDialog());
-
-    }
-    
     /**
      * Check if the selected file to Replay or View contains a valid fragment object
      */
@@ -529,11 +482,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         LogSerialiser.flush();
         LogSerialiser.finish();
         LogSerialiser.exit();
-<<<<<<< HEAD
         LOGGER.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
-=======
         DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
->>>>>>> logs & settings refactor, cmd read.me
     }
 
     /**
@@ -1712,22 +1662,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(system !=null){
 		    system.stop();
 		}
-	}
-
-	private boolean startTestarSettingsDialog(){
-		if (settings().get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
-			this.mode = settings().get(ConfigTags.Mode);
-
-			if(Main.startTestarDialog(settings, Main.getSettingsFile())) {
-				try {
-					this.settings = Main.loadSettings(new String[0], Main.getSettingsFile());
-				} catch (ConfigException e) {
-					e.printStackTrace();
-				}
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Override
