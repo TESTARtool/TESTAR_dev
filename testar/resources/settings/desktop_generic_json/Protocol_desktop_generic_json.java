@@ -28,22 +28,16 @@
 *******************************************************************************************************/
 
 
-import java.io.FileWriter;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import nl.ou.testar.*;
+import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
 import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-import org.fruit.alayer.windows.UIARoles;
-import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.Settings;
 
 import static org.fruit.alayer.Tags.Blocked;

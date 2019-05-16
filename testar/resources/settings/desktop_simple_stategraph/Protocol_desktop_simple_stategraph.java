@@ -32,11 +32,7 @@
 import java.util.Set;
 
 import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
