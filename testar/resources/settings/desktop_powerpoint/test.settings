@@ -66,7 +66,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_excel/Protocol_desktop_powerpoint
+ProtocolClass = desktop_powerpoint/Protocol_desktop_powerpoint
 
 #################################################################
 # Graphdatabase settings (experimental)

@@ -192,8 +192,6 @@ public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProt
 					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					// We want to create actions that consist of left clicking on them
 					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Store the widget in the Graphdatabase
-						storeWidget(state.get(Tags.ConcreteID), w);
 						//Create a left click action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.leftClickAt(w));
 					}
@@ -205,8 +203,6 @@ public class Protocol_desktop_simple_stategraph_eye extends ClickFilterLayerProt
 					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
 					// We want to create actions that consist of typing into them
 					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Store the widget in the Graphdatabase
-						storeWidget(state.get(Tags.ConcreteID), w);
 						//Create a type action with the Action Compiler, and add it to the set of derived actions
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
