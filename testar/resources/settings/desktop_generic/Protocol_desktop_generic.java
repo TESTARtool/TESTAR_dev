@@ -30,22 +30,17 @@
 
 import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
-
+import org.testar.protocols.DesktopProtocol;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
-public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
+public class Protocol_desktop_generic extends DesktopProtocol {
 
-	//Attributes for adding slide actions
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -68,11 +63,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-
-		SUT sut = super.startSystem();
-
-		return sut;
-
+		return super.startSystem();
 	}
 
 	/**
@@ -83,7 +74,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
+	 	super.beginSequence(system, state);
 	}
 
 
@@ -97,7 +88,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-
 		return super.getState(system);
 	}
 
@@ -136,6 +126,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
@@ -146,13 +137,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 			//optional: iterate through top level widgets based on Z-index:
 			//for(Widget w : getTopWidgets(state)){
 
+			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+				// filtering out actions on menu-containers (adding an action in the middle of the menu)
+				continue;
+			}
+
 			// Only consider enabled and non-blocked widgets
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-				if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-					// filtering out actions on menu-containers (adding an action in the middle of the menu)
-					continue;
-				}
 
 				// Do not build actions for widgets on the blacklist
 				// The blackListed widgets are those that have been filtered during the SPY mode with the
@@ -182,7 +173,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 					}
 					//Add sliding actions (like scroll, drag and drop) to the derived actions
 					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
+					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
 				}
 			}
 		}

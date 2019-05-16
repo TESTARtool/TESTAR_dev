@@ -97,6 +97,13 @@ startScripts {
     } else {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
     }
+    
+    doLast {
+        def winScriptFile  = file getWindowsScript()
+        def winFileText = winScriptFile.text
+        winFileText = winFileText.replaceAll('set CLASSPATH=.*', 'rem original CLASSPATH declaration replaced by:\nset CLASSPATH=%APP_HOME%\\\\lib\\\\\\*')
+        winScriptFile.text = winFileText
+    }
 }
 
 startScripts.dependsOn {
