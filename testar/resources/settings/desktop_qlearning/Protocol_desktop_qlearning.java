@@ -31,9 +31,7 @@
 
 import java.util.Set;
 
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphForQlearning;
-import nl.ou.testar.SimpleGuiStateGraph.GuiStateGraphWithVisitedActions;
-import nl.ou.testar.HtmlSequenceReport;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
