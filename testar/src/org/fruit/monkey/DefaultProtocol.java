@@ -101,6 +101,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.windows.WinApiException;
+
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -258,15 +260,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			runGenerateOuterLoop(system);
     		}
 
-    	}catch(SystemStartException SystemStartException) {
-    		SystemStartException.printStackTrace();
-    		DEBUGLOG.error("Exception: ",SystemStartException);
-    		this.mode = Modes.Quit;
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		DEBUGLOG.error("Exception: ",e);
-    		this.mode = Modes.Quit;
-    	}
+    	}catch(WinApiException we) {
+			System.out.println("Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition");
+			this.mode = Modes.Quit;
+		}catch(SystemStartException SystemStartException) {
+			SystemStartException.printStackTrace();
+			DEBUGLOG.error("Exception: ",SystemStartException);
+			this.mode = Modes.Quit;
+		} catch (Exception e) {
+			e.printStackTrace();
+			DEBUGLOG.error("Exception: ",e);
+			this.mode = Modes.Quit;
+		}
 
     	//Closing TESTAR EventHandler
     	closeTestarTestSession();
@@ -1232,6 +1238,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
 					if (sut.isRunning())
 						sut.stop();
+					
+					if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
+						throw new WinApiException("JAVA SUT PATH EXCEPTION");
+					
 					// issue starting the SUT
 					if (tryToKillIfRunning){
 						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");

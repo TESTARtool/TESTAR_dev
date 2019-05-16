@@ -99,6 +99,8 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		
+		isValidJavaEnvironment();
 
 		initTestarSSE(args);
 
@@ -143,6 +145,17 @@ public class Main {
 
 		System.exit(0);
 
+	}
+	
+	private static boolean isValidJavaEnvironment() {
+		
+		if(!System.getenv("JAVA_HOME").contains("jdk"))
+			System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
+		
+		if(!System.getenv("JAVA_HOME").contains("1.8"))
+			System.out.println("Java version is not JDK 1.8, please install ");
+		
+		return true;
 	}
 	
 	/**
