@@ -168,31 +168,26 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		//----------------------
 		// BUILD CUSTOM ACTIONS
 		//----------------------
-		
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
-			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						// left clicks
-						if(whiteListed(w) || isClickable(w)) {
-							actions.add(ac.leftClickAt(w));
-						}
-
-						// type into text boxes
-						if(whiteListed(w) || isTypeable(w)) {
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-						}
-						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
-
+		// iterate through top level (Z-index) widgets
+		for(Widget w : getTopWidgets(state)){
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
+				if (!blackListed(w)){  // do not build actions for tabu widgets
+					// left clicks
+					if(whiteListed(w) || isClickable(w)) {
+						actions.add(ac.leftClickAt(w));
 					}
+
+					// type into text boxes
+					if(whiteListed(w) || isTypeable(w)) {
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					}
+					// slides
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
+
 				}
-			}			
-			
+			}
 		}
-		
+
 		return actions;
 
 	}
