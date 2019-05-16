@@ -31,19 +31,13 @@
 import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
+
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -155,6 +149,11 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 			// Only consider enabled and non-blocked widgets
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){
 
+				if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+					// filtering out actions on menu-containers (adding an action in the middle of the menu)
+					continue;
+				}
+
 				// Do not build actions for widgets on the blacklist
 				// The blackListed widgets are those that have been filtered during the SPY mode with the
 				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
@@ -189,30 +188,6 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		}
 		//return the set of derived actions
 		return actions;
-	}
-
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
-
-			}
-		}
 	}
 
 	/**
