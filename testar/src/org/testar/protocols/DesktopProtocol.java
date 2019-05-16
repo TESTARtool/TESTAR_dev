@@ -92,7 +92,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         StdActionCompiler ac = new AnnotatingActionCompiler();
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-        for(Widget w : state){
+        for(Widget w : getTopWidgets(state)){
             //optional: iterate through top level widgets based on Z-index:
             //for(Widget w : getTopWidgets(state)){
 

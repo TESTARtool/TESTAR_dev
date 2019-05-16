@@ -194,12 +194,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected int testFailTimes = 0;
     protected boolean nonSuitableAction = false;
 
-    protected final GraphDB graphDB() {
-        return graphDB;
-    }
-
-    protected GraphDB graphDB;
-    protected StateModelManager stateModelManager;
+     protected StateModelManager stateModelManager;
     private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
     protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -292,11 +287,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //EventHandler is implemented in RuntimeControlsProtocol (super class):
         eventHandler = initializeEventHandler();
 
-        //Initializing Graph Database:
-        graphDB = new GraphDB(false,
-                settings.get(ConfigTags.GraphDBUrl),
-                settings.get(ConfigTags.GraphDBUser),
-                settings.get(ConfigTags.GraphDBPassword));
         //builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
         builder = NativeLinker.getNativeStateBuilder(
                 settings.get(ConfigTags.TimeToFreeze),
@@ -672,11 +662,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             cv.begin(); Util.clear(cv);
             //Not visualizing the widget info under cursor while in Generate-mode:
             //SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
-
-            //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-            // add SUT state into the graphDB:
-            LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
-            graphDB.addState(state, true);
 
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
