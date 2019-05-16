@@ -28,17 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar;
+package nl.ou.testar.ScreenshotJsonFile;
 
+public class Vertice {
+    double x;
+    double y;
 
-import java.util.Set;
-
-public class ScreenshotWidgetJsonObject {
-    Set<WidgetJsonObject> widgetJsonObjects;
-    String screenshotPath;
-
-    public ScreenshotWidgetJsonObject(Set<WidgetJsonObject> widgetJsonObjects, String screenshotPath) {
-        this.widgetJsonObjects = widgetJsonObjects;
-        this.screenshotPath = screenshotPath;
+    public Vertice(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 }

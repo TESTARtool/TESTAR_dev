@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar;
+package nl.ou.testar.ScreenshotJsonFile;
 
 import java.util.Set;
 

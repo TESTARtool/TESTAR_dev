@@ -28,30 +28,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar;
+package nl.ou.testar.ScreenshotJsonFile;
 
-public class WidgetJsonObject {
-    boolean enabled;
-    String role;
-    boolean blocked;
-    BoundingPoly boundingPoly;
-    String className;
-    String title;
-    String desc;
-    String name;
-    String toolTipText;
-    String valuePattern;
 
-    public WidgetJsonObject(boolean enabled, String role, boolean blocked, BoundingPoly boundingPoly, String className, String title, String desc, String name, String toolTipText, String valuePattern) {
-        this.enabled = enabled;
-        this.role = role;
-        this.blocked = blocked;
-        this.boundingPoly = boundingPoly;
-        this.className = className;
-        this.title = title;
-        this.desc = desc;
-        this.name = name;
-        this.toolTipText = toolTipText;
-        this.valuePattern = valuePattern;
+import java.util.Set;
+
+public class ScreenshotWidgetJsonObject {
+    Set<WidgetJsonObject> widgetJsonObjects;
+    String screenshotPath;
+
+    public ScreenshotWidgetJsonObject(Set<WidgetJsonObject> widgetJsonObjects, String screenshotPath) {
+        this.widgetJsonObjects = widgetJsonObjects;
+        this.screenshotPath = screenshotPath;
     }
 }

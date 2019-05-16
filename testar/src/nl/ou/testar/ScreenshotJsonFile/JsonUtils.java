@@ -28,10 +28,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar;
+package nl.ou.testar.ScreenshotJsonFile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import nl.ou.testar.ScreenshotJsonFile.BoundingPoly;
+import nl.ou.testar.ScreenshotJsonFile.ScreenshotWidgetJsonObject;
+import nl.ou.testar.ScreenshotJsonFile.Vertice;
+import nl.ou.testar.ScreenshotJsonFile.WidgetJsonObject;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;

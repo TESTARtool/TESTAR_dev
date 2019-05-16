@@ -28,14 +28,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************************************/
 
-package nl.ou.testar;
+package nl.ou.testar.ScreenshotJsonFile;
 
-public class Vertice {
-    double x;
-    double y;
+public class WidgetJsonObject {
+    boolean enabled;
+    String role;
+    boolean blocked;
+    BoundingPoly boundingPoly;
+    String className;
+    String title;
+    String desc;
+    String name;
+    String toolTipText;
+    String valuePattern;
 
-    public Vertice(double x, double y) {
-        this.x = x;
-        this.y = y;
+    public WidgetJsonObject(boolean enabled, String role, boolean blocked, BoundingPoly boundingPoly, String className, String title, String desc, String name, String toolTipText, String valuePattern) {
+        this.enabled = enabled;
+        this.role = role;
+        this.blocked = blocked;
+        this.boundingPoly = boundingPoly;
+        this.className = className;
+        this.title = title;
+        this.desc = desc;
+        this.name = name;
+        this.toolTipText = toolTipText;
+        this.valuePattern = valuePattern;
     }
 }
