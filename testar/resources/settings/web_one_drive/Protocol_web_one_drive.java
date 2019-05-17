@@ -29,64 +29,37 @@
  *******************************************************************************************************/
 
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.Random;
-
-import org.fruit.Assert;
-import org.fruit.Drag;
-import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.CompoundAction;
-import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.actions.Type;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
-
-import static org.fruit.monkey.ConfigTags.*;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.NativeLinker;
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
+import org.testar.protocols.DesktopProtocol;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
-
-public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
+/**
+ * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
+ *
+ * It also gives examples how to automate setting a username and password into a login screen.
+ */
+public class Protocol_web_one_drive extends DesktopProtocol {
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
@@ -94,21 +67,6 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 	static int browser; // BROWSER_*
 	static Role webController, webText; // browser dependent
 	static double browser_toolbar_filter;	
-
-	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-	static double scrollThick = 16; //scroll thickness (iexplorer)
-
-	/** 
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 * @param   settings   the current TESTAR settings as specified by the user.
-	 */
-	protected void initialize(Settings settings){
-
-		super.initialize(settings);
-		initBrowser();
-
-	}
 
 	// check browser
 	private void initBrowser(){
@@ -125,15 +83,6 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 			webController = NativeLinker.getNativeRole("UIADataItem");
 			webText = NativeLinker.getNativeRole("UIAText");
 		}
-	}
-
-	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
-	 */
-	protected void beginSequence(SUT system, State state){
-
-		super.beginSequence(system, state);
-
 	}
 
 	/**
@@ -396,7 +345,7 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 					}
 
 					// slides
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
+					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w,state);
 
 				}
 
@@ -457,64 +406,5 @@ public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
 		else
 			return false;		
 	}
-
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 * @param state the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return  the selected action (non-null!)
-	 */
-	protected Action selectAction(State state, Set<Action> actions){
-
-		return super.selectAction(state, actions);
-
-	}
-
-	/**
-	 * Execute the selected action.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	protected boolean executeAction(SUT system, State state, Action action){
-
-		return super.executeAction(system, state, action);
-
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	protected boolean moreActions(State state) {
-
-		return super.moreActions(state);
-
-	}
-
-
-	/** 
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	protected void finishSequence(){
-
-		super.finishSequence();
-
-	}
-
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 * @return  if <code>true</code> continue test, else stop	 */
-	protected boolean moreSequences() {
-
-		return super.moreSequences();
-
-	}	
 
 }

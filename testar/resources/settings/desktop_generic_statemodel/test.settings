@@ -22,8 +22,8 @@ Mode = Spy
 # SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
-SUTConnector = SUT_WINDOW_TITLE
-SUTConnectorValue = Rekenmachine
+SUTConnector = COMMAND_LINE
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -32,7 +32,7 @@ SUTConnectorValue = Rekenmachine
 #################################################################
 
 Sequences = 1
-SequenceLength = 100
+SequenceLength = 10
 
 #################################################################
 # Oracles based on suspicious titles
@@ -40,7 +40,7 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*|.*[rR]einiciando.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Actionfilter
@@ -49,7 +49,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*|.*[rR]einiciando.*
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*Cerrar.*|.*Minimizar.*|.*[sS]istema.*|.*[sS]ystem.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -66,15 +66,37 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_wincalc/Protocol_desktop_wincalc
+ProtocolClass = desktop_generic_statemodel/Protocol_desktop_generic_statemodel
 
 #################################################################
 # Graphdatabase settings (experimental)
 #################################################################
-GraphDBEnabled = false
-GraphDBUrl =
-GraphDBUser =
-GraphDBPassword =
+GraphDBEnabled = true
+GraphDBUrl = remote:/localhost/testar
+GraphDBUser = testar
+GraphDBPassword = testar
+
+#################################################################\n"
+# State model inference settings
+#################################################################\n"
+StateModelEnabled = true
+DataStore = OrientDB
+DataStoreType = remote
+DataStoreServer = localhost
+DataStoreDB = testar
+DataStoreUser = testar
+DataStorePassword = testar
+DataStoreMode = instant
+
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+# Allowed value are: Role,Path,Title,Enabled
+#################################################################
+ConcreteStateAttributes = Role,Path,Title,Enabled
+AbstractStateAttributes = Role
 
 #################################################################
 # Other more advanced settings
@@ -99,7 +121,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

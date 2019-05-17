@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = java -jar "suts/calculator.jar"
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -31,7 +31,7 @@ SUTConnectorValue = java -jar "suts/calculator.jar"
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 6
+Sequences = 1
 SequenceLength = 100
 
 #################################################################
@@ -43,13 +43,36 @@ SequenceLength = 100
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
 # Actionfilter
 #
 # Regular expression. More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[cC]lose.*|.*[cC]errar.*|.*[fF]ile.*|.*[aA]rchivo.*|.*Minimize.*|.*[mM]inimizar.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -58,7 +81,7 @@ ClickFilter = .*[cC]lose.*|.*[cC]errar.*|.*[fF]ile.*|.*[aA]rchivo.*|.*Minimize.*
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = .*mspaint.exe
+SUTProcesses =
 
 #################################################################
 # Protocolclass
@@ -66,7 +89,7 @@ SUTProcesses = .*mspaint.exe
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_buggyjavacalc/Protocol_desktop_buggyjavacalc
+ProtocolClass = desktop_generic_html_report/Protocol_desktop_generic_html_report
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -76,6 +99,15 @@ GraphDBUrl =
 GraphDBUser =
 GraphDBPassword =
 
+#################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+# Allowed value are: Role,Path,Title,Enabled
+#################################################################
+ConcreteStateAttributes = Role,Path,Title,Enabled
+AbstractStateAttributes = Role
 
 #################################################################
 # Other more advanced settings
@@ -96,7 +128,7 @@ OnlySaveFaultySequences = false
 ActionDuration = 0.0
 ShowVisualSettingsDialogOnStartup = true
 ReplayRetryTime = 30.0
-Delete = 
+Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
@@ -104,10 +136,9 @@ StartupTime = 10.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true
-CopyFromTo = 
+CopyFromTo =
 VisualizeActions = false
 VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
-

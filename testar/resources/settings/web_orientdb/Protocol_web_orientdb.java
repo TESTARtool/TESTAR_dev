@@ -1,6 +1,6 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,33 +30,26 @@
 
 
 import java.util.Set;
-
-import org.fruit.Drag;
 import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.RandomActionSelector;
 import es.upv.staq.testar.NativeLinker;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.DesktopProtocol;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
-public class Protocol_web_orientdb extends ClickFilterLayerProtocol {
+/**
+ * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
+ *
+ * It also extracts state models into graph database and uses state model to improve action selection
+ *  so the graph model has to be enabled in the test settings.
+ */
+public class Protocol_web_orientdb extends DesktopProtocol {
 
 	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10
 
 	static Role webText; // browser dependent
 	static double browser_toolbar_filter;
-
-	//Attributes for adding slide actions
-	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-	static double scrollThick = 16; // scroll thickness (iexplorer)
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -80,37 +73,6 @@ public class Protocol_web_orientdb extends ClickFilterLayerProtocol {
 	}
 
 	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-	 * @return  a started SUT, ready to be tested.
-	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException{
-
-		SUT sut = super.startSystem();
-
-		return sut;
-
-	}
-
-	/**
-	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-	 * This can be used for example for bypassing a login screen by filling the username and password
-	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 * the SUT's configuration files etc.)
-	 */
-	@Override
-	protected void beginSequence(SUT system, State state){
-
-		super.beginSequence(system, state);
-
-	}
-
-	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
 	 * own state fetching routine. The state should have attached an oracle 
@@ -131,116 +93,6 @@ public class Protocol_web_orientdb extends ClickFilterLayerProtocol {
 
 		return state;
 
-	}
-
-	/**
-	 * This is a helper method used by the default implementation of <code>buildState()</code>
-	 * It examines the SUT's current state and returns an oracle verdict.
-	 * @return oracle verdict, which determines whether the state is erroneous and why.
-	 */
-	@Override
-	protected Verdict getVerdict(State state){
-
-		Verdict verdict = super.getVerdict(state);
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
-
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-		//-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-		return verdict;
-
-	}
-
-	/**
-	 * This method is used by TESTAR to determine the set of currently available actions.
-	 * You can use the SUT's current state, analyze the widgets and their properties to create
-	 * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-	 * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-	 * will stop generation of the current action and continue with the next one.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @return  a set of actions
-	 */
-	@Override
-	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-
-		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
-		//the foreground. You should add all other actions here yourself.
-		Set<Action> actions = super.deriveActions(system,state);
-
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		StdActionCompiler ac = new AnnotatingActionCompiler();
-
-		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
-
-			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-				// Do not build actions for widgets on the blacklist
-				// The blackListed widgets are those that have been filtered during the SPY mode with the
-				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-				if (!blackListed(w)){
-
-					//For widgets that are:
-					// - clickable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of left clicking on them
-					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a left click action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.leftClickAt(w));
-					}
-
-					//For widgets that are:
-					// - typeable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-					//Add sliding actions (like scroll, drag and drop) to the derived actions
-					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
-				}
-			}
-		}
-		//return the set of derived actions
-		return actions;
-
-	}
-
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	@Override
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
-			}
-		}
 	}
 
 	@Override
@@ -291,58 +143,6 @@ public class Protocol_web_orientdb extends ClickFilterLayerProtocol {
 		if (modelAction != null) return modelAction;
 		System.out.println("StateModelManager did not return an action. Returning random");
 		return RandomActionSelector.selectAction(actions);
-	}
-
-	/**
-	 * Execute the selected action.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-
-		return super.executeAction(system, state, action);
-
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-
-		return super.moreActions(state);
-
-	}
-
-
-	/** 
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	@Override
-	protected void finishSequence(){
-
-		super.finishSequence();
-
-	}
-
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 * @return  if <code>true</code> continue test, else stop
-	 */
-	@Override
-	protected boolean moreSequences() {
-
-		return super.moreSequences();
-
 	}
 
 }

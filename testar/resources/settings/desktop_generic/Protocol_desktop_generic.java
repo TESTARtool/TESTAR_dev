@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,15 +33,15 @@ import java.util.Set;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
+/**
+ * This protocol provides default TESTAR behaviour to test Windows desktop applications.
+ *
+ * It uses random action selection algorithm.
+ */
 public class Protocol_desktop_generic extends DesktopProtocol {
-
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -129,54 +130,19 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-				// filtering out actions on menu-containers (adding an action in the middle of the menu)
-				continue;
-			}
-
-			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-				// Do not build actions for widgets on the blacklist
-				// The blackListed widgets are those that have been filtered during the SPY mode with the
-				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-				if (!blackListed(w)){
-
-					//For widgets that are:
-					// - clickable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of left clicking on them
-					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a left click action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.leftClickAt(w));
-					}
-
-					//For widgets that are:
-					// - typeable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-					//Add sliding actions (like scroll, drag and drop) to the derived actions
-					//method defined below.
-					addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
-				}
-			}
+		if(actions.size()==0){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		}
+
 		//return the set of derived actions
 		return actions;
 	}

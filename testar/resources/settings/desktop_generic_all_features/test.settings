@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Microsoft Office\\Office15\\POWERPNT.EXE"
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -40,7 +40,30 @@ SequenceLength = 100
 # Regular expression
 #################################################################
 
-SuspiciousTitles = THIS_WONT_BE_DISPLAYED
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
 
 #################################################################
 # Actionfilter
@@ -49,7 +72,7 @@ SuspiciousTitles = THIS_WONT_BE_DISPLAYED
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[mM]inimizar.*|.*[mM]inimize.*|.*[cC]errar.*|.*[cC]lose.*|.*[rR]estaurar.*|.*[rR]estore.*|.*[aA]rchivo.*|.*[aA]brir.*|.*[oO]pen.*|.*[gG]uardar.*|.*[sS]ave.*|.*[sS]alir.*|.*[iI]mprimir.*|.*[pP]rint.*|.*[cC]ompartir.*|.*[sS]hare.*|.*[eE]xport.*|.*[oO]ption.*|.*[oO]pci.*|.*[cC]uenta.*|.*[aA]ccount.*|.*[sS]oporte.*|.*[sS]upport.*|.*[mM]ail.*|.*[cC]orreo.*|.*[dD]esconectar.*|.*[sS]istema.*|.*[sS]ystem.*|.*[oO]ffice.*|.*[oO]ne[dD]rive.*|.*[dD]elete.*|.*[bB]orrar.*|.*[bB]rowse.*|.*SVN.*|.*[eE]nviar.*|.*[sS]lide.*|.*[sS]creenshot.*|.*[rR]ecording.*|.*[rR]eading.*|.*[mM]anage.*|.*[fF]ile.*|.*[nN]ew.*|.*[sS][iIíÍ].*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -66,7 +89,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_powerpoint/Protocol_desktop_powerpoint
+ProtocolClass = desktop_generic_all_features/Protocol_desktop_generic_all_features
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -77,10 +100,20 @@ GraphDBUser =
 GraphDBPassword =
 
 #################################################################
+# State identifier attributes
+#
+# Specify the widget attributes that you wish to use in constructing
+# the widget and state hash strings. Use a comma separated list.
+# Allowed value are: Role,Path,Title,Enabled
+#################################################################
+ConcreteStateAttributes = Role,Path,Title,Enabled
+AbstractStateAttributes = Role
+
+#################################################################
 # Other more advanced settings
 #################################################################
 
-ProcessesToKillDuringTest = .*firefox.exe.*|.*iexplore.exe.*|.*rundll.*
+ProcessesToKillDuringTest =
 OutputDir = ./output
 PathToReplaySequence = ./output/temp
 TempDir = ./output/temp

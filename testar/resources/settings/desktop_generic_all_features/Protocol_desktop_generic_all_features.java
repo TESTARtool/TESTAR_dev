@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,29 +30,29 @@
 
 
 import java.util.Set;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
-import org.fruit.alayer.Point;
-import org.fruit.alayer.Action;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
+import org.testar.protocols.DesktopProtocol;
 
-public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
+/**
+ * This protocol combines different functionalities of TESTAR for testing Windows desktop applications
+ * into one protocol.
+ *
+ * The optional features are commented out with short documentation s.t. you can turn them on again if you want.
+ *
+ * This protocol includes:
+ * - HTML reports of the executed test sequences with screenshots of the GUI states
+ * - Creating JSON files with information about the widgets and their locations on the screenshots
+ * - State model learning and saving state models into graph database (OrientDB).
+ *   (NOTE: the state model has to be enabled in test settings and OrientDB has to be installed)
+ * - Using the learned state model for improved action selection, prioritizing unvisited actions and using the state model as a map
+ */
+public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 
-	//Attributes for adding slide actions
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
+	private HtmlSequenceReport htmlReport;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -60,6 +61,8 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(sequenceCount());
 		super.initialize(settings);
 	}
 
@@ -74,11 +77,7 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-
-		SUT sut = super.startSystem();
-
-		return sut;
-
+		return super.startSystem();
 	}
 
 	/**
@@ -87,9 +86,9 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
 	 * the SUT's configuration files etc.)
 	 */
-	@Override
+	 @Override
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
+	 	super.beginSequence(system, state);
 	}
 
 
@@ -103,8 +102,10 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-
-		return super.getState(system);
+		State state = super.getState(system);
+		// Creating a JSON file with information about widgets and their location on the screenshot:
+		JsonUtils.createWidgetInfoJsonFile(state);
+		return state;
 	}
 
 	/**
@@ -142,77 +143,24 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-				// Do not build actions for widgets on the blacklist
-				// The blackListed widgets are those that have been filtered during the SPY mode with the
-				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-				if (!blackListed(w)){
-
-					//For widgets that are:
-					// - clickable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of left clicking on them
-					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a left click action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.leftClickAt(w));
-					}
-
-					//For widgets that are:
-					// - typeable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-					//Add sliding actions (like scroll, drag and drop) to the derived actions
-					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
-				}
-			}
+		if(actions.size()==0){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		}
+
 		//return the set of derived actions
 		return actions;
-	}
-
-	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-				));
-
-			}
-		}
 	}
 
 	/**
@@ -223,18 +171,23 @@ public class Protocol_desktop_orientdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			System.out.println("Asking state model manager for action");
-			Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
-			if (modelAction != null) return modelAction;
-			System.out.println("StateModelManager did not return an action. Returning random");
-			return RandomActionSelector.selectAction(actions);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state, actions);
+
+		//using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
+		retAction = super.selectAction(state, actions);
+		// adding the selected action into HTML report:
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
+		return retAction;
+
 	}
 
 	/**
