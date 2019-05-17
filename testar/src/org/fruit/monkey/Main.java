@@ -242,7 +242,7 @@ public class Main {
 			JFrame settingsSelectorDialog = new JFrame();
 			settingsSelectorDialog.setAlwaysOnTop(true);
 			String sseSelected = (String) JOptionPane.showInputDialog(settingsSelectorDialog,
-					"SUT setting:", "Test setting selection", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					"Select the desired setting:", "TESTAR settings", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (sseSelected == null) {
 				SSE_ACTIVATED = null;
