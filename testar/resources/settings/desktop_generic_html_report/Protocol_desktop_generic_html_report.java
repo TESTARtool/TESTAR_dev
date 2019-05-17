@@ -44,17 +44,17 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_desktop_generic_html_report extends DesktopProtocol {
 
 	private HtmlSequenceReport htmlReport;
+	private int scenarioCount = 1;
 
 	/**
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 * @param   settings  the current TESTAR settings as specified by the user.
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
 	 */
 	@Override
-	protected void initialize(Settings settings){
+	protected void preSequencePreparations() {
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(sequenceCount());
-		super.initialize(settings);
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
 	}
 
 	/**

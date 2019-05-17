@@ -23,7 +23,7 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_PRE = "output/TESTAR_scenario_";
+    private static final String REPORT_FILENAME_PRE = "output/HTMLreports/TESTAR_scenario_";
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
     private int scenarioCount = 1;
@@ -32,10 +32,25 @@ public class HtmlSequenceReport {
     }
 
     public HtmlSequenceReport(int sequenceNumber) {
+        // checking whether HTMLreports folder exists in output folder, if not, creating it:
+        try{
+            File folder = new File("output/HTMLreports");
+            if(folder.exists()&&folder.isDirectory()){
+                System.out.println("DEBUG: HTMLreports folder exists already");
+                // all good, folder is already there
+            }else{
+                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
+                //folder is missing, let's create it
+                folder.mkdir();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
-            String filename = "output/TESTAR_scenario_1_sequence_1.html"; // will be replaced
+            String filename = REPORT_FILENAME_PRE + "1_sequence_1.html"; // will be replaced
             // finding the first unused scenario number when sequence number is 1:
             boolean newFilenameFound = false;
             while(!newFilenameFound){
@@ -59,10 +74,25 @@ public class HtmlSequenceReport {
     }
 
     public HtmlSequenceReport(int scenarioCount, int sequenceNumber) {
+        // checking whether HTMLreports folder exists in output folder, if not, creating it:
+        try{
+            File folder = new File("output/HTMLreports");
+            if(folder.exists()&&folder.isDirectory()){
+                System.out.println("DEBUG: HTMLreports folder exists already");
+                // all good, folder is already there
+            }else{
+                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
+                //folder is missing, let's create it
+                folder.mkdir();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report:
-            String filename = "output/TESTAR_scenario_1_sequence_1.html"; // will be replaced
+            String filename = REPORT_FILENAME_PRE + "_1_sequence_1.html"; // will be replaced
             // finding the first unused scenario number when sequence number is 1:
             boolean newFilenameFound = false;
             while(!newFilenameFound){
@@ -95,7 +125,7 @@ public class HtmlSequenceReport {
         String imagePath = state.get(Tags.ScreenshotPath);
         // repairing the file paths:
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output",".");
+            imagePath = imagePath.replace("./output","../");
         }
         write("<h4>State:</h4>");
         write("<p><img src=\""+imagePath+"\"></p>");
@@ -106,7 +136,7 @@ public class HtmlSequenceReport {
     public void addState(State state){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output",".");
+            imagePath = imagePath.replace("./output","../");
         }
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
@@ -124,7 +154,7 @@ public class HtmlSequenceReport {
     public void addState(State state, Set<Action> actions){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output",".");
+            imagePath = imagePath.replace("./output","../");
         }
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
@@ -167,7 +197,7 @@ public class HtmlSequenceReport {
     public void addState(State state, Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output",".");
+            imagePath = imagePath.replace("./output","../");
         }
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");

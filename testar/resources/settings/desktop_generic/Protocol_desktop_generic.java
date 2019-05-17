@@ -54,6 +54,14 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 
 	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		// there is no default behaviour in this method
+	}
+
+	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
