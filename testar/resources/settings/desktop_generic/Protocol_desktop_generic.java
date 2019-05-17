@@ -30,6 +30,7 @@
 
 
 import java.util.Set;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
@@ -42,6 +43,9 @@ import org.testar.protocols.DesktopProtocol;
  * It uses random action selection algorithm.
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
+
+	private HtmlSequenceReport htmlReport;
+	private int scenarioCount = 1;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -58,7 +62,10 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected void preSequencePreparations() {
-		// there is no default behaviour in this method
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
 	}
 
 	/**
@@ -86,7 +93,6 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 	super.beginSequence(system, state);
 	}
 
-
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -97,7 +103,10 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+		State state = super.getState(system);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state);
+		return state;
 	}
 
 	/**
@@ -163,14 +172,19 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
+
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
+		Action retAction = preSelectAction(state, actions);
+		if (retAction == null)
 			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+			retAction = RandomActionSelector.selectAction(actions);
+
+		// adding the selected action into HTML report:
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
+		return retAction;
 	}
 
 	/**
