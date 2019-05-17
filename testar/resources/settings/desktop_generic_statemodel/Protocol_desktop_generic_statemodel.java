@@ -41,7 +41,7 @@ import org.testar.protocols.DesktopProtocol;
  *
  *  It only changes the selectAction() method.
  */
-public class Protocol_desktop_generic_graphdb extends DesktopProtocol {
+public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
 	/**
 	 * Select one of the possible actions (e.g. at random)
