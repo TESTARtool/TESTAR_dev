@@ -231,7 +231,7 @@ public class HtmlSequenceReport {
         try{if(action.get(Tags.Desc)!=null) write(" || "+action.get(Tags.Desc));}catch(Exception e){}
         write("</h4>");
         if(actionPath.contains("./output")){
-            actionPath = actionPath.replace("./output",".");
+            actionPath = actionPath.replace("./output","..");
         }
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
