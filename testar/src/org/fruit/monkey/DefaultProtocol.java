@@ -44,18 +44,14 @@ import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +61,8 @@ import java.util.zip.GZIPInputStream;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
+import nl.ou.testar.StateModel.StateModelManager;
+import nl.ou.testar.StateModel.StateModelManagerFactory;
 import org.fruit.Assert;
 import org.fruit.Drag;
 import org.fruit.Pair;
@@ -103,6 +101,8 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
+import org.fruit.alayer.windows.WinApiException;
+
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
@@ -194,11 +194,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     protected int testFailTimes = 0;
     protected boolean nonSuitableAction = false;
 
-    protected final GraphDB graphDB() {
-        return graphDB;
-    }
-
-    protected GraphDB graphDB;
+     protected StateModelManager stateModelManager;
     private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
     protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
@@ -259,15 +255,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     			runGenerateOuterLoop(system);
     		}
 
-    	}catch(SystemStartException SystemStartException) {
-    		SystemStartException.printStackTrace();
-    		DEBUGLOG.error("Exception: ",SystemStartException);
-    		this.mode = Modes.Quit;
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    		DEBUGLOG.error("Exception: ",e);
-    		this.mode = Modes.Quit;
-    	}
+    	}catch(WinApiException we) {
+			System.out.println("Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition");
+			this.mode = Modes.Quit;
+		}catch(SystemStartException SystemStartException) {
+			SystemStartException.printStackTrace();
+			DEBUGLOG.error("Exception: ",SystemStartException);
+			this.mode = Modes.Quit;
+		} catch (Exception e) {
+			e.printStackTrace();
+			DEBUGLOG.error("Exception: ",e);
+			this.mode = Modes.Quit;
+		}
 
     	//Closing TESTAR EventHandler
     	closeTestarTestSession();
@@ -287,17 +287,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         //EventHandler is implemented in RuntimeControlsProtocol (super class):
         eventHandler = initializeEventHandler();
 
-        //Initializing Graph Database:
-        graphDB = new GraphDB(settings.get(ConfigTags.GraphDBEnabled),
-                settings.get(ConfigTags.GraphDBUrl),
-                settings.get(ConfigTags.GraphDBUser),
-                settings.get(ConfigTags.GraphDBPassword));
         //builder = new UIAStateBuilder(settings.get(ConfigTags.TimeToFreeze));
         builder = NativeLinker.getNativeStateBuilder(
                 settings.get(ConfigTags.TimeToFreeze),
                 settings.get(ConfigTags.AccessBridgeEnabled),
                 settings.get(ConfigTags.SUTProcesses)
         );
+        
+        // new state model manager
+        if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
+        		stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
 
         try {
             if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -328,12 +327,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     /**
      * Check if the selected file to Replay or View contains a valid fragment object
      */
+
     public boolean isValidFile(){
-    	
      	try {
      		
     		File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-    		
+
      		FileInputStream fis = new FileInputStream(seqFile);
     		BufferedInputStream bis = new BufferedInputStream(fis);
     		GZIPInputStream gis = new GZIPInputStream(bis);
@@ -551,14 +550,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 LogSerialiser.log("Obtaining system state before beginSequence...\n", LogSerialiser.LogLevel.Debug);
                 State state = getState(system);
 
-                //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-
                 // beginSequence() - a script to interact with GUI, for example login screen
                 LogSerialiser.log("Starting sequence " + sequenceCount + " (output as: " + generatedSequence + ")\n\n", LogSerialiser.LogLevel.Info);
                 beginSequence(system, state);
 
                 //initializing fragment for recording replayable test sequence:
                 initFragmentForReplayableSequence(state);
+
+                // notify the statemodelmanager
+                stateModelManager.notifyTestSequencedStarted();
 
                 /*
                  ***** starting the INNER LOOP:
@@ -567,6 +567,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
+
+                // notify the state model manager of the sequence end
+                stateModelManager.notifyTestSequenceStopped();
 
                 writeAndCloseFragmentForReplayableSequence();
 
@@ -602,6 +605,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 emergencyTerminateTestSequence(system, e);
             }
         }
+        // notify the statemodelmanager that the testing has finished
+        stateModelManager.notifyTestingEnded();
         //allowing close-up in the end of test session:
         closeTestSession();
         //Closing TESTAR internal test session:
@@ -658,15 +663,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Not visualizing the widget info under cursor while in Generate-mode:
             //SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
-            //TODO graphDB should have the starting state and all the stuff from beginSequence? now it's not there
-            // add SUT state into the graphDB:
-            LogSerialiser.log("Adding state into graph database.\n", LogSerialiser.LogLevel.Debug);
-            graphDB.addState(state, true);
-
             //Deriving actions from the state:
             Set<Action> actions = deriveActions(system, state);
-
             CodingManager.buildIDs(state, actions);
+			// notify to state model the current state
+            stateModelManager.notifyNewStateReached(state, actions);
+			
+			
             if(actions.isEmpty()){
                 if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -689,6 +692,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             //Showing the red dot if visualization is on:
             if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
+            //before action execution, pass it to the state model manager
+            stateModelManager.notifyActionExecution(action);
+
             //Executing the selected action:
             executeAction(system, state, action);
             lastExecutedAction = action;
@@ -701,6 +707,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             Util.clear(cv);
             cv.end();
         }
+        
+        // notify to state model the last state
+        Set<Action> actions = deriveActions(system, state);
+        CodingManager.buildIDs(state, actions);
+        stateModelManager.notifyNewStateReached(state, actions);
     }
 
     /**
@@ -776,9 +787,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Output/logs folder
 		LogSerialiser.log(String.format(actionMode+" [%d]: %s\n%s",
 				actionCount,
-				"action = " + action.get(Tags.ConcreteID, "ConcreteID not available") +
-				" (" + action.get(Tags.AbstractID, "AbstractID not available") + ") @state = " +
-				state.get(Tags.ConcreteID, "ConcreteID not available") + " (" + state.get(Tags.Abstract_R_ID, "Abstract_R_ID not available") + ")\n",
+				"\n @Action ConcreteID = " + action.get(Tags.ConcreteID,"ConcreteID not available") +
+				" AbstractID = " + action.get(Tags.AbstractID,"AbstractID not available") +"\n"+
+				" ConcreteID CUSTOM = " +  action.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
+				" AbstractID CUSTOM = " +  action.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n"+
+				
+				" @State ConcreteID = " + state.get(Tags.ConcreteID,"ConcreteID not available") +
+				" AbstractID = " + state.get(Tags.Abstract_R_ID,"Abstract_R_ID not available") +"\n"+
+				" ConcreteID CUSTOM = "+ state.get(Tags.ConcreteIDCustom,"ConcreteID CUSTOM not available")+
+				" AbstractID CUSTOM = "+state.get(Tags.AbstractIDCustom,"AbstractID CUSTOM not available")+"\n",
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
@@ -791,7 +808,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     /**
      * Method to run TESTAR on Spy Mode.
-     * @param system
      */
     protected void runSpyLoop() {
 
@@ -869,6 +885,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
         	//initializing fragment for recording replayable test sequence:
         	initFragmentForReplayableSequence(getState(system));
+        	
+        	// notify the statemodelmanager
+            stateModelManager.notifyTestSequencedStarted();
         }
         //else, SUT & canvas exists (startSystem() & buildCanvas() created from Generate mode)
 
@@ -882,6 +901,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             
             Set<Action> actions = deriveActions(system,state);
             CodingManager.buildIDs(state, actions);
+            
+            //notify the state model manager of the new state
+            stateModelManager.notifyNewStateReached(state, actions);
+            
             if(actions.isEmpty()){
                 if (escAttempts >= MAX_ESC_ATTEMPTS){
                     LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -904,7 +927,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             
             //Save the user action information into the logs
             if (actionStatus.isUserEventAction()) {
+            	
     			CodingManager.buildIDs(state, actionStatus.getAction());
+    			
+    			//notify the state model manager of the executed action
+                stateModelManager.notifyActionExecution(actionStatus.getAction());
+    			
     			saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
     			lastExecutedAction = actionStatus.getAction();
     			actionCount++;
@@ -939,15 +967,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         }
 
         if(startedRecordMode && mode() == Modes.Quit){
+            // notify the statemodelmanager
+            stateModelManager.notifyTestSequenceStopped();
+
+        	// notify the state model manager of the sequence end
+            stateModelManager.notifyTestingEnded();
+        	
         	//Closing fragment for recording replayable test sequence:
         	writeAndCloseFragmentForReplayableSequence();
 
         	//Copy sequence file into proper directory:
         	classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
 
-            Util.clear(cv);
-            cv.end();
-            
             //If we want to Quit the current execution we stop the system
             stopSystem(system);
         }
@@ -1192,6 +1223,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
 					if (sut.isRunning())
 						sut.stop();
+					
+					if(settings.get(ConfigTags.SUTConnectorValue).contains("java -jar"))
+						throw new WinApiException("JAVA SUT PATH EXCEPTION");
+					
 					// issue starting the SUT
 					if (tryToKillIfRunning){
 						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
@@ -1564,10 +1599,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return topWidgets;
 	}
 
-    protected void storeWidget(String stateID, Widget widget) {
-        graphDB.addWidget(stateID, widget);
-    }
-
 	/**
 	 * Check whether widget w should be filtered based on
 	 * its title (matching the regular expression of the Dialog --> clickFilterPattern)
@@ -1803,8 +1834,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
             //For each possible drag, create an action and add it to the derived actions
             for (Drag drag : drags){
-                //Store the widget in the Graphdatabase
-                storeWidget(state.get(Tags.ConcreteID), w);
                 //Create a slide action with the Action Compiler, and add it to the set of derived actions
                 actions.add(ac.slideFromTo(
                         new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),

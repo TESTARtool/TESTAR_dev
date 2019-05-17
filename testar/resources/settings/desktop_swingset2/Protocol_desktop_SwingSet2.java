@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,137 +28,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- *  @author Sebastian Bauersfeld
- *  @author Urko Rueda Molina (protocol refactor & cleanup)
- */
-
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-
-import org.fruit.Assert;
-import org.fruit.Pair;
-import org.fruit.Util;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.Color;
-import org.fruit.alayer.FillPattern;
-import org.fruit.alayer.Pen;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
-import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
-import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.KBKeys;
-
-import static org.fruit.monkey.ConfigTags.*;
-
-import org.fruit.monkey.DefaultProtocol;
-import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
-
-import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
-
-import static org.fruit.alayer.Tags.NotResponding;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.RunningProcesses;
-import static org.fruit.alayer.Tags.SystemActivator;
+import org.testar.protocols.DesktopProtocol;
 import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
-
-
-public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // DefaultProtocol {
-
-
-	/** 
-	 * Called once during the life time of TESTAR
-	 * This method can be used to perform initial setup work
-	 * @param   settings   the current TESTAR settings as specified by the user.
-	 */
-
-	protected void initialize(Settings settings){
-
-		super.initialize(settings);
-
-	}
-
-	
-
-	/**
-	 * This method is invoked each time TESTAR starts to generate a new sequence
-	 */
-	protected void beginSequence(SUT system, State state){
-
-		super.beginSequence(system, state);
-
-	}
-
-	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 *      the SUT's configuratio files etc.)
-	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
-	 */
-	protected SUT startSystem() throws SystemStartException{
-		
-		return super.startSystem();
-
-	}
-
-	/**
-	 * This method is called when TESTAR requests the state of the SUT.
-	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
-	 * state is erroneous and if so why.
-	 * @return  the current state of the SUT with attached oracle.
-	 */
-	protected State getState(SUT system) throws StateBuildException{
-
-		return super.getState(system);
-
-	}
-
-	/**
-	 * This is a helper method used by the default implementation of <code>buildState()</code>
-	 * It examines the SUT's current state and returns an oracle verdict.
-	 * @return oracle verdict, which determines whether the state is erroneous and why.
-	 */
-	protected Verdict getVerdict(State state){
-
-		Verdict verdict = super.getVerdict(state); // by urueda
-		// system crashes, non-responsiveness and suspicious titles automatically detected!
-		
-		//-----------------------------------------------------------------------------
-		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-        //-----------------------------------------------------------------------------
-
-		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-		
-		return verdict;
-		
-	}
+//TODO Fernando: create a higher level SwingProtocol and document this one after that
+/**
+ * Protocol specifically for testing Java Swing applications.
+ */
+public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 
 
 	/**
@@ -227,69 +115,4 @@ public class Protocol_desktop_SwingSet2 extends ClickFilterLayerProtocol { // De
 			widgetTree(w.child(i), actions);
 		}
 	}
-	
-	/**
-	 * Select one of the possible actions (e.g. at random)
-	 * @param state the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-	 * @return  the selected action (non-null!)
-	 */
-
-	protected Action selectAction(State state, Set<Action> actions){ 
-
-		return super.selectAction(state, actions);
-
-	}
-
-
-	/**
-	 * Execute the selected action.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	protected boolean executeAction(SUT system, State state, Action action){
-		
-		return super.executeAction(system, state, action);
-		
-	}
-	
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	protected boolean moreActions(State state) {
-
-		return super.moreActions(state);
-
-	}
-
-
-
-	/** 
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	protected void finishSequence(){
-		
-		super.finishSequence();
-		
-	}
-
-
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 * @return  if <code>true</code> continue test, else stop	 */
-	protected boolean moreSequences() {
-
-		return super.moreSequences();
-
-	}
-
 }

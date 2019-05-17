@@ -165,7 +165,10 @@ public final class WinProcess extends SUTBase {
 			ret.set(Tags.Path, path);
 			ret.set(Tags.Desc, path);
 			return ret;
-		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
+		}catch(WinApiException we){
+			throw new WinApiException(we.getMessage());
+		}
+		catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
 		}
 	}

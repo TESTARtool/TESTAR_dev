@@ -10,6 +10,5 @@ doc/
 */.classpath
 .settings
 build.bat
-
 *.sse
 *.class
