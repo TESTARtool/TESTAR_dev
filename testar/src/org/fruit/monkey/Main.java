@@ -323,11 +323,15 @@ public class Main {
 		File logsDir = new File(outputDir + File.separator +"logs");
 		if(!logsDir.exists())
 			logsDir.mkdirs();
+		//Check if logs/debug dir exist, if not create it
+		File logsDebugDir = new File(logsDir+ File.separator + "debug");
+		if(!logsDebugDir.exists())
+			logsDebugDir.mkdirs();
 
 		// Starting the logs
 		try {
 			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
-			File logFile = new File(outputDir + File.separator +"logs"+ File.separator + logFileName);
+			File logFile = new File(logsDebugDir+ File.separator + logFileName);
 			if (logFile.exists()) {
 				logFile = Util.generateUniqueFile(outputDir, logFileName);
 			}
