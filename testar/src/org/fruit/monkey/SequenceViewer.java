@@ -397,7 +397,7 @@ public class SequenceViewer extends javax.swing.JFrame{
 	}	
 
 	public void updateInfo(String actionText){
-		lblInfo.setText("State: " + Integer.toString(stateCount) + "  Action: " + actionText);
+		lblInfo.setText("State: " + Integer.toString(stateCount+1) + "  Action: " + actionText);
 	}
 
 	Settings settings;

@@ -565,6 +565,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                  */
                 runGenerateInnerLoop(system, state);
 
+                //running getState() to get the state in the end of the test sequence
+                state = getState(system);
+
+                //Saving the state into replayable test sequence:
+                saveStateIntoFragmentForReplayableSequence(state);
+
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
 
@@ -747,6 +753,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         fragment.set(SystemState, state);
     }
 
+
+    /**
+     * Saving the action into the fragment for replayable sequence
+     *
+     * @param state
+     */
+    private void saveStateIntoFragmentForReplayableSequence(State state) {
+        processVerdict = getProcessVerdict();
+        verdict = state.get(OracleVerdict, Verdict.OK);
+        fragment.set(OracleVerdict, verdict.join(processVerdict));
+        fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+        fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+        LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+        TestSerialiser.write(fragment);
+        //resetting the fragment:
+        fragment =new TaggableBase();
+        fragment.set(SystemState, state);
+    }
+
     /**
      * Writing the fragment into file and closing the test serialiser
      */
@@ -757,7 +782,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         TestSerialiser.write(fragment);
         
         //Wait since TestSerialiser write all fragments on sequence File
-        while(!TestSerialiser.isSavingQueueEmpty()) {
+        while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
         	//System.out.println("Saving sequences...");
         	synchronized (this) {
 				try {
@@ -1523,6 +1548,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
 				waitCycles--;
 			} while (actionCPU > 0 && waitCycles > 0);
+			
+			protocolUtil.getActionshot(state,action);
 
 			//Save the executed action information into the logs
 			saveActionInfoInLogs(state, action, "ExecutedAction");
