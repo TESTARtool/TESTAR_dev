@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -34,22 +34,20 @@ import java.util.Set;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
+/**
+ * This is a small change to Desktop Generic Protocol to use a simple in-memory state model
+ * and Q-learning to improve the action selection.
+ *
+ * It also creates an HTML report of the sequences with screenshots of the GUI states.
+ *
+ *  It changes the initialize() and selectAction() methods.
+ */
 public class Protocol_desktop_qlearning extends DesktopProtocol {
 
 	private HtmlSequenceReport htmlReport;
@@ -66,7 +64,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 		//initializing the HTML sequence report:
 		htmlReport = new HtmlSequenceReport();
 		// initializing simple GUI state graph for Q-learning:
-		// this implementation uses concreteStateID for state abstraction so usually it find too many states:
+		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
 		super.initialize(settings);
 	}

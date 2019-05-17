@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,26 +28,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-import java.io.File;
-import java.util.Set;
-
-import org.fruit.Drag;
 import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.exceptions.SystemStartException;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol; 
 import es.upv.staq.testar.NativeLinker;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
+/**
+ * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
+ */
 public class Protocol_web_generic extends DesktopProtocol {
 	
 	// This protocol expects Mozilla Firefox or Microsoft Internet Explorer on Windows10

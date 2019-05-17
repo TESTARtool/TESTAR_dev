@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -39,20 +39,12 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.fruit.alayer.Tags;
 import eye.Eye;
 import eye.Match;
 import org.testar.protocols.DesktopProtocol;
-
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
 
 /**
  * This protocol uses:

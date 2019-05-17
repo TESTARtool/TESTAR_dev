@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -27,18 +28,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-
-/**
- * A generic desktop protocol
- * @author Urko Rueda Molina
- */
-
 import java.util.Set;
 import org.fruit.alayer.*;
 import org.testar.protocols.DesktopProtocol;
 
-
-
+/**
+ * This is a small change to Desktop Generic Protocol to use state model extraction for
+ * improved action selection algorithm.
+ *
+ * Please note, that this requires state model to be enabled in the test settings
+ * (or in Setting Dialog user interface of TESTAR).
+ *
+ *  It only changes the selectAction() method.
+ */
 public class Protocol_desktop_generic_graphdb extends DesktopProtocol {
 
 	/**
