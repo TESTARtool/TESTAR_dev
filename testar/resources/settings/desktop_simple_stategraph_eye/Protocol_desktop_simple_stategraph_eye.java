@@ -73,7 +73,7 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
+		htmlReport = new HtmlSequenceReport(sequenceCount());
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);

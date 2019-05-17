@@ -62,7 +62,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
+		htmlReport = new HtmlSequenceReport(sequenceCount());
 		super.initialize(settings);
 	}
 

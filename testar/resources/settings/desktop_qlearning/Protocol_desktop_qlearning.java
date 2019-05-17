@@ -62,7 +62,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport();
+		htmlReport = new HtmlSequenceReport(sequenceCount());
 		// initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
 		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
