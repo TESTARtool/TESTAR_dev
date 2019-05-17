@@ -33,10 +33,10 @@ import org.fruit.alayer.*;
 import org.testar.protocols.DesktopProtocol;
 
 /**
- * This is a small change to Desktop Generic Protocol to use state model extraction for
+ * This is a small change to Desktop Generic Protocol to use the learned state model for
  * improved action selection algorithm.
  *
- * Please note, that this requires state model to be enabled in the test settings
+ * Please note, that this requires state model learning to be enabled in the test settings
  * (or in Setting Dialog user interface of TESTAR).
  *
  *  It only changes the selectAction() method.
@@ -51,7 +51,10 @@ public class Protocol_desktop_generic_graphdb extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//using the action selector of the state model:
+		//Using the action selector of the state model. Basically this comes down to
+		//giving priority to unvisited actions when selecting. If all actions in the current state have been visited,
+		//the state model is used to look ahead and pick the action that can bring us to state where unexplored actions
+		// are to be found.
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 
 		if(retAction!=null){
