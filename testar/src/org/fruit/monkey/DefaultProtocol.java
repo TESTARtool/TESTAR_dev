@@ -568,6 +568,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                 //running getState() to get the state in the end of the test sequence
                 state = getState(system);
 
+                //Saving the state into replayable test sequence:
+                saveStateIntoFragmentForReplayableSequence(state);
+
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
 
@@ -744,6 +747,25 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
     	fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
     	LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+        TestSerialiser.write(fragment);
+        //resetting the fragment:
+        fragment =new TaggableBase();
+        fragment.set(SystemState, state);
+    }
+
+
+    /**
+     * Saving the action into the fragment for replayable sequence
+     *
+     * @param state
+     */
+    private void saveStateIntoFragmentForReplayableSequence(State state) {
+        processVerdict = getProcessVerdict();
+        verdict = state.get(OracleVerdict, Verdict.OK);
+        fragment.set(OracleVerdict, verdict.join(processVerdict));
+        fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
+        fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+        LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
         TestSerialiser.write(fragment);
         //resetting the fragment:
         fragment =new TaggableBase();
