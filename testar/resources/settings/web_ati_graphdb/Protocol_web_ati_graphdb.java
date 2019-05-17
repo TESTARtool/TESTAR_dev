@@ -45,6 +45,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.DesktopProtocol;
 
 import java.io.File;
 import java.util.*;
@@ -53,7 +54,7 @@ import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
 
-public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
+public class Protocol_web_ati_graphdb extends DesktopProtocol {
   // Each browser (and locale!) uses different names for standard elements
   private enum Browser {
     explorer("address", "UIAEdit", "back", "close"),
@@ -77,9 +78,6 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   private static Role webText; // browser dependent
   private static double browser_toolbar_filter;
   private static Browser browser;
-
-  private static double scrollArrowSize = 36; // sliding arrows (iexplorer)
-  private static double scrollThick = 16; // scroll thickness (iexplorer)
 
   // If we encounter a login URL, determine the 'login button'and force click
   private static String loginTitle = "inloggen"; // lower case
@@ -131,32 +129,6 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   }
 
   /**
-   * This method is invoked each time TESTAR starts to generate a new sequence
-   */
-  @Override
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
-  }
-
-  /**
-   * This method is called when TESTAR starts the System Under Test (SUT). The method should
-   * take care of
-   * 1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-   * out what executable to run)
-   * 2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuratio files etc.)
-   * 3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-   * seconds until they have finished loading)
-   *
-   * @return a started SUT, ready to be tested.
-   */
-  @Override
-  protected SUT startSystem() throws SystemStartException {
-    SUT sut = super.startSystem();
-    return sut;
-  }
-
-  /**
    * This method is called when TESTAR requests the state of the SUT.
    * Here you can add additional information to the SUT's state or write your
    * own state fetching routine. The state should have attached an oracle
@@ -175,28 +147,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
         browser_toolbar_filter = w.get(Tags.Shape, null).y() + w.get(Tags.Shape, null).height();
       }
     }
-
     return state;
-  }
-
-  /**
-   * This is a helper method used by the default implementation of <code>buildState()</code>
-   * It examines the SUT's current state and returns an oracle verdict.
-   *
-   * @return oracle verdict, which determines whether the state is erroneous and why.
-   */
-  @Override
-  protected Verdict getVerdict(State state) {
-    Verdict verdict = super.getVerdict(state); // by urueda
-    // system crashes, non-responsiveness and suspicious titles automatically detected!
-
-    //-----------------------------------------------------------------------------
-    // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-    //-----------------------------------------------------------------------------
-
-    // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-    return verdict;
   }
 
   /**
@@ -214,11 +165,6 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
   protected Set<Action> deriveActions(SUT system, State state)
       throws ActionBuildException {
     Set<Action> actions = super.deriveActions(system, state);
-
-    // Ignore this protocol if Prolog is activated
-    if (settings().get(ConfigTags.PrologActivated)) {
-      return actions;
-    }
 
     // Check if forced actions are needed to stay within allowed domains
     Set<Action> forcedActions = detectForcedActions(state);
@@ -252,7 +198,7 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
         }
 
         // slides
-        addSlidingActions(actions, ac, scrollArrowSize, scrollThick, widget,state);
+        addSlidingActions(actions, ac, SCROLL_ARROW_SIZE, SCROLL_THICK, widget,state);
       }
     }
 
@@ -287,63 +233,6 @@ public class Protocol_web_ati_graphdb extends ClickFilterLayerProtocol {
     Shape shape = w.get(Tags.Shape, null);
 
     return shape != null && shape.y() > browser_toolbar_filter;
-  }
-
-  /**
-   * Select one of the possible actions (e.g. at random)
-   *
-   * @param state   the SUT's current state
-   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-   * @return the selected action (non-null!)
-   */
-  @Override
-  protected Action selectAction(State state, Set<Action> actions) {
-    return super.selectAction(state, actions);
-  }
-
-  /**
-   * Execute the selected action.
-   *
-   * @param system the SUT
-   * @param state  the SUT's current state
-   * @param action the action to execute
-   * @return whether or not the execution succeeded
-   */
-  @Override
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the generation of actions for the
-   * current sequence. You could stop the sequence's generation after a given amount of executed
-   * actions or after a specific time etc.
-   *
-   * @return if <code>true</code> continue generation, else stop
-   */
-  @Override
-  protected boolean moreActions(State state) {
-    return super.moreActions(state);
-  }
-
-  /**
-   * This method is invoked each time after TESTAR finished the generation of a sequence.
-   */
-  @Override
-  protected void finishSequence() {
-    super.finishSequence();
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the entire test.
-   * You could stop the test after a given amount of generated sequences or
-   * after a specific time etc.
-   *
-   * @return if <code>true</code> continue test, else stop
-   */
-  @Override
-  protected boolean moreSequences() {
-    return super.moreSequences();
   }
 
   /*

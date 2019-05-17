@@ -39,11 +39,7 @@ import org.testar.protocols.DesktopProtocol;
 
 
 
-public class Protocol_desktop_generic_graphdb extends DesktopProtocol { // DefaultProtocol {
-
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
-	private long sequence=0;
+public class Protocol_desktop_generic_graphdb extends DesktopProtocol {
 
 	/**
 	 * Select one of the possible actions (e.g. at random)
@@ -66,52 +62,5 @@ public class Protocol_desktop_generic_graphdb extends DesktopProtocol { // Defau
 
 	}
 
-	/**
-	 * Execute the selected action.
-	 * @param system the SUT
-	 * @param state the SUT's current state
-	 * @param action the action to execute
-	 * @return whether or not the execution succeeded
-	 */
-	@Override
-	protected boolean executeAction(SUT system, State state, Action action){
-		action.set(CustomTags.ACTION_SEQUENCE,sequence++);
-		return super.executeAction(system, state, action);
-
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the generation of actions for the
-	 * current sequence. You could stop the sequence's generation after a given amount of executed
-	 * actions or after a specific time etc.
-	 * @return  if <code>true</code> continue generation, else stop
-	 */
-	@Override
-	protected boolean moreActions(State state) {
-		return super.moreActions(state);
-	}
-
-	/**
-	 * This method is invoked each time after TESTAR finished the generation of a sequence.
-	 */
-	@Override
-	protected void finishSequence(){
-		super.finishSequence();
-	}
-
-	/**
-	 * TESTAR uses this method to determine when to stop the entire test.
-	 * You could stop the test after a given amount of generated sequences or
-	 * after a specific time etc.
-	 * @return  if <code>true</code> continue test, else stop	 */
-	@Override
-	protected boolean moreSequences() {
-		return super.moreSequences();
-	}
-
 }
 
-
-class CustomTags extends TagsBase {
-	public static Tag<Long> ACTION_SEQUENCE = from("sequenceNumber",Long.class);
-}

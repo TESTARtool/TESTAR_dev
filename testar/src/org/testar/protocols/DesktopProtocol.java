@@ -1,10 +1,12 @@
 package org.testar.protocols;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
 
 import java.util.Set;
 
@@ -15,6 +17,61 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
+
+
+    /**
+     * This method is used by TESTAR to determine the set of currently available actions.
+     * You can use the SUT's current state, analyze the widgets and their properties to create
+     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
+     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
+     * will stop generation of the current action and continue with the next one.
+     * @param system the SUT
+     * @param state the SUT's current state
+     * @return  a set of actions
+     */
+    @Override
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+
+        //The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+        //the foreground. You should add all other actions here yourself.
+        // These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
+        Set<Action> actions = super.deriveActions(system,state);
+
+
+        // Derive left-click actions, click and type actions, and scroll actions from
+        // top level (highest Z-index) widgets of the GUI:
+        actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
+
+        if(actions.size()==0){
+            // If the top level widgets did not have any executable widgets, try all widgets:
+            System.out.println("No actions from top level widgets, changing to all widgets.");
+            // Derive left-click actions, click and type actions, and scroll actions from
+            // all widgets of the GUI:
+            actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
+        }
+
+        //return the set of derived actions
+        return actions;
+    }
+
+
+    /**
+     * Select one of the available actions (e.g. at random)
+     * @param state the SUT's current state
+     * @param actions the set of derived actions
+     * @return  the selected action (non-null!)
+     */
+    @Override
+    protected Action selectAction(State state, Set<Action> actions){
+        //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+        //unwanted processes are killed and SUT is put into foreground.
+        Action a = preSelectAction(state, actions);
+        if (a!= null) {
+            return a;
+        } else
+            //if no preSelected actions are needed, then implement your own strategy
+            return RandomActionSelector.selectAction(actions);
+    }
 
     /**
      * Iterating through all widgets of the given state
