@@ -757,7 +757,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
         TestSerialiser.write(fragment);
         
         //Wait since TestSerialiser write all fragments on sequence File
-        while(!TestSerialiser.isSavingQueueEmpty()) {
+        while(!TestSerialiser.isSavingQueueEmpty() && !ScreenshotSerialiser.isSavingQueueEmpty()) {
         	//System.out.println("Saving sequences...");
         	synchronized (this) {
 				try {
