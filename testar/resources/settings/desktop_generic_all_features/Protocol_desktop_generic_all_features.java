@@ -183,7 +183,10 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 		}
 		// if state model fails, use default:
 		System.out.println("Default action selection used.");
-		return super.selectAction(state, actions);
+		retAction = super.selectAction(state, actions);
+		// adding the selected action into HTML report:
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
+		return retAction;
 
 	}
 
