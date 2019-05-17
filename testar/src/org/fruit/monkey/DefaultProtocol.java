@@ -565,6 +565,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
                  */
                 runGenerateInnerLoop(system, state);
 
+                //running getState() to get the state in the end of the test sequence
+                state = getState(system);
+
                 //calling finishSequence() to allow scripting GUI interactions to close the SUT:
                 finishSequence();
 

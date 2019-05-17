@@ -4,14 +4,14 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Set;
 
 public class HtmlSequenceReport {
 
-    private int sequenceCounter = 0;
+    private boolean firstStateAdded = false;
+    private boolean firstActionsAdded = false;
 
     private static final String[] HEADER = new String[] {
             "<!DOCTYPE html>",
@@ -23,9 +23,11 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_PRE = "output/HTMLreports/TESTAR_scenario_";
+    private static final String REPORT_FILENAME_PRE = "output/HTMLreports/TESTAR_run_";
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
+
+    private int sequenceCounter = 0;
     private int scenarioCount = 1;
     public int getScenarioCount() {
         return scenarioCount;
@@ -134,6 +136,19 @@ public class HtmlSequenceReport {
     }
 
     public void addState(State state){
+        if(firstStateAdded){
+            if(firstActionsAdded){
+                writeStateIntoReport(state);
+            }else{
+                //don't write the state as it is the same - getState is run twice in the beginning, before the first action
+            }
+        }else{
+            firstStateAdded = true;
+            writeStateIntoReport(state);
+        }
+    }
+
+    private void writeStateIntoReport(State state){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
             imagePath = imagePath.replace("./output","../");
@@ -141,9 +156,9 @@ public class HtmlSequenceReport {
         write("<h2>State "+sequenceCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
         try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
+//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
+//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
+//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
         write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
         // file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
         // statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
@@ -151,32 +166,8 @@ public class HtmlSequenceReport {
     }
 
 
-    public void addState(State state, Set<Action> actions){
-        String imagePath = state.get(Tags.ScreenshotPath);
-        if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output","../");
-        }
-        write("<h2>State "+sequenceCounter+"</h2>");
-        write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
-        try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
-        write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-        // file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-        // statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-        sequenceCounter++;
-
-        write("<h4>Set of widgets:</h4><ul>");
-        for(Widget widget:state) {
-            write("<li>");
-            try{if(widget.get(Tags.Desc)!=null) write("<b>"+widget.get(Tags.Desc)+"</b> :: ");}catch(Exception e){}
-            try{if(widget.get(Tags.Title)!=null) write(widget.get(Tags.Title)+" :: ");}catch(Exception e){}
-            try{if(widget.get(Tags.Shape)!=null) write("X="+widget.get(Tags.Shape).x()+",Y="+widget.get(Tags.Shape).y()+", Width="+widget.get(Tags.Shape).width()+", Height="+widget.get(Tags.Shape).height());}catch(Exception e){}
-            write("</li>");
-        }
-        write("</ul>");
-
+    public void addActions(Set<Action> actions){
+        if(!firstActionsAdded) firstActionsAdded = true;
         write("<h4>Set of actions:</h4><ul>");
         for(Action action:actions){
             write("<li>");
@@ -194,15 +185,8 @@ public class HtmlSequenceReport {
         write("</ul>");
     }
 
-    public void addState(State state, Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
-        String imagePath = state.get(Tags.ScreenshotPath);
-        if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output","../");
-        }
-        write("<h2>State "+sequenceCounter+"</h2>");
-        write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
-        write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-        sequenceCounter++;
+    public void addActionsAndUnvisitedActions(Set<Action> actions, Set<String> concreteIdsOfUnvisitedActions){
+        if(!firstActionsAdded) firstActionsAdded = true;
         if(actions.size()==concreteIdsOfUnvisitedActions.size()){
             write("<h4>Set of actions (all unvisited - a new state):</h4><ul>");
             for(Action action:actions){

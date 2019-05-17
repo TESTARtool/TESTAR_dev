@@ -58,6 +58,22 @@ public class Protocol_desktop_generic_html_report extends DesktopProtocol {
 	}
 
 	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException{
+		State state = super.getState(system);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state);
+		return state;
+	}
+
+	/**
 	 * Select one of the available actions (e.g. at random)
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -65,8 +81,8 @@ public class Protocol_desktop_generic_html_report extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding state to the HTML sequence report:
-		htmlReport.addState(state, actions);
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
 
 		Action retAction = super.selectAction(state, actions);
 		// adding the selected action into HTML report:

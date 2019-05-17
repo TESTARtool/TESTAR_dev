@@ -90,6 +90,22 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 	}
 
 	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException{
+		State state = super.getState(system);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state);
+		return state;
+	}
+
+	/**
 	 * Select one of the available actions (e.g. at random)
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
@@ -99,10 +115,10 @@ public class Protocol_desktop_simple_stategraph_eye extends DesktopProtocol {
 	protected Action selectAction(State state, Set<Action> actions){
 		//adding state to the HTML sequence report:
 		try {
-			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null
-			htmlReport.addState(state, actions);
+			htmlReport.addActions(actions);
 		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
