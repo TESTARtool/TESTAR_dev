@@ -38,7 +38,7 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 /**
- * This protocol makes a little change to the Desktop Generic protocol to create HTML report of the
+ * This protocol makes a small change to the Desktop Generic protocol to create HTML reports of the
  * executed test sequences with screenshots of the GUI states.
  */
 public class Protocol_desktop_generic_html_report extends DesktopProtocol {

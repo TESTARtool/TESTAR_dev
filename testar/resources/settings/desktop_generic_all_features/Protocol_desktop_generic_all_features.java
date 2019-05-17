@@ -38,17 +38,17 @@ import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 /**
- * This protocol tries to combine all the different functionalities of TESTAR for testing Windows desktop applications
+ * This protocol combines different functionalities of TESTAR for testing Windows desktop applications
  * into one protocol.
  *
- * The optional features are commented out with short documentation.
+ * The optional features are commented out with short documentation s.t. you can turn them on again if you want.
  *
- * This protocol has:
- * - HTML report of the executed test sequence with screenshots of the GUI states
+ * This protocol includes:
+ * - HTML reports of the executed test sequences with screenshots of the GUI states
  * - Creating JSON files with information about the widgets and their locations on the screenshots
- * - State model learning and saving state models into graph database (OrientDB),
- *     state model has to be enabled in test settings and OrientDB has to be installed
- * - Using the state model for improved action selection, prioritizing unvisited actions and using the state model as a map
+ * - State model learning and saving state models into graph database (OrientDB).
+ *   (NOTE: the state model has to be enabled in test settings and OrientDB has to be installed)
+ * - Using the learned state model for improved action selection, prioritizing unvisited actions and using the state model as a map
  */
 public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 
