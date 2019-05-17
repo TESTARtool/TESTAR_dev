@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,18 +30,29 @@
 
 
 import java.util.Set;
-import nl.ou.testar.RandomActionSelector;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
+import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
 
 /**
- * This protocol provides default TESTAR behaviour to test Windows desktop applications.
+ * This protocol tries to combine all the different functionalities of TESTAR for testing Windows desktop applications
+ * into one protocol.
  *
- * It uses random action selection algorithm.
+ * The optional features are commented out with short documentation.
+ *
+ * This protocol has:
+ * - HTML report of the executed test sequence with screenshots of the GUI states
+ * - Creating JSON files with information about the widgets and their locations on the screenshots
+ * - State model learning and saving state models into graph database (OrientDB),
+ *     state model has to be enabled in test settings and OrientDB has to be installed
+ * - Using the state model for improved action selection, prioritizing unvisited actions and using the state model as a map
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
+public class Protocol_desktop_generic_all_features extends DesktopProtocol {
+
+	private HtmlSequenceReport htmlReport;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -50,6 +61,8 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport();
 		super.initialize(settings);
 	}
 
@@ -89,7 +102,10 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		return super.getState(system);
+		State state = super.getState(system);
+		// Creating a JSON file with information about widgets and their location on the screenshot:
+		JsonUtils.createWidgetInfoJsonFile(state);
+		return state;
 	}
 
 	/**
@@ -155,14 +171,20 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state, actions);
+
+		//using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
+		return super.selectAction(state, actions);
+
 	}
 
 	/**
