@@ -841,7 +841,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		while(mode() == Modes.Spy && system.isRunning()) {
 
-			State state = getState(system);
+			//Instead of use getState(SUT system) method, build our own State into Spy Mode
+			//This will prevent issues with other protocols and reports
+			Assert.notNull(system);
+			State state = builder.apply(system);
+			CodingManager.buildIDs(state);
+			calculateZIndices(state);
+			setStateForClickFilterLayerProtocol(state);
+			
 			cv.begin(); Util.clear(cv);
 
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
