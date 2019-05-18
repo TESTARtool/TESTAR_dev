@@ -55,7 +55,7 @@ public class GeneralPanel extends JPanel {
   private JSpinner spnSequenceLength;
   private JSpinner esiSpinner;
   private JComboBox<String> comboboxVerbosity;
-  private JCheckBox checkStopOnFault;
+  //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
 
@@ -131,10 +131,10 @@ public class GeneralPanel extends JPanel {
     compileCheckBox.setToolTipText(lblCompileTTT);
     add(compileCheckBox);
 
-    checkStopOnFault = new JCheckBox("Stop Test on Fault");
+    /*checkStopOnFault = new JCheckBox("Stop Test on Fault");
     checkStopOnFault.setBounds(10, 240, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
-    add(checkStopOnFault);
+    add(checkStopOnFault);*/
 
   }
 
@@ -220,7 +220,7 @@ public class GeneralPanel extends JPanel {
     this.settings = settings;
 
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
-    checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
+    //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
@@ -238,7 +238,7 @@ public class GeneralPanel extends JPanel {
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
-    settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
+    //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
