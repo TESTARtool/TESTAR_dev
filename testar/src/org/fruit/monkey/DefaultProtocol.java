@@ -1011,6 +1011,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
+		
+		preSequencePreparations();
+		
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -1124,7 +1127,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
 		}
+		
 		LogSerialiser.finish();
+		postSequenceProcessing();
 
 		// Going back to TESTAR settings dialog if it was used to start replay:
 		mode = Modes.Quit;
