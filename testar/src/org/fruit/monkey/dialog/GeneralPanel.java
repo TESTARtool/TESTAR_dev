@@ -97,7 +97,7 @@ public class GeneralPanel extends JPanel {
     add(spnSequenceLength);
 
     esiSpinner = new JSpinner();
-    esiSpinner.setBounds(160, 275, 71, 25);
+    esiSpinner.setBounds(160, 237, 71, 25);
     esiSpinner.setValue(10);
     esiSpinner.setToolTipText(intervalTTT);
     add(esiSpinner);
@@ -106,7 +106,7 @@ public class GeneralPanel extends JPanel {
     comboboxVerbosity.setModel(new DefaultComboBoxModel<>(
         new String[]{"Critical", "Information", "Debug"}));
     comboboxVerbosity.setSelectedIndex(1);
-    comboboxVerbosity.setBounds(160, 313, 107, 25);
+    comboboxVerbosity.setBounds(160, 275, 107, 25);
     comboboxVerbosity.setMaximumRowCount(3);
     comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
     add(comboboxVerbosity);
@@ -172,12 +172,12 @@ public class GeneralPanel extends JPanel {
     add(lblNofSequences);
 
     JLabel lblSamplingInterval = new JLabel("Sampling interval:");
-    lblSamplingInterval.setBounds(10, 278, 100, 14);
+    lblSamplingInterval.setBounds(10, 240, 100, 14);
     lblSamplingInterval.setToolTipText(intervalTTT);
     add(lblSamplingInterval);
 
     JLabel lblLoggingVerbosity = new JLabel("Logging Verbosity:");
-    lblLoggingVerbosity.setBounds(10, 316, 120, 14);
+    lblLoggingVerbosity.setBounds(10, 278, 120, 14);
     lblLoggingVerbosity.setToolTipText(lblLoggingVerbosityTTT);
     add(lblLoggingVerbosity);
 
