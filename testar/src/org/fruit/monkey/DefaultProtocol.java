@@ -565,9 +565,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 */
 				runGenerateInnerLoop(system, state);
 
-				//running getState() to get the state in the end of the test sequence
-				state = getState(system);
-
 				//Saving the state into replayable test sequence:
 				saveStateIntoFragmentForReplayableSequence(state);
 
