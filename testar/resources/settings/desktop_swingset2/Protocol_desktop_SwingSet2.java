@@ -61,7 +61,7 @@ public class Protocol_desktop_SwingSet2 extends DesktopProtocol {
 
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
+		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...

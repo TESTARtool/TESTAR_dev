@@ -221,6 +221,8 @@ public final class WinProcess extends SUTBase {
 
 			return ret;
 
+		}catch(WinApiException we){
+			throw new WinApiException(we.getMessage());
 		}catch(FruitException fe){
 			LogSerialiser.log(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());
 			System.out.println(appUserModelId + " - " + ActivateOptions.AO_NOERRORUI.getValue());

@@ -43,28 +43,31 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
+
 	/**
-	 * Select one of the possible actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
 	 * @param state the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Using the action selector of the state model. Basically this comes down to
-		//giving priority to unvisited actions when selecting. If all actions in the current state have been visited,
-		//the state model is used to look ahead and pick the action that can bring us to state where unexplored actions
-		// are to be found.
-		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 
-		if(retAction!=null){
-			System.out.println("State model based action selection used.");
-			return retAction;
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
-		// if state model fails, use default:
-		System.out.println("Default action selection used.");
-		return super.selectAction(state, actions);
-
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			// if state model fails, use default:
+			retAction = super.selectAction(state, actions);
+		}
+		return retAction;
 	}
 
 }
