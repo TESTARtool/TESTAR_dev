@@ -656,65 +656,61 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state) && !faultySequence) {
+		while (mode() != Modes.Quit && moreActions(state = getState(system))) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
 			}
 
 			// getState() including getVerdict() that is saved into the state:
-			LogSerialiser.log("Obtaining system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
-			state = getState(system);
+			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
+			//Not visualizing the widget info under cursor while in Generate-mode:
+			//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
 
-			if(!faultySequence) {
-				//Not visualizing the widget info under cursor while in Generate-mode:
-				//SutVisualization.visualizeState(false, markParentWidget, mouse, protocolUtil, lastPrintParentsOf, delay, cv);
-
-				//Deriving actions from the state:
-				Set<Action> actions = deriveActions(system, state);
-				CodingManager.buildIDs(state, actions);
-				// notify to state model the current state
-				stateModelManager.notifyNewStateReached(state, actions);
+			//Deriving actions from the state:
+			Set<Action> actions = deriveActions(system, state);
+			CodingManager.buildIDs(state, actions);
+			// notify to state model the current state
+			stateModelManager.notifyNewStateReached(state, actions);
 
 
-				if(actions.isEmpty()){
-					if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
-						LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
-					}
-					//----------------------------------
-					// THERE MUST ALMOST BE ONE ACTION!
-					//----------------------------------
-					// if we did not find any actions, then we just hit escape, maybe that works ;-)
-					Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-					CodingManager.buildIDs(state, escAction);
-					actions.add(escAction);
-					escAttempts++;
-				} else
-					escAttempts = 0;
-				//Showing the green dots if visualization is on:
-				if(visualizationOn) visualizeActions(cv, state, actions);
+			if(actions.isEmpty()){
+				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
+					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
+				}
+				//----------------------------------
+				// THERE MUST ALMOST BE ONE ACTION!
+				//----------------------------------
+				// if we did not find any actions, then we just hit escape, maybe that works ;-)
+				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+				CodingManager.buildIDs(state, escAction);
+				actions.add(escAction);
+				escAttempts++;
+			} else
+				escAttempts = 0;
+			//Showing the green dots if visualization is on:
+			if(visualizationOn) visualizeActions(cv, state, actions);
 
-				//Selecting one of the available actions:
-				Action action = selectAction(state, actions);
-				//Showing the red dot if visualization is on:
-				if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
+			//Selecting one of the available actions:
+			Action action = selectAction(state, actions);
+			//Showing the red dot if visualization is on:
+			if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 
-				//before action execution, pass it to the state model manager
-				stateModelManager.notifyActionExecution(action);
+			//before action execution, pass it to the state model manager
+			stateModelManager.notifyActionExecution(action);
 
-				//Executing the selected action:
-				executeAction(system, state, action);
-				lastExecutedAction = action;
-				actionCount++;
+			//Executing the selected action:
+			executeAction(system, state, action);
+			lastExecutedAction = action;
+			actionCount++;
 
-				//Saving the actions and the executed action into replayable test sequence:
-				saveActionIntoFragmentForReplayableSequence(action, state, actions);
+			//Saving the actions and the executed action into replayable test sequence:
+			saveActionIntoFragmentForReplayableSequence(action, state, actions);
 
-				// Resetting the visualization:
-				Util.clear(cv);
-				cv.end();
-			}
+			// Resetting the visualization:
+			Util.clear(cv);
+			cv.end();
 		}
 
 		// notify to state model the last state
