@@ -46,6 +46,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 
 	private HtmlSequenceReport htmlReport;
 	private int scenarioCount = 1;
+	private State latestState;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -103,10 +104,10 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		State state = super.getState(system);
+		latestState = super.getState(system);
 		//adding state to the HTML sequence report:
-		htmlReport.addState(state);
-		return state;
+		htmlReport.addState(latestState);
+		return latestState;
 	}
 
 	/**
@@ -233,4 +234,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 		super.stopSystem(system);
 	}
 
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		htmlReport.addTestVerdict(getVerdict(latestState));
+	}
 }
