@@ -444,7 +444,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private Taggable fragment; // Fragment is used for saving a replayable sequence:
-	private Verdict generalVerdict;
+	private Verdict verdict;
 	private long tStart;
 
 	/**
@@ -582,7 +582,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
 
-				Verdict stateVerdict = generalVerdict.join(new Verdict(passSeverity, "", Util.NullVisualizer));
+				Verdict stateVerdict = verdict.join(new Verdict(passSeverity, "", Util.NullVisualizer));
 				Verdict finalVerdict;
 
 				finalVerdict = stateVerdict.join(processVerdict);
@@ -732,8 +732,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// Fragment is used for saving a replayable sequence:
 		fragment = new TaggableBase();
 		fragment.set(SystemState, state);
-		generalVerdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, generalVerdict);
+		verdict = state.get(OracleVerdict, Verdict.OK);
+		fragment.set(OracleVerdict, verdict);
 	}
 
 	/**
@@ -743,8 +743,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		processVerdict = getProcessVerdict();
-		generalVerdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, generalVerdict.join(processVerdict));
+		verdict = state.get(OracleVerdict, Verdict.OK);
+		fragment.set(OracleVerdict, verdict.join(processVerdict));
 		fragment.set(ExecutedAction,action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
@@ -764,8 +764,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveStateIntoFragmentForReplayableSequence(State state) {
 		processVerdict = getProcessVerdict();
-		generalVerdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, generalVerdict.join(processVerdict));
+		verdict = state.get(OracleVerdict, Verdict.OK);
+		fragment.set(OracleVerdict, verdict.join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
@@ -1366,7 +1366,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		calculateZIndices(state);
-		Verdict verdict = generalVerdict.join(getVerdict(state));
+		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
