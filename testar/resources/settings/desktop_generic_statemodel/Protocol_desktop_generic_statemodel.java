@@ -47,30 +47,26 @@ public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 	/**
 	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
-	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
-	 * overwrite it, not always running it, we have take care of the HTML report here
-	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		// Because we overwrite the super.selectAction(state, actions), we have to include
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
 
-		//using the action selector of the state model:
-		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
-
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
+		}
 		if(retAction==null) {
 			System.out.println("State model based action selection did not find an action. Using default action selection.");
 			// if state model fails, use default:
 			retAction = super.selectAction(state, actions);
 		}
-		// Because we overwrite the super.selectAction(state, actions), we have to include
-		// adding the selected action into HTML report:
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
 		return retAction;
 	}
 

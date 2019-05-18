@@ -110,30 +110,31 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding state to the HTML sequence report:
+		// HTML is not having the unvisited actions by default, so
+		// adding actions and unvisited actions to the HTML sequence report:
 		try {
 			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
 		}catch(Exception e){
-			// catching null for the first state or any new state, when unvisited actions is still null
+			// catching null for the first state or any new state, when unvisited actions is still null,
+			// not adding the unvisited actions on those cases:
 			htmlReport.addActions(actions);
 		}
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			// returning pre-selected action
-		} else{
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = stateGraphWithVisitedActions.selectAction(state,actions);
-			//a = RandomActionSelector.selectAction(actions);
+			retAction = stateGraphWithVisitedActions.selectAction(state,actions);
 		}
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
-		return a;
+		return retAction;
 	}
 
 	/**
 	 * Execute the selected action.
+	 *
+	 * Since we are overwriting executeAction, we need to take care of the HTML report too
+	 *
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param action the action to execute
@@ -141,6 +142,8 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	 */
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
+		// adding the action that is going to be executed into HTML report:
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), action);
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds

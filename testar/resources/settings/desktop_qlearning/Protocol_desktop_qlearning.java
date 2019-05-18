@@ -79,21 +79,14 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding actions to the HTML sequence report:
-		htmlReport.addActions(actions);
-
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			// returning pre-selected action
-		} else{
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = actionSelector.selectAction(state,actions);
-			//a = RandomActionSelector.selectAction(actions);
+			retAction = actionSelector.selectAction(state,actions);
 		}
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
-		return a;
+		return retAction;
 	}
 }

@@ -133,16 +133,18 @@ public class Protocol_web_orientdb extends DesktopProtocol {
 	protected Action selectAction(State state, Set<Action> actions){
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
+		Action retAction = preSelectAction(state, actions);
+		if (retAction == null) {
 			//if no preSelected actions are needed, then implement your own strategy
-			System.out.println("Asking state model manager for action");
-		Action modelAction = stateModelManager.getAbstractActionToExecute(actions);
-		if (modelAction != null) return modelAction;
-		System.out.println("StateModelManager did not return an action. Returning random");
-		return RandomActionSelector.selectAction(actions);
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
+		}
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			//if your own action selection algorithm fails to find an action, use the default random action selection:
+			retAction = super.selectAction(state, actions);
+		}
+		return retAction;
 	}
 
 }

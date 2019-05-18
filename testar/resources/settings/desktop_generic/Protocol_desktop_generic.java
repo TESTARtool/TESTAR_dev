@@ -177,7 +177,7 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * Execute the selected action.
 	 *
 	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
-	 * 
+	 *
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param action the action to execute
