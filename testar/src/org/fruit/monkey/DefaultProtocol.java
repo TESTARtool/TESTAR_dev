@@ -444,7 +444,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private Taggable fragment; // Fragment is used for saving a replayable sequence:
-	private Verdict verdict;
 	private long tStart;
 
 	/**
@@ -563,7 +562,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				/*
 				 ***** starting the INNER LOOP:
 				 */
-				runGenerateInnerLoop(system, state);
+				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
 				//Saving the state into replayable test sequence:
 				saveStateIntoFragmentForReplayableSequence(state);
@@ -578,13 +577,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-
-				Verdict stateVerdict = verdict.join(new Verdict(passSeverity, "", Util.NullVisualizer));
-				Verdict finalVerdict;
-
-				finalVerdict = stateVerdict.join(processVerdict);
+				
+				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				setProcessVerdict(Verdict.OK);
+				
+				System.out.println("State Verdcit: "+stateVerdict);
+				
+				System.out.println("Final Verdcit: "+finalVerdict);
 
 				//Copy sequence file into proper directory:
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
@@ -649,7 +649,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 *
 	 * @param system
 	 */
-	private void runGenerateInnerLoop(SUT system, State state) {
+	private Verdict runGenerateInnerLoop(SUT system, State state) {
 		/*
 		 ***** INNER LOOP:
 		 */
@@ -714,6 +714,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
 		stateModelManager.notifyNewStateReached(state, actions);
+		
+		return getVerdict(state);
 	}
 
 	/**
@@ -725,8 +727,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// Fragment is used for saving a replayable sequence:
 		fragment = new TaggableBase();
 		fragment.set(SystemState, state);
-		verdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, verdict);
+		fragment.set(OracleVerdict, getVerdict(state));
 	}
 
 	/**
@@ -736,8 +737,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		processVerdict = getProcessVerdict();
-		verdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, verdict.join(processVerdict));
+		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ExecutedAction,action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
@@ -757,8 +757,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveStateIntoFragmentForReplayableSequence(State state) {
 		processVerdict = getProcessVerdict();
-		verdict = state.get(OracleVerdict, Verdict.OK);
-		fragment.set(OracleVerdict, verdict.join(processVerdict));
+		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
