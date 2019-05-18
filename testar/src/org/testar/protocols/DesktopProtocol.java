@@ -44,7 +44,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 
         if(actions.size()==0){
             // If the top level widgets did not have any executable widgets, try all widgets:
-            System.out.println("No actions from top level widgets, changing to all widgets.");
+//            System.out.println("No actions from top level widgets, changing to all widgets.");
             // Derive left-click actions, click and type actions, and scroll actions from
             // all widgets of the GUI:
             actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
