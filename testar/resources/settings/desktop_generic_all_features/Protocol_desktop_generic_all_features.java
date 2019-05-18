@@ -53,6 +53,7 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 
 	private HtmlSequenceReport htmlReport;
+	private int scenarioCount = 1;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -61,9 +62,18 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(sequenceCount());
 		super.initialize(settings);
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
 	}
 
 	/**
@@ -103,6 +113,8 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
 		JsonUtils.createWidgetInfoJsonFile(state);
 		return state;
@@ -140,7 +152,6 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
 		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
@@ -171,8 +182,8 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding state to the HTML sequence report:
-		htmlReport.addState(state, actions);
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
 
 		//using the action selector of the state model:
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);

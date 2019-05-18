@@ -60,6 +60,7 @@ import org.testar.protocols.DesktopProtocol;
 public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol {
 
 	private HtmlSequenceReport htmlReport;
+	private int scenarioCount = 1;
 	private GuiStateGraphWithVisitedActions stateGraphWithVisitedActions;
 
 	/** 
@@ -69,11 +70,36 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	 */
 	@Override
 	protected void initialize(Settings settings){
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(sequenceCount());
 		// initializing simple GUI state graph:
 		stateGraphWithVisitedActions = new GuiStateGraphWithVisitedActions();
 		super.initialize(settings);
+	}
+
+	/**
+	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		//initializing the HTML sequence report:
+		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+		scenarioCount = htmlReport.getScenarioCount();
+	}
+
+	/**
+	 * This method is called when the TESTAR requests the state of the SUT.
+	 * Here you can add additional information to the SUT's state or write your
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+	 * state is erroneous and if so why.
+	 * @return  the current state of the SUT with attached oracle.
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException{
+		State state = super.getState(system);
+		//adding state to the HTML sequence report:
+		htmlReport.addState(state);
+		return state;
 	}
 
 	/**
@@ -86,10 +112,10 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	protected Action selectAction(State state, Set<Action> actions){
 		//adding state to the HTML sequence report:
 		try {
-			htmlReport.addState(state, actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
+			htmlReport.addActionsAndUnvisitedActions(actions, stateGraphWithVisitedActions.getConcreteIdsOfUnvisitedActions(state));
 		}catch(Exception e){
 			// catching null for the first state or any new state, when unvisited actions is still null
-			htmlReport.addState(state, actions);
+			htmlReport.addActions(actions);
 		}
 		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.

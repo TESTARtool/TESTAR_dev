@@ -59,8 +59,8 @@ public class JsonUtils {
             Set<Vertice> vertices = new HashSet<Vertice>();
             vertices.add(new Vertice(rect.x(), rect.y()));
             vertices.add(new Vertice(rect.x()+rect.width(), rect.y()));
-            vertices.add(new Vertice(rect.x(), rect.y()+rect.height()));
             vertices.add(new Vertice(rect.x()+rect.width(), rect.y()+rect.height()));
+            vertices.add(new Vertice(rect.x(), rect.y()+rect.height()));
             BoundingPoly boundingPoly = new BoundingPoly(vertices);
             String className= widget.get(UIATags.UIAClassName, "");
             String title= widget.get(Tags.Title, "");
