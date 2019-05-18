@@ -30,8 +30,6 @@
 
 
 import java.util.Set;
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.RandomActionSelector;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
@@ -44,10 +42,6 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic extends DesktopProtocol {
 
-	private HtmlSequenceReport htmlReport;
-	private int scenarioCount = 1;
-	private State latestState;
-
 	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -59,14 +53,14 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 
 	/**
-	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
 	 */
 	@Override
 	protected void preSequencePreparations() {
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
-		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
-		scenarioCount = htmlReport.getScenarioCount();
+		super.preSequencePreparations();
 	}
 
 	/**
@@ -100,14 +94,14 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	 * own state fetching routine. The state should have attached an oracle
 	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-		latestState = super.getState(system);
-		//adding state to the HTML sequence report:
-		htmlReport.addState(latestState);
-		return latestState;
+		return super.getState(system);
 	}
 
 	/**
@@ -166,30 +160,24 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 	}
 
 	/**
-	 * Select one of the available actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
-
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction == null)
-			//if no preSelected actions are needed, then implement your own strategy
-			retAction = RandomActionSelector.selectAction(actions);
-
-		// adding the selected action into HTML report:
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
-		return retAction;
+		return(super.selectAction(state, actions));
 	}
 
 	/**
 	 * Execute the selected action.
+	 *
+	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
+	 * 
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param action the action to execute
@@ -236,9 +224,11 @@ public class Protocol_desktop_generic extends DesktopProtocol {
 
 	/**
 	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
 	 */
 	@Override
 	protected void postSequenceProcessing() {
-		htmlReport.addTestVerdict(getVerdict(latestState));
+		super.postSequenceProcessing();
 	}
 }

@@ -43,28 +43,35 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
 
+
 	/**
-	 * Select one of the possible actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	 * overwrite it, not always running it, we have take care of the HTML report here
+	 *
 	 * @param state the SUT's current state
-	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
+	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Using the action selector of the state model. Basically this comes down to
-		//giving priority to unvisited actions when selecting. If all actions in the current state have been visited,
-		//the state model is used to look ahead and pick the action that can bring us to state where unexplored actions
-		// are to be found.
+		// Because we overwrite the super.selectAction(state, actions), we have to include
+		// adding available actions into the HTML report:
+		htmlReport.addActions(actions);
+
+		//using the action selector of the state model:
 		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
 
-		if(retAction!=null){
-			System.out.println("State model based action selection used.");
-			return retAction;
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			// if state model fails, use default:
+			retAction = super.selectAction(state, actions);
 		}
-		// if state model fails, use default:
-		System.out.println("Default action selection used.");
-		return super.selectAction(state, actions);
-
+		// Because we overwrite the super.selectAction(state, actions), we have to include
+		// adding the selected action into HTML report:
+		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
+		return retAction;
 	}
 
 }
