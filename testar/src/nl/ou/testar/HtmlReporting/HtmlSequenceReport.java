@@ -82,10 +82,10 @@ public class HtmlSequenceReport {
         try{
             File folder = new File("output/HTMLreports");
             if(folder.exists()&&folder.isDirectory()){
-                System.out.println("DEBUG: HTMLreports folder exists already");
+//                System.out.println("DEBUG: HTMLreports folder exists already");
                 // all good, folder is already there
             }else{
-                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
+//                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
                 //folder is missing, let's create it
                 folder.mkdir();
             }
