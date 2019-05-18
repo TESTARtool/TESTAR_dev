@@ -134,13 +134,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
-	private static Verdict processVerdict = Verdict.OK;
-	public static void setProcessVerdict(Verdict newprocessVerdict) {
-		processVerdict = newprocessVerdict;
-	}
-	protected static Verdict getProcessVerdict() {
-		return processVerdict;
-	}
+	public static Verdict processVerdict = Verdict.OK;
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
@@ -461,7 +455,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		lastSequenceActionNumber = settings().get(ConfigTags.SequenceLength) + actionCount - 1;
 		firstSequenceActionNumber = actionCount;
 		passSeverity = Verdict.SEVERITY_OK;
-		setProcessVerdict(Verdict.OK);
+		processVerdict = Verdict.OK;
 		this.cv = buildCanvas();
 	}
 
@@ -580,11 +574,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
-				setProcessVerdict(Verdict.OK);
-				
-				System.out.println("State Verdcit: "+stateVerdict);
-				
-				System.out.println("Final Verdcit: "+finalVerdict);
+				processVerdict = Verdict.OK;
 
 				//Copy sequence file into proper directory:
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
@@ -736,7 +726,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param action
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
-		processVerdict = getProcessVerdict();
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ExecutedAction,action);
 		fragment.set(ActionSet, actions);
@@ -756,7 +745,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param state
 	 */
 	private void saveStateIntoFragmentForReplayableSequence(State state) {
-		processVerdict = getProcessVerdict();
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
@@ -893,6 +881,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//If system it's null means that we have started TESTAR from the Record User Actions Mode
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
+			
+			preSequencePreparations();
+			
 			system = startSystem();
 			startedRecordMode = true;
 			this.cv = buildCanvas();
@@ -1005,6 +996,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Copy sequence file into proper directory:
 			classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
+			
+			postSequenceProcessing();
 
 			//If we want to Quit the current execution we stop the system
 			stopSystem(system);
