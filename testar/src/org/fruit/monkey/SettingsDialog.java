@@ -239,6 +239,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
     stateModelPanel.populateFrom(settings);
+    temporalPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -273,7 +274,7 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
-    temporalPanel = TemporalPanel.createStateModelPanel();
+    temporalPanel = TemporalPanel.createTemporalPanel();
     jTabsPane.addTab("Temporal Analysis", temporalPanel);
 
     setLayout(jTabsPane);

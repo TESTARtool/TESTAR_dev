@@ -30,6 +30,8 @@
 
 package nl.ou.testar.tl;
 
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
@@ -38,6 +40,8 @@ import java.awt.event.ActionEvent;
 import java.io.*;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
+
+import static org.fruit.monkey.Main.outputDir;
 
 /**
  * Panel with settings for the state model inference module.
@@ -49,13 +53,24 @@ public class TemporalPanel extends JPanel {
     private Process webAnalyzerProcess = null;
     private JLabel label00 = new JLabel("Temporal property");
     private JTextField temporalProperty = new JTextField("G(a->Fb)");
-    private JButton modelcheckButton = new JButton("Check property");
+    private JButton MCtestButton = new JButton("Check property");
     private JLabel label02 = new JLabel("Check result");
     private JTextArea logCheckResult = new JTextArea("...");
     private JPanel logPanel;
     private JScrollPane resultsScrollPane;
+    private JButton convertGraphToMCformat = new JButton("<html>create HOA file<br>from Graphdb</html>");
     private JButton startTLWebAnalyzerButton = new JButton("<html>Start Temporal<br>WebAnalyzer</html>");
     private JButton stopTLWebAnalyzerButton = new JButton("<html>Stop Temporal<br>WebAnalyzer</html>");
+    private String dataStore;
+    private String dataStoreServer;
+    private String dataStoreDirectory;
+    private String dataStoreDB;
+    private String dataStoreUser;
+    private String dataStorePassword;
+    private String dataStoreMode;
+    private String dataStoreType;
+    private String applicationVersion;
+    private String applicationName;
 
 
     private TemporalPanel() {
@@ -67,7 +82,7 @@ public class TemporalPanel extends JPanel {
      *
      * @return StateModelPanel.
      */
-    public static TemporalPanel createStateModelPanel() {
+    public static TemporalPanel createTemporalPanel() {
         TemporalPanel panel = new TemporalPanel();
         panel.initialize();
         return panel;
@@ -87,10 +102,11 @@ public class TemporalPanel extends JPanel {
         add(temporalProperty);
 
 
-        modelcheckButton.setBounds(10, 42, 120, 27);
-        modelcheckButton.addActionListener(this::performTemporalCheck);
-        modelcheckButton.setToolTipText("Check whether the property holds on the current State Model.");
-        add(modelcheckButton);
+
+        MCtestButton.setBounds(10, 42, 120, 27);
+        MCtestButton.addActionListener(this::performLtlTranslation);
+        MCtestButton.setToolTipText("Check whether the property holds on the current State Model.");
+        add(MCtestButton);
         label02.setBounds(10, 80, 350, 27);
         add(label02);
         logPanel = new JPanel();
@@ -99,15 +115,13 @@ public class TemporalPanel extends JPanel {
         logCheckResult.setAutoscrolls(true);
         logCheckResult.setLineWrap(true);
         logCheckResult.setWrapStyleWord(true);
-        //resultsScrollPane = new JScrollPane(logCheckResult,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        //resultsScrollPane.setSize(340,210);
-        //resultsScrollPane.setBounds(160,80,250,227);
-        //logPanel.add(resultsScrollPane);
-        //logPanel.setBounds(160,80,350,227);
-        //logPanel.setSize(340,227);
-        //add(logPanel);
-
         add(logCheckResult);
+
+        convertGraphToMCformat.setBounds(10, 116, 120, 45);
+        convertGraphToMCformat.setSize(convertGraphToMCformat.getWidth(), 45);
+        convertGraphToMCformat.addActionListener(this::createMCfile);
+        convertGraphToMCformat.setToolTipText("create an HOA interface file for model checking LTL properties in SPOT");
+        add(convertGraphToMCformat);
 
         startTLWebAnalyzerButton.setBounds(10, 216, 120, 45);
         startTLWebAnalyzerButton.setSize(startTLWebAnalyzerButton.getWidth(), 45);
@@ -131,11 +145,31 @@ public class TemporalPanel extends JPanel {
 
     /**
      * Populate GraphDBFields from Settings structure.
-     *
      * @param settings The settings to load.
      */
     public void populateFrom(final Settings settings) {
+        //stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
+        //accessBridgeEnabledBox.setSelected(settings.get(ConfigTags.AccessBridgeEnabled));
+        dataStore =(settings.get(ConfigTags.DataStore));
+        dataStoreServer = settings.get(ConfigTags.DataStoreServer);
+        dataStoreDirectory= settings.get(ConfigTags.DataStoreDirectory);
+        dataStoreDB= settings.get(ConfigTags.DataStoreDB);
+        dataStoreUser= settings.get(ConfigTags.DataStoreUser);
+        dataStorePassword= settings.get(ConfigTags.DataStorePassword);
 
+        dataStoreMode=settings.get(ConfigTags.DataStoreMode);
+
+
+        dataStoreType=settings.get(ConfigTags.DataStoreType);
+        applicationName= settings.get(ConfigTags.ApplicationName);
+        applicationVersion= settings.get(ConfigTags.ApplicationVersion);
+
+        outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "temporaloracle" + File.separator;
     }
 
     /**
@@ -146,9 +180,23 @@ public class TemporalPanel extends JPanel {
     public void extractInformation(final Settings settings) {
 
     }
+    private void createMCfile(ActionEvent evt) {
+        // code goes here
+        // create a config object for the orientdb database connection info
+        Config config = new Config();
+        config.setConnectionType(dataStore);
+        config.setServer(dataStoreServer);
+        config.setDatabase(dataStoreDB);
+        config.setUser(dataStoreUser);
+        config.setPassword(dataStorePassword);
+        config.setDatabaseDirectory(dataStoreDirectory);
+        AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
+    }
 
 
-    private void performTemporalCheck(ActionEvent evt) {
+
+
+    private void performLtlTranslation(ActionEvent evt) {
         // code goes here
         Process theProcess = null;
         BufferedReader inStream = null;
