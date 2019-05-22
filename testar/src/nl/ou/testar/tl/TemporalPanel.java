@@ -190,7 +190,7 @@ public class TemporalPanel extends JPanel {
         config.setUser(dataStoreUser);
         config.setPassword(dataStorePassword);
         config.setDatabaseDirectory(dataStoreDirectory);
-        AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
+        //AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
     }
 
 
