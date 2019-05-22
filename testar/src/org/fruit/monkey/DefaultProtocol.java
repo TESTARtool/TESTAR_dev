@@ -42,6 +42,8 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -240,9 +242,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		try {
 
-			if (mode() == Modes.View && isValidFile()) {
-				new SequenceViewer(settings);
-			} else if (mode() == Modes.Replay && isValidFile()) {
+			if (mode() == Modes.View) {
+				String filePath = settings.get(ConfigTags.PathToReplaySequence);
+				if(isHtmlFile()) {
+					File htmlFile = new File(filePath);
+					Desktop.getDesktop().browse(htmlFile.toURI());
+				}
+				else if(isValidFile(filePath))
+					new SequenceViewer(settings);
+			} else if (mode() == Modes.Replay && isValidFile(settings.get(ConfigTags.PathToReplaySequence))) {
 				runReplayLoop();
 			} else if (mode() == Modes.Spy) {
 				runSpyLoop();
@@ -333,10 +341,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Check if the selected file to Replay or View contains a valid fragment object
 	 */
 
-	public boolean isValidFile(){
+	private boolean isValidFile(String filePath){
 		try {
 
-			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
+			File seqFile = new File(filePath);
 
 			FileInputStream fis = new FileInputStream(seqFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
@@ -355,6 +363,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Check if the selected file to View is a html file
+	 */
+	private boolean isHtmlFile() {
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+			return true;
+		
+		return false;
 	}
 	
 	/**
