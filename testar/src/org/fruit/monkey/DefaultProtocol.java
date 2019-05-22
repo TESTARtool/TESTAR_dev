@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -595,7 +595,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
-				//Saving the state into replayable test sequence:
+				//Saving the last state into replayable test sequence:
 				saveStateIntoFragmentForReplayableSequence(state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
@@ -697,7 +697,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state, actions);
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
-
 
 			if(actions.isEmpty()){
 				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
@@ -1392,12 +1391,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
-
-		setStateScreenshot(state);
-		
 		calculateZIndices(state);
+		
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
+		
+		setStateScreenshot(state);
+		
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
