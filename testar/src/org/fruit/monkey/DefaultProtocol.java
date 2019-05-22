@@ -750,11 +750,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 
@@ -767,11 +767,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 	/**
@@ -1375,12 +1375,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		CodingManager.buildIDs(state);
 
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
-
+		setStateScreenshot(state);
+		
 		calculateZIndices(state);
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
@@ -1399,6 +1395,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		setStateForClickFilterLayerProtocol(state);
 		return state;
+	}
+	
+	/**
+	 * Take a Screenshot of the State and associate the path into state tag
+	 */
+	private void setStateScreenshot(State state) {
+		Shape viewPort = state.get(Tags.Shape, null);
+		if(viewPort != null){
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		}
 	}
 
 	@Override
