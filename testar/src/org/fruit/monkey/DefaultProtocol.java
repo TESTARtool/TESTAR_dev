@@ -59,6 +59,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
 import nl.ou.testar.StateModel.StateModelManager;
@@ -250,9 +253,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			System.out.println("Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is a correct definition");
+			
+			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition";
+			
+			if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup))
+				popupMessage(msg);
+			
+			System.out.println(msg);
+			
 			this.mode = Modes.Quit;
+			
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			DEBUGLOG.error("Exception: ",SystemStartException);
@@ -344,6 +355,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Show a popup message to get the user's attention and inform him
+	 */
+	private void popupMessage(String message) {
+		JFrame frame = new JFrame();
+		JOptionPane.showMessageDialog(frame, message);
 	}
 
 	/**
