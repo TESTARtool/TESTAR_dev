@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -110,6 +110,7 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
+import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -161,11 +162,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
 	protected double passSeverity = Verdict.SEVERITY_OK;
-	protected static int generatedSequenceNumber = -1;
-
-	public final static int generatedSequenceCount() {
-		return generatedSequenceNumber;
-	}
 
 	protected static Action lastExecutedAction = null;
 
@@ -364,12 +360,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
-		String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
-		generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+		
+		String sequencesFileName = OutputStructure.runOutputDir;
+		
+		String generatedSequence = Util.generateUniqueFile(sequencesFileName + File.separator + "sequences", "sequence").getName();
 
+		String logFileName = OutputStructure.runOutputDir + File.separator + "logs"
+				+ File.separator + OutputStructure.startInnerLoopDateString+"_"
+        		+ OutputStructure.sutProcessName + "_sequence_" + OutputStructure.sequenceCount+".log";
+		
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-					settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
+					logFileName), true))),
 					settings.get(LogLevel));
 		} catch (NoSuchTagException e3) {
 			// TODO Auto-generated catch block
@@ -508,6 +510,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param system
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
+
+		synchronized(this){
+			OutputStructure.startRunDateString = Util.dateString(OutputStructure.DATE_FORMAT);
+			OutputStructure.sutProcessName = "prueba";//settings.get(ConfigTags.SUTConnectorValue,"");
+			OutputStructure.sequenceCount = 0;
+			OutputStructure.createOutputFolders();
+		}
+
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
@@ -522,6 +532,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+
+			synchronized(this){
+				OutputStructure.startInnerLoopDateString = Util.dateString(OutputStructure.DATE_FORMAT);
+				OutputStructure.sequenceCount++;
+			}
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
@@ -571,7 +586,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-				
+
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				processVerdict = Verdict.OK;
@@ -704,7 +719,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
 		stateModelManager.notifyNewStateReached(state, actions);
-		
+
 		return getVerdict(state);
 	}
 
@@ -832,7 +847,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state);
 			calculateZIndices(state);
 			setStateForClickFilterLayerProtocol(state);
-			
+
 			cv.begin(); Util.clear(cv);
 
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
@@ -881,9 +896,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//If system it's null means that we have started TESTAR from the Record User Actions Mode
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
-			
+
 			preSequencePreparations();
-			
+
 			system = startSystem();
 			startedRecordMode = true;
 			this.cv = buildCanvas();
@@ -996,7 +1011,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Copy sequence file into proper directory:
 			classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-			
+
 			postSequenceProcessing();
 
 			//If we want to Quit the current execution we stop the system
@@ -1011,9 +1026,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
-		
+
 		preSequencePreparations();
-		
+
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -1127,7 +1142,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		LogSerialiser.finish();
 		postSequenceProcessing();
 
