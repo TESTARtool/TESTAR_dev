@@ -89,7 +89,7 @@ public class StateFetcher implements Callable<UIAState>{
 	public UIAState call() throws Exception {				
 		Windows.CoInitializeEx(0, Windows.COINIT_MULTITHREADED);		
 		
-		UIARootElement uiaRoot = buildSkeletton(system);
+		UIARootElement uiaRoot = buildSkeleton(system);
 				
 		UIAState root = createWidgetTree(uiaRoot);
 		root.set(Tags.Role, Roles.Process);
@@ -128,7 +128,7 @@ public class StateFetcher implements Callable<UIAState>{
 	 * @param system
 	 * @return
 	 */
-	private UIARootElement buildSkeletton(SUT system){
+	private UIARootElement buildSkeleton(SUT system){
 		UIARootElement uiaRoot = buildRoot(system);
 
 		if(!uiaRoot.isRunning)
@@ -145,32 +145,32 @@ public class StateFetcher implements Callable<UIAState>{
 		// descend the root windows which belong to our process, using UIAutomation
 		uiaRoot.children = new ArrayList<UIAElement>();
 		boolean owned;
-		long hwndPID;
+		long windowHandlerProcessId;
 		List<Long> ownedWindows = new ArrayList<Long>();
-		for(long hwnd : visibleTopLevelWindows){
-			owned = Windows.GetWindow(hwnd, Windows.GW_OWNER) != 0;
-			//if (Windows.GetWindowProcessId(hwnd) == uiaRoot.pid){
-			hwndPID = Windows.GetWindowProcessId(hwnd);
-			if (hwndPID == uiaRoot.pid || isSUTProcess(hwnd)){ // by urueda	
-				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(hwndPID); // by urueda ( SUT as a set of windows/processes )				
+		for(long windowHandler : visibleTopLevelWindows){
+			owned = Windows.GetWindow(windowHandler, Windows.GW_OWNER) != 0;
+			//if (Windows.GetWindowProcessId(windowHandler) == uiaRoot.pid){
+			windowHandlerProcessId = Windows.GetWindowProcessId(windowHandler);
+			if (windowHandlerProcessId == uiaRoot.pid || isSUTProcess(windowHandler)){ // by urueda
+				uiaRoot.isForeground = uiaRoot.isForeground || WinProcess.isForeground(windowHandlerProcessId); // by urueda ( SUT as a set of windows/processes )
 				if(!owned){
-					//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
+					//uiaDescend(uiaCacheWindowTree(windowHandler), uiaRoot);
 					// by urueda
-					modalElement = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-															  uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot);
+					modalElement = this.accessBridgeEnabled ? abDescend(windowHandler, uiaRoot, 0, 0) :
+															  uiaDescend(windowHandler, uiaCacheWindowTree(windowHandler), uiaRoot);
 				} else
-					ownedWindows.add(hwnd);
+					ownedWindows.add(windowHandler);
 			}
 		}
 		
 		// if UIAutomation missed an owned window, we'll collect it here
-		for(long hwnd : ownedWindows){				
-			if(!uiaRoot.hwndMap.containsKey(hwnd)){
-				//uiaDescend(uiaCacheWindowTree(hwnd), uiaRoot);
+		for(long windowHandler : ownedWindows){
+			if(!uiaRoot.windowHandlerMap.containsKey(windowHandler)){
+				//uiaDescend(uiaCacheWindowTree(windowHandler), uiaRoot);
 				UIAElement modalE;
 				// begin by urueda
-				if ((modalE = this.accessBridgeEnabled ? abDescend(hwnd, uiaRoot, 0, 0) :
-														 uiaDescend(hwnd, uiaCacheWindowTree(hwnd), uiaRoot)) != null)
+				if ((modalE = this.accessBridgeEnabled ? abDescend(windowHandler, uiaRoot, 0, 0) :
+														 uiaDescend(windowHandler, uiaCacheWindowTree(windowHandler), uiaRoot)) != null)
 					modalElement = modalE;
 				// end by urueda
 			}
@@ -178,12 +178,12 @@ public class StateFetcher implements Callable<UIAState>{
 
 		// set z-indices for the windows
 		int z = 0;
-		for(long hwnd : visibleTopLevelWindows){
-			//long exStyle = Windows.GetWindowLong(hwnd, Windows.GWL_EXSTYLE);				
+		for(long windowHandler : visibleTopLevelWindows){
+			//long exStyle = Windows.GetWindowLong(windowHandler, Windows.GWL_EXSTYLE);
 			//if((exStyle & Windows.WS_EX_NOACTIVATE) != 0)
-			//	System.out.println(hwnd  + "   " + Windows.GetWindowText(hwnd) + "   " + Windows.GetClassName(hwnd));
+			//	System.out.println(windowHandler  + "   " + Windows.GetWindowText(windowHandler) + "   " + Windows.GetClassName(windowHandler));
 
-			UIAElement wnd = uiaRoot.hwndMap.get(hwnd);
+			UIAElement window = uiaRoot.windowHandlerMap.get(windowHandler);
 
 			// if we didn't encounter the window yet, it will be a foreign window
 
@@ -191,29 +191,29 @@ public class StateFetcher implements Callable<UIAState>{
 			// Get the title of the window - if the window is Testar's Spy window, skip it. Otherwise,
 			// the HitTest function will not work properly: it doesn't actually hit test, it checks if windows are
 			// on top of the SUT and the Java implementation of the Spy mode drawing is an invisible always on top window.
-			/*String windowTitle = Windows.GetWindowText(hwnd);
+			/*String windowTitle = Windows.GetWindowText(windowHandler);
 
 				if (windowTitle != null && Objects.equals(windowTitle, "Testar - Spy window")) {
 					continue;
 				}*/
 			// end by wcoux
 			
-			if(wnd == null){
-				wnd = new UIAElement(uiaRoot);
-				uiaRoot.children.add(wnd);
-				wnd.ignore = true;
-				wnd.hwnd = hwnd;
-				long r[] = Windows.GetWindowRect(hwnd);
+			if(window == null){
+				window = new UIAElement(uiaRoot);
+				uiaRoot.children.add(window);
+				window.ignore = true;
+				window.windowHandler = windowHandler;
+				long r[] = Windows.GetWindowRect(windowHandler);
 				if(r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
-					wnd.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
-				wnd.ctrlId = Windows.UIA_WindowControlTypeId;
-				uiaRoot.hwndMap.put(hwnd, wnd);
+					window.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+				window.ctrlId = Windows.UIA_WindowControlTypeId;
+				uiaRoot.windowHandlerMap.put(windowHandler, window);
 			}
 						
-			wnd.zindex = z++;
+			window.zindex = z++;
 						
-			if(wnd.ctrlId == Windows.UIA_MenuControlTypeId || wnd.ctrlId == Windows.UIA_WindowControlTypeId || wnd.parent == uiaRoot)
-				wnd.isTopLevelContainer = true;				
+			if(window.ctrlId == Windows.UIA_MenuControlTypeId || window.ctrlId == Windows.UIA_WindowControlTypeId || window.parent == uiaRoot)
+				window.isTopLevelContainer = true;
 				
 		}
 		
@@ -252,7 +252,7 @@ public class StateFetcher implements Callable<UIAState>{
 	
 	/* fire up the cache request */
 	private long uiaCacheWindowTree(long hwnd){
-		//return Windows.IUIAutomation_ElementFromHandleBuildCache(pAutomation, hwnd, pCacheRequest);
+		//return Windows.IUIAutomation_ElementFromHandleBuildCache(pAutomation, windowHandler, pCacheRequest);
 		// begin by urueda
 		long aep = Long.MIN_VALUE;
 		if (system.getNativeAutomationCache() != null)
@@ -268,7 +268,7 @@ public class StateFetcher implements Callable<UIAState>{
 	private void buildTLCMap(UIARootElement root){
 		ElementMap.Builder builder = ElementMap.newBuilder();
 		buildTLCMap(builder, root);
-		root.tlc = builder.build();		
+		root.elementMap = builder.build();
 	}
 
 	private void buildTLCMap(ElementMap.Builder builder, UIAElement el){
@@ -290,7 +290,7 @@ public class StateFetcher implements Callable<UIAState>{
 		parent.children.add(el);
 
 		el.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaPtr, true);			
-		el.hwnd = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaPtr, true);
+		el.windowHandler = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaPtr, true);
 
 		// bounding rectangle
 		long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaPtr, true);
@@ -313,7 +313,7 @@ public class StateFetcher implements Callable<UIAState>{
 		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaPtr, true);
 		el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaPtr, Windows.UIA_ValuePatternId);
 
-		parent.root.hwndMap.put(el.hwnd, el);
+		parent.root.windowHandlerMap.put(el.windowHandler, el);
 
 		// get extra infos from windows
 		if(el.ctrlId == Windows.UIA_WindowControlTypeId){
@@ -337,9 +337,9 @@ public class StateFetcher implements Callable<UIAState>{
 		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true); 
 		el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
 		if (el.scrollPattern){
-			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_CLIENT);
-			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_HSCROLL);
-			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.hwnd,Windows.OBJID_VSCROLL);
+			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.windowHandler,Windows.OBJID_CLIENT);
+			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.windowHandler,Windows.OBJID_HSCROLL);
+			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.windowHandler,Windows.OBJID_VSCROLL);
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
 			el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaPtr,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
@@ -420,7 +420,7 @@ public class StateFetcher implements Callable<UIAState>{
 				parent.children.add(el);
 				el.rect = rect;
 
-				el.hwnd = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				el.windowHandler = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
 				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
 					el.isTopLevelContainer = true;
 					modalElement = el;
@@ -433,7 +433,7 @@ public class StateFetcher implements Callable<UIAState>{
 				el.name = name;				
 				el.helpText = description;
 				// el.enabled = true;
-				parent.root.hwndMap.put(el.hwnd, el);
+				parent.root.windowHandlerMap.put(el.windowHandler, el);
 				
 				
 				//MenuItems are duplicate with AccessBridge when we open one Menu or combo box
@@ -444,7 +444,7 @@ public class StateFetcher implements Callable<UIAState>{
 						el.children = new ArrayList<UIAElement>(cc);
 						long[] children = Windows.GetVisibleChildren(vmidAC[0],vmidAC[1]);
 						for (int i=0; i<children.length; i++)
-							abDescend(hwnd,el,vmidAC[0],children[i]);
+							abDescend(windowHandler,el,vmidAC[0],children[i]);
 					}*/
 					
 						long childAC;

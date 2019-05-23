@@ -230,7 +230,7 @@ public final class WinProcess extends SUTBase {
 	public static boolean isForeground(long pid){
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
+		//System.out.println("foreground pid wanted: " + pid + "- windowHandler: " + windowHandler + " - wpid: " + wpid);
 		return !Windows.IsIconic(hwnd) && (wpid == pid);
 	}
 
