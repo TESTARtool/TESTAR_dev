@@ -1,12 +1,14 @@
 package org.testar.protocols;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 import nl.ou.testar.RandomActionSelector;
 import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
 
 import java.util.Set;
 
@@ -17,7 +19,37 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     //Attributes for adding slide actions
     protected static double SCROLL_ARROW_SIZE = 36; // sliding arrows
     protected static double SCROLL_THICK = 16; //scroll thickness
+    protected HtmlSequenceReport htmlReport;
+    protected int scenarioCount = 1;
+    protected State latestState;
 
+
+    /**
+     * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+     */
+    @Override
+    protected void preSequencePreparations() {
+        //initializing the HTML sequence report:
+        htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
+        // updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
+        scenarioCount = htmlReport.getScenarioCount();
+    }
+
+    /**
+     * This method is called when the TESTAR requests the state of the SUT.
+     * Here you can add additional information to the SUT's state or write your
+     * own state fetching routine. The state should have attached an oracle
+     * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
+     * state is erroneous and if so why.
+     * @return  the current state of the SUT with attached oracle.
+     */
+    @Override
+    protected State getState(SUT system) throws StateBuildException {
+        latestState = super.getState(system);
+        //adding state to the HTML sequence report:
+        htmlReport.addState(latestState);
+        return latestState;
+    }
 
     /**
      * This method is used by TESTAR to determine the set of currently available actions.
@@ -44,7 +76,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
 
         if(actions.size()==0){
             // If the top level widgets did not have any executable widgets, try all widgets:
-            System.out.println("No actions from top level widgets, changing to all widgets.");
+//            System.out.println("No actions from top level widgets, changing to all widgets.");
             // Derive left-click actions, click and type actions, and scroll actions from
             // all widgets of the GUI:
             actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
@@ -54,6 +86,19 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         return actions;
     }
 
+    /**
+     * Overwriting to add HTML report writing into it
+     *
+     * @param state
+     * @param actions
+     * @return
+     */
+    @Override
+    protected Action preSelectAction(State state, Set<Action> actions){
+        // adding available actions into the HTML report:
+        htmlReport.addActions(actions);
+        return(super.preSelectAction(state, actions));
+    }
 
     /**
      * Select one of the available actions (e.g. at random)
@@ -63,14 +108,35 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected Action selectAction(State state, Set<Action> actions){
-        //Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+        //Call the preSelectAction method from the DefaultProtocol so that, if necessary,
         //unwanted processes are killed and SUT is put into foreground.
-        Action a = preSelectAction(state, actions);
-        if (a!= null) {
-            return a;
-        } else
+        Action retAction = preSelectAction(state, actions);
+        if (retAction == null)
             //if no preSelected actions are needed, then implement your own strategy
-            return RandomActionSelector.selectAction(actions);
+            retAction = RandomActionSelector.selectAction(actions);
+        return retAction;
+    }
+
+    /**
+     * Execute the selected action.
+     * @param system the SUT
+     * @param state the SUT's current state
+     * @param action the action to execute
+     * @return whether or not the execution succeeded
+     */
+    @Override
+    protected boolean executeAction(SUT system, State state, Action action){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), action);
+        return super.executeAction(system, state, action);
+    }
+
+    /**
+     * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+     */
+    @Override
+    protected void postSequenceProcessing() {
+        htmlReport.addTestVerdict(getVerdict(latestState));
     }
 
     /**

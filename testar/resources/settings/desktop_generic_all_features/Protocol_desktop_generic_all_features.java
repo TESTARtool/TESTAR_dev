@@ -44,16 +44,12 @@ import org.testar.protocols.DesktopProtocol;
  * The optional features are commented out with short documentation s.t. you can turn them on again if you want.
  *
  * This protocol includes:
- * - HTML reports of the executed test sequences with screenshots of the GUI states
  * - Creating JSON files with information about the widgets and their locations on the screenshots
  * - State model learning and saving state models into graph database (OrientDB).
  *   (NOTE: the state model has to be enabled in test settings and OrientDB has to be installed)
  * - Using the learned state model for improved action selection, prioritizing unvisited actions and using the state model as a map
  */
 public class Protocol_desktop_generic_all_features extends DesktopProtocol {
-
-	private HtmlSequenceReport htmlReport;
-	private int scenarioCount = 1;
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -66,14 +62,14 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	}
 
 	/**
-	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
 	 */
 	@Override
 	protected void preSequencePreparations() {
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
-		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
-		scenarioCount = htmlReport.getScenarioCount();
+		super.preSequencePreparations();
 	}
 
 	/**
@@ -108,13 +104,14 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	 * own state fetching routine. The state should have attached an oracle
 	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
-		//adding state to the HTML sequence report:
-		htmlReport.addState(state);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
 		JsonUtils.createWidgetInfoJsonFile(state);
 		return state;
@@ -175,34 +172,37 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	}
 
 	/**
-	 * Select one of the available actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * preSelectAction() should be always called before your own action selection
+	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		// adding available actions into the HTML report:
-		htmlReport.addActions(actions);
-
-		//using the action selector of the state model:
-		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
-
-		if(retAction!=null){
-			System.out.println("State model based action selection used.");
-			return retAction;
+		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action retAction = preSelectAction(state, actions);
+		if (retAction == null) {
+			//if no preSelected actions are needed, then implement your own strategy
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
 		}
-		// if state model fails, use default:
-		System.out.println("Default action selection used.");
-		retAction = super.selectAction(state, actions);
-		// adding the selected action into HTML report:
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), retAction);
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			//if your own action selection algorithm fails to find an action, use the default random action selection:
+			retAction = super.selectAction(state, actions);
+		}
 		return retAction;
-
 	}
 
 	/**
 	 * Execute the selected action.
+	 *
+	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
+	 *
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param action the action to execute
@@ -247,4 +247,13 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 		super.stopSystem(system);
 	}
 
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
+	}
 }

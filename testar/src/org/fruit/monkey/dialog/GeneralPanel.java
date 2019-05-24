@@ -55,7 +55,7 @@ public class GeneralPanel extends JPanel {
   private JSpinner spnSequenceLength;
   private JSpinner esiSpinner;
   private JComboBox<String> comboboxVerbosity;
-  private JCheckBox checkStopOnFault;
+  //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
 
@@ -98,7 +98,7 @@ public class GeneralPanel extends JPanel {
     add(spnSequenceLength);
 
     esiSpinner = new JSpinner();
-    esiSpinner.setBounds(160, 275, 71, 25);
+    esiSpinner.setBounds(160, 237, 71, 25);
     esiSpinner.setValue(10);
     esiSpinner.setToolTipText(intervalTTT);
     add(esiSpinner);
@@ -107,7 +107,7 @@ public class GeneralPanel extends JPanel {
     comboboxVerbosity.setModel(new DefaultComboBoxModel<>(
         new String[]{"Critical", "Information", "Debug"}));
     comboboxVerbosity.setSelectedIndex(1);
-    comboboxVerbosity.setBounds(160, 313, 107, 25);
+    comboboxVerbosity.setBounds(160, 275, 107, 25);
     comboboxVerbosity.setMaximumRowCount(3);
     comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
     add(comboboxVerbosity);
@@ -132,10 +132,10 @@ public class GeneralPanel extends JPanel {
     compileCheckBox.setToolTipText(lblCompileTTT);
     add(compileCheckBox);
 
-    checkStopOnFault = new JCheckBox("Stop Test on Fault");
+    /*checkStopOnFault = new JCheckBox("Stop Test on Fault");
     checkStopOnFault.setBounds(10, 240, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
-    add(checkStopOnFault);
+    add(checkStopOnFault);*/
 
   }
 
@@ -173,12 +173,12 @@ public class GeneralPanel extends JPanel {
     add(lblNofSequences);
 
     JLabel lblSamplingInterval = new JLabel("Sampling interval:");
-    lblSamplingInterval.setBounds(10, 278, 100, 14);
+    lblSamplingInterval.setBounds(10, 240, 100, 14);
     lblSamplingInterval.setToolTipText(intervalTTT);
     add(lblSamplingInterval);
 
     JLabel lblLoggingVerbosity = new JLabel("Logging Verbosity:");
-    lblLoggingVerbosity.setBounds(10, 316, 120, 14);
+    lblLoggingVerbosity.setBounds(10, 278, 120, 14);
     lblLoggingVerbosity.setToolTipText(lblLoggingVerbosityTTT);
     add(lblLoggingVerbosity);
 
@@ -221,7 +221,7 @@ public class GeneralPanel extends JPanel {
     this.settings = settings;
 
     cboxSUTconnector.setSelectedItem(settings.get(ConfigTags.SUTConnector));
-    checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
+    //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
     esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
@@ -239,7 +239,7 @@ public class GeneralPanel extends JPanel {
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
-    settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
+    //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());

@@ -4,6 +4,8 @@ import nl.ou.testar.a11y.reporting.HTMLReporter;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -38,10 +40,10 @@ public class HtmlSequenceReport {
         try{
             File folder = new File("output/HTMLreports");
             if(folder.exists()&&folder.isDirectory()){
-                System.out.println("DEBUG: HTMLreports folder exists already");
+//                System.out.println("DEBUG: HTMLreports folder exists already");
                 // all good, folder is already there
             }else{
-                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
+//                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
                 //folder is missing, let's create it
                 folder.mkdir();
             }
@@ -80,10 +82,10 @@ public class HtmlSequenceReport {
         try{
             File folder = new File("output/HTMLreports");
             if(folder.exists()&&folder.isDirectory()){
-                System.out.println("DEBUG: HTMLreports folder exists already");
+//                System.out.println("DEBUG: HTMLreports folder exists already");
                 // all good, folder is already there
             }else{
-                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
+//                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
                 //folder is missing, let's create it
                 folder.mkdir();
             }
@@ -235,6 +237,12 @@ public class HtmlSequenceReport {
         }
         write("<p><img src=\""+actionPath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
     }
+
+    public void addTestVerdict(Verdict verdict){
+        write("<h2>Test verdict for this sequence: "+verdict.info()+"</h2>");
+        write("<h4>Severity: "+verdict.severity()+"</h4>");
+    }
+
     
     public void close() {
         for(String s:HTMLReporter.FOOTER){

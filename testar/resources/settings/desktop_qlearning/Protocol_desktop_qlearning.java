@@ -52,9 +52,6 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_qlearning extends DesktopProtocol {
 
-	private HtmlSequenceReport htmlReport;
-	private int scenarioCount = 1;
-	//private GuiStateGraphForQlearning stateGraph;
 	private QLearningActionSelector actionSelector;
 
 	/** 
@@ -71,55 +68,25 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	}
 
 	/**
-	 * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
-	 */
-	@Override
-	protected void preSequencePreparations() {
-		//initializing the HTML sequence report:
-		htmlReport = new HtmlSequenceReport(scenarioCount, sequenceCount);
-		// updating scenarioCount based on existing HTML files - sequence 1 gets the correct scenarioCount:
-		scenarioCount = htmlReport.getScenarioCount();
-	}
-
-	/**
-	 * This method is called when the TESTAR requests the state of the SUT.
-	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-	 * state is erroneous and if so why.
-	 * @return  the current state of the SUT with attached oracle.
-	 */
-	@Override
-	protected State getState(SUT system) throws StateBuildException {
-		State state = super.getState(system);
-		//adding state to the HTML sequence report:
-		htmlReport.addState(state);
-		return state;
-	}
-
-	/**
-	 * Select one of the available actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * Normally super.selectAction(state, actions) updates information to the HTML sequence report, but since we
+	 * overwrite it, not always running it, we have take care of the HTML report here
+	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//adding actions to the HTML sequence report:
-		htmlReport.addActions(actions);
-
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			// returning pre-selected action
-		} else{
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
 			//if no preSelected actions are needed, then implement your own action selection strategy
 			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			a = actionSelector.selectAction(state,actions);
-			//a = RandomActionSelector.selectAction(actions);
+			retAction = actionSelector.selectAction(state,actions);
 		}
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), a);
-		return a;
+		return retAction;
 	}
 }
