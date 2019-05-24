@@ -57,7 +57,6 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String OUTPUT_FOLDER = OutputStructure.runOutputDir + File.separator + "HTMLreports";
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
     
@@ -67,7 +66,7 @@ public class HtmlSequenceReport {
         try{
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
-            String filename = OUTPUT_FOLDER + File.separator + OutputStructure.startInnerLoopDateString+"_"
+            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
             		+ OutputStructure.sutProcessName + REPORT_FILENAME_MID + OutputStructure.sequenceCount
             		+ REPORT_FILENAME_AFT;
             
@@ -113,7 +112,10 @@ public class HtmlSequenceReport {
     private void writeStateIntoReport(State state){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output","../");
+        	int indexStart = imagePath.indexOf("./output");
+        	int indexScrn = imagePath.indexOf("scrshots");
+        	String replaceString = imagePath.substring(indexStart,indexScrn);
+            imagePath = imagePath.replace(replaceString,"../");
         }
         write("<h2>State "+innerLoopCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
@@ -182,11 +184,18 @@ public class HtmlSequenceReport {
         }
     }
 
-    public void addSelectedAction(String state_path, Action action){
+    public void addSelectedAction(State state, Action action){
+    	String screenshotDir = OutputStructure.screenshotsOutputDir;
 //        System.out.println("path="+state_path);
-        String actionPath = state_path.substring(0,state_path.indexOf(".png"));
+    	if(screenshotDir.contains("./output")){
+        	int indexStart = screenshotDir.indexOf("./output");
+        	int indexScrn = screenshotDir.indexOf("scrshots");
+        	String replaceString = screenshotDir.substring(indexStart,indexScrn);
+        	screenshotDir = screenshotDir.replace(replaceString,"../");
+        }
 //        System.out.println("path="+actionPath);
-        actionPath = actionPath+"_"+action.get(Tags.ConcreteID)+".png";
+        String actionPath = screenshotDir + File.separator + "sequence" + OutputStructure.sequenceCount + File.separator
+        		+ state.get(Tags.ConcreteID) + "_" + action.get(Tags.ConcreteID) + ".png";
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteID));

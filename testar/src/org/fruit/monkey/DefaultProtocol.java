@@ -361,8 +361,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 		
-		String generatedSequence = OutputStructure.sequencesOutputDir + File.separator 
-				+ "sequence" + OutputStructure.sequenceCount;
+		String sequenceCountDir = "sequence" + OutputStructure.sequenceCount;
+		
+		String generatedSequenceName = OutputStructure.sequencesOutputDir + File.separator + sequenceCountDir;
 
 		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString+"_"
@@ -377,9 +378,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			e3.printStackTrace();
 		}
 		
-		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, generatedSequence);
+		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, sequenceCountDir);
 		
-		return generatedSequence;
+		return generatedSequenceName;
 	}
 
 	/**

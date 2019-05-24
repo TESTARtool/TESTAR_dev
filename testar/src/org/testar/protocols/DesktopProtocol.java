@@ -154,7 +154,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     @Override
     protected boolean executeAction(SUT system, State state, Action action){
         // adding the action that is going to be executed into HTML report:
-        htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), action);
+        htmlReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
     }
 
