@@ -33,10 +33,12 @@ package org.testar;
 
 import java.io.File;
 
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
+import org.fruit.monkey.Settings;
 
 public class OutputStructure {
-	
+
 	private OutputStructure() {}
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss";
@@ -48,35 +50,81 @@ public class OutputStructure {
 	public static String sutProcessName;
 
 	public static String runOutputDir;
+	public static String sequencesOutputDir;
+	public static String screenshotsOutputDir;
+	public static String htmlOutputDir;
+	public static String logsOutputDir;
+	public static String debugLogsOutputDir;
 	public static String processListenerDir;
 
 	public static int sequenceCount;
 
+	public static void createOutputSUTname(Settings settings) {
+		sutProcessName = "unknown";
+
+		String sutConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
+
+		try {
+			if (sutConnectorValue.contains("http") && sutConnectorValue.contains("www.")) {
+				int indexWWW = sutConnectorValue.indexOf("www.")+1;
+				int indexEnd = sutConnectorValue.indexOf(".", indexWWW);
+				String domain = sutConnectorValue.substring(indexWWW, indexEnd);
+				sutProcessName = domain;
+			}
+			else if (sutConnectorValue.contains(".exe")) {
+				int startSUT = sutConnectorValue.lastIndexOf("\\")+1;
+				int endSUT = sutConnectorValue.indexOf(".exe");
+				String sutName = sutConnectorValue.substring(startSUT, endSUT);
+				sutProcessName = sutName;
+			}
+			else if (sutConnectorValue.contains(".jar")) {
+				int startSUT = sutConnectorValue.lastIndexOf("\\")+1;
+				int endSUT = sutConnectorValue.indexOf(".jar");
+				String sutName = sutConnectorValue.substring(startSUT, endSUT);
+				sutProcessName = sutName;
+			}
+		}catch(Exception e) {
+			System.out.println("Error: This run generation will be stored with \"unknown\" name");
+		}
+
+	}
+
 	public static void createOutputFolders() {
 
-		runOutputDir = Main.outputDir + File.separator + startRunDateString+"_"+sutProcessName;
-
+		runOutputDir = Main.outputDir + File.separator + startRunDateString + "_" + sutProcessName;
 		File runDir = new File(runOutputDir);
 		if(!runDir.exists())
 			runDir.mkdirs();
 
-		File htmlDir = new File(runOutputDir + File.separator +"HTMLreports");
+		sequencesOutputDir = runOutputDir + File.separator + "sequences";
+		File seqDir = new File(sequencesOutputDir);
+		if(!seqDir.exists())
+			seqDir.mkdirs();
+
+		screenshotsOutputDir = runOutputDir + File.separator + "scrshots";
+		File scrnDir = new File(screenshotsOutputDir);
+		if(!scrnDir.exists())
+			scrnDir.mkdirs();
+
+		htmlOutputDir = runOutputDir + File.separator + "HTMLreports";
+		File htmlDir = new File(htmlOutputDir);
 		if(!htmlDir.exists())
 			htmlDir.mkdirs();
 
-		File logsDir = new File(runOutputDir + File.separator +"logs");
+		logsOutputDir = runOutputDir + File.separator + "logs";
+		File logsDir = new File(logsOutputDir);
 		if(!logsDir.exists())
 			logsDir.mkdirs();
 
-		File logsDebugDir = new File(logsDir+ File.separator + "debug");
+		debugLogsOutputDir = logsOutputDir + File.separator + "debug";
+		File logsDebugDir = new File(debugLogsOutputDir);
 		if(!logsDebugDir.exists())
 			logsDebugDir.mkdirs();
 
-		processListenerDir = logsDir+ File.separator + "processListener";
+		processListenerDir = logsOutputDir + File.separator + "processListener";
 		File procListDir = new File(processListenerDir);
 		if(!procListDir.exists())
 			procListDir.mkdirs();
-
 	}
 
 }

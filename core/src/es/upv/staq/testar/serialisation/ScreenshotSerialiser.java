@@ -70,7 +70,7 @@ public class ScreenshotSerialiser extends Thread {
 		Assert.isTrue(!alive);
 		Assert.isTrue(scrshotSavingQueue.isEmpty());
 		alive = true; queueBoost = false;
-		singletonScreenshotSerialiser = new ScreenshotSerialiser(outputFolder + File.separator + SCRSHOTS, testSequenceFolder);
+		singletonScreenshotSerialiser = new ScreenshotSerialiser(outputFolder, testSequenceFolder);
 		singletonScreenshotSerialiser.setPriority(Thread.MIN_PRIORITY);
 		singletonScreenshotSerialiser.start();
 	}

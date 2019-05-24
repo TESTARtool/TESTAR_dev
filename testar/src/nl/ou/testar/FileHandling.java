@@ -91,7 +91,7 @@ public class FileHandling {
     }
 
 
-    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict, String outputDir){
+    public static void copyClassifiedSequence(String generatedSequence, File currentSeq, Verdict verdict){
         String targetFolder = "";
         final double sev = verdict.severity();
         if (sev == Verdict.SEVERITY_OK)
@@ -110,10 +110,10 @@ public class FileHandling {
             targetFolder = "sequences_other";
         LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
         try {
-            Util.copyToDirectory(currentSeq.getAbsolutePath(),
-            		OutputStructure.runOutputDir + File.separator + targetFolder,
-                    generatedSequence,
-                    true);
+        	
+            Util.copyToDirectory(currentSeq.getCanonicalPath(),
+            		OutputStructure.runOutputDir + File.separator + targetFolder, true);
+            
         } catch (NoSuchTagException e) {
             LogSerialiser.log("No such tag exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);
         } catch (IOException e) {

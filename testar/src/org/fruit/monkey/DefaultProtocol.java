@@ -361,11 +361,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 		
-		String sequencesFileName = OutputStructure.runOutputDir;
-		
-		String generatedSequence = Util.generateUniqueFile(sequencesFileName + File.separator + "sequences", "sequence").getName();
+		String generatedSequence = OutputStructure.sequencesOutputDir + File.separator 
+				+ "sequence" + OutputStructure.sequenceCount;
 
-		String logFileName = OutputStructure.runOutputDir + File.separator + "logs"
+		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString+"_"
         		+ OutputStructure.sutProcessName + "_sequence_" + OutputStructure.sequenceCount+".log";
 		
@@ -373,16 +372,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
 					logFileName), true))),
 					settings.get(LogLevel));
-		} catch (NoSuchTagException e3) {
-			// TODO Auto-generated catch block
-			DEBUGLOG.error("Exception: ",e3);
-			e3.printStackTrace();
-		} catch (FileNotFoundException e3) {
-			// TODO Auto-generated catch block
+		}catch (NoSuchTagException | FileNotFoundException e3) {
 			DEBUGLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
-		ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
+		
+		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, generatedSequence);
+		
 		return generatedSequence;
 	}
 
@@ -394,22 +390,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
-		final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
+		
+		String sequenceObject = OutputStructure.sequencesOutputDir + File.separator 
+				+ "sequence" + OutputStructure.sequenceCount;
+		
+		final File currentSeqObject = new File(sequenceObject);
 
 		try {
-			Util.delete(currentSeq);
-		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
-			DEBUGLOG.error("Exception: ",e2);
-		}
-		try {
-			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
+			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeqObject, true))));
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
 			DEBUGLOG.error("Exception: ",e);
 		}
-		return currentSeq;
+		
+		return currentSeqObject;
 	}
 
 
@@ -513,8 +508,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		synchronized(this){
 			OutputStructure.startRunDateString = Util.dateString(OutputStructure.DATE_FORMAT);
-			OutputStructure.sutProcessName = "prueba";//settings.get(ConfigTags.SUTConnectorValue,"");
 			OutputStructure.sequenceCount = 0;
+			OutputStructure.createOutputSUTname(settings);
 			OutputStructure.createOutputFolders();
 		}
 
@@ -592,7 +587,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				processVerdict = Verdict.OK;
 
 				//Copy sequence file into proper directory:
-				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
+				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 				postSequenceProcessing();
@@ -622,24 +617,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		mode = Modes.Quit;
 	}
 
-	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
+	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
 		if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-			LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
-			try {
-				Util.copyToDirectory(currentSeq.getAbsolutePath(),
-						settings.get(ConfigTags.OutputDir) + File.separator + "sequences",
-						generatedSequence,
-						true);
-				LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
-			} catch (NoSuchTagException e) {
-				LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-				DEBUGLOG.error("Exception: ",e);
-			} catch (IOException e) {
-				LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-				DEBUGLOG.error("Exception: ",e);
-			}
-			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
+			
+			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
+			
+			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 		}
 	}
 
