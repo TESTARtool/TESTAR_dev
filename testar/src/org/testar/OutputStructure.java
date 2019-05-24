@@ -64,21 +64,23 @@ public class OutputStructure {
 
 		String sutConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
 
+		sutConnectorValue = sutConnectorValue.replace("/", File.separator);
+		
 		try {
 			if (sutConnectorValue.contains("http") && sutConnectorValue.contains("www.")) {
-				int indexWWW = sutConnectorValue.indexOf("www.")+1;
+				int indexWWW = sutConnectorValue.indexOf("www.")+4;
 				int indexEnd = sutConnectorValue.indexOf(".", indexWWW);
 				String domain = sutConnectorValue.substring(indexWWW, indexEnd);
 				sutProcessName = domain;
 			}
 			else if (sutConnectorValue.contains(".exe")) {
-				int startSUT = sutConnectorValue.lastIndexOf("\\")+1;
+				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
 				int endSUT = sutConnectorValue.indexOf(".exe");
 				String sutName = sutConnectorValue.substring(startSUT, endSUT);
 				sutProcessName = sutName;
 			}
 			else if (sutConnectorValue.contains(".jar")) {
-				int startSUT = sutConnectorValue.lastIndexOf("\\")+1;
+				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
 				int endSUT = sutConnectorValue.indexOf(".jar");
 				String sutName = sutConnectorValue.substring(startSUT, endSUT);
 				sutProcessName = sutName;
@@ -93,8 +95,13 @@ public class OutputStructure {
 
 		runOutputDir = Main.outputDir + File.separator + startRunDateString + "_" + sutProcessName;
 		File runDir = new File(runOutputDir);
-		if(!runDir.exists())
+		runDir.mkdirs();
+		
+		//Check if main output folder was created correctly, if not use unknown name with timestamp
+		if(!runDir.exists()) {
+			runDir = new File(Main.outputDir + File.separator + startRunDateString + "_unknown");
 			runDir.mkdirs();
+		}
 
 		sequencesOutputDir = runOutputDir + File.separator + "sequences";
 		File seqDir = new File(sequencesOutputDir);
