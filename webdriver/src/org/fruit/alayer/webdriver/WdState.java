@@ -51,7 +51,14 @@ public final class WdState extends WdWidget implements State {
   }
 
   public Iterator<Widget> iterator() {
-    return new WidgetIterator(this);
+    Iterator<Widget> iterator = new WidgetIterator(this);
+
+    // If root element is null, disable iterating
+    if (this.element == null) {
+      iterator.next();
+    }
+
+    return iterator;
   }
 
   public void remove(WdWidget w) {

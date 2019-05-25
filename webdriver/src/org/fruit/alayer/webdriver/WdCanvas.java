@@ -92,7 +92,7 @@ public class WdCanvas implements Canvas {
   @Override
   public void clear(double x, double y, double width, double height) {
     Object[] args = new Object[]{x, y, width, height};
-    WdDriver.executeScript("clearCanvasTestar(arguments)", args);
+    WdDriver.executeCanvasScript("clearCanvasTestar(arguments)", args);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class WdCanvas implements Canvas {
 
     Object[] args = new Object[]{cssColor(), Math.round(fontSize), font, text,
         x + textOffsetX, y + textOffsetY};
-    WdDriver.executeScript("drawTextTestar(arguments)", args);
+    WdDriver.executeCanvasScript("drawTextTestar(arguments)", args);
   }
 
   @Override
@@ -118,7 +118,7 @@ public class WdCanvas implements Canvas {
     adjustPen(pen);
 
     Object[] args = new Object[]{cssColor(), strokeWidth, x1, y1, x2, y2};
-    WdDriver.executeScript("drawLineTestar(arguments)", args);
+    WdDriver.executeCanvasScript("drawLineTestar(arguments)", args);
   }
 
   @Override
@@ -128,7 +128,7 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x1, y1, x2, y2, x3, y3};
-    WdDriver.executeScript("drawTriangleTestar(arguments)", args);
+    WdDriver.executeCanvasScript("drawTriangleTestar(arguments)", args);
   }
 
   @Override
@@ -144,7 +144,7 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fill" : "stroke";
     Object[] args = new Object[]{cssColor(), strokeWidth, fillStroke,
         x + width / 2, y + height / 2, width / 2, height / 2};
-    WdDriver.executeScript("drawEllipseTestar(arguments)", args);
+    WdDriver.executeCanvasScript("drawEllipseTestar(arguments)", args);
   }
 
   @Override
@@ -154,7 +154,7 @@ public class WdCanvas implements Canvas {
     String fillStroke = fillPattern == FillPattern.Solid ? "fillRect" : "strokeRect";
     Object[] args = new Object[]{
         cssColor(), strokeWidth, fillStroke, x, y, width, height};
-    WdDriver.executeScript("drawRectTestar(arguments)", args);
+    WdDriver.executeCanvasScript("drawRectTestar(arguments)", args);
   }
 
   @Override

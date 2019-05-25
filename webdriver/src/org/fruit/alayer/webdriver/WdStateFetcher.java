@@ -69,7 +69,7 @@ public class WdStateFetcher implements Callable<WdState> {
       packedBody = (Map<String, Object>) result;
     }
     else {
-      throw new StateBuildException("No root element from webdriver");
+      return null;
     }
 
     WdRootElement wdRoot = new WdRootElement(packedBody);
@@ -108,9 +108,15 @@ public class WdStateFetcher implements Callable<WdState> {
   }
 
   public WdState call() {
-    WdRootElement webRoot = buildSkeletton();
+    WdRootElement rootElement = buildRoot(system);
 
-    WdState root = createWidgetTree(webRoot);
+    if (rootElement == null) {
+      return new WdState(null);
+    }
+
+    system.set(Tags.Desc, rootElement.documentTitle);
+
+    WdState root = createWidgetTree(rootElement);
     root.set(Tags.Role, Roles.Process);
     root.set(Tags.NotResponding, false);
 
@@ -119,16 +125,6 @@ public class WdStateFetcher implements Callable<WdState> {
     }
 
     return root;
-  }
-
-  /**
-   * @return WdRootElement the root element of the page
-   */
-  private WdRootElement buildSkeletton() throws StateBuildException {
-    WdRootElement rootElement = buildRoot(system);
-    system.set(Tags.Desc, rootElement.documentTitle);
-
-    return rootElement;
   }
 
   private WdState createWidgetTree(WdRootElement root) {

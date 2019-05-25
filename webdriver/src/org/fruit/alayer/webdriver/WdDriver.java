@@ -41,9 +41,9 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -64,6 +64,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
@@ -71,6 +72,7 @@ import java.util.*;
 
 
 public class WdDriver extends SUTBase {
+  private static WdDriver wdDriver = null;
   private static RemoteWebDriver webDriver = null;
   private static List<String> windowHandles = new ArrayList<>();
   public static boolean followLinks = true;
@@ -123,6 +125,8 @@ public class WdDriver extends SUTBase {
     webDriver.get(url);
 
     CanvasDimensions.startThread();
+
+    wdDriver = this;
   }
 
   private static RemoteWebDriver startChromeDriver(String chromeDriverPath,
@@ -190,7 +194,7 @@ public class WdDriver extends SUTBase {
       httpClient.execute(request);
     }
     catch (IOException ioe) {
-      ioe.printStackTrace();
+      throw new SystemStartException(ioe);
     }
   }
 
@@ -225,8 +229,7 @@ public class WdDriver extends SUTBase {
       copyFolder(sourceFolder, targetFolder);
     }
     catch (IOException ioe) {
-      ioe.printStackTrace();
-      System.exit(1);
+      throw new SystemStartException(ioe);
     }
 
     return edgeSideLoadPath;
@@ -283,7 +286,20 @@ public class WdDriver extends SUTBase {
 
   @Override
   public boolean isRunning() {
-    return webDriver != null;
+    if (webDriver == null) {
+      return false;
+    }
+
+    try {
+      updateHandlesList();
+      activate();
+      webDriver.getCurrentUrl();
+    }
+    catch (NullPointerException | WebDriverException ignored) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override
@@ -301,9 +317,11 @@ public class WdDriver extends SUTBase {
   }
 
   public static List<SUT> fromAll() {
-    List<SUT> suts = new ArrayList<>();
+    if (wdDriver == null) {
+      return new ArrayList<>();
+    }
 
-    return suts;
+    return Collections.singletonList(wdDriver);
   }
 
   public static WdDriver fromExecutable(String sutConnector)
@@ -373,9 +391,14 @@ public class WdDriver extends SUTBase {
       return;
     }
 
+    updateHandlesList();
+
     String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
-    if (!webDriver.getWindowHandle().equals(handle)) {
+    try {
       webDriver.switchTo().window(handle);
+    }
+    catch (NullPointerException | WebDriverException ignored) {
+      webDriver = null;
     }
   }
 
@@ -383,7 +406,7 @@ public class WdDriver extends SUTBase {
     try {
       return webDriver.getWindowHandles();
     }
-    catch (WebDriverException ignored) {
+    catch (NullPointerException | WebDriverException ignored) {
       return new HashSet<>();
     }
   }
@@ -392,79 +415,53 @@ public class WdDriver extends SUTBase {
     try {
       return webDriver.getCurrentUrl();
     }
-    catch (WebDriverException ignored) {
+    catch (NullPointerException | WebDriverException ignored) {
       return "";
     }
   }
 
   public static Object executeScript(String script, Object... args) {
-    if (webDriver == null) {
-      return null;
-    }
-
     try {
       // Update the list with window handles
       updateHandlesList();
+
       // Choose first or last tab, depending on user prefs
       activate();
-    }
-    catch (WebDriverException wde) {
-      return null;
-    }
 
-    // Wait until document is ready for script
-    waitDocumentReady();
-    waitCanvasReady(true);
+      // Wait until document is ready for script
+      waitDocumentReady();
 
-    try {
       return webDriver.executeScript(script, args);
     }
-    catch (WebDriverException wde) {
-      // Canvas not present : add canvas and retry script
-      if (wde.getMessage().contains("testarCtx is not defined")) {
-        waitDocumentReady();
-        waitCanvasReady(true);
-        return webDriver.executeScript(script, args);
-      }
-      // Methods from the extension not available : no way to add them now
-      if (wde.getMessage().contains(" is not defined")) {
-        return null;
-      }
-      // At the end of the sequence the browser is already closed
-      if (wde.getMessage().contains("target window already closed")) {
-        return null;
-      }
-
-      // Unknown error occurred
-      throw wde;
+    catch (NullPointerException | WebDriverException ignored) {
+      return null;
     }
   }
 
   public static void waitDocumentReady() {
     WebDriverWait wait = new WebDriverWait(webDriver, 60);
-    ExpectedCondition<Boolean> documentReady = driver -> {
+    ExpectedCondition<Boolean> documentReady = (WebDriver driver) -> {
       Object result = webDriver.executeScript("return document.readyState");
       return result != null && result.equals("complete");
     };
     wait.until(documentReady);
   }
 
-  // Add the canvas if the page doesn't have one
-  public static void waitCanvasReady(boolean first) {
+  public static void executeCanvasScript(String script, Object... args) {
     try {
-      WebDriverWait wait = new WebDriverWait(webDriver, 60);
-      ExpectedCondition<Boolean> canvasReady = driver -> {
-        Object result = webDriver.executeScript("return addCanvasTestar()");
-        return result != null && result.equals("object");
-      };
-      wait.until(canvasReady);
+      // Update the list with window handles
+      updateHandlesList();
+
+      // Choose first or last tab, depending on user prefs
+      activate();
+
+      // Add the canvas if the page doesn't have one
+      webDriver.executeScript("addCanvasTestar()");
+
+      webDriver.executeScript(script, args);
     }
-    catch (Exception e) {
-      // Try one more time
-      if (first) {
-        waitDocumentReady();
-        waitCanvasReady(false);
-      }
+    catch (NullPointerException | WebDriverException ignored) {
+
     }
   }
 }
