@@ -22,7 +22,7 @@ var getStateTreeTestar = function (ignoredTags) {
         var treeArray = [];
         traverseElementArrayTestar(treeArray, bodyWrapped, body, -1, ignoredTags);
         return treeArray;
-    } 
+    }
     else {
         traverseElementTestar(bodyWrapped, body, ignoredTags);
         return bodyWrapped;
@@ -166,7 +166,7 @@ function getNameTestar(element) {
         if (id && labelMap[id]) {
             return labelMap[id];
         }
-    } 
+    }
     catch (err) {
     }
 
@@ -275,18 +275,25 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
     var outer = undefined;
     while (elem instanceof HTMLIFrameElement ||
            elem instanceof HTMLFrameElement ||
-            (outer !== undefined && outer.contentWindow !== undefined &&
-             elem instanceof outer.contentWindow.HTMLIFrameElement)) {
+           (outer !== undefined && outer.contentWindow !== undefined &&
+            elem instanceof outer.contentWindow.HTMLIFrameElement)) {
         outer = elem;
 
+        // Adjust according to position of the iframe
         var tmp = elem.getBoundingClientRect();
         x -= tmp.x;
         y -= tmp.y;
-        elem = elem.contentWindow.document.elementFromPoint(x, y);
+
+        // Elements from a cross-origin frame are not reachable
+        try {
+            elem = elem.contentWindow.document.elementFromPoint(x, y);
+        }
+        catch(exception) {
+            return true
+        }
     }
 
-    // return whether obscured element has same parent node
-    // (will also return false if element === elem)
+    // elem can not be found, asssume the originating element is not blocked
     if (elem === null) {
         return false;
     }
@@ -301,6 +308,8 @@ function getIsBlockedTestar(element, xOffset, yOffset) {
         return false;
     }
 
+    // return whether obscured element has same parent node
+    // (will also return false if element === elem)
     return elem.parentNode !== element.parentNode;
 }
 
