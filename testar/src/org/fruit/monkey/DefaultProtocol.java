@@ -160,14 +160,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
 	protected double passSeverity = Verdict.SEVERITY_OK;
 
-	protected static Action lastExecutedAction = null;
-
-	public final static Action lastExecutedAction() {
-		return lastExecutedAction;
-	}
+	public static Action lastExecutedAction = null;
 
 	protected long lastStamp = -1;
 	protected ProtocolUtil protocolUtil = new ProtocolUtil();
@@ -179,8 +175,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false,
-			forceNextActionESC = false;
+	protected boolean forceToForeground = false;
+	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 
@@ -251,11 +247,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Quit;
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			DEBUGLOG.error("Exception: ",SystemStartException);
+			//INDEXLOG.error("Exception: ",SystemStartException);
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			DEBUGLOG.error("Exception: ",e);
+			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
 		}
 
@@ -334,7 +330,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} catch (ClassNotFoundException | IOException e) {
 
 			System.out.println("ERROR: File is not a readable, please select a correct file");
-			DEBUGLOG.error("Exception: ",e);
+			//INDEXLOG.error("Exception: ",e);
 
 			return false;	
 		}
@@ -361,20 +357,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 		
-		String sequenceCountDir = "sequence" + OutputStructure.sequenceCount;
+		String sequenceCountDir = "sequence" + OutputStructure.sequenceInnerLoopCount;
 		
 		String generatedSequenceName = OutputStructure.sequencesOutputDir + File.separator + sequenceCountDir;
 
 		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString+"_"
-        		+ OutputStructure.sutProcessName + "_sequence_" + OutputStructure.sequenceCount+".log";
+        		+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount+".log";
 		
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
 					logFileName), true))),
 					settings.get(LogLevel));
 		}catch (NoSuchTagException | FileNotFoundException e3) {
-			DEBUGLOG.error("Exception: ",e3);
+			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
 		
@@ -393,7 +389,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
 		
 		String sequenceObject = OutputStructure.sequencesOutputDir + File.separator 
-				+ "sequence" + OutputStructure.sequenceCount;
+				+ "sequence" + OutputStructure.sequenceInnerLoopCount;
 		
 		final File currentSeqObject = new File(sequenceObject);
 
@@ -402,7 +398,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			DEBUGLOG.error("Exception: ",e);
+			//INDEXLOG.error("Exception: ",e);
 		}
 		
 		return currentSeqObject;
@@ -446,7 +442,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		DEBUGLOG.info("Starting test sequence {}", sequenceCount());
+		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -472,7 +468,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
 	}
 
 	/**
@@ -508,8 +504,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void runGenerateOuterLoop(SUT system) {
 
 		synchronized(this){
-			OutputStructure.startRunDateString = Util.dateString(OutputStructure.DATE_FORMAT);
-			OutputStructure.sequenceCount = 0;
+			OutputStructure.startOuterLoopDateString = Util.dateString(OutputStructure.DATE_FORMAT);
+			OutputStructure.sequenceInnerLoopCount = 0;
 			OutputStructure.createOutputSUTname(settings);
 			OutputStructure.createOutputFolders();
 		}
@@ -531,7 +527,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			synchronized(this){
 				OutputStructure.startInnerLoopDateString = Util.dateString(OutputStructure.DATE_FORMAT);
-				OutputStructure.sequenceCount++;
+				OutputStructure.sequenceInnerLoopCount++;
 			}
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
@@ -605,7 +601,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} catch (Exception e) {
 				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
 				e.printStackTrace();
-				DEBUGLOG.error("Exception: ",e);
+				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
@@ -808,8 +804,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				LogSerialiser.LogLevel.Info);
 
 		//bin folder 
-		DEBUGLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
+				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
 
 
 	}
@@ -1093,10 +1089,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
 		} catch(IOException ioe){
-			DEBUGLOG.error("Exception: ",ioe);
+			//INDEXLOG.error("Exception: ",ioe);
 			throw new RuntimeException("Cannot read file.", ioe);
 		} catch (ClassNotFoundException cnfe) {
-			DEBUGLOG.error("Exception: ",cnfe);
+			//INDEXLOG.error("Exception: ",cnfe);
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
@@ -1723,7 +1719,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void postSequenceProcessing() {
-
+		
 	}
 
 	/**

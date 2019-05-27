@@ -112,7 +112,7 @@ public class FileHandling {
         try {
         	
             Util.copyToDirectory(currentSeq.getCanonicalPath(),
-            		OutputStructure.runOutputDir + File.separator + targetFolder, true);
+            		OutputStructure.outerLoopOutputDir + File.separator + targetFolder, true);
             
         } catch (NoSuchTagException e) {
             LogSerialiser.log("No such tag exception copying classified test sequence\n", LogSerialiser.LogLevel.Critical);

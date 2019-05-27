@@ -8,7 +8,7 @@
     <file>index.log</file>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <Pattern>
-        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n
+        %d{yyyy-MM-dd-HH:mm:ss.SSS} %msg%n
       </Pattern>
     </encoder>
 

@@ -123,8 +123,8 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {		
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
@@ -138,7 +138,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceCount+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdErr.log", true));
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -152,10 +152,10 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceCount+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdErr.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -195,8 +195,8 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {	
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
@@ -210,7 +210,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceCount+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdOut.log", true));
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();
@@ -223,10 +223,10 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceCount+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdOut.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();

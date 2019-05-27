@@ -43,13 +43,13 @@ public class OutputStructure {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss";
 
-	public static String startRunDateString;
-
+	public static String startOuterLoopDateString;
 	public static String startInnerLoopDateString;
 
-	public static String sutProcessName;
-
-	public static String runOutputDir;
+	public static String executedSUTname;
+	public static int sequenceInnerLoopCount;
+	
+	public static String outerLoopOutputDir;
 	public static String sequencesOutputDir;
 	public static String screenshotsOutputDir;
 	public static String htmlOutputDir;
@@ -57,10 +57,8 @@ public class OutputStructure {
 	public static String debugLogsOutputDir;
 	public static String processListenerDir;
 
-	public static int sequenceCount;
-
 	public static void createOutputSUTname(Settings settings) {
-		sutProcessName = "unknown";
+		executedSUTname = "unknown";
 
 		String sutConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
 
@@ -71,19 +69,19 @@ public class OutputStructure {
 				int indexWWW = sutConnectorValue.indexOf("www.")+4;
 				int indexEnd = sutConnectorValue.indexOf(".", indexWWW);
 				String domain = sutConnectorValue.substring(indexWWW, indexEnd);
-				sutProcessName = domain;
+				executedSUTname = domain;
 			}
 			else if (sutConnectorValue.contains(".exe")) {
 				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
 				int endSUT = sutConnectorValue.indexOf(".exe");
 				String sutName = sutConnectorValue.substring(startSUT, endSUT);
-				sutProcessName = sutName;
+				executedSUTname = sutName;
 			}
 			else if (sutConnectorValue.contains(".jar")) {
 				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
 				int endSUT = sutConnectorValue.indexOf(".jar");
 				String sutName = sutConnectorValue.substring(startSUT, endSUT);
-				sutProcessName = sutName;
+				executedSUTname = sutName;
 			}
 		}catch(Exception e) {
 			System.out.println("Error: This run generation will be stored with \"unknown\" name");
@@ -93,32 +91,32 @@ public class OutputStructure {
 
 	public static void createOutputFolders() {
 
-		runOutputDir = Main.outputDir + File.separator + startRunDateString + "_" + sutProcessName;
-		File runDir = new File(runOutputDir);
+		outerLoopOutputDir = Main.outputDir + File.separator + startOuterLoopDateString + "_" + executedSUTname;
+		File runDir = new File(outerLoopOutputDir);
 		runDir.mkdirs();
 		
 		//Check if main output folder was created correctly, if not use unknown name with timestamp
 		if(!runDir.exists()) {
-			runDir = new File(Main.outputDir + File.separator + startRunDateString + "_unknown");
+			runDir = new File(Main.outputDir + File.separator + startOuterLoopDateString + "_unknown");
 			runDir.mkdirs();
 		}
 
-		sequencesOutputDir = runOutputDir + File.separator + "sequences";
+		sequencesOutputDir = outerLoopOutputDir + File.separator + "sequences";
 		File seqDir = new File(sequencesOutputDir);
 		if(!seqDir.exists())
 			seqDir.mkdirs();
 
-		screenshotsOutputDir = runOutputDir + File.separator + "scrshots";
+		screenshotsOutputDir = outerLoopOutputDir + File.separator + "scrshots";
 		File scrnDir = new File(screenshotsOutputDir);
 		if(!scrnDir.exists())
 			scrnDir.mkdirs();
 
-		htmlOutputDir = runOutputDir + File.separator + "HTMLreports";
+		htmlOutputDir = outerLoopOutputDir + File.separator + "HTMLreports";
 		File htmlDir = new File(htmlOutputDir);
 		if(!htmlDir.exists())
 			htmlDir.mkdirs();
 
-		logsOutputDir = runOutputDir + File.separator + "logs";
+		logsOutputDir = outerLoopOutputDir + File.separator + "logs";
 		File logsDir = new File(logsOutputDir);
 		if(!logsDir.exists())
 			logsDir.mkdirs();

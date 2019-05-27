@@ -67,14 +67,14 @@ public class HtmlSequenceReport {
             //TODO put filename into settings, name with sequence number
             // creating a new file for the report
             String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
-            		+ OutputStructure.sutProcessName + REPORT_FILENAME_MID + OutputStructure.sequenceCount
+            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
             		+ REPORT_FILENAME_AFT;
             
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
             }
-            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceCount+"</h1>");
+            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceInnerLoopCount+"</h1>");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -194,7 +194,7 @@ public class HtmlSequenceReport {
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
 //        System.out.println("path="+actionPath);
-        String actionPath = screenshotDir + File.separator + "sequence" + OutputStructure.sequenceCount + File.separator
+        String actionPath = screenshotDir + File.separator + "sequence" + OutputStructure.sequenceInnerLoopCount + File.separator
         		+ state.get(Tags.ConcreteID) + "_" + action.get(Tags.ConcreteID) + ".png";
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
