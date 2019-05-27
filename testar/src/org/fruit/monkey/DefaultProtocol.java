@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,8 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -58,6 +60,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
@@ -237,8 +242,17 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		try {
 
-			if (mode() == Modes.View && isValidFile()) {
-				new SequenceViewer(settings);
+			if (mode() == Modes.View) {
+				if(isHtmlFile()) {
+					File htmlFile = new File(settings.get(ConfigTags.PathToReplaySequence));
+					Desktop.getDesktop().browse(htmlFile.toURI());
+				}
+				/*else if(isValidFile())
+					new SequenceViewer(settings);*/
+				else {
+					popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
+					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
+				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				runReplayLoop();
 			} else if (mode() == Modes.Spy) {
@@ -250,9 +264,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			System.out.println("Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is a correct definition");
+
+			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition";
+
+			popupMessage(msg);
+
+			System.out.println(msg);
+
 			this.mode = Modes.Quit;
+
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			DEBUGLOG.error("Exception: ",SystemStartException);
@@ -322,7 +343,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Check if the selected file to Replay or View contains a valid fragment object
 	 */
 
-	public boolean isValidFile(){
+	private boolean isValidFile(){
 		try {
 
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -337,13 +358,36 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		} catch (ClassNotFoundException | IOException e) {
 
-			System.out.println("ERROR: File is not a readable, please select a correct file");
+			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
+
+			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
 			DEBUGLOG.error("Exception: ",e);
 
 			return false;	
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if the selected file to View is a html file
+	 */
+	private boolean isHtmlFile() {
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Show a popup message to get the user's attention and inform him.
+	 * Only if GUI option is enabled (disabled for CI)
+	 */
+	private void popupMessage(String message) {
+		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, message);
+		}
 	}
 
 	/**
@@ -558,7 +602,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
-				//Saving the state into replayable test sequence:
+				//Saving the last state into replayable test sequence:
 				saveStateIntoFragmentForReplayableSequence(state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
@@ -571,7 +615,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-				
+
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
 				processVerdict = Verdict.OK;
@@ -661,7 +705,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
-
 			if(actions.isEmpty()){
 				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
 					LogSerialiser.log("No available actions to execute! Tried ESC <" + MAX_ESC_ATTEMPTS + "> times. Stopping sequence generation!\n", LogSerialiser.LogLevel.Critical);
@@ -704,7 +747,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
 		stateModelManager.notifyNewStateReached(state, actions);
-		
+
 		return getVerdict(state);
 	}
 
@@ -731,11 +774,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 
@@ -748,11 +791,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 	/**
@@ -832,7 +875,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state);
 			calculateZIndices(state);
 			setStateForClickFilterLayerProtocol(state);
-			
+
 			cv.begin(); Util.clear(cv);
 
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
@@ -881,9 +924,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//If system it's null means that we have started TESTAR from the Record User Actions Mode
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
-			
+
 			preSequencePreparations();
-			
+
 			system = startSystem();
 			startedRecordMode = true;
 			this.cv = buildCanvas();
@@ -996,7 +1039,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Copy sequence file into proper directory:
 			classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-			
+
 			postSequenceProcessing();
 
 			//If we want to Quit the current execution we stop the system
@@ -1011,9 +1054,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
-		
+
 		preSequencePreparations();
-		
+
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -1127,7 +1170,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		LogSerialiser.finish();
 		postSequenceProcessing();
 
@@ -1355,16 +1398,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
-
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
-
 		calculateZIndices(state);
+
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
+
+		setStateScreenshot(state);
+
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
@@ -1380,6 +1420,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		setStateForClickFilterLayerProtocol(state);
 		return state;
+	}
+
+	/**
+	 * Take a Screenshot of the State and associate the path into state tag
+	 */
+	private void setStateScreenshot(State state) {
+		Shape viewPort = state.get(Tags.Shape, null);
+		if(viewPort != null){
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		}
 	}
 
 	@Override

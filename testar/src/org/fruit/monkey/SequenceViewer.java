@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -251,8 +251,6 @@ public class SequenceViewer extends javax.swing.JFrame{
 	
 	public void movePic(Taggable fragment, int direction) throws IOException, ClassNotFoundException{
 		State state = fragment.get(Tags.SystemState, new StdState());
-
-		//Image img = state.get(Tags.Screenshot, null);
 
 		String scrshotPath = state.get(Tags.ScreenshotPath, null);
 		Image img = AWTCanvas.fromFile(scrshotPath);
