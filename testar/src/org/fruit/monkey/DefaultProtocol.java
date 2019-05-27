@@ -131,6 +131,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private String generatedSequence;
+	
+	public String getGeneratedSequenceName() {
+		return generatedSequence;
+	}
 
 	private File currentSeq;
 
@@ -400,13 +404,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
 		
-		String sequenceCountDir = "sequence" + OutputStructure.sequenceInnerLoopCount;
+		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 		
-		String generatedSequenceName = OutputStructure.sequencesOutputDir + File.separator + sequenceCountDir;
+		String generatedSequenceName = OutputStructure.sequencesOutputDir 
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
 		String logFileName = OutputStructure.logsOutputDir
-				+ File.separator + OutputStructure.startInnerLoopDateString+"_"
-        		+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount+".log";
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+        		+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
 		
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
@@ -431,8 +437,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
 		
-		String sequenceObject = OutputStructure.sequencesOutputDir + File.separator 
-				+ "sequence" + OutputStructure.sequenceInnerLoopCount;
+		String sequenceObject = OutputStructure.sequencesOutputDir 
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname
+				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount + ".testar";
 		
 		final File currentSeqObject = new File(sequenceObject);
 
