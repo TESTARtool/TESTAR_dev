@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
+* Copyright (c) 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
 *
@@ -45,6 +45,7 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 
 import java.awt.*;
@@ -54,9 +55,6 @@ import java.util.List;
 
 /**
  * Utility class to enhance TESTAR protocol.
- * 
- * @author Urko Rueda Molina (alias: urueda)
- *
  */
 public class ProtocolUtil {
 
@@ -246,8 +244,11 @@ public class ProtocolUtil {
 			if (viewPort != null && (viewPort.width() * viewPort.height() < 1))
 				viewPort = null;
 		}
-		if (viewPort == null)
+		
+		//If the state Shape is not properly obtained, or the State has an error, use full monitor screen
+		if (viewPort == null || (state.get(Tags.OracleVerdict, Verdict.OK).severity() > Verdict.SEVERITY_OK))
 			viewPort = state.get(Tags.Shape, null); // get the SUT process canvas (usually, full monitor screen)
+		
 		if (viewPort.width() <= 0 || viewPort.height() <= 0)
 			return null;
 		AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
