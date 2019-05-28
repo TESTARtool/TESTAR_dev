@@ -970,6 +970,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
 
+			synchronized(this){
+				OutputStructure.calculateOuterLoopDateString();
+				OutputStructure.sequenceInnerLoopCount = 0;
+				OutputStructure.createOutputSUTname(settings);
+				OutputStructure.createOutputFolders();
+				OutputStructure.calculateInnerLoopDateString();
+				OutputStructure.sequenceInnerLoopCount++;
+			}
+			
 			preSequencePreparations();
 
 			system = startSystem();
@@ -1099,6 +1108,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
+		
+		synchronized(this){
+			OutputStructure.calculateOuterLoopDateString();
+			OutputStructure.sequenceInnerLoopCount = 0;
+			OutputStructure.createOutputSUTname(settings);
+			OutputStructure.createOutputFolders();
+			OutputStructure.calculateInnerLoopDateString();
+			OutputStructure.sequenceInnerLoopCount++;
+		}
 
 		preSequencePreparations();
 
