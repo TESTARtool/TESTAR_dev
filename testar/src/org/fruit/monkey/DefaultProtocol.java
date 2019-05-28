@@ -131,7 +131,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private String generatedSequence;
-	
+
 	public String getGeneratedSequenceName() {
 		return generatedSequence;
 	}
@@ -239,9 +239,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		try {
 
 			if (mode() == Modes.View) {
-				if(isHtmlFile()) {
-					File htmlFile = new File(settings.get(ConfigTags.PathToReplaySequence));
-					Desktop.getDesktop().browse(htmlFile.toURI());
+				if(isHtmlFile() || isLogFile()) {
+					try {
+						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
+						Desktop.getDesktop().browse(file.toURI());
+					}catch (Exception e) {
+						popupMessage("Exception: Check the path of the file, something is wrong");
+						System.out.println("Exception: Check the path of the file, something is wrong");
+					}
+				} else if (!findHTMLreport().contains("error")) {
+					try {
+						File htmlFile = new File(findHTMLreport());
+						Desktop.getDesktop().browse(htmlFile.toURI());
+					}catch (Exception e) {
+						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
+						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
+					}
 				}
 				/*else if(isValidFile())
 					new SequenceViewer(settings);*/
@@ -373,6 +386,32 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
+	
+	/**
+	 * Check if the selected file to View is a log file
+	 */
+	private boolean isLogFile() {
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".log"))
+			return true;
+
+		return false;
+	}
+	
+	/**
+	 * If the user selects a .testar object file to use the View mode, try to find the corresponding html file
+	 */
+	private String findHTMLreport() {
+		String foundedHTML = "error";
+		String path = settings.get(ConfigTags.PathToReplaySequence);
+		if(path.contains(".testar")) {
+			path.replace(".testar", ".html");
+			path.replace(File.separator + "sequences" + File.separator, File.separator + "HTMLreports" + File.separator);
+			if (new File(path).exists())
+				foundedHTML = path;
+		}
+		
+		return foundedHTML;
+	}
 
 	/**
 	 * Show a popup message to get the user's attention and inform him.
@@ -403,17 +442,20 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
-		
+
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
-		
+
 		String generatedSequenceName = OutputStructure.sequencesOutputDir 
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
 		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
-        		+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
+				+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
 		
+		String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + sequenceCountDir;
+
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
 					logFileName), true))),
@@ -422,9 +464,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
-		
-		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, sequenceCountDir);
-		
+
+		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, screenshotsDirectory);
+
 		return generatedSequenceName;
 	}
 
@@ -436,12 +478,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
-		
+
 		String sequenceObject = OutputStructure.sequencesOutputDir 
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname
 				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount + ".testar";
-		
+
 		final File currentSeqObject = new File(sequenceObject);
 
 		try {
@@ -451,7 +493,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
 			//INDEXLOG.error("Exception: ",e);
 		}
-		
+
 		return currentSeqObject;
 	}
 
@@ -555,7 +597,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void runGenerateOuterLoop(SUT system) {
 
 		synchronized(this){
-			OutputStructure.startOuterLoopDateString = Util.dateString(OutputStructure.DATE_FORMAT);
+			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
 			OutputStructure.createOutputSUTname(settings);
 			OutputStructure.createOutputFolders();
@@ -577,7 +619,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		while (mode() != Modes.Quit && moreSequences()) {
 
 			synchronized(this){
-				OutputStructure.startInnerLoopDateString = Util.dateString(OutputStructure.DATE_FORMAT);
+				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
 
@@ -668,9 +710,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
 		if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-			
+
 			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
-			
+
 			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 		}
 	}
@@ -1776,7 +1818,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	@Override
 	protected void postSequenceProcessing() {
-		
+
 	}
 
 	/**

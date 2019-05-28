@@ -194,8 +194,10 @@ public class HtmlSequenceReport {
         	screenshotDir = screenshotDir.replace(replaceString,"../");
         }
 //        System.out.println("path="+actionPath);
-        String actionPath = screenshotDir + File.separator + "sequence" + OutputStructure.sequenceInnerLoopCount + File.separator
-        		+ state.get(Tags.ConcreteID) + "_" + action.get(Tags.ConcreteID) + ".png";
+        String actionPath = screenshotDir + File.separator 
+        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+        		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+        		+ File.separator + state.get(Tags.ConcreteID) + "_" + action.get(Tags.ConcreteID) + ".png";
 //        System.out.println("path="+actionPath);
         write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteID));

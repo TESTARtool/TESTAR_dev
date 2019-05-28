@@ -33,6 +33,7 @@ package org.testar;
 
 import java.io.File;
 
+import org.fruit.Util;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
@@ -56,6 +57,22 @@ public class OutputStructure {
 	public static String logsOutputDir;
 	public static String debugLogsOutputDir;
 	public static String processListenerDir;
+	
+	public static void calculateOuterLoopDateString() {
+		String date = Util.dateString(OutputStructure.DATE_FORMAT);
+		date = date + "s";
+		date = date.substring(0, 16) + "m" + date.substring(17);
+		date = date.substring(0, 13) + "h" + date.substring(14);
+		startOuterLoopDateString = date;
+	}
+	
+	public static void calculateInnerLoopDateString() {
+		String date = Util.dateString(OutputStructure.DATE_FORMAT);
+		date = date + "s";
+		date = date.substring(0, 16) + "m" + date.substring(17);
+		date = date.substring(0, 13) + "h" + date.substring(14);
+		startInnerLoopDateString = date;
+	}
 
 	public static void createOutputSUTname(Settings settings) {
 		executedSUTname = "unknown";
