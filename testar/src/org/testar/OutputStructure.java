@@ -49,7 +49,7 @@ public class OutputStructure {
 
 	public static String executedSUTname;
 	public static int sequenceInnerLoopCount;
-	
+
 	public static String outerLoopOutputDir;
 	public static String sequencesOutputDir;
 	public static String screenshotsOutputDir;
@@ -57,7 +57,7 @@ public class OutputStructure {
 	public static String logsOutputDir;
 	public static String debugLogsOutputDir;
 	public static String processListenerDir;
-	
+
 	public static void calculateOuterLoopDateString() {
 		String date = Util.dateString(OutputStructure.DATE_FORMAT);
 		date = date + "s";
@@ -65,7 +65,7 @@ public class OutputStructure {
 		date = date.substring(0, 13) + "h" + date.substring(14);
 		startOuterLoopDateString = date;
 	}
-	
+
 	public static void calculateInnerLoopDateString() {
 		String date = Util.dateString(OutputStructure.DATE_FORMAT);
 		date = date + "s";
@@ -77,31 +77,37 @@ public class OutputStructure {
 	public static void createOutputSUTname(Settings settings) {
 		executedSUTname = "unknown";
 
-		String sutConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
+		if(settings.get(ConfigTags.ApplicationName,"").equals("")) {
 
-		sutConnectorValue = sutConnectorValue.replace("/", File.separator);
-		
-		try {
-			if (sutConnectorValue.contains("http") && sutConnectorValue.contains("www.")) {
-				int indexWWW = sutConnectorValue.indexOf("www.")+4;
-				int indexEnd = sutConnectorValue.indexOf(".", indexWWW);
-				String domain = sutConnectorValue.substring(indexWWW, indexEnd);
-				executedSUTname = domain;
+			String sutConnectorValue = settings.get(ConfigTags.SUTConnectorValue);
+
+			sutConnectorValue = sutConnectorValue.replace("/", File.separator);
+
+			try {
+				if (sutConnectorValue.contains("http") && sutConnectorValue.contains("www.")) {
+					int indexWWW = sutConnectorValue.indexOf("www.")+4;
+					int indexEnd = sutConnectorValue.indexOf(".", indexWWW);
+					String domain = sutConnectorValue.substring(indexWWW, indexEnd);
+					executedSUTname = domain;
+				}
+				else if (sutConnectorValue.contains(".exe")) {
+					int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
+					int endSUT = sutConnectorValue.indexOf(".exe");
+					String sutName = sutConnectorValue.substring(startSUT, endSUT);
+					executedSUTname = sutName;
+				}
+				else if (sutConnectorValue.contains(".jar")) {
+					int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
+					int endSUT = sutConnectorValue.indexOf(".jar");
+					String sutName = sutConnectorValue.substring(startSUT, endSUT);
+					executedSUTname = sutName;
+				}
+			}catch(Exception e) {
+				System.out.println("Error: This run generation will be stored with \"unknown\" name");
 			}
-			else if (sutConnectorValue.contains(".exe")) {
-				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
-				int endSUT = sutConnectorValue.indexOf(".exe");
-				String sutName = sutConnectorValue.substring(startSUT, endSUT);
-				executedSUTname = sutName;
-			}
-			else if (sutConnectorValue.contains(".jar")) {
-				int startSUT = sutConnectorValue.lastIndexOf(File.separator)+1;
-				int endSUT = sutConnectorValue.indexOf(".jar");
-				String sutName = sutConnectorValue.substring(startSUT, endSUT);
-				executedSUTname = sutName;
-			}
-		}catch(Exception e) {
-			System.out.println("Error: This run generation will be stored with \"unknown\" name");
+			
+		}else {
+			executedSUTname = settings.get(ConfigTags.ApplicationName,"unknown");
 		}
 
 	}
@@ -111,7 +117,7 @@ public class OutputStructure {
 		outerLoopOutputDir = Main.outputDir + File.separator + startOuterLoopDateString + "_" + executedSUTname;
 		File runDir = new File(outerLoopOutputDir);
 		runDir.mkdirs();
-		
+
 		//Check if main output folder was created correctly, if not use unknown name with timestamp
 		if(!runDir.exists()) {
 			runDir = new File(Main.outputDir + File.separator + startOuterLoopDateString + "_unknown");
