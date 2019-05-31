@@ -111,7 +111,10 @@ public class FileHandling {
         LogSerialiser.log("Copying classified sequence (\"" + generatedSequence + "\") to " + targetFolder + " folder...\n", LogSerialiser.LogLevel.Info);
         try {
         	
-            Util.copyToDirectory(currentSeq.getCanonicalPath(),
+        	Util.copyToDirectory(currentSeq.getCanonicalPath(),
+            		OutputStructure.outerLoopOutputDir + File.separator + "sequences", true);
+        	
+        	Util.copyToDirectory(currentSeq.getCanonicalPath(),
             		OutputStructure.outerLoopOutputDir + File.separator + targetFolder, true);
             
         } catch (NoSuchTagException e) {

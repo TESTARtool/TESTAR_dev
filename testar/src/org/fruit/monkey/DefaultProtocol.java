@@ -386,7 +386,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
-	
+
 	/**
 	 * Check if the selected file to View is a log file
 	 */
@@ -396,7 +396,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		return false;
 	}
-	
+
 	/**
 	 * If the user selects a .testar object file to use the View mode, try to find the corresponding html file
 	 */
@@ -409,7 +409,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if (new File(path).exists())
 				foundedHTML = path;
 		}
-		
+
 		return foundedHTML;
 	}
 
@@ -452,7 +452,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
-		
+
 		String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir;
 
@@ -479,7 +479,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
 
-		String sequenceObject = OutputStructure.sequencesOutputDir 
+		String sequenceObject = settings.get(ConfigTags.TempDir)
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname
 				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount + ".testar";
@@ -562,6 +562,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.finish();
 		LogSerialiser.exit();
 		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+		
+		//Delete the temporally testar file
+		try {
+			Util.delete(currentSeq);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		}
+
 	}
 
 	/**
@@ -587,6 +595,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.finish();
 		LogSerialiser.exit();
 		this.mode = Modes.Quit;
+		
+		//Delete the temporally testar file
+		try {
+			Util.delete(currentSeq);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		}
 	}
 
 	/**
@@ -978,7 +993,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
-			
+
 			preSequencePreparations();
 
 			system = startSystem();
@@ -1108,7 +1123,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
-		
+
 		synchronized(this){
 			OutputStructure.calculateOuterLoopDateString();
 			OutputStructure.sequenceInnerLoopCount = 0;
