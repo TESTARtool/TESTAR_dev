@@ -99,6 +99,10 @@ public class ProcessListener{
 
 		//Create File to save the logs of these oracles
 		File dir = new File(OutputStructure.processListenerDir);
+		
+		String logProcessListenerName = OutputStructure.processListenerDir
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
 		//Prepare runnable to read Error buffer
 		Runnable readErrors = new Runnable() {
@@ -138,7 +142,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(logProcessListenerName + "_StdErr.log", true));
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -152,7 +156,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(logProcessListenerName + "_StdErr.log", true));
 
 							if(DefaultProtocol.lastExecutedAction!=null)
 								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
@@ -210,7 +214,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(logProcessListenerName + "_StdOut.log", true));
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();
@@ -223,7 +227,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+OutputStructure.sequenceInnerLoopCount+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(logProcessListenerName + "_StdOut.log", true));
 
 							if(DefaultProtocol.lastExecutedAction!=null)
 								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);

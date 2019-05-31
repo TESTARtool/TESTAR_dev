@@ -689,8 +689,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
-				processVerdict = Verdict.OK;
-
 				//Copy sequence file into proper directory:
 				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
 
