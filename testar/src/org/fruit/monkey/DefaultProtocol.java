@@ -1193,7 +1193,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			if(settings.get(ConfigTags.ProcessListenerEnabled)) {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
-			
+
+			// for most windows applications and most jar files, this is where the SUT gets created!
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 			
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(

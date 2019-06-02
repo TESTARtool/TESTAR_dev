@@ -63,11 +63,11 @@ class UIAWidget implements Widget, Serializable {
 	UIAWidget parent;
 	Map<Tag<?>, Object> tags = Util.newHashMap();
 	List<UIAWidget> children = new ArrayList<UIAWidget>();
-	UIAElement element;
+	UIAElement uiaElement;
 		
-	protected UIAWidget(UIAState root, UIAWidget parent, UIAElement element){
+	protected UIAWidget(UIAState root, UIAWidget parent, UIAElement uiaElement){
 		this.parent = parent;
-		this.element = element;
+		this.uiaElement = uiaElement;
 		this.root = root;
 		
 		if(parent != null)

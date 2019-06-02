@@ -68,8 +68,8 @@ final class UIAState extends UIAWidget implements State {
 	}
 
 	void invalidate(UIAWidget w){
-		if(w.element != null)
-			w.element.backRef = null;
+		if(w.uiaElement != null)
+			w.uiaElement.backRef = null;
 		w.root = null;
 		for(UIAWidget c : w.children)
 			invalidate(c);
@@ -112,102 +112,102 @@ final class UIAState extends UIAWidget implements State {
 
 		if(ret != null){
 			return (T)ret;
-		}else if(w.element == null || w.tags.containsKey(t)){
+		}else if(w.uiaElement == null || w.tags.containsKey(t)){
 			return defaultValue;
 		}
 		
 		if(t.equals(Tags.Desc)){
-			ret = w.element.name;
+			ret = w.uiaElement.name;
 		}else if(t.equals(Tags.Role)){
-			ret = UIARoles.fromTypeId(w.element.ctrlId);
+			ret = UIARoles.fromTypeId(w.uiaElement.ctrlId);
 		}else if(t.equals(Tags.HitTester)){
-			ret = new UIAHitTester(w.element);
+			ret = new UIAHitTester(w.uiaElement);
 		}else if(t.equals(Tags.Shape)){	
-			ret = w.element.rect;
+			ret = w.uiaElement.rect;
 		}else if(t.equals(Tags.Blocked)){
-			ret = w.element.blocked;
+			ret = w.uiaElement.blocked;
 		}else if(t.equals(Tags.Enabled)){
-			ret = w.element.enabled;
+			ret = w.uiaElement.enabled;
 		}else if(t.equals(Tags.Title)){
-			ret = w.element.name;
+			ret = w.uiaElement.name;
 		}else if (t.equals(Tags.ValuePattern)) {
-			ret = w.element.valuePattern;
+			ret = w.uiaElement.valuePattern;
 		}else if(t.equals(Tags.ToolTipText)){
-			ret = w.element.helpText;
+			ret = w.uiaElement.helpText;
 		}else if(t.equals(Tags.PID)){
-			ret = w == this ? ((UIARootElement)element).pid : null;
+			ret = w == this ? ((UIARootElement) uiaElement).pid : null;
 		}else if(t.equals(Tags.IsRunning)){
-			ret = w == this ? ((UIARootElement)element).isRunning : null;
+			ret = w == this ? ((UIARootElement) uiaElement).isRunning : null;
 		}else if(t.equals(Tags.TimeStamp)){
-			ret = w == this ? ((UIARootElement)element).timeStamp : null;
+			ret = w == this ? ((UIARootElement) uiaElement).timeStamp : null;
 		}else if(t.equals(Tags.Foreground)){
-			ret = w == this ? ((UIARootElement)element).isForeground : null;
+			ret = w == this ? ((UIARootElement) uiaElement).isForeground : null;
 		}else if(t.equals(Tags.HasStandardKeyboard)){
-			ret = w == this ? ((UIARootElement)element).hasStandardKeyboard : null;	
+			ret = w == this ? ((UIARootElement) uiaElement).hasStandardKeyboard : null;
 		}else if(t.equals(Tags.HasStandardMouse)){
-			ret = w == this ? ((UIARootElement)element).hasStandardMouse : null;				
+			ret = w == this ? ((UIARootElement) uiaElement).hasStandardMouse : null;
 		}else if(t.equals(UIATags.UIAName)){ 
-			ret = w.element.name;
+			ret = w.uiaElement.name;
 		}else if(t.equals(UIATags.UIAOrientation)){
-			ret = w.element.orientation;
+			ret = w.uiaElement.orientation;
 		// begin by urueda
 		}else if(t.equals(Tags.ZIndex)){
-			ret = w.element.zindex;
+			ret = w.uiaElement.zindex;
 		}else if(t.equals(UIATags.UIAIsWindowModal)){
-			ret = w.element.isModal;
+			ret = w.uiaElement.isModal;
 		}else if(t.equals(UIATags.UIAIsTopmostWindow)){
-			ret = w.element.isTopmostWnd;
+			ret = w.uiaElement.isTopmostWnd;
 		}else if(t.equals(UIATags.UIAIsContentElement)){
-			ret = w.element.isContentElement;
+			ret = w.uiaElement.isContentElement;
 		}else if(t.equals(UIATags.UIAIsControlElement)){
-			ret = w.element.isControlElement;
+			ret = w.uiaElement.isControlElement;
 		}else if(t.equals(UIATags.UIAScrollPattern)){
-			ret = w.element.scrollPattern;
+			ret = w.uiaElement.scrollPattern;
 		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
-		//	ret = w.element.scrollbarInfo;
+		//	ret = w.uiaElement.scrollbarInfo;
 		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
-		//	ret = w.element.scrollbarInfoH;
+		//	ret = w.uiaElement.scrollbarInfoH;
 		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
-		//	ret = w.element.scrollbarInfoV;
+		//	ret = w.uiaElement.scrollbarInfoV;
 		}else if(t.equals(UIATags.UIAHorizontallyScrollable)){
-			ret = w.element.hScroll;
+			ret = w.uiaElement.hScroll;
 		}else if(t.equals(UIATags.UIAVerticallyScrollable)){
-			ret = w.element.vScroll;
+			ret = w.uiaElement.vScroll;
 		}else if(t.equals(UIATags.UIAScrollHorizontalViewSize)){
-			ret = w.element.hScrollViewSize;
+			ret = w.uiaElement.hScrollViewSize;
 		}else if(t.equals(UIATags.UIAScrollVerticalViewSize)){
-			ret = w.element.vScrollViewSize;
+			ret = w.uiaElement.vScrollViewSize;
 		}else if(t.equals(UIATags.UIAScrollHorizontalPercent)){
-			ret = w.element.hScrollPercent;
+			ret = w.uiaElement.hScrollPercent;
 		}else if(t.equals(UIATags.UIAScrollVerticalPercent)){
-			ret = w.element.vScrollPercent;
+			ret = w.uiaElement.vScrollPercent;
 		// end by urueda
 		}else if(t.equals(UIATags.UIAHelpText)){
-			ret = w.element.helpText;
+			ret = w.uiaElement.helpText;
 		}else if(t.equals(UIATags.UIAClassName)){
-			ret = w.element.className;
+			ret = w.uiaElement.className;
 		}else if(t.equals(UIATags.UIAControlType)){
-			ret = w.element.ctrlId;
+			ret = w.uiaElement.ctrlId;
 		}else if(t.equals(UIATags.UIACulture)){
-			ret = w.element.culture;
+			ret = w.uiaElement.culture;
 		}else if(t.equals(UIATags.UIAFrameworkId)){
-			ret = w.element.frameworkId;
+			ret = w.uiaElement.frameworkId;
 		}else if(t.equals(UIATags.UIAHasKeyboardFocus)){
-			ret = w.element.hasKeyboardFocus;
+			ret = w.uiaElement.hasKeyboardFocus;
 		}else if(t.equals(UIATags.UIAIsKeyboardFocusable)){
-			ret = w.element.isKeyboardFocusable;
+			ret = w.uiaElement.isKeyboardFocusable;
 		}else if(t.equals(UIATags.UIAProviderDescription)){
-			ret = w.element.providerDesc;
+			ret = w.uiaElement.providerDesc;
 		}else if(t.equals(UIATags.UIAWindowInteractionState)){
-			ret = w.element.wndInteractionState;
+			ret = w.uiaElement.wndInteractionState;
 		}else if(t.equals(UIATags.UIAWindowVisualState)){
-			ret = w.element.wndVisualState;
+			ret = w.uiaElement.wndVisualState;
 		}else if(t.equals(UIATags.UIAAutomationId)){
-			ret = w.element.automationId;
+			ret = w.uiaElement.automationId;
 		}else if(t.equals(UIATags.UIAAcceleratorKey)){
-			ret = w.element.acceleratorKey;
+			ret = w.uiaElement.acceleratorKey;
 		}else if(t.equals(UIATags.UIAAccessKey)){
-			ret = w.element.accessKey;
+			ret = w.uiaElement.accessKey;
 		}
 		
 		cacheTag(w, t, ret);
@@ -236,32 +236,32 @@ final class UIAState extends UIAWidget implements State {
 	UIAWidget getParent(UIAWidget w){ return w.parent; }
 
 
-	Iterable<Tag<?>> tags(final UIAWidget w){
-		Assert.notNull(w);
+	Iterable<Tag<?>> tags(final UIAWidget widget){
+		Assert.notNull(widget);
 
 		// compile a query set
 		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
-		queryTags.addAll(tags.keySet());
-		queryTags.addAll(Tags.tagSet());
-		queryTags.addAll(UIATags.tagSet());
+		queryTags.addAll(tags.keySet());  // the tags that have been set on this widget (state is also a widget)
+		queryTags.addAll(Tags.tagSet()); // the tags defined in org.fruit.alayer.Tags
+		queryTags.addAll(UIATags.tagSet()); // the tags defined in org.fruit.alayer.windows.UIATags
 
-		Iterable<Tag<?>> ret = new Iterable<Tag<?>>(){
+		Iterable<Tag<?>> returnTags = new Iterable<Tag<?>>(){
 			public Iterator<Tag<?>> iterator() {
 				return new Iterator<Tag<?>>(){
-					Iterator<Tag<?>> i = queryTags.iterator();
-					UIAWidget target = w;
-					Tag<?> next;
+					Iterator<Tag<?>> tagIterator = queryTags.iterator();
+					UIAWidget targetWidget = widget;
+					Tag<?> nextTag;
 
 					private Tag<?> fetchNext(){
-						if(next == null){
-							while(i.hasNext()){
-								next = i.next();
-								if(target.get(next, null) != null)
-									return next;
+						if(nextTag == null){
+							while(tagIterator.hasNext()){
+								nextTag = tagIterator.next();
+								if(targetWidget.get(nextTag, null) != null)
+									return nextTag;
 							}
-							next = null;
+							nextTag = null;
 						}
-						return next;
+						return nextTag;
 					}
 
 					public boolean hasNext() {
@@ -269,20 +269,18 @@ final class UIAState extends UIAWidget implements State {
 					}
 
 					public Tag<?> next() {
-						Tag<?> ret = fetchNext();
-						if(ret == null)
+						Tag<?> returnTag = fetchNext();
+						if(returnTag == null)
 							throw new NoSuchElementException();
-						next = null;
-						return ret;
+						nextTag = null;
+						return returnTag;
 					}
 
 					public void remove() { throw new UnsupportedOperationException(); }
-
 				};
 			}
-
 		};
-		return ret;
+		return returnTags;
 	}
 
 	//public String toString(){ return Util.treeDesc(this, 2, Tags.Desc); }

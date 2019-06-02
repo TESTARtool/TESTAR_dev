@@ -53,7 +53,7 @@ class UIAElement implements Serializable {
 		hasKeyboardFocus, isKeyboardFocusable,
 		isTopmostWnd, isTopLevelContainer,
 		scrollPattern, hScroll, vScroll; // by urueda
-	long ctrlId, culture, orientation, windowHandler, wndInteractionState, wndVisualState;
+	long ctrlId, culture, orientation, windowHandle, wndInteractionState, wndVisualState;
 	Rect rect;
 	String name, helpText, automationId, className, providerDesc, frameworkId,
 		acceleratorKey, accessKey;

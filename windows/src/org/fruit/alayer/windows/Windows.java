@@ -95,7 +95,7 @@ public final class Windows{
 	public static final long WindowVisualState_Minimized = 2;
 
 
-	/* UIA element mode */	
+	/* UIA uiaElement mode */
 	public static final long AutomationElementMode_None = 0;
 	public static final long AutomationElementMode_Full = 1;
 
