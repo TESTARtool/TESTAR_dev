@@ -57,6 +57,11 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebTagName = from("WebTagName", String.class);
 
   /**
+   * Styled class of a widget
+   */
+  public static final Tag<String> WebCssClasses = from("WebCssClasses", String.class);
+  
+  /**
    * Help text of a widget
    */
   public static final Tag<String> WebHelpText = from("WebHelpText", String.class);
