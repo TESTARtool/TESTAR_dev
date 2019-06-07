@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Open Universiteit - www.ou.nl
+* Copyright (c) 2017, 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -186,18 +186,18 @@ public class StateModelPanel extends JPanel {
 
         // NEW COLUMN
 
-        label12.setBounds(330, 128, 150, 27);
+        label12.setBounds(330, 52, 150, 27);
         add(label12);
-        accessBridgeEnabledBox.setBounds(480, 128, 50, 27);
+        accessBridgeEnabledBox.setBounds(480, 52, 50, 27);
         add(accessBridgeEnabledBox);
 
-        label9.setBounds(330,166,150,27);
+        label9.setBounds(330,90,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(480, 166, 50, 27);
+        resetDatabaseCheckbox.setBounds(480, 90, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 204, 150, 27);
+        analysisButton.setBounds(330, 128, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

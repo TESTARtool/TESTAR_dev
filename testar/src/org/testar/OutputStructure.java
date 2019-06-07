@@ -109,6 +109,10 @@ public class OutputStructure {
 		}else {
 			executedSUTname = settings.get(ConfigTags.ApplicationName,"");
 		}
+		
+		String version = settings.get(ConfigTags.ApplicationVersion,"");
+		if(!version.isEmpty())
+			executedSUTname += "_" + version;
 
 	}
 

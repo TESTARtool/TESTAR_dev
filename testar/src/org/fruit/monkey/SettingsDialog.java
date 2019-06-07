@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -70,11 +70,11 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.1.2 (23-May-2019)";
+  static final String TESTAR_VERSION = "2.1.3 (10-June-2019)";
 
   private String settingsFile;
   private Settings settings;
-  //TODO: what is this ret variable. Can´t you just return settings in the run method?
+  //TODO: what is this ret variable. Cant you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
