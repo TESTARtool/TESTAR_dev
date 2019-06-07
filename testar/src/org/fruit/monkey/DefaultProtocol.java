@@ -318,9 +318,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		// new state model manager
-		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
+		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay ) {
+			//Create the output folders
+			OutputStructure.calculateOuterLoopDateString();
+			OutputStructure.sequenceInnerLoopCount = 0;
+			OutputStructure.createOutputSUTname(settings);
+			OutputStructure.createOutputFolders();
+
+			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+		}
 
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -562,7 +569,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.finish();
 		LogSerialiser.exit();
 		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
-		
+
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
@@ -595,7 +602,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.finish();
 		LogSerialiser.exit();
 		this.mode = Modes.Quit;
-		
+
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
@@ -610,13 +617,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param system
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
-
-		synchronized(this){
-			OutputStructure.calculateOuterLoopDateString();
-			OutputStructure.sequenceInnerLoopCount = 0;
-			OutputStructure.createOutputSUTname(settings);
-			OutputStructure.createOutputFolders();
-		}
 
 		boolean startFromGenerate = false;
 		if(system==null)
@@ -984,10 +984,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(system == null) {
 
 			synchronized(this){
-				OutputStructure.calculateOuterLoopDateString();
-				OutputStructure.sequenceInnerLoopCount = 0;
-				OutputStructure.createOutputSUTname(settings);
-				OutputStructure.createOutputFolders();
 				OutputStructure.calculateInnerLoopDateString();
 				OutputStructure.sequenceInnerLoopCount++;
 			}
@@ -1123,10 +1119,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		ObjectInputStream ois = null;
 
 		synchronized(this){
-			OutputStructure.calculateOuterLoopDateString();
-			OutputStructure.sequenceInnerLoopCount = 0;
-			OutputStructure.createOutputSUTname(settings);
-			OutputStructure.createOutputFolders();
 			OutputStructure.calculateInnerLoopDateString();
 			OutputStructure.sequenceInnerLoopCount++;
 		}

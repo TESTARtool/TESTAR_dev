@@ -75,7 +75,7 @@ public class OutputStructure {
 	}
 
 	public static void createOutputSUTname(Settings settings) {
-		executedSUTname = "unknown";
+		executedSUTname = "";
 
 		if(settings.get(ConfigTags.ApplicationName,"").equals("")) {
 
@@ -103,11 +103,11 @@ public class OutputStructure {
 					executedSUTname = sutName;
 				}
 			}catch(Exception e) {
-				System.out.println("Error: This run generation will be stored with \"unknown\" name");
+				System.out.println("Error: This run generation will be stored with empty name");
 			}
 			
 		}else {
-			executedSUTname = settings.get(ConfigTags.ApplicationName,"unknown");
+			executedSUTname = settings.get(ConfigTags.ApplicationName,"");
 		}
 
 	}
