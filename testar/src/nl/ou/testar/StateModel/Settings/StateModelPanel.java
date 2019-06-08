@@ -30,14 +30,17 @@
 
 package nl.ou.testar.StateModel.Settings;
 
+import nl.ou.testar.StateModel.Analysis.AnalysisManager;
+import nl.ou.testar.StateModel.Analysis.HttpServer.JettyServer;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -60,6 +63,7 @@ public class StateModelPanel extends JPanel {
     private JLabel label11 = new JLabel("Application version");
     private JLabel label12 = new JLabel("AccessBridge enabled");
     private JLabel label13 = new JLabel("DataStoreDirectory");
+    private JLabel label14 = new JLabel();
 
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
@@ -77,6 +81,10 @@ public class StateModelPanel extends JPanel {
     private JCheckBox accessBridgeEnabledBox = new JCheckBox();
     private JTextField dataStoreDirectoryField = new JTextField();
     private JButton dirButton = new JButton("..");
+    private JButton analysisButton = new JButton("Analysis");
+    private JDialog analysisDialog;
+
+    private String outputDir;
 
     private StateModelPanel(){
         super();
@@ -111,6 +119,7 @@ public class StateModelPanel extends JPanel {
         components.add(dataStoreModeBox);
         components.add(accessBridgeEnabledBox);
         components.add(dirButton);
+        components.add(analysisButton);
 
         // add the components to the panel
         setLayout(null);
@@ -124,6 +133,7 @@ public class StateModelPanel extends JPanel {
                 if (stateModelEnabledChkBox.isSelected()) {
                     checkDataType();
                 }
+                checkAnalysisButtonActive();
             }
         });
         add(stateModelEnabledChkBox);
@@ -202,6 +212,19 @@ public class StateModelPanel extends JPanel {
         resetDatabaseCheckbox.setBounds(480, 166, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
+
+        analysisButton.setBounds(330, 204, 150, 27);
+        analysisButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openServer();
+                checkAnalysisButtonActive();
+            }
+        });
+        add(analysisButton);
+
+        label14.setBounds(330, 242, 300, 27);
+        add(label14);
     }
 
     /**
@@ -233,6 +256,13 @@ public class StateModelPanel extends JPanel {
         // check if the fields should be enabled or not
         components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
         checkDataType();
+        checkAnalysisButtonActive();
+        outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "graphs" + File.separator;
     }
 
     /**
@@ -273,6 +303,10 @@ public class StateModelPanel extends JPanel {
         dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
     }
 
+    private void checkAnalysisButtonActive() {
+        analysisButton.setEnabled(stateModelEnabledChkBox.isSelected() && analysisDialog == null);
+    }
+
     private void chooseFileActionPerformed(ActionEvent evt) {
         JFileChooser fd = new JFileChooser();
         fd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -283,6 +317,29 @@ public class StateModelPanel extends JPanel {
 
             // Set the text from settings in txtSutPath
             dataStoreDirectoryField.setText(file);
+        }
+    }
+
+    private void openServer() {
+        try {
+            label14.setText("");
+            // create a config object for the orientdb database connection info
+            Config config = new Config();
+            config.setConnectionType((String)dataStoreTypeBox.getSelectedItem());
+            config.setServer(dataStoreServerTextfield.getText());
+            config.setDatabase(dataStoreDBTextfield.getText());
+            config.setUser(dataStoreUserTextfield.getText());
+            config.setPassword(getPassword());
+            config.setDatabaseDirectory(dataStoreDirectoryField.getText());
+            AnalysisManager analysisManager = new AnalysisManager(config, outputDir);
+            JettyServer jettyServer = new JettyServer();
+            jettyServer.start(outputDir, analysisManager);
+            Desktop desktop = java.awt.Desktop.getDesktop();
+            URI uri = new URI("http://localhost:8090/models");
+            desktop.browse(uri);
+        }
+        catch (Exception ex) {
+            label14.setText("Please check your connection credentials.");
         }
     }
 

@@ -9,6 +9,7 @@ public class QueueVisualizer extends JDialog {
 
     public QueueVisualizer(String title) {
         super((JFrame)null, title, false);
+        setLocationRelativeTo(null);
         this.setType(Type.POPUP);
         this.setUndecorated(true);
         msg = new Label(title);

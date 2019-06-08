@@ -76,6 +76,7 @@ public class CodingManager {
 	public static final String ID_PREFIX_ACTION = "A";
 	
 	private static final Tag<?>[] TAGS_CONCRETE_ID = new Tag<?>[]{Tags.Role,Tags.Title,/*Tags.Shape,*/Tags.Enabled, Tags.Path};
+	private static final Tag<?>[] TAGS_ABSTRACT_ID = new Tag<?>[]{Tags.Role};
 	private static final Tag<?>[] TAGS_ABSTRACT_R_ID = new Tag<?>[]{Tags.Role};
 	private static final Tag<?>[] TAGS_ABSTRACT_R_T_ID = new Tag<?>[]{Tags.Role,Tags.Title};
 	private static final Tag<?>[] TAGS_ABSTRACT_R_T_P_ID = new Tag<?>[]{Tags.Role,Tags.Title,Tags.Path};
@@ -151,18 +152,20 @@ public class CodingManager {
 	public static synchronized void buildIDs(Widget widget){
 		if (widget.parent() != null){
 			widget.set(Tags.ConcreteID, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE + CodingManager.codify(widget, false, CodingManager.TAGS_CONCRETE_ID));
+			widget.set(Tags.AbstractID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_ID));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_ID));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_ID));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.codify(widget, false, CodingManager.TAGS_ABSTRACT_R_T_P_ID));
 			widget.set(Tags.ConcreteIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_CONCRETE_CUSTOM + CodingManager.codify(widget, false, customTagsForConcreteId));
 			widget.set(Tags.AbstractIDCustom, ID_PREFIX_WIDGET + ID_PREFIX_ABSTRACT_CUSTOM + CodingManager.codify(widget, false, customTagsForAbstractId));
 		} else if (widget instanceof State) { // UI root
-			String cid, a_R_id, a_R_T_id, a_R_T_P_id, concreteIdCustom, abstractIdCustom;
-			cid = a_R_id = a_R_T_id = a_R_T_P_id = concreteIdCustom = abstractIdCustom = "";
+			String cid, aid, a_R_id, a_R_T_id, a_R_T_P_id, concreteIdCustom, abstractIdCustom;
+			cid = aid = a_R_id = a_R_T_id = a_R_T_P_id = concreteIdCustom = abstractIdCustom = "";
 			for (Widget w : (State) widget){
 				if (w != widget){
 					buildIDs(w);
 					cid += w.get(Tags.ConcreteID);
+					aid += w.get(Tags.AbstractID);
 					a_R_id += w.get(Tags.Abstract_R_ID);
 					a_R_T_id += w.get(Tags.Abstract_R_T_ID);
 					a_R_T_P_id += w.get(Tags.Abstract_R_T_P_ID);
@@ -171,6 +174,7 @@ public class CodingManager {
 				}
 			}
 			widget.set(Tags.ConcreteID, ID_PREFIX_STATE + ID_PREFIX_CONCRETE + CodingManager.toID(cid));
+			widget.set(Tags.AbstractID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT + CodingManager.toID(aid));
 			widget.set(Tags.Abstract_R_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R + CodingManager.toID(a_R_id));
 			widget.set(Tags.Abstract_R_T_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T + CodingManager.toID(a_R_T_id));
 			widget.set(Tags.Abstract_R_T_P_ID, ID_PREFIX_STATE + ID_PREFIX_ABSTRACT_R_T_P + CodingManager.toID(a_R_T_P_id));
