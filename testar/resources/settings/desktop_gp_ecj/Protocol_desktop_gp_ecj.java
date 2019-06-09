@@ -185,6 +185,10 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
 
         // To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
         for (Widget w : state) {
+
+            if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+                continue;
+            }
             //optional: iterate through top level widgets based on Z-index:
             //for(Widget w : getTopWidgets(state)){
 
