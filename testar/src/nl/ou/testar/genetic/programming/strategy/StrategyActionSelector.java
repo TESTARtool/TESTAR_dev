@@ -5,6 +5,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Verdict;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface StrategyActionSelector {
@@ -70,4 +71,8 @@ public interface StrategyActionSelector {
      * Set Verdict
      */
     void setVerdict(final Verdict verdict);
+
+    void postExecuteAction();
+
+    Map<Integer, Integer> getActionMetrics();
 }

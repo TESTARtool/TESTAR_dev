@@ -2,7 +2,14 @@ import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.genetic.programming.strategy.StrategyActionSelector;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactory;
 import nl.ou.testar.genetic.programming.strategy.StrategyFactoryImpl;
-import org.fruit.alayer.*;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.Roles;
+import org.fruit.alayer.SUT;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
+import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -276,7 +283,9 @@ public class Protocol_desktop_gp_ecj extends ClickFilterLayerProtocol {
      */
     @Override
     protected boolean executeAction(SUT system, State state, Action action) {
-        return super.executeAction(system, state, action);
+        final boolean isActionExecuted = super.executeAction(system, state, action);
+        strategyActionSelector.postExecuteAction();
+        return isActionExecuted;
     }
 
     /**

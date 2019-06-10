@@ -2,12 +2,18 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
-import org.fruit.alayer.*;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
@@ -17,6 +23,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     private Date endDate;
     private int currentSequence = 0;
     private Verdict verdict;
+    private final Map<Integer, Integer> actionResults = new TreeMap<>();
     private static final Logger logger = LoggerFactory.getLogger(StrategyActionSelector.class);
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
@@ -40,7 +47,6 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         final Action action = strategyTree.getAction(stateManager).orElseGet(() -> this.stateManager.getAlternativeAction());
         this.updateState(action, state);
         logger.info("The selected action is of type {}", action.get(Tags.Role));
-
         return action;
     }
 
@@ -48,7 +54,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     public void printMetrics() {
         stateManager.printActionWithTimeExecuted();
         logger.info("Total number of actions {}", stateManager.getTotalNumberOfActions());
-        logger.info("Total number of unique actions{}", stateManager.getTotalNumberOfUniqueExecutedActions());
+        logger.info("Total number of unique actions {}", stateManager.getTotalNumberOfUniqueExecutedActions());
         logger.info("Total number of states visited {}", stateManager.getTotalVisitedStates());
         logger.info("Total number of unique states {}", stateManager.getTotalNumberOfUniqueStates());
         logger.info("Total number of irregular actions {}", stateManager.getNumberOfIrregularActions());
@@ -57,6 +63,16 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     public void setVerdict(final Verdict verdict) {
         this.verdict = verdict;
+    }
+
+    @Override
+    public void postExecuteAction() {
+        this.actionResults.put(stateManager.getTotalNumberOfActions(), stateManager.getTotalNumberOfUniqueStates());
+    }
+
+    @Override
+    public Map<Integer, Integer> getActionMetrics() {
+        return this.actionResults;
     }
 
     @Override
