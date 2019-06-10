@@ -33,9 +33,9 @@ package nl.ou.testar.ScreenshotJsonFile;
 import java.util.Set;
 
 public class BoundingPoly {
-    Set<Vertice> vertices;
+    Vertice[] vertices;
 
-    public BoundingPoly(Set<Vertice> vertices) {
+    public BoundingPoly(Vertice[] vertices) {
         this.vertices = vertices;
     }
 }

@@ -58,11 +58,11 @@ public class JsonUtils {
             String role = widget.get(Tags.Role, null).toString();
             boolean blocked = widget.get(Tags.Blocked, null);
             Rect rect = (Rect) widget.get(Tags.Shape, null);
-            Set<Vertice> vertices = new HashSet<Vertice>();
-            vertices.add(new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()));
-            vertices.add(new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()));
-            vertices.add(new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()+rect.height()));
-            vertices.add(new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()+rect.height()));
+            Vertice[] vertices = new Vertice[4];
+            vertices[0]=new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y());
+            vertices[1]=new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y());
+            vertices[2]=new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()+rect.height());
+            vertices[3]=new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()+rect.height());
             BoundingPoly boundingPoly = new BoundingPoly(vertices);
             String className= widget.get(UIATags.UIAClassName, "");
             String title= widget.get(Tags.Title, "");
