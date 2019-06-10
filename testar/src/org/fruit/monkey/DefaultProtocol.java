@@ -412,7 +412,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String path = settings.get(ConfigTags.PathToReplaySequence);
 		if(path.contains(".testar")) {
 			path = path.replace(".testar", ".html");
-			path = path.replace(File.separator + "sequences" + File.separator, File.separator + "HTMLreports" + File.separator);
+			
+			int startIndex = path.indexOf(File.separator + "sequences");
+			int endIndex = path.indexOf(File.separator, startIndex+2);
+			
+			String replace = path.substring(startIndex, endIndex+1);
+			
+			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
 		}
