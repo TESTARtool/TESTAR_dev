@@ -313,7 +313,11 @@ public class Main {
 		// Starting the logs
 		try {
 			// TODO: The date format is not consistent everywhere (see DATE-FORMAT comments)
-			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
+            String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss");
+            if (System.getProperty("counter") != null) {
+                logFileName += "_sequence" + System.getProperty("counter");
+            }
+            logFileName += ".log";
 			File logFile = new File(settings.get(OutputDir) + File.separator + logFileName);
 			if (logFile.exists()) {
 				logFile = Util.generateUniqueFile(settings.get(OutputDir), logFileName);
