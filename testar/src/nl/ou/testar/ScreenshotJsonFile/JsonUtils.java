@@ -49,6 +49,8 @@ import java.util.Set;
 public class JsonUtils {
 
     public static void createWidgetInfoJsonFile(State state){
+        Rect sutRect = (Rect) state.get(Tags.Shape, null);
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
         for(Widget widget:state){
@@ -57,10 +59,10 @@ public class JsonUtils {
             boolean blocked = widget.get(Tags.Blocked, null);
             Rect rect = (Rect) widget.get(Tags.Shape, null);
             Set<Vertice> vertices = new HashSet<Vertice>();
-            vertices.add(new Vertice(rect.x(), rect.y()));
-            vertices.add(new Vertice(rect.x()+rect.width(), rect.y()));
-            vertices.add(new Vertice(rect.x()+rect.width(), rect.y()+rect.height()));
-            vertices.add(new Vertice(rect.x(), rect.y()+rect.height()));
+            vertices.add(new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()));
+            vertices.add(new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()));
+            vertices.add(new Vertice(rect.x()-sutRect.x()+rect.width(), rect.y()-sutRect.y()+rect.height()));
+            vertices.add(new Vertice(rect.x()-sutRect.x(), rect.y()-sutRect.y()+rect.height()));
             BoundingPoly boundingPoly = new BoundingPoly(vertices);
             String className= widget.get(UIATags.UIAClassName, "");
             String title= widget.get(Tags.Title, "");
