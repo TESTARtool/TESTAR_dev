@@ -91,11 +91,11 @@ public class QlearningGuiState {
                         // also the action is the same:
                         if(guiStateTransition.getTargetStateConcreteId().equals(newTransition.getTargetStateConcreteId())){
                             // also the target state is the same -> identical transition
-                            System.out.println(this.getClass()+": addStateTransition: identical transition found - no need to save again");
+                            System.out.println(this.getClass()+": addStateEncoding: identical transition found - no need to save again");
                             return;
                         }else{
                             // same source state and same action, but different target state -> some external factor or the data values affect the behaviour
-                            System.out.println(this.getClass()+": addStateTransition: WARNING: same source state, same action, but different target state!");
+                            System.out.println(this.getClass()+": addStateEncoding: WARNING: same source state, same action, but different target state!");
                         }
                     }
                 }else{
@@ -104,7 +104,7 @@ public class QlearningGuiState {
             }
         }
         // otherwise adding the new state transition:
-//        System.out.println(this.getClass()+": addStateTransition: adding the new state transition");
+//        System.out.println(this.getClass()+": addStateEncoding: adding the new state transition");
         stateTransitions.add(newTransition);
     }
 
