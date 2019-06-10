@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -28,35 +28,47 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************************************/
 
-import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+import java.util.Set;
 import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.*;
 import org.testar.protocols.DesktopProtocol;
 
 /**
- * This is a small change to Desktop Generic Protocol to create JSON files describing the widgets
- *  and their location into output/scrshots folder.
+ * This is a small change to Desktop Generic Protocol to use the learned state model for
+ * improved action selection algorithm.
  *
- *  It only changes the getState() method.
+ * Please note, that this requires state model learning to be enabled in the test settings
+ * (or in Setting Dialog user interface of TESTAR).
+ *
+ *  It only changes the selectAction() method.
  */
-public class Protocol_desktop_generic_json extends DesktopProtocol {
+public class Protocol_desktop_generic_statemodel extends DesktopProtocol {
+
 
 	/**
-	 * This method is called when the TESTAR requests the state of the SUT.
-	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine.
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
 	 *
-	 * Here we don't change the default behaviour, but we add one more step to
-	 * create a JSON file from the state information.
-	 *
-	 * @return  the current state of the SUT with attached oracle.
+	 * @param state the SUT's current state
+	 * @param actions the set of derived actions
+	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected State getState(SUT system) throws StateBuildException{
-		State state = super.getState(system);
-		// Creating a JSON file with information about widgets and their location on the screenshot:
-		JsonUtils.createWidgetInfoJsonFile(state);
-		return state;
+	protected Action selectAction(State state, Set<Action> actions){
+
+		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
+		//unwanted processes are killed and SUT is put into foreground.
+		Action retAction = preSelectAction(state, actions);
+		if (retAction== null) {
+			//if no preSelected actions are needed, then implement your own action selection strategy
+			//using the action selector of the state model:
+			retAction = stateModelManager.getAbstractActionToExecute(actions);
+		}
+		if(retAction==null) {
+			System.out.println("State model based action selection did not find an action. Using default action selection.");
+			// if state model fails, use default:
+			retAction = super.selectAction(state, actions);
+		}
+		return retAction;
 	}
 
 }
+

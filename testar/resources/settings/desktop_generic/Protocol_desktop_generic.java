@@ -1,6 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,23 +30,17 @@
 
 
 import java.util.Set;
-import nl.ou.testar.RandomActionSelector;
-import org.fruit.Drag;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.actions.AnnotatingActionCompiler;
-import org.fruit.alayer.actions.StdActionCompiler;
-import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.DesktopProtocol;
 
-import static org.fruit.alayer.Tags.Blocked;
-import static org.fruit.alayer.Tags.Enabled;
-
-public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
-
-	//Attributes for adding slide actions
-	static double scrollArrowSize = 36; // sliding arrows
-	static double scrollThick = 16; //scroll thickness
+/**
+ * This protocol provides default TESTAR behaviour to test Windows desktop applications.
+ *
+ * It uses random action selection algorithm.
+ */
+public class Protocol_desktop_generic extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -55,6 +50,17 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
+	}
+
+	/**
+	 * This methods is called before each test sequence, before startSystem(),
+	 * allowing for example using external profiling software on the SUT
+	 *
+	 * HTML sequence report will be initialized in the super.preSequencePreparations() for each sequence
+	 */
+	@Override
+	protected void preSequencePreparations() {
+		super.preSequencePreparations();
 	}
 
 	/**
@@ -68,11 +74,7 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-
-		SUT sut = super.startSystem();
-
-		return sut;
-
+		return super.startSystem();
 	}
 
 	/**
@@ -83,9 +85,8 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-		super.beginSequence(system, state);
+	 	super.beginSequence(system, state);
 	}
-
 
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
@@ -93,11 +94,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 	 * own state fetching routine. The state should have attached an oracle
 	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
+	 *
+	 * super.getState(system) puts the state information also to the HTML sequence report
+	 *
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	@Override
 	protected State getState(SUT system) throws StateBuildException{
-
 		return super.getState(system);
 	}
 
@@ -136,80 +139,45 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 
 		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
 		//the foreground. You should add all other actions here yourself.
+		// These "special" actions are prioritized over the normal GUI actions in selectAction() / preSelectAction().
 		Set<Action> actions = super.deriveActions(system,state);
 
-		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
-		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
-		for(Widget w : state){
-			//optional: iterate through top level widgets based on Z-index:
-			//for(Widget w : getTopWidgets(state)){
+		// Derive left-click actions, click and type actions, and scroll actions from
+		// top level (highest Z-index) widgets of the GUI:
+		actions = deriveClickTypeScrollActionsFromTopLevelWidgets(actions, system, state);
 
-			// Only consider enabled and non-blocked widgets
-			if(w.get(Enabled, true) && !w.get(Blocked, false)){
-
-				if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
-					// filtering out actions on menu-containers (adding an action in the middle of the menu)
-					continue;
-				}
-
-				// Do not build actions for widgets on the blacklist
-				// The blackListed widgets are those that have been filtered during the SPY mode with the
-				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
-				if (!blackListed(w)){
-
-					//For widgets that are:
-					// - clickable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of left clicking on them
-					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a left click action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.leftClickAt(w));
-					}
-
-					//For widgets that are:
-					// - typeable
-					// and
-					// - unFiltered by any of the regular expressions in the Filter-tab, or
-					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
-					// We want to create actions that consist of typing into them
-					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
-						//Create a type action with the Action Compiler, and add it to the set of derived actions
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-					}
-					//Add sliding actions (like scroll, drag and drop) to the derived actions
-					//method defined below.
-					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
-				}
-			}
+		if(actions.size()==0){
+			// If the top level widgets did not have any executable widgets, try all widgets:
+//			System.out.println("No actions from top level widgets, changing to all widgets.");
+			// Derive left-click actions, click and type actions, and scroll actions from
+			// all widgets of the GUI:
+			actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
 		}
+
 		//return the set of derived actions
 		return actions;
 	}
 
 	/**
-	 * Select one of the available actions (e.g. at random)
+	 * Select one of the available actions using an action selection algorithm (for example random action selection)
+	 *
+	 * super.selectAction(state, actions) updates information to the HTML sequence report
+	 *
 	 * @param state the SUT's current state
 	 * @param actions the set of derived actions
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		//Call the preSelectAction method from the AbstractProtocol so that, if necessary,
-		//unwanted processes are killed and SUT is put into foreground.
-		Action a = preSelectAction(state, actions);
-		if (a!= null) {
-			return a;
-		} else
-			//if no preSelected actions are needed, then implement your own strategy
-			return RandomActionSelector.selectAction(actions);
+		return(super.selectAction(state, actions));
 	}
 
 	/**
 	 * Execute the selected action.
+	 *
+	 * super.executeAction(system, state, action) is updating the HTML sequence report with selected action
+	 *
 	 * @param system the SUT
 	 * @param state the SUT's current state
 	 * @param action the action to execute
@@ -254,4 +222,13 @@ public class Protocol_desktop_generic extends ClickFilterLayerProtocol {
 		super.stopSystem(system);
 	}
 
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
+	}
 }

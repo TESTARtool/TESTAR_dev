@@ -100,6 +100,8 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
+		isValidJavaEnvironment();
+
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
@@ -123,12 +125,12 @@ public class Main {
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
 			while(startTestarDialog(settings, testSettingsFileName)) {
-				
+
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(args, testSettingsFileName);
-				
+
 				setTestarDirectory(settings);
-				
+
 				settingsLogs(settings);
 
 				initCodingManager(settings);
@@ -144,7 +146,22 @@ public class Main {
 		System.exit(0);
 
 	}
-	
+
+	private static boolean isValidJavaEnvironment() {
+
+		try {
+			if(!System.getenv("JAVA_HOME").contains("jdk"))
+				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
+
+			if(!System.getenv("JAVA_HOME").contains("1.8"))
+				System.out.println("Java version is not JDK 1.8, please install ");
+		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
+				+"Check if JAVA_HOME system variable is correctly defined \n \n"
+				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
+
+		return true;
+	}
+
 	/**
 	 * Set the current directory of TESTAR, settings and output folders
 	 */
@@ -157,7 +174,7 @@ public class Main {
 			System.out.println(e);
 			System.out.println("Please execute TESTAR from their existing directory");
 		}*/
-		
+
 		outputDir = settings.get(ConfigTags.OutputDir);
 		tempDir = settings.get(ConfigTags.TempDir);
 	}
@@ -229,7 +246,7 @@ public class Main {
 			JFrame settingsSelectorDialog = new JFrame();
 			settingsSelectorDialog.setAlwaysOnTop(true);
 			String sseSelected = (String) JOptionPane.showInputDialog(settingsSelectorDialog,
-					"SUT setting:", "Test setting selection", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					"Select the desired setting:", "TESTAR settings", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (sseSelected == null) {
 				SSE_ACTIVATED = null;
@@ -310,11 +327,15 @@ public class Main {
 		File logsDir = new File(outputDir + File.separator +"logs");
 		if(!logsDir.exists())
 			logsDir.mkdirs();
+		//Check if logs/debug dir exist, if not create it
+		File logsDebugDir = new File(logsDir+ File.separator + "debug");
+		if(!logsDebugDir.exists())
+			logsDebugDir.mkdirs();
 
 		// Starting the logs
 		try {
 			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
-			File logFile = new File(outputDir + File.separator +"logs"+ File.separator + logFileName);
+			File logFile = new File(logsDebugDir+ File.separator + logFileName);
 			if (logFile.exists()) {
 				logFile = Util.generateUniqueFile(outputDir, logFileName);
 			}
@@ -349,7 +370,7 @@ public class Main {
 
 				classPath[i] = new File(cp.get(i)).toURI().toURL();
 			}
-			
+
 			loader = new URLClassLoader(classPath);
 
 			String pc = settings.get(ProtocolClass);
@@ -460,7 +481,7 @@ public class Main {
 			defaults.add(Pair.from(DataStore, ""));
 			defaults.add(Pair.from(DataStoreType, ""));
 			defaults.add(Pair.from(DataStoreServer, ""));
-            defaults.add(Pair.from(DataStoreDirectory, ""));
+			defaults.add(Pair.from(DataStoreDirectory, ""));
 			defaults.add(Pair.from(DataStoreDB, ""));
 			defaults.add(Pair.from(DataStoreUser, ""));
 			defaults.add(Pair.from(DataStorePassword, ""));
@@ -662,39 +683,39 @@ public class Main {
 		}
 	}
 
-    /**
-     * This method initializes the coding manager with custom tags to use for constructing
-     * concrete and abstract state ids, if provided of course.
-     * @param settings
-     */
-    private static void initCodingManager(Settings settings) {
-        // we look if there are user-provided custom state tags in the settings
-        // if so, we provide these to the coding manager
-        int i;
+	/**
+	 * This method initializes the coding manager with custom tags to use for constructing
+	 * concrete and abstract state ids, if provided of course.
+	 * @param settings
+	 */
+	private static void initCodingManager(Settings settings) {
+		// we look if there are user-provided custom state tags in the settings
+		// if so, we provide these to the coding manager
+		int i;
 
-        // first the attributes for the concrete state id
-        if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-            i = 0;
+		// first the attributes for the concrete state id
+		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+			i = 0;
 
-            Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
-            for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
-                concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
-            }
+			Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+			for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+				concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+			}
 
-            CodingManager.setCustomTagsForConcreteId(concreteTags);
-        }
+			CodingManager.setCustomTagsForConcreteId(concreteTags);
+		}
 
-        // then the attributes for the abstract state id
-        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-            i = 0;
+		// then the attributes for the abstract state id
+		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+			i = 0;
 
-            Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
-            for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
-                abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
-            }
+			Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+			for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+				abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+			}
 
-            CodingManager.setCustomTagsForAbstractId(abstractTags);
-        }
-    }
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
+		}
+	}
 
 }

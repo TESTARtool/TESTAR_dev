@@ -131,7 +131,7 @@ public class ProcessListener{
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
-							DefaultProtocol.setProcessVerdict(verdict);
+							DefaultProtocol.processVerdict = verdict;
 
 							DefaultProtocol.faultySequence = true;
 
@@ -203,7 +203,7 @@ public class ProcessListener{
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
 
 							//Set that we found an error
-							DefaultProtocol.setProcessVerdict(verdict);
+							DefaultProtocol.processVerdict = verdict;
 
 							DefaultProtocol.faultySequence = true;
 
