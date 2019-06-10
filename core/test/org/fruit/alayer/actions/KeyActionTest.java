@@ -29,12 +29,13 @@
 
 package org.fruit.alayer.actions;
 
-import static java.awt.event.KeyEvent.VK_ALT;
-import static java.awt.event.KeyEvent.VK_CONTROL;
-import static org.junit.Assert.*;
-
 import org.fruit.alayer.Action;
 import org.junit.Test;
+
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_CONTROL;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class KeyActionTest {
 
