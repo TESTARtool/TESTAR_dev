@@ -3,6 +3,8 @@ package nl.ou.testar.genetic.programming.strategy;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNode;
 import nl.ou.testar.genetic.programming.strategy.actionTypes.StrategyNodeAction;
 import org.fruit.alayer.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Set;
@@ -15,9 +17,10 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     private Date endDate;
     private int currentSequence = 0;
     private Verdict verdict;
+    private static final Logger logger = LoggerFactory.getLogger(StrategyActionSelector.class);
 
     StrategyActionSelectorImpl(final StrategyNode strategy) {
-        System.out.println("DEBUG: creating genetic programming strategy");
+        logger.debug("creating genetic programming strategy");
         if (strategy instanceof StrategyNodeAction) {
             strategyTree = (StrategyNodeAction) strategy;
         } else {
@@ -36,7 +39,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
         stateManager.updateState(state, actions);
         final Action action = strategyTree.getAction(stateManager).orElseGet(() -> this.stateManager.getAlternativeAction());
         this.updateState(action, state);
-        System.out.printf("The selected action is of type %s \n", action.get(Tags.Role));
+        logger.info("The selected action is of type {}", action.get(Tags.Role));
 
         return action;
     }
@@ -44,12 +47,12 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     @Override
     public void printMetrics() {
         stateManager.printActionWithTimeExecuted();
-        System.out.printf("Total number of actions %d \n", stateManager.getTotalNumberOfActions());
-        System.out.printf("Total number of unique actions %d \n", stateManager.getTotalNumberOfUniqueExecutedActions());
-        System.out.printf("Total number of states visited %d \n", stateManager.getTotalVisitedStates());
-        System.out.printf("Total number of unique states %d \n", stateManager.getTotalNumberOfUniqueStates());
-        System.out.printf("Total number of irregular actions %d \n", stateManager.getNumberOfIrregularActions());
-        System.out.printf("Total number of unavailable actions %d \n", stateManager.getNumberOfActionsNotFound());
+        logger.info("Total number of actions {}", stateManager.getTotalNumberOfActions());
+        logger.info("Total number of unique actions{}", stateManager.getTotalNumberOfUniqueExecutedActions());
+        logger.info("Total number of states visited {}", stateManager.getTotalVisitedStates());
+        logger.info("Total number of unique states {}", stateManager.getTotalNumberOfUniqueStates());
+        logger.info("Total number of irregular actions {}", stateManager.getNumberOfIrregularActions());
+        logger.info("Total number of unavailable actions {}", stateManager.getNumberOfActionsNotFound());
     }
 
     public void setVerdict(final Verdict verdict) {
@@ -72,7 +75,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
     }
 
     public void printSequenceExecutionDuration() {
-        System.out.printf("It took %d seconds to execute \n", this.sequenceDuration());
+        logger.debug("It took %d seconds to execute {}", this.sequenceDuration());
     }
 
     private long sequenceDuration() {

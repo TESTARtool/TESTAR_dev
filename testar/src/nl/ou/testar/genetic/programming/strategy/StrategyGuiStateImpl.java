@@ -2,6 +2,8 @@ package nl.ou.testar.genetic.programming.strategy;
 
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     private Tag<String> ACTION_ID = Tags.Desc;
     private Tag<String> STATE_ID;
+
+    private static final Logger logger = LoggerFactory.getLogger(StrategyGuiStateImpl.class);
 
     StrategyGuiStateImpl() {
     }
@@ -67,7 +71,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public Action getRandomActionOfType(final ActionExecutionStatus actionExecutionStatus, final List<Action> providedListOfActions) {
         if (executed.size() == 0) {
-            System.out.println("List of executed actions is empty, returning a random action from the list of actions.");
+            logger.debug("List of executed actions is empty, returning a random action from the list of actions.");
             return getRandomActionOfType(providedListOfActions);
         }
         int i;
@@ -101,17 +105,17 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     private Action getRandomActionOfType(List<Action> providedListOfActions) {
         if (providedListOfActions.size() != 0) {
-            System.out.println("Getting a random action from the provided list.");
+            logger.debug("Getting a random action from the provided list.");
             return providedListOfActions.get(rnd.nextInt(providedListOfActions.size()));
         } else {
-            System.out.println("Provided list is empty, returning null.");
+            logger.debug("Provided list is empty, returning null.");
             return null;
         }
     }
 
     public Action getRandomUnexecutedActionOfType(final Role actionType) {
         if (actionType == null) {
-            System.out.println("ActionType is null, returning null");
+            logger.debug("ActionType is null, returning null");
             return null;
         }
         return getRandomActionOfType(UNEXECUTED, getActionsOfType(actionType));
@@ -137,17 +141,17 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     public Action previousAction() {
         if (previousActions != null && !previousActions.isEmpty()) {
-            System.out.println("Returning the previous action");
+            logger.debug("Returning the previous action");
             return previousActions.get(previousActions.size() - 1);
 
         } else {
-            System.out.println("There are no previous actions, returning null.");
+            logger.debug("There are no previous actions, returning null.");
             return getRandomAction();
         }
     }
 
     public int getNumberOfPreviousActions() {
-        System.out.println("Returning the number of previous actions: " + previousActions.size());
+        logger.debug("Returning the number of previous actions: {}", previousActions.size());
         return previousActions.size();
     }
 
@@ -157,13 +161,13 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
     }
 
     public void addActionToPreviousActions(final Action action) {
-        System.out.println("Adding the selected action of type '" + action.get(Tags.Role) + "' to the history...");
+        logger.debug("Adding the selected action of type '" + action.get(Tags.Role) + "' to the history...");
         try {
             previousActions.add(action);
             this.incrementPreviousExecutedActions(action);
         } catch (NoSuchTagException e) {
             this.irregularActions.add(action);
-            System.out.println("This was an irregular action, I've not added it to the history.");
+            logger.debug("Irregular action, not added to the history: {}", e.getMessage());
         }
 
     }
@@ -194,7 +198,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
             this.previousActions.stream()
                     .filter(action -> action.get(ACTION_ID).equals(actionId))
                     .findFirst()
-                    .ifPresent(action -> System.out.printf("%s executed %d times \n", action.get(ACTION_ID), noOfExecutions))
+                    .ifPresent(action -> logger.debug("{} executed {} times", action.get(ACTION_ID), noOfExecutions))
         );
     }
 
@@ -255,7 +259,7 @@ public class StrategyGuiStateImpl implements StrategyGuiState {
 
     @Override
     public Action getAlternativeAction() {
-        System.out.println("Could not select action, provide alternative action");
+        logger.debug("Could not select action, provide alternative action");
         this.updateActionNotSetList();
         return this.getRandomAction();
     }

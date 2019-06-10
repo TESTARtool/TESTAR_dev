@@ -7,6 +7,8 @@ import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
     private Queue<AvailableReturnTypes> queue = new LinkedList<>();
     private StrategyActionSelector strategyActionSelector;
     private List<Metric> metrics = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(StrategyFactoryImpl.class);
 
     public StrategyFactoryImpl(final String strategy) {
         if (strategy.endsWith(".txt")) {
@@ -35,11 +38,12 @@ public class StrategyFactoryImpl implements StrategyFactory {
             br.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            logger.error("File not found. Current directory: ", e);
             throw new RuntimeException("File not found. Current directory: " + System.getProperty("user.dir"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Strategy from file: " + strategyFromFile);
+        logger.info("Strategy from file: {}", strategyFromFile);
         return strategyFromFile;
     }
 
@@ -47,8 +51,9 @@ public class StrategyFactoryImpl implements StrategyFactory {
         try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
             return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
         } catch (IOException e) {
-            System.out.println("Error while reading text input file!");
+            logger.error("Error while reading text input file!", e);
         }
+        logger.error("The content of the input file (\" + inputFile + \") seems to be corrupt!");
         throw new RuntimeException("The content of the input file (" + inputFile + ") seems to be corrupt!");
     }
 
@@ -63,6 +68,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
             ps.close();
             System.out.println(headers + "\n" + metrics);
         } catch (NoSuchTagException | FileNotFoundException e) {
+            logger.error("Metric serialisation exception: ", e);
             LogSerialiser.log("Metric serialisation exception" + e.getMessage(), LogSerialiser.LogLevel.Critical);
         }
     }
@@ -249,6 +255,7 @@ public class StrategyFactoryImpl implements StrategyFactory {
                 children.add(getStrategyNode());
                 return new SnTypeOfActionOf(children);
             default:
+                logger.error("Action not supported");
                 throw new RuntimeException("Action not supported");
         }
     }
