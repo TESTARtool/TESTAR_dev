@@ -50,7 +50,7 @@ public class JsonUtils {
 
     public static void createWidgetInfoJsonFile(State state){
         Rect sutRect = (Rect) state.child(0).get(Tags.Shape, null);
-        System.out.println("DEBUG: SUT rect x="+sutRect.x()+", y="+sutRect.y()+", width="+sutRect.width()+", height="+sutRect.height());
+//        System.out.println("DEBUG: SUT rect x="+sutRect.x()+", y="+sutRect.y()+", width="+sutRect.width()+", height="+sutRect.height());
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Set<WidgetJsonObject> widgetJsonObjects = new HashSet<WidgetJsonObject>();
