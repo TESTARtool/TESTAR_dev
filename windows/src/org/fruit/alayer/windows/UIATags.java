@@ -37,7 +37,14 @@ package org.fruit.alayer.windows;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.TagsBase;
+import es.upv.staq.testar.StateManagementTags;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static es.upv.staq.testar.StateManagementTags.*;
 
 public final class UIATags extends TagsBase {
 	
@@ -626,4 +633,36 @@ public final class UIATags extends TagsBase {
 	public static final Tag<Double> UIAScrollVerticalViewSize = from("UIAScrollVerticalViewSize", Double.class);
 	public static final Tag<Double> UIAScrollHorizontalPercent = from("UIAScrollHorizontalPercent", Double.class);
 	public static final Tag<Double> UIAScrollVerticalPercent = from("UIAScrollVerticalPercent", Double.class);
+
+	// a mapping from the state management tags to windows automation tags
+	private static Map<Tag<?>, Tag<?>> tagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
+	{
+		{
+			put(WidgetControlType, UIATags.UIAControlType);
+			put(WidgetWindowHandle, UIATags.UIANativeWindowHandle);
+			put(WidgetIsEnabled, UIATags.UIAIsEnabled);
+			put(WidgetTitle, UIATags.UIAName);
+			put(WidgetHelpText, UIATags.UIAHelpText);
+			put(WidgetAutomationId, UIATags.UIAAutomationId);
+			put(WidgetClassName, UIATags.UIAClassName);
+			put(WidgetFrameworkId, UIATags.UIAFrameworkId);
+			put(WidgetOrientationId, UIATags.UIAOrientation);
+			put(WidgetIsContentElement, UIATags.UIAOrientation);
+			put(WidgetIsControlElement, UIATags.UIAIsControlElement);
+			put(WidgetHasKeyboardFocus, UIATags.UIAHasKeyboardFocus);
+			put(WidgetIsKeyboardFocusable, UIATags.UIAIsKeyboardFocusable);
+			put(WidgetItemType, UIATags.UIAItemType);
+			put(WidgetItemStatus, UIATags.UIAItemStatus);
+			put(WidgetPath, Tags.Path);
+		}
+	};
+
+	/**
+	 * This method will return its equivalent, internal UIA tag, if available.
+	 * @param mappedTag
+	 * @return
+	 */
+	public static <T> Tag<T> getMappedTag(Tag<T> mappedTag) {
+		return (Tag<T>) tagMappingWindows.getOrDefault(mappedTag, null);
+	}
 }

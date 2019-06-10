@@ -107,112 +107,124 @@ final class UIAState extends UIAWidget implements State {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T> T get(UIAWidget w, Tag<T> t, T defaultValue) {
-		Object ret = w.tags.get(t);
+	<T> T get(UIAWidget widget, Tag<T> tag, T defaultValue) {
+		// first we check if it is a state management tag that has been mapped to an automation tag
+		Tag<T> stateManagementTag = UIATags.getMappedTag(tag);
+		if (stateManagementTag != null) {
+			tag = stateManagementTag;
+		}
 
-		if(ret != null){
-			return (T)ret;
-		}else if(w.uiaElement == null || w.tags.containsKey(t)){
+		Object returnObject = widget.tags.get(tag);
+
+		if(returnObject != null){
+			return (T)returnObject;
+		}else if(widget.uiaElement == null || widget.tags.containsKey(tag)){
 			return defaultValue;
 		}
+
+		// check the automation element for the tag
+		returnObject = uiaElement.get(tag, null);
+		if (returnObject != null) {
+			return (T)returnObject;
+		}
 		
-		if(t.equals(Tags.Desc)){
-			ret = w.uiaElement.name;
-		}else if(t.equals(Tags.Role)){
-			ret = UIARoles.fromTypeId(w.uiaElement.ctrlId);
-		}else if(t.equals(Tags.HitTester)){
-			ret = new UIAHitTester(w.uiaElement);
-		}else if(t.equals(Tags.Shape)){	
-			ret = w.uiaElement.rect;
-		}else if(t.equals(Tags.Blocked)){
-			ret = w.uiaElement.blocked;
-		}else if(t.equals(Tags.Enabled)){
-			ret = w.uiaElement.enabled;
-		}else if(t.equals(Tags.Title)){
-			ret = w.uiaElement.name;
-		}else if (t.equals(Tags.ValuePattern)) {
-			ret = w.uiaElement.valuePattern;
-		}else if(t.equals(Tags.ToolTipText)){
-			ret = w.uiaElement.helpText;
-		}else if(t.equals(Tags.PID)){
-			ret = w == this ? ((UIARootElement) uiaElement).pid : null;
-		}else if(t.equals(Tags.IsRunning)){
-			ret = w == this ? ((UIARootElement) uiaElement).isRunning : null;
-		}else if(t.equals(Tags.TimeStamp)){
-			ret = w == this ? ((UIARootElement) uiaElement).timeStamp : null;
-		}else if(t.equals(Tags.Foreground)){
-			ret = w == this ? ((UIARootElement) uiaElement).isForeground : null;
-		}else if(t.equals(Tags.HasStandardKeyboard)){
-			ret = w == this ? ((UIARootElement) uiaElement).hasStandardKeyboard : null;
-		}else if(t.equals(Tags.HasStandardMouse)){
-			ret = w == this ? ((UIARootElement) uiaElement).hasStandardMouse : null;
-		}else if(t.equals(UIATags.UIAName)){ 
-			ret = w.uiaElement.name;
-		}else if(t.equals(UIATags.UIAOrientation)){
-			ret = w.uiaElement.orientation;
+		if(tag.equals(Tags.Desc)){
+			returnObject = widget.uiaElement.name;
+		}else if(tag.equals(Tags.Role)){
+			returnObject = UIARoles.fromTypeId(widget.uiaElement.ctrlId);
+		}else if(tag.equals(Tags.HitTester)){
+			returnObject = new UIAHitTester(widget.uiaElement);
+		}else if(tag.equals(Tags.Shape)){
+			returnObject = widget.uiaElement.rect;
+		}else if(tag.equals(Tags.Blocked)){
+			returnObject = widget.uiaElement.blocked;
+		}else if(tag.equals(Tags.Enabled)){
+			returnObject = widget.uiaElement.enabled;
+		}else if(tag.equals(Tags.Title)){
+			returnObject = widget.uiaElement.name;
+		}else if (tag.equals(Tags.ValuePattern)) {
+			returnObject = widget.uiaElement.valuePattern;
+		}else if(tag.equals(Tags.ToolTipText)){
+			returnObject = widget.uiaElement.helpText;
+		}else if(tag.equals(Tags.PID)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).pid : null;
+		}else if(tag.equals(Tags.IsRunning)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).isRunning : null;
+		}else if(tag.equals(Tags.TimeStamp)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).timeStamp : null;
+		}else if(tag.equals(Tags.Foreground)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).isForeground : null;
+		}else if(tag.equals(Tags.HasStandardKeyboard)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).hasStandardKeyboard : null;
+		}else if(tag.equals(Tags.HasStandardMouse)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).hasStandardMouse : null;
+		}else if(tag.equals(UIATags.UIAName)){
+			returnObject = widget.uiaElement.name;
+		}else if(tag.equals(UIATags.UIAOrientation)){
+			returnObject = widget.uiaElement.orientation;
 		// begin by urueda
-		}else if(t.equals(Tags.ZIndex)){
-			ret = w.uiaElement.zindex;
-		}else if(t.equals(UIATags.UIAIsWindowModal)){
-			ret = w.uiaElement.isModal;
-		}else if(t.equals(UIATags.UIAIsTopmostWindow)){
-			ret = w.uiaElement.isTopmostWnd;
-		}else if(t.equals(UIATags.UIAIsContentElement)){
-			ret = w.uiaElement.isContentElement;
-		}else if(t.equals(UIATags.UIAIsControlElement)){
-			ret = w.uiaElement.isControlElement;
-		}else if(t.equals(UIATags.UIAScrollPattern)){
-			ret = w.uiaElement.scrollPattern;
+		}else if(tag.equals(Tags.ZIndex)){
+			returnObject = widget.uiaElement.zindex;
+		}else if(tag.equals(UIATags.UIAIsWindowModal)){
+			returnObject = widget.uiaElement.isModal;
+		}else if(tag.equals(UIATags.UIAIsTopmostWindow)){
+			returnObject = widget.uiaElement.isTopmostWnd;
+		}else if(tag.equals(UIATags.UIAIsContentElement)){
+			returnObject = widget.uiaElement.isContentElement;
+		}else if(tag.equals(UIATags.UIAIsControlElement)){
+			returnObject = widget.uiaElement.isControlElement;
+		}else if(tag.equals(UIATags.UIAScrollPattern)){
+			returnObject = widget.uiaElement.scrollPattern;
 		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
 		//	ret = w.uiaElement.scrollbarInfo;
 		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
 		//	ret = w.uiaElement.scrollbarInfoH;
 		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
 		//	ret = w.uiaElement.scrollbarInfoV;
-		}else if(t.equals(UIATags.UIAHorizontallyScrollable)){
-			ret = w.uiaElement.hScroll;
-		}else if(t.equals(UIATags.UIAVerticallyScrollable)){
-			ret = w.uiaElement.vScroll;
-		}else if(t.equals(UIATags.UIAScrollHorizontalViewSize)){
-			ret = w.uiaElement.hScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollVerticalViewSize)){
-			ret = w.uiaElement.vScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollHorizontalPercent)){
-			ret = w.uiaElement.hScrollPercent;
-		}else if(t.equals(UIATags.UIAScrollVerticalPercent)){
-			ret = w.uiaElement.vScrollPercent;
+		}else if(tag.equals(UIATags.UIAHorizontallyScrollable)){
+			returnObject = widget.uiaElement.hScroll;
+		}else if(tag.equals(UIATags.UIAVerticallyScrollable)){
+			returnObject = widget.uiaElement.vScroll;
+		}else if(tag.equals(UIATags.UIAScrollHorizontalViewSize)){
+			returnObject = widget.uiaElement.hScrollViewSize;
+		}else if(tag.equals(UIATags.UIAScrollVerticalViewSize)){
+			returnObject = widget.uiaElement.vScrollViewSize;
+		}else if(tag.equals(UIATags.UIAScrollHorizontalPercent)){
+			returnObject = widget.uiaElement.hScrollPercent;
+		}else if(tag.equals(UIATags.UIAScrollVerticalPercent)){
+			returnObject = widget.uiaElement.vScrollPercent;
 		// end by urueda
-		}else if(t.equals(UIATags.UIAHelpText)){
-			ret = w.uiaElement.helpText;
-		}else if(t.equals(UIATags.UIAClassName)){
-			ret = w.uiaElement.className;
-		}else if(t.equals(UIATags.UIAControlType)){
-			ret = w.uiaElement.ctrlId;
-		}else if(t.equals(UIATags.UIACulture)){
-			ret = w.uiaElement.culture;
-		}else if(t.equals(UIATags.UIAFrameworkId)){
-			ret = w.uiaElement.frameworkId;
-		}else if(t.equals(UIATags.UIAHasKeyboardFocus)){
-			ret = w.uiaElement.hasKeyboardFocus;
-		}else if(t.equals(UIATags.UIAIsKeyboardFocusable)){
-			ret = w.uiaElement.isKeyboardFocusable;
-		}else if(t.equals(UIATags.UIAProviderDescription)){
-			ret = w.uiaElement.providerDesc;
-		}else if(t.equals(UIATags.UIAWindowInteractionState)){
-			ret = w.uiaElement.wndInteractionState;
-		}else if(t.equals(UIATags.UIAWindowVisualState)){
-			ret = w.uiaElement.wndVisualState;
-		}else if(t.equals(UIATags.UIAAutomationId)){
-			ret = w.uiaElement.automationId;
-		}else if(t.equals(UIATags.UIAAcceleratorKey)){
-			ret = w.uiaElement.acceleratorKey;
-		}else if(t.equals(UIATags.UIAAccessKey)){
-			ret = w.uiaElement.accessKey;
+		}else if(tag.equals(UIATags.UIAHelpText)){
+			returnObject = widget.uiaElement.helpText;
+		}else if(tag.equals(UIATags.UIAClassName)){
+			returnObject = widget.uiaElement.className;
+		}else if(tag.equals(UIATags.UIAControlType)){
+			returnObject = widget.uiaElement.ctrlId;
+		}else if(tag.equals(UIATags.UIACulture)){
+			returnObject = widget.uiaElement.culture;
+		}else if(tag.equals(UIATags.UIAFrameworkId)){
+			returnObject = widget.uiaElement.frameworkId;
+		}else if(tag.equals(UIATags.UIAHasKeyboardFocus)){
+			returnObject = widget.uiaElement.hasKeyboardFocus;
+		}else if(tag.equals(UIATags.UIAIsKeyboardFocusable)){
+			returnObject = widget.uiaElement.isKeyboardFocusable;
+		}else if(tag.equals(UIATags.UIAProviderDescription)){
+			returnObject = widget.uiaElement.providerDesc;
+		}else if(tag.equals(UIATags.UIAWindowInteractionState)){
+			returnObject = widget.uiaElement.wndInteractionState;
+		}else if(tag.equals(UIATags.UIAWindowVisualState)){
+			returnObject = widget.uiaElement.wndVisualState;
+		}else if(tag.equals(UIATags.UIAAutomationId)){
+			returnObject = widget.uiaElement.automationId;
+		}else if(tag.equals(UIATags.UIAAcceleratorKey)){
+			returnObject = widget.uiaElement.acceleratorKey;
+		}else if(tag.equals(UIATags.UIAAccessKey)){
+			returnObject = widget.uiaElement.accessKey;
 		}
 		
-		cacheTag(w, t, ret);
+		cacheTag(widget, tag, returnObject);
 		
-		return (ret == null) ? defaultValue : (T)ret;
+		return (returnObject == null) ? defaultValue : (T)returnObject;
 	}
 
 	@SuppressWarnings("unchecked")

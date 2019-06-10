@@ -37,6 +37,7 @@ package org.fruit.alayer.windows;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 
+import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -289,76 +290,113 @@ public class StateFetcher implements Callable<UIAState>{
 
 		UIAElement modalElement = null; // by urueda
 
-		UIAElement el = new UIAElement(parent);
-		parent.children.add(el);
+		UIAElement uiaElement = new UIAElement(parent);
+		parent.children.add(uiaElement);
 
-		el.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaCachePointer, true);
-		el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
+		// fetch windows automation properties and store them on the element as tags
+
+		uiaElement.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaCachePointer, true);
+		uiaElement.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
 
 		// bounding rectangle
 		long r[] = Windows.IUIAutomationElement_get_BoundingRectangle(uiaCachePointer, true);
 		if(r != null && r[2] - r[0] >= 0 && r[3] - r[1] >= 0)
-			el.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
+			uiaElement.rect = Rect.fromCoordinates(r[0], r[1], r[2], r[3]);
 
-		el.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaCachePointer, true);
-		el.name = Windows.IUIAutomationElement_get_Name(uiaCachePointer, true);
-		el.helpText = Windows.IUIAutomationElement_get_HelpText(uiaCachePointer, true);
-		el.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaCachePointer, true);
-		el.className = Windows.IUIAutomationElement_get_ClassName(uiaCachePointer, true);
-		el.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaCachePointer, true);
-		el.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaCachePointer, true);
-		el.orientation = Windows.IUIAutomationElement_get_Orientation(uiaCachePointer, true);
-		el.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaCachePointer, true);
-		el.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaCachePointer, true);
-		el.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaCachePointer, true);
-		el.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaCachePointer, true);
-		el.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaCachePointer, true);
-		el.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaCachePointer, true);
-		el.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaCachePointer, Windows.UIA_ValuePatternId);
+		uiaElement.enabled = Windows.IUIAutomationElement_get_IsEnabled(uiaCachePointer, true);
+		uiaElement.name = Windows.IUIAutomationElement_get_Name(uiaCachePointer, true);
+		uiaElement.helpText = Windows.IUIAutomationElement_get_HelpText(uiaCachePointer, true);
+		uiaElement.automationId = Windows.IUIAutomationElement_get_AutomationId(uiaCachePointer, true);
+		uiaElement.className = Windows.IUIAutomationElement_get_ClassName(uiaCachePointer, true);
+		uiaElement.providerDesc = Windows.IUIAutomationElement_get_ProviderDescription(uiaCachePointer, true);
+		uiaElement.frameworkId = Windows.IUIAutomationElement_get_FrameworkId(uiaCachePointer, true);
+		uiaElement.orientation = Windows.IUIAutomationElement_get_Orientation(uiaCachePointer, true);
+		uiaElement.isContentElement = Windows.IUIAutomationElement_get_IsContentElement(uiaCachePointer, true);
+		uiaElement.isControlElement = Windows.IUIAutomationElement_get_IsControlElement(uiaCachePointer, true);
+		uiaElement.hasKeyboardFocus = Windows.IUIAutomationElement_get_HasKeyboardFocus(uiaCachePointer, true);
+		uiaElement.isKeyboardFocusable = Windows.IUIAutomationElement_get_IsKeyboardFocusable(uiaCachePointer, true);
+		uiaElement.accessKey = Windows.IUIAutomationElement_get_AccessKey(uiaCachePointer, true);
+		uiaElement.acceleratorKey = Windows.IUIAutomationElement_get_AcceleratorKey(uiaCachePointer, true);
+		uiaElement.valuePattern = Windows.IUIAutomationElement_get_ValuePattern(uiaCachePointer, Windows.UIA_ValuePatternId);
 
-		parent.root.windowHandleMap.put(el.windowHandle, el);
+		parent.root.windowHandleMap.put(uiaElement.windowHandle, uiaElement);
 
 		// get extra infos from windows
-		if(el.ctrlId == Windows.UIA_WindowControlTypeId){
+		if(uiaElement.ctrlId == Windows.UIA_WindowControlTypeId){
 			//long uiaWndPtr = Windows.IUIAutomationElement_GetPattern(uiaPtr, Windows.UIA_WindowPatternId, true);
 			long uiaWindowPointer = Windows.IUIAutomationElement_GetPattern(uiaCachePointer, Windows.UIA_WindowPatternId, true); // by urueda
 			if(uiaWindowPointer != 0){
-				el.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWindowPointer, true);
-				el.blocked = (el.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
-				el.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWindowPointer, true);
-				el.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWindowPointer, true);
+				uiaElement.wndInteractionState = Windows.IUIAutomationWindowPattern_get_WindowInteractionState(uiaWindowPointer, true);
+				uiaElement.blocked = (uiaElement.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
+				uiaElement.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWindowPointer, true);
+				uiaElement.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWindowPointer, true);
 				Windows.IUnknown_Release(uiaWindowPointer);
 			}
-			el.culture = Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true);
+			uiaElement.culture = Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true);
 		}
 
 		// check if we missed detection of a modal window
-		if (!el.isModal && el.automationId != null &&
-				(el.automationId.contains("messagebox") || el.automationId.contains("window"))){ // try to detect potential modal window!
-			modalElement = markModal(el);
+		if (!uiaElement.isModal && uiaElement.automationId != null &&
+				(uiaElement.automationId.contains("messagebox") || uiaElement.automationId.contains("window"))){ // try to detect potential modal window!
+			modalElement = markModal(uiaElement);
 		}
 
 		// get some non-cached property values for elements implementing the scroll pattern
 		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true);
-		el.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-		if (el.scrollPattern){
+		uiaElement.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+		if (uiaElement.scrollPattern){
 			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_CLIENT);
 			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_HSCROLL);
 			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_VSCROLL);
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
-			el.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			uiaElement.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
-			el.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			uiaElement.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
-			el.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
-			el.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
+			uiaElement.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
-			el.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
-			el.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
 		}
-		// end by urueda	
+		// end by urueda
+
+
+		// now add the properties as tags
+		// the reason why we're doing this, is because the tags make for a more flexible way of adding properties
+		// as opposed to hard-coded attributes.
+		// it also makes for a uniform interface when talking about the UIA attributes
+		// In time, these hard-coded attributes should be refactored away.
+		uiaElement.set(UIATags.UIAControlType, uiaElement.ctrlId);
+		uiaElement.set(UIATags.UIANativeWindowHandle, uiaElement.windowHandle);
+		uiaElement.set(UIATags.UIAIsEnabled, uiaElement.enabled);
+		uiaElement.set(UIATags.UIAName, uiaElement.name);
+		uiaElement.set(UIATags.UIAHelpText, uiaElement.helpText);
+		uiaElement.set(UIATags.UIAAutomationId, uiaElement.automationId);
+		uiaElement.set(UIATags.UIAClassName, uiaElement.className);
+		uiaElement.set(UIATags.UIAProviderDescription, uiaElement.providerDesc);
+		uiaElement.set(UIATags.UIAFrameworkId, uiaElement.frameworkId);
+		uiaElement.set(UIATags.UIAOrientation, uiaElement.orientation);
+		uiaElement.set(UIATags.UIAIsContentElement, uiaElement.isContentElement);
+		uiaElement.set(UIATags.UIAIsControlElement, uiaElement.isControlElement);
+		uiaElement.set(UIATags.UIAHasKeyboardFocus, uiaElement.hasKeyboardFocus);
+		uiaElement.set(UIATags.UIAIsKeyboardFocusable, uiaElement.isKeyboardFocusable);
+		uiaElement.set(UIATags.UIAAccessKey, uiaElement.accessKey);
+		uiaElement.set(UIATags.UIAAcceleratorKey, uiaElement.acceleratorKey);
+
+		// new properties, not in attributes yet
+		uiaElement.set(UIATags.UIALocalizedControlType, Windows.IUIAutomationElement_get_LocalizedControlType(uiaCachePointer, true));
+//		System.out.println("Control type: " + uiaElement.get(UIATags.UIALocalizedControlType));
+		uiaElement.set(UIATags.UIAItemType, Windows.IUIAutomationElement_get_ItemType(uiaCachePointer, true));
+//		System.out.println("Item type: " + uiaElement.get(UIATags.UIAItemType));
+		uiaElement.set(UIATags.UIAItemStatus, Windows.IUIAutomationElement_get_ItemStatus(uiaCachePointer, true));
+		obj = Windows.IUIAutomationElement_GetPropertyValueEx(uiaCachePointer, Windows.UIA_FullDescriptionPropertyId, true, true);
+		uiaElement.set(UIATags.UIAFullDescription, obj instanceof String ? (String)obj : "");
+//		System.out.println(uiaElement.get(UIATags.UIAFullDescription));
+		uiaElement.set(UIATags.UIACulture, Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true));
+
 
 		// get the properties for potential child elements
 		long uiaChildrenPointer = Windows.IUIAutomationElement_GetCachedChildren(uiaCachePointer);
@@ -369,13 +407,13 @@ public class StateFetcher implements Callable<UIAState>{
 			long nrOfChildren = Windows.IUIAutomationElementArray_get_Length(uiaChildrenPointer);
 
 			if(nrOfChildren > 0){
-				el.children = new ArrayList<UIAElement>((int)nrOfChildren);
+				uiaElement.children = new ArrayList<UIAElement>((int)nrOfChildren);
 
 				for(int i = 0; i < nrOfChildren; i++){
 					long childPointer = Windows.IUIAutomationElementArray_GetElement(uiaChildrenPointer, i);
 					if(childPointer != 0){
 						// begin by urueda
-						UIAElement modalE = uiaDescend(hwnd, childPointer, el);
+						UIAElement modalE = uiaDescend(hwnd, childPointer, uiaElement);
 						if (modalE != null && modalElement == null) // parent-modal is preferred to child-modal
 							modalElement = modalE;
 						// end by urueda							

@@ -34,6 +34,7 @@
 package org.fruit.alayer.windows;
 
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.TaggableBase;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -42,7 +43,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-class UIAElement implements Serializable {
+class UIAElement extends TaggableBase implements Serializable {
 	private static final long serialVersionUID = -2561441199642411403L;
 	List<UIAElement> children = Collections.emptyList();
 	UIAElement parent;

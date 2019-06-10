@@ -131,6 +131,7 @@ public final class Windows{
 	public static final long UIA_FlowsFromPropertyId	= 30148;
 	public static final long UIA_FlowsToPropertyId	= 30106;
 	public static final long UIA_FrameworkIdPropertyId	= 30024;
+	public static final long UIA_FullDescriptionPropertyId = 30159;
 	public static final long UIA_HasKeyboardFocusPropertyId	= 30008;
 	public static final long UIA_HelpTextPropertyId	= 30013;
 	public static final long UIA_IsContentElementPropertyId	= 30017;

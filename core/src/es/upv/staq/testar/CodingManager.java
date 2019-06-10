@@ -31,6 +31,7 @@
 package es.upv.staq.testar;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.zip.CRC32;
@@ -98,6 +99,7 @@ public class CodingManager {
      */
 	public static synchronized void setCustomTagsForConcreteId(Tag<?>[] tags) {
 		customTagsForConcreteId = tags;
+		Arrays.sort(customTagsForConcreteId,Comparator.comparing(Tag::name));
 	}
 
     /**
@@ -107,6 +109,7 @@ public class CodingManager {
      */
 	public static synchronized void setCustomTagsForAbstractId(Tag<?>[] tags) {
 		customTagsForAbstractId = tags;
+		Arrays.sort(customTagsForAbstractId, Comparator.comparing(Tag::name));
 	}
 
 	/**
@@ -341,9 +344,7 @@ public class CodingManager {
 		// we calculate the hash using the tags that are used in constructing the custom abstract state id
 		// for now, an easy way is to order them alphabetically by name
 		Tag<?>[] abstractTags = getCustomTagsForAbstractId().clone();
-		Arrays.sort(abstractTags, (Tag<?> tagA, Tag<?> tagB) -> {
-			return tagA.name().compareTo(tagB.name());
-		});
+		Arrays.sort(abstractTags, Comparator.comparing(Tag::name));
 		StringBuilder hashInput = new StringBuilder();
 		for (Tag<?> tag : abstractTags) {
 			hashInput.append(tag.name());
