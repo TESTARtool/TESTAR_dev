@@ -86,6 +86,6 @@ public class WdProtocolUtil extends ProtocolUtil {
     Rect rect = Rect.from(
         actionArea.x, actionArea.y, actionArea.width + 1, actionArea.height + 1);
     AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect);
-    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID), action.get(Tags.ConcreteID), scrshot);
+    return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
   }
 }
