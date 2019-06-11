@@ -131,13 +131,13 @@ public class StrategyFactoryImpl implements StrategyFactory {
         this.strategyActionSelector.setVerdict(verdict);
         this.strategyActionSelector.printSequenceExecutionDuration();
         this.saveMetrics();
-        this.writeMetricsToFile(settings, this.getFileName("ecj_sequence_"), this.getMetricHeaders(), this.getMetricContent());
-        this.writeMetricsToFile(settings, this.getFileName("actions_sequence_"), this.getActionHeaders(), this.geActionContent());
+        this.writeMetricsToFile(settings, this.getFileName("ecj_sequence"), this.getMetricHeaders(), this.getMetricContent());
+        this.writeMetricsToFile(settings, this.getFileName("actions_sequence"), this.getActionHeaders(), this.getActionContent());
         this.printMetrics();
         this.clear();
     }
 
-    private String geActionContent() {
+    private String getActionContent() {
         final StringBuilder sb = new StringBuilder();
         this.strategyActionSelector.getActionMetrics().forEach((numberOfActions, numberOfUniqueStates) ->
                 sb

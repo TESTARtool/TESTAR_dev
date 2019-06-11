@@ -67,6 +67,7 @@ public class StrategyActionSelectorImpl implements StrategyActionSelector {
 
     @Override
     public void postExecuteAction() {
+        logger.info("POST execution: adding action to map: {}", this.actionResults);
         this.actionResults.put(stateManager.getTotalNumberOfActions(), stateManager.getTotalNumberOfUniqueStates());
     }
 
