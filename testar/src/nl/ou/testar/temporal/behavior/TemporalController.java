@@ -45,13 +45,20 @@ public class TemporalController {
      */
     public TemporalController(final Config config, String outputDir) {
         String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
-                config.getServer() : config.getDatabaseDirectory()) +"\\";//+ "/";
+                config.getServer() : config.getDatabaseDirectory());// +"/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+        // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
+
         dbConfig = config;
         this.outputDir = outputDir;
+        System.out.println("debug orientdb: "+orientDB);
 System.out.println("debug tot hier");
+        System.out.println("debug config: "+config.getDatabase()+"!");
+        System.out.println("debug config: "+config.getUser()+"!");
+        System.out.println("debug config: "+config.getPassword()+"!");
         // check if the credentials are valid
         db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
+     //   db = orientDB.open("testar", "testar", "testar");
             // if there is no connection possible this will throw an exception
         System.out.println("debug tot hier2");
     }

@@ -36,7 +36,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
-import nl.ou.testar.tl.TemporalPanel;
+import nl.ou.testar.temporal.ui.TemporalPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -239,6 +239,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
     stateModelPanel.populateFrom(settings);
+    temporalPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -248,6 +249,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     stateModelPanel.extractInformation(settings);
+    temporalPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -274,7 +276,7 @@ public class SettingsDialog extends JFrame implements Observer {
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
     temporalPanel = TemporalPanel.createStateModelPanel();
-    jTabsPane.addTab("State Model", stateModelPanel);
+    jTabsPane.addTab("Temporal Oracles", temporalPanel);
 
     setLayout(jTabsPane);
     pack();

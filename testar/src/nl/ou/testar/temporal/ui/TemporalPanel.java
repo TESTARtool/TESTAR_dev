@@ -335,16 +335,15 @@ private void setupMiner(){
             String tmp= dataStoreDirectory;
             logCheckResult.append("connecting to: db");
             config.setDatabaseDirectory(tmp);
-            //config.setDatabaseDirectory("/orientdb-tp3-3.0.18/databases");
             TemporalController tcontrol = new TemporalController(config,outputDir);
-            List<AbstractStateModel> models =tcontrol.fetchModels();
+            List<AbstractStateModel> models = tcontrol.fetchModels();
 
-                logCheckResult.append("model count: "+models.size());
-                AbstractStateModel model = models.get(0);
-logCheckResult.append("Model info:"+model.getApplicationName()+", "+model.getModelIdentifier());
-                TemporalModel tmodel = tcontrol.getTemporalModel(model);
-                logCheckResult.append(" done");
-            JSONHandler.save(tmodel,outputDir+"testTmodel.json");
+            logCheckResult.append("model count: " + models.size());
+            AbstractStateModel model = models.get(0);
+            logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier());
+            TemporalModel tmodel = tcontrol.getTemporalModel(model);
+            logCheckResult.append(" done");
+            JSONHandler.save(tmodel, outputDir + "testTmodel.json");
             logCheckResult.append(" saving to file done");
 
             logCheckResult.append("\n");
