@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -47,6 +47,7 @@ import org.fruit.alayer.Verdict;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
+import org.testar.OutputStructure;
 
 public class ProcessListener{
 
@@ -97,9 +98,11 @@ public class ProcessListener{
 		Pattern processLogs= Pattern.compile(settings.get(ConfigTags.ProcessLogs), Pattern.UNICODE_CHARACTER_CLASS);
 
 		//Create File to save the logs of these oracles
-		File dir = new File("output/ProcessLogs");
-		if(!dir.exists())
-			dir.mkdirs();
+		File dir = new File(OutputStructure.processListenerDir);
+		
+		String logProcessListenerName = OutputStructure.processListenerDir
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
 		//Prepare runnable to read Error buffer
 		Runnable readErrors = new Runnable() {
@@ -124,8 +127,8 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {		
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
@@ -139,7 +142,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(logProcessListenerName + "_StdErr.log", true));
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -153,10 +156,10 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdErr:	" +ch);
 
-							writerError = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdErr.log", true));
+							writerError = new PrintWriter(new FileWriter(logProcessListenerName + "_StdErr.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							writerError.println(DateString+"	on Action:	"+actionId+"	SUT StdErr:	" +ch);
 							writerError.flush();
@@ -196,8 +199,8 @@ public class ProcessListener{
 						if(processOracles!=null && matcherOracles.matches()) {	
 
 							//Prepare Verdict report
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							Verdict verdict = new Verdict(Verdict.SEVERITY_SUSPICIOUS_TITLE,
 									"Process Listener suspicious title: '" + ch + ", on Action:	'"+actionId+".");
@@ -211,7 +214,7 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(logProcessListenerName + "_StdOut.log", true));
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();
@@ -224,10 +227,10 @@ public class ProcessListener{
 							String DateString = Util.dateString(DATE_FORMAT);
 							System.out.println("SUT Log StdOut:	" +ch);
 
-							writerOut = new PrintWriter(new FileWriter(dir+"/sequence"+DefaultProtocol.generatedSequenceCount()+"_StdOut.log", true));
+							writerOut = new PrintWriter(new FileWriter(logProcessListenerName + "_StdOut.log", true));
 
-							if(DefaultProtocol.lastExecutedAction()!=null)
-								actionId=DefaultProtocol.lastExecutedAction().get(Tags.ConcreteID);
+							if(DefaultProtocol.lastExecutedAction!=null)
+								actionId=DefaultProtocol.lastExecutedAction.get(Tags.ConcreteID);
 
 							writerOut.println(DateString+"	on Action:	"+ actionId+"	SUT StdOut:	" +ch);
 							writerOut.flush();

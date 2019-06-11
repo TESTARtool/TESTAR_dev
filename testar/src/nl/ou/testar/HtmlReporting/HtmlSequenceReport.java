@@ -1,3 +1,34 @@
+/***************************************************************************************************
+ *
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
+
+
 package nl.ou.testar.HtmlReporting;
 
 import nl.ou.testar.a11y.reporting.HTMLReporter;
@@ -5,6 +36,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
+import org.testar.OutputStructure;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -25,97 +57,24 @@ public class HtmlSequenceReport {
     };
 
     private PrintWriter out;
-    private static final String REPORT_FILENAME_PRE = "output/HTMLreports/TESTAR_run_";
     private static final String REPORT_FILENAME_MID ="_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
+    
+    private int innerLoopCounter = 0;
 
-    private int sequenceCounter = 0;
-    private int scenarioCount = 1;
-    public int getScenarioCount() {
-        return scenarioCount;
-    }
-
-    public HtmlSequenceReport(int sequenceNumber) {
-        // checking whether HTMLreports folder exists in output folder, if not, creating it:
-        try{
-            File folder = new File("output/HTMLreports");
-            if(folder.exists()&&folder.isDirectory()){
-//                System.out.println("DEBUG: HTMLreports folder exists already");
-                // all good, folder is already there
-            }else{
-//                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
-                //folder is missing, let's create it
-                folder.mkdir();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
+    public HtmlSequenceReport() {
         try{
             //TODO put filename into settings, name with sequence number
-            // creating a new file for the report:
-            String filename = REPORT_FILENAME_PRE + "1_sequence_1.html"; // will be replaced
-            // finding the first unused scenario number when sequence number is 1:
-            boolean newFilenameFound = false;
-            while(!newFilenameFound){
-                filename = REPORT_FILENAME_PRE+scenarioCount+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
-                File file = new File(filename);
-                if(file.exists()){
-                    scenarioCount++;
-                }else{
-                    newFilenameFound = true;
-                }
-            }
-//            System.out.println("Starting sequence report into file: "+filename);
+            // creating a new file for the report
+            String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
+            		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
+            		+ REPORT_FILENAME_AFT;
+            
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
                 write(s);
             }
-            write("<h1>TESTAR execution sequence report for sequence "+sequenceNumber+"</h1>");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public HtmlSequenceReport(int scenarioCount, int sequenceNumber) {
-        // checking whether HTMLreports folder exists in output folder, if not, creating it:
-        try{
-            File folder = new File("output/HTMLreports");
-            if(folder.exists()&&folder.isDirectory()){
-//                System.out.println("DEBUG: HTMLreports folder exists already");
-                // all good, folder is already there
-            }else{
-//                System.out.println("DEBUG: HTMLreports folder does not exist, creating");
-                //folder is missing, let's create it
-                folder.mkdir();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        try{
-            //TODO put filename into settings, name with sequence number
-            // creating a new file for the report:
-            String filename = REPORT_FILENAME_PRE + "_1_sequence_1.html"; // will be replaced
-            // finding the first unused scenario number when sequence number is 1:
-            boolean newFilenameFound = false;
-            while(!newFilenameFound){
-                filename = REPORT_FILENAME_PRE+scenarioCount+REPORT_FILENAME_MID+sequenceNumber+REPORT_FILENAME_AFT;
-                File file = new File(filename);
-                if(file.exists()){
-                    scenarioCount++;
-                }else{
-                    newFilenameFound = true;
-                }
-            }
-            //updating the scenarioCount:
-            this.scenarioCount = scenarioCount;
-//            System.out.println("Starting sequence report into file: "+filename);
-            out = new PrintWriter(filename, HTMLReporter.CHARSET);
-            for(String s:HEADER){
-                write(s);
-            }
-            write("<h1>TESTAR execution sequence report for sequence "+sequenceNumber+"</h1>");
+            write("<h1>TESTAR execution sequence report for sequence "+OutputStructure.sequenceInnerLoopCount+"</h1>");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -153,9 +112,12 @@ public class HtmlSequenceReport {
     private void writeStateIntoReport(State state){
         String imagePath = state.get(Tags.ScreenshotPath);
         if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output","../");
+        	int indexStart = imagePath.indexOf("./output");
+        	int indexScrn = imagePath.indexOf("scrshots");
+        	String replaceString = imagePath.substring(indexStart,indexScrn);
+            imagePath = imagePath.replace(replaceString,"../");
         }
-        write("<h2>State "+sequenceCounter+"</h2>");
+        write("<h2>State "+innerLoopCounter+"</h2>");
         write("<h4>concreteID="+state.get(Tags.ConcreteID)+"</h4>");
         try{if(state.get(Tags.AbstractID)!=null) write("<h4>abstractID="+state.get(Tags.AbstractID)+"</h4>");}catch(Exception e){}
 //        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
@@ -164,7 +126,7 @@ public class HtmlSequenceReport {
         write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
         // file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
         // statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-        sequenceCounter++;
+        innerLoopCounter++;
     }
 
 
@@ -222,13 +184,22 @@ public class HtmlSequenceReport {
         }
     }
 
-    public void addSelectedAction(String state_path, Action action){
+    public void addSelectedAction(State state, Action action){
+    	String screenshotDir = OutputStructure.screenshotsOutputDir;
 //        System.out.println("path="+state_path);
-        String actionPath = state_path.substring(0,state_path.indexOf(".png"));
+    	if(screenshotDir.contains("./output")){
+        	int indexStart = screenshotDir.indexOf("./output");
+        	int indexScrn = screenshotDir.indexOf("scrshots");
+        	String replaceString = screenshotDir.substring(indexStart,indexScrn);
+        	screenshotDir = screenshotDir.replace(replaceString,"../");
+        }
 //        System.out.println("path="+actionPath);
-        actionPath = actionPath+"_"+action.get(Tags.ConcreteID)+".png";
+        String actionPath = screenshotDir + File.separator 
+        		+ OutputStructure.startInnerLoopDateString + "_" + OutputStructure.executedSUTname
+        		+ "_sequence_" + OutputStructure.sequenceInnerLoopCount 
+        		+ File.separator + state.get(Tags.ConcreteID) + "_" + action.get(Tags.ConcreteID) + ".png";
 //        System.out.println("path="+actionPath);
-        write("<h2>Selected Action "+sequenceCounter+" leading to State "+sequenceCounter+"\"</h2>");
+        write("<h2>Selected Action "+innerLoopCounter+" leading to State "+innerLoopCounter+"\"</h2>");
         write("<h4>concreteID="+action.get(Tags.ConcreteID));
         try{if(action.get(Tags.Desc)!=null) write(" || "+action.get(Tags.Desc));}catch(Exception e){}
         write("</h4>");
