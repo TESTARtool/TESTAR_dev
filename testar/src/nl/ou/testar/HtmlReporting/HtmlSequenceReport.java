@@ -210,7 +210,11 @@ public class HtmlSequenceReport {
     }
 
     public void addTestVerdict(Verdict verdict){
-        write("<h2>Test verdict for this sequence: "+verdict.info()+"</h2>");
+    	String verdictInfo = verdict.info();
+    	if(verdict.severity() > Verdict.OK.severity())
+    		verdictInfo = verdictInfo.replace(Verdict.OK.info(), "");
+    	
+        write("<h2>Test verdict for this sequence: "+verdictInfo+"</h2>");
         write("<h4>Severity: "+verdict.severity()+"</h4>");
     }
 
