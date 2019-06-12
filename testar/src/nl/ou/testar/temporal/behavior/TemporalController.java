@@ -51,16 +51,10 @@ public class TemporalController {
 
         dbConfig = config;
         this.outputDir = outputDir;
-        System.out.println("debug orientdb: "+orientDB);
-System.out.println("debug tot hier");
-        System.out.println("debug config: "+config.getDatabase()+"!");
-        System.out.println("debug config: "+config.getUser()+"!");
-        System.out.println("debug config: "+config.getPassword()+"!");
+
         // check if the credentials are valid
         db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
-     //   db = orientDB.open("testar", "testar", "testar");
-            // if there is no connection possible this will throw an exception
-        System.out.println("debug tot hier2");
+
     }
 
     /**
@@ -76,9 +70,8 @@ System.out.println("debug tot hier");
      */
     public List<AbstractStateModel> fetchModels() {
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        //try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
-            System.out.println("debug tot hier3");
             while (resultSet.hasNext()) {
                 OResult result = resultSet.next();
                 // we're expecting a vertex
@@ -100,7 +93,7 @@ System.out.println("debug tot hier");
                     abstractStateModels.add(abstractStateModel);
                 }
             }
-        }
+        //}
         return abstractStateModels;
     }
 
@@ -114,20 +107,23 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
     System.out.println("debug tot hier4");
     // concrete states
     String stmt = "SELECT FROM V WHERE @class = 'ConcreteState'";
-    Map<String, Object> params = new HashMap<>();
-    OResultSet resultSet = db.query(stmt, params);
-
+    //Map<String, Object> params = new HashMap<>();
+    //OResultSet resultSet = db.query(stmt, params);
+    OResultSet resultSet = db.query(stmt);
 
     while (resultSet.hasNext()) {
         OResult result = resultSet.next();
         // we're expecting a vertex
         if (result.isVertex()) {
+
             Optional<OVertex> op = result.getVertex();
+            System.out.println("debug tot hier5;"+op);
             if (!op.isPresent()) continue;
 
             OVertex stateVertex = op.get();
             StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
             List<String> props = new ArrayList<>();
+            System.out.println("debug tot hier6;"+senc.getState());
             for (String propertyName : stateVertex.getPropertyNames()) {
                 if (propertyName.contains("in_") || propertyName.contains("out_")) {
                     // these are edge indicators. Ignore
@@ -142,13 +138,15 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                 //****
                 // concrete widgets
 
-                props.addAll(getWidgetPropositions(senc.getState()));
+                //props.addAll(getWidgetPropositions(senc.getState()));
 
                 //***
 
             }
+            System.out.println("debug tot hier7;");
             senc.setStateAPs(props);
-            senc.setTransitionColl(getTransitions( senc.getState()));
+            System.out.println("debug tot hier8;");
+            //senc.setTransitionColl(getTransitions( senc.getState()));
             tmodel.addStateEncoding(senc);
             }
 
@@ -164,11 +162,12 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
         //stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
        // String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM (SELECT * FROM :state)) WHERE @class = 'Widget'";
-        String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM  :state) WHERE @class = 'Widget'";
+        String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM  @rid = :state) WHERE @class = 'Widget'";
         Map<String, Object> params = new HashMap<>();
         params.put("state",state);
+        System.out.println("debug tot hierwidget5");
         OResultSet resultSet = db.query(stmt, params);
-        System.out.println("debug tot hier5");
+        System.out.println("debug tot hierwidget5a");
         //***
         List<String> props = new ArrayList<>();
         while (resultSet.hasNext()) {
@@ -205,7 +204,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
 
         // concrete states
-        String stmt = "SELECT FROM (TRAVERSE outE('ConcreteAction') FROM :state) where @class='ConcreteAction'";
+        String stmt = "SELECT * FROM (TRAVERSE outE('ConcreteAction') FROM @rid = :state) where @class='ConcreteAction'";
         Map<String, Object> params = new HashMap<>();
         params.put("state",state);
         OResultSet resultSet = db.query(stmt, params);

@@ -111,7 +111,9 @@ public class TemporalPanel extends JPanel {
         if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
             outputDir += File.separator;
         }
-        outputDir = outputDir + "temporal" + File.separator;
+        outputDir = outputDir + "temporal";
+        new File(outputDir).mkdirs();
+        outputDir = outputDir +  File.separator;
     }
 
     public void refreshsettings(){
@@ -333,18 +335,18 @@ private void setupMiner(){
             config.setPassword(dataStorePassword);
 
             String tmp= dataStoreDirectory;
-            logCheckResult.append("connecting to: db");
+            logCheckResult.append("connecting to: db\n");
             config.setDatabaseDirectory(tmp);
             TemporalController tcontrol = new TemporalController(config,outputDir);
             List<AbstractStateModel> models = tcontrol.fetchModels();
 
-            logCheckResult.append("model count: " + models.size());
+            logCheckResult.append("model count: " + models.size()+"\n");
             AbstractStateModel model = models.get(0);
-            logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier());
+            logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
             TemporalModel tmodel = tcontrol.getTemporalModel(model);
-            logCheckResult.append(" done");
+            logCheckResult.append(" done\n");
             JSONHandler.save(tmodel, outputDir + "testTmodel.json");
-            logCheckResult.append(" saving to file done");
+            logCheckResult.append(" saving to file done\n");
 
             logCheckResult.append("\n");
 
