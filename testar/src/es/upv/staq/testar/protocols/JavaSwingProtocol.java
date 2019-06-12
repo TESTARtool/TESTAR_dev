@@ -51,7 +51,7 @@ import org.fruit.monkey.Settings;
 import nl.ou.testar.RandomActionSelector;
 
 public class JavaSwingProtocol extends ClickFilterLayerProtocol{
-
+	
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -89,13 +89,23 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 		Assert.isTrue(actions != null && !actions.isEmpty());
 
 		int numberOfCellsJavaTable = 0;
+		
+		boolean executeTableAction = false;
 
 		for(Widget w : state) {
 
 			//If exist some table into the Java Swing SUT, read how many childs cells exist
 			if(w.get(Tags.Role).toString().contains("Table")) {
+				executeTableAction = true;
 				numberOfCellsJavaTable = BuilderAccessBridge.childsOfJavaTable;
 			}
+			
+			if(w.get(UIATags.UIAAutomationId,"").contains("dialog")) {
+				executeTableAction = false;
+				break;
+				
+			}
+
 		}
 
 		//Allow to the user define a maximum number of cells (By default could be high)
@@ -111,7 +121,7 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 			int random = new Random().nextInt(actions.size() + numberOfCellsJavaTable);
 
 			//Check if coinflip determines we are going to execute an action into the table
-			if(random < numberOfCellsJavaTable)
+			if(random < numberOfCellsJavaTable && executeTableAction)
 				BuilderAccessBridge.updateActionJavaTable = true;
 
 			return RandomActionSelector.selectAction(actions);
@@ -139,6 +149,7 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 			//Read the actions of new State (we want to find a TableCell)
 			Set<Action> actions = deriveTableActions(system, state);
 
+			//Update to false, will be determined next action iteration
 			BuilderAccessBridge.updateActionJavaTable = false;
 
 			if(!actions.isEmpty()) {
@@ -170,7 +181,8 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 		for(Widget w : state){
 			//Save all new widgets created that represents the cells of the tables
 			if(w.get(UIATags.UIAAutomationId,"").toString().contains("TableCell")) {
-				actions.add(ac.leftClickAt(w));
+				actions.add(ac.leftDoubleClickAt(w));
+				actions.add(ac.rightClickAt(w));
 			}
 		}
 

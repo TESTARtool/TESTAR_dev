@@ -177,7 +177,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 		//Force actions into Widgets that are potentially Calendar
 		// Think a better condition?
 		for(Widget w : state){
-			if(w.parent()!=null && w.parent().childCount()>30) {
+			if(w.parent()!=null && w.parent().childCount()>50) {
 				forceActionsIntoChildsWidgetTree(w.parent().parent(), actions);
 			}
 		}
