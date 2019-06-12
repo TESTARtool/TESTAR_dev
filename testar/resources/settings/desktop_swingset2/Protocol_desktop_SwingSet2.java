@@ -173,16 +173,22 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 		//----------------------
 		// BUILD CUSTOM ACTIONS
 		//----------------------
-
+		
 		//Force actions into Widgets that are potentially Calendar
 		// Think a better condition?
+		//Calendar detection for bng application
+		Widget widgetWissen = null;
+		boolean vandaagDetected = false;
 		for(Widget w : state){
-			if(w.parent()!=null && w.parent().childCount()>50) {
-				forceActionsIntoChildsWidgetTree(w.parent().parent(), actions);
-			}
+			if(w.get(Title,"").equals("Wissen"))
+				widgetWissen = w;
+			if(w.get(Title,"").contains("Vandaag"))
+				vandaagDetected = true;
 		}
+		if(widgetWissen!=null && vandaagDetected && widgetWissen.parent()!=null && widgetWissen.parent().parent()!=null)
+			forceActionsIntoChildsWidgetTree(widgetWissen.parent().parent(), actions);
 
-		// iterate through all widgets
+		// iterate through top widgets
 		for(Widget w : getTopWidgets(state)){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
