@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Action;
+import org.fruit.alayer.Rect;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -51,7 +52,7 @@ import org.fruit.monkey.Settings;
 import nl.ou.testar.RandomActionSelector;
 
 public class JavaSwingProtocol extends ClickFilterLayerProtocol{
-	
+
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
@@ -61,7 +62,7 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	protected void initialize(Settings settings){
 
 		super.initialize(settings);
-		
+
 		BuilderAccessBridge.customJavaSwingButtons = settings.get(ConfigTags.CustomJavaSwingButtons);
 		BuilderAccessBridge.searchNonVisibleJavaWindows = settings.get(ConfigTags.SearchNonVisibleJavaWindows);
 
@@ -89,7 +90,7 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 		Assert.isTrue(actions != null && !actions.isEmpty());
 
 		int numberOfCellsJavaTable = 0;
-		
+
 		boolean executeTableAction = false;
 
 		for(Widget w : state) {
@@ -99,11 +100,11 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 				executeTableAction = true;
 				numberOfCellsJavaTable = BuilderAccessBridge.childsOfJavaTable;
 			}
-			
+
 			if(w.get(UIATags.UIAAutomationId,"").contains("dialog")) {
 				executeTableAction = false;
 				break;
-				
+
 			}
 
 		}
@@ -139,7 +140,7 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	protected boolean executeAction(SUT system, State state, Action action){
 
 		if(BuilderAccessBridge.updateActionJavaTable) {
-			
+
 			//Coinflip determines that we are going to execute an action into the table
 			//We have to update the state making an Access Bridge calls to obtain properly a cell position
 
@@ -193,11 +194,36 @@ public class JavaSwingProtocol extends ClickFilterLayerProtocol{
 	//Force actions on Tree widgets with a wrong accessibility
 	public void forceActionsIntoChildsWidgetTree(Widget w, Set<Action> actions) {
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		actions.add(ac.leftClickAt(w));
-		w.set(Tags.ActionSet, actions);
+
+		if(widgetInsideBounds(w)) {
+			actions.add(ac.leftClickAt(w));
+			w.set(Tags.ActionSet, actions);
+		}
+
 		for(int i = 0; i<w.childCount(); i++) {
 			forceActionsIntoChildsWidgetTree(w.child(i), actions);
 		}
+	}
+
+	/**
+	 * Use this customized method instead of GetVisibleChildren Access Bridge call
+	 */
+	public boolean widgetInsideBounds(Widget w) {
+		try {
+			int windowsContainerNumber = Integer.parseInt(w.get(Tags.Path).substring(1,2));
+
+			Widget windowsContainer = w.root().child(windowsContainerNumber);
+
+			Rect container = Rect.from(windowsContainer.get(Tags.Shape).x(),windowsContainer.get(Tags.Shape).y(),
+					windowsContainer.get(Tags.Shape).width(),windowsContainer.get(Tags.Shape).height());
+
+			if(w.get(Tags.Shape).y() > (container.y() + container.height()))
+				return false;
+			if(w.get(Tags.Shape).x() > (container.x() + container.width()))
+				return false;
+		}catch(Exception e) {}
+		
+		return true;
 	}
 
 }

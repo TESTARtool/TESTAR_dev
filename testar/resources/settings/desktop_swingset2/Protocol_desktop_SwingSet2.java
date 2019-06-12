@@ -173,7 +173,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 		//----------------------
 		// BUILD CUSTOM ACTIONS
 		//----------------------
-		
+
 		//Force actions into Widgets that are potentially Calendar
 		// Think a better condition?
 		//Calendar detection for bng application
@@ -195,22 +195,26 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
 
-					// left clicks
-					if(whiteListed(w) || isClickable(w))
-						actions.add(ac.leftClickAt(w));
+					if(widgetInsideBounds(w)) { // Check if widget is out of container coordinates
+						
+						// left clicks
+						if(whiteListed(w) || isClickable(w))
+							actions.add(ac.leftClickAt(w));
 
-					// type into text boxes
-					if(isTypeable(w))
-						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+						// type into text boxes
+						if(isTypeable(w))
+							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 
-					//Force actions on some widgets with a wrong accessibility
-					//Optional, comment this changes if your Swing applications doesn't need it
+						//Force actions on some widgets with a wrong accessibility
+						//Optional, comment this changes if your Swing applications doesn't need it
 
-					if(w.get(Tags.Role).toString().contains("Tree") ||
-							w.get(Tags.Role).toString().contains("ComboBox") ||
-							w.get(Tags.Role).toString().contains("List") ||
-							w.get(Tags.Role).toString().contains("Table")) {
-						forceActionsIntoChildsWidgetTree(w, actions);
+						if(w.get(Tags.Role).toString().contains("Tree") ||
+								w.get(Tags.Role).toString().contains("ComboBox") ||
+								w.get(Tags.Role).toString().contains("List") ||
+								w.get(Tags.Role).toString().contains("Table")) {
+							forceActionsIntoChildsWidgetTree(w, actions);
+						}
+
 					}
 
 				}
