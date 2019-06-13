@@ -330,6 +330,12 @@ public class StateFetcher implements Callable<UIAState>{
 				uiaElement.blocked = (uiaElement.wndInteractionState != Windows.WindowInteractionState_ReadyForUserInteraction);
 				uiaElement.isTopmostWnd = Windows.IUIAutomationWindowPattern_get_IsTopmost(uiaWindowPointer, true);
 				uiaElement.isModal = Windows.IUIAutomationWindowPattern_get_IsModal(uiaWindowPointer, true);
+
+				// also set the tags in the uiaelement
+				uiaElement.set(UIATags.UIAIsTopmostWindow, uiaElement.isTopmostWnd);
+				uiaElement.set(UIATags.UIAIsWindowModal, uiaElement.isModal);
+				uiaElement.set(UIATags.UIAWindowInteractionState, uiaElement.wndInteractionState);
+
 				Windows.IUnknown_Release(uiaWindowPointer);
 			}
 			uiaElement.culture = Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true);
@@ -392,10 +398,13 @@ public class StateFetcher implements Callable<UIAState>{
 		uiaElement.set(UIATags.UIAItemType, Windows.IUIAutomationElement_get_ItemType(uiaCachePointer, true));
 //		System.out.println("Item type: " + uiaElement.get(UIATags.UIAItemType));
 		uiaElement.set(UIATags.UIAItemStatus, Windows.IUIAutomationElement_get_ItemStatus(uiaCachePointer, true));
-		obj = Windows.IUIAutomationElement_GetPropertyValueEx(uiaCachePointer, Windows.UIA_FullDescriptionPropertyId, true, true);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_FullDescriptionPropertyId, true);
 		uiaElement.set(UIATags.UIAFullDescription, obj instanceof String ? (String)obj : "");
 //		System.out.println(uiaElement.get(UIATags.UIAFullDescription));
 		uiaElement.set(UIATags.UIACulture, Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true));
+		uiaElement.set(UIATags.UIAProcessId, Windows.IUIAutomationElement_get_ProcessId(uiaCachePointer, true));
+		obj = Windows.IUIAutomationElement_GetPropertyValueEx(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true, true);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true); //true);
 
 
 		// get the properties for potential child elements

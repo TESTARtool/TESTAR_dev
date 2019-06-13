@@ -263,7 +263,7 @@ public final class UIATags extends TagsBase {
 	public static final Tag<Boolean> UIAIsTopmostWindow = from("UIAIsTopmostWindow", Boolean.class);
 
 	/**
-	 * If the widget is a window, this tells it is modal (such as a message box)
+	 * If the widget is a window, this tells if it is modal (such as a message box)
 	 */
 	public static final Tag<Boolean> UIAIsWindowModal = from("UIAIsWindowModal", Boolean.class);
 	public static final Tag<Long> UIAWindowInteractionState = from("UIAWindowInteractionState", Long.class);

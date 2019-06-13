@@ -129,8 +129,9 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_NativeWindowHandlePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ProviderDescriptionPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_OrientationPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RuntimeIdPropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RuntimeIdPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsWindowPatternAvailablePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ProcessIdPropertyId);
 
 		// begin by urueda
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsScrollPatternAvailablePropertyId);
@@ -149,6 +150,9 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowIsModalPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowWindowInteractionStatePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowWindowVisualStatePropertyId);
+
+		// window pattern properties
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsWindowPatternAvailablePropertyId);
 
 	}
 
