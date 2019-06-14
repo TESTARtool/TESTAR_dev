@@ -344,7 +344,6 @@ private void setupMiner(){
             AbstractStateModel model = models.get(0);
             logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
             TemporalModel tmodel = tcontrol.getTemporalModel(model);
-            logCheckResult.append(" done\n");
             JSONHandler.save(tmodel, outputDir + "testTmodel.json");
             logCheckResult.append(" saving to file done\n");
 
