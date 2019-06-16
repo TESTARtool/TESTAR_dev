@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,11 @@ public class GeneralPanel extends JPanel {
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
+  
+  private JLabel labelAppName = new JLabel("Application name");
+  private JLabel labelAppVersion = new JLabel("Application version");
+  private JTextField applicationNameField = new JTextField();
+  private JTextField applicationVersionField = new JTextField();
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -136,7 +141,16 @@ public class GeneralPanel extends JPanel {
     checkStopOnFault.setBounds(10, 240, 192, 21);
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);*/
+    
+    labelAppName.setBounds(330, 242, 150, 27);
+    add(labelAppName);
+    applicationNameField.setBounds(480, 242, 125, 27);
+    add(applicationNameField);
 
+    labelAppVersion.setBounds(330, 280, 150, 27);
+    add(labelAppVersion);
+    applicationVersionField.setBounds(480, 280, 125, 27);
+    add(applicationVersionField);
   }
 
   private void addGeneralControlsLocal() {
@@ -229,6 +243,8 @@ public class GeneralPanel extends JPanel {
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
     comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
+    applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
+    applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
   }
 
   /**
@@ -246,6 +262,8 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
+    settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
+    settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

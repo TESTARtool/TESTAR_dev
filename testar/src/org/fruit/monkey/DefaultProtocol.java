@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,6 +42,8 @@ import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
 import static org.fruit.monkey.ConfigTags.OutputDir;
+
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -58,6 +60,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import es.upv.staq.testar.*;
 import nl.ou.testar.*;
@@ -110,6 +115,7 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
+import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
@@ -125,6 +131,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	private String generatedSequence;
+
+	public String getGeneratedSequenceName() {
+		return generatedSequence;
+	}
 
 	private File currentSeq;
 
@@ -159,19 +169,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected List<ProcessInfo> contextRunningProcesses = null;
 	protected static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	protected static final org.slf4j.Logger DEBUGLOG = LoggerFactory.getLogger(AbstractProtocol.class);
+	protected static final org.slf4j.Logger INDEXLOG = LoggerFactory.getLogger(AbstractProtocol.class);
 	protected double passSeverity = Verdict.SEVERITY_OK;
-	protected static int generatedSequenceNumber = -1;
 
-	public final static int generatedSequenceCount() {
-		return generatedSequenceNumber;
-	}
-
-	protected static Action lastExecutedAction = null;
-
-	public final static Action lastExecutedAction() {
-		return lastExecutedAction;
-	}
+	public static Action lastExecutedAction = null;
 
 	protected long lastStamp = -1;
 	protected ProtocolUtil protocolUtil = new ProtocolUtil();
@@ -183,8 +184,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected Map<String, Matcher> suspiciousTitlesMatchers = new WeakHashMap<String, Matcher>();
 	private StateBuilder builder;
 	protected String forceKillProcess = null;
-	protected boolean forceToForeground = false,
-			forceNextActionESC = false;
+	protected boolean forceToForeground = false;
+	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 
@@ -237,8 +238,30 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		try {
 
-			if (mode() == Modes.View && isValidFile()) {
-				new SequenceViewer(settings);
+			if (mode() == Modes.View) {
+				if(isHtmlFile() || isLogFile()) {
+					try {
+						File file = new File(settings.get(ConfigTags.PathToReplaySequence)).getCanonicalFile();
+						Desktop.getDesktop().browse(file.toURI());
+					}catch (Exception e) {
+						popupMessage("Exception: Check the path of the file, something is wrong");
+						System.out.println("Exception: Check the path of the file, something is wrong");
+					}
+				} else if (!findHTMLreport().contains("error")) {
+					try {
+						File htmlFile = new File(findHTMLreport());
+						Desktop.getDesktop().browse(htmlFile.toURI());
+					}catch (Exception e) {
+						popupMessage("Exception: Select a log or html file to visualize the TESTAR resutls");
+						System.out.println("Exception: Select a log or html file to visualize the TESTAR resutls");
+					}
+				}
+				/*else if(isValidFile())
+					new SequenceViewer(settings);*/
+				else {
+					popupMessage("Please select a file.html (output/HTMLreports) to use the View mode");
+					System.out.println("Exception: Please select a file.html (output/HTMLreports) to use the View mode");
+				}
 			} else if (mode() == Modes.Replay && isValidFile()) {
 				runReplayLoop();
 			} else if (mode() == Modes.Spy) {
@@ -250,16 +273,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			}
 
 		}catch(WinApiException we) {
-			System.out.println("Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
-			+" is a correct definition");
+
+			String msg = "Exception: Check if current SUTs path: "+settings.get(ConfigTags.SUTConnectorValue)
+			+" is a correct definition";
+
+			popupMessage(msg);
+
+			System.out.println(msg);
+
 			this.mode = Modes.Quit;
+
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
-			DEBUGLOG.error("Exception: ",SystemStartException);
+			//INDEXLOG.error("Exception: ",SystemStartException);
 			this.mode = Modes.Quit;
 		} catch (Exception e) {
 			e.printStackTrace();
-			DEBUGLOG.error("Exception: ",e);
+			//INDEXLOG.error("Exception: ",e);
 			this.mode = Modes.Quit;
 		}
 
@@ -288,9 +318,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				settings.get(ConfigTags.SUTProcesses)
 				);
 
-		// new state model manager
-		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay )
+		if ( mode() == Modes.Generate || mode() == Modes.Record || mode() == Modes.Replay ) {
+			//Create the output folders
+			OutputStructure.calculateOuterLoopDateString();
+			OutputStructure.sequenceInnerLoopCount = 0;
+			OutputStructure.createOutputSUTname(settings);
+			OutputStructure.createOutputFolders();
+
+			// new state model manager
 			stateModelManager = StateModelManagerFactory.getStateModelManager(settings);
+		}
 
 		try {
 			if (!settings.get(ConfigTags.UnattendedTests)) {
@@ -322,7 +359,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * Check if the selected file to Replay or View contains a valid fragment object
 	 */
 
-	public boolean isValidFile(){
+	private boolean isValidFile(){
 		try {
 
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -336,14 +373,68 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			ois.close();
 
 		} catch (ClassNotFoundException | IOException e) {
+			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
 
-			System.out.println("ERROR: File is not a readable, please select a correct file");
-			DEBUGLOG.error("Exception: ",e);
+			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
+			//INDEXLOG.error("Exception: ",e);
 
 			return false;	
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if the selected file to View is a html file
+	 */
+	private boolean isHtmlFile() {
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".html"))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * Check if the selected file to View is a log file
+	 */
+	private boolean isLogFile() {
+		if(settings.get(ConfigTags.PathToReplaySequence).contains(".log"))
+			return true;
+
+		return false;
+	}
+
+	/**
+	 * If the user selects a .testar object file to use the View mode, try to find the corresponding html file
+	 */
+	private String findHTMLreport() {
+		String foundedHTML = "error";
+		String path = settings.get(ConfigTags.PathToReplaySequence);
+		if(path.contains(".testar")) {
+			path = path.replace(".testar", ".html");
+			
+			int startIndex = path.indexOf(File.separator + "sequences");
+			int endIndex = path.indexOf(File.separator, startIndex+2);
+			
+			String replace = path.substring(startIndex, endIndex+1);
+			
+			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
+			if (new File(path).exists())
+				foundedHTML = path;
+		}
+
+		return foundedHTML;
+	}
+
+	/**
+	 * Show a popup message to get the user's attention and inform him.
+	 * Only if GUI option is enabled (disabled for CI)
+	 */
+	private void popupMessage(String message) {
+		if(settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)) {
+			JFrame frame = new JFrame();
+			JOptionPane.showMessageDialog(frame, message);
+		}
 	}
 
 	/**
@@ -364,24 +455,32 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private String getAndStoreGeneratedSequence() {
 		//TODO refactor replayable sequences with something better (model perhaps?)
-		String generatedSequence = Util.generateUniqueFile(settings.get(ConfigTags.OutputDir) + File.separator + "sequences", "sequence").getName();
-		generatedSequenceNumber = new Integer(generatedSequence.replace("sequence", ""));
+
+		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
+
+		String generatedSequenceName = OutputStructure.sequencesOutputDir 
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
+
+		String logFileName = OutputStructure.logsOutputDir
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
+
+		String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname + sequenceCountDir;
 
 		try {
 			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(
-					settings.get(OutputDir) + File.separator + "logs" + File.separator + generatedSequence + ".log"), true))),
+					logFileName), true))),
 					settings.get(LogLevel));
-		} catch (NoSuchTagException e3) {
-			// TODO Auto-generated catch block
-			DEBUGLOG.error("Exception: ",e3);
-			e3.printStackTrace();
-		} catch (FileNotFoundException e3) {
-			// TODO Auto-generated catch block
-			DEBUGLOG.error("Exception: ",e3);
+		}catch (NoSuchTagException | FileNotFoundException e3) {
+			//INDEXLOG.error("Exception: ",e3);
 			e3.printStackTrace();
 		}
-		ScreenshotSerialiser.start(settings.get(ConfigTags.OutputDir), generatedSequence);
-		return generatedSequence;
+
+		ScreenshotSerialiser.start(OutputStructure.screenshotsOutputDir, screenshotsDirectory);
+
+		return generatedSequenceName;
 	}
 
 	/**
@@ -392,22 +491,23 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private File getAndStoreSequenceFile() {
 		LogSerialiser.log("Creating new sequence file...\n", LogSerialiser.LogLevel.Debug);
-		final File currentSeq = new File(settings.get(ConfigTags.TempDir) + File.separator + "tmpsequence");
+
+		String sequenceObject = settings.get(ConfigTags.TempDir)
+				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
+				+ OutputStructure.executedSUTname
+				+ "_sequence_" + OutputStructure.sequenceInnerLoopCount + ".testar";
+
+		final File currentSeqObject = new File(sequenceObject);
 
 		try {
-			Util.delete(currentSeq);
-		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
-			DEBUGLOG.error("Exception: ",e2);
-		}
-		try {
-			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeq, true))));
+			TestSerialiser.start(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(currentSeqObject, true))));
 			LogSerialiser.log("Created new sequence file!\n", LogSerialiser.LogLevel.Debug);
 		} catch (IOException e) {
 			LogSerialiser.log("I/O exception creating new sequence file\n", LogSerialiser.LogLevel.Critical);
-			DEBUGLOG.error("Exception: ",e);
+			//INDEXLOG.error("Exception: ",e);
 		}
-		return currentSeq;
+
+		return currentSeqObject;
 	}
 
 
@@ -448,7 +548,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private void startTestSequence(SUT system) {
 		//for measuring the time of one sequence:
 		tStart = System.currentTimeMillis();
-		DEBUGLOG.info("Starting test sequence {}", sequenceCount());
+		//INDEXLOG.info("Starting test sequence {}", sequenceCount());
 
 		actionCount = 1;
 		this.testFailTimes = 0;
@@ -474,7 +574,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.flush();
 		LogSerialiser.finish();
 		LogSerialiser.exit();
-		DEBUGLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+		//INDEXLOG.info("Test sequence {} finished in {} ms", sequenceCount(), System.currentTimeMillis() - tStart);
+
+		//Delete the temporally testar file
+		try {
+			Util.delete(currentSeq);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		}
+
 	}
 
 	/**
@@ -500,6 +608,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		LogSerialiser.finish();
 		LogSerialiser.exit();
 		this.mode = Modes.Quit;
+
+		//Delete the temporally testar file
+		try {
+			Util.delete(currentSeq);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		}
 	}
 
 	/**
@@ -508,6 +623,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @param system
 	 */
 	protected void runGenerateOuterLoop(SUT system) {
+
 		boolean startFromGenerate = false;
 		if(system==null)
 			startFromGenerate = true;
@@ -522,6 +638,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+
+			synchronized(this){
+				OutputStructure.calculateInnerLoopDateString();
+				OutputStructure.sequenceInnerLoopCount++;
+			}
 
 			//empty method in defaultProtocol - allowing implementation in application specific protocols:
 			preSequencePreparations();
@@ -558,7 +679,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				 */
 				Verdict stateVerdict = runGenerateInnerLoop(system, state);
 
-				//Saving the state into replayable test sequence:
+				//Saving the last state into replayable test sequence:
 				saveStateIntoFragmentForReplayableSequence(state);
 
 				//calling finishSequence() to allow scripting GUI interactions to close the SUT:
@@ -571,13 +692,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				if (faultySequence)
 					LogSerialiser.log("Sequence contained faults!\n", LogSerialiser.LogLevel.Critical);
-				
+
 				Verdict finalVerdict = stateVerdict.join(processVerdict);
 
-				processVerdict = Verdict.OK;
-
 				//Copy sequence file into proper directory:
-				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict,generatedSequence,currentSeq);
+				classifyAndCopySequenceIntoAppropriateDirectory(finalVerdict, generatedSequence, currentSeq);
 
 				//calling postSequenceProcessing() to allow resetting test environment after test sequence, etc
 				postSequenceProcessing();
@@ -594,7 +713,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			} catch (Exception e) {
 				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
 				e.printStackTrace();
-				DEBUGLOG.error("Exception: ",e);
+				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
@@ -607,24 +726,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		mode = Modes.Quit;
 	}
 
-	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
+	private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict, String generatedSequence, File currentSeq){
 		if (!settings().get(ConfigTags.OnlySaveFaultySequences) ||
 				finalVerdict.severity() >= settings().get(ConfigTags.FaultThreshold)) {
-			LogSerialiser.log("Copying generated sequence (\"" + generatedSequence + "\") to output directory...\n", LogSerialiser.LogLevel.Info);
-			try {
-				Util.copyToDirectory(currentSeq.getAbsolutePath(),
-						settings.get(ConfigTags.OutputDir) + File.separator + "sequences",
-						generatedSequence,
-						true);
-				LogSerialiser.log("Copied generated sequence to output directory!\n", LogSerialiser.LogLevel.Debug);
-			} catch (NoSuchTagException e) {
-				LogSerialiser.log("No such tag exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-				DEBUGLOG.error("Exception: ",e);
-			} catch (IOException e) {
-				LogSerialiser.log("I/O exception copying test sequence\n", LogSerialiser.LogLevel.Critical);
-				DEBUGLOG.error("Exception: ",e);
-			}
-			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict, settings.get(ConfigTags.OutputDir));
+
+			LogSerialiser.log("Saved generated sequence (\"" + generatedSequence + "\")\n", LogSerialiser.LogLevel.Info);
+
+			FileHandling.copyClassifiedSequence(generatedSequence, currentSeq, finalVerdict);
 		}
 	}
 
@@ -660,7 +768,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state, actions);
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
-
 
 			if(actions.isEmpty()){
 				if (mode() != Modes.Spy && escAttempts >= MAX_ESC_ATTEMPTS){
@@ -704,7 +811,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
 		stateModelManager.notifyNewStateReached(state, actions);
-		
+
 		return getVerdict(state);
 	}
 
@@ -731,11 +838,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 
@@ -748,11 +855,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
+		fragment.set(SystemState, state);
 		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
 		fragment =new TaggableBase();
-		fragment.set(SystemState, state);
 	}
 
 	/**
@@ -808,8 +915,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				LogSerialiser.LogLevel.Info);
 
 		//bin folder 
-		DEBUGLOG.info(actionMode+" number {} Widget {} finished in {} ms",
-				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);
+		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
+				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
 
 
 	}
@@ -832,7 +939,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			CodingManager.buildIDs(state);
 			calculateZIndices(state);
 			setStateForClickFilterLayerProtocol(state);
-			
+
 			cv.begin(); Util.clear(cv);
 
 			//in Spy-mode, always visualize the widget info under the mouse cursor:
@@ -881,9 +988,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//If system it's null means that we have started TESTAR from the Record User Actions Mode
 		//We need to invoke the SUT & the canvas representation
 		if(system == null) {
-			
+
+			synchronized(this){
+				OutputStructure.calculateInnerLoopDateString();
+				OutputStructure.sequenceInnerLoopCount++;
+			}
+
 			preSequencePreparations();
-			
+
 			system = startSystem();
 			startedRecordMode = true;
 			this.cv = buildCanvas();
@@ -996,7 +1108,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Copy sequence file into proper directory:
 			classifyAndCopySequenceIntoAppropriateDirectory(Verdict.OK,generatedSequence,currentSeq);
-			
+
 			postSequenceProcessing();
 
 			//If we want to Quit the current execution we stop the system
@@ -1011,9 +1123,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		BufferedInputStream bis = null;
 		GZIPInputStream gis = null;
 		ObjectInputStream ois = null;
-		
+
+		synchronized(this){
+			OutputStructure.calculateInnerLoopDateString();
+			OutputStructure.sequenceInnerLoopCount++;
+		}
+
 		preSequencePreparations();
-		
+
 		SUT system = startSystem();
 		try{
 			File seqFile = new File(settings.get(ConfigTags.PathToReplaySequence));
@@ -1093,10 +1210,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 
 		} catch(IOException ioe){
-			DEBUGLOG.error("Exception: ",ioe);
+			//INDEXLOG.error("Exception: ",ioe);
 			throw new RuntimeException("Cannot read file.", ioe);
 		} catch (ClassNotFoundException cnfe) {
-			DEBUGLOG.error("Exception: ",cnfe);
+			//INDEXLOG.error("Exception: ",cnfe);
 			throw new RuntimeException("Cannot read file.", cnfe);
 		} finally {
 			if (ois != null){
@@ -1127,7 +1244,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 			LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
 		}
-		
+
 		LogSerialiser.finish();
 		postSequenceProcessing();
 
@@ -1355,16 +1472,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		State state = builder.apply(system);
 
 		CodingManager.buildIDs(state);
-
-		Shape viewPort = state.get(Tags.Shape, null);
-		if(viewPort != null){
-			//AWTCanvas scrShot = AWTCanvas.fromScreenshot(Rect.from(viewPort.x(), viewPort.y(), viewPort.width(), viewPort.height()), AWTCanvas.StorageFormat.PNG, 1);
-			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
-		}
-
 		calculateZIndices(state);
+
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
+
+		setStateScreenshot(state);
+
 		if (mode() != Modes.Spy && verdict.severity() >= settings().get(ConfigTags.FaultThreshold)){
 			faultySequence = true;
 			LogSerialiser.log("Detected fault: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
@@ -1380,6 +1494,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 		setStateForClickFilterLayerProtocol(state);
 		return state;
+	}
+
+	/**
+	 * Take a Screenshot of the State and associate the path into state tag
+	 */
+	private void setStateScreenshot(State state) {
+		Shape viewPort = state.get(Tags.Shape, null);
+		if(viewPort != null){
+			state.set(Tags.ScreenshotPath, protocolUtil.getStateshot(state));
+		}
 	}
 
 	@Override
