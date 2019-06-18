@@ -8,8 +8,8 @@ import java.util.Set;
 public class TemporalModel extends TemporalBean{
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
-    private List<TemporalTrace> testSequences; //
-    private List<String> apOfModel; //AP<digits> to widget property map:
+    private List<TemporalTrace> traces; //
+    private List<String> modelAPs; //AP<digits> to widget property map:
     private String formatVersion="20190603";
 
 
@@ -17,25 +17,25 @@ public class TemporalModel extends TemporalBean{
     public TemporalModel(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
         super(applicationName, applicationVersion, modelIdentifier, abstractionAttributes);
         this.stateEncodings = new ArrayList<>();
-        this.apOfModel = new ArrayList<String>();
+        this.modelAPs = new ArrayList<String>();
     }
 
 
 
-    public List<String> getApOfModel() {
-        return apOfModel;
+    public List<String> getModelAPs() {
+        return modelAPs;
     }
 
-    public void setApOfModel(List<String> apOfModel) {
-        this.apOfModel = apOfModel;
+    public void setModelAPs(List<String> modelAPs) {
+        this.modelAPs = modelAPs;
     }
 
-    public List<TemporalTrace> getStateTransistionSequence() {
-        return testSequences;
+    public List<TemporalTrace> getTraces() {
+        return traces;
     }
 
-    public void setStateTransistionSequence(List<TemporalTrace> stateTransistionSequence) {
-        this.testSequences = stateTransistionSequence;
+    public void setTraces(List<TemporalTrace> stateTransistionSequence) {
+        this.traces = stateTransistionSequence;
     }
 
     public List<StateEncoding> getStateEncodings() {
@@ -43,32 +43,31 @@ public class TemporalModel extends TemporalBean{
     }
 
     public void setStateEncodings(List<StateEncoding> stateEncodings) {
+
         this.stateEncodings = stateEncodings;
+        for (StateEncoding stateEnc: stateEncodings) {
+            this.modelAPs.addAll(stateEnc.getStateAPs());
+        }
+        for (StateEncoding stateEnc: stateEncodings) {  // observer pattern?
+            stateEnc.updateAllTransitionConjuncts(modelAPs);
+        }
     }
 
+    public String getFormatVersion() {        return formatVersion;   }
 
-    public String getFormatVersion() {
-        return formatVersion;
-    }
-
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
-    }
-
+    public void setFormatVersion(String formatVersion) {    this.formatVersion = formatVersion;    }
 
 
     //custom
-    public void addStateEncoding(StateEncoding state) {
-        stateEncodings.add(state);
-    }
+    public void addStateEncoding(StateEncoding stateEncoding) {
 
-    public void removeStateEncoding(StateEncoding state) { stateEncodings.remove(state); }
-
-    public void setAllEncodedAPConjuncts(){
-        for (StateEncoding stateEnc: stateEncodings) {
-            stateEnc.setEncodedAPConjuncts(apOfModel);
+        stateEncodings.add(stateEncoding);
+        this.modelAPs.addAll(stateEncoding.getStateAPs());
+        for (StateEncoding stateEnc: stateEncodings) {// observer pattern?
+            stateEnc.updateAllTransitionConjuncts(modelAPs);
         }
     }
+
 
     public void fetchDBModel(String filter){
         //loop through model ,
@@ -94,9 +93,9 @@ public class TemporalModel extends TemporalBean{
     result.append("Start: 0\n");
     result.append("Acceptance: 1 Inf(1))\n");  //==Buchi
     result.append("AP: ");
-    result.append(apOfModel.size());
+    result.append(modelAPs.size());
         int i=0;
-        for (String ap:apOfModel             ) {
+        for (String ap: modelAPs) {
             result.append(" \"ap");
             result.append(i);
             result.append("\"");

@@ -10,20 +10,20 @@ public class TemporalTraceEvent implements Cloneable{
 
 
     private String state; //
-    private String edge;  //
+    private String transition;  //
     private List<String> properties;
 
 
 
-    public TemporalTraceEvent(String state, String edge) {
+    public TemporalTraceEvent(String state, String transition) {
         this.state = state;
-        this.edge = edge;
+        this.transition = transition;
         this.properties = new ArrayList<>();
     }
 
-    public TemporalTraceEvent(String state, String edge, List<String> properties) {
+    public TemporalTraceEvent(String state, String transition, List<String> properties) {
         this.state = state;
-        this.edge = edge;
+        this.transition = transition;
         this.properties = properties;
     }
 
@@ -37,12 +37,12 @@ public class TemporalTraceEvent implements Cloneable{
         this.state = state;
     }
 
-    public String getEdge() {
-        return edge;
+    public String getTransition() {
+        return transition;
     }
 
-    public void setEdge(String edge) {
-        this.edge = edge;
+    public void setTransition(String transition) {
+        this.transition = transition;
     }
 
     public List<String> getProperties() {

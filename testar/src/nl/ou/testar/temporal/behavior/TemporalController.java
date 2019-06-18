@@ -1,7 +1,5 @@
 package nl.ou.testar.temporal.behavior;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -22,9 +20,11 @@ import nl.ou.testar.temporal.structure.StateEncoding;
 import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.structure.TransitionEncoding;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
-import java.time.Instant;
 import java.util.*;
 
 public class TemporalController {
@@ -237,12 +237,6 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
     }
 
 
-    // concrete actions
-  //  stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
-
-
-
-
 //***********************************
 
     /**
@@ -287,139 +281,6 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
         return sequenceList;
     }
 
-    /**
-     * This model generates graph data for a given abstract state model and writes it to a json file.
-     * @param modelIdentifier the abstract state model identifier
-     * @param abstractLayerRequired true if the abstract state layer needs to be exported
-     * @param concreteLayerRequired true if the concrete state layer needs to be exported
-     * @param sequenceLayerRequired true if the sequence layer needs to be exported
-     * @return
-     */
-    public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
-        ArrayList<Element> elements = new ArrayList<>();
-        if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
-            try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
-                if (abstractLayerRequired) {
-                    elements.addAll(fetchAbstractLayer(modelIdentifier, db, showCompoundGraph));
-                }
-
-                if (concreteLayerRequired) {
-                    elements.addAll(fetchConcreteLayer(modelIdentifier, db, showCompoundGraph));
-                }
-
-                if (sequenceLayerRequired) {
-                    elements.addAll(fetchSequenceLayer(modelIdentifier, db, showCompoundGraph));
-                }
-
-                if (abstractLayerRequired && concreteLayerRequired) {
-                    elements.addAll(fetchAbstractConcreteConnectors(modelIdentifier, db));
-                }
-
-                if (concreteLayerRequired && sequenceLayerRequired) {
-                    elements.addAll(fetchConcreteSequenceConnectors(modelIdentifier, db));
-                }
-            }
-        }
-
-        StringBuilder builder = new StringBuilder(modelIdentifier);
-        builder.append("_");
-        if (abstractLayerRequired) builder.append("A");
-        if (concreteLayerRequired) builder.append("C");
-        if (sequenceLayerRequired) builder.append("S");
-        builder.append("_");
-        builder.append(Instant.now().toEpochMilli());
-        builder.append("_elements.json");
-        String filename = builder.toString();
-        File output = new File(outputDir + filename);
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(elements);
-            // let's write the resulting json to a file
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                writer.write(result);
-                writer.close();
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return filename;
-    }
-
-    /**
-     * This method fetches the elements in the abstract state layer for a given abstract state model.
-     * @param modelIdentifier
-     * @param db
-     * @return
-     */
-    private List<Element> fetchAbstractLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
-        ArrayList<Element> elements = new ArrayList<>();
-
-        // optionally add a parent node for the abstract layer
-        if (showCompoundGraph) {
-            Vertex abstractStateParent = new Vertex("A1");
-            elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
-        }
-
-        // abstract states
-        String stmt = "SELECT FROM AbstractState WHERE modelIdentifier = :identifier";
-        Map<String, Object> params = new HashMap<>();
-        params.put("identifier", modelIdentifier);
-        OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null, modelIdentifier));
-
-        // abstract actions
-        stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
-        resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "AbstractAction"));
-
-        // Black hole class
-        stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
-        resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null, modelIdentifier));
-
-
-        // unvisited abstract actions
-        stmt = "SELECT FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
-        resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction"));
-
-        return elements;
-    }
-
-    /**
-     * This method fetches the elements in the concrete state layer for a given abstract state model.
-     * @param modelIdentifier
-     * @param db
-     * @return
-     */
-    private List<Element> fetchConcreteLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
-        ArrayList<Element> elements = new ArrayList<>();
-
-        // optionally add a parent node for the concrete layer
-        if (showCompoundGraph) {
-            Vertex concreteStateParent = new Vertex("C1");
-            elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
-        }
-
-        // concrete states
-        String stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-        Map<String, Object> params = new HashMap<>();
-        params.put("identifier", modelIdentifier);
-        OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null, modelIdentifier));
-
-        // concrete actions
-        stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
-        resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "ConcreteAction"));
-
-        return elements;
-    }
 
     /**
      * This method fetches the elements in the sequence layer for a given abstract state model.
@@ -427,6 +288,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
      * @param db
      * @return
      */
+
     private List<Element> fetchSequenceLayer(String modelIdentifier, ODatabaseSession db, boolean showCompoundGraph) {
         ArrayList<Element> elements = new ArrayList<>();
 
@@ -461,43 +323,8 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
         return elements;
     }
 
-    /**
-     * This method fetches the edges between the abstract and concrete layers.
-     * @param modelIdentifier
-     * @param db
-     * @return
-     */
-    private List<Element> fetchAbstractConcreteConnectors(String modelIdentifier, ODatabaseSession db) {
-        ArrayList<Element> elements = new ArrayList<>();
 
-        // abstractedBy relation
-        String stmt = "SELECT FROM (TRAVERSE inE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'isAbstractedBy'";
-        Map<String, Object> params = new HashMap<>();
-        params.put("identifier", modelIdentifier);
-        OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "isAbstractedBy"));
 
-        return elements;
-    }
-
-    /**
-     * This method fetches the edges between the concrete and sequence layers.
-     * @param modelIdentifier
-     * @param db
-     * @return
-     */
-    private List<Element> fetchConcreteSequenceConnectors(String modelIdentifier, ODatabaseSession db) {
-        ArrayList<Element> elements = new ArrayList<>();
-
-        // accessed relation
-        String stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').inE('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'Accessed'";
-        Map<String, Object> params = new HashMap<>();
-        params.put("identifier", modelIdentifier);
-        OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchEdges(resultSet, "Accessed"));
-
-        return elements;
-    }
 
     /**
      * This method transforms a resultset of nodes into elements.

@@ -51,7 +51,7 @@ public class TransitionEncoding {
         this.encodedAPConjunct = encodedAPConjunct;
 
     }
-    public void setDeterministicAPConjunct(List<String> modelAPs, List<String> stateAPs){
+    public void setEncodedTransitionConjunct(List<String> modelAPs, List<String> stateAPs){
         StringBuilder encodedresult= new StringBuilder();
 
         int i=0;

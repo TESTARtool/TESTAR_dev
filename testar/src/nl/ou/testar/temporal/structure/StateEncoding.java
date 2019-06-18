@@ -57,10 +57,10 @@ public class StateEncoding {
         return result;
     }
 
-    public void setEncodedAPConjuncts(List<String> modelAPs) {
+    public void updateAllTransitionConjuncts(List<String> modelAPs) {
 
         for (TransitionEncoding trans : transitionColl) {
-            trans.setDeterministicAPConjunct(modelAPs, stateAPs);
+            trans.setEncodedTransitionConjunct(modelAPs, stateAPs);
 
         }
     }
