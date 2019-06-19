@@ -44,6 +44,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StateFetcher implements Callable<UIAState>{
 	
@@ -347,11 +348,24 @@ public class StateFetcher implements Callable<UIAState>{
 			modalElement = markModal(uiaElement);
 		}
 
-		// get pattern availability properties (these specify if certain control patterns are available in the uia element
-		for (long availabilityProperty : UIAMapping.getPatternPropertyIds()) {
-			Object object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, availabilityProperty, true);
-			uiaElement.set(UIAMapping.getMappedPatternAvailabilityTag(availabilityProperty), object instanceof Boolean && (Boolean)object);
+		// get the active pattern availability properties (these specify if certain control patterns are available in the uia element
+		for(Tag<Boolean> availabilityTag : UIATags.getPatternAvailabilityTags().stream().filter(UIATags::tagIsActive).collect(Collectors.toSet())) {
+			Object object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPropertyIdForAvailabityTag(availabilityTag), true);
+			uiaElement.set(availabilityTag, object instanceof Boolean && (Boolean)object);
+
+			// if a pattern is present, we also want to store the properties that are specific to that pattern
+			if (uiaElement.get(availabilityTag)) {
+				// get the active child tags for this pattern
+				for(Tag<?> patternPropertyTag : UIATags.getChildTags(availabilityTag).stream().filter(UIATags::tagIsActive).collect(Collectors.toSet())) {
+					long patternPropertyId = UIAMapping.getPatternPropertyIdentifier(patternPropertyTag);
+					object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
+					if (object != null) {
+						setConvertedObjectValue(patternPropertyTag, object, uiaElement);
+					}
+				}
+			}
 		}
+
 
 		// get some non-cached property values for elements implementing the scroll pattern
 		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsScrollPatternAvailablePropertyId, true); //true);
@@ -581,6 +595,10 @@ public class StateFetcher implements Callable<UIAState>{
 		element.backRef = w;
 		for(UIAElement child : element.children)
 			createWidgetTree(w, child);
+	}
+
+	private <T> void setConvertedObjectValue(Tag<T> tag, Object object, UIAElement uiaElement) {
+		uiaElement.set(tag, (T) object);
 	}
 	
 }

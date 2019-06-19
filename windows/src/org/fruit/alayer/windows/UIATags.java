@@ -784,8 +784,8 @@ public final class UIATags extends TagsBase {
 	public static final Tag<Boolean> UIAWindowCanMinimize = from("UIAWindowCanMinimize", Boolean.class);
 	public static final Tag<Boolean> UIAWindowIsModal = from("UIAWindowIsModal", Boolean.class);
 	public static final Tag<Boolean> UIAWindowIsTopmost = from("UIAWindowIsTopmost", Boolean.class);
-	public static final Tag<Integer> UIAWindowWindowInteractionState = from("UIAWindowWindowInteractionState", Integer.class); // check
-	public static final Tag<Integer> UIAWindowWindowVisualState = from("UIAWindowWindowVisualState", Integer.class); // check
+	public static final Tag<Long> UIAWindowWindowInteractionState = from("UIAWindowWindowInteractionState", Long.class); // check
+	public static final Tag<Long> UIAWindowWindowVisualState = from("UIAWindowWindowVisualState", Long.class); // check
 
 	// a mapping from the state management tags to windows automation tags
 	private static Map<Tag<?>, Tag<?>> stateTagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
@@ -809,6 +809,47 @@ public final class UIATags extends TagsBase {
 			put(WidgetPath, Tags.Path);
 		}
 	};
+
+	private static Set<Tag<Boolean>> patternAvailabilityTags = new HashSet<Tag<Boolean>>() {
+		{
+			add(UIAIsAnnotationPatternAvailable);
+			add(UIAIsDockPatternAvailable);
+			add(UIAIsDragPatternAvailable);
+			add(UIAIsDropTargetPatternAvailable);
+			add(UIAIsExpandCollapsePatternAvailable);
+			add(UIAIsGridItemPatternAvailable);
+			add(UIAIsGridPatternAvailable);
+			add(UIAIsInvokePatternAvailable);
+			add(UIAIsItemContainerPatternAvailable);
+			add(UIAIsLegacyIAccessiblePatternAvailable);
+			add(UIAIsMultipleViewPatternAvailable);
+			add(UIAIsObjectModelPatternAvailable);
+			add(UIAIsRangeValuePatternAvailable);
+			add(UIAIsScrollItemPatternAvailable);
+			add(UIAIsScrollPatternAvailable);
+			add(UIAIsSelectionItemPatternAvailable);
+			add(UIAIsSelectionPatternAvailable);
+			add(UIAIsSpreadsheetPatternAvailable);
+			add(UIAIsSpreadsheetItemPatternAvailable);
+			add(UIAIsStylesPatternAvailable);
+			add(UIAIsSynchronizedInputPatternAvailable);
+			add(UIAIsTableItemPatternAvailable);
+			add(UIAIsTablePatternAvailable);
+			add(UIAIsTextChildPatternAvailable);
+			add(UIAIsTextPatternAvailable);
+			add(UIAIsTextPattern2Available);
+			add(UIAIsTogglePatternAvailable);
+			add(UIAIsTransformPatternAvailable);
+			add(UIAIsTransformPattern2Available);
+			add(UIAIsValuePatternAvailable);
+			add(UIAIsVirtualizedItemPatternAvailable);
+			add(UIAIsWindowPatternAvailable);
+		}
+	};
+
+	public static Set<Tag<Boolean>> getPatternAvailabilityTags() {
+		return patternAvailabilityTags;
+	}
 
 	// we need a mapping from a control pattern availability tag to its children
 	private static Map<Tag<?>, Set<Tag<?>>> controlPatternChildMapping = new HashMap<Tag<?>, Set<Tag<?>>>() {
@@ -1055,38 +1096,38 @@ public final class UIATags extends TagsBase {
 	// a mapping from a tag to its active state
 	private static Map<Tag<?>, Boolean> tagActiveMapping = new HashMap<Tag<?>, Boolean>() {
 		{
-			put(UIAIsAnnotationPatternAvailable, false);
-			put(UIAIsDockPatternAvailable, false);
-			put(UIAIsDragPatternAvailable, false);
-			put(UIAIsDropTargetPatternAvailable, false);
-			put(UIAIsExpandCollapsePatternAvailable, false);
-			put(UIAIsGridItemPatternAvailable, false);
-			put(UIAIsGridPatternAvailable, false);
-			put(UIAIsInvokePatternAvailable, false);
-			put(UIAIsItemContainerPatternAvailable, false);
-			put(UIAIsLegacyIAccessiblePatternAvailable, false);
-			put(UIAIsMultipleViewPatternAvailable, false);
-			put(UIAIsObjectModelPatternAvailable, false);
-			put(UIAIsRangeValuePatternAvailable, false);
-			put(UIAIsScrollItemPatternAvailable, false);
-			put(UIAIsScrollPatternAvailable, false);
-			put(UIAIsSelectionItemPatternAvailable, false);
-			put(UIAIsSelectionPatternAvailable, false);
-			put(UIAIsSpreadsheetPatternAvailable, false);
-			put(UIAIsSpreadsheetItemPatternAvailable, false);
-			put(UIAIsStylesPatternAvailable, false);
-			put(UIAIsSynchronizedInputPatternAvailable, false);
-			put(UIAIsTableItemPatternAvailable, false);
-			put(UIAIsTablePatternAvailable, false);
-			put(UIAIsTextChildPatternAvailable, false);
-			put(UIAIsTextPatternAvailable, false);
-			put(UIAIsTextPattern2Available, false);
-			put(UIAIsTogglePatternAvailable, false);
-			put(UIAIsTransformPatternAvailable, false);
-			put(UIAIsTransformPattern2Available, false);
-			put(UIAIsValuePatternAvailable, false);
-			put(UIAIsVirtualizedItemPatternAvailable, false);
-			put(UIAIsWindowPatternAvailable, false);
+			put(UIAIsAnnotationPatternAvailable, true);
+			put(UIAIsDockPatternAvailable, true);
+			put(UIAIsDragPatternAvailable, true);
+			put(UIAIsDropTargetPatternAvailable, true);
+			put(UIAIsExpandCollapsePatternAvailable, true);
+			put(UIAIsGridItemPatternAvailable, true);
+			put(UIAIsGridPatternAvailable, true);
+			put(UIAIsInvokePatternAvailable, true);
+			put(UIAIsItemContainerPatternAvailable, true);
+			put(UIAIsLegacyIAccessiblePatternAvailable, true);
+			put(UIAIsMultipleViewPatternAvailable, true);
+			put(UIAIsObjectModelPatternAvailable, true);
+			put(UIAIsRangeValuePatternAvailable, true);
+			put(UIAIsScrollItemPatternAvailable, true);
+			put(UIAIsScrollPatternAvailable, true);
+			put(UIAIsSelectionItemPatternAvailable, true);
+			put(UIAIsSelectionPatternAvailable, true);
+			put(UIAIsSpreadsheetPatternAvailable, true);
+			put(UIAIsSpreadsheetItemPatternAvailable, true);
+			put(UIAIsStylesPatternAvailable, true);
+			put(UIAIsSynchronizedInputPatternAvailable, true);
+			put(UIAIsTableItemPatternAvailable, true);
+			put(UIAIsTablePatternAvailable, true);
+			put(UIAIsTextChildPatternAvailable, true);
+			put(UIAIsTextPatternAvailable, true);
+			put(UIAIsTextPattern2Available, true);
+			put(UIAIsTogglePatternAvailable, true);
+			put(UIAIsTransformPatternAvailable, true);
+			put(UIAIsTransformPattern2Available, true);
+			put(UIAIsValuePatternAvailable, true);
+			put(UIAIsVirtualizedItemPatternAvailable, true);
+			put(UIAIsWindowPatternAvailable, true);
 			put(UIAAnnotationAnnotationTypeId, false);
 			put(UIAAnnotationAnnotationTypeName, false);
 			put(UIAAnnotationAuthor, false);
@@ -1165,12 +1206,12 @@ public final class UIATags extends TagsBase {
 			put(UIATransform2ZoomMinimum, false);
 			put(UIAValueIsReadOnly, false);
 			put(UIAValueValue, false);
-			put(UIAWindowCanMaximize, false);
-			put(UIAWindowCanMinimize, false);
-			put(UIAWindowIsModal, false);
-			put(UIAWindowIsTopmost, false);
-			put(UIAWindowWindowInteractionState, false);
-			put(UIAWindowWindowVisualState, false);
+			put(UIAWindowCanMaximize, true);
+			put(UIAWindowCanMinimize, true);
+			put(UIAWindowIsModal, true);
+			put(UIAWindowIsTopmost, true);
+			put(UIAWindowWindowInteractionState, true);
+			put(UIAWindowWindowVisualState, true);
 		}
 	};
 
