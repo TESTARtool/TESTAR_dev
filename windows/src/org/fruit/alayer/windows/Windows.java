@@ -154,7 +154,7 @@ public final class Windows{
 	public static final long UIA_RuntimeIdPropertyId = 30000;
 	public static final long UIA_ProviderDescriptionPropertyId = 30107;
 
-
+	// control pattern property ids
 	public static final long UIA_AnnotationAnnotationTypeIdPropertyId	= 30113;
 	public static final long UIA_AnnotationAnnotationTypeNamePropertyId	= 30114;
 	public static final long UIA_AnnotationAuthorPropertyId	= 30115;

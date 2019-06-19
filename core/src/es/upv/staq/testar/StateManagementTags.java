@@ -61,6 +61,7 @@ public class StateManagementTags {
     // the path in the widget tree that leads to the widget
     public static final Tag<String> WidgetPath = Tag.from("Path to the widget", String.class);
 
+
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
         {

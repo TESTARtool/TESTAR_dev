@@ -34,15 +34,16 @@
 
 package org.fruit.alayer.windows;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.fruit.alayer.Rect;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.TagsBase;
-import es.upv.staq.testar.StateManagementTags;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static es.upv.staq.testar.StateManagementTags.*;
 
@@ -621,12 +622,120 @@ public final class UIATags extends TagsBase {
 
 
 	 */
+	
+	////////// PATTERN AVAILABILITY PROPERTIES ////////////
+	public static final Tag<Boolean> UIAIsAnnotationPatternAvailable = from("UIAIsAnnotationPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsDockPatternAvailable = from("UIAIsDockPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsDragPatternAvailable = from("UIAIsDragPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsDropTargetPatternAvailable = from("UIAIsDropTargetPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsExpandCollapsePatternAvailable = from("UIAIsExpandCollapsePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsGridItemPatternAvailable = from("UIAIsGridItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsGridPatternAvailable = from("UIAIsGridPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsInvokePatternAvailable = from("UIAIsInvokePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsItemContainerPatternAvailable = from("UIAIsItemContainerPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsLegacyIAccessiblePatternAvailable = from("UIAIsLegacyIAccessiblePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsMultipleViewPatternAvailable = from("UIAIsMultipleViewPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsObjectModelPatternAvailable = from("UIAIsObjectModelPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsRangeValuePatternAvailable = from("UIAIsRangeValuePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsScrollItemPatternAvailable = from("UIAIsScrollItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsScrollPatternAvailable = from("UIAIsScrollPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsSelectionItemPatternAvailable = from("UIAIsSelectionItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsSelectionPatternAvailable = from("UIAIsSelectionPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsSpreadsheetPatternAvailable = from("UIAIsSpreadsheetPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsSpreadsheetItemPatternAvailable = from("UIAIsSpreadsheetItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsStylesPatternAvailable = from("UIAIsStylesPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsSynchronizedInputPatternAvailable = from("UIAIsSynchronizedInputPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTableItemPatternAvailable = from("UIAIsTableItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTablePatternAvailable = from("UIAIsTablePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTextChildPatternAvailable = from("UIAIsTextChildPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTextPatternAvailable = from("UIAIsTextPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTextPattern2Available = from("UIAIsTextPattern2Available", Boolean.class);
+	public static final Tag<Boolean> UIAIsTogglePatternAvailable = from("UIAIsTogglePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTransformPatternAvailable = from("UIAIsTransformPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsTransformPattern2Available = from("UIAIsTransformPattern2Available", Boolean.class);
+	public static final Tag<Boolean> UIAIsValuePatternAvailable = from("UIAIsValuePatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsVirtualizedItemPatternAvailable = from("UIAIsVirtualizedItemPatternAvailable", Boolean.class);
+	public static final Tag<Boolean> UIAIsWindowPatternAvailable = from("UIAIsWindowPatternAvailable", Boolean.class);
 
 	////////// PATTERN PROPERTIES  ///////////
+
+	// annotation pattern
+	public static final Tag<Integer> UIAAnnotationAnnotationTypeId = from("UIAAnnotationAnnotationTypeId", Integer.class);
+	public static final Tag<String>	UIAAnnotationAnnotationTypeName = from("UIAAnnotationAnnotationTypeName", String.class);
+	public static final Tag<String>	UIAAnnotationAuthor = from("UIAAnnotationAuthor", String.class);
+	public static final Tag<String> UIAAnnotationDateTime = from("UIAAnnotationDateTime", String.class);
+	public static final Tag<Integer> UIAnnotationTarget = from("UIAnnotationTarget", Integer.class);
+
+	// dock pattern
+	public static final Tag<Integer> UIADockDockPosition = from("UIADockDockPosition ", Integer.class);
+
+	// drag control pattern
+	public static final Tag<String> UIADragDropEffect = from("UIADragDropEffect", String.class);
+	public static final Tag<String> UIADragDropEffects = from("UIADragDropEffects", String.class);
+	public static final Tag<Boolean> UIADragIsGrabbed = from("UIADragIsGrabbed", Boolean.class);
+	public static final Tag<Integer> UIADragGrabbedItems = from("UIADragGrabbedItems", Integer.class);
+
+	// drop target control pattern
+	public static final Tag<String> UIADropTargetDropTargetEffect = from("UIADropTargetDropTargetEffect", String.class);
+	public static final Tag<Integer> UIADropTargetDropTargetEffects = from("UIADropTargetDropTargetEffects", Integer.class);
+
+	// expande/collapse pattern
+	public static final Tag<Integer> UIAExpandCollapseExpandCollapseState = from("UIAExpandCollapseExpandCollapseState", Integer.class);
+
+	// grid control pattern
+	public static final Tag<Integer> UIAGridColumnCount = from ("UIAGridColumnCount", Integer.class);
+	public static final Tag<Integer> UIAGridRowCount = from("UIAGridRowCount", Integer.class);
+
+	// grid item control pattern
+	public static final Tag<Integer> UIAGridItemColumn = from("UIAGridItemColumn", Integer.class);
+	public static final Tag<Integer> UIAGridItemColumnSpan = from("UIAGridItemColumnSpan", Integer.class);
+	public static final Tag<Integer> UIAGridItemContainingGrid = from("UIAGridItemContainingGrid", Integer.class);
+	public static final Tag<Integer> UIAGridItemRow = from("UIAGridItemRow", Integer.class);
+	public static final Tag<Integer> UIAGridItemRowSpan = from("UIAGridItemRowSpan", Integer.class);
+
+	// LegacyIAccessible control pattern
+	public static final Tag<Integer> UIALegacyIAccessibleChildId = from ("UIALegacyIAccessibleChildId", Integer.class);
+	public static final Tag<String> UIALegacyIAccessibleDefaultAction = from("UIALegacyIAccessibleDefaultAction", String.class);
+	public static final Tag<String> UIALegacyIAccessibleDescription = from("UIALegacyIAccessibleDescription", String.class);
+	public static final Tag<String> UIALegacyIAccessibleHelp = from("UIALegacyIAccessibleHelp", String.class);
+	public static final Tag<String> UIALegacyIAccessibleKeyboardShortcut = from("UIALegacyIAccessibleKeyboardShortcut", String.class);
+	public static final Tag<String> UIALegacyIAccessibleName = from("UIALegacyIAccessibleName", String.class);
+	public static final Tag<Integer> UIALegacyIAccessibleRole = from("UIALegacyIAccessibleRole", Integer.class);
+	public static final Tag<Integer> UIALegacyIAccessibleSelection = from("UIALegacyIAccessibleSelection", Integer.class); // list/array
+	public static final Tag<Integer> UIALegacyIAccessibleState = from("UIALegacyIAccessibleState", Integer.class);
+	public static final Tag<String> UIALegacyIAccessibleValue = from("UIALegacyIAccessibleValue", String. class);
+
+	// MultipleView control pattern
+	public static final Tag<Integer> UIAMultipleViewCurrentView = from("UIAMultipleViewCurrentView", Integer.class);
+	public static final Tag<Integer> UIAMultipleViewSupportedViews = from("UIAMultipleViewSupportedViews", Integer.class); // array
+
+	// range value control pattern
+	public static final Tag<Boolean> UIARangeValueIsReadOnly = from("UIARangeValueIsReadOnly", Boolean.class);
+	public static final Tag<Integer> UIARangeValueLargeChange = from("UIARangeValueLargeChange", Integer.class);
+	public static final Tag<Integer> UIARangeValueMaximum = from("UIARangeValueMaximum", Integer.class);
+	public static final Tag<Integer> UIARangeValueMinimum = from("UIARangeValueMinimum", Integer.class);
+	public static final Tag<Integer> UIARangeValueSmallChange = from("UIARangeValueSmallChange", Integer.class);
+	public static final Tag<Integer> UIARangeValueValue = from("UIARangeValueValue", Integer.class);
+
+	// selection control pattern
+	public static final Tag<Boolean> UIASelectionCanSelectMultiple = from("UIASelectionCanSelectMultiple", Boolean.class);
+	public static final Tag<Boolean> UIASelectionIsSelectionRequired = from("UIASelectionIsSelectionRequired", Boolean.class);
+	public static final Tag<Integer> UIASelectionSelection = from("UIASelectionSelection", Integer.class); // array
+
+	// selection item control pattern
+	public static final Tag<Boolean> UIASelectionItemIsSelected = from("UIASelectionItemIsSelected", Boolean.class);
+	public static final Tag<Integer> UIASelectionItemSelectionContainer = from("UIASelectionItemSelectionContainer", Integer.class);
+
+	// spreadsheet item control panel
+	public static final Tag<String> UIASpreadsheetItemFormula = from("UIASpreadsheetItemFormula", String.class);
+	public static final Tag<Integer> UIASpreadsheetItemAnnotationObjects = from("UIASpreadsheetItemAnnotationObjects", Integer.class); //array
+	public static final Tag<Integer> UIASpreadsheetItemAnnotationTypes = from("UIASpreadsheetItemAnnotationTypes", Integer.class); // array
+
+	// scroll pattern
 	public static final Tag<Boolean> UIAScrollPattern = from("UIAScrollPattern", Boolean.class);
-	//public static final Tag<int[]> UIAScrollbarInfo = from("UIAScrollbarInfo", int[].class);
-	//public static final Tag<int[]> UIAScrollbarInfoH = from("UIAScrollbarInfoH", int[].class);
-	//public static final Tag<int[]> UIAScrollbarInfoV = from("UIAScrollbarInfoV", int[].class);
+	public static final Tag<int[]> UIAScrollbarInfo = from("UIAScrollbarInfo", int[].class);
+	public static final Tag<int[]> UIAScrollbarInfoH = from("UIAScrollbarInfoH", int[].class);
+	public static final Tag<int[]> UIAScrollbarInfoV = from("UIAScrollbarInfoV", int[].class);
 	public static final Tag<Boolean> UIAHorizontallyScrollable = from("UIAHorizontallyScrollable", Boolean.class);
 	public static final Tag<Boolean> UIAVerticallyScrollable = from("UIAVerticallyScrollable", Boolean.class);
 	public static final Tag<Double> UIAScrollHorizontalViewSize = from("UIAScrollHorizontalViewSize", Double.class);
@@ -634,26 +743,299 @@ public final class UIATags extends TagsBase {
 	public static final Tag<Double> UIAScrollHorizontalPercent = from("UIAScrollHorizontalPercent", Double.class);
 	public static final Tag<Double> UIAScrollVerticalPercent = from("UIAScrollVerticalPercent", Double.class);
 
+	// styles control pattern
+	public static final Tag<String> UIAStylesExtendedProperties = from("UIAStylesExtendedProperties", String.class);
+	public static final Tag<Integer> UIAStylesFillColor = from("UIAStylesFillColor", Integer.class);
+	public static final Tag<Integer> UIAStylesFillPatternColor = from("UIAStylesFillPatternColor", Integer.class);
+	public static final Tag<String> UIAStylesFillPatternStyle = from("UIAStylesFillPatternStyle", String.class);
+	public static final Tag<String> UIAStylesShape = from("UIAStylesShape", String.class);
+	public static final Tag<Integer> UIAStylesStyleId = from("UIAStylesStyleId", Integer.class);
+	public static final Tag<String> UIAStylesStyleName = from("UIAStylesStyleName", String.class);
+
+	// table control pattern
+	public static final Tag<Integer> UIATableColumnHeaders = from("UIATableColumnHeaders", Integer.class); // array
+	public static final Tag<Integer> UIATableRowHeaders = from("UIATableRowHeaders", Integer.class); // array
+	public static final Tag<Integer> UIATableRowOrColumnMajor = from("UIATableRowOrColumnMajor", Integer.class);
+
+	// table item control panel
+	public static final Tag<Integer> UIATableItemColumnHeaderItems = from("UIATableItemColumnHeaderItems", Integer.class); // array
+	public static final Tag<Integer> UIATableItemRowHeaderItems = from("UIATableItemRowHeaderItems", Integer.class); //array
+
+	// toggle control pattern
+	public static final Tag<Integer> UIAToggleToggleState = from("UIAToggleToggleState", Integer.class);
+
+	// transform pattern
+	public static final Tag<Boolean> UIATransformCanMove = from("UIATransformCanMove", Boolean.class);
+	public static final Tag<Boolean> UIATransformCanResize = from("UIATransformCanResize", Boolean.class);
+	public static final Tag<Boolean> UIATransformCanRotate = from("UIATransformCanRotate", Boolean.class);
+
+	//transform 2 pattern
+	public static final Tag<Boolean> UIATransform2CanZoom = from("UIATransform2CanZoom", Boolean.class);
+	public static final Tag<Integer> UIATransform2ZoomLevel = from("UIATransform2ZoomLevel", Integer.class);
+	public static final Tag<Integer> UIATransform2ZoomMaximum = from("UIATransform2ZoomMaximum", Integer.class);
+	public static final Tag<Integer> UIATransform2ZoomMinimum = from("UIATransform2ZoomMinimum", Integer.class);
+
+	// Value control pattern
+	public static final Tag<Boolean> UIAValueIsReadOnly = from("UIAValueIsReadOnly", Boolean.class);
+	public static final Tag<String> UIAValueValue = from("UIAValueValue", String.class);
+
+	// window control pattern
+	public static final Tag<Boolean> UIAWindowCanMaximize = from("UIAWindowCanMaximize", Boolean.class);
+	public static final Tag<Boolean> UIAWindowCanMinimize = from("UIAWindowCanMinimize", Boolean.class);
+	public static final Tag<Boolean> UIAWindowIsModal = from("UIAWindowIsModal", Boolean.class);
+	public static final Tag<Boolean> UIAWindowIsTopmost = from("UIAWindowIsTopmost", Boolean.class);
+	public static final Tag<Integer> UIAWindowWindowInteractionState = from("UIAWindowWindowInteractionState", Integer.class); // check
+	public static final Tag<Integer> UIAWindowWindowVisualState = from("UIAWindowWindowVisualState", Integer.class); // check
+
 	// a mapping from the state management tags to windows automation tags
-	private static Map<Tag<?>, Tag<?>> tagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
+	private static Map<Tag<?>, Tag<?>> stateTagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
 	{
 		{
-			put(WidgetControlType, UIATags.UIAControlType);
-			put(WidgetWindowHandle, UIATags.UIANativeWindowHandle);
-			put(WidgetIsEnabled, UIATags.UIAIsEnabled);
-			put(WidgetTitle, UIATags.UIAName);
-			put(WidgetHelpText, UIATags.UIAHelpText);
-			put(WidgetAutomationId, UIATags.UIAAutomationId);
-			put(WidgetClassName, UIATags.UIAClassName);
-			put(WidgetFrameworkId, UIATags.UIAFrameworkId);
-			put(WidgetOrientationId, UIATags.UIAOrientation);
-			put(WidgetIsContentElement, UIATags.UIAOrientation);
-			put(WidgetIsControlElement, UIATags.UIAIsControlElement);
-			put(WidgetHasKeyboardFocus, UIATags.UIAHasKeyboardFocus);
-			put(WidgetIsKeyboardFocusable, UIATags.UIAIsKeyboardFocusable);
-			put(WidgetItemType, UIATags.UIAItemType);
-			put(WidgetItemStatus, UIATags.UIAItemStatus);
+			put(WidgetControlType, UIAControlType);
+			put(WidgetWindowHandle, UIANativeWindowHandle);
+			put(WidgetIsEnabled, UIAIsEnabled);
+			put(WidgetTitle, UIAName);
+			put(WidgetHelpText, UIAHelpText);
+			put(WidgetAutomationId, UIAAutomationId);
+			put(WidgetClassName, UIAClassName);
+			put(WidgetFrameworkId, UIAFrameworkId);
+			put(WidgetOrientationId, UIAOrientation);
+			put(WidgetIsContentElement, UIAOrientation);
+			put(WidgetIsControlElement, UIAIsControlElement);
+			put(WidgetHasKeyboardFocus, UIAHasKeyboardFocus);
+			put(WidgetIsKeyboardFocusable, UIAIsKeyboardFocusable);
+			put(WidgetItemType, UIAItemType);
+			put(WidgetItemStatus, UIAItemStatus);
 			put(WidgetPath, Tags.Path);
+		}
+	};
+
+	// we need a mapping from a control pattern availability tag to its children
+	private static Map<Tag<?>, Set<Tag<?>>> controlPatternChildMapping = new HashMap<Tag<?>, Set<Tag<?>>>() {
+		{
+			////////// PATTERN AVAILABILITY PROPERTIES ////////////
+			put(UIAIsAnnotationPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAAnnotationAnnotationTypeId);
+					add(UIAAnnotationAnnotationTypeName);
+					add(UIAAnnotationAuthor);
+					add(UIAAnnotationDateTime);
+					add(UIAnnotationTarget);
+				}
+			});
+			put(UIAIsDockPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIADockDockPosition);
+				}
+			});
+			put(UIAIsDragPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIADragDropEffect);
+					add(UIADragDropEffects);
+					add(UIADragIsGrabbed);
+					add(UIADragGrabbedItems);
+				}
+			});
+			put(UIAIsDropTargetPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIADropTargetDropTargetEffect);
+					add(UIADropTargetDropTargetEffects);
+				}
+			});
+			put(UIAIsExpandCollapsePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAExpandCollapseExpandCollapseState);
+				}
+			});
+			put(UIAIsGridItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAGridItemColumn);
+					add(UIAGridItemColumnSpan);
+					add(UIAGridItemContainingGrid);
+					add(UIAGridItemRow);
+					add(UIAGridItemRowSpan);
+				}
+			});
+			put(UIAIsGridPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAGridColumnCount);
+					add(UIAGridRowCount);
+				}
+			});
+			put(UIAIsInvokePatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsItemContainerPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsLegacyIAccessiblePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIALegacyIAccessibleChildId);
+					add(UIALegacyIAccessibleDefaultAction);
+					add(UIALegacyIAccessibleDescription);
+					add(UIALegacyIAccessibleHelp);
+					add(UIALegacyIAccessibleKeyboardShortcut);
+					add(UIALegacyIAccessibleName);
+					add(UIALegacyIAccessibleRole);
+					add(UIALegacyIAccessibleSelection);
+					add(UIALegacyIAccessibleState);
+					add(UIALegacyIAccessibleValue);
+				}
+			});
+			put(UIAIsMultipleViewPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAMultipleViewCurrentView);
+					add(UIAMultipleViewSupportedViews );
+				}
+			});
+			put(UIAIsObjectModelPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsRangeValuePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIARangeValueIsReadOnly);
+					add(UIARangeValueLargeChange);
+					add(UIARangeValueMaximum);
+					add(UIARangeValueMinimum);
+					add(UIARangeValueSmallChange);
+					add(UIARangeValueValue);
+				}
+			});
+			put(UIAIsScrollItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsScrollPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAScrollPattern);
+					add(UIAHorizontallyScrollable);
+					add(UIAVerticallyScrollable);
+					add(UIAScrollHorizontalViewSize);
+					add(UIAScrollVerticalViewSize);
+					add(UIAScrollHorizontalPercent);
+					add(UIAScrollVerticalPercent);
+					add(UIAScrollbarInfo);
+					add(UIAScrollbarInfoH);
+					add(UIAScrollbarInfoV);
+				}
+			});
+			put(UIAIsSelectionItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIASelectionItemIsSelected);
+					add(UIASelectionItemSelectionContainer);
+				}
+			});
+			put(UIAIsSelectionPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIASelectionCanSelectMultiple);
+					add(UIASelectionIsSelectionRequired);
+					add(UIASelectionSelection);
+				}
+			});
+			put(UIAIsSpreadsheetPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsSpreadsheetItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIASpreadsheetItemFormula);
+					add(UIASpreadsheetItemAnnotationObjects);
+					add(UIASpreadsheetItemAnnotationTypes);
+				}
+			});
+			put(UIAIsStylesPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAStylesExtendedProperties);
+					add(UIAStylesFillColor);
+					add(UIAStylesFillPatternColor);
+					add(UIAStylesFillPatternStyle);
+					add(UIAStylesShape);
+					add(UIAStylesStyleId);
+					add(UIAStylesStyleName);
+				}
+			});
+			put(UIAIsSynchronizedInputPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsTableItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIATableItemColumnHeaderItems);
+					add(UIATableItemRowHeaderItems);
+				}
+			});
+			put(UIAIsTablePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIATableColumnHeaders);
+					add(UIATableRowHeaders);
+					add(UIATableRowOrColumnMajor);
+				}
+			});
+			put(UIAIsTextChildPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsTextPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsTextPattern2Available, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsTogglePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAToggleToggleState);
+				}
+			});
+			put(UIAIsTransformPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIATransformCanMove);
+					add(UIATransformCanResize);
+					add(UIATransformCanRotate);
+				}
+			});
+			put(UIAIsTransformPattern2Available, new HashSet<Tag<?>>() {
+				{
+					add(UIATransform2CanZoom);
+					add(UIATransform2ZoomLevel);
+					add(UIATransform2ZoomMaximum);
+					add(UIATransform2ZoomMinimum);
+				}
+			});
+			put(UIAIsValuePatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAValueIsReadOnly);
+					add(UIAValueValue);
+				}
+			});
+			put(UIAIsVirtualizedItemPatternAvailable, new HashSet<Tag<?>>() {
+				{
+
+				}
+			});
+			put(UIAIsWindowPatternAvailable, new HashSet<Tag<?>>() {
+				{
+					add(UIAWindowCanMaximize);
+					add(UIAWindowCanMinimize);
+					add(UIAWindowIsModal);
+					add(UIAWindowIsTopmost);
+					add(UIAWindowWindowInteractionState);
+					add(UIAWindowWindowVisualState);
+				}
+			});
 		}
 	};
 
@@ -663,6 +1045,141 @@ public final class UIATags extends TagsBase {
 	 * @return
 	 */
 	public static <T> Tag<T> getMappedTag(Tag<T> mappedTag) {
-		return (Tag<T>) tagMappingWindows.getOrDefault(mappedTag, null);
+		return (Tag<T>) stateTagMappingWindows.getOrDefault(mappedTag, null);
 	}
+
+	public static Set<Tag<?>> getChildTags(Tag<?> patternAvailabilityTag) {
+		return controlPatternChildMapping.getOrDefault(patternAvailabilityTag, null);
+	}
+
+	// a mapping from a tag to its active state
+	private static Map<Tag<?>, Boolean> tagActiveMapping = new HashMap<Tag<?>, Boolean>() {
+		{
+			put(UIAIsAnnotationPatternAvailable, false);
+			put(UIAIsDockPatternAvailable, false);
+			put(UIAIsDragPatternAvailable, false);
+			put(UIAIsDropTargetPatternAvailable, false);
+			put(UIAIsExpandCollapsePatternAvailable, false);
+			put(UIAIsGridItemPatternAvailable, false);
+			put(UIAIsGridPatternAvailable, false);
+			put(UIAIsInvokePatternAvailable, false);
+			put(UIAIsItemContainerPatternAvailable, false);
+			put(UIAIsLegacyIAccessiblePatternAvailable, false);
+			put(UIAIsMultipleViewPatternAvailable, false);
+			put(UIAIsObjectModelPatternAvailable, false);
+			put(UIAIsRangeValuePatternAvailable, false);
+			put(UIAIsScrollItemPatternAvailable, false);
+			put(UIAIsScrollPatternAvailable, false);
+			put(UIAIsSelectionItemPatternAvailable, false);
+			put(UIAIsSelectionPatternAvailable, false);
+			put(UIAIsSpreadsheetPatternAvailable, false);
+			put(UIAIsSpreadsheetItemPatternAvailable, false);
+			put(UIAIsStylesPatternAvailable, false);
+			put(UIAIsSynchronizedInputPatternAvailable, false);
+			put(UIAIsTableItemPatternAvailable, false);
+			put(UIAIsTablePatternAvailable, false);
+			put(UIAIsTextChildPatternAvailable, false);
+			put(UIAIsTextPatternAvailable, false);
+			put(UIAIsTextPattern2Available, false);
+			put(UIAIsTogglePatternAvailable, false);
+			put(UIAIsTransformPatternAvailable, false);
+			put(UIAIsTransformPattern2Available, false);
+			put(UIAIsValuePatternAvailable, false);
+			put(UIAIsVirtualizedItemPatternAvailable, false);
+			put(UIAIsWindowPatternAvailable, false);
+			put(UIAAnnotationAnnotationTypeId, false);
+			put(UIAAnnotationAnnotationTypeName, false);
+			put(UIAAnnotationAuthor, false);
+			put(UIAAnnotationDateTime, false);
+			put(UIAnnotationTarget, false);
+			put(UIADockDockPosition, false);
+			put(UIADragDropEffect, false);
+			put(UIADragDropEffects, false);
+			put(UIADragIsGrabbed, false);
+			put(UIADragGrabbedItems, false);
+			put(UIADropTargetDropTargetEffect, false);
+			put(UIADropTargetDropTargetEffects, false);
+			put(UIAExpandCollapseExpandCollapseState, false);
+			put(UIAGridColumnCount, false);
+			put(UIAGridRowCount, false);
+			put(UIAGridItemColumn, false);
+			put(UIAGridItemColumnSpan, false);
+			put(UIAGridItemContainingGrid, false);
+			put(UIAGridItemRow, false);
+			put(UIAGridItemRowSpan, false);
+			put(UIALegacyIAccessibleChildId, false);
+			put(UIALegacyIAccessibleDefaultAction, false);
+			put(UIALegacyIAccessibleDescription, false);
+			put(UIALegacyIAccessibleHelp, false);
+			put(UIALegacyIAccessibleKeyboardShortcut, false);
+			put(UIALegacyIAccessibleName, false);
+			put(UIALegacyIAccessibleRole, false);
+			put(UIALegacyIAccessibleSelection, false);
+			put(UIALegacyIAccessibleState, false);
+			put(UIALegacyIAccessibleValue, false);
+			put(UIAMultipleViewCurrentView, false);
+			put(UIAMultipleViewSupportedViews, false);
+			put(UIARangeValueIsReadOnly, false);
+			put(UIARangeValueLargeChange, false);
+			put(UIARangeValueMaximum, false);
+			put(UIARangeValueMinimum, false);
+			put(UIARangeValueSmallChange, false);
+			put(UIARangeValueValue, false);
+			put(UIASelectionCanSelectMultiple, false);
+			put(UIASelectionIsSelectionRequired, false);
+			put(UIASelectionSelection, false);
+			put(UIASelectionItemIsSelected, false);
+			put(UIASelectionItemSelectionContainer, false);
+			put(UIASpreadsheetItemFormula, false);
+			put(UIASpreadsheetItemAnnotationObjects, false);
+			put(UIASpreadsheetItemAnnotationTypes, false);
+			put(UIAScrollPattern, false);
+			put(UIAScrollbarInfo, false);
+			put(UIAScrollbarInfoH, false);
+			put(UIAScrollbarInfoV, false);
+			put(UIAHorizontallyScrollable, false);
+			put(UIAVerticallyScrollable, false);
+			put(UIAScrollHorizontalViewSize, false);
+			put(UIAScrollVerticalViewSize, false);
+			put(UIAScrollHorizontalPercent, false);
+			put(UIAScrollVerticalPercent, false);
+			put(UIAStylesExtendedProperties, false);
+			put(UIAStylesFillColor, false);
+			put(UIAStylesFillPatternColor, false);
+			put(UIAStylesFillPatternStyle, false);
+			put(UIAStylesShape, false);
+			put(UIAStylesStyleId, false);
+			put(UIAStylesStyleName, false);
+			put(UIATableColumnHeaders, false);
+			put(UIATableRowHeaders, false);
+			put(UIATableRowOrColumnMajor, false);
+			put(UIATableItemColumnHeaderItems, false);
+			put(UIATableItemRowHeaderItems, false);
+			put(UIAToggleToggleState, false);
+			put(UIATransformCanMove, false);
+			put(UIATransformCanResize, false);
+			put(UIATransformCanRotate, false);
+			put(UIATransform2CanZoom, false);
+			put(UIATransform2ZoomLevel, false);
+			put(UIATransform2ZoomMaximum, false);
+			put(UIATransform2ZoomMinimum, false);
+			put(UIAValueIsReadOnly, false);
+			put(UIAValueValue, false);
+			put(UIAWindowCanMaximize, false);
+			put(UIAWindowCanMinimize, false);
+			put(UIAWindowIsModal, false);
+			put(UIAWindowIsTopmost, false);
+			put(UIAWindowWindowInteractionState, false);
+			put(UIAWindowWindowVisualState, false);
+		}
+	};
+
+	public static Set<Tag<?>> getAllActiveTags() {
+		return tagActiveMapping.keySet().stream().filter(tag -> tagActiveMapping.getOrDefault(tag, false)).collect(Collectors.toSet());
+	}
+
+	public static boolean tagIsActive(Tag<?> tag) {
+		return tagActiveMapping.getOrDefault(tag, false);
+	}
+
 }

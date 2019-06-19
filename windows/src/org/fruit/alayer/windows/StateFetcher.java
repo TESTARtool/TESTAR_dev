@@ -347,24 +347,30 @@ public class StateFetcher implements Callable<UIAState>{
 			modalElement = markModal(uiaElement);
 		}
 
+		// get pattern availability properties (these specify if certain control patterns are available in the uia element
+		for (long availabilityProperty : UIAMapping.getPatternPropertyIds()) {
+			Object object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, availabilityProperty, true);
+			uiaElement.set(UIAMapping.getMappedPatternAvailabilityTag(availabilityProperty), object instanceof Boolean && (Boolean)object);
+		}
+
 		// get some non-cached property values for elements implementing the scroll pattern
-		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsScrollPatternAvailablePropertyId, false); //true);
+		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsScrollPatternAvailablePropertyId, true); //true);
 		uiaElement.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
 		if (uiaElement.scrollPattern){
 			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_CLIENT);
 			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_HSCROLL);
 			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_VSCROLL);
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, true);
 			uiaElement.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollVerticallyScrollablePropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollVerticallyScrollablePropertyId, true);
 			uiaElement.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalViewSizePropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalViewSizePropertyId, true);
 			uiaElement.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalViewSizePropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalViewSizePropertyId, true);
 			uiaElement.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, true);
 			uiaElement.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
-			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId, false);
+			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId, true);
 			uiaElement.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
 		}
 		// end by urueda
