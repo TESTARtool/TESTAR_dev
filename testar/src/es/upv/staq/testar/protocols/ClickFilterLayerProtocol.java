@@ -39,11 +39,16 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.Canvas;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.monkey.DefaultProtocol;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
+
+import static java.awt.event.KeyEvent.VK_ALT;
+import static java.awt.event.KeyEvent.VK_CAPS_LOCK;
+import static java.awt.event.KeyEvent.VK_CONTROL;
+import static java.awt.event.KeyEvent.VK_SHIFT;
+import static java.awt.event.KeyEvent.VK_TAB;
 
 /**
  * Testing protocol enhancements to ease tester work.
@@ -60,7 +65,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	//pressing CAPS-LOCK + SHIFT and clicking on the widget
 
     private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
-    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VK_CAPS_LOCK);
     private boolean whiteTabuMode = false; // true => white, false = tabu
     private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
 
@@ -86,21 +91,21 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	 * @param key
 	 */
     @Override
-    public void keyDown(KBKeys key) {    	
+    public void keyDown(int key) {
         super.keyDown(key);        
         if (mode() == Modes.Spy){ 
-        	if (key == KBKeys.VK_CAPS_LOCK)
+        	if (key == VK_CAPS_LOCK)
         		displayWhiteTabu = !displayWhiteTabu;
-        	else if (key == KBKeys.VK_TAB)
+        	else if (key == VK_TAB)
         		preciseCoding = !preciseCoding;
-        	else if (key == KBKeys.VK_SHIFT)
+        	else if (key == VK_SHIFT)
         		shiftPressed = true;
-	    	else if (key == KBKeys.VK_CONTROL){
+	    	else if (key == VK_CONTROL){
 	    		ctrlPressed = true;
 	    		filterArea[0] = mouseX;
 	    		filterArea[1] = mouseY;
 	    	}
-	    	else if (key == KBKeys.VK_ALT){
+	    	else if (key == VK_ALT){
 	    		altPressed = true;
 			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
 //	    		if (!ctrlPressed && !shiftPressed)
@@ -110,17 +115,17 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
     }
 
     @Override
-    public void keyUp(KBKeys key) {    	
+    public void keyUp(int key) {
     	super.keyUp(key);
         if (mode() == Modes.Spy){
-        	if (key == KBKeys.VK_SHIFT)
+        	if (key == VK_SHIFT)
 	    		shiftPressed = false;
-        	else if (key == KBKeys.VK_CONTROL && displayWhiteTabu){
+        	else if (key == VK_CONTROL && displayWhiteTabu){
 	    		filterArea[2] = mouseX;
 	    		filterArea[3] = mouseY;
 	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
 	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == KBKeys.VK_ALT)
+	    	} else if (key == VK_ALT)
 	    		altPressed = false;
         }
     }

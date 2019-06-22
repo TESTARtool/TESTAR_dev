@@ -30,7 +30,6 @@
 
 package es.upv.staq.testar;
 
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 
 /**
@@ -41,9 +40,9 @@ import org.fruit.alayer.devices.MouseButtons;
  */
 public interface IEventListener {
 
-	public abstract void keyDown(KBKeys key);
+	public abstract void keyDown(int key);
 
-	public abstract void keyUp(KBKeys key);
+	public abstract void keyUp(int key);
 
 	public abstract void mouseDown(MouseButtons btn, double x, double y);
 

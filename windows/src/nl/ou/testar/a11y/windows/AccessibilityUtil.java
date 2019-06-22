@@ -39,7 +39,6 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.windows.UIATags;
 
 import java.awt.event.KeyEvent;
@@ -130,8 +129,6 @@ public final class AccessibilityUtil {
 
     private AccessibilityUtil() {
     }
-    private AccessibilityUtil() {
-    }
 
     /**
      * Compiles a compound action for the given shortcut key combination
@@ -182,10 +179,6 @@ public final class AccessibilityUtil {
     /**
      * Checks whether the given widget is relevant to accessibility evaluation
      * Checks whether the given widget is relevant to accessibility evaluation
-     *
-     * @param w The widget.
-     * @return True if the widget is relevant, else false.
-     */
      *
      * @param w The widget.
      * @return True if the widget is relevant, else false.

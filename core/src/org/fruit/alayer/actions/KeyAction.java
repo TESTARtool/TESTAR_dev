@@ -56,7 +56,6 @@ import static java.awt.event.KeyEvent.VK_NUMPAD9;
 
 /**
  * An action which presses a given Key on the Keyboard.
- *
  * @author Urko Rueda
  */
 public abstract class KeyAction extends TaggableBase implements Action {
@@ -70,29 +69,29 @@ public abstract class KeyAction extends TaggableBase implements Action {
     public abstract String toString();
 
     public final void run(SUT system, State state, double duration) {
-        try {
+        try{
             Assert.notNull(system);
             Util.pause(duration);
-			else
-                performKeyAction(system, key);
+            try {
+                performKeyAction(system,key);
             } catch (IllegalArgumentException e) {
                 altNumpad(system, Integer.toString(key));
             }
-        } catch (NoSuchTagException tue) {
+        }catch(NoSuchTagException tue){
             throw new ActionFailedException(tue);
         }
     }
 
     protected abstract void performKeyAction(SUT system, int key);
 
-    protected void altNumpad(SUT system, String numpadCodes) {
-        if (numpadCodes == null || !numpadCodes.matches("^\\d+$")) {
+    protected void altNumpad(SUT system, String numpadCodes){
+        if (numpadCodes == null || !numpadCodes.matches("^\\d+$")){
             System.out.println("Unknown key: " + numpadCodes);
             return;
         }
         Keyboard keyb = system.get(Tags.StandardKeyboard);
         keyb.press(VK_ALT);
-        for (char charater : numpadCodes.toCharArray()) {
+        for (char charater : numpadCodes.toCharArray()){
             int NUMPAD_KEY = getNumpad(charater);
             if (NUMPAD_KEY > -1) {
                 keyb.press(NUMPAD_KEY);
@@ -102,36 +101,25 @@ public abstract class KeyAction extends TaggableBase implements Action {
         keyb.release(VK_ALT);
     }
 
-    private int getNumpad(char numberChar) {
-        switch (numberChar) {
-            case '0':
-                return VK_NUMPAD0;
-            case '1':
-                return VK_NUMPAD1;
-            case '2':
-                return VK_NUMPAD2;
-            case '3':
-                return VK_NUMPAD3;
-            case '4':
-                return VK_NUMPAD4;
-            case '5':
-                return VK_NUMPAD5;
-            case '6':
-                return VK_NUMPAD6;
-            case '7':
-                return VK_NUMPAD7;
-            case '8':
-                return VK_NUMPAD8;
-            case '9':
-                return VK_NUMPAD9;
-            default:
-                System.out.println("AltNumpad - not a number 0-9: " + numberChar);
+    private int getNumpad(char numberChar){
+        switch (numberChar){
+            case '0' : return VK_NUMPAD0;
+            case '1' : return VK_NUMPAD1;
+            case '2' : return VK_NUMPAD2;
+            case '3' : return VK_NUMPAD3;
+            case '4' : return VK_NUMPAD4;
+            case '5' : return VK_NUMPAD5;
+            case '6' : return VK_NUMPAD6;
+            case '7' : return VK_NUMPAD7;
+            case '8' : return VK_NUMPAD8;
+            case '9' : return VK_NUMPAD9;
+            default  : System.out.println("AltNumpad - not a number 0-9: " + numberChar);
                 return -1;
         }
     }
 
     @Override
-    public String toShortString() {
+    public String toShortString(){
         Role r = get(Tags.Role, null);
         if (r != null)
             return r.toString();
@@ -140,7 +128,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
     }
 
     @Override
-    public String toParametersString() {
+    public String toParametersString(){
         return "(" + key + ")";
     }
 

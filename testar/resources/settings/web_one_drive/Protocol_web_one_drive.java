@@ -5,7 +5,7 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
-*
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  * this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
@@ -14,7 +14,7 @@
  * 3. Neither the name of the copyright holder nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
-*
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,22 +37,24 @@ import org.fruit.alayer.Role;
 import org.fruit.alayer.Roles;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Shape;
+import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.devices.AWTKeyboard;
-import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.alayer.Tags;
 import es.upv.staq.testar.NativeLinker;
 import org.testar.protocols.DesktopProtocol;
+
+import static java.awt.event.KeyEvent.VK_2;
+import static java.awt.event.KeyEvent.VK_SHIFT;
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.alayer.Tags.Enabled;
-import static org.fruit.alayer.Tags.Title;
 
 /**
  * This protocol is using the default Windows accessibility API (Windows UI Automation API) to test Web applications.
@@ -62,11 +64,11 @@ import static org.fruit.alayer.Tags.Title;
 public class Protocol_web_one_drive extends DesktopProtocol {
 
 	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
-    static final int BROWSER_IEXPLORER = 1;
-    static final int BROWSER_FIREFOX = 2;
-    static int browser; // BROWSER_*
-    static Role webController, webText; // browser dependent
-    static double browser_toolbar_filter;
+	static final int BROWSER_IEXPLORER = 1;
+	static final int BROWSER_FIREFOX = 2;
+	static int browser; // BROWSER_*
+	static Role webController, webText; // browser dependent
+	static double browser_toolbar_filter;
 
 	// check browser
 	private void initBrowser(){
@@ -87,7 +89,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
+	 * take care of
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
 	 *      out what executable to run)
 	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -114,10 +116,10 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 				executeAction(sut, state, ac.clickTypeInto(w, "testarhandson", true));
 
 				//Based on ENG Keyboard, Shift + 2 typing arroba character
-				kb.press(KBKeys.VK_SHIFT);
-				kb.press(KBKeys.VK_2);
-				kb.release(KBKeys.VK_2);
-				kb.release(KBKeys.VK_SHIFT);
+				kb.press(VK_SHIFT);
+				kb.press(VK_2);
+				kb.release(VK_2);
+				kb.release(VK_SHIFT);
 
 				executeAction(sut, state, ac.clickTypeInto(w, "gmail.com", false));
 
@@ -207,8 +209,8 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	/**
 	 * This method is called when TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
@@ -262,7 +264,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		}
 
-        return verdict;
+		return verdict;
 
 	}
 
@@ -294,9 +296,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
 							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));
 			}
-        } catch (NoSuchTagException nste) {
-            return Verdict.OK;
-        }
+		} catch (NoSuchTagException nste) { return Verdict.OK; }
 		return Verdict.OK;
 	}
 
@@ -313,21 +313,21 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		Set<Action> actions = super.deriveActions(system,state);
-        // unwanted processes, force SUT to foreground, ... actions automatically derived!
+		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
 		//----------------------
 		// BUILD CUSTOM ACTIONS
-		//----------------------		
+		//----------------------
 
 		// iterate through all widgets
 		for(Widget w : state){
 
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
-				if (!blackListed(w)){  // do not build actions for tabu widgets  
+				if (!blackListed(w)){  // do not build actions for tabu widgets
 
 					// create left clicks
 					if(whiteListed(w) || isClickable(w))
@@ -355,15 +355,15 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 
 		}
 
-        return actions;
-    }
+		return actions;
+	}
 
-    private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
+	private final int MAX_CLICKABLE_TITLE_LENGTH = 12;
 
 	@Override
-	protected boolean isClickable(Widget w){		
+	protected boolean isClickable(Widget w){
 		if (!isAtBrowserCanvas(w))
-			return false;	
+			return false;
 
 		String title = w.get(Title, "");
 		Role role = w.get(Tags.Role, Roles.Widget);
@@ -371,11 +371,11 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 			return super.isUnfiltered(w);
 		else
 			return super.isClickable(w);
-	} 	
+	}
 
 	private boolean isDoubleClickable(Widget w){
 		if (!isAtBrowserCanvas(w))
-			return false;	
+			return false;
 
 		if (isClickable(w)){
 			Widget wParent = w.parent();
@@ -387,12 +387,12 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		}
 
 		return false;
-	}	
+	}
 
 	@Override
 	protected boolean isTypeable(Widget w){
 		if (!isAtBrowserCanvas(w))
-			return false;	
+			return false;
 
 		Role role = w.get(Tags.Role, null);
 		if (role != null && Role.isOneOf(role, webText))
@@ -406,7 +406,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		if (shape != null && shape.y() > browser_toolbar_filter)
 			return true;
 		else
-			return false;		
+			return false;
 	}
 
 }
