@@ -36,6 +36,7 @@ package org.fruit.alayer.actions;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.devices.KBKeys;
 
 /**
  * An action which presses a given Key on the Keyboard.
@@ -45,7 +46,7 @@ public final class KeyDown extends //TaggableBase
 
 	private static final long serialVersionUID = -462251384755779329L;
 		
-	public KeyDown(int key){
+	public KeyDown(KBKeys key){
 		super(key);
 	}
 	
@@ -63,13 +64,13 @@ public final class KeyDown extends //TaggableBase
 	
 	// by urueda
 	@Override
-	protected void performKeyAction(SUT system, int key) {
+	protected void performKeyAction(SUT system, KBKeys key) {		
 		system.get(Tags.StandardKeyboard).press(key);		
 	}
 	
 	@Override
 	public boolean equals(Object o) {
-		return o == this || (o instanceof KeyDown && this.key == ((KeyDown)o).key);
+		return o == this || (o instanceof KeyDown && this.key.equals(((KeyDown)o).key));
 	}
 	
 }

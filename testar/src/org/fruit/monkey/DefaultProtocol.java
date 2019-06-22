@@ -96,6 +96,7 @@ import org.fruit.alayer.Visualizer;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.*;
 import org.fruit.alayer.devices.AWTMouse;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.devices.MouseButtons;
 import org.fruit.alayer.exceptions.ActionBuildException;
@@ -114,57 +115,22 @@ import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-
-import static java.awt.event.KeyEvent.VK_ESCAPE;
-import static org.fruit.alayer.Tags.ActionDelay;
-import static org.fruit.alayer.Tags.ActionDuration;
-import static org.fruit.alayer.Tags.ActionSet;
-import static org.fruit.alayer.Tags.Desc;
-import static org.fruit.alayer.Tags.ExecutedAction;
-import static org.fruit.alayer.Tags.IsRunning;
-import static org.fruit.alayer.Tags.OracleVerdict;
-import static org.fruit.alayer.Tags.SystemState;
-import static org.fruit.alayer.Tags.Title;
-import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
+import org.testar.OutputStructure;
 
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
-    public static boolean faultySequence;
-    private State stateForClickFilterLayerProtocol;
+	public static boolean faultySequence;
+	private State stateForClickFilterLayerProtocol;
 
-    public State getStateForClickFilterLayerProtocol() {
-        return stateForClickFilterLayerProtocol;
-    }
+	public State getStateForClickFilterLayerProtocol() {
+		return stateForClickFilterLayerProtocol;
+	}
 
-    public void setStateForClickFilterLayerProtocol(State stateForClickFilterLayerProtocol) {
-        this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
-    }
+	public void setStateForClickFilterLayerProtocol(State stateForClickFilterLayerProtocol) {
+		this.stateForClickFilterLayerProtocol = stateForClickFilterLayerProtocol;
+	}
 
-    private String generatedSequence;
+	private String generatedSequence;
 
 	public String getGeneratedSequenceName() {
 		return generatedSequence;
@@ -412,7 +378,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
 			//INDEXLOG.error("Exception: ",e);
 
-			return false;
+			return false;	
 		}
 
 		return true;
@@ -446,12 +412,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String path = settings.get(ConfigTags.PathToReplaySequence);
 		if(path.contains(".testar")) {
 			path = path.replace(".testar", ".html");
-
+			
 			int startIndex = path.indexOf(File.separator + "sequences");
 			int endIndex = path.indexOf(File.separator, startIndex+2);
-
+			
 			String replace = path.substring(startIndex, endIndex+1);
-
+			
 			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
@@ -492,7 +458,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-		String generatedSequenceName = OutputStructure.sequencesOutputDir
+		String generatedSequenceName = OutputStructure.sequencesOutputDir 
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
@@ -613,8 +579,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
 		}
 
 	}
@@ -646,8 +612,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
+		} catch (IOException e2) {	
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
 		}
 	}
 
@@ -811,7 +777,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// THERE MUST ALMOST BE ONE ACTION!
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
+				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 				CodingManager.buildIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
@@ -923,7 +889,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Saving the action information into the logs
-	 *
+	 * 
 	 * @param state
 	 * @param action
 	 * @param actionMode
@@ -948,7 +914,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
-		//bin folder
+		//bin folder 
 		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
 				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
 
@@ -1077,7 +1043,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				// THERE MUST ALMOST BE ONE ACTION!
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
-                Action escAction = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
+				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 				CodingManager.buildIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
@@ -1395,7 +1361,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							printSutInfo = "Waiting for the SUT to be accessible ...";
 							FlashFeedback.flash(printSutInfo, 500);
 						}
-						Util.pauseMs(500);
+						Util.pauseMs(500);				
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
 					if (sut.isRunning())
 						sut.stop();
@@ -1408,7 +1374,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
 						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
 					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
+						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
 		}
 	}
 
@@ -1442,7 +1408,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
+		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
 	}
 
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
@@ -1472,7 +1438,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");
+		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
 	}
 
 	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
@@ -1545,7 +1511,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Assert.notNull(state);
 		//-------------------
 		// ORACLES FOR FREE
-		//-------------------
+		//-------------------		
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
@@ -1602,7 +1568,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
-		Set<Action> actions = new HashSet<Action>();
+		Set<Action> actions = new HashSet<Action>();	
 
 		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
@@ -1680,7 +1646,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		else if (this.forceNextActionESC){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-            Action a = new AnnotatingActionCompiler().hitKey(VK_ESCAPE);
+			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
 			CodingManager.buildIDs(state, a);
 			this.forceNextActionESC = false;
 			return a;
@@ -1845,7 +1811,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
+		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&
@@ -1933,8 +1899,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
 				return null;
 			}
-        } else if (userEvent[0] instanceof Integer) // key events
-            return (new AnnotatingActionCompiler()).hitKey((int) userEvent[0]);
+		} else if (userEvent[0] instanceof KBKeys) // key events
+			return (new AnnotatingActionCompiler()).hitKey((KBKeys)userEvent[0]);
 		else if (userEvent[0] instanceof String){ // type events
 			if (lastExecutedAction == null)
 				return null;

@@ -33,7 +33,12 @@
  */
 package org.fruit.alayer.windows;
 
-import es.upv.staq.testar.serialisation.LogSerialiser;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Util;
@@ -44,19 +49,13 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.AWTMouse;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import static java.awt.event.KeyEvent.VK_ALT;
-import static java.awt.event.KeyEvent.VK_TAB;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 
 public final class WinProcess extends SUTBase {
 
@@ -72,13 +71,13 @@ public final class WinProcess extends SUTBase {
 		int cnt = 0;
 		while(!isForeground(pid) && cnt < maxTries && isRunning(pid)){
 			cnt++;
-            kb.press(VK_ALT);
+			kb.press(KBKeys.VK_ALT);
 
 			for(int i = 0; i < cnt && isRunning(pid); i++){
-                kb.press(VK_TAB);
-                kb.release(VK_TAB);
-            }
-            kb.release(VK_ALT);
+				kb.press(KBKeys.VK_TAB);
+				kb.release(KBKeys.VK_TAB);
+			}
+			kb.release(KBKeys.VK_ALT);
 			Util.pause(foregroundEstablishTime);
 		}	
 

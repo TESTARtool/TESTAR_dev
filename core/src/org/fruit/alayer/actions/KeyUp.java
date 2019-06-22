@@ -36,6 +36,7 @@ package org.fruit.alayer.actions;
 import org.fruit.alayer.Role;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.devices.KBKeys;
 
 /**
  * An action which releases a given Key on the Keyboard.
@@ -45,7 +46,7 @@ public final class KeyUp extends //TaggableBase
 	
 	private static final long serialVersionUID = -7035337967443813849L;
 
-	public KeyUp(int key){
+	public KeyUp(KBKeys key){
 		super(key);
 	}
 	
@@ -63,7 +64,7 @@ public final class KeyUp extends //TaggableBase
 	
 	// by urueda
 	@Override
-	protected void performKeyAction(SUT system, int key) {
+	protected void performKeyAction(SUT system, KBKeys key) {
 		system.get(Tags.StandardKeyboard).release(key);		
 	}
 
@@ -73,7 +74,7 @@ public final class KeyUp extends //TaggableBase
 	
 	@Override
 	public boolean equals(Object o) {
-		return o == this || (o instanceof KeyUp && this.key == ((KeyUp)o).key);
+		return o == this || (o instanceof KeyUp && this.key.equals(((KeyUp)o).key));
 	}
 
 }

@@ -43,41 +43,46 @@ public class AccessibilityUtilTest {
 		
 		// single keys
 		exp =
-				"(70)" // press
-				+ "(70)"; // release
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_F").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("  VK_F  ").toParametersString());
+				"(VK_F)" // press
+				+ "(VK_F)"; // release
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("F").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("  F  ").toParametersString());
 		exp =
-				"(27)" // press
-				+ "(27)"; // release
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_ESCAPE").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("vk_escape").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_ESCAPE").toParametersString());
+				"(VK_ESCAPE)" // press
+				+ "(VK_ESCAPE)"; // release
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("ESC").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("esc").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Escape").toParametersString());
 		exp =
-				"(17)" // press
-				+ "(17)"; // release
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL").toParametersString());
+				"(VK_CONTROL)" // press
+				+ "(VK_CONTROL)"; // release
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Ctrl").toParametersString());
 		
 		// key combinations
 		exp =
-				"(17)(16)(70)" // press
-				+ "(70)(16)(17)"; // release
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_F").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("  VK_CONTROL+VK_SHIFT+VK_F  ").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_F").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_F").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_F").toParametersString());
+				"(VK_CONTROL)(VK_SHIFT)(VK_F)" // press
+				+ "(VK_F)(VK_SHIFT)(VK_CONTROL)"; // release
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Ctrl+Shift+F").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("  Ctrl+Shift+F  ").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("ctrl+shift+f").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("CTRL+SHIFT+F").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Control+Shift+F").toParametersString());
 		
 		// keys that have different symbols when Shift is pressed
 		exp =
-				"(17)(16)(91)" // press
-				+ "(91)(16)(17)"; // release
+				"(VK_CONTROL)(VK_SHIFT)(VK_OPEN_BRACKET)" // press
+				+ "(VK_OPEN_BRACKET)(VK_SHIFT)(VK_CONTROL)"; // release
 		// the Action should send the non-Shift'ed key
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_OPEN_BRACKET").toParametersString());
-		assertEquals(exp, AccessibilityUtil.parseShortcutKey("VK_CONTROL+VK_SHIFT+VK_OPEN_BRACKET").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Control+Shift+[").toParametersString());
+		assertEquals(exp, AccessibilityUtil.parseShortcutKey("Control+Shift+{").toParametersString());
 		
 		// invalid strings
-		assertNull(AccessibilityUtil.parseShortcutKey("  "));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("  "));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("FF"));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("f0"));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("Ctrl-Shift-F"));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("Ctrl+Shift+FF"));
+		assertEquals(null, AccessibilityUtil.parseShortcutKey("Ctrl+Shift++F"));
 	}
 
 }

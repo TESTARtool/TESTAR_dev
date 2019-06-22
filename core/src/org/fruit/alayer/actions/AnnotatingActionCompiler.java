@@ -45,6 +45,7 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.StrokeCaps;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
+import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.visualizers.EllipseVisualizer;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.visualizers.TextVisualizer;
@@ -207,7 +208,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	}
 	
 	@Override
-	public Action hitKey(int key){
+	public Action hitKey(KBKeys key){
 		Action ret = super.hitKey(key);
 		ret.set(Tags.Desc, "Hit Key " + key);
 		ret.set(Tags.Role, ActionRoles.HitKey);		
@@ -215,7 +216,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 	}
 	
 	@Override
-	public Action hitShortcutKey(List<Integer> keys){
+	public Action hitShortcutKey(List<KBKeys> keys){
 		Action ret = super.hitShortcutKey(keys);
 		String keysString = "";
 		for (int i = 0; i < keys.size(); i++)
