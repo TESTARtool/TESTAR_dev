@@ -1,6 +1,5 @@
-package nl.ou.testar.tl;
+package nl.ou.testar.temporal.scratch.tl;
 
-import java.util.*;
 import java.io.*;
 class StreamConsumer extends Thread
 {

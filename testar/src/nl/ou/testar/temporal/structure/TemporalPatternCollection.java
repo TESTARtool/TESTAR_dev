@@ -1,5 +1,7 @@
 package nl.ou.testar.temporal.structure;
 
+import nl.ou.testar.temporal.scratch.TemporalPattern;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

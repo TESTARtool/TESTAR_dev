@@ -28,7 +28,7 @@
 *******************************************************************************************************/
 
 
-package nl.ou.testar.tl;
+package nl.ou.testar.temporal.scratch.tl;
 
 import org.fruit.monkey.Settings;
 

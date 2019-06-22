@@ -1,30 +1,49 @@
 package nl.ou.testar.temporal.structure;
 
-import nl.ou.testar.temporal.util.TemporalType;
+import com.opencsv.bean.CsvBindAndSplitByName;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
+import nl.ou.testar.temporal.util.CSVConvertValStatus;
+import nl.ou.testar.temporal.util.CSVConvertVerdict;
 import nl.ou.testar.temporal.util.ValStatus;
 import nl.ou.testar.temporal.util.Verdict;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-public class TemporalOracle implements Cloneable{
+public class TemporalOracle extends TemporalPattern{
 
-
-
-    private long id;// sequential nr
-    private TemporalType temporalType;
-    private String alias; //short description e.g. spec pattern name
-    private String propertytemplate;  // e.g. G(b0->Fb1)
-    private Map<String, String> paramSubstitutions; //b25-> 'Button_OK_ParentTitle'
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> substitutions; //b0,b1,b2,bn; //b25-> 'Button_OK_ParentTitle'
+    @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus validationStatus;
+    @CsvCustomBindByName(converter = CSVConvertVerdict.class)
     private Verdict verdict;
+    @CsvBindByName
     private double traceSupport;
+    @CsvBindByName
     private double traceConfidence;
+    @CsvBindByName
     private double traceLift;
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> testsequenceIDs;
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> prefixOfRun; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> cycleOfRun;  // idem
+    @CsvBindByName
+    private String runDate;
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> log;
 
+
+    public List<String> getSubstitutions() {
+        return substitutions;
+    }
+
+    public void setSubstitutions(List<String> substitutions) {
+        this.substitutions = substitutions;
+    }
     public List<String> getTestsequenceIDs() {
         return testsequenceIDs;
     }
@@ -33,61 +52,7 @@ public class TemporalOracle implements Cloneable{
         this.testsequenceIDs = testsequenceIDs;
     }
 
-    private  List<String> testsequenceIDs;
-    private LinkedHashMap<String, String> prefixOfRun; //state -> edge->state-> etc
-    private LinkedHashMap<String, String> cycleOfRun;  // idem
-    private String runDate;
-    private List<String> log;
 
-
-    private List<String> comments;
-    private String modifieddate;
-
-
-    public TemporalOracle() {
-    }
-
-    public TemporalOracle(long id, TemporalType tlType, String alias, String propertypattern) {
-        this.id = id;
-        this.temporalType = tlType;
-        this.alias = alias;
-        this.propertytemplate = propertypattern;
-        this.log=new ArrayList<String>();
-        this.comments=new ArrayList<String>();
-        this.modifieddate= LocalDateTime.now().toString();
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public TemporalType getTemporalType() {
-        return temporalType;
-    }
-
-    public void setTemporalType(TemporalType temporalType) {
-        this.temporalType = temporalType;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getPropertytemplate() {
-        return propertytemplate;
-    }
-
-    public void setPropertytemplate(String propertytemplate) {
-        this.propertytemplate = propertytemplate;
-    }
 
     public ValStatus getValidationStatus() {
         return validationStatus;
@@ -129,19 +94,19 @@ public class TemporalOracle implements Cloneable{
         this.traceLift = traceLift;
     }
 
-    public LinkedHashMap<String, String> getPrefixOfRun() {
+    public List<String> getPrefixOfRun() {
         return prefixOfRun;
     }
 
-    public void setPrefixOfRun(LinkedHashMap<String, String> prefixOfRun) {
+    public void setPrefixOfRun(List<String> prefixOfRun) {
         this.prefixOfRun = prefixOfRun;
     }
 
-    public LinkedHashMap<String, String> getCycleOfRun() {
+    public List<String> getCycleOfRun() {
         return cycleOfRun;
     }
 
-    public void setCycleOfRun(LinkedHashMap<String, String> cycleOfRun) {
+    public void setCycleOfRun(List<String> cycleOfRun) {
         this.cycleOfRun = cycleOfRun;
     }
 
@@ -153,14 +118,6 @@ public class TemporalOracle implements Cloneable{
         this.runDate = runDate;
     }
 
-    public String getModifieddate() {
-        return modifieddate;
-    }
-
-    public void setModifieddate(String modifieddate) {
-        this.modifieddate = modifieddate;
-    }
-
     public List<String> getLog() {
         return log;
     }
@@ -169,9 +126,6 @@ public class TemporalOracle implements Cloneable{
         this.log = log;
     }
 
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
     public Object clone() throws            CloneNotSupportedException
     {
         return super.clone();

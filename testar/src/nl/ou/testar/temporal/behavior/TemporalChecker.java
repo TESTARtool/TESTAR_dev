@@ -1,7 +1,7 @@
 package nl.ou.testar.temporal.behavior;
 
 import nl.ou.testar.temporal.structure.TemporalModel;
-import nl.ou.testar.temporal.structure.TemporalOracle;
+import nl.ou.testar.temporal.scratch.TemporalOracle;
 import nl.ou.testar.temporal.structure.TemporalOracleCollection;
 import nl.ou.testar.temporal.util.JSONHandler;
 

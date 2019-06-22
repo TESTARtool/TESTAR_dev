@@ -1,108 +1,95 @@
 package nl.ou.testar.temporal.structure;
 
+import com.opencsv.bean.CsvBindAndSplitByName;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
+import nl.ou.testar.temporal.util.CSVConvertTemporalType;
 import nl.ou.testar.temporal.util.TemporalType;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class TemporalPattern implements Cloneable{
+public class TemporalPattern extends TemporalBean implements Cloneable{
 
+    @CsvCustomBindByName(converter = CSVConvertTemporalType.class)
+    private TemporalType temporalFormalism;
+    @CsvBindByName
+    private String decription; //short description e.g. spec pattern name
 
-
-    private long id;// sequential nr
-    private TemporalType temporalType;
-    private String alias; //short description e.g. spec pattern name
-    private String propertytemplate;  // e.g. G(b0->Fb1)
-    private List<String> params; //b0,b1,b2,bn
-    private int paramcount;
-
-
-
-    private List<String> filtertags;
-
-    private List<String> comments;
+    @CsvBindByName
+    private String scope;  // see spec pattern http://patterns.projects.cs.ksu.edu
+    @CsvBindByName
+    private String patternclass; // see taxonomy http://patterns.projects.cs.ksu.edu
+    @CsvBindByName
+    private String pattern;  // e.g. G(b0->Fb1)
+    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    private List<String> parameters; //b0,b1,b2,bn
+    @CsvBindByName
+    private String formatVersion="20190603";
 
 
 
     public TemporalPattern() {
     }
 
-    public TemporalPattern(long id, TemporalType tlType, String alias, String propertypattern) {
-        this.id = id;
-        this.temporalType = tlType;
-        this.alias = alias;
-        this.propertytemplate = propertypattern;
-        this.comments=new ArrayList<String>();
-        this.modifieddate= LocalDateTime.now().toString();
+    public TemporalPattern(TemporalType tlType, String description, String pattern) {
+        this.temporalFormalism = tlType;
+        this.decription = description;
+        this.pattern = pattern;
+    }
+    public TemporalType getTemporalFormalism() {
+        return temporalFormalism;
     }
 
-    public long getId() {
-        return id;
+    public void setTemporalFormalism(TemporalType temporalFormalism) {
+        this.temporalFormalism = temporalFormalism;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public String getScope() {
+        return scope;
     }
 
-    public TemporalType getTemporalType() {
-        return temporalType;
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
-    public void setTemporalType(TemporalType temporalType) {
-        this.temporalType = temporalType;
+    public String getPatternclass() {
+        return patternclass;
     }
 
-    public String getAlias() {
-        return alias;
+    public void setPatternclass(String patternclass) {
+        this.patternclass = patternclass;
     }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
+
+    public String getDecription() {
+        return decription;
     }
 
-    public String getPropertytemplate() {
-        return propertytemplate;
+    public void setDecription(String decription) {
+        this.decription = decription;
     }
 
-    public void setPropertytemplate(String propertytemplate) {
-        this.propertytemplate = propertytemplate;
+    public String getPattern() {
+        return pattern;
     }
 
-    public List<String> getParams() {
-        return params;
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
     }
 
     public int getParamcount() {
-        return paramcount;
+        return parameters.size();
     }
 
-    public void setParamcount(int paramcount) {
-        this.paramcount = paramcount;
-    }
 
-    public List<String> getFiltertags() {
-        return filtertags;
-    }
 
-    public void setFiltertags(List<String> filtertags) {
-        this.filtertags = filtertags;
-    }
-
-    public void setParams(List<String> params) {
-        this.params = params;
-    }
-
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public String getModifieddate() {
-        return modifieddate;
-    }
-
-    public void setModifieddate(String modifieddate) {
-        this.modifieddate = modifieddate;
+    public void setParameters(List<String> parameters) {
+        this.parameters = parameters;
     }
 
     public String getFormatVersion() {
@@ -113,12 +100,7 @@ public class TemporalPattern implements Cloneable{
         this.formatVersion = formatVersion;
     }
 
-    private String modifieddate;
-    private String formatVersion="20190603";
 
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
     public Object clone() throws            CloneNotSupportedException
     {
         return super.clone();
