@@ -62,7 +62,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
     private static final long serialVersionUID = 4379174151668501105L;
     protected final int key;
 
-    public KeyAction(int key) {
+    public KeyAction(int key){
         this.key = key;
     }
 
@@ -73,7 +73,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
             Assert.notNull(system);
             Util.pause(duration);
             try {
-                performKeyAction(system,key);
+                performKeyAction(system, key);
             } catch (IllegalArgumentException e) {
                 altNumpad(system, Integer.toString(key));
             }
@@ -93,7 +93,7 @@ public abstract class KeyAction extends TaggableBase implements Action {
         keyb.press(VK_ALT);
         for (char charater : numpadCodes.toCharArray()){
             int NUMPAD_KEY = getNumpad(charater);
-            if (NUMPAD_KEY > -1) {
+            if (NUMPAD_KEY > -1){
                 keyb.press(NUMPAD_KEY);
                 keyb.release(NUMPAD_KEY);
             }
