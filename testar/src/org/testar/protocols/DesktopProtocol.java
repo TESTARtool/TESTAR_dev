@@ -44,7 +44,12 @@ import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
@@ -303,7 +308,10 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
                     // We want to create actions that consist of typing into them
                     if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
                         //Create a type action with the Action Compiler, and add it to the set of derived actions
-                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                        final Optional<String[]> textList = Optional.ofNullable(getTextInputsFromFile(settings.get(ConfigTags.InputFileText)));
+                        final String textToInsert = textList.isPresent() ? textList.get()[new Random().nextInt(textList.get().length)] : this.getRandomText(w);
+
+                        actions.add(ac.clickTypeInto(w, textToInsert, true));
                     }
                     //Add sliding actions (like scroll, drag and drop) to the derived actions
                     //method defined below.
@@ -335,6 +343,15 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
                 ));
 
             }
+        }
+    }
+
+    private String[] getTextInputsFromFile(final String inputFile) {
+        try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
+            return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
+        } catch (IOException e) {
+            System.out.println("Error while reading text input file!");
+            return null;
         }
     }
 }
