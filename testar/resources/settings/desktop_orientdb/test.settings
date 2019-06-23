@@ -102,7 +102,7 @@ GraphDBPassword = testar
 #################################################################\n"
 # State model inference settings
 #################################################################\n"
-StateModelEnabled = true
+StateModelEnabled = false
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer = localhost
@@ -143,8 +143,8 @@ ReplayRetryTime = 30.0
 Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.9
-StartupTime = 10.0
+TimeToWaitAfterAction = 0.0
+StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

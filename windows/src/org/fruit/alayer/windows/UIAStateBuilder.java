@@ -39,6 +39,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 import org.fruit.Assert;
 import org.fruit.alayer.Roles;
@@ -133,41 +134,15 @@ public final class UIAStateBuilder implements StateBuilder {
 		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsWindowPatternAvailablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ProcessIdPropertyId);
 
-		//pattern availability properties
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsAnnotationPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDockPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDragPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDropTargetPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsExpandCollapsePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsGridItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsGridPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsInvokePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsItemContainerPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsLegacyIAccessiblePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsMultipleViewPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsObjectModelPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsRangeValuePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsScrollItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsScrollPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsSelectionItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsSelectionPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsSpreadsheetPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsSpreadsheetItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsStylesPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsSynchronizedInputPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTableItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTablePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTextChildPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTextPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTextPattern2AvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTogglePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTransformPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsTransformPattern2AvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsValuePatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsVirtualizedItemPatternAvailablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsWindowPatternAvailablePropertyId);
+		// cache all active pattern availability and pattern properties
+		UIATags.getPatternAvailabilityTags().stream().flatMap(tag -> Stream.concat(Stream.of(tag), UIATags.getChildTags(tag).stream()))
+				.filter(UIATags::tagIsActive).forEach(tag ->
+					Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, UIAMapping.getPatternPropertyIdentifier(tag))
+		);
 
-		// begin by urueda
+
+		// the following properties are left in for backwards compatibility
+		// scroll control pattern properties
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticallyScrollablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontalViewSizePropertyId);
@@ -176,7 +151,7 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
 		// end by urueda
 
-		// window role properties
+		// window control pattern properties
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowIsTopmostPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowCanMaximizePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_WindowCanMinimizePropertyId);

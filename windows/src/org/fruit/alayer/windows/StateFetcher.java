@@ -38,13 +38,12 @@ import org.fruit.Util;
 import org.fruit.alayer.*;
 
 import java.awt.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StateFetcher implements Callable<UIAState>{
 	
@@ -294,8 +293,8 @@ public class StateFetcher implements Callable<UIAState>{
 		UIAElement uiaElement = new UIAElement(parent);
 		parent.children.add(uiaElement);
 
+		////////////////////  START BACKWARDS COMPATIBLE STUFF /////////////////////////////////////
 		// fetch windows automation properties and store them on the element as tags
-
 		uiaElement.ctrlId = Windows.IUIAutomationElement_get_ControlType(uiaCachePointer, true);
 		uiaElement.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCachePointer, true);
 
@@ -348,47 +347,49 @@ public class StateFetcher implements Callable<UIAState>{
 			modalElement = markModal(uiaElement);
 		}
 
+
+		//////////////////////////   END BACKWARDS COMPATIBLE STUFF  ////////////////////////////////
+
 		// get the active pattern availability properties (these specify if certain control patterns are available in the uia element
-		for(Tag<Boolean> availabilityTag : UIATags.getPatternAvailabilityTags().stream().filter(UIATags::tagIsActive).collect(Collectors.toSet())) {
-			Object object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPropertyIdForAvailabityTag(availabilityTag), true);
+		UIATags.getPatternAvailabilityTags().stream().filter(UIATags::tagIsActive).forEach(availabilityTag -> {
+			Object object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(availabilityTag), true);
 			uiaElement.set(availabilityTag, object instanceof Boolean && (Boolean)object);
 
 			// if a pattern is present, we also want to store the properties that are specific to that pattern
 			if (uiaElement.get(availabilityTag)) {
-				// get the active child tags for this pattern
-				for(Tag<?> patternPropertyTag : UIATags.getChildTags(availabilityTag).stream().filter(UIATags::tagIsActive).collect(Collectors.toSet())) {
-					long patternPropertyId = UIAMapping.getPatternPropertyIdentifier(patternPropertyTag);
-					object = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
-					if (object != null) {
+				UIATags.getChildTags(availabilityTag).stream().filter(UIATags::tagIsActive).forEach(patternPropertyTag -> {
+					Object propertyObject = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
+					if (propertyObject != null) {
 						setConvertedObjectValue(patternPropertyTag, object, uiaElement);
 					}
-				}
+				});
 			}
-		}
+		});
 
 
+		//////////////// SOME MORE BACKWARDS COMPATIBLE STUFF /////////////////////
 		// get some non-cached property values for elements implementing the scroll pattern
-		Object obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsScrollPatternAvailablePropertyId, true); //true);
-		uiaElement.scrollPattern = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+		Object obj;
+		uiaElement.scrollPattern = uiaElement.get(UIATags.UIAIsScrollPatternAvailable);
 		if (uiaElement.scrollPattern){
 			//el.scrollbarInfo = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_CLIENT);
 			//el.scrollbarInfoH = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_HSCROLL);
 			//el.scrollbarInfoV = Windows.GetScrollBarInfo((int)el.windowHandle,Windows.OBJID_VSCROLL);
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollHorizontallyScrollablePropertyId, true);
-			uiaElement.hScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			uiaElement.hScroll = obj instanceof Boolean && ((Boolean) obj);
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer,  Windows.UIA_ScrollVerticallyScrollablePropertyId, true);
-			uiaElement.vScroll = obj instanceof Boolean ? ((Boolean)obj).booleanValue() : false;
+			uiaElement.vScroll = obj instanceof Boolean && ((Boolean) obj);
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalViewSizePropertyId, true);
-			uiaElement.hScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.hScrollViewSize = obj instanceof Double ? ((Double)obj) : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalViewSizePropertyId, true);
-			uiaElement.vScrollViewSize = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;;
+			uiaElement.vScrollViewSize = obj instanceof Double ? ((Double)obj) : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId, true);
-			uiaElement.hScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.hScrollPercent = obj instanceof Double ? ((Double)obj) : -1.0;
 			obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId, true);
-			uiaElement.vScrollPercent = obj instanceof Double ? ((Double)obj).doubleValue() : -1.0;
+			uiaElement.vScrollPercent = obj instanceof Double ? ((Double)obj) : -1.0;
 		}
-		// end by urueda
 
+		//////////////// END SOME MORE BACKWARDS COMPATIBLE STUFF   //////////////////
 
 		// now add the properties as tags
 		// the reason why we're doing this, is because the tags make for a more flexible way of adding properties
@@ -411,6 +412,7 @@ public class StateFetcher implements Callable<UIAState>{
 		uiaElement.set(UIATags.UIAIsKeyboardFocusable, uiaElement.isKeyboardFocusable);
 		uiaElement.set(UIATags.UIAAccessKey, uiaElement.accessKey);
 		uiaElement.set(UIATags.UIAAcceleratorKey, uiaElement.acceleratorKey);
+		uiaElement.set(UIATags.UIABoundingRectangle, uiaElement.rect);
 
 		// new properties, not in attributes yet
 		uiaElement.set(UIATags.UIALocalizedControlType, Windows.IUIAutomationElement_get_LocalizedControlType(uiaCachePointer, true));
@@ -425,6 +427,8 @@ public class StateFetcher implements Callable<UIAState>{
 		uiaElement.set(UIATags.UIAProcessId, Windows.IUIAutomationElement_get_ProcessId(uiaCachePointer, true));
 		obj = Windows.IUIAutomationElement_GetPropertyValueEx(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true, true);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true); //true);
+
+
 
 
 		// get the properties for potential child elements
@@ -598,7 +602,37 @@ public class StateFetcher implements Callable<UIAState>{
 	}
 
 	private <T> void setConvertedObjectValue(Tag<T> tag, Object object, UIAElement uiaElement) {
-		uiaElement.set(tag, (T) object);
+		Stream<Tag<?>> tagsToWatch = Stream.of(
+			UIATags.UIADropTargetDropTargetEffects,
+			UIATags.UIALegacyIAccessibleSelection,
+			UIATags.UIAMultipleViewSupportedViews,
+			UIATags.UIASelectionSelection,
+			UIATags.UIASpreadsheetItemAnnotationObjects,
+			UIATags.UIASpreadsheetItemAnnotationTypes,
+			UIATags.UIATableColumnHeaders,
+			UIATags.UIATableRowHeaders,
+			UIATags.UIATableItemColumnHeaderItems,
+			UIATags.UIATableItemRowHeaderItems,
+			UIATags.UIADragDropEffects,
+			UIATags.UIADragGrabbedItems);
+
+		tagsToWatch.forEach(tagToWatch -> {
+			if (tagToWatch.equals(tag)) {
+				System.out.println("Encountered " + tagToWatch.name() + ": " + object.toString());
+			}
+		});
+
+		// there are some values that can be returned, which need special processing, because they
+		// can be arrays, etc.
+		// not a fan of multiple if/else statements, so will have to see about refactoring this at one point in time..
+		if (tag.equals(UIATags.UIADragDropEffects)) {
+			// array of strings...convert to a single string
+			if (object instanceof String[]) {
+				uiaElement.set(tag, (T) Arrays.toString((String[])object));
+			}
+		}
+		else {
+			uiaElement.set(tag, (T) object);
+		}
 	}
-	
 }

@@ -109,7 +109,7 @@ final class UIAState extends UIAWidget implements State {
 	@SuppressWarnings("unchecked")
 	<T> T get(UIAWidget widget, Tag<T> tag, T defaultValue) {
 		// first we check if it is a state management tag that has been mapped to an automation tag
-		Tag<T> stateManagementTag = UIATags.getMappedTag(tag);
+		Tag<T> stateManagementTag = UIAMapping.getMappedStateTag(tag);
 		if (stateManagementTag != null) {
 			tag = stateManagementTag;
 		}
@@ -173,7 +173,7 @@ final class UIAState extends UIAWidget implements State {
 			returnObject = widget.uiaElement.isContentElement;
 		}else if(tag.equals(UIATags.UIAIsControlElement)){
 			returnObject = widget.uiaElement.isControlElement;
-		}else if(tag.equals(UIATags.UIAScrollPattern)){
+		}else if(tag.equals(UIATags.UIAIsScrollPatternAvailable)){
 			returnObject = widget.uiaElement.scrollPattern;
 		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
 		//	ret = w.uiaElement.scrollbarInfo;

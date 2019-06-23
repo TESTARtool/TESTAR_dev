@@ -3,67 +3,86 @@ package org.fruit.alayer.windows;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+
+import static es.upv.staq.testar.StateManagementTags.*;
+import static org.fruit.alayer.windows.UIATags.*;
 
 public class UIAMapping {
 
-    private static BiMap<Long, Tag<Boolean>> patternAvailabilityMapping = HashBiMap.create();
+    // a mapping from the state management tags to windows automation tags
+    private static Map<Tag<?>, Tag<?>> stateTagMappingWindows = new HashMap<Tag<?>, Tag<?>>()
+    {
+        {
+            put(WidgetControlType, UIAControlType);
+            put(WidgetWindowHandle, UIANativeWindowHandle);
+            put(WidgetIsEnabled, UIAIsEnabled);
+            put(WidgetTitle, UIAName);
+            put(WidgetHelpText, UIAHelpText);
+            put(WidgetAutomationId, UIAAutomationId);
+            put(WidgetClassName, UIAClassName);
+            put(WidgetFrameworkId, UIAFrameworkId);
+            put(WidgetOrientationId, UIAOrientation);
+            put(WidgetIsContentElement, UIAOrientation);
+            put(WidgetIsControlElement, UIAIsControlElement);
+            put(WidgetHasKeyboardFocus, UIAHasKeyboardFocus);
+            put(WidgetIsKeyboardFocusable, UIAIsKeyboardFocusable);
+            put(WidgetItemType, UIAItemType);
+            put(WidgetItemStatus, UIAItemStatus);
+            put(WidgetPath, Tags.Path);
+            put(WidgetBoundary, UIABoundingRectangle);
+        }
+    };
 
-    static {
-            patternAvailabilityMapping.put(Windows.UIA_IsAnnotationPatternAvailablePropertyId, UIATags.UIAIsAnnotationPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsDockPatternAvailablePropertyId, UIATags.UIAIsDockPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsDragPatternAvailablePropertyId, UIATags.UIAIsDragPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsDropTargetPatternAvailablePropertyId, UIATags.UIAIsDropTargetPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsExpandCollapsePatternAvailablePropertyId, UIATags.UIAIsExpandCollapsePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsGridItemPatternAvailablePropertyId, UIATags.UIAIsGridItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsGridPatternAvailablePropertyId, UIATags.UIAIsGridPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsInvokePatternAvailablePropertyId, UIATags.UIAIsInvokePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsItemContainerPatternAvailablePropertyId, UIATags.UIAIsItemContainerPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsLegacyIAccessiblePatternAvailablePropertyId, UIATags.UIAIsLegacyIAccessiblePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsMultipleViewPatternAvailablePropertyId, UIATags.UIAIsMultipleViewPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsObjectModelPatternAvailablePropertyId, UIATags.UIAIsObjectModelPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsRangeValuePatternAvailablePropertyId, UIATags.UIAIsRangeValuePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsScrollItemPatternAvailablePropertyId, UIATags.UIAIsScrollItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsScrollPatternAvailablePropertyId, UIATags.UIAIsScrollPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsSelectionItemPatternAvailablePropertyId, UIATags.UIAIsSelectionItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsSelectionPatternAvailablePropertyId, UIATags.UIAIsSelectionPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsSpreadsheetPatternAvailablePropertyId, UIATags.UIAIsSpreadsheetPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsSpreadsheetItemPatternAvailablePropertyId, UIATags.UIAIsSpreadsheetItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsStylesPatternAvailablePropertyId, UIATags.UIAIsStylesPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsSynchronizedInputPatternAvailablePropertyId, UIATags.UIAIsSynchronizedInputPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTableItemPatternAvailablePropertyId, UIATags.UIAIsTableItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTablePatternAvailablePropertyId, UIATags.UIAIsTablePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTextChildPatternAvailablePropertyId, UIATags.UIAIsTextChildPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTextPatternAvailablePropertyId, UIATags.UIAIsTextPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTextPattern2AvailablePropertyId, UIATags.UIAIsTextPattern2Available);
-            patternAvailabilityMapping.put(Windows.UIA_IsTogglePatternAvailablePropertyId, UIATags.UIAIsTogglePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTransformPatternAvailablePropertyId, UIATags.UIAIsTransformPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsTransformPattern2AvailablePropertyId, UIATags.UIAIsTransformPattern2Available);
-            patternAvailabilityMapping.put(Windows.UIA_IsValuePatternAvailablePropertyId, UIATags.UIAIsValuePatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsVirtualizedItemPatternAvailablePropertyId, UIATags.UIAIsVirtualizedItemPatternAvailable);
-            patternAvailabilityMapping.put(Windows.UIA_IsWindowPatternAvailablePropertyId, UIATags.UIAIsWindowPatternAvailable);
+    /**
+     * This method will return its equivalent, internal UIA tag, if available.
+     * @param mappedTag
+     * @return
+     */
+    public static <T> Tag<T> getMappedStateTag(Tag<T> mappedTag) {
+        return (Tag<T>) stateTagMappingWindows.getOrDefault(mappedTag, null);
     }
 
-    public static Tag<Boolean> getMappedPatternAvailabilityTag(long propertyId) {
-        return patternAvailabilityMapping.getOrDefault(propertyId, null);
-    }
-
-    public static long getPropertyIdForAvailabityTag(Tag<Boolean> tag) {
-        return patternAvailabilityMapping.inverse().getOrDefault(tag, null);
-    }
-
-    public static Set<Long> getPatternPropertyIds() {
-        return patternAvailabilityMapping.keySet();
-    }
-
-    public static Set<Tag<Boolean>> getPatternAvailabilityTags() {
-        return patternAvailabilityMapping.inverse().keySet();
-    }
-
+    // a mapping from tags to their UIA id and vice versa
     private static BiMap<Long, Tag<?>> patternPropertyMapping = HashBiMap.create();
 
     static {
+        patternPropertyMapping.put(Windows.UIA_IsAnnotationPatternAvailablePropertyId, UIATags.UIAIsAnnotationPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsDockPatternAvailablePropertyId, UIATags.UIAIsDockPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsDragPatternAvailablePropertyId, UIATags.UIAIsDragPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsDropTargetPatternAvailablePropertyId, UIATags.UIAIsDropTargetPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsExpandCollapsePatternAvailablePropertyId, UIATags.UIAIsExpandCollapsePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsGridItemPatternAvailablePropertyId, UIATags.UIAIsGridItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsGridPatternAvailablePropertyId, UIATags.UIAIsGridPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsInvokePatternAvailablePropertyId, UIATags.UIAIsInvokePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsItemContainerPatternAvailablePropertyId, UIATags.UIAIsItemContainerPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsLegacyIAccessiblePatternAvailablePropertyId, UIATags.UIAIsLegacyIAccessiblePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsMultipleViewPatternAvailablePropertyId, UIATags.UIAIsMultipleViewPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsObjectModelPatternAvailablePropertyId, UIATags.UIAIsObjectModelPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsRangeValuePatternAvailablePropertyId, UIATags.UIAIsRangeValuePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsScrollItemPatternAvailablePropertyId, UIATags.UIAIsScrollItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsScrollPatternAvailablePropertyId, UIATags.UIAIsScrollPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsSelectionItemPatternAvailablePropertyId, UIATags.UIAIsSelectionItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsSelectionPatternAvailablePropertyId, UIATags.UIAIsSelectionPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsSpreadsheetPatternAvailablePropertyId, UIATags.UIAIsSpreadsheetPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsSpreadsheetItemPatternAvailablePropertyId, UIATags.UIAIsSpreadsheetItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsStylesPatternAvailablePropertyId, UIATags.UIAIsStylesPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsSynchronizedInputPatternAvailablePropertyId, UIATags.UIAIsSynchronizedInputPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTableItemPatternAvailablePropertyId, UIATags.UIAIsTableItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTablePatternAvailablePropertyId, UIATags.UIAIsTablePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTextChildPatternAvailablePropertyId, UIATags.UIAIsTextChildPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTextPatternAvailablePropertyId, UIATags.UIAIsTextPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTextPattern2AvailablePropertyId, UIATags.UIAIsTextPattern2Available);
+        patternPropertyMapping.put(Windows.UIA_IsTogglePatternAvailablePropertyId, UIATags.UIAIsTogglePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTransformPatternAvailablePropertyId, UIATags.UIAIsTransformPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsTransformPattern2AvailablePropertyId, UIATags.UIAIsTransformPattern2Available);
+        patternPropertyMapping.put(Windows.UIA_IsValuePatternAvailablePropertyId, UIATags.UIAIsValuePatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsVirtualizedItemPatternAvailablePropertyId, UIATags.UIAIsVirtualizedItemPatternAvailable);
+        patternPropertyMapping.put(Windows.UIA_IsWindowPatternAvailablePropertyId, UIATags.UIAIsWindowPatternAvailable);
         patternPropertyMapping.put(Windows.UIA_AnnotationAnnotationTypeIdPropertyId, UIATags.UIAAnnotationAnnotationTypeId);
         patternPropertyMapping.put(Windows.UIA_AnnotationAnnotationTypeNamePropertyId, UIATags.UIAAnnotationAnnotationTypeName);
         patternPropertyMapping.put(Windows.UIA_AnnotationAuthorPropertyId, UIATags.UIAAnnotationAuthor);

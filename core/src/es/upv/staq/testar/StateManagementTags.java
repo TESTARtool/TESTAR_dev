@@ -12,7 +12,6 @@ import java.util.Set;
 
 public class StateManagementTags {
 
-
     // a widget's control type
     public static final Tag<String> WidgetControlType = Tag.from("Widget control type", String.class);
 
@@ -61,6 +60,9 @@ public class StateManagementTags {
     // the path in the widget tree that leads to the widget
     public static final Tag<String> WidgetPath = Tag.from("Path to the widget", String.class);
 
+    // the on-screen boundaries for the widget (coordinates)
+    public static final Tag<String> WidgetBoundary = Tag.from("Widget on-screen boundaries", String.class);
+
 
     // a set containing the tags that are available for state management
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
@@ -81,6 +83,7 @@ public class StateManagementTags {
             add(WidgetItemType);
             add(WidgetItemStatus);
             add(WidgetPath);
+            add(WidgetBoundary);
         }
     };
 
