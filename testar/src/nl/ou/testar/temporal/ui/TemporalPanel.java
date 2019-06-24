@@ -36,7 +36,11 @@ import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.structure.APSelectorManager;
 import nl.ou.testar.temporal.structure.TemporalModel;
+import nl.ou.testar.temporal.structure.TemporalOracle;
+import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.JSONHandler;
+import nl.ou.testar.temporal.util.TemporalType;
+import nl.ou.testar.temporal.util.ValStatus;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -49,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.fruit.monkey.Main.outputDir;
@@ -328,11 +333,12 @@ private void setupMiner(){
     private void testdb(ActionEvent evt) {
         try
         {
+            testoracleCSV();
             APSelectorManager APmgr = new APSelectorManager();
             APmgr.setDefaultValuedExpressions();
             APmgr.setDefaultAllAttributes();
             APmgr.setDefaultWidgetFilter();
-            JSONHandler.save(APmgr, outputDir + "testAPmanager.json",true);
+            JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
             Config config = new Config();
             config.setConnectionType(dataStoreType);
             config.setServer(dataStoreServerDNS);
@@ -350,10 +356,11 @@ private void setupMiner(){
             AbstractStateModel model = models.get(0);
             logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
             TemporalModel tmodel = tcontrol.getTemporalModel(model);
-            JSONHandler.save(tmodel, outputDir + "testTmodel.json");
+            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             logCheckResult.append(" saving to file done\n");
 
             logCheckResult.append("\n");
+            tcontrol.shutdown();
 
         }
         catch(Exception e)
@@ -364,6 +371,45 @@ private void setupMiner(){
             e.printStackTrace();
         }
 
+    }
+    public void testoracleCSV() {
+        logCheckResult.append("performing a small test: writing an oracle to CSV file and read back");
+        Set attrib = new HashSet();
+        attrib.add("R");
+        attrib.add("T");
+        attrib.add("P");
+        attrib.add("E");
+
+        TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
+        to.setApplicationName("notepad");
+        to.setApplicationVersion("v10");
+        to.setModelIdentifier("34edf5");
+        to.setAbstractionAttributes(attrib);
+        to.setTemporalFormalism(TemporalType.LTL);
+        to.setValidationStatus(ValStatus.ACCEPTED);
+        to.setDecription("a precedes b");
+        to.setScope("globally");
+        to.setPatternclass("precedence");
+        to.setPattern("!b U a");
+        to.setParameters(Arrays.asList("a", "b"));
+        to.setSubstitutions(Arrays.asList("UIButton_OK", "UIWindow_Title_main_exists"));
+        List<TemporalOracle> tocoll = new ArrayList<>();
+        tocoll.add(to);
+
+        CSVHandler.save(tocoll, outputDir + "temporalOracle1.csv");
+        logCheckResult.append("csv saved: ");
+
+        List<TemporalOracle> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
+        if (fromcoll == null) {
+            logCheckResult.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir);
+        } else {
+            logCheckResult.append("csv loaded: ");
+            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism());
+            CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
+            logCheckResult.append("csv saved: ");
+
+        }
     }
 
 

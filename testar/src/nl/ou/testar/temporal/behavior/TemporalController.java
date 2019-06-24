@@ -132,22 +132,22 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                 }
                 props.add(propertyName+"__"+ stateVertex.getProperty(propertyName).toString());
 
-                //****
-                // concrete widgets
-
-                props.addAll(getWidgetPropositions(senc.getState()));
-
-                //***
 
             }
+            //****
+            // concrete widgets
+            props.addAll(getWidgetPropositions(senc.getState()));
+            //***
+
             senc.setStateAPs(props);
             senc.setTransitionColl(getTransitions( senc.getState()));
-            tmodel.addStateEncoding(senc);
+            tmodel.addStateEncoding(senc,false);
             }
 
 
 
         }
+    tmodel.updateTransitions();
     return tmodel;
     }
 
@@ -206,7 +206,8 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
             // we're expecting a vertex
             if (result.isEdge()) {
                 Optional<OEdge> op = result.getEdge();
-                if (!op.isPresent()) continue;
+                if (!op.isPresent()) {
+                    System.out.println("debug state;"+state+" waiting on edgde");continue;}
                 OEdge actionEdge = op.get();
                 OVertexDocument source = actionEdge.getProperty("out");
                 OVertexDocument target = actionEdge.getProperty("in");

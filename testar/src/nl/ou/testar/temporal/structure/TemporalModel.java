@@ -48,10 +48,9 @@ public class TemporalModel extends TemporalBean{
         for (StateEncoding stateEnc: stateEncodings) {
             this.modelAPs.addAll(stateEnc.getStateAPs());
         }
-        for (StateEncoding stateEnc: stateEncodings) {  // observer pattern?
-            stateEnc.updateAllTransitionConjuncts(modelAPs);
-        }
+        updateTransitions();
     }
+
 
     public String getFormatVersion() {        return formatVersion;   }
 
@@ -59,27 +58,29 @@ public class TemporalModel extends TemporalBean{
 
 
     //custom
-    public void addStateEncoding(StateEncoding stateEncoding) {
+    public void addStateEncoding(StateEncoding stateEncoding, boolean updateTransitionsImmediate) {
 
         stateEncodings.add(stateEncoding);
         this.modelAPs.addAll(stateEncoding.getStateAPs());
-        for (StateEncoding stateEnc: stateEncodings) {// observer pattern?
+        if (updateTransitionsImmediate) {updateTransitions();        }
+    }
+    public void updateTransitions() {
+        for (StateEncoding stateEnc : stateEncodings) {// observer pattern?
             stateEnc.updateAllTransitionConjuncts(modelAPs);
         }
+
     }
 
 
-    public void fetchDBModel(String filter){
+
+        public void fetchDBModel(String filter){
         //loop through model ,
         //  query db model and set in header properties
         // query concret states and moke stat encoding per state
         //===> define properties to collect strategies,
         //per state get outbound edges and make transition encodings
-        //
-        //
         //  collect AP's make a listentry : [Statexxx, list of AP's] apply filters
         //   state list, +ap's
-
 
 
     }

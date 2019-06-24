@@ -59,18 +59,29 @@ public class APSelectorManager {
 
 
     private Set<TagBean<?>> setTestarTagSet(){
+
+        System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
+        System.out.println("debug length of Tagsset:"+Tags.tagSet().size());
+        Tag<?> r = UIATags.UIAItemType;
+        System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
+        System.out.println("debug length of Tagsset:"+Tags.tagSet().size());
+
+        for (Tag<?> t:UIATags.tagSet()
+             ) {
+            //System.out.println("debug element of UIAtagset:"+t.name()+t.type());
+        }
+        //System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
         Set<Tag<?>> tags = new HashSet<Tag<?>>();
         tags.addAll(Tags.tagSet());
         tags.addAll(UIATags.tagSet());
-        Set<TagBean<?>> tagset=new LinkedHashSet<>();
-System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
-        System.out.println("debug length of Tagsset:"+Tags.tagSet().size());
-System.out.println("debug length of tags set:"+tags.size());
+
+        Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
+        System.out.println("debug length of tags set:"+tags.size());
         Iterator<Tag<?>> iterator;
         for (iterator = tags.iterator(); iterator.hasNext(); ) {
             Tag<?> t = iterator.next();
             TagBean<?> t1 = TagBean.from(t.name(), t.type());
-            tagset.add(t1);
+            tmptagset.add(t1);
         }
         // copy tags    Tags.tagSet();  //unmodifiable se
 /*        for (Iterator<Tag<?>> iterator = Tags.tagSet().iterator(); iterator.hasNext(); ) {
@@ -80,7 +91,7 @@ System.out.println("debug length of tags set:"+tags.size());
         }*/
 
        // tagset.addAll(UIATags.tagSet());  //getNativetags ??
-        return  tagset;
+        return  tmptagset;
     };
 
 
