@@ -29,10 +29,11 @@ public class JSONHandler {
         }
         return null;
     }
-    public static void save(Object content, String toFile) {
+    public static void save(Object content, String toFile, boolean failOnEmptyBean) {
         try {
             File output = new File(toFile);
             ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
             ;
             String result = objectMapper.writeValueAsString(content);
             // let's write the resulting json to a file
@@ -46,7 +47,10 @@ public class JSONHandler {
             e.printStackTrace();
         }
     }
+    public static void save(Object content, String toFile ) {
+        save( content,  toFile, true);
 
+    }
     public static ArrayList<String> peek(String target, String inFile) {
         ArrayList<String>  tmp = new ArrayList<String>();
         try (JsonParser jParser = new JsonFactory()

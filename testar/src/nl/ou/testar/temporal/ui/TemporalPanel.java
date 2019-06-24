@@ -34,6 +34,7 @@ import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import nl.ou.testar.temporal.behavior.TemporalController;
+import nl.ou.testar.temporal.structure.APSelectorManager;
 import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.util.JSONHandler;
 import org.fruit.monkey.ConfigTags;
@@ -327,6 +328,11 @@ private void setupMiner(){
     private void testdb(ActionEvent evt) {
         try
         {
+            APSelectorManager APmgr = new APSelectorManager();
+            APmgr.setDefaultValuedExpressions();
+            APmgr.setDefaultAllAttributes();
+            APmgr.setDefaultWidgetFilter();
+            JSONHandler.save(APmgr, outputDir + "testAPmanager.json",true);
             Config config = new Config();
             config.setConnectionType(dataStoreType);
             config.setServer(dataStoreServerDNS);
