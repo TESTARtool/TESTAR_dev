@@ -120,7 +120,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
             OVertex stateVertex = op.get();
             StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
             List<String> props = new ArrayList<>();
-            System.out.println("debug state;"+senc.getState());
+            //System.out.println("debug state;"+senc.getState());
             for (String propertyName : stateVertex.getPropertyNames()) {
                 if (propertyName.contains("in_") || propertyName.contains("out_")) {
                     // these are edge indicators. Ignore

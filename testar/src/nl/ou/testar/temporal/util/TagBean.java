@@ -63,6 +63,9 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 	private  String name;
 	private int hashcode;
 
+	public TagBean() {  //for JSON handler
+	}
+
 
 	@SuppressWarnings("unchecked")
 	public static <T> TagBean<T> from(String name, Class<?> valueType){
@@ -73,6 +76,7 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 			return existing;
 		return ret;
 	}
+
 
 	private static final long serialVersionUID = -1215427100999751182L;
 

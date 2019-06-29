@@ -21,31 +21,29 @@ public class APSelectorManager {
     private Set<TagBean<?>> entireAttributeSet ;
     private  Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
     private Set<WidgetFilter> widgetfilters;
-
     public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
         return valuedExpressions;
     }
-
-    public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
-        this.valuedExpressions = valuedExpressions;
-    }
+    private String formatVersion="20190629";
 
 
 
 
     public APSelectorManager() {
-        entireAttributeSet = setTestarTagSet();
+        entireAttributeSet = getEntireTagSet();
         widgetfilters = new LinkedHashSet<>();
         selectedAttributes = new LinkedHashSet<TagBean<?>>();
     }
 
-
-    public Set<TagBean<?>> getEntireAttributeSet() {
-        return entireAttributeSet;
+    public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
+        this.valuedExpressions = valuedExpressions;
+    }
+    public String getFormatVersion() {
+        return formatVersion;
     }
 
-    public void setEntireAttributeSet(Set<TagBean<?>> entireAttributeSet) {
-        this.entireAttributeSet = entireAttributeSet;
+    public void setFormatVersion(String formatVersion) {
+        this.formatVersion = formatVersion;
     }
 
     public Set<WidgetFilter> getWidgetfilters() {
@@ -58,39 +56,24 @@ public class APSelectorManager {
 
 
 
-    private Set<TagBean<?>> setTestarTagSet(){
+    private Set<TagBean<?>> getEntireTagSet(){
 
-        System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
-        System.out.println("debug length of Tagsset:"+Tags.tagSet().size());
-        Tag<?> r = UIATags.UIAItemType;
-        System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
-        System.out.println("debug length of Tagsset:"+Tags.tagSet().size());
 
-        for (Tag<?> t:UIATags.tagSet()
-             ) {
-            //System.out.println("debug element of UIAtagset:"+t.name()+t.type());
-        }
-        //System.out.println("debug length of UIAtagset:"+UIATags.tagSet().size());
+        // WORKAROUND
+        // the 2 dummy reads are required to ensure properly initialization of the classes: static property is used!
+        Tag<?> dummy = UIATags.UIAItemType;
+        dummy=Tags.Enabled;
+
         Set<Tag<?>> tags = new HashSet<Tag<?>>();
         tags.addAll(Tags.tagSet());
-        tags.addAll(UIATags.tagSet());
-
+        tags.addAll(UIATags.tagSet());//alternatve for platform independent: getNativetags ??
         Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
-        System.out.println("debug length of tags set:"+tags.size());
         Iterator<Tag<?>> iterator;
         for (iterator = tags.iterator(); iterator.hasNext(); ) {
             Tag<?> t = iterator.next();
             TagBean<?> t1 = TagBean.from(t.name(), t.type());
             tmptagset.add(t1);
         }
-        // copy tags    Tags.tagSet();  //unmodifiable se
-/*        for (Iterator<Tag<?>> iterator = Tags.tagSet().iterator(); iterator.hasNext(); ) {
-            Tag<?> t = iterator.next();
-            TagBean<?> t1 = TagBean.from(t.name(), t.type());
-            tagset.add(t1);
-        }*/
-
-       // tagset.addAll(UIATags.tagSet());  //getNativetags ??
         return  tmptagset;
     };
 
@@ -120,7 +103,7 @@ public class APSelectorManager {
             }
         }
     }
-    public void setDefaultAllAttributes() {
+    public void setDefaultAttributes() {
         selectedAttributes = entireAttributeSet;
     }
 
@@ -233,14 +216,14 @@ public class APSelectorManager {
 
 
     //custom
-    public void addPattern(InferrableExpression ip, String value) {
+    public void addExpressionPattern(InferrableExpression ip, String value) {
         valuedExpressions.add(new PairBean<>(ip,value));
     }
-    public void removePattern(InferrableExpression ip, String value) {
+    public void removeExpressionPattern(InferrableExpression ip, String value) {
         valuedExpressions.remove(new PairBean<>(ip,value));
     }
 
-    public boolean addPattern(String patternStr) {
+    public boolean addExpressionPattern(String patternStr) {
         boolean succes = false;  //remains certainly false if pattern is not found
         for (InferrableExpression iap : InferrableExpression.values()) {
             if (patternStr.startsWith(String.valueOf(iap))) {

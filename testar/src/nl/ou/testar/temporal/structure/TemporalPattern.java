@@ -6,15 +6,16 @@ import com.opencsv.bean.CsvCustomBindByName;
 import nl.ou.testar.temporal.util.CSVConvertTemporalType;
 import nl.ou.testar.temporal.util.TemporalType;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class TemporalPattern extends TemporalBean implements Cloneable{
 
+
+
     @CsvCustomBindByName(converter = CSVConvertTemporalType.class)
     private TemporalType temporalFormalism;
     @CsvBindByName
-    private String decription; //short description e.g. spec pattern name
+    private String description; //short description e.g. spec pattern name
 
     @CsvBindByName
     private String scope;  // see spec pattern http://patterns.projects.cs.ksu.edu
@@ -22,21 +23,17 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     private String patternclass; // see taxonomy http://patterns.projects.cs.ksu.edu
     @CsvBindByName
     private String pattern;  // e.g. G(b0->Fb1)
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> parameters; //b0,b1,b2,bn
-    @CsvBindByName
-    private String formatVersion="20190603";
 
+    @CsvBindByName
+    private String formatVersion="20190629";
 
 
     public TemporalPattern() {
+    super();
     }
 
-    public TemporalPattern(TemporalType tlType, String description, String pattern) {
-        this.temporalFormalism = tlType;
-        this.decription = description;
-        this.pattern = pattern;
-    }
     public TemporalType getTemporalFormalism() {
         return temporalFormalism;
     }
@@ -62,12 +59,12 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     }
 
 
-    public String getDecription() {
-        return decription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDecription(String decription) {
-        this.decription = decription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getPattern() {
@@ -90,14 +87,6 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
 
     public void setParameters(List<String> parameters) {
         this.parameters = parameters;
-    }
-
-    public String getFormatVersion() {
-        return formatVersion;
-    }
-
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
     }
 
 

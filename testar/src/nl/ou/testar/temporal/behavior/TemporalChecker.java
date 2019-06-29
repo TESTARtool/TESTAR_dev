@@ -2,12 +2,14 @@ package nl.ou.testar.temporal.behavior;
 
 import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.scratch.TemporalOracle;
-import nl.ou.testar.temporal.structure.TemporalOracleCollection;
+import nl.ou.testar.temporal.scratch.TemporalOracleCollection;
 import nl.ou.testar.temporal.util.JSONHandler;
+
+import java.util.List;
 
 public class TemporalChecker {
     private TemporalModel tm;
-    private TemporalOracleCollection toc;
+    private List<nl.ou.testar.temporal.structure.TemporalOracle> toc;
     private TemporalOracle to;
 
     public void loadTemporalproperties(String fromFile) {

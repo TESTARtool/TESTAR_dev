@@ -3,17 +3,13 @@ package nl.ou.testar.temporal.structure;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
-import nl.ou.testar.temporal.util.CSVConvertValStatus;
-import nl.ou.testar.temporal.util.CSVConvertVerdict;
-import nl.ou.testar.temporal.util.ValStatus;
-import nl.ou.testar.temporal.util.Verdict;
+import nl.ou.testar.temporal.util.*;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class TemporalOracle extends TemporalPattern{
 
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> substitutions; //b0,b1,b2,bn; //b25-> 'Button_OK_ParentTitle'
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus validationStatus;
@@ -25,16 +21,21 @@ public class TemporalOracle extends TemporalPattern{
     private double traceConfidence;
     @CsvBindByName
     private double traceLift;
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> testsequenceIDs;
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> prefixOfRun; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> cycleOfRun;  // idem
     @CsvBindByName
     private String runDate;
-    @CsvBindAndSplitByName(elementType = String.class,collectionType = LinkedList.class)
-    private List<String> log;
+
+    @CsvBindByName
+    private String formatVersion="20190629";
+
+    public TemporalOracle() {
+        super();
+    }
 
 
     public List<String> getSubstitutions() {
@@ -118,17 +119,36 @@ public class TemporalOracle extends TemporalPattern{
         this.runDate = runDate;
     }
 
-    public List<String> getLog() {
-        return log;
-    }
-
-    public void setLog(List<String> log) {
-        this.log = log;
-    }
-
     public Object clone() throws            CloneNotSupportedException
     {
         return super.clone();
     }
+public static TemporalOracle getSampleOracle(){
+    TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
+    Set attrib = new HashSet();
+    attrib.add("R");
+    attrib.add("T");
+    attrib.add("P");
+    attrib.add("E");
+    to.setApplicationName("notepad");
+    to.setApplicationVersion("v10");
+
+    to.setModelIdentifier("34edf5");
+    to.setAbstractionAttributes(attrib);
+    to.setTemporalFormalism(TemporalType.LTL);
+    to.setValidationStatus(ValStatus.ACCEPTED);
+    to.setDescription("a precedes b");
+    to.setScope("globally");
+    to.setPatternclass("precedence");
+    to.setPattern("!b U a");
+    to.setParameters(Arrays.asList("a", "b"));
+    to.setSubstitutions(Arrays.asList("a:UIButton_OK", "b:UIWindow_Title_main_exists"));
+    List<String> comments= new ArrayList<String>();
+    comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
+    comments.add("CSV editor of choice is LibreCalc as this tool can explicitly quote all text field");
+    comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
+    to.setComments(comments);
+    return to;
+}
 
 }

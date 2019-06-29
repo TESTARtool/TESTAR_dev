@@ -40,6 +40,9 @@ import java.io.Serializable;
 public class PairBean<L, R> implements Serializable {
 	private static final long serialVersionUID = 6777608823096421544L;
 
+	public PairBean() { //for JSON handler
+	}
+
 	public L getLeft() {
 		return left;
 	}

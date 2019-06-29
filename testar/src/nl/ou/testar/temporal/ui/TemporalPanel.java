@@ -34,13 +34,9 @@ import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import nl.ou.testar.temporal.behavior.TemporalController;
-import nl.ou.testar.temporal.structure.APSelectorManager;
-import nl.ou.testar.temporal.structure.TemporalModel;
-import nl.ou.testar.temporal.structure.TemporalOracle;
+import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.JSONHandler;
-import nl.ou.testar.temporal.util.TemporalType;
-import nl.ou.testar.temporal.util.ValStatus;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -52,8 +48,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.fruit.monkey.Main.outputDir;
@@ -137,7 +135,7 @@ public class TemporalPanel extends JPanel {
 
         setupMiner();
         // add the components to the panel
-        setLayout(null);
+        //setLayout(null);
         label00.setBounds(10, 14, 350, 27);
         add(label00);
         temporalProperty.setBounds(160, 14, 125, 27);
@@ -156,7 +154,7 @@ public class TemporalPanel extends JPanel {
         logCheckResult.setAutoscrolls(true);
         logCheckResult.setLineWrap(true);
         logCheckResult.setWrapStyleWord(true);
-        //resultsScrollPane = new JScrollPane(logCheckResult,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        resultsScrollPane = new JScrollPane(logCheckResult,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         //resultsScrollPane.setSize(340,210);
         //resultsScrollPane.setBounds(160,80,250,227);
         //logPanel.add(resultsScrollPane);
@@ -164,7 +162,8 @@ public class TemporalPanel extends JPanel {
         //logPanel.setSize(340,227);
         //add(logPanel);
 
-        add(logCheckResult);
+        //add(logCheckResult);
+        add(resultsScrollPane);
 
         startTLWebAnalyzerButton.setBounds(10, 126, 120, 45);
         startTLWebAnalyzerButton.setSize(startTLWebAnalyzerButton.getWidth(), 45);
@@ -333,12 +332,10 @@ private void setupMiner(){
     private void testdb(ActionEvent evt) {
         try
         {
-            testoracleCSV();
-            APSelectorManager APmgr = new APSelectorManager();
-            APmgr.setDefaultValuedExpressions();
-            APmgr.setDefaultAllAttributes();
-            APmgr.setDefaultWidgetFilter();
-            JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
+            testOracleCSV();
+            testPatternCSV();
+            testApSelectionManagerJSON();
+
             Config config = new Config();
             config.setConnectionType(dataStoreType);
             config.setServer(dataStoreServerDNS);
@@ -348,6 +345,7 @@ private void setupMiner(){
 
             String tmp= dataStoreDirectory;
             logCheckResult.append("connecting to: db\n");
+            logCheckResult.repaint();
             config.setDatabaseDirectory(tmp);
             TemporalController tcontrol = new TemporalController(config,outputDir);
             List<AbstractStateModel> models = tcontrol.fetchModels();
@@ -366,51 +364,87 @@ private void setupMiner(){
         catch(Exception e)
         {
             System.err.println("Error on testing db");
-            logCheckResult.append("Error on testing db");
+            logCheckResult.append("Error on testing db\n");
             logCheckResult.append("\n");
             e.printStackTrace();
         }
 
     }
-    public void testoracleCSV() {
-        logCheckResult.append("performing a small test: writing an oracle to CSV file and read back");
-        Set attrib = new HashSet();
-        attrib.add("R");
-        attrib.add("T");
-        attrib.add("P");
-        attrib.add("E");
+    public void testOracleCSV() {
+        logCheckResult.append("performing a small test: writing an oracle to CSV file and read back\n");
 
-        TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
-        to.setApplicationName("notepad");
-        to.setApplicationVersion("v10");
-        to.setModelIdentifier("34edf5");
-        to.setAbstractionAttributes(attrib);
-        to.setTemporalFormalism(TemporalType.LTL);
-        to.setValidationStatus(ValStatus.ACCEPTED);
-        to.setDecription("a precedes b");
-        to.setScope("globally");
-        to.setPatternclass("precedence");
-        to.setPattern("!b U a");
-        to.setParameters(Arrays.asList("a", "b"));
-        to.setSubstitutions(Arrays.asList("UIButton_OK", "UIWindow_Title_main_exists"));
+
+        TemporalOracle to= TemporalOracle.getSampleOracle();
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
 
         CSVHandler.save(tocoll, outputDir + "temporalOracle1.csv");
-        logCheckResult.append("csv saved: ");
+        logCheckResult.append("csv saved: \n");
 
         List<TemporalOracle> fromcoll;
         fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
         if (fromcoll == null) {
-            logCheckResult.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir);
+            logCheckResult.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir+"\n");
         } else {
-            logCheckResult.append("csv loaded: ");
-            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism());
+            logCheckResult.append("csv loaded: \n");
+            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
             CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
-            logCheckResult.append("csv saved: ");
+            logCheckResult.append("csv saved: \n");
 
         }
     }
+    public void testPatternCSV() {
+        logCheckResult.append("performing a small test: writing a pattern to CSV file\n");
+
+
+        TemporalConstraintedPattern pat= TemporalConstraintedPattern.getSamplePattern();
+        List<TemporalConstraintedPattern> patcoll = new ArrayList<>();
+        patcoll.add(pat);
+
+        CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
+        logCheckResult.append("csv saved: ");
+
+        List<TemporalConstraintedPattern> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalPattern1.csv", TemporalConstraintedPattern.class);
+        if (fromcoll == null) {
+            logCheckResult.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir+"\n");
+        } else {
+            logCheckResult.append("csv loaded: \n");
+            logCheckResult.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
+            logCheckResult.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString()+"\n");
+
+            CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
+            logCheckResult.append("csv saved: \n");
+
+        }
+
+        }
+    public void testApSelectionManagerJSON() {
+        logCheckResult.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
+
+        APSelectorManager APmgr = new APSelectorManager();
+        APmgr.setDefaultValuedExpressions();
+        APmgr.setDefaultAttributes();
+        APmgr.setDefaultWidgetFilter();
+        JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
+        logCheckResult.append("json saved: \n");
+
+        APSelectorManager APmgr1 = new APSelectorManager();
+        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APmgr.getClass());
+
+        if (APmgr1 == null) {
+            logCheckResult.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir+"\n");
+        } else {
+            logCheckResult.append("json loaded: \n");
+            Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();
+            Iterator<WidgetFilter> wfiter = wfset.iterator();
+            WidgetFilter wf = wfiter.next();
+            logCheckResult.append("widgetroles that were read from file: " + wf.getWidgetRolesMatches().toString()+"\n");
+
+
+        }
+    }
+
 
 
 }

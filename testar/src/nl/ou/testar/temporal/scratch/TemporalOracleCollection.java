@@ -1,6 +1,6 @@
-package nl.ou.testar.temporal.structure;
+package nl.ou.testar.temporal.scratch;
 
-import nl.ou.testar.temporal.scratch.TemporalOracle;
+import nl.ou.testar.temporal.structure.TemporalBean;
 
 import java.util.ArrayList;
 import java.util.List;
