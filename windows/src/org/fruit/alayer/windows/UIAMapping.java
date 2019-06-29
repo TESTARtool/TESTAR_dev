@@ -27,7 +27,7 @@ public class UIAMapping {
             put(WidgetClassName, UIAClassName);
             put(WidgetFrameworkId, UIAFrameworkId);
             put(WidgetOrientationId, UIAOrientation);
-            put(WidgetIsContentElement, UIAOrientation);
+            put(WidgetIsContentElement, UIAIsContentElement);
             put(WidgetIsControlElement, UIAIsControlElement);
             put(WidgetHasKeyboardFocus, UIAHasKeyboardFocus);
             put(WidgetIsKeyboardFocusable, UIAIsKeyboardFocusable);

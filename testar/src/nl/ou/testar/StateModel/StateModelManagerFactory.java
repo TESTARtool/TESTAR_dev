@@ -12,8 +12,10 @@ import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StateModelManagerFactory {
 
@@ -23,24 +25,14 @@ public class StateModelManagerFactory {
             return new DummyModelManager();
         }
 
-        // check the attributes for the abstract state id
-        if (settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+        Set<Tag<?>> abstractTags = Arrays.stream(CodingManager.getCustomTagsForAbstractId()).collect(Collectors.toSet());
+        if (abstractTags.isEmpty()) {
             throw new RuntimeException("No Abstract State Attributes were provided in the settings file");
         }
 
-        Set<Tag<?>> abstractTags = new HashSet<>();
-        for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
-            abstractTags.add(CodingManager.allowedStateTags.get(abstractStateAttribute));
-        }
-
-        // and then check the attributes for the concrete state id
-        if (settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+        Set<Tag<?>> concreteStateTags = Arrays.stream(CodingManager.getCustomTagsForConcreteId()).collect(Collectors.toSet());
+        if (concreteStateTags.isEmpty()) {
             throw new RuntimeException("No concrete State Attributes were provided in the settings file");
-        }
-
-        Set<Tag<?>> concreteStateTags = new HashSet<>();
-        for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
-            concreteStateTags.add(CodingManager.allowedStateTags.get(concreteStateAttribute));
         }
 
         // get a persistence manager

@@ -34,10 +34,13 @@
  */
 package org.fruit.alayer.windows;
 
+import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 
 import java.awt.*;
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -50,26 +53,28 @@ public class StateFetcher implements Callable<UIAState>{
 	private final SUT system;
 
 	transient long automationPointer, cacheRequestPointer;
-	// begin by urueda
+
 	private boolean releaseCachedAutomatinElement;
 	
 	private boolean accessBridgeEnabled;
 	
 	private static Pattern sutProcessesMatcher;
-	// end by urueda
+
+	private List<Map<String , String>> mappedValues;
+
 	
 	public StateFetcher(SUT system, long automationPointer, long cacheRequestPointer,
 						boolean accessBridgeEnabled, String SUTProcesses){		
 		this.system = system;
 		this.automationPointer = automationPointer;
 		this.cacheRequestPointer = cacheRequestPointer;
-		// begin by urueda
 		this.accessBridgeEnabled = accessBridgeEnabled;
 		if (SUTProcesses == null || SUTProcesses.isEmpty())
 			StateFetcher.sutProcessesMatcher = null;
 		else
-			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);		
-		// end by urueda
+			StateFetcher.sutProcessesMatcher = Pattern.compile(SUTProcesses, Pattern.UNICODE_CHARACTER_CLASS);
+
+		mappedValues = new ArrayList<>();
 	}
 	
 	// by urueda (refactor)
@@ -93,6 +98,7 @@ public class StateFetcher implements Callable<UIAState>{
 		// first build the UIAElement skeleton.
 		// this means fetching information from the Windows Automation API about all the elements in the Automation Tree
 		UIARootElement uiaRoot = buildSkeleton(system);
+//		writeToCSV(mappedValues);
 
 		// next we use the created Automation tree, with the uiaRoot as its base, to create the Testar widget tree
 		UIAState root = createWidgetTree(uiaRoot);
@@ -455,6 +461,9 @@ public class StateFetcher implements Callable<UIAState>{
 			}
 			Windows.IUnknown_Release(uiaChildrenPointer);
 		}
+
+		// add to csv for analysis purposed
+		mappedValues.add(extractTagsForCsv(uiaElement));
 		
 		return modalElement; // by urueda
 	}
@@ -628,11 +637,61 @@ public class StateFetcher implements Callable<UIAState>{
 		if (tag.equals(UIATags.UIADragDropEffects)) {
 			// array of strings...convert to a single string
 			if (object instanceof String[]) {
-				uiaElement.set(tag, (T) Arrays.toString((String[])object));
+				uiaElement.set(tag, (T)String.join(", ", (String[])object));
+			}
+			else if (object instanceof String) {
+				uiaElement.set(tag, (T) object);
 			}
 		}
 		else {
 			uiaElement.set(tag, (T) object);
 		}
+	}
+
+	private Map<String, String> extractTagsForCsv(UIAElement uiaElement) {
+		List<Tag<?>> stateTags = StateManagementTags.getAllTags().stream().map(UIAMapping::getMappedStateTag).collect(Collectors.toList());
+		return stateTags.stream().collect(Collectors.toMap(Tag::name, tag -> uiaElement.get(tag, null) != null ? uiaElement.get(tag, null).toString() : "null"));
+	}
+
+	public void writeToCSV(List<Map<String, String>> valuesToExport) {
+		List<String> linesToExport = new ArrayList<>();
+
+		// title row:
+		List<Tag<?>> stateTags = StateManagementTags.getAllTags().stream().map(UIAMapping::getMappedStateTag).sorted(Comparator.comparing(Tag::name)).collect(Collectors.toList());
+		String titleRowString = convertToCSV(stateTags.stream().map(Tag::name).toArray(String[]::new));
+		linesToExport.add(titleRowString);
+
+		for(Map<String, String> valueMapping : valuesToExport) {
+			// follow the stateTags list order
+			String[] line = stateTags.stream().map(tag -> valueMapping.getOrDefault(tag.name(),null) == null ? "null" : valueMapping.get(tag.name())).toArray(String[]::new);
+			linesToExport.add(convertToCSV(line));
+		}
+
+		File csvOutputFile = new File("widgetUIAOutput.csv");
+		try {
+			PrintWriter printWriter = new PrintWriter(csvOutputFile);
+			linesToExport.stream().forEach(printWriter::println);
+			printWriter.flush();
+			printWriter.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String convertToCSV(String[] data) {
+		return Stream.of(data)
+				.map(this::escapeSpecialCharacters)
+				.collect(Collectors.joining(";"));
+	}
+
+	public String escapeSpecialCharacters(String data) {
+		String escapedData = data.replaceAll("\\R", " ");
+		if (data.contains(",") || data.contains("\"") || data.contains("'")) {
+			data = data.replace("\"", "\"\"");
+			escapedData = "\"" + data + "\"";
+		}
+		escapedData = escapedData.replaceAll(";", "^");
+		return escapedData;
 	}
 }

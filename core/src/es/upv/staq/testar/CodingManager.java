@@ -120,17 +120,12 @@ public class CodingManager {
 		return customTagsForAbstractId;
 	}
 
-	// this map holds the state tags that should be provided to the coding manager
-    // for use in constructing concrete and abstract state id's
-	public static HashMap<String, Tag<?>> allowedStateTags = new HashMap<String, Tag<?>>() {
-		{
-			put("Role", Tags.Role);
-			put("Title", Tags.Title);
-			put("Path", Tags.Path);
-			put("Enabled", Tags.Enabled);
-		}
-	};
-	
+	/**
+	 * Returns the tags that are currently being used to create a custom abstract state id
+	 * @return
+	 */
+	public static Tag<?>[] getCustomTagsForConcreteId() { return customTagsForConcreteId;}
+
 	// ###########################################
 	//  Widgets/States and Actions IDs management
 	// ###########################################
