@@ -431,8 +431,40 @@ public class StateFetcher implements Callable<UIAState>{
 //		System.out.println(uiaElement.get(UIATags.UIAFullDescription));
 		uiaElement.set(UIATags.UIACulture, Windows.IUIAutomationElement_get_Culture(uiaCachePointer, true));
 		uiaElement.set(UIATags.UIAProcessId, Windows.IUIAutomationElement_get_ProcessId(uiaCachePointer, true));
-		obj = Windows.IUIAutomationElement_GetPropertyValueEx(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true, true);
-		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsWindowPatternAvailablePropertyId, true); //true);
+		uiaElement.set(UIATags.UIAIsOffscreen, Windows.IUIAutomationElement_get_IsOffscreen(uiaCachePointer, true));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_AriaPropertiesPropertyId, true);
+		uiaElement.set(UIATags.UIAAriaProperties, obj instanceof String ? (String)obj : "");
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_AriaRolePropertyId, true);
+		uiaElement.set(UIATags.UIAAriaRole, obj instanceof String ? (String) obj : "");
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsDataValidForFormPropertyId, true);
+		uiaElement.set(UIATags.UIAIsDataValidForForm, obj instanceof Boolean && ((Boolean) obj));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsDialogPropertyId, true);
+		uiaElement.set(UIATags.UIAIsDialog, obj instanceof Boolean && ((Boolean) obj));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsPasswordPropertyId, true);
+		uiaElement.set(UIATags.UIAIsPassword, obj instanceof Boolean && ((Boolean) obj));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsPeripheralPropertyId, true);
+		uiaElement.set(UIATags.UIAIsPeripheral, obj instanceof Boolean && ((Boolean) obj));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsRequiredForFormPropertyId, true);
+		uiaElement.set(UIATags.UIAIsRequiredForForm, obj instanceof Boolean && ((Boolean) obj));
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LabeledByPropertyId, true);
+		uiaElement.set(UIATags.UIALabeledBy, obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LandmarkTypePropertyId, true);
+		uiaElement.set(UIATags.UIALandmarkType, (Long)obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LocalizedLandmarkTypePropertyId, true);
+		uiaElement.set(UIATags.UIALocalizedLandmarkType, (String)obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LevelPropertyId, true);
+		uiaElement.set(UIATags.UIALevel, (Long) obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LiveSettingPropertyId, true);
+		uiaElement.set(UIATags.UIALiveSetting, (Long) obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_PositionInSetPropertyId, true);
+		uiaElement.set(UIATags.UIAPositionInSet, (Long) obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_SizeOfSetPropertyId, true);
+		uiaElement.set(UIATags.UIASizeOfSet, (Long) obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_RotationPropertyId, true);
+		uiaElement.set(UIATags.UIARotation, (Long) obj);
+		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_VisualEffectsPropertyId, true);
+		uiaElement.set(UIATags.UIAVisualEffects, (Long) obj);
+
 
 
 
@@ -642,6 +674,57 @@ public class StateFetcher implements Callable<UIAState>{
 			else if (object instanceof String) {
 				uiaElement.set(tag, (T) object);
 			}
+		}
+		else if (tag.equals(UIATags.UIADragGrabbedItems)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIADropTargetDropTargetEffects)) {
+			// array of strings...convert to a single string
+			if (object instanceof String[]) {
+				uiaElement.set(tag, (T)String.join(", ", (String[])object));
+			}
+			else if (object instanceof String) {
+				uiaElement.set(tag, (T) object);
+			}
+		}
+		else if (tag.equals(UIATags.UIALegacyIAccessibleSelection)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIAMultipleViewSupportedViews)) {
+			if (object instanceof Long[]) {
+				uiaElement.set(tag, (T) Arrays.stream((Long[])object).map(Object::toString).reduce("", (base, string) -> base.equals("") ? string : base + ", " + string));
+			}
+		}
+		else if (tag.equals(UIATags.UIASelectionSelection)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationObjects)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationTypes)) {
+			if (object instanceof Long[]) {
+				uiaElement.set(tag, (T) Arrays.stream((Long[])object).map(Object::toString).reduce("", (base, string) -> base.equals("") ? string : base + ", " + string));
+			}
+		}
+		else if (tag.equals(UIATags.UIATableColumnHeaders)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIATableRowHeaders)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIATableItemColumnHeaderItems)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
+		}
+		else if (tag.equals(UIATags.UIATableItemRowHeaderItems)) {
+			// not sure what vt_unknown will translate into, so we just leave it as object for now
+			uiaElement.set(tag, (T) object);
 		}
 		else {
 			uiaElement.set(tag, (T) object);

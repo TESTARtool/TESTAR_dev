@@ -7,7 +7,6 @@ import org.fruit.alayer.Tags;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static es.upv.staq.testar.StateManagementTags.*;
 import static org.fruit.alayer.windows.UIATags.*;
@@ -35,6 +34,140 @@ public class UIAMapping {
             put(WidgetItemStatus, UIAItemStatus);
             put(WidgetPath, Tags.Path);
             put(WidgetBoundary, UIABoundingRectangle);
+            put(WidgetIsOffscreen, UIAIsOffscreen);
+            put(WidgetName, UIAName); // UIAName
+            put(WidgetAccelatorKey, UIAAcceleratorKey);
+            put(WidgetAccessKey, UIAAccessKey);
+            put(WidgetAriaProperties, UIAAriaProperties);
+            put(WidgetAriaRole, UIAAriaRole);
+            put(WidgetIsDialog, UIAIsDialog);
+            put(WidgetIsPassword, UIAIsPassword);
+            put(WidgetIsPeripheral, UIAIsPeripheral);
+            put(WidgetIsRequiredForForm, UIAIsRequiredForForm);
+            put(WidgetLandmarkType, UIALandmarkType);
+            put(WidgetGroupLevel, UIALevel);
+            put(WidgetLiveSetting, UIALiveSetting);
+            put(WidgetSetPosition, UIAPositionInSet);
+            put(WidgetSetSize, UIASizeOfSet);
+            put(WidgetRotation, UIARotation);
+
+            // patterns
+            put(WidgetAnnotationPattern, UIAIsAnnotationPatternAvailable);
+            put(WidgetDockPattern, UIAIsDockPatternAvailable);
+            put(WidgetDragPattern, UIAIsDragPatternAvailable);
+            put(WidgetDropTargetPattern, UIAIsDropTargetPatternAvailable);
+            put(WidgetExpandCollapsePattern, UIAIsExpandCollapsePatternAvailable);
+            put(WidgetGridItemPattern, UIAIsGridItemPatternAvailable);
+            put(WidgetGridPattern, UIAIsGridPatternAvailable);
+            put(WidgetInvokePattern, UIAIsInvokePatternAvailable);
+            put(WidgetItemContainerPattern, UIAIsItemContainerPatternAvailable);
+            put(WidgetLegacyIAccessiblePattern, UIAIsLegacyIAccessiblePatternAvailable);
+            put(WidgetMultipleViewPattern, UIAIsMultipleViewPatternAvailable);
+            put(WidgetObjectModelPattern, UIAIsObjectModelPatternAvailable);
+            put(WidgetRangeValuePattern, UIAIsRangeValuePatternAvailable);
+            put(WidgetScrollItemPattern, UIAIsScrollItemPatternAvailable);
+            put(WidgetScrollPattern, UIAIsScrollPatternAvailable);
+            put(WidgetSelectionItemPattern, UIAIsSelectionItemPatternAvailable);
+            put(WidgetSelectionPattern, UIAIsSelectionPatternAvailable);
+            put(WidgetSpreadsheetPattern, UIAIsSpreadsheetPatternAvailable);
+            put(WidgetSpreadsheetItemPattern, UIAIsSpreadsheetItemPatternAvailable);
+            put(WidgetStylesPattern, UIAIsStylesPatternAvailable);
+            put(WidgetSynchronizedInputPattern, UIAIsSynchronizedInputPatternAvailable);
+            put(WidgetTableItemPattern, UIAIsTableItemPatternAvailable);
+            put(WidgetTablePattern, UIAIsTablePatternAvailable);
+            put(WidgetTextChildPattern, UIAIsTextChildPatternAvailable);
+            put(WidgetTextPattern, UIAIsTextPatternAvailable);
+            put(WidgetTextPattern2, UIAIsTextPattern2Available);
+            put(WidgetTogglePattern, UIAIsTogglePatternAvailable);
+            put(WidgetTransformPattern, UIAIsTransformPatternAvailable);
+            put(WidgetTransformPattern2, UIAIsTransformPattern2Available);
+            put(WidgetValuePattern, UIAIsValuePatternAvailable);
+            put(WidgetVirtualizedItemPattern, UIAIsVirtualizedItemPatternAvailable);
+            put(WidgetWindowPattern, UIAIsWindowPatternAvailable);
+
+            // control pattern properties
+            put(WidgetAnnotationAnnotationTypeId, UIAAnnotationAnnotationTypeId);
+            put(WidgetAnnotationAnnotationTypeName, UIAAnnotationAnnotationTypeName);
+            put(WidgetAnnotationAuthor, UIAAnnotationAuthor);
+            put(WidgetAnnotationDateTime, UIAAnnotationDateTime);
+            put(WidgetAnnotationTarget, UIAAnnotationTarget);
+            put(WidgetDockDockPosition, UIADockDockPosition ); // check
+            put(WidgetDragDropEffect, UIADragDropEffect);
+            put(WidgetDragDropEffects, UIADragDropEffects); // array
+            put(WidgetDragIsGrabbed, UIADragIsGrabbed);
+            put(WidgetDragGrabbedItems, UIADragGrabbedItems); // array
+            put(WidgetDropTargetDropTargetEffect, UIADropTargetDropTargetEffect);
+            put(WidgetDropTargetDropTargetEffects, UIADropTargetDropTargetEffects); // array
+            put(WidgetExpandCollapseExpandCollapseState, UIAExpandCollapseExpandCollapseState);
+            put(WidgetGridColumnCount, UIAGridColumnCount);
+            put(WidgetGridRowCount, UIAGridRowCount);
+            put(WidgetGridItemColumn, UIAGridItemColumn);
+            put(WidgetGridItemColumnSpan, UIAGridItemColumnSpan);
+            put(WidgetGridItemContainingGrid, UIAGridItemContainingGrid);
+            put(WidgetGridItemRow, UIAGridItemRow);
+            put(WidgetGridItemRowSpan, UIAGridItemRowSpan);
+            put(WidgetLegacyIAccessibleChildId, UIALegacyIAccessibleChildId);
+            put(WidgetLegacyIAccessibleDefaultAction, UIALegacyIAccessibleDefaultAction);
+            put(WidgetLegacyIAccessibleDescription, UIALegacyIAccessibleDescription);
+            put(WidgetLegacyIAccessibleHelp, UIALegacyIAccessibleHelp);
+            put(WidgetLegacyIAccessibleKeyboardShortcut, UIALegacyIAccessibleKeyboardShortcut);
+            put(WidgetLegacyIAccessibleName, UIALegacyIAccessibleName);
+            put(WidgetLegacyIAccessibleRole, UIALegacyIAccessibleRole);
+            put(WidgetLegacyIAccessibleSelection, UIALegacyIAccessibleSelection); // list/array
+            put(WidgetLegacyIAccessibleState, UIALegacyIAccessibleState);
+            put(WidgetLegacyIAccessibleValue, UIALegacyIAccessibleValue);
+            put(WidgetMultipleViewCurrentView, UIAMultipleViewCurrentView);
+            put(WidgetMultipleViewSupportedViews, UIAMultipleViewSupportedViews); // array
+            put(WidgetRangeValueIsReadOnly, UIARangeValueIsReadOnly);
+            put(WidgetRangeValueLargeChange, UIARangeValueLargeChange);
+            put(WidgetRangeValueMaximum, UIARangeValueMaximum);
+            put(WidgetRangeValueMinimum, UIARangeValueMinimum);
+            put(WidgetRangeValueSmallChange, UIARangeValueSmallChange);
+            put(WidgetRangeValueValue, UIARangeValueValue);
+            put(WidgetSelectionCanSelectMultiple, UIASelectionCanSelectMultiple);
+            put(WidgetSelectionIsSelectionRequired, UIASelectionIsSelectionRequired);
+            put(WidgetSelectionSelection, UIASelectionSelection); // array
+            put(WidgetSelectionItemIsSelected, UIASelectionItemIsSelected);
+            put(WidgetSelectionItemSelectionContainer, UIASelectionItemSelectionContainer);
+            put(WidgetSpreadsheetItemFormula, UIASpreadsheetItemFormula);
+            put(WidgetSpreadsheetItemAnnotationObjects, UIASpreadsheetItemAnnotationObjects); //array
+            put(WidgetSpreadsheetItemAnnotationTypes, UIASpreadsheetItemAnnotationTypes); // array
+            put(WidgetHorizontallyScrollable, UIAHorizontallyScrollable);
+            put(WidgetVerticallyScrollable, UIAVerticallyScrollable);
+            put(WidgetScrollHorizontalViewSize, UIAScrollHorizontalViewSize);
+            put(WidgetScrollVerticalViewSize, UIAScrollVerticalViewSize);
+            put(WidgetScrollHorizontalPercent, UIAScrollHorizontalPercent);
+            put(WidgetScrollVerticalPercent, UIAScrollVerticalPercent);
+            put(WidgetStylesExtendedProperties, UIAStylesExtendedProperties);
+            put(WidgetStylesFillColor, UIAStylesFillColor);
+            put(WidgetStylesFillPatternColor, UIAStylesFillPatternColor);
+            put(WidgetStylesFillPatternStyle, UIAStylesFillPatternStyle);
+            put(WidgetStylesShape, UIAStylesShape);
+            put(WidgetStylesStyleId, UIAStylesStyleId);
+            put(WidgetStylesStyleName, UIAStylesStyleName);
+            put(WidgetTableColumnHeaders, UIATableColumnHeaders); // array
+            put(WidgetTableRowHeaders, UIATableRowHeaders); // array
+            put(WidgetTableRowOrColumnMajor, UIATableRowOrColumnMajor);
+            put(WidgetTableItemColumnHeaderItems, UIATableItemColumnHeaderItems); // array
+            put(WidgetTableItemRowHeaderItems, UIATableItemRowHeaderItems); //array
+            put(WidgetToggleToggleState, UIAToggleToggleState);
+            put(WidgetTransformCanMove, UIATransformCanMove);
+            put(WidgetTransformCanResize, UIATransformCanResize);
+            put(WidgetTransformCanRotate, UIATransformCanRotate);
+            put(WidgetTransform2CanZoom, UIATransform2CanZoom);
+            put(WidgetTransform2ZoomLevel, UIATransform2ZoomLevel);
+            put(WidgetTransform2ZoomMaximum, UIATransform2ZoomMaximum);
+            put(WidgetTransform2ZoomMinimum, UIATransform2ZoomMinimum);
+            put(WidgetValueIsReadOnly, UIAValueIsReadOnly);
+            put(WidgetValueValue, UIAValueValue);
+            put(WidgetWindowCanMaximize, UIAWindowCanMaximize);
+            put(WidgetWindowCanMinimize, UIAWindowCanMinimize);
+            put(WidgetWindowIsModal, UIAWindowIsModal);
+            put(WidgetWindowIsTopmost, UIAWindowIsTopmost);
+            put(WidgetWindowWindowInteractionState, UIAWindowWindowInteractionState); // check
+            put(WidgetWindowWindowVisualState, UIAWindowWindowVisualState); // check
+
+
         }
     };
 
@@ -87,7 +220,7 @@ public class UIAMapping {
         patternPropertyMapping.put(Windows.UIA_AnnotationAnnotationTypeNamePropertyId, UIATags.UIAAnnotationAnnotationTypeName);
         patternPropertyMapping.put(Windows.UIA_AnnotationAuthorPropertyId, UIATags.UIAAnnotationAuthor);
         patternPropertyMapping.put(Windows.UIA_AnnotationDateTimePropertyId, UIATags.UIAAnnotationDateTime);
-        patternPropertyMapping.put(Windows.UIA_AnnotationTargetPropertyId, UIATags.UIAnnotationTarget);
+        patternPropertyMapping.put(Windows.UIA_AnnotationTargetPropertyId, UIATags.UIAAnnotationTarget);
         patternPropertyMapping.put(Windows.UIA_DockDockPositionPropertyId, UIATags.UIADockDockPosition);
         patternPropertyMapping.put(Windows.UIA_DragDropEffectPropertyId, UIATags.UIADragDropEffect);
         patternPropertyMapping.put(Windows.UIA_DragDropEffectsPropertyId, UIATags.UIADragDropEffects);

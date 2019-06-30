@@ -117,15 +117,15 @@ public final class UIAStateBuilder implements StateBuilder {
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_HelpTextPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsContentElementPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsControlElementPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDataValidForFormPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDataValidForFormPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsEnabledPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsKeyboardFocusablePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsOffscreenPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsPasswordPropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsRequiredForFormPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsOffscreenPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsPasswordPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsRequiredForFormPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ItemStatusPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ItemTypePropertyId);
-		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LabeledByPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LabeledByPropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LocalizedControlTypePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_NativeWindowHandlePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ProviderDescriptionPropertyId);
@@ -133,6 +133,18 @@ public final class UIAStateBuilder implements StateBuilder {
 //		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RuntimeIdPropertyId);
 		//Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsWindowPatternAvailablePropertyId);
 		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ProcessIdPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_AriaPropertiesPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_AriaRolePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsDialogPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_IsPeripheralPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LandmarkTypePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LocalizedLandmarkTypePropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LevelPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_LiveSettingPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_PositionInSetPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_SizeOfSetPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_RotationPropertyId);
+		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_VisualEffectsPropertyId);
 
 		// cache all active pattern availability and pattern properties
 		UIATags.getPatternAvailabilityTags().stream().flatMap(tag -> Stream.concat(Stream.of(tag), UIATags.getChildTags(tag).stream()))

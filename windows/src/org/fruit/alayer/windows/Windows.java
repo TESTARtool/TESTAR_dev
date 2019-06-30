@@ -57,8 +57,8 @@ public final class Windows{
 	public static final long PixelFormatExtended     = 0x00100000; 
 	public static final long PixelFormatCanonical    = 0x00200000; 
 
-	public static final long PixelFormatUndefined = 0; 
-	public static final long PixelFormatDontCare  = 0; 
+	public static final long PixelFormatUndefined = 0;
+	public static final long PixelFormatDontCare  = 0;
 
 	public static final long PixelFormat1bppIndexed    =  (1 | ( 1 << 8) | PixelFormatIndexed | PixelFormatGDI);
 	public static final long PixelFormat4bppIndexed    =  (2 | ( 4 << 8) | PixelFormatIndexed | PixelFormatGDI);
@@ -137,22 +137,31 @@ public final class Windows{
 	public static final long UIA_IsContentElementPropertyId	= 30017;
 	public static final long UIA_IsControlElementPropertyId	= 30016;
 	public static final long UIA_IsDataValidForFormPropertyId	= 30103;
+	public static final long UIA_IsDialogPropertyId = 30174;
 	public static final long UIA_IsEnabledPropertyId	= 30010;
 	public static final long UIA_IsKeyboardFocusablePropertyId	= 30009;
 	public static final long UIA_IsOffscreenPropertyId	= 30022;
 	public static final long UIA_IsPasswordPropertyId	= 30019;
+	public static final long UIA_IsPeripheralPropertyId = 30150;
 	public static final long UIA_IsRequiredForFormPropertyId	= 30025;
 	public static final long UIA_ItemStatusPropertyId	= 30026;
 	public static final long UIA_ItemTypePropertyId	= 30021;
 	public static final long UIA_LabeledByPropertyId	= 30018;
+	public static final long UIA_LandmarkTypePropertyId = 30157;
+	public static final long UIA_LevelPropertyId = 30154;
+	public static final long UIA_LocalizedLandmarkTypePropertyId = 30158;
 	public static final long UIA_LiveSettingPropertyId = 30135;
 	public static final long UIA_LocalizedControlTypePropertyId = 30004;
 	public static final long UIA_NamePropertyId	= 30005;
 	public static final long UIA_NativeWindowHandlePropertyId	= 30020;
 	public static final long UIA_OrientationPropertyId	= 30023;
+	public static final long UIA_PositionInSetPropertyId = 30152;
 	public static final long UIA_ProcessIdPropertyId	= 30002;
 	public static final long UIA_RuntimeIdPropertyId = 30000;
 	public static final long UIA_ProviderDescriptionPropertyId = 30107;
+	public static final long UIA_RotationPropertyId = 30166;
+	public static final long UIA_SizeOfSetPropertyId = 30153;
+	public static final long UIA_VisualEffectsPropertyId = 30163;
 
 	// control pattern property ids
 	public static final long UIA_AnnotationAnnotationTypeIdPropertyId	= 30113;

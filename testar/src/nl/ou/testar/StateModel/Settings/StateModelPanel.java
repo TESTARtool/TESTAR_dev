@@ -30,6 +30,7 @@
 
 package nl.ou.testar.StateModel.Settings;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.HttpServer.JettyServer;
@@ -329,7 +330,7 @@ public class StateModelPanel extends JPanel {
     }
 
     private void checkDataType() {
-        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote"));
+        dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote") && stateModelEnabledChkBox.isSelected());
         dataStoreDirectoryField.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
         dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
     }
@@ -375,7 +376,7 @@ public class StateModelPanel extends JPanel {
     }
 
     private void openStateTagSelection() {
-        stateTagsDialog = new AbstractStateSettings(allStateManagementTags, selectedStateManagementTags);
+        stateTagsDialog = new AbstractStateSettings(allStateManagementTags, selectedStateManagementTags, CodingManager.getDefaultAbstractStateTags());
         stateTagsDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

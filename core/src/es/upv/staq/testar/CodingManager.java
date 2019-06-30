@@ -91,6 +91,7 @@ public class CodingManager {
 	// two arrays to hold the tags that will be used in constructing the concrete and abstract state id's
 	private static Tag<?>[] customTagsForConcreteId = new Tag<?>[]{};
 	private static Tag<?>[] customTagsForAbstractId = new Tag<?>[]{};
+	private static Tag<?>[] defaultAbstractStateTags = new Tag<?>[] {StateManagementTags.WidgetControlType};
 
     /**
      * Set the array of tags that should be used in constructing the concrete state id's.
@@ -125,6 +126,12 @@ public class CodingManager {
 	 * @return
 	 */
 	public static Tag<?>[] getCustomTagsForConcreteId() { return customTagsForConcreteId;}
+
+	/**
+	 * Returns the default tags for use in creating the abstract state id
+	 * @return
+	 */
+	public static Tag<?>[] getDefaultAbstractStateTags() {return defaultAbstractStateTags;}
 
 	// ###########################################
 	//  Widgets/States and Actions IDs management
@@ -219,8 +226,14 @@ public class CodingManager {
 	
 	private static String getTaggedString(Widget leaf, Tag<?>... tags){
 		StringBuilder sb = new StringBuilder();
-		for(Tag<?> t : tags)
+		for(Tag<?> t : tags) {
 			sb.append(leaf.get(t, null));
+			// check if we are dealing with a state management tag and, if so, if it has child tags
+			// that we need to incorporate
+			if (StateManagementTags.isStateManagementTag(t) && StateManagementTags.getTagGroup(t).equals(StateManagementTags.Group.ControlPattern)) {
+				StateManagementTags.getChildTags(t).stream().sorted(Comparator.comparing(Tag::name)).forEach(tag -> sb.append(leaf.get(tag, null)));
+			}
+		}
 		return sb.toString();
 	}
 	
