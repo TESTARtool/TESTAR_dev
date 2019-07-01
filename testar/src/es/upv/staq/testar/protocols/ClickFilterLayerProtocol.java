@@ -44,6 +44,8 @@ import org.fruit.monkey.DefaultProtocol;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
 
+import static java.awt.event.KeyEvent.VK_CAPS_LOCK;
+
 import static org.jnativehook.keyboard.NativeKeyEvent.VC_ALT;
 import static org.jnativehook.keyboard.NativeKeyEvent.VC_CAPS_LOCK;
 import static org.jnativehook.keyboard.NativeKeyEvent.VC_CONTROL;
@@ -65,7 +67,7 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	//pressing CAPS-LOCK + SHIFT and clicking on the widget
 
 	private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
-	private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VC_CAPS_LOCK);
+	private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VK_CAPS_LOCK);
 	private boolean whiteTabuMode = false; // true => white, false = tabu
 	private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
 

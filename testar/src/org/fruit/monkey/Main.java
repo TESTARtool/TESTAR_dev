@@ -453,6 +453,7 @@ public class Main {
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+			defaults.add(Pair.from(InputFileText, "blns.txt"));
 
 			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {

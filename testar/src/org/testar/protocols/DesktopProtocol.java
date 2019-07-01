@@ -68,8 +68,9 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     protected void preSequencePreparations() {
     	
     	if(!new File(settings.get(ConfigTags.InputFileText)).exists()) {
-    		System.out.println("Warning: BLNS file from desktop_generic settings cannot be readed, "
+    		System.out.println("Warning: BLNS file from "+ settings.get(ConfigTags.ProtocolClass) + " settings cannot be readed, "
     				+ "check if the current value is correct: " + settings.get(ConfigTags.InputFileText));
+    		System.out.println("Example of correct value: \"InputFileText = ./settings/desktop_generic/blns.txt\" ");
     		System.out.println("If you want to use a set of advanced Strings to test the text input fields, "
     				+ "please configure properly the InputFileText setting");
     	}
