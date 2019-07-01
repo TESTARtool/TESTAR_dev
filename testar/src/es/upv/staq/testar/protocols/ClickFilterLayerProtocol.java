@@ -1,37 +1,37 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 package es.upv.staq.testar.protocols;
 
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.util.Set;
 
 import nl.ou.testar.SutVisualization;
@@ -44,11 +44,11 @@ import org.fruit.monkey.DefaultProtocol;
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.managers.FilteringManager;
 
-import static java.awt.event.KeyEvent.VK_ALT;
-import static java.awt.event.KeyEvent.VK_CAPS_LOCK;
-import static java.awt.event.KeyEvent.VK_CONTROL;
-import static java.awt.event.KeyEvent.VK_SHIFT;
-import static java.awt.event.KeyEvent.VK_TAB;
+import static org.jnativehook.keyboard.NativeKeyEvent.VC_ALT;
+import static org.jnativehook.keyboard.NativeKeyEvent.VC_CAPS_LOCK;
+import static org.jnativehook.keyboard.NativeKeyEvent.VC_CONTROL;
+import static org.jnativehook.keyboard.NativeKeyEvent.VC_SHIFT;
+import static org.jnativehook.keyboard.NativeKeyEvent.VC_TAB;
 
 /**
  * Testing protocol enhancements to ease tester work.
@@ -64,20 +64,20 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	//The ClickFilterLsyerProtocol adds the functionality to filter actions in SPY mode by
 	//pressing CAPS-LOCK + SHIFT and clicking on the widget
 
-    private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
-    private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VK_CAPS_LOCK);
-    private boolean whiteTabuMode = false; // true => white, false = tabu
-    private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
+	private boolean preciseCoding = false; // false =>  CodingManager.ABSTRACT_R_T_ID; true => CodingManager.ABSTRACT_R_T_P_ID
+	private boolean displayWhiteTabu = Toolkit.getDefaultToolkit().getLockingKeyState(VC_CAPS_LOCK);
+	private boolean whiteTabuMode = false; // true => white, false = tabu
+	private boolean ctrlPressed = false, altPressed = false, shiftPressed = false;
 
-    private double mouseX = Double.MIN_VALUE, mouseY = Double.MIN_VALUE;
-    private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
-    
-    private FilteringManager filteringManager;
-    private DataManager dataManager;
-    
-    /**
-     * Constructor.
-     */
+	private double mouseX = Double.MIN_VALUE, mouseY = Double.MIN_VALUE;
+	private double[] filterArea = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MIN_VALUE,Double.MIN_VALUE}; // <x1,y1,x2,y2>
+
+	private FilteringManager filteringManager;
+	private DataManager dataManager;
+
+	/**
+	 * Constructor.
+	 */
 	public ClickFilterLayerProtocol(){
 		super();
 		filteringManager = new FilteringManager();
@@ -90,74 +90,75 @@ public class ClickFilterLayerProtocol extends DefaultProtocol {
 	 * Add additional TESTAR keyboard shortcuts in SPY mode to enable the filtering of actions by clicking on them
 	 * @param key
 	 */
-    @Override
-    public void keyDown(int key) {
-        super.keyDown(key);        
-        if (mode() == Modes.Spy){ 
-        	if (key == VK_CAPS_LOCK)
-        		displayWhiteTabu = !displayWhiteTabu;
-        	else if (key == VK_TAB)
-        		preciseCoding = !preciseCoding;
-        	else if (key == VK_SHIFT)
-        		shiftPressed = true;
-	    	else if (key == VK_CONTROL){
-	    		ctrlPressed = true;
-	    		filterArea[0] = mouseX;
-	    		filterArea[1] = mouseY;
-	    	}
-	    	else if (key == VK_ALT){
-	    		altPressed = true;
-			//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
-//	    		if (!ctrlPressed && !shiftPressed)
-//	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
-	    	}
-        }
-    }
+	@Override
+	public void keyDown(int key) {
+		super.keyDown(key);        
+		if (mode() == Modes.Spy){ 
+			if (key == VC_CAPS_LOCK)
+				displayWhiteTabu = !displayWhiteTabu;
+			else if (key == VC_TAB)
+				preciseCoding = !preciseCoding;
+			else if (key == VC_SHIFT)
+				shiftPressed = true;
+			else if (key == VC_CONTROL){
+				ctrlPressed = true;
+				filterArea[0] = mouseX;
+				filterArea[1] = mouseY;
+			}
+			else if (key == VC_ALT){
+				altPressed = true;
+				//Disabled functionality, because it was opening a Dialog asking for Input type (by accident):
+				//	    		if (!ctrlPressed && !shiftPressed)
+				//	    			filteringManager.setWidgetFilter(getStateForClickFilterLayerProtocol(),this.mouse,preciseCoding);
+			}
+		}
+	}
 
-    @Override
-    public void keyUp(int key) {
-    	super.keyUp(key);
-        if (mode() == Modes.Spy){
-        	if (key == VK_SHIFT)
-	    		shiftPressed = false;
-        	else if (key == VK_CONTROL && displayWhiteTabu){
-	    		filterArea[2] = mouseX;
-	    		filterArea[3] = mouseY;
-	    		ctrlPressed = false; whiteTabuMode = shiftPressed;
-	    		filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(),this.mouse,this.filterArea,this.whiteTabuMode,this.preciseCoding);
-	    	} else if (key == VK_ALT)
-	    		altPressed = false;
-        }
-    }
-    	
+	@Override
+	public void keyUp(int key) {
+		super.keyUp(key);
+		if (mode() == Modes.Spy){
+			if (key == VC_SHIFT) {
+				shiftPressed = false;
+			} else if (key == VC_CONTROL && displayWhiteTabu){
+				filterArea[2] = mouseX;
+				filterArea[3] = mouseY;
+				ctrlPressed = false; whiteTabuMode = shiftPressed;
+				filteringManager.manageWhiteTabuLists(getStateForClickFilterLayerProtocol(), this.mouse, this.filterArea, this.whiteTabuMode, this.preciseCoding);
+			} else if (key == VC_ALT) {
+				altPressed = false;
+			}
+		}
+	}
+
 	@Override
 	public void mouseMoved(double x, double y) {
 		mouseX = x;
 		mouseY = y;
 	}
 
-    @Override
+	@Override
 	protected void visualizeActions(Canvas canvas, State state, Set<Action> actions){
 		SutVisualization.visualizeActions(canvas, state, actions);
-    	if(displayWhiteTabu && (mode() == Modes.Spy))// || mode() == Modes.GenerateDebug)){ // && settings().get(ConfigTags.VisualizeActions)){
-    		filteringManager.visualizeActions(canvas,state);
+		if(displayWhiteTabu && (mode() == Modes.Spy))
+			filteringManager.visualizeActions(canvas,state);
 	}
 
-    protected boolean blackListed(Widget w){
-    	return filteringManager.blackListed(w);
-    }
+	protected boolean blackListed(Widget w){
+		return filteringManager.blackListed(w);
+	}
 
-    protected boolean whiteListed(Widget w){
-    	return filteringManager.whiteListed(w);
-    }
-    
-    @Override
-    protected String getRandomText(Widget w){
-    	String randomText = filteringManager.getRandomText(w);
-    	if (randomText == null || randomText.length() == 0)
-    		return super.getRandomText(w);
-    	else
-    		return randomText;
-    }
-        
+	protected boolean whiteListed(Widget w){
+		return filteringManager.whiteListed(w);
+	}
+
+	@Override
+	protected String getRandomText(Widget w){
+		String randomText = filteringManager.getRandomText(w);
+		if (randomText == null || randomText.length() == 0)
+			return super.getRandomText(w);
+		else
+			return randomText;
+	}
+
 }

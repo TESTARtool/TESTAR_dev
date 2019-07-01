@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -59,7 +60,7 @@ public final class Type extends TaggableBase implements Action {
 	
 	public Type(String text){
 		Assert.hasText(text);
-		checkAscii(text);
+		//checkAscii(text); //Comment temporally to decide if remove or modify
 		this.text = text;
 	}
 	
@@ -100,7 +101,6 @@ public final class Type extends TaggableBase implements Action {
 
 	public String toString(){ return "Type text '" + text + "'"; }
 	
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		for (Role r : discardParameters){
@@ -110,7 +110,6 @@ public final class Type extends TaggableBase implements Action {
 		return toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		Role r = get(Tags.Role, null);
@@ -120,7 +119,6 @@ public final class Type extends TaggableBase implements Action {
 			return toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
 		return "(" + text + ")";

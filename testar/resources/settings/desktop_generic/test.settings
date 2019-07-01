@@ -142,4 +142,4 @@ VisualizeSelectedAction = true
 TestGenerator = random
 MaxReward = 9999999
 Discount = .95
-InputFileText = blns.txt
+InputFileText = ./settings/desktop_generic/blns.txt

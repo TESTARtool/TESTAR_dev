@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -101,39 +101,6 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     	FlashFeedback.flash(modeNfo, 1000);
 
     }
-
-    //Old code to switch between modes
-    /*private synchronized void nextMode(boolean forward){
-        if(forward){
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }else{
-            switch(mode){
-                case Record:
-                    mode = Modes.Generate; break;
-                case Generate:
-                    mode = Modes.Record; break;
-                default:
-                    break;
-            }
-        }
-
-        // Add some logging
-        // Add the FlashFeedback about the mode you are in in the upper left corner.
-        String modeParamS = "";
-        if (mode == Modes.Record)
-            modeParamS = " (" + settings.get(ConfigTags.TimeToWaitAfterAction) + " wait time between actions)";
-
-        String modeNfo = "'" + mode + "' mode active." + modeParamS;
-        LogSerialiser.log(modeNfo + "\n", LogSerialiser.LogLevel.Info);
-        FlashFeedback.flash(modeNfo);
-    }*/
 
     /**
      * Set the mode with the given parameter value

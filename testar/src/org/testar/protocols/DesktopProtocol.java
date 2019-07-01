@@ -66,6 +66,14 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected void preSequencePreparations() {
+    	
+    	if(!new File(settings.get(ConfigTags.InputFileText)).exists()) {
+    		System.out.println("Warning: BLNS file from desktop_generic settings cannot be readed, "
+    				+ "check if the current value is correct: " + settings.get(ConfigTags.InputFileText));
+    		System.out.println("If you want to use a set of advanced Strings to test the text input fields, "
+    				+ "please configure properly the InputFileText setting");
+    	}
+    	
         //initializing the HTML sequence report:
         htmlReport = new HtmlSequenceReport();
     }
@@ -350,7 +358,6 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         try (final Stream<String> lines = Files.lines(new File(inputFile).toPath())) {
             return lines.filter(line -> !line.startsWith("#") && !line.isEmpty()).toArray(String[]::new);
         } catch (IOException e) {
-            System.out.println("Error while reading text input file!");
             return null;
         }
     }

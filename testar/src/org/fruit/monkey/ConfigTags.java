@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -126,6 +127,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
+  
   public static final Tag<String> InputFileText = Tag.from("InputFileText", String.class);
 
 }

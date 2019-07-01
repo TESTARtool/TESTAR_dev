@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -41,7 +42,7 @@ import org.fruit.alayer.Tags;
  * An action which releases a given Key on the Keyboard.
  */
 public final class KeyUp extends //TaggableBase
-		KeyAction { // by urueda
+		KeyAction {
 	
 	private static final long serialVersionUID = -7035337967443813849L;
 
@@ -51,7 +52,6 @@ public final class KeyUp extends //TaggableBase
 	
 	public String toString() { return "Release Key " + key; }
 
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		for (Role r : discardParameters){
@@ -61,13 +61,11 @@ public final class KeyUp extends //TaggableBase
 		return toString();
 	}
 	
-	// by urueda
 	@Override
 	protected void performKeyAction(SUT system, int key) {
 		system.get(Tags.StandardKeyboard).release(key);		
 	}
 
-	// by urueda
 	@Override
 	protected void altNumpad(SUT system, String numpadCodes){}
 	
