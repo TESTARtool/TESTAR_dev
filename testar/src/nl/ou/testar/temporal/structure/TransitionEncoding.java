@@ -1,10 +1,11 @@
 package nl.ou.testar.temporal.structure;
 
 import java.util.List;
+import java.util.Set;
 
 public class TransitionEncoding {
     private String edge;
-    private List<String > edgeAPs;
+    private Set<String > edgeAPs;
     private String targetState;
     private String encodedAPConjunct;
 
@@ -22,7 +23,7 @@ public class TransitionEncoding {
     public TransitionEncoding() {
     }
 
-    public TransitionEncoding(String edge, List<String> edgeAPs) {
+    public TransitionEncoding(String edge, Set<String> edgeAPs) {
         this.edge = edge;
         this.edgeAPs = edgeAPs;
     }
@@ -35,11 +36,11 @@ public class TransitionEncoding {
         this.edge = edge;
     }
 
-    public List<String> getEdgeAPs() {
+    public Set<String> getEdgeAPs() {
         return edgeAPs;
     }
 
-    public void setEdgeAPs(List<String> edgeAPs) {
+    public void setEdgeAPs(Set<String> edgeAPs) {
         this.edgeAPs = edgeAPs;
     }
 
@@ -51,7 +52,7 @@ public class TransitionEncoding {
         this.encodedAPConjunct = encodedAPConjunct;
 
     }
-    public void setEncodedTransitionConjunct(List<String> modelAPs, List<String> stateAPs){
+    public void setEncodedTransitionConjunct(List<String> modelAPs, Set<String> stateAPs){
         StringBuilder encodedresult= new StringBuilder();
 
         int i=0;

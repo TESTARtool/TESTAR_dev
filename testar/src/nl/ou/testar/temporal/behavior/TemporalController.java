@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OEdge;
+import com.orientechnologies.orient.core.record.OElement;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
@@ -16,9 +17,11 @@ import nl.ou.testar.StateModel.Analysis.Json.Vertex;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import nl.ou.testar.temporal.structure.APSelectorManager;
 import nl.ou.testar.temporal.structure.StateEncoding;
 import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.structure.TransitionEncoding;
+import org.fruit.alayer.Tags;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,10 +39,11 @@ public class TemporalController {
 
     private String outputDir;
     private ODatabaseSession db;
+    private APSelectorManager Apmgr;
 
     /**
-     *
      * Constructor
+     *
      * @param config
      * @param outputDir
      */
@@ -66,124 +70,105 @@ public class TemporalController {
 
     /**
      * This method fetches a list of the abstract state models in the current OrientDB data store.
+     *
      * @return
      */
     public List<AbstractStateModel> fetchModels() {
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         //try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
-            OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
-            while (resultSet.hasNext()) {
-                OResult result = resultSet.next();
-                // we're expecting a vertex
-                if (result.isVertex()) {
-                    Optional<OVertex> op = result.getVertex();
-                    if (!op.isPresent()) continue;
-                    OVertex modelVertex = op.get();
-
-                    String applicationName = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
-                    String applicationVersion = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
-                    String modelIdentifier = (String)getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
-                    Set abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
-                    // fetch the test sequences
-                    List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier, db);
-
-                    AbstractStateModel abstractStateModel = new AbstractStateModel(
-                            applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
-                    );
-                    abstractStateModels.add(abstractStateModel);
-                }
-            }
-        //}
-        return abstractStateModels;
-    }
-
-
-//*********************************
-public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
-   TemporalModel tmodel = new TemporalModel(
-           abstractStateModel.getApplicationName(),abstractStateModel.getApplicationVersion(),
-           abstractStateModel.getModelIdentifier(),abstractStateModel.getAbstractionAttributes());
-    // concrete states
-    String stmt = "SELECT FROM V WHERE @class = 'ConcreteState'";
-    //Map<String, Object> params = new HashMap<>();
-    //OResultSet resultSet = db.query(stmt, params);
-    OResultSet resultSet = db.query(stmt);
-
-    while (resultSet.hasNext()) {
-        OResult result = resultSet.next();
-        // we're expecting a vertex
-        if (result.isVertex()) {
-
-            Optional<OVertex> op = result.getVertex();
-            if (!op.isPresent()) continue;
-
-            OVertex stateVertex = op.get();
-            StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
-            List<String> props = new ArrayList<>();
-            //System.out.println("debug state;"+senc.getState());
-            for (String propertyName : stateVertex.getPropertyNames()) {
-                if (propertyName.contains("in_") || propertyName.contains("out_")) {
-                    // these are edge indicators. Ignore
-                    continue;
-                }
-                if (propertyName.equals("screenshot")) {
-                    //ignore
-                    continue;
-                }
-                props.add(propertyName+"__"+ stateVertex.getProperty(propertyName).toString());
-
-
-            }
-            //****
-            // concrete widgets
-            props.addAll(getWidgetPropositions(senc.getState()));
-            //***
-
-            senc.setStateAPs(props);
-            senc.setTransitionColl(getTransitions( senc.getState()));
-            tmodel.addStateEncoding(senc,false);
-            }
-
-
-
-        }
-    tmodel.updateTransitions();
-    return tmodel;
-    }
-
-    private List<String> getWidgetPropositions( String state ) {
-
-        // concrete widgets
-
-        //stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-       // String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM (SELECT * FROM :state)) WHERE @class = 'Widget'";
-        String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
-        Map<String, Object> params = new HashMap<>();
-        params.put("state",state);
-        OResultSet resultSet = db.query(stmt, params);
-        //***
-        List<String> props = new ArrayList<>();
+        OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
             if (result.isVertex()) {
                 Optional<OVertex> op = result.getVertex();
                 if (!op.isPresent()) continue;
+                OVertex modelVertex = op.get();
+
+                String applicationName = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
+                String applicationVersion = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
+                String modelIdentifier = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
+                Set abstractionAttributes = (Set) getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
+                // fetch the test sequences
+                List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier, db);
+
+                AbstractStateModel abstractStateModel = new AbstractStateModel(
+                        applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
+                );
+                abstractStateModels.add(abstractStateModel);
+            }
+        }
+        //}
+        return abstractStateModels;
+    }
+
+
+    //*********************************
+    public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel, APSelectorManager Apmgr) {
+        this.Apmgr = Apmgr;
+
+        TemporalModel tmodel = new TemporalModel(
+                abstractStateModel.getApplicationName(), abstractStateModel.getApplicationVersion(),
+                abstractStateModel.getModelIdentifier(), abstractStateModel.getAbstractionAttributes());
+        // concrete states
+        String stmt = "SELECT FROM V WHERE @class = 'ConcreteState'";
+        //Map<String, Object> params = new HashMap<>();
+        //OResultSet resultSet = db.query(stmt, params);
+        OResultSet resultSet = db.query(stmt);
+        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
+
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()) {
+
+                Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
 
                 OVertex stateVertex = op.get();
+                StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
+                //List<String> props = new ArrayList<>();
+                Set<String> props = new HashSet<>();
+                //System.out.println("debug state;"+senc.getState());
+
+                //compose key
 
 
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    if (propertyName.contains("in_") || propertyName.contains("out_")) {
-                        // these are edge indicators. Ignore
-                        continue;
-                    }
-                    if (propertyName.equals("screenshot")) {
-                        //ignore
-                        continue;
-                    }
-                    props.add(propertyName+"__"+ stateVertex.getProperty(propertyName).toString());
+                    computeProps(propertyName,stateVertex,props);
 
+            }
+                props.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
+                senc.setStateAPs(props);
+                senc.setTransitionColl(getTransitions(senc.getState()));
+                tmodel.addStateEncoding(senc, false);
+            }
+        }
+        tmodel.updateTransitions(); //update once. this is a costly operation
+        return tmodel;
+    }
+
+    private Set<String> getWidgetPropositions(String state) {
+
+        // concrete widgets
+
+        //stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+        // String stmt = "SELECT * FROM (TRAVERSE in('isChildOf') FROM (SELECT * FROM :state)) WHERE @class = 'Widget'";
+        String stmt = "SELECT FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) WHERE @class = 'Widget'";
+        Map<String, Object> params = new HashMap<>();
+        params.put("state", state);
+        OResultSet resultSet = db.query(stmt, params);
+        //***
+        Set<String> props = new HashSet<>();
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()) {
+                Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
+                OVertex stateVertex = op.get();
+                for (String propertyName : stateVertex.getPropertyNames()) {
+                    computeProps(propertyName,stateVertex,props);
                 }
             }
         }
@@ -191,15 +176,14 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
     }
 
 
-    private List<TransitionEncoding> getTransitions( String state ) {
+    private List<TransitionEncoding> getTransitions(String state) {
         List<TransitionEncoding> trenclist = new ArrayList<>();
-
 
 
         // concrete states
         String stmt = "SELECT * FROM (TRAVERSE outE('ConcreteAction') FROM (SELECT FROM ConcreteState WHERE @rid = :state)) where @class='ConcreteAction'";
         Map<String, Object> params = new HashMap<>();
-        params.put("state",state);
+        params.put("state", state);
         OResultSet resultSet = db.query(stmt, params);
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
@@ -207,7 +191,9 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
             if (result.isEdge()) {
                 Optional<OEdge> op = result.getEdge();
                 if (!op.isPresent()) {
-                    System.out.println("debug state;"+state+" waiting on edgde");continue;}
+                   // System.out.println("debug state;" + state + " waiting on edgde");
+                    continue;
+                }
                 OEdge actionEdge = op.get();
                 OVertexDocument source = actionEdge.getProperty("out");
                 OVertexDocument target = actionEdge.getProperty("in");
@@ -215,19 +201,10 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                 TransitionEncoding trenc = new TransitionEncoding();
                 trenc.setEdge(actionEdge.getIdentity().toString());
                 trenc.setTargetState(target.getIdentity().toString());
-                List<String> props = new ArrayList<>();
+                Set<String> props = new HashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    if (propertyName.contains("in_") || propertyName.contains("out_")) {
-                        // these are edge indicators. Ignore
-                        continue;
+                        computeProps(propertyName,actionEdge,props);
                     }
-                    if (propertyName.equals("screenshot")) {
-                        //ignore
-                        continue;
-                    }
-                    props.add(propertyName+"__"+ actionEdge.getProperty(propertyName).toString());
-
-                }
                 trenc.setEdgeAPs(props);
                 trenclist.add(trenc);
             }
@@ -242,6 +219,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
     /**
      * This method fetches the test sequences for a given abstract state model.
+     *
      * @param modelIdentifier
      * @param db
      * @return
@@ -268,7 +246,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                 int nrOfNodes = 0;
                 if (nodeResultSet.hasNext()) {
                     OResult nodeResult = nodeResultSet.next();
-                    nrOfNodes = (int)getConvertedValue(OType.INTEGER, nodeResult.getProperty("nr"));
+                    nrOfNodes = (int) getConvertedValue(OType.INTEGER, nodeResult.getProperty("nr"));
                     if (nrOfNodes > 0) {
                         nrOfNodes--;
                     }
@@ -285,6 +263,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
     /**
      * This method fetches the elements in the sequence layer for a given abstract state model.
+     *
      * @param modelIdentifier
      * @param db
      * @return
@@ -325,10 +304,9 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
     }
 
 
-
-
     /**
      * This method transforms a resultset of nodes into elements.
+     *
      * @param resultSet
      * @param className
      * @return
@@ -361,8 +339,8 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                     jsonVertex.addProperty("parent", parent);
                 }
                 Element element = new Element(Element.GROUP_NODES, jsonVertex, className);
-                if(stateVertex.getPropertyNames().contains("isInitial")) {
-                    if ((Boolean)getConvertedValue(OType.BOOLEAN, stateVertex.getProperty("isInitial"))) {
+                if (stateVertex.getPropertyNames().contains("isInitial")) {
+                    if ((Boolean) getConvertedValue(OType.BOOLEAN, stateVertex.getProperty("isInitial"))) {
                         element.addClass("isInitial");
                     }
                 }
@@ -374,6 +352,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
     /**
      * This method transforms a resultset of edges into elements.
+     *
      * @param resultSet
      * @param className
      * @return
@@ -405,6 +384,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
     /**
      * This method saves screenshots to disk.
+     *
      * @param recordBytes
      * @param identifier
      */
@@ -421,7 +401,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
         }
 
         // save the file to disk
-        File screenshotFile = new File( screenshotDir, identifier + ".png");
+        File screenshotFile = new File(screenshotDir, identifier + ".png");
         try {
             FileOutputStream outputStream = new FileOutputStream(screenshotFile);
             outputStream.write(recordBytes.toStream());
@@ -429,8 +409,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
             outputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -444,6 +423,7 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
 
     /**
      * Helper method that converts an object value based on a specified OrientDB data type.
+     *
      * @param oType
      * @param valueToConvert
      * @return
@@ -475,6 +455,94 @@ public TemporalModel getTemporalModel(AbstractStateModel abstractStateModel ) {
                 convertedValue = OType.convert(valueToConvert, Date.class);
                 break;
         }
-        return  convertedValue;
+        return convertedValue;
+    }
+
+    private void computeProps(String propertyName, OElement graphElement, Set<String> props) {
+
+        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
+        StringBuilder apkey = new StringBuilder();
+
+        //compose key
+        for (String k : Apmgr.getAPKey()
+        ) {
+            Object prop = graphElement.getProperty(k);
+            if (prop == null) {
+                String fallback;
+                Object concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists
+                if (concreteprop == null) {
+                    fallback = "undefined";
+                } else {
+                    fallback = concreteprop.toString();
+                }
+                apkey.append(fallback);
+                apkey.append("_");
+            }
+            else {
+                apkey.append(prop); apkey.append("_");
+            }
+        }
+        props.addAll(Apmgr.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+
+
+/*        for (TagBean<?> tb : Apmgr.getSelectedAttributes()
+        ) {
+            if (Validation.sanitizeAttributeName(tb.name()) == propertyName) {
+                // check if Boolean
+                if (tb.type() == Boolean.class) {
+                    props.add(apkey + propertyName + "__" + graphElement.getProperty(propertyName).toString());
+                } else if (tb.type() == Long.class || tb.type() == Double.class || tb.type() == Integer.class) {
+                    // add number value expressions
+                    for (PairBean<InferrableExpression, String> pb : Apmgr.getValuedExpressions()
+                    ) {
+                        boolean b = true;
+                        if (pb.left().typ == "number") {
+                        }
+                        Double val = Double.parseDouble(graphElement.getProperty(propertyName).toString());  //is a bit naieve, does not take actual type into account
+                        Double refval = Double.parseDouble(pb.right());
+                        //assume _lt
+                        if (pb.left().name().contains("_eq")) b = val.longValue() == refval.longValue();
+                        else b = val.longValue() < refval.longValue();
+                        props.add(apkey.toString() + propertyName + "_" + pb.left().name() + pb.right() + "__" + b);
+                    }
+
+                } else if (tb.type() == Shape.class) {
+
+                    // add spahe value expressions not ready yet CSS 20190630
+
+
+                } else {       //assume string
+                    for (PairBean<InferrableExpression, String> pb : Apmgr.getValuedExpressions()
+                    ) {
+                        boolean b = true;
+                        if (pb.left().typ == "text") {
+
+                            if (pb.left().name().contains("length")) {
+                                long len = graphElement.getProperty(propertyName).toString().length();
+
+                                Double refval = Double.parseDouble(pb.right());
+
+                                if (pb.left().name().contains("_eq")) {
+                                    b = len == refval.longValue();
+
+                                } else {//assume _lt
+                                    b = len < refval.longValue();
+                                }
+
+                            } else {
+                                //assume a "text" match criterion
+                                String val = graphElement.getProperty(propertyName).toString();
+                                String match = pb.right();
+                                b = val.matches(match);
+                            }
+
+
+                        }
+                        props.add(apkey.toString() + propertyName + "_" + pb.left().name() + pb.right() + "__" + b);
+                    }
+                }
+            }
+
+        }*/
     }
 }

@@ -334,7 +334,7 @@ private void setupMiner(){
         {
             testOracleCSV();
             testPatternCSV();
-            testApSelectionManagerJSON();
+            APSelectorManager APmgr = testApSelectionManagerJSON();
 
             Config config = new Config();
             config.setConnectionType(dataStoreType);
@@ -353,7 +353,7 @@ private void setupMiner(){
             logCheckResult.append("model count: " + models.size()+"\n");
             AbstractStateModel model = models.get(0);
             logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
-            TemporalModel tmodel = tcontrol.getTemporalModel(model);
+            TemporalModel tmodel = tcontrol.getTemporalModel(model,APmgr);
             JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             logCheckResult.append(" saving to file done\n");
 
@@ -419,17 +419,14 @@ private void setupMiner(){
         }
 
         }
-    public void testApSelectionManagerJSON() {
+    public APSelectorManager testApSelectionManagerJSON() {
         logCheckResult.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
 
-        APSelectorManager APmgr = new APSelectorManager();
-        APmgr.setDefaultValuedExpressions();
-        APmgr.setDefaultAttributes();
-        APmgr.setDefaultWidgetFilter();
+        APSelectorManager APmgr = new APSelectorManager(true);
         JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
         logCheckResult.append("json saved: \n");
 
-        APSelectorManager APmgr1 = new APSelectorManager();
+        APSelectorManager APmgr1 ;
         APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APmgr.getClass());
 
         if (APmgr1 == null) {
@@ -443,6 +440,7 @@ private void setupMiner(){
 
 
         }
+        return APmgr1;
     }
 
 

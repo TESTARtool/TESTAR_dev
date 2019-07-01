@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.structure;
 
+import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import nl.ou.testar.temporal.util.InferrableExpression;
 import nl.ou.testar.temporal.util.PairBean;
 import nl.ou.testar.temporal.util.TagBean;
@@ -9,22 +10,28 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.windows.UIARoles;
 import org.fruit.alayer.windows.UIATags;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
 public class APSelectorManager {
 
+
+
+    private List<String> APKey= new ArrayList<>();
     private Set<TagBean<?>> selectedAttributes;
+
+
+
+    //private BiMap<String, Class<?>> selectedAttributes1;
     private Set<TagBean<?>> entireAttributeSet ;
     private  Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
     private Set<WidgetFilter> widgetfilters;
     public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
         return valuedExpressions;
     }
-    private String formatVersion="20190629";
+    private String formatVersion="20190630 ";
+
+    private List<String> comments = new ArrayList<>();
 
 
 
@@ -33,10 +40,50 @@ public class APSelectorManager {
         entireAttributeSet = getEntireTagSet();
         widgetfilters = new LinkedHashSet<>();
         selectedAttributes = new LinkedHashSet<TagBean<?>>();
+        comments.add("relpos expressions are the quadrants  based on the position of the widget  in the parent window");
+        comments.add("this enables to distinguish 2 buttons with the same title in the relative window in 2 different states");
+        comments.add("this is not functional yet. CSS 20190630");
+    }
+    public APSelectorManager(boolean initializeWithDefaults) {
+        this();
+        if (initializeWithDefaults){
+            setDefaultValuedExpressions();
+            setDefaultAttributes();
+            setDefaultWidgetFilter();
+            setRoleTitlePathAsAPKey();
+        }
+
     }
 
+    public List<String> getAPKey() {
+        return APKey;
+    }
+    /*public BiMap<String, Class<?> > getSelectedAttributes1() {
+        return selectedAttributes1;
+    }
+
+    public void setSelectedAttributes1(BiMap<String, Class<?> > selectedAttributes1) {
+        this.selectedAttributes1 = selectedAttributes1;
+    }*/
+    //public  String getAttributeName(Class<?> clazz) {  return selectedAttributes1.inverse().get(clazz);}
+
+    //public Class<?> getAttributeType(String name) { return selectedAttributes1.get(name);   }
+
+
+    public void setAPKey(List<String> APKey) {
+        this.APKey = APKey;
+    }
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
     public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
-        this.valuedExpressions = valuedExpressions;
+        if (valuedExpressions!=null) this.valuedExpressions = valuedExpressions;
+        this.valuedExpressions.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
+        this.valuedExpressions.add(new PairBean<>(InferrableExpression.exists_, ""));
     }
     public String getFormatVersion() {
         return formatVersion;
@@ -59,19 +106,22 @@ public class APSelectorManager {
     private Set<TagBean<?>> getEntireTagSet(){
 
 
-        // WORKAROUND
-        // the 2 dummy reads are required to ensure properly initialization of the classes: static property is used!
+        // WORKAROUND CSS 20190629
+        // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
+        // both classes Tags and UIATags inherit from abstract class TagBase
+        //with this initialization, the call to .tagset() form either class collides into the same tagset content.
+
         Tag<?> dummy = UIATags.UIAItemType;
         dummy=Tags.Enabled;
 
         Set<Tag<?>> tags = new HashSet<Tag<?>>();
         tags.addAll(Tags.tagSet());
-        tags.addAll(UIATags.tagSet());//alternatve for platform independent: getNativetags ??
+        tags.addAll(UIATags.tagSet());//alternative for platform independent is : getNativetags ??
         Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
         Iterator<Tag<?>> iterator;
         for (iterator = tags.iterator(); iterator.hasNext(); ) {
             Tag<?> t = iterator.next();
-            TagBean<?> t1 = TagBean.from(t.name(), t.type());
+            TagBean<?> t1 = TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type()); //orientdb style tags
             tmptagset.add(t1);
         }
         return  tmptagset;
@@ -79,12 +129,34 @@ public class APSelectorManager {
 
 
 
+
+    public Set<String> getSelectedSanitizedAttributeNames() {
+        Set<String> tagNames = new HashSet<>();
+        for (TagBean<?> tb:selectedAttributes
+             ) {tagNames.add(Validation.sanitizeAttributeName(tb.name()));
+        }
+        return tagNames;
+    }
+
     public Set<TagBean<?>> getSelectedAttributes() {
         return selectedAttributes;
     }
-
     public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
         this.selectedAttributes = selectedAttributes;
+    }
+
+    public void setRoleTitlePathAsAPKey(){
+        APKey.clear();
+
+        APKey.add(Tags.Role.name());
+        APKey.add(Tags.Title.name());
+        APKey.add(Tags.Path.name());
+    }
+
+    public void setRoleTitleAsAPKey(){
+        APKey.clear();
+        APKey.add(Tags.Role.name());
+        APKey.add(Tags.Title.name());
     }
 
     public void setDefaultWidgetFilter(){
@@ -95,7 +167,7 @@ public class APSelectorManager {
     }
 
 
-    public void setDefaultBooleanAttributes() {
+    public void setDefaultOnlyBooleanAttributes() {
         for (TagBean<?> tag : entireAttributeSet
         ) {
             if (tag.type() == Boolean.class) {
@@ -111,7 +183,7 @@ public class APSelectorManager {
 
         for (TagBean<?> tag : entireAttributeSet
         ) {
-            if ( tag.name() == attrib) {
+            if ( tag.name().equals(attrib)) {
                 selectedAttributes.add(tag);
                 break;
             }
@@ -126,7 +198,7 @@ public class APSelectorManager {
     public void removeAttribute(String attrib){
         for (TagBean<?> tag : entireAttributeSet
         ) {
-            if ( tag.name() == attrib) {
+            if ( tag.name().equals(attrib)) {
                 selectedAttributes.remove(tag);
                 break;
             }
@@ -136,7 +208,7 @@ public class APSelectorManager {
         TagBean<?> ret=null;
         for (TagBean<?> tag : selectedAttributes
         ) {
-            if ( tag.name() == attrib) {
+            if ( tag.name().equals(attrib)){
                 ret=tag;
                 break;
             }
@@ -153,8 +225,9 @@ public class APSelectorManager {
     }
 
 
-    public void useDefaultValuedExpressions() {
-        valuedExpressions.clear();
+    private void useDefaultValuedExpressions() {
+        //valuedExpressions.clear();
+        setValuedExpressions(null); //initialize
         valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "1"));
@@ -206,6 +279,10 @@ public class APSelectorManager {
         valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "200"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.is_blank_, ""));
         valuedExpressions.add(new PairBean<>(InferrableExpression.exists_, ""));
+        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_upleft_, ""));
+        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_upright_, ""));
+        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_downleft_, ""));
+        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_downright_, ""));
         valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAButton.toString()));
         valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAWindow.toString()));
         valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIACheckBox.toString()));
@@ -246,12 +323,14 @@ public class APSelectorManager {
 
 
     public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
+        System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
         Set<String> apset = new LinkedHashSet<>();
-        TagBean<?> tag = null;
-        tag = getTag(attrib);
+        TagBean<?> tag = getTag(attrib);
+
         if (tag != null) {   //this attribute is required as a(n) (set of) AP
+
             if (tag.type() == Boolean.class) {
-                apset.add(widgetkey + "_" + attrib + "__"); // just encode the TRUE/existence  and FALSE is then considered absence
+                apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
             } else
 
                 for (PairBean<InferrableExpression, String> iap : valuedExpressions
@@ -260,16 +339,16 @@ public class APSelectorManager {
                         int intVal = (int) Double.parseDouble(value);
                         if (((iap.left() == InferrableExpression.value_eq_) && (intVal == Integer.parseInt(iap.right()))) ||
                                 ((iap.left() == InferrableExpression.value_lt_) && (intVal < Integer.parseInt(iap.right())))) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");// just encode the TRUE/existence  and FALSE is then considered absence
                         }
                     }
-                    if (iap.left().typ == "text" && (tag.type() == Double.class)) {
+                    if (iap.left().typ == "text" && (tag.type() == String.class)) {
 
                         if (((iap.left() == InferrableExpression.textmatch_) && value.matches(iap.right())) ||
                                 ((iap.left() == InferrableExpression.textlength_eq_) && (value.length() == Integer.parseInt(iap.right()))) ||
                                 ((iap.left() == InferrableExpression.textlength_lt_) && (value.length() < Integer.parseInt(iap.right())))
                         ) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
                         }
 
                     }
@@ -278,34 +357,37 @@ public class APSelectorManager {
                         //String[] shapecomponents=value.split("w:")[1];
                         String test = value.split("w:")[1].split(" ")[0];
                         int width = (int) Double.parseDouble(test);
-                        test = value.split("h:")[1].split(" ")[0];
+                        test = value.split("h:")[1].split("]")[0];
                         int heigth = (int) Double.parseDouble(test);
 
                         if (((iap.left() == InferrableExpression.width_lt_) && (width < Integer.parseInt(iap.right()))) ||
                                 ((iap.left() == InferrableExpression.heigth_lt_) && (heigth < Integer.parseInt(iap.right())))
                         ) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
                         }
                     }
                     if (iap.left().typ == "path" && (tag.type() == String.class)) {
                         //format:     <data key="Path">[0, 0, 8]</data>
                         if ((iap.left() == InferrableExpression.pathmatch_) && value.matches(iap.right())) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
                         }
                     }
                     if (iap.left().typ == "boolean") {   //add these regardless of the tag-type
                         //format:     <data key="Abc"></data>
                         if ((iap.left() == InferrableExpression.is_blank_) && value.matches("")) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "_"); //note : 1 space only
                         }
-                        if ((iap.left() == InferrableExpression.exists_) && value.matches("")) {
-                            apset.add(widgetkey + "_" + attrib + "_" + iap.left().name() + iap.right() + "__");
+                        if ((iap.left() == InferrableExpression.exists_) ) {
+                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "_");
                         }
 
                     }
                 }
 
         }
+        System.out.println("debug getAPOfAttributes exit with apset size: "+ apset.size());
+        if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset element0: "+ apset.iterator().next());
+
         return apset;
     }
 

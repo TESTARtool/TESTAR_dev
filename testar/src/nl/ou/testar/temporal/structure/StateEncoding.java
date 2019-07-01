@@ -1,11 +1,12 @@
 package nl.ou.testar.temporal.structure;
 
 import java.util.List;
+import java.util.Set;
 
 public class StateEncoding {
     private String state;
     private List<TransitionEncoding> transitionColl;
-    private List<String> stateAPs;
+    private Set<String> stateAPs;
 
     public StateEncoding(String state) {
         this.state = state;
@@ -35,11 +36,11 @@ public class StateEncoding {
         transitionColl.remove(tenc);
     }
 
-    public List<String> getStateAPs() {
+    public Set<String> getStateAPs() {
         return stateAPs;
     }
 
-    public void setStateAPs(List<String> stateAPs) {
+    public void setStateAPs(Set<String> stateAPs) {
         this.stateAPs = stateAPs;
     }
 

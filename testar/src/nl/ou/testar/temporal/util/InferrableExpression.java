@@ -12,9 +12,11 @@ public  enum InferrableExpression {
     textlength_eq_("text"),
     textlength_lt_("text"),
     is_blank_("boolean"),
-    exists_("boolean");
-
-
+    exists_("boolean"),
+    relpos_upleft_("boolean"),  //relative position in parent window
+    relpos_upright_("boolean"),
+    relpos_downleft_("boolean"),
+    relpos_downright_("boolean"),;
 
     public final String typ;
 
