@@ -40,6 +40,7 @@ import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.WebdriverProtocol;
 
 import java.util.*;
 
@@ -49,7 +50,7 @@ import static org.fruit.alayer.webdriver.Constants.scrollArrowSize;
 import static org.fruit.alayer.webdriver.Constants.scrollThick;
 
 
-public class Protocol_webdriver_kuveyt extends ClickFilterLayerProtocol {
+public class Protocol_webdriver_kuveyt extends WebdriverProtocol {
   // Classes that are deemed clickable by the web framework
   private static List<String> clickableClasses = Arrays.asList(
       "owl-dot", "participation", "rdMaturity");
