@@ -17,7 +17,7 @@ public class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         Car car = new Car("yellow", "renault");
 
-        File output = new File("car.json");
+        File output = new File("symbol.json");
         try {
 
             String result = objectMapper.writeValueAsString(car);

@@ -11,6 +11,7 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import nl.ou.testar.StateModel.Analysis.Json.Edge;
 import nl.ou.testar.StateModel.Analysis.Json.Element;
 import nl.ou.testar.StateModel.Analysis.Json.Vertex;
@@ -21,6 +22,10 @@ import nl.ou.testar.temporal.structure.APSelectorManager;
 import nl.ou.testar.temporal.structure.StateEncoding;
 import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.structure.TransitionEncoding;
+import nl.ou.testar.temporal.util.*;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
+import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
 import org.fruit.alayer.Tags;
 
 import java.io.File;
@@ -29,6 +34,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
+
+//import org.apache.tinkerpop.gremlin.structure.Graph;
+//import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
 
 public class TemporalController {
 
@@ -135,7 +143,7 @@ public class TemporalController {
 
 
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps(propertyName,stateVertex,props);
+                    computeProps(propertyName,stateVertex,props,false);
 
             }
                 props.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
@@ -168,7 +176,7 @@ public class TemporalController {
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps(propertyName,stateVertex,props);
+                   computeProps(propertyName,stateVertex,props,true);
                 }
             }
         }
@@ -203,7 +211,7 @@ public class TemporalController {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> props = new HashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                        computeProps(propertyName,actionEdge,props);
+                        computeProps(propertyName,actionEdge,props,true);
                     }
                 trenc.setEdgeAPs(props);
                 trenclist.add(trenc);
@@ -458,91 +466,218 @@ public class TemporalController {
         return convertedValue;
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> props) {
+    private void computeProps(String propertyName, OElement graphElement, Set<String> props, boolean isWidget) {
 
         //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
         StringBuilder apkey = new StringBuilder();
-
-        //compose key
-        for (String k : Apmgr.getAPKey()
-        ) {
-            Object prop = graphElement.getProperty(k);
-            if (prop == null) {
-                String fallback;
-                Object concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists
-                if (concreteprop == null) {
-                    fallback = "undefined";
-                } else {
-                    fallback = concreteprop.toString();
+        boolean pass=true;
+         //System.out.println("debug passwidget filter: " + propertyName + " _ "+graphElement.toString()+" _ "+isWidget);
+        if (isWidget) {
+            pass = Apmgr.passWidgetFilters(
+                    graphElement.getProperty(Tags.Role.name().toString()),
+                    graphElement.getProperty(Tags.Title.name().toString()),
+                    graphElement.getProperty(Tags.Path.name().toString())
+                    //graphElement.getProperty(Tags.Path.name().toString() // dummy, parenttitle is not implemented yet
+            );
+        }
+        if (pass){
+            //compose key
+            for (String k : Apmgr.getAPKey()
+            ) {
+                Object prop = graphElement.getProperty(k);
+                if (prop == null) {
+                    String fallback;
+                    Object concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists
+                    if (concreteprop == null) {
+                        fallback = "undefined";
+                    } else {
+                        fallback = concreteprop.toString();
+                    }
+                    apkey.append(fallback);
+                    apkey.append(APEncodingSeparator.SECTIONSIGN.symbol);
                 }
-                apkey.append(fallback);
-                apkey.append("_");
+                else {
+                    apkey.append(prop); apkey.append(APEncodingSeparator.SECTIONSIGN.symbol);
+                }
             }
-            else {
-                apkey.append(prop); apkey.append("_");
+            props.addAll(Apmgr.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+        }
+
+    }
+    public void testgraphmlexport(String file){
+        String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
+                dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
+String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
+        OrientGraph grap = new OrientGraph(dbconnectstring,dbConfig.getUser(),dbConfig.getPassword());
+        System.out.println("debug connectionstring: "+dbconnectstring+" \n");
+
+        //Graph graph = new OrientGraph(connectionString+"/"+dbConfig.getDatabase(),dbConfig.getUser(),dbConfig.getPassword());
+        Map<String,Object> conf = new HashMap<String,Object>();
+        conf.put("blueprints.graph", "com.tinkerpop.blueprints.impls.orient.OrientGraph");
+        conf.put("blueprints.orientdb.url",dbconnectstring);
+        conf.put("blueprints.orientdb.username",dbConfig.getUser());
+        conf.put("blueprints.orientdb.password",dbConfig.getPassword());
+
+        //Graph graph = GraphFactory.open(conf);
+        Graph graph = GraphFactory.open(conf);
+        //GraphTraversalSource gts = graph.traversal();
+        //final GraphWriter writer = graph.io(IoCore.graphson()).writer();
+       // final OutputStream os = new FileOutputStream("tinkerpop-modern.json");
+       // writer.writeObject(os, graph);
+
+
+        System.out.println("debug writing graphml file \n");
+        try {
+            try {
+            File output = new File(file);
+            FileOutputStream fos = new FileOutputStream(output.getAbsolutePath());
+            //GraphMLWriter writer = new GraphMLWriter(graph); //GraphMLWriter.outputGraph(grap,fos);
+                GraphMLWriter writer = GraphMLWriter.build().create();
+                writer.writeGraph(fos,graph);
+
+                //writer.outputGraph(fos);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        } finally {
+            try {
+               grap.shutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        props.addAll(Apmgr.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+    }
+    public void testmygraphmlexport(String file){
+
+        //init
+        Set<GraphML_DocKey> docnodekeys=new HashSet<>() ;
+        Set<GraphML_DocKey> docedgekeys=new HashSet<>() ;
 
 
-/*        for (TagBean<?> tb : Apmgr.getSelectedAttributes()
-        ) {
-            if (Validation.sanitizeAttributeName(tb.name()) == propertyName) {
-                // check if Boolean
-                if (tb.type() == Boolean.class) {
-                    props.add(apkey + propertyName + "__" + graphElement.getProperty(propertyName).toString());
-                } else if (tb.type() == Long.class || tb.type() == Double.class || tb.type() == Integer.class) {
-                    // add number value expressions
-                    for (PairBean<InferrableExpression, String> pb : Apmgr.getValuedExpressions()
-                    ) {
-                        boolean b = true;
-                        if (pb.left().typ == "number") {
-                        }
-                        Double val = Double.parseDouble(graphElement.getProperty(propertyName).toString());  //is a bit naieve, does not take actual type into account
-                        Double refval = Double.parseDouble(pb.right());
-                        //assume _lt
-                        if (pb.left().name().contains("_eq")) b = val.longValue() == refval.longValue();
-                        else b = val.longValue() < refval.longValue();
-                        props.add(apkey.toString() + propertyName + "_" + pb.left().name() + pb.right() + "__" + b);
+        List<GraphML_DocNode> nodes = new ArrayList<>() ;
+        List<GraphML_DocEdge> edges = new ArrayList<>() ;
+
+
+        //get nodes
+
+        String stmt = "SELECT * FROM V ";
+        //Map<String, Object> params = new HashMap<>();
+        //OResultSet resultSet = db.query(stmt, params);
+        OResultSet resultSet = db.query(stmt);
+        System.out.println("resultset >0 : "+resultSet.hasNext()+"\n");
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()) {
+                Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
+                OVertex stateVertex = op.get();
+                String nodeId = stateVertex.getIdentity().toString();
+                List<GraphML_DocEleProperty> eleProperties=new ArrayList<>();
+
+                String  keyname ;
+                String attributeType;
+                for (String propertyName : stateVertex.getPropertyNames()) {
+                    if (propertyName.matches(".*class")){
+                      keyname= result.isVertex() ? "labelV" : "labelE";
+                      attributeType="string";
+
+                    }else {
+                        keyname=propertyName;
+                        attributeType = stateVertex.getProperty(propertyName).getClass().getSimpleName();
                     }
-
-                } else if (tb.type() == Shape.class) {
-
-                    // add spahe value expressions not ready yet CSS 20190630
-
-
-                } else {       //assume string
-                    for (PairBean<InferrableExpression, String> pb : Apmgr.getValuedExpressions()
-                    ) {
-                        boolean b = true;
-                        if (pb.left().typ == "text") {
-
-                            if (pb.left().name().contains("length")) {
-                                long len = graphElement.getProperty(propertyName).toString().length();
-
-                                Double refval = Double.parseDouble(pb.right());
-
-                                if (pb.left().name().contains("_eq")) {
-                                    b = len == refval.longValue();
-
-                                } else {//assume _lt
-                                    b = len < refval.longValue();
-                                }
-
-                            } else {
-                                //assume a "text" match criterion
-                                String val = graphElement.getProperty(propertyName).toString();
-                                String match = pb.right();
-                                b = val.matches(match);
-                            }
-
-
-                        }
-                        props.add(apkey.toString() + propertyName + "_" + pb.left().name() + pb.right() + "__" + b);
+                    if (propertyName.contains("in_") || propertyName.contains("out_")) {
+                        // these are edge indicators. Ignore
+                        continue;
                     }
+                    if (result.isVertex()){
+                        docnodekeys.add(new GraphML_DocKey(keyname,"node",keyname,attributeType));
+                    }else{
+                        docedgekeys.add(new GraphML_DocKey(keyname,"edge",keyname,attributeType));
+                    }
+                    eleProperties.add(new GraphML_DocEleProperty(keyname,stateVertex.getProperty(propertyName).toString()));
                 }
-            }
+                if (result.isVertex()){
+                    nodes.add(new GraphML_DocNode(nodeId,eleProperties));
+                }else{
+                    edges.add(new GraphML_DocEdge(nodeId,"","",eleProperties));
 
-        }*/
+                }
+
+            }
+        }
+
+
+
+        //get edges
+
+        stmt = "SELECT * FROM E ";
+        //Map<String, Object> params = new HashMap<>();
+        //OResultSet resultSet = db.query(stmt, params);
+         resultSet = db.query(stmt);
+        System.out.println("resultset >0 : "+resultSet.hasNext()+"\n");
+        String source="";
+        String target="";
+        while (resultSet.hasNext()) {
+            OResult result = resultSet.next();
+            // we're expecting a vertex
+            if (result.isVertex()|| result.isEdge() ){
+                Optional<OElement> op = result.getElement();
+                //Optional<OVertex> op = result.getVertex();
+                if (!op.isPresent()) continue;
+                OElement graphElement = op.get();
+                String nodeId = graphElement.getIdentity().toString();
+                if (result.isEdge() ) {
+                    source = ((OVertexDocument) graphElement.getProperty("out")).getIdentity().toString();
+                    target = ((OVertexDocument) graphElement.getProperty("in")).getIdentity().toString();
+                }
+
+                List<GraphML_DocEleProperty> eleProperties=new ArrayList<>();
+
+                String  keyname ;
+                String attributeType;
+                for (String propertyName : graphElement.getPropertyNames()) {
+                    if (propertyName.matches(".*class")){
+                        keyname= result.isVertex() ? "labelV" : "labelE";
+                        attributeType="string";
+
+                    }else {
+                        keyname=propertyName;
+                        attributeType = graphElement.getProperty(propertyName).getClass().getSimpleName();
+                    }
+                    if (propertyName.startsWith("in") || propertyName.startsWith("out")) {
+                        // these are edge indicators. Ignore
+                        continue;
+                    }
+                    //edge source and target
+                    if (result.isVertex()){
+                        docnodekeys.add(new GraphML_DocKey(keyname,"node",keyname,attributeType));
+
+                    }else{
+                        docedgekeys.add(new GraphML_DocKey(keyname,"edge",keyname,attributeType));
+
+                    }
+                    eleProperties.add(new GraphML_DocEleProperty(keyname,graphElement.getProperty(propertyName).toString()));
+                }
+                if (result.isVertex()){
+                    nodes.add(new GraphML_DocNode(nodeId,eleProperties));
+                }else{
+                    edges.add(new GraphML_DocEdge(nodeId,source,target,eleProperties));
+
+                }
+
+            }
+        }
+        GraphML_DocGraph graph= new GraphML_DocGraph(dbConfig.getDatabase(),nodes,edges);
+        Set<GraphML_DocKey> tempset = new LinkedHashSet<GraphML_DocKey>();
+        tempset.addAll(docnodekeys);
+        tempset.addAll(docedgekeys);
+        GraphML_DocRoot root = new GraphML_DocRoot(tempset,graph);
+        XMLHandler.save(root,file);
+
+
     }
 }

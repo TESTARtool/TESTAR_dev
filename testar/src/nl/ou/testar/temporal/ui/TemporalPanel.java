@@ -358,8 +358,16 @@ private void setupMiner(){
             logCheckResult.append(" saving to file done\n");
 
             logCheckResult.append("\n");
-            tcontrol.shutdown();
 
+            //tcontrol.testgraphmlexport(outputDir + "GraphML.XML");
+            //logCheckResult.append(" saving to grpgmlfile done\n");
+
+            logCheckResult.append("\n");
+            tcontrol.testmygraphmlexport(outputDir + "GraphMLtestcss.XML");
+            logCheckResult.append(" saving to 2nd grpgmlfile done\n");
+
+            logCheckResult.append("\n");
+            tcontrol.shutdown();
         }
         catch(Exception e)
         {

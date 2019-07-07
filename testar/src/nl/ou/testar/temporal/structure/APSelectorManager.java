@@ -260,7 +260,7 @@ public class APSelectorManager {
         valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:LEFT)"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RIGHT)"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "")); //no title
-        valuedExpressions.add(new PairBean<>(InferrableExpression.pathmatch_, ".\\[(\\d+,)*\\d+\\]"));
+        valuedExpressions.add(new PairBean<>(InferrableExpression.pathmatch_, ".*\\[(\\d+, )*\\d+\\]"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "50"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "250"));
         valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "500"));
@@ -323,7 +323,7 @@ public class APSelectorManager {
 
 
     public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
-        System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
+        //System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
         Set<String> apset = new LinkedHashSet<>();
         TagBean<?> tag = getTag(attrib);
 
@@ -385,10 +385,71 @@ public class APSelectorManager {
                 }
 
         }
-        System.out.println("debug getAPOfAttributes exit with apset size: "+ apset.size());
-        if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset element0: "+ apset.iterator().next());
+        //System.out.println("debug getAPOfAttributes exit with apset size: "+ apset.size());
+      //  if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset size and element0: "+apset.size()+" : "+ apset.iterator().next());
+      //  if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset size and element0: "+apset.size()+" : "+ apset.iterator().next());
 
         return apset;
     }
 
+    public boolean passWidgetFilters(String role, String title, String path){
+        boolean pass=false;
+        //pass if at least one of the roles match and at least one of the title matches and at least one of the path's matches
+        // make disjunct with all widget filters
+        if (role==null &&title==null && path==null) {// regain control actions by TESTAR itself, usually doe snot change state
+            role = "TESTAR";
+            title="TESTAR";
+            path="TESTAR";
+        }
+
+        for (WidgetFilter wf:widgetfilters
+        ) {
+            pass = (wf.getWidgetRolesMatches().size() == 0) ;  // no filter means pass
+
+            if (!pass) {
+                for (String frole : wf.getWidgetRolesMatches()
+                ) {
+                    pass = role.matches(frole);
+//
+                    if (pass) break;
+                }
+            }
+
+            if (!pass) continue;  //if still not passed, chck the next widgetfilter
+            pass = (wf.getWidgetTitleMatches().size() == 0) ;
+            if (!pass) {
+                for (String ftitle : wf.getWidgetTitleMatches()
+                ) {
+                    pass = title.matches(ftitle);
+                    if (pass) break;
+                }
+            }
+
+            if (!pass) continue;
+            pass = (wf.getWidgetPathMatches().size() == 0) ;
+            if (!pass) {
+
+                for (String fpath : wf.getWidgetPathMatches()
+                ) {
+                    pass = path.matches(fpath);
+                    if (pass) break;
+                }
+            }
+//            if (!pass) continue;
+//            pass= (wf.getWidgetParentTitleMatches().size()==0);
+//            if (!pass) {
+//
+//                for (String fppath : wf.getWidgetParentTitleMatches()
+//                ) {
+//                    pass = role.matches(fppath);
+//                    if (pass) break;
+//                }
+//            }
+
+            if (pass) break; // role, title and path matches, that is enough
+        }
+
+
+        return pass;
+    }
 }

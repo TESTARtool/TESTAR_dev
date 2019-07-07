@@ -64,6 +64,10 @@ dependencies {
     compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
     compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
     compile 'com.opencsv:opencsv:4.6'  //css 20190610
+
+    compile group: 'org.apache.tinkerpop', name: 'gremlin-core', version: '3.4.0'  //css 20190706
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.0" // css20190707
+
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
