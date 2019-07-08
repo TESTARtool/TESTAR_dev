@@ -10,11 +10,11 @@ public class GraphML_DocGraph {
     private String id="G";
     @JacksonXmlProperty( isAttribute = true)
     private String edgedefault="directed";
-    //@JacksonXmlProperty( isAttribute = false, localName = "node")
+    @JacksonXmlProperty( isAttribute = false, localName = "node")
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<GraphML_DocNode> nodes ;
-    //@JacksonXmlProperty( isAttribute = false, localName = "edge")
-    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty( isAttribute = false, localName = "edge")
+    @JacksonXmlElementWrapper(useWrapping = false )
     private List<GraphML_DocEdge> edges ;
 
     public GraphML_DocGraph(String id, List<GraphML_DocNode> nodes, List<GraphML_DocEdge> edges) {

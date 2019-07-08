@@ -555,124 +555,85 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
         //init
         Set<GraphML_DocKey> docnodekeys=new HashSet<>() ;
         Set<GraphML_DocKey> docedgekeys=new HashSet<>() ;
-
-
         List<GraphML_DocNode> nodes = new ArrayList<>() ;
         List<GraphML_DocEdge> edges = new ArrayList<>() ;
 
+        //get nodes , then get edges
+        List<String> stmtlist= new ArrayList<>();
+        stmtlist.add("SELECT * FROM V ");
+        stmtlist.add("SELECT * FROM E ");
 
-        //get nodes
+        //stmt = "SELECT * FROM E ";
+        for (String stmt:stmtlist
+             ) {
+            //Map<String, Object> params = new HashMap<>();
+            //OResultSet resultSet = db.query(stmt, params);
+            OResultSet resultSet = db.query(stmt);
+            String source = "";
+            String target = "";
+            String keyname;
+            String attributeType;
+            while (resultSet.hasNext()) {
+                OResult result = resultSet.next();
+                // we're expecting a node or edge
+                if (result.isVertex() || result.isEdge()) {
+                    Optional<OElement> op = result.getElement();
 
-        String stmt = "SELECT * FROM V ";
-        //Map<String, Object> params = new HashMap<>();
-        //OResultSet resultSet = db.query(stmt, params);
-        OResultSet resultSet = db.query(stmt);
-        System.out.println("resultset >0 : "+resultSet.hasNext()+"\n");
-        while (resultSet.hasNext()) {
-            OResult result = resultSet.next();
-            // we're expecting a vertex
-            if (result.isVertex()) {
-                Optional<OVertex> op = result.getVertex();
-                if (!op.isPresent()) continue;
-                OVertex stateVertex = op.get();
-                String nodeId = stateVertex.getIdentity().toString();
-                List<GraphML_DocEleProperty> eleProperties=new ArrayList<>();
-
-                String  keyname ;
-                String attributeType;
-                for (String propertyName : stateVertex.getPropertyNames()) {
-                    if (propertyName.matches(".*class")){
-                      keyname= result.isVertex() ? "labelV" : "labelE";
-                      attributeType="string";
-
-                    }else {
-                        keyname=propertyName;
-                        attributeType = stateVertex.getProperty(propertyName).getClass().getSimpleName();
+                    if (!op.isPresent()) continue;
+                    OElement graphElement = op.get();
+                    String eleId = graphElement.getIdentity().toString();
+                    if (result.isEdge()) {
+                        source = ((OVertexDocument) graphElement.getProperty("out")).getIdentity().toString();
+                        target = ((OVertexDocument) graphElement.getProperty("in")).getIdentity().toString();
                     }
-                    if (propertyName.contains("in_") || propertyName.contains("out_")) {
-                        // these are edge indicators. Ignore
-                        continue;
+                    List<GraphML_DocEleProperty> eleProperties = new ArrayList<>();
+                    for (String propertyName : graphElement.getPropertyNames()) {
+                        keyname = propertyName;
+                        String rawattributeType = graphElement.getProperty(propertyName).getClass().getSimpleName().toLowerCase();
+                        //if(rawattributeType.equals("date")||rawattributeType.startsWith("orecord")||rawattributeType.startsWith("otracked")){
+                        if(!rawattributeType.equals("boolean")&&
+                                !rawattributeType.equals("long") &&
+                                !rawattributeType.equals("double")&&
+                                !rawattributeType.equals("string")){
+                            attributeType="string"; // unknown types are converted to string
+                        }else
+                            attributeType=rawattributeType;
+
+                        if (result.isEdge() && (propertyName.startsWith("in") || propertyName.startsWith("out"))) {
+                            // these are probably edge indicators. Ignore
+                            continue;
+                        }
+                        if (result.isVertex() &&(propertyName.contains("in_") || propertyName.contains("out_"))) {
+                            // these are probably edge indicators. Ignore
+                            continue;
+                        }
+                        if (result.isVertex()) {
+                            docnodekeys.add(new GraphML_DocKey(keyname, "node", keyname, attributeType));
+
+                        } else {
+                            docedgekeys.add(new GraphML_DocKey(keyname, "edge", keyname, attributeType));
+
+                        }
+                        eleProperties.add(new GraphML_DocEleProperty(keyname, graphElement.getProperty(propertyName).toString()));
                     }
-                    if (result.isVertex()){
-                        docnodekeys.add(new GraphML_DocKey(keyname,"node",keyname,attributeType));
-                    }else{
-                        docedgekeys.add(new GraphML_DocKey(keyname,"edge",keyname,attributeType));
+                    if (result.isVertex()) {
+
+                        eleProperties.add(new GraphML_DocEleProperty("labelV", graphElement.getSchemaType().get().toString()));
+                        nodes.add(new GraphML_DocNode(eleId, eleProperties));
+                    } else {
+                        eleProperties.add(new GraphML_DocEleProperty("labelE", graphElement.getSchemaType().get().toString()));
+                        edges.add(new GraphML_DocEdge(eleId, source, target, eleProperties));
+
                     }
-                    eleProperties.add(new GraphML_DocEleProperty(keyname,stateVertex.getProperty(propertyName).toString()));
+
                 }
-                if (result.isVertex()){
-                    nodes.add(new GraphML_DocNode(nodeId,eleProperties));
-                }else{
-                    edges.add(new GraphML_DocEdge(nodeId,"","",eleProperties));
-
-                }
-
             }
-        }
 
-
-
-        //get edges
-
-        stmt = "SELECT * FROM E ";
-        //Map<String, Object> params = new HashMap<>();
-        //OResultSet resultSet = db.query(stmt, params);
-         resultSet = db.query(stmt);
-        System.out.println("resultset >0 : "+resultSet.hasNext()+"\n");
-        String source="";
-        String target="";
-        while (resultSet.hasNext()) {
-            OResult result = resultSet.next();
-            // we're expecting a vertex
-            if (result.isVertex()|| result.isEdge() ){
-                Optional<OElement> op = result.getElement();
-                //Optional<OVertex> op = result.getVertex();
-                if (!op.isPresent()) continue;
-                OElement graphElement = op.get();
-                String nodeId = graphElement.getIdentity().toString();
-                if (result.isEdge() ) {
-                    source = ((OVertexDocument) graphElement.getProperty("out")).getIdentity().toString();
-                    target = ((OVertexDocument) graphElement.getProperty("in")).getIdentity().toString();
-                }
-
-                List<GraphML_DocEleProperty> eleProperties=new ArrayList<>();
-
-                String  keyname ;
-                String attributeType;
-                for (String propertyName : graphElement.getPropertyNames()) {
-                    if (propertyName.matches(".*class")){
-                        keyname= result.isVertex() ? "labelV" : "labelE";
-                        attributeType="string";
-
-                    }else {
-                        keyname=propertyName;
-                        attributeType = graphElement.getProperty(propertyName).getClass().getSimpleName();
-                    }
-                    if (propertyName.startsWith("in") || propertyName.startsWith("out")) {
-                        // these are edge indicators. Ignore
-                        continue;
-                    }
-                    //edge source and target
-                    if (result.isVertex()){
-                        docnodekeys.add(new GraphML_DocKey(keyname,"node",keyname,attributeType));
-
-                    }else{
-                        docedgekeys.add(new GraphML_DocKey(keyname,"edge",keyname,attributeType));
-
-                    }
-                    eleProperties.add(new GraphML_DocEleProperty(keyname,graphElement.getProperty(propertyName).toString()));
-                }
-                if (result.isVertex()){
-                    nodes.add(new GraphML_DocNode(nodeId,eleProperties));
-                }else{
-                    edges.add(new GraphML_DocEdge(nodeId,source,target,eleProperties));
-
-                }
-
-            }
         }
         GraphML_DocGraph graph= new GraphML_DocGraph(dbConfig.getDatabase(),nodes,edges);
         Set<GraphML_DocKey> tempset = new LinkedHashSet<GraphML_DocKey>();
+        docnodekeys.add(new GraphML_DocKey("labelV", "node", "labelV", "string"));
+        docedgekeys.add(new GraphML_DocKey("labelE", "edge", "labelE", "string"));
         tempset.addAll(docnodekeys);
         tempset.addAll(docedgekeys);
         GraphML_DocRoot root = new GraphML_DocRoot(tempset,graph);
@@ -680,4 +641,5 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
 
 
     }
+
 }

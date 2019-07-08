@@ -10,7 +10,7 @@ import java.util.Set;
 public class GraphML_DocRoot {
     @JacksonXmlProperty( isAttribute = true)
     private String xmlns="http://graphml.graphdrawing.org/xmlns";
-    @JacksonXmlProperty( isAttribute = true, localName = "xlmns:xsi")
+    @JacksonXmlProperty( isAttribute = true, localName = "xmlns:xsi")
     private String xmlns_xsi="http://www.w3.org/2001/XMLSchema-instance";
     @JacksonXmlProperty( isAttribute = true, localName = "xsi:schemaLocation")
     private String xsi_schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd";
