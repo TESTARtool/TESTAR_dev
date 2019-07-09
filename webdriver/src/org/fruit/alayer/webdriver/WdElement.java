@@ -171,16 +171,16 @@ public class WdElement implements Serializable {
               (scrollOn.contains(overflowX) || hasHorizontalScrollbar);
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
+      hScrollViewSize = clientWidth;
     }
-    hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
     boolean hasVerticalScrollbar = offsetWidth > (clientWidth + borderWidth);
     vScroll = scrollHeight > clientHeight &&
               (scrollOn.contains(overflowY) || hasVerticalScrollbar);
     if (scrollHeight != clientHeight) {
       vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
+      vScrollViewSize = clientHeight;
     }
-    vScrollViewSize = 100.0 * clientHeight / scrollHeight;
 
     scrollPattern = hScroll || vScroll;
   }
@@ -220,13 +220,13 @@ public class WdElement implements Serializable {
     borderWidth = castDimensionsToLong(dims.get("borderWidth"));
     borderHeight = castDimensionsToLong(dims.get("borderHeight"));
   }
-  
+
   private long castDimensionsToLong(Object o) {
 	  if(o instanceof Double)
 		  return ((Double) o).longValue();
 	  else if(o instanceof Long)
 		  return ((Long) o).longValue();
-	  
+
 	  return (long)o;
   }
 }
