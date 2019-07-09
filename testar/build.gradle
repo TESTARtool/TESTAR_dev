@@ -23,6 +23,11 @@ sourceSets {
  * This task set the working directory to the install folder and runs testar.bat
  */
 task runTestar(type: Exec) {
+    // Make sure temp dir exists on case-sensitive OSs
+    doFirst{
+        new File("${project.buildDir}/install/testar/bin/output/temp").mkdirs()
+    }
+
     group = 'custom_testar'
     description ='runTESTAR'
     workingDir 'target/install/testar/bin'
