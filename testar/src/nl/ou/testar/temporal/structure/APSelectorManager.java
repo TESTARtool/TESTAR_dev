@@ -109,7 +109,8 @@ public class APSelectorManager {
         // WORKAROUND CSS 20190629
         // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
         // both classes Tags and UIATags inherit from abstract class TagBase
-        //with this initialization, the call to .tagset() form either class collides into the same tagset content.
+        //without this initialization, the call to .tagset() from either class collides into the same tagset content.
+        // symptom: UIATags appears to have the same tags as Tags and we're mising out on the real UIATags.
 
         Tag<?> dummy = UIATags.UIAItemType;
         dummy=Tags.Enabled;
@@ -130,7 +131,7 @@ public class APSelectorManager {
 
 
 
-    public Set<String> getSelectedSanitizedAttributeNames() {
+    private  Set<String> retrieveSelectedSanitizedAttributeNames() {
         Set<String> tagNames = new HashSet<>();
         for (TagBean<?> tb:selectedAttributes
              ) {tagNames.add(Validation.sanitizeAttributeName(tb.name()));

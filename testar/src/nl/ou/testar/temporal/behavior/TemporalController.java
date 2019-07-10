@@ -211,9 +211,11 @@ public class TemporalController {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> props = new HashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                        computeProps(propertyName,actionEdge,props,true);
+                        computeProps(propertyName,actionEdge,props,false);
                     }
                 trenc.setEdgeAPs(props);
+
+                // add to model aps??? css 10/7
                 trenclist.add(trenc);
             }
 
