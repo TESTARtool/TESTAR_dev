@@ -447,23 +447,23 @@ public class StateFetcher implements Callable<UIAState>{
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_IsRequiredForFormPropertyId, true);
 		uiaElement.set(UIATags.UIAIsRequiredForForm, obj instanceof Boolean && ((Boolean) obj));
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LabeledByPropertyId, true);
-		uiaElement.set(UIATags.UIALabeledBy, obj);
+		setObjectValueIfNotNull(UIATags.UIALabeledBy, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LandmarkTypePropertyId, true);
-		uiaElement.set(UIATags.UIALandmarkType, (Long)obj);
+		setObjectValueIfNotNull(UIATags.UIALandmarkType, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LocalizedLandmarkTypePropertyId, true);
-		uiaElement.set(UIATags.UIALocalizedLandmarkType, (String)obj);
+		setObjectValueIfNotNull(UIATags.UIALocalizedLandmarkType, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LevelPropertyId, true);
-		uiaElement.set(UIATags.UIALevel, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIALevel, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_LiveSettingPropertyId, true);
-		uiaElement.set(UIATags.UIALiveSetting, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIALiveSetting, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_PositionInSetPropertyId, true);
-		uiaElement.set(UIATags.UIAPositionInSet, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIAPositionInSet, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_SizeOfSetPropertyId, true);
-		uiaElement.set(UIATags.UIASizeOfSet, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIASizeOfSet, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_RotationPropertyId, true);
-		uiaElement.set(UIATags.UIARotation, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIARotation, obj, uiaElement);
 		obj = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, Windows.UIA_VisualEffectsPropertyId, true);
-		uiaElement.set(UIATags.UIAVisualEffects, (Long) obj);
+		setObjectValueIfNotNull(UIATags.UIAVisualEffects, obj, uiaElement);
 
 
 
@@ -495,7 +495,7 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 
 		// add to csv for analysis purposed
-		mappedValues.add(extractTagsForCsv(uiaElement));
+//		mappedValues.add(extractTagsForCsv(uiaElement));
 		
 		return modalElement; // by urueda
 	}
@@ -642,6 +642,12 @@ public class StateFetcher implements Callable<UIAState>{
 			createWidgetTree(w, child);
 	}
 
+	private <T> void setObjectValueIfNotNull(Tag<T> tag, Object object, UIAElement uiaElement) {
+		if (object != null) {
+			uiaElement.set(tag, (T) object);
+		}
+	}
+
 	private <T> void setConvertedObjectValue(Tag<T> tag, Object object, UIAElement uiaElement) {
 		Stream<Tag<?>> tagsToWatch = Stream.of(
 			UIATags.UIADropTargetDropTargetEffects,
@@ -677,7 +683,9 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 		else if (tag.equals(UIATags.UIADragGrabbedItems)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIADropTargetDropTargetEffects)) {
 			// array of strings...convert to a single string
@@ -690,7 +698,9 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 		else if (tag.equals(UIATags.UIALegacyIAccessibleSelection)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIAMultipleViewSupportedViews)) {
 			if (object instanceof Long[]) {
@@ -699,11 +709,15 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 		else if (tag.equals(UIATags.UIASelectionSelection)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationObjects)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIASpreadsheetItemAnnotationTypes)) {
 			if (object instanceof Long[]) {
@@ -712,22 +726,32 @@ public class StateFetcher implements Callable<UIAState>{
 		}
 		else if (tag.equals(UIATags.UIATableColumnHeaders)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIATableRowHeaders)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIATableItemColumnHeaderItems)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else if (tag.equals(UIATags.UIATableItemRowHeaderItems)) {
 			// not sure what vt_unknown will translate into, so we just leave it as object for now
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 		else {
-			uiaElement.set(tag, (T) object);
+			if (object != null) {
+				uiaElement.set(tag, (T) object);
+			}
 		}
 	}
 

@@ -35,7 +35,6 @@ public class UIAMapping {
             put(WidgetPath, Tags.Path);
             put(WidgetBoundary, UIABoundingRectangle);
             put(WidgetIsOffscreen, UIAIsOffscreen);
-            put(WidgetName, UIAName); // UIAName
             put(WidgetAccelatorKey, UIAAcceleratorKey);
             put(WidgetAccessKey, UIAAccessKey);
             put(WidgetAriaProperties, UIAAriaProperties);

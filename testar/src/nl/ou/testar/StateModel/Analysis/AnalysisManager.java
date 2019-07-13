@@ -31,8 +31,10 @@ public class AnalysisManager {
     // orient db instance that will create database sessions
     private OrientDB orientDB;
 
+    // orient db configuration object
     private Config dbConfig;
 
+    // the location of the directory where we need to store output files
     private String outputDir;
 
     /**

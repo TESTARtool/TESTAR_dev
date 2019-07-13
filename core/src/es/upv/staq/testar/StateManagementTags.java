@@ -69,9 +69,6 @@ public class StateManagementTags {
     // is the widget off-screen?
     public static final Tag<Boolean> WidgetIsOffscreen = Tag.from("Widget is off-screen", Boolean.class);
 
-    // the widget's name
-    public static final Tag<String> WidgetName = Tag.from("Widget name", String.class); // UIAName
-
     // accelator key combinations for the widget
     public static final Tag<String> WidgetAccelatorKey = Tag.from("Widget accelator key", String.class);
 
@@ -295,7 +292,6 @@ public class StateManagementTags {
             add(WidgetPath);
             add(WidgetBoundary);
             // new
-            add(WidgetName); // UIAName
             add(WidgetAccelatorKey);
             add(WidgetAccessKey);
             add(WidgetAriaProperties);
@@ -375,7 +371,6 @@ public class StateManagementTags {
         settingsMap.put(WidgetItemType, "WidgetItemType");
         settingsMap.put(WidgetItemStatus, "WidgetItemStatus");
         settingsMap.put(WidgetPath, "WidgetPath");
-        settingsMap.put(WidgetName, "WidgetName");
         settingsMap.put(WidgetAccelatorKey, "WidgetAccelatorKey");
         settingsMap.put(WidgetAccessKey, "WidgetAccessKey");
         settingsMap.put(WidgetAriaProperties, "WidgetAriaProperties");
@@ -443,7 +438,6 @@ public class StateManagementTags {
             put(WidgetItemType, Group.General);
             put(WidgetItemStatus, Group.General);
             put(WidgetPath, Group.General);
-            put(WidgetName, Group.General);
             put(WidgetAccelatorKey, Group.General);
             put(WidgetAccessKey, Group.General);
             put(WidgetAriaProperties, Group.General);

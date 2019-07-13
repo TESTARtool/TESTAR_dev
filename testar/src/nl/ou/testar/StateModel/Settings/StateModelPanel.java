@@ -329,16 +329,19 @@ public class StateModelPanel extends JPanel {
         return  result.toString();
     }
 
+    // make sure the right text fields are enabled based on the selected data store type (remote or local)
     private void checkDataType() {
         dataStoreServerTextfield.setEnabled(dataStoreTypeBox.getSelectedItem().equals("remote") && stateModelEnabledChkBox.isSelected());
         dataStoreDirectoryField.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
         dirButton.setEnabled(dataStoreTypeBox.getSelectedItem().equals("plocal"));
     }
 
+    // helper method to ensure that the state model enabled box is selected
     private void checkAnalysisButtonActive() {
         analysisButton.setEnabled(stateModelEnabledChkBox.isSelected());
     }
 
+    // show a file dialog to choose the directory where the local install of OrientDB is located
     private void chooseFileActionPerformed(ActionEvent evt) {
         JFileChooser fd = new JFileChooser();
         fd.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -352,6 +355,7 @@ public class StateModelPanel extends JPanel {
         }
     }
 
+    // this helper method will start a jetty integrated server and show the model listings page
     private void openServer() {
         try {
             label14.setText("");
