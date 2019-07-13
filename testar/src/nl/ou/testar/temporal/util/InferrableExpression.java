@@ -13,6 +13,7 @@ public  enum InferrableExpression {
     textlength_lt_("text"),
     is_blank_("boolean"),
     exists_("boolean"),
+    is_deadstate_("boolean"),
     relpos_upleft_("boolean"),  //relative position in parent window
     relpos_upright_("boolean"),
     relpos_downleft_("boolean"),

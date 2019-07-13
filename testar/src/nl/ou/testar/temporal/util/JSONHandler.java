@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class JSONHandler {
@@ -36,17 +33,12 @@ public class JSONHandler {
             objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
 
             String result = objectMapper.writeValueAsString(content);
-            byte[]  byteres = objectMapper.writeValueAsBytes(content);
+
             // let's write the resulting json to a file
             if (output.exists() || output.createNewFile()) {
-
-                //BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
-                //writer.append(result);
-                //writer.close();
-             //   BufferedOutputStream bos = new BufferedOutputStream(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
-                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(output.getAbsolutePath()));
-                   bos.write(byteres);
-
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));
+                writer.append(result);
+                writer.close();
             }
         } catch (
                 IOException e) {

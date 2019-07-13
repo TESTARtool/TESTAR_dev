@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.structure;
 
-import java.util.List;
 import java.util.Set;
 
 public class TransitionEncoding {
@@ -52,7 +51,7 @@ public class TransitionEncoding {
         this.encodedAPConjunct = encodedAPConjunct;
 
     }
-    public void setEncodedTransitionConjunct(List<String> modelAPs, Set<String> stateAPs){
+    public void setEncodedTransitionConjunct(Set<String> modelAPs, Set<String> stateAPs){
         StringBuilder encodedresult= new StringBuilder();
 
         int i=0;

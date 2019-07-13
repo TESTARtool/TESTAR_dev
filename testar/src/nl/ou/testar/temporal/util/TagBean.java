@@ -76,9 +76,9 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 			return existing;
 		return ret;
 	}
+	public static final TagBean<Boolean> IsDeadState = TagBean.from("IsDeadState", Boolean.class);   //refactoring candidate
 
-
-	private static final long serialVersionUID = -1215427100999751182L;
+	private static final long serialVersionUID = -1215427100999751199L;
 
 	public Class<?> getClazz() {
 		return clazz;

@@ -90,6 +90,9 @@ protected static final String csvsep=";";
         public void setLog (List < String > log) {
             this.log = log;
         }
+    public void addLog ( String  log) {
+        this.log.add( log);
+    }
 
         public List<String> getComments () {
             return comments;
@@ -98,6 +101,9 @@ protected static final String csvsep=";";
         public void setComments (List < String > comments) {
             this.comments = comments;
         }
+    public void addComments ( String  comment) {
+        this.comments.add( comment);
+    }
 
         public String getModifieddate () {
             return modifieddate;

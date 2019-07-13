@@ -1,6 +1,7 @@
 package nl.ou.testar.temporal.structure;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
+import nl.ou.testar.temporal.util.APEncodingSeparator;
 import nl.ou.testar.temporal.util.InferrableExpression;
 import nl.ou.testar.temporal.util.PairBean;
 import nl.ou.testar.temporal.util.TagBean;
@@ -25,11 +26,16 @@ public class APSelectorManager {
     //private BiMap<String, Class<?>> selectedAttributes1;
     private Set<TagBean<?>> entireAttributeSet ;
     private  Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
+
+
+
+    private String apEncodingSeparator;
+
     private Set<WidgetFilter> widgetfilters;
     public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
         return valuedExpressions;
     }
-    private String formatVersion="20190630 ";
+    private String formatVersion="20190713";
 
     private List<String> comments = new ArrayList<>();
 
@@ -38,8 +44,13 @@ public class APSelectorManager {
 
     public APSelectorManager() {
         entireAttributeSet = getEntireTagSet();
+        entireAttributeSet.add(createDeadStateTag());
         widgetfilters = new LinkedHashSet<>();
         selectedAttributes = new LinkedHashSet<TagBean<?>>();
+        selectedAttributes.add(createDeadStateTag());
+       comments.add("An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
+        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and NOT in the map");
+        comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late' in the model");
         comments.add("relpos expressions are the quadrants  based on the position of the widget  in the parent window");
         comments.add("this enables to distinguish 2 buttons with the same title in the relative window in 2 different states");
         comments.add("this is not functional yet. CSS 20190630");
@@ -51,24 +62,21 @@ public class APSelectorManager {
             setDefaultAttributes();
             setDefaultWidgetFilter();
             setRoleTitlePathAsAPKey();
+            this.apEncodingSeparator= APEncodingSeparator.DOUBLEDAGGER.symbol;
         }
 
+    }
+    public String getApEncodingSeparator() {
+        return apEncodingSeparator;
+    }
+
+    public void setApEncodingSeparator(String apEncodingSeparator) {
+        this.apEncodingSeparator = apEncodingSeparator;
     }
 
     public List<String> getAPKey() {
         return APKey;
     }
-    /*public BiMap<String, Class<?> > getSelectedAttributes1() {
-        return selectedAttributes1;
-    }
-
-    public void setSelectedAttributes1(BiMap<String, Class<?> > selectedAttributes1) {
-        this.selectedAttributes1 = selectedAttributes1;
-    }*/
-    //public  String getAttributeName(Class<?> clazz) {  return selectedAttributes1.inverse().get(clazz);}
-
-    //public Class<?> getAttributeType(String name) { return selectedAttributes1.get(name);   }
-
 
     public void setAPKey(List<String> APKey) {
         this.APKey = APKey;
@@ -84,6 +92,7 @@ public class APSelectorManager {
         if (valuedExpressions!=null) this.valuedExpressions = valuedExpressions;
         this.valuedExpressions.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
         this.valuedExpressions.add(new PairBean<>(InferrableExpression.exists_, ""));
+        this.valuedExpressions.add(new PairBean<>(InferrableExpression.is_deadstate_, ""));
     }
     public String getFormatVersion() {
         return formatVersion;
@@ -128,7 +137,14 @@ public class APSelectorManager {
         return  tmptagset;
     };
 
+private TagBean<?> createDeadStateTag() {
+    //TagBean<?> dtag = new TagBean<>("IsDeadState", Boolean.class); // refactoring candidate
+    TagBean<?> dtag = TagBean.IsDeadState;
 
+    return dtag;
+
+
+}
 
 
     private  Set<String> retrieveSelectedSanitizedAttributeNames() {
@@ -143,8 +159,10 @@ public class APSelectorManager {
         return selectedAttributes;
     }
     public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
+
         this.selectedAttributes = selectedAttributes;
-    }
+        this.selectedAttributes.add(createDeadStateTag()); // include always this custom 'tag'
+            }
 
     public void setRoleTitlePathAsAPKey(){
         APKey.clear();
@@ -330,8 +348,11 @@ public class APSelectorManager {
 
         if (tag != null) {   //this attribute is required as a(n) (set of) AP
 
-            if (tag.type() == Boolean.class) {
-                apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
+            if (tag.type() == Boolean.class ) {
+               // apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
+                if ( Boolean.parseBoolean(value)) {
+                    apset.add(widgetkey + attrib + "__");
+                }
             } else
 
                 for (PairBean<InferrableExpression, String> iap : valuedExpressions

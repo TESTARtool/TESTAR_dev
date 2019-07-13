@@ -1,32 +1,35 @@
 package nl.ou.testar.temporal.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
+import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
 public class TemporalModel extends TemporalBean{
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
     private List<TemporalTrace> traces; //
-    private List<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion="20190603";
+    @JsonIgnore
+    private Set<String> modelAPs; //AP<digits> to widget property map:
+    private String formatVersion="20190713";
 
 
 
     public TemporalModel(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
         super(applicationName, applicationVersion, modelIdentifier, abstractionAttributes);
         this.stateEncodings = new ArrayList<>();
-        this.modelAPs = new ArrayList<String>();
+        this.modelAPs = new LinkedHashSet<>();  //must maintain order
     }
 
 
 
-    public List<String> getModelAPs() {
+    public Set<String> getModelAPs() {
         return modelAPs;
     }
 
-    public void setModelAPs(List<String> modelAPs) {
+    public void setModelAPs(Set<String> modelAPs) {
         this.modelAPs = modelAPs;
     }
 
@@ -47,6 +50,7 @@ public class TemporalModel extends TemporalBean{
         this.stateEncodings = stateEncodings;
         for (StateEncoding stateEnc: stateEncodings) {
             this.modelAPs.addAll(stateEnc.getStateAPs());
+            this.modelAPs.addAll(stateEnc.retrieveAllEgdeAPs());
         }
         updateTransitions();
     }
@@ -62,6 +66,9 @@ public class TemporalModel extends TemporalBean{
 
         stateEncodings.add(stateEncoding);
         this.modelAPs.addAll(stateEncoding.getStateAPs());
+        this.modelAPs.addAll(stateEncoding.retrieveAllEgdeAPs());
+
+
         if (updateTransitionsImmediate) {updateTransitions();        }
     }
     public void updateTransitions() {
@@ -73,7 +80,7 @@ public class TemporalModel extends TemporalBean{
 
 
 
-        public void fetchDBModel(String filter){
+    public void fetchDBModel(String filter){
         //loop through model ,
         //  query db model and set in header properties
         // query concret states and moke stat encoding per state
@@ -84,17 +91,18 @@ public class TemporalModel extends TemporalBean{
 
 
     }
+
     private String makeHOAOutput(){
         //see http://adl.github.io/hoaf/
-    StringBuilder result=new StringBuilder();
-    result.append("HOA v1\n");
-    result.append("States: ");
-    result.append(stateEncodings.size());
-    result.append("\n");
-    result.append("Start: 0\n");
-    result.append("Acceptance: 1 Inf(1))\n");  //==Buchi
-    result.append("AP: ");
-    result.append(modelAPs.size());
+        StringBuilder result=new StringBuilder();
+        result.append("HOA v1\n");
+        result.append("States: ");
+        result.append(stateEncodings.size());
+        result.append("\n");
+        result.append("Start: 0\n");
+        result.append("Acceptance: 1 Inf(1))\n");  //==Buchi
+        result.append("AP: ");
+        result.append(modelAPs.size());
         int i=0;
         for (String ap: modelAPs) {
             result.append(" \"ap");
@@ -102,8 +110,8 @@ public class TemporalModel extends TemporalBean{
             result.append("\"");
             i++;
         }
-     result.append("\n");
-     result.append("--BODY--");
+        result.append("\n");
+        result.append("--BODY--");
         int s=0;
         for (StateEncoding stateenc: stateEncodings) {
             result.append("State: ");
@@ -121,6 +129,19 @@ public class TemporalModel extends TemporalBean{
         return result.toString();
     }
 
+    @JsonGetter("modelAPs")
+    private LinkedHashMap<Integer,String> getSimpleModelMap(){
+        LinkedHashMap<Integer,String> map = new LinkedHashMap<>();
 
-
+        int i=0;
+        for (String ap:modelAPs         ) {
+                map.put(i, ap);
+                i++;
+        }
+        return map;
+    }
+    @JsonSetter("modelAPs")
+    private void setFromSimpleModelMap(LinkedHashMap<Integer,String> map){
+        this.modelAPs.addAll(map.values());
+    }
 }

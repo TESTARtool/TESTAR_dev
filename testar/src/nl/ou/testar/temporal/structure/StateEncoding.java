@@ -1,5 +1,6 @@
 package nl.ou.testar.temporal.structure;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +59,14 @@ public class StateEncoding {
         return result;
     }
 
-    public void updateAllTransitionConjuncts(List<String> modelAPs) {
+    public Set<String> retrieveAllEgdeAPs(){
+        Set<String> edgeAPS = new LinkedHashSet<>();
+        for (TransitionEncoding trans : transitionColl) {
+            edgeAPS.addAll(trans.getEdgeAPs());
+        }
+            return edgeAPS;
+    }
+    public void updateAllTransitionConjuncts(Set<String> modelAPs) {
 
         for (TransitionEncoding trans : transitionColl) {
             trans.setEncodedTransitionConjunct(modelAPs, stateAPs);

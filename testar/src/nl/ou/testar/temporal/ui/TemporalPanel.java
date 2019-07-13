@@ -30,7 +30,6 @@
 
 package nl.ou.testar.temporal.ui;
 
-import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import nl.ou.testar.temporal.behavior.TemporalController;
@@ -348,23 +347,21 @@ private void setupMiner(){
             logCheckResult.repaint();
             config.setDatabaseDirectory(tmp);
             TemporalController tcontrol = new TemporalController(config,outputDir);
-            List<AbstractStateModel> models = tcontrol.fetchModels();
+           //List<AbstractStateModel> models = tcontrol.fetchModels();
 
-            logCheckResult.append("model count: " + models.size()+"\n");
-            AbstractStateModel model = models.get(0);
-            logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
-            TemporalModel tmodel = tcontrol.getTemporalModel(model,APmgr);
+            //logCheckResult.append("model count: " + models.size()+"\n");
+            //AbstractStateModel model = models.get(0);
+            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
             JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             logCheckResult.append(" saving to file done\n");
 
             logCheckResult.append("\n");
 
-            //tcontrol.testgraphmlexport(outputDir + "GraphML.XML");
-            //logCheckResult.append(" saving to grpgmlfile done\n");
 
             logCheckResult.append("\n");
-            tcontrol.testmygraphmlexport(outputDir + "GraphMLtestcss.XML");
-            logCheckResult.append(" saving to 2nd grpgmlfile done\n");
+            tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            logCheckResult.append(" saving to  graphml file done\n");
 
             logCheckResult.append("\n");
             tcontrol.shutdown();
