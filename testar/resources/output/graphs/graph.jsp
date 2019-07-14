@@ -9,6 +9,10 @@
     <script src="js/cytoscape-cose-bilkent.js"></script>
     <script src="js/cytoscape-cola.js"></script>
     <script src="js/cytoscape-euler.js"></script>
+    <script src="js/dagre.js"></script>
+    <script src="js/cytoscape-dagre.js"></script>
+    <script src="js/klay.js"></script>
+    <script src="js/cytoscape-klay.js"></script>
     <script src="js/jquery-3.2.1.slim.min.js"></script>
     <script src="js/jquery.magnific-popup.min.js"></script>
     <link rel="stylesheet" href="css/magnific-popup.css">
@@ -30,6 +34,8 @@
             <option value="cose-bilkent">Cose-bilkent</option>
             <option value="cola">Cola</option>
             <option value="euler">Euler</option>
+            <option value="dagre">Dagre</option>
+            <option value="klay">Klay</option>
         </select></label></div>
         <div>
             <label for="show-labels"><input type="checkbox" id="show-labels" checked> Show node labels</label>
@@ -45,8 +51,8 @@
 
 <div class="cd-panel cd-panel--from-right js-cd-panel-main">
     <div class="cd-panel__container">
-        <div class="panel-header">
-            <button id="close-panel" type="button">Close</button>
+        <div class="panel-header" id="content-panel-header">
+            <%--<button id="close-panel" type="button">Close</button>--%>
         </div>
         <div class="cd-panel__content" id="cd-content-panel">
 
@@ -60,7 +66,7 @@
     let cy = cytoscape({
         container: document.getElementById("cy"),
 
-        elements: fetch("${graphContentFile}").then(function(response) {
+        elements: fetch("${contentFolder}/${graphContentFile}").then(function(response) {
             return response.json();
         })
 
@@ -71,7 +77,9 @@
             {
                 selector: 'node',
                 style: {
-                    'background-color': '#ad1a66',
+                    'background-color': '#F6EFF7',
+                    'border-width': "1px",
+                    'border-color': '#000000',
                     'label': 'data(id)'
                 }
             },
@@ -79,7 +87,8 @@
             {
                 selector: ':parent',
                 style: {
-                    'background-opacity': 0.2
+                    'background-opacity': 0.9,
+                    'border-style' : 'dashed'
                 }
             },
 
@@ -96,8 +105,8 @@
             {
                 selector: '.AbstractAction',
                 style: {
-                    'line-color': '#ad1a66',
-                    'target-arrow-color': '#ad1a66'
+                    'line-color': '#1c9099',
+                    'target-arrow-color': '#1c9099'
                 }
 
             },
@@ -105,17 +114,16 @@
             {
                 selector: '.AbstractState',
                 style: {
-                    'background-color': '#ad1a66'
+                    'background-color': '#1c9099'
                 }
             },
 
             {
                 selector: '.isInitial',
                 style: {
-                    'background-color': '#ad1a66',
+                    'background-color': '#1c9099',
                     'width': '60px',
                     'height': '60px',
-                    'border-width': '2px',
                     'border-color': '#000000'
                 }
             },
@@ -123,9 +131,9 @@
             {
                 selector: '.ConcreteState',
                 style: {
-                    'background-color': '#ffa44b',
+                    'background-color': '#67A9CF',
                     'background-image': function (ele) {
-                        return "${modelIdentifier}/" + ele.data('id') + ".png"
+                        return "${contentFolder}/" + ele.data('id') + ".png"
                     },
                     'background-fit': 'contain'
                 }
@@ -134,44 +142,69 @@
             {
                 selector: '.ConcreteAction',
                 style: {
-                    'line-color': '#ffa44b',
-                    'target-arrow-color': '#ffa44b'
+                    'line-color': '#67A9CF',
+                    'target-arrow-color': '#67A9CF'
                 }
             },
 
             {
                 selector: '.isAbstractedBy',
                 style: {
-                    'line-color': '#bdbf8f',
-                    'target-arrow-color': '#bdbf8f'
+                    'line-color': '#bdc9e1',
+                    'target-arrow-color': '#bdc9e1'
                 }
             },
 
             {
                 selector: '.SequenceStep',
                 style: {
-                    'line-color': '#ff7492'
+                    'line-color': '#016450',
+                    'target-arrow-color': '#016450'
                 }
             },
 
             {
                 selector: '.SequenceNode',
                 style: {
-                    'background-color': '#ff7492'
+                    'background-color': '#016450'
                 }
             },
 
             {
                 selector: '.FirstNode',
                 style: {
-                    'line-color': '#ffe192'
+                    'line-color': '#014636',
+                    'target-arrow-color': '#014636'
                 }
             },
 
             {
                 selector: '.TestSequence',
                 style: {
-                    'background-color': '#ffe192'
+                    'background-color': '#014636'
+                }
+            },
+            {
+                selector: 'Accessed',
+                style: {
+                    'line-color': '#d0d1e6',
+                    'target-arrow-color': '#d0d1e6'
+                }
+            },
+
+            {
+                selector: '.Widget',
+                style: {
+                    'background-color': '#e7298a',
+                    'background-opacity': 0.8
+                }
+            },
+
+            {
+                selector: '.isChildOf',
+                style: {
+                    'line-color': "#df65b0",
+                    'target-arrow-color': '#df65b0'
                 }
             },
 
@@ -189,8 +222,9 @@
             {
                 selector: '.UnvisitedAbstractAction',
                 style: {
-                    'line-color': "#999989",
-                    'target-arrow-color': "#999989",
+                    'line-color': "#1c9099",
+                    'target-arrow-color': "#1c9099",
+                    'line-style': 'dashed',
                     'width': 1
                 }
             },
@@ -241,15 +275,10 @@
         }).run();
     });
 
-    // document.getElementById("myBtn").addEventListener("mousedown", function () {
+    // document.getElementById("close-panel").addEventListener("click", function () {
     //     let cdPanel = document.getElementsByClassName("cd-panel")[0];
-    //     cdPanel.classList.add("cd-panel--is-visible");
+    //     cdPanel.classList.remove("cd-panel--is-visible");
     // });
-
-    document.getElementById("close-panel").addEventListener("click", function () {
-        let cdPanel = document.getElementsByClassName("cd-panel")[0];
-        cdPanel.classList.remove("cd-panel--is-visible");
-    });
 
     let showLabels = document.getElementById("show-labels");
     showLabels.addEventListener("change", function () {
@@ -266,49 +295,79 @@
         let targetNode = evt.target;
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
+        let contentPanelHeader = document.getElementById("content-panel-header");
 
-        // remove all the current child elements
+        // remove all the current child elements for both panel and panel header
         let child = contentPanel.lastChild;
         while (child) {
             contentPanel.removeChild(child);
             child = contentPanel.lastChild;
         }
 
+        child = contentPanelHeader.lastChild;
+        while (child) {
+            contentPanelHeader.removeChild(child);
+            child = contentPanelHeader.lastChild;
+        }
+
+        ///////////// add button section ///////////////////////////
+        let closeButton = document.createElement("button");
+        closeButton.id = "close-panel";
+        closeButton.appendChild(document.createTextNode("Close"));
+        closeButton.addEventListener("click", function () {
+            let cdPanel = document.getElementsByClassName("cd-panel")[0];
+            cdPanel.classList.remove("cd-panel--is-visible");
+        });
+        contentPanelHeader.appendChild(closeButton);
+
+        // for concrete states we provide a button to retrieve the widget tree
+        if (targetNode.hasClass("ConcreteState")) {
+            let form = document.createElement("form");
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.value = targetNode.id();
+            input.name = "concrete_state_id";
+            form.appendChild(input);
+
+            form.method = "POST";
+            form.action = "graph";
+            form.target = "_blank";
+            contentPanel.appendChild(form);
+
+            let widgetTreeButton = document.createElement("button");
+            widgetTreeButton.id ="widget-tree-button";
+            widgetTreeButton.appendChild(document.createTextNode("Inspect widget tree"));
+            widgetTreeButton.addEventListener("click", function () {
+                form.submit();
+            });
+            contentPanelHeader.appendChild(widgetTreeButton);
+        }
+
         // add a visibility button
-        let visButton = document.createElement("button");
-        visButton.id = "toggle-visible";
-        visButton.appendChild(document.createTextNode("Make invisible"));
-        visButton.addEventListener("click", function () {
+        let visibilityButton = document.createElement("button");
+        visibilityButton.id = "toggle-visible";
+        visibilityButton.appendChild(document.createTextNode("Make invisible"));
+        visibilityButton.addEventListener("click", function () {
             targetNode.addClass("invisible");
         });
-        contentPanel.appendChild(visButton);
+        contentPanelHeader.appendChild(visibilityButton);
 
         // add a highlight button
         let highlightButton = document.createElement("button");
         highlightButton.id = "highlight";
         highlightButton.appendChild(document.createTextNode("Highlight"));
         highlightButton.addEventListener("click", function () {
-            // let selectedItems = cy.collection();
-            // console.log(selectedItems.size());
-            // selectedItems = selectedItems.union(targetNode);
-            // console.log(selectedItems.size());
-            //
-            // let nbh = selectedItems.neighborhood();
-            // console.log(nbh);
-            // selectedItems = selectedItems.union(selectedItems.neighborhood());
-            // console.log(selectedItems.size());
-            // let otherItems = cy.$("*").difference(selectedItems);
-            // console.log(cy.$("*").size());
-            // console.log(otherItems.size());
-            // otherItems.addClass("invisible");
-
             cy.$("*").difference(cy.$(targetNode).closedNeighborhood()).addClass("dim");
         });
-        contentPanel.appendChild(highlightButton);
+        contentPanelHeader.appendChild(highlightButton);
+
+        //////////////// end add button section //////////////////
+
+        /////////// screenshot segment //////////
 
         // create a popup anchor
         let popupAnchor = document.createElement("a");
-        popupAnchor.href = "${modelIdentifier}/" + targetNode.id() + ".png";
+        popupAnchor.href = "${contentFolder}/" + targetNode.id() + ".png";
         $(popupAnchor).magnificPopup(
             {type: "image"}
         );
@@ -317,21 +376,58 @@
         if (targetNode.hasClass("ConcreteState")) { // add the screenshot full image
             let nodeImage = document.createElement("img");
             nodeImage.alt = "Image for node " + targetNode.id();
-            nodeImage.src = "${modelIdentifier}/" + targetNode.id() + ".png";
+            nodeImage.src = "${contentFolder}/" + targetNode.id() + ".png";
             nodeImage.classList.add("node-img-full");
             popupAnchor.appendChild(nodeImage);
             contentPanel.appendChild(popupAnchor);
         }
+        /////////// end screenshot segment /////////////
+
+        ////////// data segment   //////////////
+        let paragraph = document.createElement("p");
+        paragraph.classList.add("paragraph-data");
+        let h3 = document.createElement("h3");
+        h3.appendChild(document.createTextNode("Element data:"));
+        paragraph.appendChild(h3);
+
+        // add the data into a table
+        let dataTable = document.createElement("table");
+        dataTable.classList.add("table-data");
+        let tableHeaderRow = document.createElement("tr");
+        let th1 = document.createElement("th");
+        th1.appendChild(document.createTextNode("Attribute name"));
+        let th2 = document.createElement("th");
+        th2.appendChild(document.createTextNode("Attribute value"));
+        tableHeaderRow.appendChild(th1);
+        tableHeaderRow.appendChild(th2);
+        let thead = document.createElement("thead");
+        thead.appendChild(tableHeaderRow);
+        dataTable.appendChild(thead);
+        let tbody = document.createElement("tbody");
 
         let data = targetNode.data();
-        for (let item in data) {
+        // we want to sort the data first
+        const orderedData = {};
+        Object.keys(data).sort().forEach(function (key) {
+            orderedData[key] = data[key];
+        });
+
+        for (let item in orderedData) {
             if (data.hasOwnProperty(item)) {
-                let nodeContent = document.createElement("div");
-                let textContent = document.createTextNode(item + " : " + data[item]);
-                nodeContent.appendChild(textContent);
-                contentPanel.appendChild(nodeContent);
+                let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                td1.appendChild(document.createTextNode(item));
+                let td2 = document.createElement("td");
+                td2.appendChild(document.createTextNode(data[item]));
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tbody.appendChild(tr);
             }
         }
+        dataTable.appendChild(tbody);
+        paragraph.appendChild(dataTable);
+        contentPanel.appendChild(paragraph);
+        ////////// end data segment //////////
 
         sidePanel.classList.add("cd-panel--is-visible");
         // console.log( 'tapped ' + node.id() );

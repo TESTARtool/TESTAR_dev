@@ -296,7 +296,7 @@ public class StateManagementTags {
             add(WidgetAccessKey);
             add(WidgetAriaProperties);
             add(WidgetAriaRole);
-            add(WidgetIsDialog);
+//            add(WidgetIsDialog); (deactived for now, because the UIA API does not seem to recognize it)
             add(WidgetIsPassword);
             add(WidgetIsPeripheral);
             add(WidgetIsRequiredForForm);

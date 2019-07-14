@@ -180,24 +180,7 @@ public class AnalysisManager {
         builder.append(Instant.now().toEpochMilli());
         builder.append("_elements.json");
         String filename = builder.toString();
-        File output = new File(outputDir + filename);
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(elements);
-            // let's write the resulting json to a file
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                writer.write(result);
-                writer.close();
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return filename;
+        return writeJson(elements, filename, modelIdentifier);
     }
 
     /**
@@ -349,6 +332,35 @@ public class AnalysisManager {
         return elements;
     }
 
+    public String fetchWidgetTree(String concreteStateIdentifier) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            ArrayList<Element> elements = new ArrayList<>();
+
+            // convert the concrete state identifier to an internal id if needed
+            String internalId = concreteStateIdentifier.indexOf("n") == 0 ? unformatId(concreteStateIdentifier) : concreteStateIdentifier;
+
+            // first get all the widgets
+            String stmt = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid))";
+            Map<String, Object> params = new HashMap<>();
+            params.put("rid", internalId);
+            OResultSet resultSet = db.query(stmt, params);
+            elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
+
+            // then get the parent/child relationship between the widgets
+            stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
+            resultSet = db.query(stmt, params);
+            elements.addAll(fetchEdges(resultSet, "isChildOf"));
+
+            // create a filename
+            StringBuilder builder = new StringBuilder(concreteStateIdentifier);
+            builder.append("_");
+            builder.append(Instant.now().toEpochMilli());
+            builder.append("_elements.json");
+            String filename = builder.toString();
+            return writeJson(elements, filename, concreteStateIdentifier);
+        }
+    }
+
     /**
      * This method transforms a resultset of nodes into elements.
      * @param resultSet
@@ -458,10 +470,17 @@ public class AnalysisManager {
 
     }
 
+    // this helper method formats the @RID property into something that can be used in a web frontend
     private String formatId(String id) {
         if (id.indexOf("#") != 0) return id; // not an orientdb id
         id = id.replaceAll("[#]", "");
         return id.replaceAll("[:]", "_");
+    }
+
+    // and this helper method formats a web frontend node id into one that is useable for internal orientdb use
+    private String unformatId(String id) {
+        id = id.replaceAll("n", "#");
+        return id.replaceAll("_", ":");
     }
 
     /**
@@ -498,5 +517,32 @@ public class AnalysisManager {
                 break;
         }
         return  convertedValue;
+    }
+
+    // this helper method will write elements to a file in json format
+    private String writeJson(ArrayList<Element> elements, String filename, String subFolderName) {
+        // check if the subfolder already exists
+        File subFolder = new File(outputDir + subFolderName);
+        if (!subFolder.isDirectory() && !subFolder.mkdir()) {
+            return "";
+        }
+
+        File output = new File(subFolder, filename);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String result = mapper.writeValueAsString(elements);
+            // let's write the resulting json to a file
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
+                writer.write(result);
+                writer.close();
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filename;
     }
 }
