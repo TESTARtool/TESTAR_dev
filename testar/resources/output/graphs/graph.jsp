@@ -185,7 +185,7 @@
                 }
             },
             {
-                selector: 'Accessed',
+                selector: '.Accessed',
                 style: {
                     'line-color': '#d0d1e6',
                     'target-arrow-color': '#d0d1e6'
