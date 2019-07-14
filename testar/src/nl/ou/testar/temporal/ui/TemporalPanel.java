@@ -360,8 +360,8 @@ private void setupMiner(){
 
 
             logCheckResult.append("\n");
-            tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
-            logCheckResult.append(" saving to  graphml file done\n");
+            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            logCheckResult.append(" saving to  graphml file done with result:"+res+"\n");
 
             logCheckResult.append("\n");
             tcontrol.shutdown();
@@ -383,7 +383,7 @@ private void setupMiner(){
         List<TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
 
-        CSVHandler.save(tocoll, outputDir + "temporalOracle1.csv");
+        CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
         logCheckResult.append("csv saved: \n");
 
         List<TemporalOracle> fromcoll;

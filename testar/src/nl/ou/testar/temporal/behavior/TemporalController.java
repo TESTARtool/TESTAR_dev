@@ -115,40 +115,30 @@ public class TemporalController {
     public TemporalModel getTemporalModel( APSelectorManager Apmgr) {
         List<AbstractStateModel> abstractStateModels= fetchAbstractModels();
         AbstractStateModel abstractStateModel;
-        if (abstractStateModels.size()==1 ){
-            abstractStateModel =abstractStateModels.get(0);
-        }else if (abstractStateModels.size()==0 ){
+        if (abstractStateModels.size()==0 ) {
             System.out.println("ERROR: Number of Models in the graph database is ZERO");
             return null;
-        }else {
-            abstractStateModel = abstractStateModels.get(0);
-            System.out.println("ERROR: Number of Models in the graph database is more than ONE. We try with the first model");
         }
-        TemporalModel tmodel = new TemporalModel(
-                abstractStateModel.getApplicationName(), abstractStateModel.getApplicationVersion(),
-                abstractStateModel.getModelIdentifier(), abstractStateModel.getAbstractionAttributes());
-
-        this.Apmgr = Apmgr;
-
-
-
+        abstractStateModel =abstractStateModels.get(0);
         String stmt;
         Map<String, Object> params = new HashMap<>();
-        params.put("identifier", abstractStateModel.getModelIdentifier());
 
         if (abstractStateModels.size()>1){
+            System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
             params.put("identifier", abstractStateModel.getModelIdentifier());
-            // navigate from concrete to abstract to apply the filter on the abstractstate.
+            // navigate from abstractstate to apply the filter.
             stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
         }else{
             stmt = "SELECT FROM V WHERE @class = 'ConcreteState'";
         }
-
-
-        // concrete states
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt);
-        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
 
+        TemporalModel tmodel = new TemporalModel(
+                abstractStateModel.getApplicationName(), abstractStateModel.getApplicationVersion(),
+                abstractStateModel.getModelIdentifier(), abstractStateModel.getAbstractionAttributes());
+
+        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
+        this.Apmgr = Apmgr;
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -603,25 +593,50 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
             }
         }
     }
-    public void saveToGraphMLFile(String file){
+    public boolean saveToGraphMLFile(String file){
+
 
         //init
+
+        List<AbstractStateModel> abstractStateModels= fetchAbstractModels();
+        AbstractStateModel abstractStateModel;
+        if (abstractStateModels.size()==0 ) {
+            System.out.println("ERROR: Number of Models in the graph database is ZERO");
+            return false;
+        }
+        abstractStateModel =abstractStateModels.get(0);
+        String stmt;
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", abstractStateModel.getModelIdentifier());
+        //!!!!!!!!!!!!!!!!!!!!!!get nodes , then get edges. this is required for postprocessing a graphml by python package networkx.
+        List<String> stmtlist= new ArrayList<>();
+
+
+        if (abstractStateModels.size()>1){// navigate from abstractstate to be able to apply the filter.
+            System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
+           // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
+            //stmtlist.add("SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier"); // select abstractstate themselves
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+            // the "both()" in the next stmt is needed to invoke recursion.
+            // apparently , the next result set contains first a list of all nodes, then of all edge: good !
+            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
+
+        }else{
+            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) ");
+            //stmtlist.add("SELECT  FROM V ");//  stmtlist.add("SELECT  FROM E ");
+        }
+
+
         Set<GraphML_DocKey> docnodekeys=new HashSet<>() ;
         Set<GraphML_DocKey> docedgekeys=new HashSet<>() ;
         List<GraphML_DocNode> nodes = new ArrayList<>() ;
         List<GraphML_DocEdge> edges = new ArrayList<>() ;
 
-        //get nodes , then get edges
-        List<String> stmtlist= new ArrayList<>();
-        stmtlist.add("SELECT * FROM V ");
-        stmtlist.add("SELECT * FROM E ");
-
-        //stmt = "SELECT * FROM E ";
-        for (String stmt:stmtlist
+        for (String stm:stmtlist
              ) {
             //Map<String, Object> params = new HashMap<>();
             //OResultSet resultSet = db.query(stmt, params);
-            OResultSet resultSet = db.query(stmt);
+            OResultSet resultSet = db.query(stm,params);
             String source = "";
             String target = "";
             String keyname;
@@ -692,7 +707,7 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
         GraphML_DocRoot root = new GraphML_DocRoot(tempset,graph);
         XMLHandler.save(root,file);
 
-
+return true;
     }
 
 }
