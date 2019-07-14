@@ -1,4 +1,4 @@
-package nl.ou.testar;
+package nl.ou.testar.HtmlReporting;
 
 import nl.ou.testar.a11y.reporting.HTMLReporter;
 import org.fruit.alayer.Action;

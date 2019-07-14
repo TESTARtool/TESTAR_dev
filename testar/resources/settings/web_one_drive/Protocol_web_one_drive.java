@@ -1,38 +1,33 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
-
- 
-/**
- *  @author (base) Sebastian Bauersfeld
- *  @author (Bitrix24 adaptation, protocol refactor & cleanup) Urko Rueda (alias: urueda)
- */
 
 import java.io.File;
 import java.util.Collections;
@@ -42,7 +37,7 @@ import java.util.Set;
 import java.util.Random;
 
 import org.fruit.Assert;
-import org.fruit.Drag; // by urueda
+import org.fruit.Drag;
 import org.fruit.Pair;
 import org.fruit.Util;
 import org.fruit.alayer.Action;
@@ -68,7 +63,9 @@ import org.fruit.alayer.actions.CompoundAction;
 import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.actions.Type;
+import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
+import org.fruit.alayer.devices.Keyboard;
 
 import static org.fruit.monkey.ConfigTags.*;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
@@ -89,9 +86,9 @@ import static org.fruit.alayer.Tags.Foreground;
 import static org.fruit.alayer.Tags.Enabled;
 
 
-public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
-	
-	// platform: Windows7 -> we expect Mozilla Firefox or Microsoft Internet Explorer
+public class Protocol_web_one_drive extends ClickFilterLayerProtocol {
+
+	// platform: Windows10 -> we expect Mozilla Firefox or Microsoft Internet Explorer
 	static final int BROWSER_IEXPLORER = 1;
 	static final int BROWSER_FIREFOX = 2;
 	static int browser; // BROWSER_*
@@ -100,19 +97,19 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 
 	static double scrollArrowSize = 36; // sliding arrows (iexplorer)
 	static double scrollThick = 16; //scroll thickness (iexplorer)
-	
+
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
 	protected void initialize(Settings settings){
-		
+
 		super.initialize(settings);
 		initBrowser();
-		
+
 	}
-	
+
 	// check browser
 	private void initBrowser(){
 		browser = 0;
@@ -129,16 +126,16 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 			webText = NativeLinker.getNativeRole("UIAText");
 		}
 	}
-	
+
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
 	protected void beginSequence(SUT system, State state){
-		
+
 		super.beginSequence(system, state);
-		
+
 	}
-	
+
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
 	 * take care of 
@@ -148,14 +145,114 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 *      the SUT's configuratio files etc.)
 	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
 	 *      seconds until they have finished loading)
-     * @return  a started SUT, ready to be tested.
+	 * @return  a started SUT, ready to be tested.
 	 */
 	protected SUT startSystem() throws SystemStartException{
-        
+
 		SUT sut = super.startSystem();
 
-        return sut;
-    
+		Keyboard kb = AWTKeyboard.build();
+
+		/**
+		 * START Option 1: 
+		 * read the widgets of the current state and execute action based on them
+		 */
+		State state = getState(sut);
+
+		for(Widget w :state) {
+			if(w.get(Tags.Title,"").contains("Email") && w.get(Tags.Title,"").contains("phone")) {
+				StdActionCompiler ac = new AnnotatingActionCompiler();
+				executeAction(sut, state, ac.clickTypeInto(w, "testarhandson", true));
+
+				//Based on ENG Keyboard, Shift + 2 typing arroba character
+				kb.press(KBKeys.VK_SHIFT);
+				kb.press(KBKeys.VK_2);
+				kb.release(KBKeys.VK_2);
+				kb.release(KBKeys.VK_SHIFT);
+
+				executeAction(sut, state, ac.clickTypeInto(w, "gmail.com", false));
+
+			}
+		}
+
+		for(Widget w :state) {
+			if(w.get(Tags.Title,"").contains("Next")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(sut, state, ac.leftClickAt(w));
+				}
+			}
+		}
+
+		//Wait a bit
+		Util.pause(5);
+
+		//Update state
+		state = getState(sut);
+
+		for(Widget w :state) {
+			if(w.get(Tags.Title,"").contains("Enter the password")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAEdit")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(sut, state, ac.clickTypeInto(w, "0neDrivetestar", true));
+				}
+			}
+		}
+
+		for(Widget w :state) {
+			if(w.get(Tags.Title,"").contains("Sign in")) {
+				Role role = w.get(Tags.Role, Roles.Widget);
+				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					executeAction(sut, state, ac.leftClickAt(w));
+				}
+			}
+		}
+
+		//Wait a bit
+		Util.pause(2);
+
+		/**
+		 * END Option 1
+		 */
+
+
+		/**
+		 * START Option2:
+		 *  Work doing keyboard actions, without check the state and widgets
+		 */
+		/*new CompoundAction.Builder()   
+		.add(new Type("testarhandson"),0.5).build() //assume keyboard focus is on the user field   
+		.run(sut, null, 0.5);
+
+		kb.press(KBKeys.VK_SHIFT);
+		kb.press(KBKeys.VK_2);
+		kb.release(KBKeys.VK_2);
+		kb.release(KBKeys.VK_SHIFT);
+
+		new CompoundAction.Builder()  
+		.add(new Type("gmail.com"),0.5)
+		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
+		.run(sut, null, 1);
+
+		Util.pause(8);
+
+		new CompoundAction.Builder()
+		.add(new Type("0neDrivetestar"),0.5)   
+		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
+		.run(sut, null, 1);
+
+		//Wait a bit
+		Util.pause(1);*/
+
+		/**
+		 * END Option 2
+		 */
+
+		return sut;
+
 	}
 
 	/**
@@ -167,17 +264,17 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return  the current state of the SUT with attached oracle.
 	 */
 	protected State getState(SUT system) throws StateBuildException{
-		
+
 		State state = super.getState(system);
 
-        for(Widget w : state){
-            Role role = w.get(Tags.Role, Roles.Widget);
-            if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
-            	browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
-        }
-		
+		for(Widget w : state){
+			Role role = w.get(Tags.Role, Roles.Widget);
+			if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAToolBar")}))
+				browser_toolbar_filter = w.get(Tags.Shape,null).y() + w.get(Tags.Shape,null).height();
+		}
+
 		return state;
-		
+
 	}
 
 	/**
@@ -186,44 +283,44 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
 	protected Verdict getVerdict(State state){
-		
-		Verdict verdict = super.getVerdict(state); // by urueda
+
+		Verdict verdict = super.getVerdict(state);
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
-		
+
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-        //-----------------------------------------------------------------------------
-		
+		//-----------------------------------------------------------------------------
+
 		Role role;
 		String title;
 		Shape shape;
-		
+
 		// search all widgets for suspicious titles
 		for(Widget w : state){
 
 			role = w.get(Tags.Role, null);
 			title = w.get(Title, "");
 			shape = w.get(Tags.Shape, null);
-			
+
 			// Check that all images have an alternate textual description (accessibility, W3C WAI)
 			verdict = verdict.join(getW3CWAIVerdict(state, w, role, title));				
-				
+
 			// check for too small texts to be legible
 			verdict = verdict.join(getSmallTextVerdict(state, w, role, shape));
-			
+
 			// check for scrollable UI elements whether their size is enough for usability
 			verdict = verdict.join(getScrollsUsabilityVerdict(state, w, shape));
-				
+
 		}
 
 		return verdict;		
 
 	}
-	
+
 	private Verdict getW3CWAIVerdict(State state, Widget w, Role role, String title){
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAImage")) && title.isEmpty())
 			return new Verdict(Verdict.SEVERITY_WARNING, "Not all images have an alternate textual description",
-							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
+					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "W3C WAI", 0.5, 0.5));
 		else
 			return Verdict.OK;
 	}
@@ -232,26 +329,26 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		final int MINIMUM_FONT_SIZE = 8; // px
 		if (role != null && role.equals(NativeLinker.getNativeRole("UIAText")) && shape.height() < MINIMUM_FONT_SIZE)
 			return new Verdict(Verdict.SEVERITY_WARNING, "Not all texts have a size greater than " + MINIMUM_FONT_SIZE + "px",
-							   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
+					new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small text", 0.5, 0.5));
 		else
 			return Verdict.OK;	
 	}
-	
+
 	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
 		final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
 		try {
 			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
+							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAHorizontallyScrollable") && shape.width() < MINIMUM_SCROLLABLE_UISIZE)
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all horizontal-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
-									   new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
+							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small horizontal-scrollable UI element", 0.5, 0.5));																			
 			}
 		} catch (NoSuchTagException nste) { return Verdict.OK; }
 		return Verdict.OK;
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -263,28 +360,28 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return  a set of actions
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
+
+		Set<Action> actions = super.deriveActions(system,state);
 		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
 		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
+
 		//----------------------
 		// BUILD CUSTOM ACTIONS
 		//----------------------		
 
 		// iterate through all widgets
 		for(Widget w : state){
-			
+
 			if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
 
 				if (!blackListed(w)){  // do not build actions for tabu widgets  
-								
+
 					// create left clicks
 					if(whiteListed(w) || isClickable(w))
 						actions.add(ac.leftClickAt(w));
-	
+
 					// create double left click
 					if(whiteListed(w) || isDoubleClickable(w)){
 						if(browser == BROWSER_FIREFOX)
@@ -297,14 +394,14 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 					if(isTypeable(w)){
 						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
 					}
-					
+
 					// slides
 					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
-	                
+
 				}
-				
+
 			}
-			
+
 		}
 
 		return actions;
@@ -316,9 +413,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	protected boolean isClickable(Widget w){		
 		if (!isAtBrowserCanvas(w))
 			return false;	
-		
-        String title = w.get(Title, "");
-        Role role = w.get(Tags.Role, Roles.Widget);
+
+		String title = w.get(Title, "");
+		Role role = w.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, webText) && title.length() < MAX_CLICKABLE_TITLE_LENGTH)
 			return super.isUnfiltered(w);
 		else
@@ -328,7 +425,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	private boolean isDoubleClickable(Widget w){
 		if (!isAtBrowserCanvas(w))
 			return false;	
-		
+
 		if (isClickable(w)){
 			Widget wParent = w.parent();
 			if (wParent != null){
@@ -337,7 +434,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 					return isUnfiltered(w);
 			}
 		}
-		
+
 		return false;
 	}	
 
@@ -345,15 +442,14 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	protected boolean isTypeable(Widget w){
 		if (!isAtBrowserCanvas(w))
 			return false;	
-		
+
 		Role role = w.get(Tags.Role, null);
 		if (role != null && Role.isOneOf(role, webText))
 			return isUnfiltered(w);
-		
+
 		return false;
 	}
-	
-	// by urueda
+
 	private boolean isAtBrowserCanvas(Widget w){
 		Shape shape = w.get(Tags.Shape,null);
 		if (shape != null && shape.y() > browser_toolbar_filter)
@@ -361,7 +457,7 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 		else
 			return false;		
 	}
-		
+
 	/**
 	 * Select one of the possible actions (e.g. at random)
 	 * @param state the SUT's current state
@@ -369,9 +465,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	protected Action selectAction(State state, Set<Action> actions){
-		
+
 		return super.selectAction(state, actions);
-		
+
 	}
 
 	/**
@@ -382,11 +478,11 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return whether or not the execution succeeded
 	 */
 	protected boolean executeAction(SUT system, State state, Action action){
-		
+
 		return super.executeAction(system, state, action);
-		
+
 	}
-	
+
 	/**
 	 * TESTAR uses this method to determine when to stop the generation of actions for the
 	 * current sequence. You could stop the sequence's generation after a given amount of executed
@@ -394,9 +490,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * @return  if <code>true</code> continue generation, else stop
 	 */
 	protected boolean moreActions(State state) {
-		
+
 		return super.moreActions(state);
-		
+
 	}
 
 
@@ -404,9 +500,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	protected void finishSequence(){
-		
+
 		super.finishSequence();
-		
+
 	}
 
 
@@ -416,9 +512,9 @@ public class Protocol_web_bitrix24 extends ClickFilterLayerProtocol {
 	 * after a specific time etc.
 	 * @return  if <code>true</code> continue test, else stop	 */
 	protected boolean moreSequences() {
-		
+
 		return super.moreSequences();
-		
+
 	}	
-	
+
 }

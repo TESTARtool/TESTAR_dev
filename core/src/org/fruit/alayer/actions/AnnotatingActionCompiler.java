@@ -124,6 +124,7 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.leftClickAt(widget, relX, relY); // by urueda
 		ret.set(Tags.Desc, "Left Click at '" + widget.get(Tags.Desc, "<no description>") + "'");
 		//ret.set(Tags.Targets, Util.newArrayList(wf));
+        ret.set(Tags.OriginWidget, widget);
 		return ret;
 	}
 
@@ -162,7 +163,8 @@ public class AnnotatingActionCompiler extends StdActionCompiler {
 		Action ret = super.clickTypeInto(widget, relX, relY, text, replaceText);
 		//ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, 5, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'"));
 		ret.set(Tags.Desc, "Type '" + Util.abbreviate(text, DISPLAY_TEXT_MAX_LENGTH, "...") + "' into '" + widget.get(Tags.Desc, "<no description>" + "'")); // by urueda
-		return ret;
+		ret.set(Tags.OriginWidget, widget);
+        return ret;
 	}
 
 	@Override

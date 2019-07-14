@@ -33,25 +33,14 @@
  * @author Urko Rueda Molina
  */
 
-import java.io.File;
 import java.util.Set;
-
 import nl.ou.testar.CustomType;
-import org.fruit.alayer.Action;
+import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.TagsBase;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Verdict;
-import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
-import org.fruit.monkey.ConfigTags;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
-
 import static org.fruit.alayer.Tags.Blocked;
 import static org.fruit.alayer.Tags.Enabled;
 
@@ -62,7 +51,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	static double scrollThick = 16; //scroll thickness
 	private long sequence=0;
 
-	/** 
+	/**
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
@@ -73,7 +62,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 
 	}
-	
+
 
 	/**
 	 * This method is invoked each time the TESTAR starts to generate a new sequence
@@ -84,11 +73,11 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 		super.beginSequence(system, state);
 
 	}
-	
+
 
 	/**
 	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
+	 * take care of
 	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
 	 *      out what executable to run)
 	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -99,9 +88,9 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected SUT startSystem() throws SystemStartException{
-		
+
 		SUT sut = super.startSystem();
-		
+
 		return sut;
 
 	}
@@ -111,8 +100,8 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
-	 * own state fetching routine. The state should have attached an oracle 
-	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the 
+	 * own state fetching routine. The state should have attached an oracle
+	 * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
@@ -135,17 +124,17 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 
 		Verdict verdict = super.getVerdict(state); // by urueda
 		// system crashes, non-responsiveness and suspicious titles automatically detected!
-		
+
 		//-----------------------------------------------------------------------------
 		// MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
         //-----------------------------------------------------------------------------
 
 		// ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-		
+
 		return verdict;
-		
+
 	}
-	
+
 	/**
 	 * This method is used by TESTAR to determine the set of currently available actions.
 	 * You can use the SUT's current state, analyze the widgets and their properties to create
@@ -158,47 +147,63 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
-		
-		Set<Action> actions = super.deriveActions(system,state); // by urueda
-		// unwanted processes, force SUT to foreground, ... actions automatically derived!
 
-		// create an action compiler, which helps us create actions, such as clicks, drag&drop, typing ...
+		//The super method returns a ONLY actions for killing unwanted processes if needed, or bringing the SUT to
+		//the foreground. You should add all other actions here yourself.
+		Set<Action> actions = super.deriveActions(system,state);
+
+		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
-		
-		//----------------------
-		// BUILD CUSTOM ACTIONS
-		//----------------------
-		
-		if (!settings().get(ConfigTags.PrologActivated)){ // is prolog deactivated?
-			
-			// iterate through all widgets
-			for(Widget w : getTopWidgets(state)){
-				if(w.get(Enabled, true) && !w.get(Blocked, false)){ // only consider enabled and non-blocked widgets
-					if (!blackListed(w)){  // do not build actions for tabu widgets  
-						//storeWidget(state.get(Tags.ConcreteID), w);
-						// left clicks
-						if(whiteListed(w) || isClickable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.leftClickAt(w));
-						}
 
-						// type into text boxes
-						if(whiteListed(w) || isTypeable(w)) {
-							storeWidget(state.get(Tags.ConcreteID), w);
-							actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
-						}
-						// slides
-						addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w,state);
+		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+		for(Widget w : state){
+			if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+				// filtering out actions on menu-containers (adding an action in the middle of the menu)
+				continue;
+			}
 
+			//optional: iterate through top level widgets based on Z-index:
+			//for(Widget w : getTopWidgets(state)){
+
+			// Only consider enabled and non-blocked widgets
+			if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+				// Do not build actions for widgets on the blacklist
+				// The blackListed widgets are those that have been filtered during the SPY mode with the
+				//CAPS_LOCK + SHIFT + Click clickfilter functionality.
+				if (!blackListed(w)){
+
+					//For widgets that are:
+					// - clickable
+					// and
+					// - unFiltered by any of the regular expressions in the Filter-tab, or
+					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					// We want to create actions that consist of left clicking on them
+					if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						//Create a left click action with the Action Compiler, and add it to the set of derived actions
+						actions.add(ac.leftClickAt(w));
 					}
-				}
-			}			
-			
-		}
-		
-		return actions;
 
+					//For widgets that are:
+					// - typeable
+					// and
+					// - unFiltered by any of the regular expressions in the Filter-tab, or
+					// - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+					// We want to create actions that consist of typing into them
+					if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+						//Create a type action with the Action Compiler, and add it to the set of derived actions
+						actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+					}
+					//Add sliding actions (like scroll, drag and drop) to the derived actions
+					//method defined below.
+					addSlidingActions(actions,ac,scrollArrowSize,scrollThick,w, state);
+				}
+			}
+		}
+		//return the set of derived actions
+		return actions;
 	}
+
 
 	/**
 	 * Select one of the possible actions (e.g. at random)
@@ -208,6 +213,15 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
+		//using the action selector of the state model:
+		Action retAction = stateModelManager.getAbstractActionToExecute(actions);
+
+		if(retAction!=null){
+			System.out.println("State model based action selection used.");
+			return retAction;
+		}
+		// if state model fails, use default:
+		System.out.println("Default action selection used.");
 		return super.selectAction(state, actions);
 
 	}
@@ -243,19 +257,15 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 */
 	@Override
 	protected boolean moreActions(State state) {
-
 		return super.moreActions(state);
-
 	}
 
-	/** 
+	/**
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
 	@Override
 	protected void finishSequence(){
-		
 		super.finishSequence();
-		
 	}
 
 	/**
@@ -265,9 +275,7 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	 * @return  if <code>true</code> continue test, else stop	 */
 	@Override
 	protected boolean moreSequences() {
-
 		return super.moreSequences();
-
 	}
 
 	private class ButtonColor extends CustomType {
@@ -283,7 +291,6 @@ public class Protocol_desktop_generic_graphdb extends ClickFilterLayerProtocol {
 	}
 	
 }
-
 
  class ButtonColorTags extends TagsBase {
 	 public static Tag<Integer> RED_VALUE = from("red", Integer.class);

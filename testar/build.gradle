@@ -45,7 +45,18 @@ dependencies {
     compile files('./lib/jsyntaxpane-1.1.5.jar')
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
-    compile jnativehook
+    compile files('./lib/gson-2.8.5.jar')
+    compile 'com.1stleg:jnativehook:2.1.0'
+    compile 'com.google.guava:guava:26.0-jre'
+    compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
+    compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-webapp', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-annotations', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'apache-jsp', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'apache-jstl', version: '9.4.16.v20190411'
     runtime project(':windows')
     runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.2'
 }
@@ -97,6 +108,13 @@ startScripts {
                                      '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
     } else {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
+    }
+    
+    doLast {
+        def winScriptFile  = file getWindowsScript()
+        def winFileText = winScriptFile.text
+        winFileText = winFileText.replaceAll('set CLASSPATH=.*', 'rem original CLASSPATH declaration replaced by:\nset CLASSPATH=%APP_HOME%\\\\lib\\\\\\*')
+        winScriptFile.text = winFileText
     }
 }
 

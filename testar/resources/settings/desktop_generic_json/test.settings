@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = "C:\\Program Files\\Internet Explorer\\iexplore.exe" "https://testar.bitrix24.com/"
+SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 
 #################################################################
 # Sequences
@@ -43,13 +43,36 @@ SequenceLength = 100
 SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
+
+#################################################################
 # Actionfilter
 #
 # Regular expression. More filters can be added in Spy mode,
 # these will be added to the protocol_filter.xml file.
 #################################################################
 
-ClickFilter = .*[sS]ave.*|.*[gG]uardar.*|.*[fF]ormat.*|.*[fF]ormatear.*|.*[pP]rint.*|.*[iI]mprimir.*|.*[eE]mail.*|.*[fF]ile.*|.*[aA]rchivo.*|.*[mM]inimize.*|.*[mM]inimizar.*|.*[dD]isconnect.*|.*[dD]esconectar.*
+ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir.*|.*[eE]xit.*|.*[mM]inimizar.*|.*[mM]inimi[zs]e.*|.*[gG]uardar.*|.*[sS]ave.*|.*[iI]mprimir.*|.*[pP]rint.*
 
 #################################################################
 # Processfilter
@@ -66,7 +89,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = web_bitrix24/Protocol_web_bitrix24
+ProtocolClass = desktop_generic_json/Protocol_desktop_generic_json
 
 #################################################################
 # Graphdatabase settings (experimental)
