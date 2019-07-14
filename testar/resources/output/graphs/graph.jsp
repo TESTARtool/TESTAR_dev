@@ -252,6 +252,14 @@
                     'border-color': '#FFFFFF',
                     'background-image-opacity': 0.05
                 }
+            },
+            {
+                selector: '.leaves',
+                style: {
+                    'width': '60px',
+                    'height': '60px',
+                    'border-width': '2px'
+                }
             }
         ],
 
@@ -274,6 +282,9 @@
             animationDuration: 1000
         }).run();
     });
+
+    // highlight the leaves, which in this case will be the root of the widget tree
+    cy.ready(() => cy.$(".Widget").leaves().addClass("leaves"));
 
     // document.getElementById("close-panel").addEventListener("click", function () {
     //     let cdPanel = document.getElementsByClassName("cd-panel")[0];
