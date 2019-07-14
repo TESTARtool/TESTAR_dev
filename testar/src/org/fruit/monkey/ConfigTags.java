@@ -71,6 +71,7 @@ public final class ConfigTags {
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> MyClassPath = Tag.from("MyClassPath", (Class<List<String>>) (Class<?>) List.class);
   public static final Tag<String> ProtocolClass = Tag.from("ProtocolClass", String.class);
+  public static final Tag<String> ClassesDir = Tag.from("ClassesDir", String.class);
   public static final Tag<Boolean> UseRecordedActionDurationAndWaitTimeDuringReplay = Tag.from("UseRecordedActionDurationAndWaitTimeDuringReplay", Boolean.class);
   public static final Tag<Boolean> StopGenerationOnFault = Tag.from("StopGenerationOnFault", Boolean.class);
   public static final Tag<Double> TimeToFreeze = Tag.from("TimeToFreeze", Double.class);

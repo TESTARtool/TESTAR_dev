@@ -53,7 +53,7 @@ import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
 
-	//public static final String TESTAR_DIR_PROPERTY = "DIRNAME"; //Use the OS environment to obtain TESTAR directory
+	public static final String TESTAR_DIR_PROPERTY = "TESTAR_DIR"; //Use the OS environment to obtain TESTAR directory
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
@@ -97,6 +97,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
+		initTestarPaths();
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
@@ -138,21 +139,43 @@ public class Main {
 
 	}
 	
+	private static void initTestarPaths() {
+		try {
+			String newTestarDir = System.getenv(TESTAR_DIR_PROPERTY);
+			if (newTestarDir != null) {
+				testarDir = newTestarDir;
+				if (!testarDir.endsWith(File.separator)) {
+					testarDir = testarDir + File.separator;
+				}
+			}
+		}catch (Exception e) {
+			System.out.println("Use default path settings");
+		}
+		settingsDir = testarDir + "settings" + File.separator;
+		outputDir = testarDir + "output" + File.separator;
+		tempDir = outputDir + "temp" + File.separator;
+		System.out.println("Testar directory  : " + testarDir);
+		System.out.println("Settings directory: " + settingsDir);
+		
+	}
+
+	public static String getTestarDir() {
+		return testarDir;
+	}
+
+	public static String getSettingsDir() {
+		return settingsDir;
+	}
+
 	/**
 	 * Set the current directory of TESTAR, settings and output folders
 	 */
 	private static void setTestarDirectory(Settings settings) {
 		//Use the OS environment to obtain TESTAR directory
-		/*try {
-			testarDir = System.getenv(TESTAR_DIR_PROPERTY);
-		}catch (Exception e) {
-			testarDir = "." + File.separator;
-			System.out.println(e);
-			System.out.println("Please execute TESTAR from their existing directory");
-		}*/
-		
 		outputDir = settings.get(ConfigTags.OutputDir);
 		tempDir = settings.get(ConfigTags.TempDir);
+		System.out.println("Output directory  : " + outputDir);
+		System.out.println("Temp directory    : " + tempDir);
 	}
 
 	/**

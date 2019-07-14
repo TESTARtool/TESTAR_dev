@@ -49,13 +49,13 @@ import org.fruit.Util;
 public class ProtocolEditor extends javax.swing.JDialog {
     private static final long serialVersionUID = 5922037291232012481L;
 
-    private String settingsDir;
-    private String protocolClass; // by urueda
+//    private String protocolClass; // by urueda
+    private Settings settings;
     
     //public ProtocolEditor() {
-    public ProtocolEditor(String settingsDir, String protocolClass) { // by urueda
-        this.settingsDir = settingsDir;
-    	this.protocolClass = protocolClass;
+    public ProtocolEditor(Settings settings) { // by urueda
+    	this.settings = settings;
+
         DefaultSyntaxKit.initKit();
         initComponents();
         codeEditor.setContentType("text/java");
@@ -144,7 +144,7 @@ public class ProtocolEditor extends javax.swing.JDialog {
             Util.saveToFile(codeEditor.getText(), protocolFile.getPath());
             File compileDir = protocolFile.getParentFile();
 			List<File> fileList = new ArrayList<File>(1); fileList.add(compileDir); // by urueda
-            Util.compileJava(settingsDir, fileList,
+            Util.compileJava(settings.get(ConfigTags.ClassesDir), fileList,
             				 System.getProperty("java.class.path")); //";./monkey.jar");
             // end bu urueda     
             console.setText(console.getText() + "OK");
@@ -155,11 +155,12 @@ public class ProtocolEditor extends javax.swing.JDialog {
 
     private File getProtocolFile() {
         File protocolFile ;
+        String protocolClass = settings.get(ConfigTags.ProtocolClass);
         if (Paths.get(protocolClass).isAbsolute()) {
             protocolFile = new File(protocolClass + ".java");
         }
         else {
-            protocolFile = new File(settingsDir + protocolClass + ".java");
+            protocolFile = new File(Main.settingsDir + protocolClass + ".java");
         }
         return protocolFile;
     }

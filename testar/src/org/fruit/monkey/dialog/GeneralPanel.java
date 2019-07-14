@@ -207,7 +207,7 @@ public class GeneralPanel extends JPanel {
   }
 
   private void btnEditProtocolActionPerformed(ActionEvent evt) {
-    JDialog dialog = new ProtocolEditor(Main.settingsDir, settings.get(ConfigTags.ProtocolClass));
+    JDialog dialog = new ProtocolEditor(settings);
     dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
     dialog.setVisible(true);
   }
