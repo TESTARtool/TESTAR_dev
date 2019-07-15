@@ -33,10 +33,7 @@ package org.fruit.alayer.webdriver;
 import org.fruit.alayer.Rect;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WdElement implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
@@ -90,7 +87,9 @@ public class WdElement implements Serializable {
     this.root = root;
     this.parent = parent;
 
-    attributeMap = (Map<String, String>) packedElement.get("attributeMap");
+    // Cast object to Map, create new HashMap as casted map is not serializable
+    attributeMap = new HashMap<>(
+        (Map<String, String>) packedElement.get("attributeMap"));
 
     id = attributeMap.getOrDefault("id", "");
     name = (String) packedElement.get("name");
