@@ -1,4 +1,4 @@
-package desktop_generic_temporaloracles; /***************************************************************************************************
+/***************************************************************************************************
 *
 * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
 * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
