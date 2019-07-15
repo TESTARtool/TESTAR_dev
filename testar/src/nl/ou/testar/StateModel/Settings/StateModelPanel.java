@@ -79,6 +79,7 @@ public class StateModelPanel extends JPanel {
     private JButton dirButton = new JButton("..");
     private JButton analysisButton = new JButton("Analysis");
     private JDialog analysisDialog;
+    private JButton exportDBbutton = new JButton("Export DB");
 
     private String outputDir;
 
@@ -114,6 +115,7 @@ public class StateModelPanel extends JPanel {
         components.add(accessBridgeEnabledBox);
         components.add(dirButton);
         components.add(analysisButton);
+        components.add(exportDBbutton);
 
         // add the components to the panel
         setLayout(null);
@@ -206,6 +208,17 @@ public class StateModelPanel extends JPanel {
             }
         });
         add(analysisButton);
+        
+        exportDBbutton.setBounds(330, 166, 150, 27);
+        exportDBbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	ExportDatabaseDialog exportDBdialog = new ExportDatabaseDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            	exportDBdialog.setVisible(true);
+            }
+        });
+        add(exportDBbutton);
 
         label14.setBounds(330, 242, 300, 27);
         add(label14);
