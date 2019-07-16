@@ -13,10 +13,10 @@ INCLUDES= /I "$(JAVA_HOME)\include"\
 DLLFILE="..\target\resources\main\windows.dll"
 
 JAVA_CLASSFILE = "..\target\classes\java\main\org\fruit\alayer\windows\Windows.class"
-JAVA_CLASS = org.fruit.alayer.windows.Windows
+JAVA_CLASS = org.fruit.alayer.windows.Windows.java
+JAVA_FILE = "..\src\org\fruit\alayer\windows\Windows.java"
 
 OBJFILES= main_w10.obj\
-# by urueda
 		  AccessBridgeCalls.obj
 
 HPPFILES= windows.h\
@@ -28,13 +28,14 @@ CPPFLAGS= /EHsc /O2 /MD /wd4311 /wd4312
 all: windows.h $(DLLFILE)
 
 windows.h: $(JAVA_CLASSFILE)
-	javah -jni -force -o windows.h -classpath ..\target\classes\java\main $(JAVA_CLASS)
+	"$(JAVA_HOME)\bin\javac" $(JAVA_FILE) -d . -h .
+	ren "org_fruit_alayer_windows_Windows.h" "windows.h"
+	rmdir "org" /s /q
 
 $(OBJFILES): windows.h
 
 .cpp.obj:
 # cl $(CPPFLAGS) /c $*.cpp $(INCLUDES)
-# by urueda
 	cl $(CPPFLAGS) /c "AccessBridge\AccessBridgeCalls.c" $*.cpp $(INCLUDES)
 
 
