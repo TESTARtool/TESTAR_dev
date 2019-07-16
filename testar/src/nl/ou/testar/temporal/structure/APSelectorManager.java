@@ -8,7 +8,6 @@ import nl.ou.testar.temporal.util.TagBean;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
-import org.fruit.alayer.windows.UIARoles;
 import org.fruit.alayer.windows.UIATags;
 
 import java.util.*;
@@ -20,23 +19,14 @@ public class APSelectorManager {
 
     private List<String> APKey= new ArrayList<>();
     private Set<TagBean<?>> selectedAttributes;
-
-
-
-    //private BiMap<String, Class<?>> selectedAttributes1;
     private Set<TagBean<?>> entireAttributeSet ;
     private  Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
-
-
-
     private String apEncodingSeparator;
-
     private Set<WidgetFilter> widgetfilters;
     public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
         return valuedExpressions;
     }
     private String formatVersion="20190713";
-
     private List<String> comments = new ArrayList<>();
 
 
@@ -92,7 +82,6 @@ public class APSelectorManager {
         if (valuedExpressions!=null) this.valuedExpressions = valuedExpressions;
         this.valuedExpressions.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
         this.valuedExpressions.add(new PairBean<>(InferrableExpression.exists_, ""));
-        this.valuedExpressions.add(new PairBean<>(InferrableExpression.is_deadstate_, ""));
     }
     public String getFormatVersion() {
         return formatVersion;
@@ -234,7 +223,17 @@ private TagBean<?> createDeadStateTag() {
         }
         return  ret;
     }
-
+    private TagBean<?> getTag(String attrib,WidgetFilter wf){
+        TagBean<?> ret=null;
+        for (TagBean<?> tag : selectedAttributes
+        ) {
+            if ( tag.name().equals(attrib)){
+                ret=tag;
+                break;
+            }
+        }
+        return  ret;
+    }
     public boolean contains(String attrib){
 
         if(getTag(attrib)!=null){
@@ -246,67 +245,8 @@ private TagBean<?> createDeadStateTag() {
 
     private void useDefaultValuedExpressions() {
         //valuedExpressions.clear();
-        setValuedExpressions(null); //initialize
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "1"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_eq_, "2"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "10"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "100"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "1000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "10000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "100000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.value_lt_, "1000000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CANCEL)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:YES)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:NO)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:GO)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RUN)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SAVE)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:EXIT)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CLOSE)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:REMOVE)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:ERROR)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SUBMIT)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OPEN)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:IGNORE)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:PROCEED)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:PRINT)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:VIEW)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:UP)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:DOWN)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:LEFT)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RIGHT)"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textmatch_, "")); //no title
-        valuedExpressions.add(new PairBean<>(InferrableExpression.pathmatch_, ".*\\[(\\d+, )*\\d+\\]"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "50"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "250"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "500"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.heigth_lt_, "1000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.width_lt_, "50"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.width_lt_, "250"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.width_lt_, "500"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.width_lt_, "1000"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_eq_, "1"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_eq_, "2"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_eq_, "3"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "10"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "20"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "50"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "100"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.textlength_lt_, "200"));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.is_blank_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.exists_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_upleft_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_upright_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_downleft_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.relpos_downright_, ""));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAButton.toString()));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAWindow.toString()));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIACheckBox.toString()));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIARadioButton.toString()));
-        valuedExpressions.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAEdit.toString()));
+        setValuedExpressions(null); //initialize and include mandatory ones
+        valuedExpressions.addAll(WidgetFilter.useDefaultValuedExpressions());//new PairBean<>(InferrableExpression.value_eq_, "0"));
 
     }
 
@@ -346,7 +286,7 @@ private TagBean<?> createDeadStateTag() {
         Set<String> apset = new LinkedHashSet<>();
         TagBean<?> tag = getTag(attrib);
 
-        if (tag != null) {   //this attribute is required as a(n) (set of) AP
+        if (tag != null) {   //this attribute is required as a(n) (set of) AP .. result is dependent on selectedattributes
 
             if (tag.type() == Boolean.class ) {
                // apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
@@ -405,12 +345,7 @@ private TagBean<?> createDeadStateTag() {
 
                     }
                 }
-
         }
-        //System.out.println("debug getAPOfAttributes exit with apset size: "+ apset.size());
-      //  if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset size and element0: "+apset.size()+" : "+ apset.iterator().next());
-      //  if (apset.size()>0) System.out.println("debug getAPOfAttributes exit with apset size and element0: "+apset.size()+" : "+ apset.iterator().next());
-
         return apset;
     }
 
@@ -427,12 +362,10 @@ private TagBean<?> createDeadStateTag() {
         for (WidgetFilter wf:widgetfilters
         ) {
             pass = (wf.getWidgetRolesMatches().size() == 0) ;  // no filter means pass
-
             if (!pass) {
                 for (String frole : wf.getWidgetRolesMatches()
                 ) {
                     pass = role.matches(frole);
-//
                     if (pass) break;
                 }
             }

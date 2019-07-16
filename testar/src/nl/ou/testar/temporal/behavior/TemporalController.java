@@ -46,7 +46,7 @@ public class TemporalController {
     private Config dbConfig;
     private String outputDir;
     private ODatabaseSession db;
-    private APSelectorManager Apmgr;
+    private APSelectorManager apSelectorManager;
 
 
     /**
@@ -66,9 +66,18 @@ public class TemporalController {
 
         // check if the credentials are valid
         db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
-
+        setDefaultAPSelectormanager();
+    }
+    public void saveAPSelectorManager (String filename) {
+        JSONHandler.save(apSelectorManager, outputDir + filename,true);
     }
 
+    public void loadApSelectorManager(String filename) {
+        this.apSelectorManager =  (APSelectorManager) JSONHandler.load(outputDir + filename, apSelectorManager.getClass());
+    }
+    public void setDefaultAPSelectormanager(){
+        this.apSelectorManager =new APSelectorManager(true);
+    }
     /**
      * Shuts down the orientDB connection.
      */
@@ -137,8 +146,8 @@ public class TemporalController {
                 abstractStateModel.getApplicationName(), abstractStateModel.getApplicationVersion(),
                 abstractStateModel.getModelIdentifier(), abstractStateModel.getAbstractionAttributes());
 
-        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
-        this.Apmgr = Apmgr;
+        //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
+        this.apSelectorManager = Apmgr;
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -176,7 +185,7 @@ public class TemporalController {
 
         for (String ap : tmodel.getModelAPs()    // check the resulting model for DeadStates
         ) {
-            //if (ap.matches(Apmgr.getApEncodingSeparator()+TagBean.IsDeadState)) {
+            //if (ap.matches(apSelectorManager.getApEncodingSeparator()+TagBean.IsDeadState)) {
             if (ap.contains(Apmgr.getApEncodingSeparator() + TagBean.IsDeadState.name())) {
                 tmodel.addLog("WARNING: Model contains dead states (there are states without outgoing edges)");
                 break;
@@ -504,11 +513,11 @@ public class TemporalController {
     }
 
     private void computeProps(String propertyName, OElement graphElement, Set<String> props, boolean isWidget, boolean isDeadState) {
-        //Set selectedAttibutes = Apmgr.getSelectedSanitizedAttributeNames();
+        //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
         StringBuilder apkey = new StringBuilder();
         boolean pass=true;
         if (isWidget) {
-            pass = Apmgr.passWidgetFilters(
+            pass = apSelectorManager.passWidgetFilters(
                     graphElement.getProperty(Tags.Role.name().toString()),
                     graphElement.getProperty(Tags.Title.name().toString()),
                     graphElement.getProperty(Tags.Path.name().toString())
@@ -517,7 +526,7 @@ public class TemporalController {
         }
         if (pass){
             //compose key
-            for (String k : Apmgr.getAPKey()
+            for (String k : apSelectorManager.getAPKey()
             ) {
                 Object prop = graphElement.getProperty(k);
                 if (prop == null) {
@@ -533,15 +542,15 @@ public class TemporalController {
                         fallback = concreteprop.toString();
                     }
                     apkey.append(fallback);
-                    apkey.append(Apmgr.getApEncodingSeparator());
+                    apkey.append(apSelectorManager.getApEncodingSeparator());
                 }
                 else {
                     apkey.append(prop);
-                    apkey.append(Apmgr.getApEncodingSeparator());
+                    apkey.append(apSelectorManager.getApEncodingSeparator());
                 }
             }
 
-            props.addAll(Apmgr.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+            props.addAll(apSelectorManager.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
 
         }
 
