@@ -16,30 +16,34 @@ import java.util.Set;
 
 public class APSelector {
     private Set<TagBean<?>> selectedAttributes;
-    //private static Set<PairBean<InferrableExpression,String>> defaultValuedExpressions= new LinkedHashSet<>();
     private  Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
 
+
+    public APSelector(Set<TagBean<?>> selectedAttributes, Set<PairBean<InferrableExpression, String>> valuedExpressions) {
+       setSelectedAttributes(selectedAttributes);
+        this.valuedExpressions = valuedExpressions;
+    }
 
     public APSelector() {
         selectedAttributes=new LinkedHashSet<>();
         valuedExpressions =new LinkedHashSet<>();
     }
-   public APSelector(boolean initializeWithBasics) {  //candidate fo refactoring: valueexpression
-       this();
-       if (initializeWithBasics) {
-           selectedAttributes = getEntireTagSet();
-           this.valuedExpressions = useBasicValuedExpressions();
-       }
 
-    }
     public Set<TagBean<?>> getSelectedAttributes() {
         return selectedAttributes;
     }
 
     public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
         this.selectedAttributes = selectedAttributes;
+        this.selectedAttributes.add(deadStateTag());
     }
 
+    private static final TagBean<?> deadStateTag() {
+        //TagBean<?> dtag = new TagBean<>("IsDeadState", Boolean.class); // refactoring candidate
+        TagBean<?> dtag = TagBean.IsDeadState;
+
+        return dtag;
+    }
     private static final Set<TagBean<?>> getEntireTagSet(){
 
 
@@ -62,6 +66,7 @@ public class APSelector {
             TagBean<?> t1 = TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type()); //orientdb style tags
             tmptagset.add(t1);
         }
+        tmptagset.add(deadStateTag());
         return  tmptagset;
     };
 
@@ -100,7 +105,7 @@ public class APSelector {
         simve.add(new PairBean<>(InferrableExpression.textlength_lt_, "20"));
         simve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAButton.toString()));
         simve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAWindow.toString()));
-return simve;
+        return simve;
 
     }
 
@@ -165,7 +170,7 @@ return simve;
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIACheckBox.toString()));
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIARadioButton.toString()));
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAEdit.toString()));
-return defve;
+        return defve;
     }
 
 
