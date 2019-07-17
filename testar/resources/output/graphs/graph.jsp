@@ -112,7 +112,9 @@
                     'background-color': '#F6EFF7',
                     'border-width': "1px",
                     'border-color': '#000000',
-                    'label': 'data(id)'
+                    'label': 'data(counter)',
+                    'color': '#5d574d',
+                    'font-size': '0.5em'
                 }
             },
 
@@ -120,7 +122,8 @@
                 selector: ':parent',
                 style: {
                     'background-opacity': 0.9,
-                    'border-style' : 'dashed'
+                    'border-style' : 'dashed',
+                    'label': 'data(id)'
                 }
             },
 
@@ -131,7 +134,11 @@
                     'line-color': '#ccc',
                     'target-arrow-color': '#ccc',
                     'target-arrow-shape': 'triangle',
-                    'curve-style': 'unbundled-bezier'
+                    'curve-style': 'unbundled-bezier',
+                    'text-rotation' : 'autorotate',
+                    'label': 'data(counter)',
+                    'color': '#5d574d',
+                    'font-size': '0.4em'
                 }
             },
             {
@@ -228,7 +235,8 @@
                 selector: '.Widget',
                 style: {
                     'background-color': '#e7298a',
-                    'background-opacity': 0.8
+                    'background-opacity': 0.8,
+                    'label' : 'data(customLabel)'
                 }
             },
 
@@ -247,7 +255,8 @@
                     'background-color': '#000000',
                     'label': 'data(id)',
                     'background-image' : "img/blackhole-bg.jpg",
-                    'background-fit': 'contain'
+                    'background-fit': 'contain',
+                    'label': 'BlackHole'
                 }
             },
 
@@ -317,6 +326,9 @@
 
     // highlight the leaves, which in this case will be the root of the widget tree
     cy.ready(() => cy.$(".Widget").leaves().addClass("leaves"));
+    cy.ready(() => cy.$(".Widget").forEach(
+        (w) => w.data("customLabel", w.data("Role") + "-" + w.data("counter"))
+    ));
 
     // document.getElementById("close-panel").addEventListener("click", function () {
     //     let cdPanel = document.getElementsByClassName("cd-panel")[0];

@@ -194,7 +194,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the abstract layer
         if (showCompoundGraph) {
-            Vertex abstractStateParent = new Vertex("A1");
+            Vertex abstractStateParent = new Vertex("AbstractLayer");
             elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
         }
 
@@ -203,7 +203,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
@@ -213,7 +213,7 @@ public class AnalysisManager {
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
 
 
         // unvisited abstract actions
@@ -235,7 +235,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the concrete layer
         if (showCompoundGraph) {
-            Vertex concreteStateParent = new Vertex("C1");
+            Vertex concreteStateParent = new Vertex("ConcreteLayer");
             elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
         }
 
@@ -244,7 +244,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "ConcreteLayer" : null, modelIdentifier));
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
@@ -265,7 +265,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the sequence layer
         if (showCompoundGraph) {
-            Vertex sequenceParent = new Vertex("S1");
+            Vertex sequenceParent = new Vertex("SequenceLayer");
             elements.add(new Element(Element.GROUP_NODES, sequenceParent, "Parent"));
         }
 
@@ -274,12 +274,12 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "S1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "S1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
