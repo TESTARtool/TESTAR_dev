@@ -23,26 +23,58 @@
 <div class="topbar">
     <img src="img/testar-logo.png" class="logo">
     <div class="layout">
-        <div><label for="layout-control">Layout: <select name="layout-control" id="layout-control">
-            <option selected disabled></option>
-            <option value="random">Random</option>
-            <option value="grid">Grid</option>
-            <option value="circle">Circle</option>
-            <option value="concentric">Concentric</option>
-            <option value="breadthfirst">Breadthfirst</option>
-            <option value="cose">Cose</option>
-            <option value="cose-bilkent">Cose-bilkent</option>
-            <option value="cola">Cola</option>
-            <option value="euler">Euler</option>
-            <option value="dagre">Dagre</option>
-            <option value="klay">Klay</option>
-        </select></label></div>
-        <div>
-            <label for="show-labels"><input type="checkbox" id="show-labels" checked> Show node labels</label>
+        <div class="column">
+            <div><label for="layout-control">Layout: <select name="layout-control" id="layout-control">
+                <option selected disabled></option>
+                <option value="random">Random</option>
+                <option value="grid">Grid</option>
+                <option value="circle">Circle</option>
+                <option value="concentric">Concentric</option>
+                <option value="breadthfirst">Breadthfirst</option>
+                <option value="cose">Cose</option>
+                <option value="cose-bilkent">Cose-bilkent</option>
+                <option value="cola">Cola</option>
+                <option value="euler">Euler</option>
+                <option value="dagre">Dagre</option>
+                <option value="klay">Klay</option>
+            </select></label></div>
+            <div>
+                <label for="show-labels"><input type="checkbox" id="show-labels" checked> Show node labels</label>
+            </div>
+            <div>
+                <button id="show-all" type="button" class="skip">Show all nodes</button>
+            </div>
         </div>
-        <div>
-            <button id="show-all" type="button">Show all nodes</button>
+
+        <div class="column">
+            <div class="extra-margin-left"><span class="legend">Legend:</span></div>
         </div>
+
+        <div class="column">
+            <div class="legend-box abstract-state"></div>
+            <div class="legend-box concrete-state"></div>
+            <div class="legend-box sequence-node"></div>
+        </div>
+
+        <div class="column">
+            <div class="legend-text">Abstract state</div>
+            <div class="legend-text">Concrete State</div>
+            <div class="legend-text">Sequence Node</div>
+        </div>
+
+        <div class="column">
+            <div class="legend-box first-node"></div>
+            <div class="legend-box blackhole"></div>
+            <div class="legend-box widget"></div>
+        </div>
+
+        <div class="column">
+            <div class="legend-text">First Sequence Node</div>
+            <div class="legend-text">Black hole</div>
+            <div class="legend-text">Widget</div>
+        </div>
+
+
     </div>
 </div>
 
@@ -324,6 +356,7 @@
         ///////////// add button section ///////////////////////////
         let closeButton = document.createElement("button");
         closeButton.id = "close-panel";
+        closeButton.classList.add("skip");
         closeButton.appendChild(document.createTextNode("Close"));
         closeButton.addEventListener("click", function () {
             let cdPanel = document.getElementsByClassName("cd-panel")[0];
@@ -347,6 +380,7 @@
 
             let widgetTreeButton = document.createElement("button");
             widgetTreeButton.id ="widget-tree-button";
+            widgetTreeButton.classList.add("skip");
             widgetTreeButton.appendChild(document.createTextNode("Inspect widget tree"));
             widgetTreeButton.addEventListener("click", function () {
                 form.submit();
@@ -357,6 +391,7 @@
         // add a visibility button
         let visibilityButton = document.createElement("button");
         visibilityButton.id = "toggle-visible";
+        visibilityButton.classList.add("skip");
         visibilityButton.appendChild(document.createTextNode("Make invisible"));
         visibilityButton.addEventListener("click", function () {
             targetNode.addClass("invisible");
@@ -366,6 +401,7 @@
         // add a highlight button
         let highlightButton = document.createElement("button");
         highlightButton.id = "highlight";
+        highlightButton.classList.add("skip");
         highlightButton.appendChild(document.createTextNode("Highlight"));
         highlightButton.addEventListener("click", function () {
             cy.$("*").difference(cy.$(targetNode).closedNeighborhood()).addClass("dim");

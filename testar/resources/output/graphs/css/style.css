@@ -2,6 +2,7 @@ img.logo {
     width: 249px;
     height: 202px;
     display: inline-block;
+    float: left;
 }
 .topbar {
     /*position: absolute;*/
@@ -26,12 +27,99 @@ div.layout {
     margin-left: 50px;
     display: inline-block;
     vertical-align: top;
+    float: left;
 }
 
-div.layout > div {
+div.layout > div.column {
     float: left;
     padding-top: 10px;
     padding-right: 10px;
+    margin-right: 20px;
+}
+
+div.layout > div.column > div {
+    margin-bottom: 10px;
+}
+
+div.extra-margin-left {
+    margin-left: 30px;
+}
+
+span.legend {
+    font-size: 1.5em;
+    color: #5d574d;
+    font-weight: bold;
+}
+
+div.layout > div.column > div.legend-box {
+    width: 40px;
+    height: 30px;
+    margin-bottom: 10px;
+    border: black;
+    border-width: 1px;
+    border-style: solid;
+}
+
+div.layout > div.column > div.legend-text {
+    height: 30px;
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    line-height: 30px;
+    margin-left: -20px;
+}
+
+div.abstract-state {
+    background-color: #1c9099;
+}
+
+div.abstract-action {
+
+}
+
+div.unvisited-abstract-action {
+
+}
+
+div.blackhole {
+    background-image: url('../img/blackhole-bg.jpg');
+    background-size: contain;
+}
+
+div.initial-state {
+    background-color: #1c9099;
+}
+
+div.concrete-state {
+    background-color: #67A9CF;
+}
+
+div.concrete-action {
+
+}
+
+div.sequence-step {
+
+}
+
+div.sequence-node {
+    background-color: #016450;
+}
+
+div.first-node {
+    background-color: #014636;
+}
+
+div.test-sequence {
+    background-color: #014636;
+}
+
+div.widget {
+    background-color: #e7298a;
+    opacity: 0.8;
+}
+
+div.is-child-of {
+    background-color: #df65b0;
 }
 
 .cd-panel {
@@ -235,3 +323,36 @@ table.table-data {
 p.paragraph-data {
     margin-right: 10px;
 }
+
+button.skip {
+    background-color: #8c9cbf;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8c9cbf), color-stop(50%, #546a9e), color-stop(50%, #36518f), color-stop(100%, #3d5691));
+    background-image: -webkit-linear-gradient(top, #8c9cbf 0%, #546a9e 50%, #36518f 50%, #3d5691 100%);
+    background-image: -moz-linear-gradient(top, #8c9cbf 0%, #546a9e 50%, #36518f 50%, #3d5691 100%);
+    background-image: -ms-linear-gradient(top, #8c9cbf 0%, #546a9e 50%, #36518f 50%, #3d5691 100%);
+    background-image: -o-linear-gradient(top, #8c9cbf 0%, #546a9e 50%, #36518f 50%, #3d5691 100%);
+    background-image: linear-gradient(top, #8c9cbf 0%, #546a9e 50%, #36518f 50%, #3d5691 100%);
+    border: 1px solid #172d6e;
+    border-bottom: 1px solid #0e1d45;
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 1px 0 0 #b1b9cb;
+    box-shadow: inset 0 1px 0 0 #b1b9cb;
+    color: #fff;
+    font: bold 16px/1 "helvetica neue", helvetica, arial, sans-serif;
+    padding: 7px 0 8px 0;
+    text-decoration: none;
+    text-align: center;
+    text-shadow: 0 -1px 1px #000f4d;
+    width: 150px; }
+button.skip:hover {
+    background-color: #7f8dad;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7f8dad), color-stop(50%, #4a5e8c), color-stop(50%, #2f477d), color-stop(100%, #364c80));
+    background-image: -webkit-linear-gradient(top, #7f8dad 0%, #4a5e8c 50%, #2f477d 50%, #364c80 100%);
+    background-image: -moz-linear-gradient(top, #7f8dad 0%, #4a5e8c 50%, #2f477d 50%, #364c80 100%);
+    background-image: -ms-linear-gradient(top, #7f8dad 0%, #4a5e8c 50%, #2f477d 50%, #364c80 100%);
+    background-image: -o-linear-gradient(top, #7f8dad 0%, #4a5e8c 50%, #2f477d 50%, #364c80 100%);
+    background-image: linear-gradient(top, #7f8dad 0%, #4a5e8c 50%, #2f477d 50%, #364c80 100%);
+    cursor: pointer; }
+button.skip:active {
+    -webkit-box-shadow: inset 0 0 20px 0 #1d2845, 0 1px 0 white;
+    box-shadow: inset 0 0 20px 0 #1d2845, 0 1px 0 white; }
