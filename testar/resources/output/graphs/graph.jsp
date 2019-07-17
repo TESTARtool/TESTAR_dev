@@ -64,14 +64,14 @@
 
         <div class="column">
             <div class="legend-box first-node"></div>
-            <div class="legend-box blackhole"></div>
             <div class="legend-box widget"></div>
+            <div class="legend-box blackhole"></div>
         </div>
 
         <div class="column">
             <div class="legend-text">First Sequence Node</div>
-            <div class="legend-text">Black hole</div>
             <div class="legend-text">Widget</div>
+            <div class="legend-text">Black hole</div>
         </div>
 
 
