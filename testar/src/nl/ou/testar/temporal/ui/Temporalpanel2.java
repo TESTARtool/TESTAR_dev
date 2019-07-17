@@ -5,14 +5,44 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import nl.ou.testar.StateModel.Settings.StateModelPanel;
+import nl.ou.testar.temporal.behavior.TemporalController;
+import nl.ou.testar.temporal.structure.*;
+import nl.ou.testar.temporal.util.CSVHandler;
+import nl.ou.testar.temporal.util.JSONHandler;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-public class Temporalpanel2 {
+import static org.fruit.monkey.Main.outputDir;
+
+public class Temporalpanel2 {  //"extends JPanel" was manually added
+    //****custom
+    private Process webAnalyzerProcess = null;
+    private StateModelPanel stateModelPanel;
+    String dataStoreText;
+    String dataStoreServerDNS;
+    String dataStoreDirectory;
+    String dataStoreDBText;
+    String dataStoreUser;
+    String dataStorePassword;
+    String dataStoreType;
+    //**** custom
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
     private JTextArea textArea1;
@@ -49,13 +79,303 @@ public class Temporalpanel2 {
     private JButton defaultSelectorButton;
 
     public Temporalpanel2() {
-        startAnalyzerButton.addActionListener(new ActionListener() {
+         //   super(); // init as a JPanel css
+        parseLTLFormulaButton.addActionListener(this::performTemporalCheck);
+        startAnalyzerButton.addActionListener(this::startTemporalWebAnalyzer);
+        stopAnalyzerButton.addActionListener(this::stopTemporalWebAnalyzer);
+        testDbConnectionButton.addActionListener(this::testdb);
+        clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                textArea1.setText("cleared");
             }
         });
     }
+    public static Temporalpanel2 createTemporalPanel() {
+        Temporalpanel2 panel = new Temporalpanel2();
+        panel.initialize();
+        return panel;
+    }
+    private void initialize(){
+        /// customize
+
+    }
+
+    //***********TESTAR generic panel code
+    public void populateFrom(final Settings settings) {
+        // used here, but controlled on StateModelPanel
+        dataStoreText=settings.get(ConfigTags.DataStore);
+        dataStoreServerDNS= settings.get(ConfigTags.DataStoreServer);
+        dataStoreDirectory= settings.get(ConfigTags.DataStoreDirectory);
+        dataStoreDBText=settings.get(ConfigTags.DataStoreDB);
+        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
+        dataStorePassword= settings.get(ConfigTags.DataStorePassword);
+        dataStoreType= settings.get(ConfigTags.DataStoreType);
+
+
+        outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "temporal";
+        new File(outputDir).mkdirs();
+        outputDir = outputDir +  File.separator;
+    }
+    public void refreshsettings(){
+        Settings dbsettings =new Settings();
+        stateModelPanel.extractInformation(dbsettings);
+        populateFrom(dbsettings);
+
+    }
+    public void extractInformation(final Settings settings) {    }
+    //***********TESTAR****************
+
+
+
+//******************Eventhandlers
+    private void performTemporalCheck(ActionEvent evt) {
+        // code goes here
+        Process theProcess = null;
+        BufferedReader inStream = null;
+        String cli = "ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse '" + textField1.getText() + "'";
+        String response;
+        textArea1.setText("invoking : ");
+        textArea1.append("\n");
+        textArea1.setText(cli);
+        textArea1.append("\n");
+        // call the external program
+        try {
+            theProcess = Runtime.getRuntime().exec(cli);
+        } catch (IOException e) {
+            System.err.println("Error on exec() method");
+            textArea1.append("Error on exec() method");
+            textArea1.append("\n");
+            e.printStackTrace();
+        }
+
+        // read from the called program's standard output stream
+        try {
+            inStream = new BufferedReader(new InputStreamReader
+                    (theProcess.getInputStream()));
+            while ((response = inStream.readLine()) != null) {
+                System.out.println("response: " + response);
+                textArea1.append(response);
+                textArea1.append("\n");
+            }
+
+            textArea1.append("------------Action completed---------------" + "\n");
+        } catch (IOException e) {
+            System.err.println("Error on inStream.readLine()");
+            textArea1.append("Error on inStream.readLine()");
+            textArea1.append("\n");
+            e.printStackTrace();
+        }
+    }
+    private void startTemporalWebAnalyzer(ActionEvent evt) {
+        // code goes here
+
+
+
+        BufferedReader inStream = null;
+        String cli_part1 = "python C:\\Users\\c\\git\\Testar_viz\\run.py";
+        String cli = "C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate"+ " && " +cli_part1;
+
+        String response;
+        textArea1.setText("invoking : ");
+        textArea1.append("\n");
+        textArea1.append(cli_part1);
+        textArea1.append("\n");
+        // call the external program
+        try
+        {
+            if (webAnalyzerProcess==null) {
+                webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
+                textArea1.append("Visualizer Started. goto http://localhost:8050");
+                textArea1.append("\n");
+                Desktop desktop = Desktop.getDesktop();
+                URI uri = new URI("http://localhost:8050");
+                desktop.browse(uri);
+                // any error message?
+                try
+                {
+                    StreamConsumer errorConsumer = new
+                            StreamConsumer (webAnalyzerProcess.getErrorStream(), "ERROR");
+
+
+                    // any output?
+                    StreamConsumer  outputConsumer = new
+                            StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
+
+
+                    // kick them off
+                    errorConsumer.start();
+                    outputConsumer.start();
+
+                    // any error???
+                } catch (Throwable t)
+                {
+                    t.printStackTrace();
+                }
+            }
+
+            else {
+                textArea1.append("Visualizer was already running. goto http://localhost:8050");
+                textArea1.append("\n");
+            }
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error on exec() method");
+            textArea1.append("Error on exec() method");
+            textArea1.append("\n");
+            e.printStackTrace();
+        }
+    }
+    private void stopTemporalWebAnalyzer(ActionEvent evt) {
+        try
+        {
+            if(webAnalyzerProcess!=null) {
+                webAnalyzerProcess.destroyForcibly();
+                textArea1.append("Forcing Visualizer  to Stop.");
+                boolean ret = webAnalyzerProcess.waitFor(5,  TimeUnit.SECONDS);  //gently wait
+                if (ret){ webAnalyzerProcess=null; }
+                textArea1.append("Visualizer Stopped. (exitcode was : "+ret+")");
+                textArea1.append("\n");
+            }
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error on stopping");
+            textArea1.append("Error on stopping");
+            textArea1.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+    private void testdb(ActionEvent evt) {
+        try
+        {
+            testOracleCSV();
+            testPatternCSV();
+            APSelectorManager APmgr = testApSelectionManagerJSON();
+
+            Config config = new Config();
+            config.setConnectionType(dataStoreType);
+            config.setServer(dataStoreServerDNS);
+            config.setDatabase(dataStoreDBText);
+            config.setUser(dataStoreUser);
+            config.setPassword(dataStorePassword);
+
+            String tmp= dataStoreDirectory;
+            textArea1.append("connecting to: db\n");
+            textArea1.repaint();
+            config.setDatabaseDirectory(tmp);
+            TemporalController tcontrol = new TemporalController(config,outputDir);
+            //List<AbstractStateModel> models = tcontrol.fetchModels();
+
+            //logCheckResult.append("model count: " + models.size()+"\n");
+            //AbstractStateModel model = models.get(0);
+            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
+            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
+            textArea1.append(" saving to file done\n");
+
+            textArea1.append("\n");
+
+
+            textArea1.append("\n");
+            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            textArea1.append(" saving to  graphml file done with result:"+res+"\n");
+
+            textArea1.append("\n");
+            tcontrol.shutdown();
+        }
+        catch(Exception e)
+        {
+            System.err.println("Error on testing db");
+            textArea1.append("Error on testing db\n");
+            textArea1.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+    public void testOracleCSV() {
+        textArea1.append("performing a small test: writing an oracle to CSV file and read back\n");
+
+
+        TemporalOracle to= TemporalOracle.getSampleOracle();
+        List<TemporalOracle> tocoll = new ArrayList<>();
+        tocoll.add(to);
+
+        CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
+        textArea1.append("csv saved: \n");
+
+        List<TemporalOracle> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
+        if (fromcoll == null) {
+            textArea1.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir+"\n");
+        } else {
+            textArea1.append("csv loaded: \n");
+            textArea1.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
+            CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
+            textArea1.append("csv saved: \n");
+
+        }
+    }
+    public void testPatternCSV() {
+        textArea1.append("performing a small test: writing a pattern to CSV file\n");
+
+
+        TemporalConstraintedPattern pat= TemporalConstraintedPattern.getSamplePattern();
+        List<TemporalConstraintedPattern> patcoll = new ArrayList<>();
+        patcoll.add(pat);
+
+        CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
+        textArea1.append("csv saved: ");
+
+        List<TemporalConstraintedPattern> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalPattern1.csv", TemporalConstraintedPattern.class);
+        if (fromcoll == null) {
+            textArea1.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir+"\n");
+        } else {
+            textArea1.append("csv loaded: \n");
+            textArea1.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
+            textArea1.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString()+"\n");
+
+            CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
+            textArea1.append("csv saved: \n");
+
+        }
+
+    }
+    public APSelectorManager testApSelectionManagerJSON() {
+        textArea1.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
+
+        APSelectorManager APmgr = new APSelectorManager(true);
+        JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
+        textArea1.append("json saved: \n");
+
+        APSelectorManager APmgr1 ;
+        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APmgr.getClass());
+
+        if (APmgr1 == null) {
+            textArea1.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir+"\n");
+        } else {
+            textArea1.append("json loaded: \n");
+            Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();
+            Iterator<WidgetFilter> wfiter = wfset.iterator();
+            WidgetFilter wf = wfiter.next();
+            textArea1.append("widgetroles that were read from file: " + wf.getWidgetRolesMatches().toString()+"\n");
+
+
+        }
+        return APmgr1;
+    }
+
+//*******************Eventhandlers
+
+
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -246,4 +566,7 @@ public class Temporalpanel2 {
         return panel1;
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }
