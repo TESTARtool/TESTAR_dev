@@ -45,7 +45,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     //**** custom
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
-    private JTextArea textArea1;
+    private JTextArea textArea12;
     private JButton clearButton;
     private JTextField textField1;
     private JButton parseLTLFormulaButton;
@@ -68,313 +68,69 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField textField10;
     private JTextField textField12;
     private JButton button6;
-    private JButton testDbConnectionButton;
+    private JButton AllFilesButton;
     private JButton reloadSettingsButton;
     private JButton modelCheckButton;
     private JButton sampleOracleButton;
     private JButton temporalModelButton;
     private JButton samplePatternButton;
     private JButton graphMLButton;
-    private JButton simpleSelectorButton;
     private JButton defaultSelectorButton;
+    private JButton testDBConnectionButton;
 
     public Temporalpanel2() {
-         //   super(); // init as a JPanel css
+        System.out.println("debug creating temporal panel2 instance");
+        //super(); // init as a JPanel css
         parseLTLFormulaButton.addActionListener(this::performTemporalCheck);
         startAnalyzerButton.addActionListener(this::startTemporalWebAnalyzer);
         stopAnalyzerButton.addActionListener(this::stopTemporalWebAnalyzer);
-        testDbConnectionButton.addActionListener(this::testdb);
+        AllFilesButton.addActionListener(this::testdb);
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textArea1.setText("cleared");
+                textArea12.setText("cleared");
+            }
+        });
+        reloadSettingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshsettings();
+                textArea12.append("reloaded statemodel settings");
+            }
+        });
+        sampleOracleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testOracleCSV();
+            }
+        });
+        samplePatternButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testPatternCSV();
+            }
+        });
+        graphMLButton.addActionListener(this::testgraphml);
+        temporalModelButton.addActionListener(this::testtemporalmodel);
+        defaultSelectorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testSaveDefaultApSelectionManagerJSON();
+            }
+        });
+        testDBConnectionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
     }
+
     public static Temporalpanel2 createTemporalPanel() {
         Temporalpanel2 panel = new Temporalpanel2();
         panel.initialize();
         return panel;
     }
-    private void initialize(){
-        /// customize
-
-    }
-
-    //***********TESTAR generic panel code
-    public void populateFrom(final Settings settings) {
-        // used here, but controlled on StateModelPanel
-        dataStoreText=settings.get(ConfigTags.DataStore);
-        dataStoreServerDNS= settings.get(ConfigTags.DataStoreServer);
-        dataStoreDirectory= settings.get(ConfigTags.DataStoreDirectory);
-        dataStoreDBText=settings.get(ConfigTags.DataStoreDB);
-        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
-        dataStorePassword= settings.get(ConfigTags.DataStorePassword);
-        dataStoreType= settings.get(ConfigTags.DataStoreType);
-
-
-        outputDir = settings.get(ConfigTags.OutputDir);
-        // check if the output directory has a trailing line separator
-        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-            outputDir += File.separator;
-        }
-        outputDir = outputDir + "temporal";
-        new File(outputDir).mkdirs();
-        outputDir = outputDir +  File.separator;
-    }
-    public void refreshsettings(){
-        Settings dbsettings =new Settings();
-        stateModelPanel.extractInformation(dbsettings);
-        populateFrom(dbsettings);
-
-    }
-    public void extractInformation(final Settings settings) {    }
-    //***********TESTAR****************
-
-
-
-//******************Eventhandlers
-    private void performTemporalCheck(ActionEvent evt) {
-        // code goes here
-        Process theProcess = null;
-        BufferedReader inStream = null;
-        String cli = "ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse '" + textField1.getText() + "'";
-        String response;
-        textArea1.setText("invoking : ");
-        textArea1.append("\n");
-        textArea1.setText(cli);
-        textArea1.append("\n");
-        // call the external program
-        try {
-            theProcess = Runtime.getRuntime().exec(cli);
-        } catch (IOException e) {
-            System.err.println("Error on exec() method");
-            textArea1.append("Error on exec() method");
-            textArea1.append("\n");
-            e.printStackTrace();
-        }
-
-        // read from the called program's standard output stream
-        try {
-            inStream = new BufferedReader(new InputStreamReader
-                    (theProcess.getInputStream()));
-            while ((response = inStream.readLine()) != null) {
-                System.out.println("response: " + response);
-                textArea1.append(response);
-                textArea1.append("\n");
-            }
-
-            textArea1.append("------------Action completed---------------" + "\n");
-        } catch (IOException e) {
-            System.err.println("Error on inStream.readLine()");
-            textArea1.append("Error on inStream.readLine()");
-            textArea1.append("\n");
-            e.printStackTrace();
-        }
-    }
-    private void startTemporalWebAnalyzer(ActionEvent evt) {
-        // code goes here
-
-
-
-        BufferedReader inStream = null;
-        String cli_part1 = "python C:\\Users\\c\\git\\Testar_viz\\run.py";
-        String cli = "C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate"+ " && " +cli_part1;
-
-        String response;
-        textArea1.setText("invoking : ");
-        textArea1.append("\n");
-        textArea1.append(cli_part1);
-        textArea1.append("\n");
-        // call the external program
-        try
-        {
-            if (webAnalyzerProcess==null) {
-                webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
-                textArea1.append("Visualizer Started. goto http://localhost:8050");
-                textArea1.append("\n");
-                Desktop desktop = Desktop.getDesktop();
-                URI uri = new URI("http://localhost:8050");
-                desktop.browse(uri);
-                // any error message?
-                try
-                {
-                    StreamConsumer errorConsumer = new
-                            StreamConsumer (webAnalyzerProcess.getErrorStream(), "ERROR");
-
-
-                    // any output?
-                    StreamConsumer  outputConsumer = new
-                            StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
-
-
-                    // kick them off
-                    errorConsumer.start();
-                    outputConsumer.start();
-
-                    // any error???
-                } catch (Throwable t)
-                {
-                    t.printStackTrace();
-                }
-            }
-
-            else {
-                textArea1.append("Visualizer was already running. goto http://localhost:8050");
-                textArea1.append("\n");
-            }
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error on exec() method");
-            textArea1.append("Error on exec() method");
-            textArea1.append("\n");
-            e.printStackTrace();
-        }
-    }
-    private void stopTemporalWebAnalyzer(ActionEvent evt) {
-        try
-        {
-            if(webAnalyzerProcess!=null) {
-                webAnalyzerProcess.destroyForcibly();
-                textArea1.append("Forcing Visualizer  to Stop.");
-                boolean ret = webAnalyzerProcess.waitFor(5,  TimeUnit.SECONDS);  //gently wait
-                if (ret){ webAnalyzerProcess=null; }
-                textArea1.append("Visualizer Stopped. (exitcode was : "+ret+")");
-                textArea1.append("\n");
-            }
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error on stopping");
-            textArea1.append("Error on stopping");
-            textArea1.append("\n");
-            e.printStackTrace();
-        }
-
-    }
-    private void testdb(ActionEvent evt) {
-        try
-        {
-            testOracleCSV();
-            testPatternCSV();
-            APSelectorManager APmgr = testApSelectionManagerJSON();
-
-            Config config = new Config();
-            config.setConnectionType(dataStoreType);
-            config.setServer(dataStoreServerDNS);
-            config.setDatabase(dataStoreDBText);
-            config.setUser(dataStoreUser);
-            config.setPassword(dataStorePassword);
-
-            String tmp= dataStoreDirectory;
-            textArea1.append("connecting to: db\n");
-            textArea1.repaint();
-            config.setDatabaseDirectory(tmp);
-            TemporalController tcontrol = new TemporalController(config,outputDir);
-            //List<AbstractStateModel> models = tcontrol.fetchModels();
-
-            //logCheckResult.append("model count: " + models.size()+"\n");
-            //AbstractStateModel model = models.get(0);
-            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
-            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
-            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
-            textArea1.append(" saving to file done\n");
-
-            textArea1.append("\n");
-
-
-            textArea1.append("\n");
-            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
-            textArea1.append(" saving to  graphml file done with result:"+res+"\n");
-
-            textArea1.append("\n");
-            tcontrol.shutdown();
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error on testing db");
-            textArea1.append("Error on testing db\n");
-            textArea1.append("\n");
-            e.printStackTrace();
-        }
-
-    }
-    public void testOracleCSV() {
-        textArea1.append("performing a small test: writing an oracle to CSV file and read back\n");
-
-
-        TemporalOracle to= TemporalOracle.getSampleOracle();
-        List<TemporalOracle> tocoll = new ArrayList<>();
-        tocoll.add(to);
-
-        CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
-        textArea1.append("csv saved: \n");
-
-        List<TemporalOracle> fromcoll;
-        fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
-        if (fromcoll == null) {
-            textArea1.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir+"\n");
-        } else {
-            textArea1.append("csv loaded: \n");
-            textArea1.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
-            CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
-            textArea1.append("csv saved: \n");
-
-        }
-    }
-    public void testPatternCSV() {
-        textArea1.append("performing a small test: writing a pattern to CSV file\n");
-
-
-        TemporalConstraintedPattern pat= TemporalConstraintedPattern.getSamplePattern();
-        List<TemporalConstraintedPattern> patcoll = new ArrayList<>();
-        patcoll.add(pat);
-
-        CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
-        textArea1.append("csv saved: ");
-
-        List<TemporalConstraintedPattern> fromcoll;
-        fromcoll = CSVHandler.load(outputDir + "temporalPattern1.csv", TemporalConstraintedPattern.class);
-        if (fromcoll == null) {
-            textArea1.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir+"\n");
-        } else {
-            textArea1.append("csv loaded: \n");
-            textArea1.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
-            textArea1.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString()+"\n");
-
-            CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
-            textArea1.append("csv saved: \n");
-
-        }
-
-    }
-    public APSelectorManager testApSelectionManagerJSON() {
-        textArea1.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
-
-        APSelectorManager APmgr = new APSelectorManager(true);
-        JSONHandler.save(APmgr, outputDir + "APSelectorManager.json",true);
-        textArea1.append("json saved: \n");
-
-        APSelectorManager APmgr1 ;
-        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APmgr.getClass());
-
-        if (APmgr1 == null) {
-            textArea1.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir+"\n");
-        } else {
-            textArea1.append("json loaded: \n");
-            Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();
-            Iterator<WidgetFilter> wfiter = wfset.iterator();
-            WidgetFilter wf = wfiter.next();
-            textArea1.append("widgetroles that were read from file: " + wf.getWidgetRolesMatches().toString()+"\n");
-
-
-        }
-        return APmgr1;
-    }
-
-//*******************Eventhandlers
-
 
 
     {
@@ -393,14 +149,19 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
      */
     private void $$$setupUI$$$() {
         panel1 = new JPanel();
-        panel1.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow"));
+        panel1.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,top:4dlu:noGrow,center:d:grow"));
+        panel1.setPreferredSize(new Dimension(621, 340));
+        panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null));
         final JSeparator separator1 = new JSeparator();
         CellConstraints cc = new CellConstraints();
         panel1.add(separator1, cc.xy(1, 1, CellConstraints.FILL, CellConstraints.FILL));
         tabbedPane1 = new JTabbedPane();
-        panel1.add(tabbedPane1, cc.xyw(1, 3, 7));
+        tabbedPane1.setMinimumSize(new Dimension(617, 275));
+        tabbedPane1.setPreferredSize(new Dimension(617, 275));
+        tabbedPane1.setRequestFocusEnabled(true);
+        panel1.add(tabbedPane1, cc.xyw(1, 3, 16));
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Test/Setup", panel2);
         textField1 = new JTextField();
         panel2.add(textField1, cc.xyw(3, 1, 8, CellConstraints.FILL, CellConstraints.DEFAULT));
@@ -418,24 +179,26 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         graphMLButton = new JButton();
         graphMLButton.setText("GraphML");
         panel2.add(graphMLButton, cc.xy(7, 9));
-        testDbConnectionButton = new JButton();
-        testDbConnectionButton.setText("Test Db Connection");
-        panel2.add(testDbConnectionButton, cc.xy(1, 3));
         reloadSettingsButton = new JButton();
         reloadSettingsButton.setText("Reload Settings");
         panel2.add(reloadSettingsButton, cc.xy(1, 5));
         samplePatternButton = new JButton();
         samplePatternButton.setText("Sample Pattern");
         panel2.add(samplePatternButton, cc.xy(3, 9));
-        simpleSelectorButton = new JButton();
-        simpleSelectorButton.setText("Simple Selector");
-        panel2.add(simpleSelectorButton, cc.xy(5, 7));
         temporalModelButton = new JButton();
         temporalModelButton.setText("TemporalModel");
+        temporalModelButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
         panel2.add(temporalModelButton, cc.xy(7, 7));
         defaultSelectorButton = new JButton();
         defaultSelectorButton.setText("Default Selector");
         panel2.add(defaultSelectorButton, cc.xy(5, 9));
+        AllFilesButton = new JButton();
+        AllFilesButton.setText("All Files");
+        AllFilesButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
+        panel2.add(AllFilesButton, cc.xy(5, 7));
+        testDBConnectionButton = new JButton();
+        testDBConnectionButton.setText("Test DB Connection");
+        panel2.add(testDBConnectionButton, cc.xy(1, 3));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(10, 13, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane1.addTab("Miner", panel3);
@@ -494,7 +257,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         mineOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
         panel3.add(mineOraclesButton, new GridConstraints(8, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel4.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Visualizer", panel4);
         final JLabel label6 = new JLabel();
         label6.setText("Input Oracle File");
@@ -504,9 +267,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         button4 = new JButton();
         button4.setText("...");
         panel4.add(button4, cc.xy(7, 5));
-        startAnalyzerButton = new JButton();
-        startAnalyzerButton.setText("Start Analyzer");
-        panel4.add(startAnalyzerButton, cc.xy(1, 15));
         final JLabel label7 = new JLabel();
         label7.setText("GraphML File");
         panel4.add(label7, cc.xy(1, 7));
@@ -526,33 +286,22 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         button6 = new JButton();
         button6.setText("...");
         panel4.add(button6, cc.xy(7, 11));
-        final Spacer spacer5 = new Spacer();
-        panel4.add(spacer5, cc.xy(7, 13, CellConstraints.FILL, CellConstraints.DEFAULT));
-        final Spacer spacer6 = new Spacer();
-        panel4.add(spacer6, cc.xy(3, 13, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label8 = new JLabel();
         label8.setText("Output Oracle File");
         panel4.add(label8, cc.xy(1, 11));
         stopAnalyzerButton = new JButton();
         stopAnalyzerButton.setText("Stop Analyzer");
-        panel4.add(stopAnalyzerButton, cc.xy(1, 17));
-        final JLabel label9 = new JLabel();
-        label9.setText("Log:");
-        panel1.add(label9, cc.xy(1, 7));
+        panel4.add(stopAnalyzerButton, cc.xy(1, 15));
+        startAnalyzerButton = new JButton();
+        startAnalyzerButton.setText("Start Analyzer");
+        panel4.add(startAnalyzerButton, cc.xy(1, 13));
         final JScrollPane scrollPane1 = new JScrollPane();
-        panel1.add(scrollPane1, cc.xyw(1, 9, 7, CellConstraints.FILL, CellConstraints.FILL));
-        textArea1 = new JTextArea();
-        textArea1.setMinimumSize(new Dimension(0, 100));
-        textArea1.setPreferredSize(new Dimension(0, 100));
-        scrollPane1.setViewportView(textArea1);
-        final JSeparator separator6 = new JSeparator();
-        panel1.add(separator6, new CellConstraints(1, 5, 7, 1, CellConstraints.FILL, CellConstraints.FILL, new Insets(0, 2, 2, 0)));
-        final JLabel label10 = new JLabel();
-        label10.setText("");
-        panel1.add(label10, cc.xy(7, 7));
+        panel1.add(scrollPane1, cc.xywh(1, 5, 9, 4, CellConstraints.FILL, CellConstraints.FILL));
+        textArea12 = new JTextArea();
+        scrollPane1.setViewportView(textArea12);
         clearButton = new JButton();
         clearButton.setText("Clear");
-        panel1.add(clearButton, cc.xy(5, 7));
+        panel1.add(clearButton, cc.xy(13, 8));
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(graphDBModelRadioButton);
@@ -569,4 +318,345 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
+
+
+    private void initialize() {
+        /// customize
+
+    }
+
+    //***********TESTAR generic panel code
+    public void populateFrom(final Settings settings) {
+        // used here, but controlled on StateModelPanel
+        dataStoreText = settings.get(ConfigTags.DataStore);
+        dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
+        dataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
+        dataStoreDBText = settings.get(ConfigTags.DataStoreDB);
+        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
+        dataStorePassword = settings.get(ConfigTags.DataStorePassword);
+        dataStoreType = settings.get(ConfigTags.DataStoreType);
+
+
+        outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + "temporal";
+        new File(outputDir).mkdirs();
+        outputDir = outputDir + File.separator;
+    }
+
+    public void refreshsettings() {
+        Settings dbsettings = new Settings();
+        stateModelPanel.extractInformation(dbsettings);
+        populateFrom(dbsettings);
+
+    }
+
+    public void extractInformation(final Settings settings) {
+    }
+    //***********TESTAR****************
+
+
+    //******************Eventhandlers
+    private void performTemporalCheck(ActionEvent evt) {
+        // code goes here
+        Process theProcess = null;
+        BufferedReader inStream = null;
+        String cli = "ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse '" + textField1.getText() + "'";
+        String response;
+        textArea12.setText("invoking : ");
+        textArea12.append("\n");
+        textArea12.setText(cli);
+        textArea12.append("\n");
+        // call the external program
+        try {
+            theProcess = Runtime.getRuntime().exec(cli);
+        } catch (IOException e) {
+            System.err.println("Error on exec() method");
+            textArea12.append("Error on exec() method");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+        // read from the called program's standard output stream
+        try {
+            inStream = new BufferedReader(new InputStreamReader
+                    (theProcess.getInputStream()));
+            while ((response = inStream.readLine()) != null) {
+                System.out.println("response: " + response);
+                textArea12.append(response);
+                textArea12.append("\n");
+            }
+
+            textArea12.append("------------Action completed---------------" + "\n");
+        } catch (IOException e) {
+            System.err.println("Error on inStream.readLine()");
+            textArea12.append("Error on inStream.readLine()");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+    }
+
+    private void startTemporalWebAnalyzer(ActionEvent evt) {
+        // code goes here
+
+
+        BufferedReader inStream = null;
+        String cli_part1 = "python C:\\Users\\c\\git\\Testar_viz\\run.py";
+        String cli = "C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate" + " && " + cli_part1;
+
+        String response;
+        textArea12.setText("invoking : ");
+        textArea12.append("\n");
+        textArea12.append(cli_part1);
+        textArea12.append("\n");
+        // call the external program
+        try {
+            if (webAnalyzerProcess == null) {
+                webAnalyzerProcess = Runtime.getRuntime().exec(cli_part1);
+                textArea12.append("Visualizer Started. goto http://localhost:8050");
+                textArea12.append("\n");
+                Desktop desktop = Desktop.getDesktop();
+                URI uri = new URI("http://localhost:8050");
+                desktop.browse(uri);
+                // any error message?
+                try {
+                    StreamConsumer errorConsumer = new
+                            StreamConsumer(webAnalyzerProcess.getErrorStream(), "ERROR");
+
+
+                    // any output?
+                    StreamConsumer outputConsumer = new
+                            StreamConsumer(webAnalyzerProcess.getInputStream(), "OUTPUT");
+
+
+                    // kick them off
+                    errorConsumer.start();
+                    outputConsumer.start();
+
+                    // any error???
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            } else {
+                textArea12.append("Visualizer was already running. goto http://localhost:8050");
+                textArea12.append("\n");
+            }
+        } catch (Exception e) {
+            System.err.println("Error on exec() method");
+            textArea12.append("Error on exec() method");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+    }
+
+    private void stopTemporalWebAnalyzer(ActionEvent evt) {
+        try {
+            if (webAnalyzerProcess != null) {
+                webAnalyzerProcess.destroyForcibly();
+                textArea12.append("Forcing Visualizer  to Stop.");
+                boolean ret = webAnalyzerProcess.waitFor(5, TimeUnit.SECONDS);  //gently wait
+                if (ret) {
+                    webAnalyzerProcess = null;
+                }
+                textArea12.append("Visualizer Stopped. (exitcode was : " + ret + ")");
+                textArea12.append("\n");
+            }
+        } catch (Exception e) {
+            System.err.println("Error on stopping");
+            textArea12.append("Error on stopping");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void testdb(ActionEvent evt) {
+        try {
+            testOracleCSV();
+            testPatternCSV();
+            testSaveDefaultApSelectionManagerJSON();
+
+            testtemporalmodel(null);
+            testgraphml(null);
+
+            textArea12.append("\n");
+
+        } catch (Exception e) {
+            System.err.println("Error on testing db");
+            textArea12.append("Error on testing db\n");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void testdbconnection(ActionEvent evt) {
+        try {
+
+            Config config = new Config();
+            config.setConnectionType(dataStoreType);
+            config.setServer(dataStoreServerDNS);
+            config.setDatabase(dataStoreDBText);
+            config.setUser(dataStoreUser);
+            config.setPassword(dataStorePassword);
+
+            String tmp = dataStoreDirectory;
+            textArea12.append("connecting to: db\n");
+            textArea12.repaint();
+            config.setDatabaseDirectory(tmp);
+            TemporalController tcontrol = new TemporalController(config, outputDir);
+            textArea12.append(tcontrol.pingDB());
+            textArea12.append("\n");
+            tcontrol.shutdown();
+        } catch (Exception e) {
+            System.err.println("Error on testing db");
+            textArea12.append("Error on testing db\n");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void testtemporalmodel(ActionEvent evt) {
+        try {
+
+            APSelectorManager APmgr = testLoadApSelectionManagerJSON();
+
+            Config config = new Config();
+            config.setConnectionType(dataStoreType);
+            config.setServer(dataStoreServerDNS);
+            config.setDatabase(dataStoreDBText);
+            config.setUser(dataStoreUser);
+            config.setPassword(dataStorePassword);
+
+            String tmp = dataStoreDirectory;
+            textArea12.append("connecting to: db\n");
+            textArea12.repaint();
+            config.setDatabaseDirectory(tmp);
+            TemporalController tcontrol = new TemporalController(config, outputDir);
+            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
+            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
+            textArea12.append(" saving to file done\n");
+            tcontrol.shutdown();
+        } catch (Exception e) {
+            System.err.println("Error on testing db");
+            textArea12.append("Error on testing db\n");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+
+    private void testgraphml(ActionEvent evt) {
+        try {
+            Config config = new Config();
+            config.setConnectionType(dataStoreType);
+            config.setServer(dataStoreServerDNS);
+            config.setDatabase(dataStoreDBText);
+            config.setUser(dataStoreUser);
+            config.setPassword(dataStorePassword);
+
+            String tmp = dataStoreDirectory;
+            textArea12.append("connecting to: db\n");
+            textArea12.repaint();
+            config.setDatabaseDirectory(tmp);
+            TemporalController tcontrol = new TemporalController(config, outputDir);
+            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            textArea12.append(" saving to  graphml file done with result:" + res + "\n");
+            textArea12.append("\n");
+            tcontrol.shutdown();
+        } catch (Exception e) {
+            System.err.println("Error on testing db");
+            textArea12.append("Error on testing db\n");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+    }
+
+    public void testOracleCSV() {
+        textArea12.append("performing a small test: writing an oracle to CSV file and read back\n");
+
+
+        TemporalOracle to = TemporalOracle.getSampleOracle();
+        List<TemporalOracle> tocoll = new ArrayList<>();
+        tocoll.add(to);
+
+        CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
+        textArea12.append("csv saved: \n");
+
+        List<TemporalOracle> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
+        if (fromcoll == null) {
+            textArea12.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir + "\n");
+        } else {
+            textArea12.append("csv loaded: \n");
+            textArea12.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism() + "\n");
+            CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
+            textArea12.append("csv saved: \n");
+
+        }
+    }
+
+    public void testPatternCSV() {
+        textArea12.append("performing a small test: writing a pattern to CSV file\n");
+
+
+        TemporalConstraintedPattern pat = TemporalConstraintedPattern.getSamplePattern();
+        List<TemporalConstraintedPattern> patcoll = new ArrayList<>();
+        patcoll.add(pat);
+
+        CSVHandler.save(patcoll, outputDir + "temporalPatternSample.csv");
+        textArea12.append("csv saved: ");
+
+        List<TemporalConstraintedPattern> fromcoll;
+        fromcoll = CSVHandler.load(outputDir + "temporalPattern1.csv", TemporalConstraintedPattern.class);
+        if (fromcoll == null) {
+            textArea12.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir + "\n");
+        } else {
+            textArea12.append("csv loaded: \n");
+            textArea12.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism() + "\n");
+            textArea12.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString() + "\n");
+
+            CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
+            textArea12.append("csv saved: \n");
+
+        }
+
+    }
+
+    public void testSaveDefaultApSelectionManagerJSON() {
+        textArea12.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
+
+        APSelectorManager APmgr = new APSelectorManager(true);
+        JSONHandler.save(APmgr, outputDir + "APSelectorManager.json", true);
+        textArea12.append("json saved: \n");
+    }
+
+    public APSelectorManager testLoadApSelectionManagerJSON() {
+
+
+        APSelectorManager APmgr1;
+        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APSelectorManager.class);
+
+        if (APmgr1 == null) {
+            textArea12.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir + "\n");
+        } else {
+            textArea12.append("json loaded: \n");
+            Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();
+            Iterator<WidgetFilter> wfiter = wfset.iterator();
+            WidgetFilter wf = wfiter.next();
+            textArea12.append("widgetroles that were read from file: " + wf.getWidgetRolesMatches().toString() + "\n");
+
+
+        }
+        return APmgr1;
+    }
+
+//*******************Eventhandlers
+
+
 }

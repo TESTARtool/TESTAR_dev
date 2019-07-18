@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="nl.ou.testar.temporal.ui.Temporalpanel2">
-  <grid id="27dc6" binding="panel1" custom-create="true" default-binding="true" layout-manager="FormLayout">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="center:d:grow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="center:max(d;4px):noGrow"/>
+    <rowspec value="center:d:grow"/>
+    <colspec value="fill:d:grow"/>
+    <colspec value="left:4dlu:noGrow"/>
+    <colspec value="fill:d:grow"/>
+    <colspec value="left:4dlu:noGrow"/>
+    <colspec value="fill:max(d;4px):noGrow"/>
+    <colspec value="left:4dlu:noGrow"/>
+    <colspec value="fill:max(d;4px):noGrow"/>
+    <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:d:grow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
@@ -21,7 +28,9 @@
     <constraints>
       <xy x="20" y="20" width="668" height="415"/>
     </constraints>
-    <properties/>
+    <properties>
+      <preferredSize width="621" height="340"/>
+    </properties>
     <border type="empty">
       <size top="0" left="2" bottom="2" right="2"/>
     </border>
@@ -35,14 +44,14 @@
       </component>
       <tabbedpane id="4617a" binding="tabbedPane1" default-binding="true">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="8" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="2" column="0" row-span="1" col-span="16" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
           <forms/>
         </constraints>
         <properties>
           <minimumSize width="617" height="275"/>
-          <preferredSize width="617" height="325"/>
+          <preferredSize width="617" height="275"/>
           <requestFocusEnabled value="true"/>
         </properties>
         <border type="none"/>
@@ -126,15 +135,6 @@
                   <text value="GraphML"/>
                 </properties>
               </component>
-              <component id="22a3" class="javax.swing.JButton" binding="testDbConnectionButton" default-binding="true">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Test Db Connection"/>
-                </properties>
-              </component>
               <component id="52d5a" class="javax.swing.JButton" binding="reloadSettingsButton" default-binding="true">
                 <constraints>
                   <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -153,15 +153,6 @@
                   <text value="Sample Pattern"/>
                 </properties>
               </component>
-              <component id="2caa0" class="javax.swing.JButton" binding="simpleSelectorButton" default-binding="true">
-                <constraints>
-                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Simple Selector"/>
-                </properties>
-              </component>
               <component id="eab2" class="javax.swing.JButton" binding="temporalModelButton" default-binding="true">
                 <constraints>
                   <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -169,6 +160,7 @@
                 </constraints>
                 <properties>
                   <text value="TemporalModel"/>
+                  <toolTipText value="requires APSelectorManagerTEST.json file in directory temporal"/>
                 </properties>
               </component>
               <component id="a1237" class="javax.swing.JButton" binding="defaultSelectorButton" default-binding="true">
@@ -178,6 +170,25 @@
                 </constraints>
                 <properties>
                   <text value="Default Selector"/>
+                </properties>
+              </component>
+              <component id="22a3" class="javax.swing.JButton" binding="AllFilesButton">
+                <constraints>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="All Files"/>
+                  <toolTipText value="requires APSelectorManagerTEST.json file in directory temporal"/>
+                </properties>
+              </component>
+              <component id="9e739" class="javax.swing.JButton" binding="testDBConnectionButton" default-binding="true">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Test DB Connection"/>
                 </properties>
               </component>
             </children>
@@ -357,8 +368,6 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:d:grow"/>
-            <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
@@ -401,15 +410,6 @@
                 </constraints>
                 <properties>
                   <text value="..."/>
-                </properties>
-              </component>
-              <component id="6a418" class="javax.swing.JButton" binding="startAnalyzerButton" default-binding="true">
-                <constraints>
-                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Start Analyzer"/>
                 </properties>
               </component>
               <component id="6feb1" class="javax.swing.JLabel">
@@ -477,18 +477,6 @@
                   <text value="..."/>
                 </properties>
               </component>
-              <hspacer id="df9d8">
-                <constraints>
-                  <grid row="12" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-              </hspacer>
-              <hspacer id="62cad">
-                <constraints>
-                  <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-              </hspacer>
               <component id="f5c61" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -500,58 +488,49 @@
               </component>
               <component id="c1d7b" class="javax.swing.JButton" binding="stopAnalyzerButton" default-binding="true">
                 <constraints>
-                  <grid row="16" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <text value="Stop Analyzer"/>
                 </properties>
               </component>
+              <component id="6a418" class="javax.swing.JButton" binding="startAnalyzerButton" default-binding="true">
+                <constraints>
+                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Start Analyzer"/>
+                </properties>
+              </component>
             </children>
           </grid>
         </children>
       </tabbedpane>
-      <component id="14c6c" class="javax.swing.JLabel">
+      <scrollpane id="bb4fa">
         <constraints>
-          <grid row="4" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-          <forms/>
+          <grid row="4" column="0" row-span="4" col-span="9" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <forms defaultalign-horz="false" defaultalign-vert="false"/>
         </constraints>
-        <properties>
-          <text value=""/>
-        </properties>
-      </component>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="97dab" class="javax.swing.JTextArea" binding="textArea12">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
       <component id="2a88" class="javax.swing.JButton" binding="clearButton" default-binding="true">
         <constraints>
-          <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="7" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
           <text value="Clear"/>
         </properties>
       </component>
-      <scrollpane id="60a11">
-        <constraints>
-          <grid row="5" column="0" row-span="4" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-          <forms/>
-        </constraints>
-        <properties>
-          <minimumSize width="0" height="0"/>
-          <preferredSize width="0" height="300"/>
-          <requestFocusEnabled value="false"/>
-        </properties>
-        <border type="none"/>
-        <children>
-          <component id="1d913" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
-            <constraints/>
-            <properties>
-              <autoscrolls value="false"/>
-              <minimumSize width="0" height="0"/>
-              <preferredSize width="0" height="0"/>
-              <requestFocusEnabled value="false"/>
-            </properties>
-          </component>
-        </children>
-      </scrollpane>
     </children>
   </grid>
   <buttonGroups>

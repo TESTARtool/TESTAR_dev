@@ -82,7 +82,17 @@ public class TemporalController {
      * Shuts down the orientDB connection.
      */
     public void shutdown() {
+        db.close();
         orientDB.close();
+    }
+    public String pingDB(){
+       StringBuilder sb = new StringBuilder();
+        List<AbstractStateModel> models = fetchAbstractModels();
+
+        sb.append("model count: " + models.size()+"\n");
+        AbstractStateModel model = models.get(0);
+        sb.append("Model0 info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+        return sb.toString();
     }
 
     /**
