@@ -127,4 +127,25 @@ public final class ConfigTags {
   public static final Tag<Boolean> ProcessListenerEnabled = Tag.from("ProcessListenerEnabled", Boolean.class);
   public static final Tag<String> SuspiciousProcessOutput = Tag.from("SuspiciousProcessOutput", String.class);
   public static final Tag<String> ProcessLogs = Tag.from("ProcessLogs", String.class);
+  
+  // Coverage tags
+  public static final Tag<String> TestarSetup = Tag.from("TestarSetup", String.class);
+  public static final Tag<String> TestarTestRun = Tag.from("TestarTestRun", String.class);
+
+  public static final Tag<String> SutServerRestart = Tag.from("SutServerRestart", String.class);
+  public static final Tag<String> SutServerUsername = Tag.from("SutServerUsername", String.class);
+  public static final Tag<String> SutServerHostname = Tag.from("SutServerHostname", String.class);
+  public static final Tag<String> SutServerPort = Tag.from("SutServerPort", String.class);
+  public static final Tag<String> SutServerKeyFile = Tag.from("SutServerKeyFile", String.class);
+
+  public static final Tag<String> CoverageServerUsername = Tag.from("CoverageServerUsername", String.class);
+  public static final Tag<String> CoverageServerHostname = Tag.from("CoverageServerHostname", String.class);
+  public static final Tag<String> CoverageServerPort = Tag.from("CoverageServerPort", String.class);
+  public static final Tag<String> CoverageServerKeyFile = Tag.from("CoverageServerKeyFile", String.class);
+
+  public static final Tag<String> CoverageCommandReset = Tag.from("CoverageCommandReset", String.class);
+  public static final Tag<String> CoverageCommandDump = Tag.from("CoverageCommandDump", String.class);
+  public static final Tag<String> CoverageCommandXmlReport = Tag.from("CoverageCommandXmlReport", String.class);
+  public static final Tag<String> CoverageCommandHtmlReport = Tag.from("CoverageCommandHtmlReport", String.class);
+
 }

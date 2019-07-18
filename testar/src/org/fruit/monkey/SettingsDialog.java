@@ -89,6 +89,8 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private StateModelPanel stateModelPanel;
+  private SutServerPanel sutServerPanel;
+  private CoverageServerPanel coverageServerPanel;
 
   /**
    * Starts the settings Dialog.
@@ -238,6 +240,8 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
     stateModelPanel.populateFrom(settings);
+    sutServerPanel.populateFrom(settings);
+    coverageServerPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -247,6 +251,8 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     stateModelPanel.extractInformation(settings);
+    sutServerPanel.extractInformation(settings);
+    coverageServerPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -272,7 +278,10 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
-
+    sutServerPanel = new SutServerPanel();
+    jTabsPane.addTab("SUT server", sutServerPanel);
+    coverageServerPanel = new CoverageServerPanel();
+    jTabsPane.addTab("Coverage server", coverageServerPanel);
     setLayout(jTabsPane);
     pack();
     setCentreScreen();

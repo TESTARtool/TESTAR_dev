@@ -58,6 +58,8 @@ public class GeneralPanel extends JPanel {
   private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
+  private JTextField txtTestarSetup;
+  private JTextField txtTestarTestRun;
 
   public GeneralPanel(SettingsDialog settingsDialog) {
     setLayout(null);
@@ -137,6 +139,15 @@ public class GeneralPanel extends JPanel {
     checkStopOnFault.setToolTipText(checkStopOnFaultTTT);
     add(checkStopOnFault);
 
+    txtTestarSetup = new JTextField();
+    txtTestarSetup.setBounds(360, 240, 200, 25);
+    txtTestarSetup.setToolTipText(testarSetupTTT);
+    add(txtTestarSetup);
+
+    txtTestarTestRun = new JTextField();
+    txtTestarTestRun.setBounds(360, 278, 200, 25);
+    txtTestarTestRun.setToolTipText(testarTestRunTTT);
+    add(txtTestarTestRun);
   }
 
   private void addGeneralControlsLocal() {
@@ -191,6 +202,17 @@ public class GeneralPanel extends JPanel {
     lblProtocol.setBounds(286, 164, 64, 14);
     lblProtocol.setToolTipText(comboBoxProtocolTTT);
     add(lblProtocol);
+    
+    JLabel lblTestarSetup = new JLabel("Setup:");
+    lblTestarSetup.setBounds(286, 240, 64, 14);
+    lblTestarSetup.setToolTipText(testarSetupTTT);
+    add(lblTestarSetup);
+    
+    JLabel lblTestarTestRun = new JLabel("Test run:");
+    lblTestarTestRun.setBounds(286, 278, 64, 14);
+    lblTestarTestRun.setToolTipText(testarTestRunTTT);
+    add(lblTestarTestRun);
+    
   }
 
   private void btnSutPathActionPerformed(ActionEvent evt) {
@@ -229,6 +251,8 @@ public class GeneralPanel extends JPanel {
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
     comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
+    txtTestarSetup.setText(settings.get(ConfigTags.TestarSetup));
+    txtTestarTestRun.setText(settings.get(ConfigTags.TestarTestRun));
   }
 
   /**
@@ -246,6 +270,8 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
+    settings.set(ConfigTags.TestarSetup, txtTestarSetup.getText());
+    settings.set(ConfigTags.TestarTestRun, txtTestarTestRun.getText());
   }
 
   public class MyItemListener extends Observable implements ItemListener {

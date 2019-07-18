@@ -72,6 +72,8 @@ public class ToolTipTexts {
   public static String intervalTTT = "Set the sampling interval";
   public static String comboBoxProtocolTTT = "Select the protocol you want to use from the dropdown list";
   public static String btnSelectSUTTTT = "Select the path to the SUT by navigating to it";
+  public static String testarSetupTTT = "Identifier for this TESTAR setup";
+  public static String testarTestRunTTT = "Identifier for this test run";
 
   // TTTs for the walker tab
   public static String testGeneratorTTT = "Determines how the IU actions are selected during tests";
