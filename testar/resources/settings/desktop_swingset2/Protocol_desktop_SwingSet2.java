@@ -63,10 +63,10 @@ import static org.fruit.monkey.ConfigTags.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.DefaultProtocol;
 import org.fruit.monkey.Settings;
+import org.testar.protocols.JavaSwingProtocol;
 import org.fruit.alayer.Tags;
 
 import es.upv.staq.testar.NativeLinker;
-import es.upv.staq.testar.protocols.JavaSwingProtocol;
 
 import static org.fruit.alayer.Tags.NotResponding;
 import static org.fruit.alayer.Tags.IsRunning;
