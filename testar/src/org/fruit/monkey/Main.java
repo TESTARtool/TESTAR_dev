@@ -31,6 +31,7 @@
 
 package org.fruit.monkey;
 
+import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
@@ -38,6 +39,7 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.alayer.Tag;
 
 import javax.swing.*;
 import java.io.*;
@@ -45,6 +47,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
+import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -53,7 +56,6 @@ public class Main {
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
-	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	//Default paths
 	public static String testarDir = "." + File.separator;
@@ -93,6 +95,8 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
+		isValidJavaEnvironment();
+
 		initTestarSSE(args);
 
 		String testSettingsFileName = getTestSettingsFile();
@@ -104,9 +108,9 @@ public class Main {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
-			settingsLogs(settings);
-
 			setTestarDirectory(settings);
+
+			initCodingManager(settings);
 
 			startTestar(settings, testSettingsFileName);
 		}
@@ -114,13 +118,13 @@ public class Main {
 		//TESTAR GUI is enabled, we're going to show again the GUI when the selected protocol execution finishes
 		else{
 			while(startTestarDialog(settings, testSettingsFileName)) {
-				
+
 				testSettingsFileName = getTestSettingsFile();
 				settings = loadTestarSettings(args, testSettingsFileName);
-				
+
 				setTestarDirectory(settings);
-				
-				settingsLogs(settings);
+
+				initCodingManager(settings);
 
 				startTestar(settings, testSettingsFileName);
 			}
@@ -133,7 +137,22 @@ public class Main {
 		System.exit(0);
 
 	}
-	
+
+	private static boolean isValidJavaEnvironment() {
+
+		try {
+			if(!System.getenv("JAVA_HOME").contains("jdk"))
+				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
+
+			if(!System.getenv("JAVA_HOME").contains("1.8"))
+				System.out.println("Java version is not JDK 1.8, please install ");
+		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
+				+"Check if JAVA_HOME system variable is correctly defined \n \n"
+				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
+
+		return true;
+	}
+
 	/**
 	 * Set the current directory of TESTAR, settings and output folders
 	 */
@@ -146,7 +165,7 @@ public class Main {
 			System.out.println(e);
 			System.out.println("Please execute TESTAR from their existing directory");
 		}*/
-		
+
 		outputDir = settings.get(ConfigTags.OutputDir);
 		tempDir = settings.get(ConfigTags.TempDir);
 	}
@@ -218,7 +237,7 @@ public class Main {
 			JFrame settingsSelectorDialog = new JFrame();
 			settingsSelectorDialog.setAlwaysOnTop(true);
 			String sseSelected = (String) JOptionPane.showInputDialog(settingsSelectorDialog,
-					"SUT setting:", "Test setting selection", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					"Select the desired setting:", "TESTAR settings", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
 			if (sseSelected == null) {
 				SSE_ACTIVATED = null;
@@ -289,37 +308,6 @@ public class Main {
 	}
 
 	/**
-	 * If logs file doesn't exist create it
-	 * Create a log into the output/logs directory to save the information of selected settings
-	 * 
-	 * @param settings
-	 */
-	private static void settingsLogs(Settings settings) {
-		//Check if logs dir exist, if not create it
-		File logsDir = new File(outputDir + File.separator +"logs");
-		if(!logsDir.exists())
-			logsDir.mkdirs();
-		
-		// Starting the logs
-		try {
-			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
-			File logFile = new File(outputDir + File.separator +"logs"+ File.separator + logFileName);
-			if (logFile.exists()) {
-				logFile = Util.generateUniqueFile(outputDir, logFileName);
-			}
-			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel));
-		} catch (Throwable t) {
-			System.out.println("Cannot initialize log file!");
-			t.printStackTrace(System.out);
-			System.exit(-1);
-		}
-		LogSerialiser.log(Util.dateString(DATE_FORMAT) + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running with the next settings:\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
-	}
-
-	/**
 	 * Start TESTAR protocol with the selected settings
 	 * 
 	 * This method get the specific protocol class of the selected settings to run TESTAR
@@ -338,7 +326,7 @@ public class Main {
 
 				classPath[i] = new File(cp.get(i)).toURI().toURL();
 			}
-			
+
 			loader = new URLClassLoader(classPath);
 
 			String pc = settings.get(ProtocolClass);
@@ -370,7 +358,7 @@ public class Main {
 					e.printStackTrace();
 				}
 			}
-			
+
 			TestSerialiser.exit();
 			ScreenshotSerialiser.exit();
 			LogSerialiser.exit();
@@ -452,12 +440,32 @@ public class Main {
 			defaults.add(Pair.from(GraphDBUrl, ""));
 			defaults.add(Pair.from(GraphDBUser, ""));
 			defaults.add(Pair.from(GraphDBPassword, ""));
-			
+
+			defaults.add(Pair.from(StateModelEnabled, false));
+			defaults.add(Pair.from(DataStore, ""));
+			defaults.add(Pair.from(DataStoreType, ""));
+			defaults.add(Pair.from(DataStoreServer, ""));
+			defaults.add(Pair.from(DataStoreDirectory, ""));
+			defaults.add(Pair.from(DataStoreDB, ""));
+			defaults.add(Pair.from(DataStoreUser, ""));
+			defaults.add(Pair.from(DataStorePassword, ""));
+			defaults.add(Pair.from(DataStoreMode, ""));
+			defaults.add(Pair.from(ResetDataStore, false));
+			defaults.add(Pair.from(ApplicationName, ""));
+			defaults.add(Pair.from(ApplicationVersion, ""));
+
 			defaults.add(Pair.from(AlwaysCompile, true));
 			
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
+
+			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
+			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
+				{
+					add("Role");
+				}
+			}));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
@@ -480,6 +488,17 @@ public class Main {
 			//PrologActivated is ALWAYS false.
 			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
 			settings.set(ConfigTags.PrologActivated, false);
+
+			// check that the abstract state properties and the abstract action properties have at least 1 value
+			if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
+			}
+
+			// check that the abstract state properties and the abstract action properties have at least 1 value
+			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
+				throw new ConfigException("Please provide at least 1 valid abstract state attribute or leave the key out of the settings file");
+			}
+
 			return settings;
 		} catch (IOException ioe) {
 			throw new ConfigException("Unable to load configuration file!", ioe);
@@ -627,6 +646,41 @@ public class Main {
 		if (p != null) {
 			settings.set(ConfigTags.UnattendedTests, new Boolean(p).booleanValue());
 			LogSerialiser.log("Property <" + pS + "> overridden to <" + p + ">", LogSerialiser.LogLevel.Critical);
+		}
+	}
+
+	/**
+	 * This method initializes the coding manager with custom tags to use for constructing
+	 * concrete and abstract state ids, if provided of course.
+	 * @param settings
+	 */
+	private static void initCodingManager(Settings settings) {
+		// we look if there are user-provided custom state tags in the settings
+		// if so, we provide these to the coding manager
+		int i;
+
+		// first the attributes for the concrete state id
+		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+			i = 0;
+
+			Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
+			for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
+				concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
+			}
+
+			CodingManager.setCustomTagsForConcreteId(concreteTags);
+		}
+
+		// then the attributes for the abstract state id
+		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+			i = 0;
+
+			Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
+			for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
+				abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+			}
+
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
 		}
 	}
 

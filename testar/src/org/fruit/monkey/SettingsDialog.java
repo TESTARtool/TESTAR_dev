@@ -1,7 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018 Open Universiteit - www.ou.nl
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -36,6 +36,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.GraphDBPanel;
+import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -69,11 +70,11 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.0.5 (12-June-19)";
+  static final String TESTAR_VERSION = "SWING VERSION 2.1.4 (18-July-2019)";
 
   private String settingsFile;
   private Settings settings;
-  //TODO: what is this ret variable. Can´t you just return settings in the run method?
+  //TODO: what is this ret variable. Cant you just return settings in the run method?
   private Settings ret;
 
   private JButton btnGenerate;
@@ -87,7 +88,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private OraclePanel oraclePanel;
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
-  private GraphDBPanel graphDBPanel;
+  private StateModelPanel stateModelPanel;
 
   /**
    * Starts the settings Dialog.
@@ -236,7 +237,7 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.populateFrom(settings);
     timingPanel.populateFrom(settings);
     miscPanel.populateFrom(settings);
-    graphDBPanel.populateFrom(settings);
+    stateModelPanel.populateFrom(settings);
   }
 
   private void extractInformation(Settings settings) {
@@ -245,7 +246,7 @@ public class SettingsDialog extends JFrame implements Observer {
     oraclePanel.extractInformation(settings);
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
-    graphDBPanel.extractInformation(settings);
+    stateModelPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -269,8 +270,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Time Settings", timingPanel);
     miscPanel = new MiscPanel();
     jTabsPane.addTab("Misc", miscPanel);
-    graphDBPanel = GraphDBPanel.createGraphDBPanel();
-    jTabsPane.addTab("GraphDB", graphDBPanel);
+    stateModelPanel = StateModelPanel.createStateModelPanel();
+    jTabsPane.addTab("State Model", stateModelPanel);
 
     setLayout(jTabsPane);
     pack();

@@ -84,6 +84,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
+	@Override
 	protected void initialize(Settings settings){
 
 		super.initialize(settings);
@@ -93,6 +94,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	/**
 	 * This method is invoked each time TESTAR starts to generate a new sequence
 	 */
+	@Override
 	protected void beginSequence(SUT system, State state){
 
 		super.beginSequence(system, state);
@@ -110,6 +112,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 *      seconds until they have finished loading)
 	 * @return  a started SUT, ready to be tested.
 	 */
+	@Override
 	protected SUT startSystem() throws SystemStartException{
 
 		return super.startSystem();
@@ -124,6 +127,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
+	@Override
 	protected State getState(SUT system) throws StateBuildException{
 
 		return super.getState(system);
@@ -135,6 +139,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
+	@Override
 	protected Verdict getVerdict(State state){
 
 		Verdict verdict = super.getVerdict(state); // by urueda
@@ -161,7 +166,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
-
+	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		Set<Action> actions = super.deriveActions(system,state); // by urueda
@@ -233,7 +238,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
 	 * @return  the selected action (non-null!)
 	 */
-
+	@Override
 	protected Action selectAction(State state, Set<Action> actions){ 
 
 		return super.selectAction(state, actions);
@@ -248,6 +253,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * @param action the action to execute
 	 * @return whether or not the execution succeeded
 	 */
+	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 
 		return super.executeAction(system, state, action);
@@ -261,6 +267,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * actions or after a specific time etc.
 	 * @return  if <code>true</code> continue generation, else stop
 	 */
+	@Override
 	protected boolean moreActions(State state) {
 
 		return super.moreActions(state);
@@ -272,6 +279,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	/** 
 	 * This method is invoked each time after TESTAR finished the generation of a sequence.
 	 */
+	@Override
 	protected void finishSequence(){
 
 		super.finishSequence();
@@ -285,6 +293,7 @@ public class Protocol_desktop_SwingSet2 extends JavaSwingProtocol {
 	 * You could stop the test after a given amount of generated sequences or
 	 * after a specific time etc.
 	 * @return  if <code>true</code> continue test, else stop	 */
+	@Override
 	protected boolean moreSequences() {
 
 		return super.moreSequences();

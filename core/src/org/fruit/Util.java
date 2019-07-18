@@ -647,6 +647,11 @@ public final class Util {
       throws IOException {
     copyToDirectory(new File(fileOrDirectory), new File(destDir), null, false);
   }
+  
+  public static void copyToDirectory(String fileOrDirectory, String destDir, boolean compress)
+	      throws IOException {
+	    copyToDirectory(new File(fileOrDirectory), new File(destDir), null, compress);
+	  }
 
   public static void copyToDirectory(String fileOrDirectory, String destDir,
                                      String targetName)
