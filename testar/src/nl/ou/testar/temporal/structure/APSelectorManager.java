@@ -1,10 +1,6 @@
 package nl.ou.testar.temporal.structure;
 
 import nl.ou.testar.temporal.util.APEncodingSeparator;
-import nl.ou.testar.temporal.util.InferrableExpression;
-import nl.ou.testar.temporal.util.PairBean;
-import nl.ou.testar.temporal.util.TagBean;
-import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tags;
 
 import java.util.ArrayList;
@@ -116,76 +112,9 @@ public class APSelectorManager extends APSelector{
 
     //custom
 
-    public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
-        //System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
-        Set<String> apset = new LinkedHashSet<>();
-        TagBean<?> tag = getTag(attrib);
-
-        if (tag != null) {   //this attribute is required as a(n) (set of) AP .. result is dependent on selectedattributes
-
-            if (tag.type() == Boolean.class ) {
-               // apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
-                if ( Boolean.parseBoolean(value)) {
-                    apset.add(widgetkey + attrib + "__");
-                }
-            } else
-
-                for (PairBean<InferrableExpression, String> iap : getValuedExpressions()
-                ) {
-                    if (iap.left().typ == "number" && (tag.type() == Double.class || tag.type() == Long.class || tag.type() == Integer.class)) {
-                        int intVal = (int) Double.parseDouble(value);
-                        if (((iap.left() == InferrableExpression.value_eq_) && (intVal == Integer.parseInt(iap.right()))) ||
-                                ((iap.left() == InferrableExpression.value_lt_) && (intVal < Integer.parseInt(iap.right())))) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");// just encode the TRUE/existence  and FALSE is then considered absence
-                        }
-                    }
-                    if (iap.left().typ == "text" && (tag.type() == String.class)) {
-
-                        if (((iap.left() == InferrableExpression.textmatch_) && value.matches(iap.right())) ||
-                                ((iap.left() == InferrableExpression.textlength_eq_) && (value.length() == Integer.parseInt(iap.right()))) ||
-                                ((iap.left() == InferrableExpression.textlength_lt_) && (value.length() < Integer.parseInt(iap.right())))
-                        ) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
-                        }
-
-                    }
-                    if (iap.left().typ == "shape" && (tag.type() == Shape.class)) {
-                        //format:   <data key="Shape">Rect [x:459.0 y:243.0 w:116.0 h:18.0]</data>
-                        //String[] shapecomponents=value.split("w:")[1];
-                        String test = value.split("w:")[1].split(" ")[0];
-                        int width = (int) Double.parseDouble(test);
-                        test = value.split("h:")[1].split("]")[0];
-                        int heigth = (int) Double.parseDouble(test);
-
-                        if (((iap.left() == InferrableExpression.width_lt_) && (width < Integer.parseInt(iap.right()))) ||
-                                ((iap.left() == InferrableExpression.heigth_lt_) && (heigth < Integer.parseInt(iap.right())))
-                        ) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
-                        }
-                    }
-                    if (iap.left().typ == "path" && (tag.type() == String.class)) {
-                        //format:     <data key="Path">[0, 0, 8]</data>
-                        if ((iap.left() == InferrableExpression.pathmatch_) && value.matches(iap.right())) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
-                        }
-                    }
-                    if (iap.left().typ == "boolean") {   //add these regardless of the tag-type
-                        //format:     <data key="Abc"></data>
-                        if ((iap.left() == InferrableExpression.is_blank_) && value.matches("")) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "_"); //note : 1 space only
-                        }
-                        if ((iap.left() == InferrableExpression.exists_) ) {
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "_");
-                        }
-
-                    }
-                }
-        }
-        return apset;
-    }
-
-    public boolean passWidgetFilters(String role, String title, String path){
+    public List<WidgetFilter> passWidgetFilters(String role, String title, String path){
         boolean pass=false;
+        List<WidgetFilter> passedWidgetFilters= new ArrayList<>();
         //pass if at least one of the roles match and at least one of the title matches and at least one of the path's matches
         // make disjunct with all widget filters
         if (role==null &&title==null && path==null) {// regain control actions by TESTAR itself, usually doe snot change state
@@ -205,7 +134,7 @@ public class APSelectorManager extends APSelector{
                 }
             }
 
-            if (!pass) continue;  //if still not passed, chck the next widgetfilter
+            if (!pass) continue;  //if still not passed, check the next widgetfilter as this one will never pass.
             pass = (wf.getWidgetTitleMatches().size() == 0) ;
             if (!pass) {
                 for (String ftitle : wf.getWidgetTitleMatches()
@@ -236,10 +165,13 @@ public class APSelectorManager extends APSelector{
 //                }
 //            }
 
-            if (pass) break; // role, title and path matches, that is enough
+            if (pass) {
+                passedWidgetFilters.add(wf);
+               // break; // role, title and path matches, that is enough
+            }
         }
 
 
-        return pass;
+        return passedWidgetFilters; //pass;
     }
 }

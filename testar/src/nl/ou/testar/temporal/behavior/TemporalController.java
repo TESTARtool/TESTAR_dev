@@ -19,10 +19,7 @@ import nl.ou.testar.StateModel.Analysis.Json.Vertex;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.temporal.structure.APSelectorManager;
-import nl.ou.testar.temporal.structure.StateEncoding;
-import nl.ou.testar.temporal.structure.TemporalModel;
-import nl.ou.testar.temporal.structure.TransitionEncoding;
+import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
@@ -168,7 +165,7 @@ public class TemporalController {
 
                 OVertex stateVertex = op.get();
                 StateEncoding senc = new StateEncoding(stateVertex.getIdentity().toString());
-                Set<String> props = new LinkedHashSet<>();
+                Set<String> propositions = new LinkedHashSet<>();
 
 
                 boolean deadstate = false;
@@ -182,10 +179,10 @@ public class TemporalController {
                     System.out.println("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
                 }
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps(propertyName, stateVertex, props, false);
+                    computeProps(propertyName, stateVertex, propositions, false);
                 }
-                props.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
-                senc.setStateAPs(props);
+                propositions.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
+                senc.setStateAPs(propositions);
                 senc.setTransitionColl(getTransitions(senc.getState()));
                 tmodel.addStateEncoding(senc, false);
             }
@@ -220,7 +217,7 @@ public class TemporalController {
         params.put("state", state);
         OResultSet resultSet = db.query(stmt, params);
         //***
-        Set<String> props = new LinkedHashSet<>();
+        Set<String> propositions = new LinkedHashSet<>();
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting a vertex
@@ -229,11 +226,11 @@ public class TemporalController {
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                   computeProps(propertyName,stateVertex,props,true);
+                   computeProps(propertyName,stateVertex,propositions,true);
                 }
             }
         }
-        return props;
+        return propositions;
     }
 
     private List<TransitionEncoding> getTransitions(String state) {
@@ -261,11 +258,11 @@ public class TemporalController {
                 TransitionEncoding trenc = new TransitionEncoding();
                 trenc.setEdge(actionEdge.getIdentity().toString());
                 trenc.setTargetState(target.getIdentity().toString());
-                Set<String> props = new LinkedHashSet<>();
+                Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                        computeProps(propertyName,actionEdge,props,false);
+                        computeProps(propertyName,actionEdge,propositions,false);
                     }
-                trenc.setEdgeAPs(props);
+                trenc.setEdgeAPs(propositions);
 
                 trenclist.add(trenc);
             }
@@ -518,21 +515,28 @@ public class TemporalController {
         return convertedValue;
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> props, boolean isWidget ) {
-        computeProps(propertyName, graphElement,  props, isWidget, false);
+    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget ) {
+        computeProps(propertyName, graphElement,  globalPropositions, isWidget, false);
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> props, boolean isWidget, boolean isDeadState) {
+    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isDeadState) {
         //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
         StringBuilder apkey = new StringBuilder();
         boolean pass=true;
+        List<WidgetFilter> passedWidgetFilters;
         if (isWidget) {
-            pass = apSelectorManager.passWidgetFilters(
+            passedWidgetFilters = apSelectorManager.passWidgetFilters(
                     graphElement.getProperty(Tags.Role.name().toString()),
                     graphElement.getProperty(Tags.Title.name().toString()),
                     graphElement.getProperty(Tags.Path.name().toString())
                     //graphElement.getProperty(Tags.Path.name().toString() // dummy, parenttitle is not implemented yet
             );
+            if (passedWidgetFilters!=null && passedWidgetFilters.size()>0 ){
+                for (WidgetFilter wf: passedWidgetFilters) // add the filter specific elected attributes and expressions
+                {// candidate for refactoring as this requires a double iteration of widget filter
+                globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+            }
+            }
         }
         if (pass){
             //compose key
@@ -559,8 +563,8 @@ public class TemporalController {
                     apkey.append(apSelectorManager.getApEncodingSeparator());
                 }
             }
-
-            props.addAll(apSelectorManager.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+            // add the generic (widget filte rindependent ) atributes and expresions)
+            globalPropositions.addAll(apSelectorManager.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
 
         }
 
