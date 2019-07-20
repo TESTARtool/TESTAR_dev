@@ -179,7 +179,7 @@ public class TemporalController {
                     System.out.println("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
                 }
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps(propertyName, stateVertex, propositions, false);
+                    computeProps(propertyName, stateVertex, propositions, false,false);
                 }
                 propositions.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
                 senc.setStateAPs(propositions);
@@ -226,7 +226,7 @@ public class TemporalController {
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                   computeProps(propertyName,stateVertex,propositions,true);
+                   computeProps(propertyName,stateVertex,propositions,true,false);
                 }
             }
         }
@@ -260,7 +260,7 @@ public class TemporalController {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                        computeProps(propertyName,actionEdge,propositions,false);
+                        computeProps(propertyName,actionEdge,propositions,false,true);
                     }
                 trenc.setEdgeAPs(propositions);
 
@@ -515,15 +515,38 @@ public class TemporalController {
         return convertedValue;
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget ) {
-        computeProps(propertyName, graphElement,  globalPropositions, isWidget, false);
+    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget,boolean isEdge ) {
+        computeProps(propertyName, graphElement,  globalPropositions, isWidget, isEdge, false);
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isDeadState) {
-        //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
+    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isEdge, boolean isDeadState) {
+        // isdeadstate is not used
         StringBuilder apkey = new StringBuilder();
-        boolean pass=true;
         List<WidgetFilter> passedWidgetFilters;
+        //compose APkey
+        for (String k : apSelectorManager.getAPKey()
+        ) {
+            Object prop = graphElement.getProperty(k);
+            if (prop == null) {
+                String fallback;
+                Object concreteprop;
+                if (isWidget) {
+                    concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
+                }else
+                    concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
+                if (concreteprop == null) {
+                    fallback = "undefined";
+                } else {
+                    fallback = concreteprop.toString();
+                }
+                apkey.append(fallback);
+                apkey.append(apSelectorManager.getApEncodingSeparator());
+            }
+            else {
+                apkey.append(prop);
+                apkey.append(apSelectorManager.getApEncodingSeparator());
+            }
+        }
         if (isWidget) {
             passedWidgetFilters = apSelectorManager.passWidgetFilters(
                     graphElement.getProperty(Tags.Role.name().toString()),
@@ -531,41 +554,19 @@ public class TemporalController {
                     graphElement.getProperty(Tags.Path.name().toString())
                     //graphElement.getProperty(Tags.Path.name().toString() // dummy, parenttitle is not implemented yet
             );
+
             if (passedWidgetFilters!=null && passedWidgetFilters.size()>0 ){
                 for (WidgetFilter wf: passedWidgetFilters) // add the filter specific elected attributes and expressions
                 {// candidate for refactoring as this requires a double iteration of widget filter
-                globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
-            }
+                    globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+                }
             }
         }
-        if (pass){
-            //compose key
-            for (String k : apSelectorManager.getAPKey()
-            ) {
-                Object prop = graphElement.getProperty(k);
-                if (prop == null) {
-                    String fallback;
-                    Object concreteprop;
-                    if (isWidget) {
-                        concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
-                    }else
-                        concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
-                    if (concreteprop == null) {
-                        fallback = "undefined";
-                    } else {
-                        fallback = concreteprop.toString();
-                    }
-                    apkey.append(fallback);
-                    apkey.append(apSelectorManager.getApEncodingSeparator());
-                }
-                else {
-                    apkey.append(prop);
-                    apkey.append(apSelectorManager.getApEncodingSeparator());
-                }
-            }
-            // add the generic (widget filte rindependent ) atributes and expresions)
-            globalPropositions.addAll(apSelectorManager.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
-
+        if (!isWidget && isEdge){
+            globalPropositions.addAll(apSelectorManager.getTransitionFilter().getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+        }
+        if (!isWidget && !isEdge){
+            globalPropositions.addAll(apSelectorManager.getStateFilter().getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
         }
 
     }

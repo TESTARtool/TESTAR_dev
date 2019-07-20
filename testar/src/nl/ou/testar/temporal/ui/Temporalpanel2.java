@@ -77,6 +77,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton graphMLButton;
     private JButton defaultSelectorButton;
     private JButton testDBConnectionButton;
+    private JButton writeSelectorButton;
+    private JButton loadSelectorButton;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -124,6 +126,19 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
             }
         });
+        loadSelectorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                APSelectorManager apmgr = testLoadApSelectionManagerJSON();
+                textArea12.append("loaded selector manager: " + apmgr.getComments().toString());
+            }
+        });
+        writeSelectorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testSaveCheckedApSelectionManagerJSON();
+            }
+        });
     }
 
     public static Temporalpanel2 createTemporalPanel() {
@@ -161,7 +176,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         tabbedPane1.setRequestFocusEnabled(true);
         panel1.add(tabbedPane1, cc.xyw(1, 3, 16));
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Test/Setup", panel2);
         textField1 = new JTextField();
         panel2.add(textField1, cc.xyw(3, 1, 8, CellConstraints.FILL, CellConstraints.DEFAULT));
@@ -199,6 +214,12 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         testDBConnectionButton = new JButton();
         testDBConnectionButton.setText("Test DB Connection");
         panel2.add(testDBConnectionButton, cc.xy(1, 3));
+        writeSelectorButton = new JButton();
+        writeSelectorButton.setText("Write Selector");
+        panel2.add(writeSelectorButton, cc.xy(5, 13));
+        loadSelectorButton = new JButton();
+        loadSelectorButton.setText("Load Selector");
+        panel2.add(loadSelectorButton, cc.xy(3, 13));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(10, 13, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane1.addTab("Miner", panel3);
@@ -629,10 +650,18 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     }
 
     public void testSaveDefaultApSelectionManagerJSON() {
-        textArea12.append("performing a small test: writing an Selectionmanager.JSON and reading another\n");
+        textArea12.append("performing a small test: writing an Selectionmanager.JSON\n");
 
         APSelectorManager APmgr = new APSelectorManager(true);
         JSONHandler.save(APmgr, outputDir + "APSelectorManager.json", true);
+        textArea12.append("json saved: \n");
+    }
+
+    public void testSaveCheckedApSelectionManagerJSON() {
+        textArea12.append(" writing  APSelectorManagerChecked.JSON\n");
+
+        APSelectorManager APmgr = new APSelectorManager(true);
+        JSONHandler.save(APmgr, outputDir + "APSelectorManagerChecked.json", true);
         textArea12.append("json saved: \n");
     }
 
@@ -640,7 +669,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
 
         APSelectorManager APmgr1;
-        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APSelectorManager.class);
+        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManager.json", APSelectorManager.class);
 
         if (APmgr1 == null) {
             textArea12.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir + "\n");

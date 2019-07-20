@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import nl.ou.testar.temporal.util.InferrableExpression;
 import nl.ou.testar.temporal.util.PairBean;
 import nl.ou.testar.temporal.util.TagBean;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
@@ -17,23 +18,23 @@ import java.util.Set;
 
 public class APSelector {
     private Set<TagBean<?>> selectedAttributes;
-    private Set<PairBean<InferrableExpression,String>> valuedExpressions = new LinkedHashSet<>();
-
+    private Set<PairBean<InferrableExpression,String>> valuedExpressions;
 
 
 
     public APSelector() {
+
         selectedAttributes=new LinkedHashSet<>();
         valuedExpressions =new LinkedHashSet<>();
-    }
 
-    public Set<TagBean<?>> getSelectedAttributes() {
-        return selectedAttributes;
     }
-
-    public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
-        this.selectedAttributes = selectedAttributes;
-        this.selectedAttributes.add(deadStateTag());
+    public static final String reflectFieldSelectedAttributes(){
+        String name=APSelector.class.getDeclaredFields()[0].getName();
+        return name;
+    }
+    public static final String reflectFieldvaluedExpressions(){
+        String name=APSelector.class.getDeclaredFields()[1].getName();
+        return name;
     }
 
     public static final TagBean<?> deadStateTag() {
@@ -42,18 +43,15 @@ public class APSelector {
 
         return dtag;
     }
-    public static final Set<TagBean<?>> getEntireAttributeTagSet(){
 
-
+    public static final Set<TagBean<?>> getEntireAttributes(){
         // WORKAROUND CSS 20190629
         // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
         // both classes Tags and UIATags inherit from abstract class TagBase
         //without this initialization, the call to .tagset() from either class collides into the same tagset content.
         // symptom: UIATags appears to have the same tags as Tags and we're missing out on the real UIATags.
-
         Tag<?> dummy = UIATags.UIAItemType;
         dummy= Tags.Enabled;
-
         Set<Tag<?>> tags = new HashSet<Tag<?>>();
         tags.addAll(Tags.tagSet());
         tags.addAll(UIATags.tagSet());//alternative for platform independent is : getNativetags ??
@@ -64,23 +62,24 @@ public class APSelector {
             TagBean<?> t1 = TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type()); //orientdb style tags
             tmptagset.add(t1);
         }
-        tmptagset.add(deadStateTag());
+        tmptagset.addAll(getMinimalAttributes());
         return  tmptagset;
-    };
-
-    public void setDefaultOnlyBooleanAttributes() {
-        for (TagBean<?> tag : getEntireAttributeTagSet()
-        ) {
-            if (tag.type() == Boolean.class) {
-                selectedAttributes.add(tag);
-            }
-        }
-        selectedAttributes.add(deadStateTag());
     }
+    public static final Set<TagBean<?>> getMinimalAttributes(){
+        // to prevent that edges are totally filtered away.
+        Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
+        Tag<?> t= Tags.Enabled;
+        tmptagset.add(TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type())); //orientdb style tags
+        t = Tags.Role;
+        tmptagset.add(TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type())); //orientdb style tags
+        tmptagset.add(deadStateTag());  // actually only of interest for states
+        return  tmptagset;
+    }
+
     public static final Set<TagBean<?>> getBasicAttributes() {
         Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
         Set<String> basicset = new HashSet<>();
-        basicset.add("Role");
+        //basicset.add("Role");
         basicset.add("Title");
         basicset.add("Path");
         basicset.add("Desc");
@@ -88,69 +87,19 @@ public class APSelector {
         basicset.add("Blocked");
         basicset.add("Shape");
 
-        for (TagBean<?> tag : getEntireAttributeTagSet()
+        for (TagBean<?> tag : getEntireAttributes()
         ) {
             if (basicset.contains(tag.name())) {
                 tmptagset.add(tag);
             }
         }
-        tmptagset.add(deadStateTag());
+        tmptagset.addAll(getMinimalAttributes());
         return tmptagset;
-    }
-
-    public void addAttribute(String attrib){
-
-        for (TagBean<?> tag : getEntireAttributeTagSet()
-        ) {
-            if ( tag.name().equals(attrib)) {
-                selectedAttributes.add(tag);
-                break;
-            }
-        }
-    }
-
-    public TagBean<?> getTag(String attrib){
-        TagBean<?> ret=null;
-        for (TagBean<?> tag : selectedAttributes
-        ) {
-            if ( tag.name().equals(attrib)){
-                ret=tag;
-                break;
-            }
-        }
-        return  ret;
-    }
-    public  TagBean<?> getTag(String attrib,WidgetFilter wf){
-        TagBean<?> ret=null;
-        for (TagBean<?> tag : selectedAttributes
-        ) {
-            if ( tag.name().equals(attrib)){
-                ret=tag;
-                break;
-            }
-        }
-        return  ret;
-    }
-    public boolean contains(String attrib){
-
-        if(getTag(attrib)!=null){
-            return true;
-        }
-        return false;
-    }
-    public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
-        return valuedExpressions;
-    }
-
-
-    public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
-        this.valuedExpressions = valuedExpressions;
     }
 
     public static final Set<PairBean<InferrableExpression,String>> useBasicValuedExpressions() {
         Set<PairBean<InferrableExpression,String>> simve = new LinkedHashSet<>();
-        simve.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
-        simve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
+        simve.addAll(useMinimalValuedExpressions());
         simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)"));
         simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CANCEL)"));
         simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:YES)"));
@@ -171,12 +120,17 @@ public class APSelector {
         simve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAWindow.toString()));
         return simve;
 
+    };
+    public static final Set<PairBean<InferrableExpression,String>>  useMinimalValuedExpressions() {
+        Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
+        minve.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
+        minve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
+        return minve;
     }
 
     public static final Set<PairBean<InferrableExpression,String>>  useStandardValuedExpressions() {
         Set<PairBean<InferrableExpression,String>> defve = new LinkedHashSet<>();
-        defve.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
-        defve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
+        defve.addAll(useMinimalValuedExpressions());
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "1"));
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "2"));
@@ -234,13 +188,93 @@ public class APSelector {
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIACheckBox.toString()));
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIARadioButton.toString()));
         defve.add(new PairBean<>(InferrableExpression.rolematch_, UIARoles.UIAEdit.toString()));
+        defve.add(new PairBean<>(InferrableExpression.rolematch_, Roles.Process.toString()));
+
         return defve;
+    }
+
+    public Set<TagBean<?>> getSelectedAttributes() {
+        return selectedAttributes;
+    }
+
+    public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
+        if (selectedAttributes.size()==0){
+            this.selectedAttributes.addAll(getMinimalAttributes());
+        }else {
+            this.selectedAttributes = selectedAttributes; //responsibility of the test manager
+            this.selectedAttributes.add(deadStateTag());
+        }
+    }
+
+    public void setDefaultOnlyBooleanAttributes() {
+        for (TagBean<?> tag : getEntireAttributes()
+        ) {
+            if (tag.type() == Boolean.class) {
+                selectedAttributes.add(tag);
+            }
+        }
+        selectedAttributes.add(deadStateTag());
+    }
+
+    public void addAttribute(String attrib){
+
+        for (TagBean<?> tag : getEntireAttributes()
+        ) {
+            if ( tag.name().equals(attrib)) {
+                selectedAttributes.add(tag);
+                break;
+            }
+        }
+    }
+
+    public TagBean<?> getTag(String attrib){
+        TagBean<?> ret=null;
+        for (TagBean<?> tag : selectedAttributes  // consider to pass if selected atributes = emp ty?
+        ) {
+            if ( tag.name().equals(attrib)){
+                ret=tag;
+                break;
+            }
+        }
+        return  ret;
+    }
+
+    public  TagBean<?> getTag(String attrib,WidgetFilter wf){
+        TagBean<?> ret=null;
+        for (TagBean<?> tag : selectedAttributes
+        ) {
+            if ( tag.name().equals(attrib)){
+                ret=tag;
+                break;
+            }
+        }
+        return  ret;
+    }
+
+    public boolean contains(String attrib){
+
+        if(getTag(attrib)!=null){
+            return true;
+        }
+        return false;
+    }
+
+    public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
+        return valuedExpressions;
+    }
+
+    public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
+        if (valuedExpressions.size()==0){
+            this.valuedExpressions.addAll(useMinimalValuedExpressions());
+        }else{
+            this.valuedExpressions = valuedExpressions; //responsibility of the test manager
+        }
+
     }
 
 
 
     //custom
-
 
     public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
         //System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
@@ -315,9 +349,6 @@ public class APSelector {
 
     public void addExpressionPattern(InferrableExpression ip, String value) {
         valuedExpressions.add(new PairBean<>(ip,value));
-    }
-    public void removeExpressionPattern(InferrableExpression ip, String value) {
-        valuedExpressions.remove(new PairBean<>(ip,value));
     }
 
     public boolean addExpressionPattern(String patternStr) {
