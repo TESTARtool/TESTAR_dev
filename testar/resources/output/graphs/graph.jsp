@@ -39,10 +39,10 @@
                 <option value="klay">Klay</option>
             </select></label></div>
             <div>
-                <label for="show-labels"><input type="checkbox" id="show-labels" checked> Show node labels</label>
+                <label for="show-labels" class="custom-checkbox">Show labels<input type="checkbox" id="show-labels" checked><span class="checkmark"></span></label>
             </div>
             <div>
-                <button id="show-all" type="button" class="skip">Show all nodes</button>
+                <button id="show-all" type="button" class="button_custom">Show all nodes</button>
             </div>
         </div>
 
@@ -74,6 +74,13 @@
             <div class="legend-text">Black hole</div>
         </div>
 
+        <div class="column">
+            <div class="extra-margin-left"><label for="toggle-abstract-layer" class="custom-checkbox">Show abstract layer<input type="checkbox" id="toggle-abstract-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-concrete-layer" class="custom-checkbox">Show concrete layer<input type="checkbox" id="toggle-concrete-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-sequence-layer" class="custom-checkbox">Show sequence layer<input type="checkbox" id="toggle-sequence-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-layer-transitions" class="custom-checkbox">Show inter-layer edges<input type="checkbox" id="toggle-layer-transitions" checked><span class="checkmark"></span></label></div>
+        </div>
+
 
     </div>
 </div>
@@ -95,15 +102,15 @@
 
 <script>
 
+    let appStatus = {};
+
+
     let cy = cytoscape({
         container: document.getElementById("cy"),
 
         elements: fetch("${contentFolder}/${graphContentFile}").then(function(response) {
             return response.json();
-        })
-
-
-        ,
+        }),
 
         style: [ // the stylesheet for the graph
             {
@@ -114,7 +121,7 @@
                     'border-color': '#000000',
                     'label': 'data(counter)',
                     'color': '#5d574d',
-                    'font-size': '0.5em'
+                    'font-size': '0.4em'
                 }
             },
 
@@ -130,7 +137,7 @@
             {
                 selector: 'edge',
                 style: {
-                    'width': 2,
+                    'width': 1,
                     'line-color': '#ccc',
                     'target-arrow-color': '#ccc',
                     'target-arrow-shape': 'triangle',
@@ -138,7 +145,7 @@
                     'text-rotation' : 'autorotate',
                     'label': 'data(counter)',
                     'color': '#5d574d',
-                    'font-size': '0.4em'
+                    'font-size': '0.3em'
                 }
             },
             {
@@ -153,7 +160,8 @@
             {
                 selector: '.AbstractState',
                 style: {
-                    'background-color': '#1c9099'
+                    'background-color': '#1c9099',
+                    'label' : 'data(customLabel)'
                 }
             },
 
@@ -174,7 +182,8 @@
                     'background-image': function (ele) {
                         return "${contentFolder}/" + ele.data('id') + ".png"
                     },
-                    'background-fit': 'contain'
+                    'background-fit': 'contain',
+                    'label' : 'data(customLabel)'
                 }
             },
 
@@ -190,7 +199,10 @@
                 selector: '.isAbstractedBy',
                 style: {
                     'line-color': '#bdc9e1',
-                    'target-arrow-color': '#bdc9e1'
+                    'target-arrow-color': '#bdc9e1',
+                    'line-style': 'dashed',
+                    'arrow-scale': 0.5,
+                    'width': 0.5
                 }
             },
 
@@ -205,7 +217,8 @@
             {
                 selector: '.SequenceNode',
                 style: {
-                    'background-color': '#016450'
+                    'background-color': '#016450',
+                    'label' : 'data(customLabel)'
                 }
             },
 
@@ -220,14 +233,18 @@
             {
                 selector: '.TestSequence',
                 style: {
-                    'background-color': '#014636'
+                    'background-color': '#014636',
+                    'label' : 'data(customLabel)'
                 }
             },
             {
                 selector: '.Accessed',
                 style: {
                     'line-color': '#d0d1e6',
-                    'target-arrow-color': '#d0d1e6'
+                    'target-arrow-color': '#d0d1e6',
+                    'line-style': 'dashed',
+                    'arrow-scale': 0.5,
+                    'width': 0.5
                 }
             },
 
@@ -324,17 +341,6 @@
         }).run();
     });
 
-    // highlight the leaves, which in this case will be the root of the widget tree
-    cy.ready(() => cy.$(".Widget").leaves().addClass("leaves"));
-    cy.ready(() => cy.$(".Widget").forEach(
-        (w) => w.data("customLabel", w.data("Role") + "-" + w.data("counter"))
-    ));
-
-    // document.getElementById("close-panel").addEventListener("click", function () {
-    //     let cdPanel = document.getElementsByClassName("cd-panel")[0];
-    //     cdPanel.classList.remove("cd-panel--is-visible");
-    // });
-
     let showLabels = document.getElementById("show-labels");
     showLabels.addEventListener("change", function () {
         if (showLabels.checked) {
@@ -342,6 +348,7 @@
         }
         else {
             cy.$('node').addClass('no-label');
+            cy.$('edge').addClass('no-label');
         }
     });
 
@@ -496,7 +503,122 @@
     showAllButton.addEventListener("click", function () {
         cy.$('.invisible').removeClass('invisible');
         cy.$('.dim').removeClass('dim');
-    })
+    });
+
+    cy.ready(function (event) {
+        appStatus.nrOfAbstractStates =  cy.$('node .AbstractState').size();
+        appStatus.nrOfConcreteStates = cy.$('node .ConcreteState').size();
+        appStatus.nrOfSequenceNodes = cy.$('node .SequenceNode').size();
+        appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
+        appStatus.concreteLayerPresent = appStatus.nrOfConcreteStates > 0;
+        appStatus.sequenceLayerPresent = appStatus.nrOfSequenceNodes > 0;
+        appStatus.nrOfLayersPresent = 0;
+        console.log(appStatus);
+
+        // ready several toggle buttons
+        // abstract layer toggle
+        let abstractLayerToggle = document.getElementById("toggle-abstract-layer");
+        if (appStatus.abstractLayerPresent) {
+            appStatus.nrOfLayersPresent++;
+            abstractLayerToggle.checked = true;
+            abstractLayerToggle.addEventListener("change", (e) => {
+                if (abstractLayerToggle.checked) {
+                    cy.$('node.AbstractState').union(cy.$('node.BlackHole')).union(cy.$('node.AbstractState').parent()).removeClass("invisible");
+                }
+                else {
+                    cy.$('node.AbstractState').union(cy.$('node.BlackHole')).union(cy.$('node.AbstractState').parent()).addClass("invisible");
+                }
+            });
+        }
+        else {
+            abstractLayerToggle.checked = false;
+            abstractLayerToggle.disabled = true;
+        }
+
+        // concrete layer toggle
+        let concreteLayerToggle = document.getElementById("toggle-concrete-layer");
+        if (appStatus.concreteLayerPresent) {
+            appStatus.nrOfLayersPresent++;
+            concreteLayerToggle.checked = true;
+            concreteLayerToggle.addEventListener("change", (e) => {
+                if (concreteLayerToggle.checked) {
+                    cy.$('node.ConcreteState').union(cy.$('node.ConcreteState').parent()).removeClass("invisible");
+                }
+                else {
+                    cy.$('node.ConcreteState').union(cy.$('node.ConcreteState').parent()).addClass("invisible");
+                }
+            });
+        }
+        else {
+            concreteLayerToggle.checked = false;
+            concreteLayerToggle.disabled = true;
+        }
+
+        // sequence layer toggle
+        let sequenceLayerToggle = document.getElementById("toggle-sequence-layer");
+        if (appStatus.sequenceLayerPresent) {
+            appStatus.nrOfLayersPresent++;
+            sequenceLayerToggle.checked = true;
+            sequenceLayerToggle.addEventListener("change", (e) => {
+                if (sequenceLayerToggle.checked) {
+                    cy.$('node.SequenceNode').union(cy.$('node.SequenceNode').parent()).removeClass("invisible");
+                }
+                else {
+                    cy.$('node.SequenceNode').union(cy.$('node.SequenceNode').parent()).addClass("invisible");
+                }
+            });
+        }
+        else {
+            sequenceLayerToggle.checked = false;
+            sequenceLayerToggle.disabled = true;
+        }
+
+        // toggle for edges between the layers
+        let interLayerEdgesToggle = document.getElementById("toggle-layer-transitions");
+        if (appStatus.nrOfLayersPresent > 1 && appStatus.concreteLayerPresent) {
+            interLayerEdgesToggle.checked = true;
+            interLayerEdgesToggle.addEventListener("change", (e) => {
+                if (interLayerEdgesToggle.checked) {
+                    cy.$('edge.isAbstractedBy').union(cy.$('edge.Accessed')).removeClass("invisible");
+                }
+                else {
+                    cy.$('edge.isAbstractedBy').union(cy.$('edge.Accessed')).addClass("invisible");
+                }
+            });
+        }
+        else {
+            interLayerEdgesToggle.checked = false;
+            interLayerEdgesToggle.disabled = true;
+        }
+
+        // highlight the leaves, which in this case will be the root of the widget tree
+        cy.$(".Widget").leaves().addClass("leaves");
+        cy.$(".Widget").forEach(
+            (w) => w.data("customLabel", w.data("Role") + "-" + w.data("counter"))
+        );
+
+        // create custom labels for several classes
+        // concrete state:
+        cy.$(".ConcreteState").forEach(
+            (w) => w.data("customLabel", "CS-" + w.data("counter"))
+        );
+
+        // abstract state
+        cy.$(".AbstractState").forEach(
+            (w) => w.data("customLabel", "AS-" + w.data("counter"))
+        );
+
+        // sequence node
+        cy.$(".SequenceNode").forEach(
+            (w) => w.data("customLabel", "SN-" + w.data("counter"))
+        );
+
+        // test sequence
+        cy.$(".TestSequence").forEach(
+            (w) => w.data("customLabel", "TS-" + w.data("counter"))
+        );
+
+    });
 
 </script>
 </body>

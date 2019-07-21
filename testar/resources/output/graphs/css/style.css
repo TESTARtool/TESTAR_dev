@@ -356,3 +356,91 @@ button.skip:hover {
 button.skip:active {
     -webkit-box-shadow: inset 0 0 20px 0 #1d2845, 0 1px 0 white;
     box-shadow: inset 0 0 20px 0 #1d2845, 0 1px 0 white; }
+
+.button_custom{
+    border:1px solid #616261; -webkit-border-radius: 5px; -moz-border-radius: 5px;border-radius: 5px;font-size:12px;font-family:arial, helvetica, sans-serif; padding: 8px 8px 8px 8px; text-decoration:none; display:inline-block;text-shadow: -1px -1px 0 rgba(0,0,0,0.3);font-weight:bold; color: #FFFFFF;
+    background-color: #7d7e7d; background-image: -webkit-gradient(linear, left top, left bottom, from(#7d7e7d), to(#0e0e0e));
+    background-image: -webkit-linear-gradient(top, #7d7e7d, #0e0e0e);
+    background-image: -moz-linear-gradient(top, #7d7e7d, #0e0e0e);
+    background-image: -ms-linear-gradient(top, #7d7e7d, #0e0e0e);
+    background-image: -o-linear-gradient(top, #7d7e7d, #0e0e0e);
+    background-image: linear-gradient(to bottom, #7d7e7d, #0e0e0e);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#7d7e7d, endColorstr=#0e0e0e);
+}
+
+.button_custom:hover{
+    border:1px solid #4a4b4a;
+    background-color: #646464; background-image: -webkit-gradient(linear, left top, left bottom, from(#646464), to(#282828));
+    background-image: -webkit-linear-gradient(top, #646464, #282828);
+    background-image: -moz-linear-gradient(top, #646464, #282828);
+    background-image: -ms-linear-gradient(top, #646464, #282828);
+    background-image: -o-linear-gradient(top, #646464, #282828);
+    background-image: linear-gradient(to bottom, #646464, #282828);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#646464, endColorstr=#282828);
+}
+
+/* Customize the label (the container) */
+.custom-checkbox {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.custom-checkbox:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: #5d574d;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.custom-checkbox .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
