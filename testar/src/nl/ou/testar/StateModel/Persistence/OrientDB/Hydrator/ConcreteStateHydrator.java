@@ -10,6 +10,8 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.Verdict;
 
 public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
 
@@ -48,5 +50,21 @@ public class ConcreteStateHydrator implements EntityHydrator<VertexEntity>{
             // we simply add a property for each tag
             target.addPropertyValue(Validation.sanitizeAttributeName(tag.name()), new PropertyValue(TypeConvertor.getInstance().getOrientDBType(attributes.get(tag).getClass()), attributes.get(tag)));
         }
+
+        // get the oracle verdict and transform it into a custom code
+        Verdict verdict = attributes.get(Tags.OracleVerdict, null);
+        int oracleVerdictCode = 4; // default value
+        if (verdict != null) {
+            if (verdict.severity() == Verdict.SEVERITY_MIN) {
+                oracleVerdictCode = 1;
+            }
+            else if (verdict.severity() == Verdict.SEVERITY_MAX) {
+                oracleVerdictCode = 2;
+            }
+            else if (verdict.severity() > Verdict.SEVERITY_MIN && verdict.severity() < Verdict.SEVERITY_MAX) {
+                oracleVerdictCode = 3;
+            }
+        }
+        target.addPropertyValue("oracleVerdictCode", new PropertyValue(OType.INTEGER, oracleVerdictCode));
     }
 }

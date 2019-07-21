@@ -190,7 +190,7 @@ div.is-child-of {
     transition-delay: 0s;
 }
 
-#close-panel, #toggle-visible, #highlight, #widget-tree-button {
+#close-panel, #toggle-visible, #highlight, #widget-tree-button, #trace-path-button {
     float: right;
     margin-right: 10px;
 }
@@ -338,12 +338,12 @@ button.skip {
     -webkit-box-shadow: inset 0 1px 0 0 #b1b9cb;
     box-shadow: inset 0 1px 0 0 #b1b9cb;
     color: #fff;
-    font: bold 16px/1 "helvetica neue", helvetica, arial, sans-serif;
+    font: bold 12px/1 "helvetica neue", helvetica, arial, sans-serif;
     padding: 7px 0 8px 0;
     text-decoration: none;
     text-align: center;
     text-shadow: 0 -1px 1px #000f4d;
-    width: 150px; }
+    width: 120px; }
 button.skip:hover {
     background-color: #7f8dad;
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #7f8dad), color-stop(50%, #4a5e8c), color-stop(50%, #2f477d), color-stop(100%, #364c80));

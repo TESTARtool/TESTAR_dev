@@ -223,6 +223,12 @@ public class EntityClassFactory {
         counter.setAutoIncrement(true);
         concreteStateClass.addProperty(counter);
         concreteStateClass.setSuperClassName("Widget");
+        Property oracleVerdictCode = new Property("oracleVerdictCode", OType.INTEGER);
+        oracleVerdictCode.setMandatory(true);
+        oracleVerdictCode.setNullable(false);
+        oracleVerdictCode.setIdentifier(false);
+        oracleVerdictCode.setIndexAble(true);
+        concreteStateClass.addProperty(oracleVerdictCode);
         entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
         return concreteStateClass;
     }

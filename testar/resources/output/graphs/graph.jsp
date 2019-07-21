@@ -318,6 +318,13 @@
                     'height': '60px',
                     'border-width': '2px'
                 }
+            },
+            {
+                selector: '.errorState',
+                style: {
+                    'border-color': '#FF0000',
+                    'line-color': '#FF0000'
+                }
             }
         ],
 
@@ -423,9 +430,32 @@
         highlightButton.classList.add("skip");
         highlightButton.appendChild(document.createTextNode("Highlight"));
         highlightButton.addEventListener("click", function () {
-            cy.$("*").difference(cy.$(targetNode).closedNeighborhood()).addClass("dim");
+            let allNodes = cy.$(targetNode).closedNeighborhood();
+            allNodes = allNodes.union(allNodes.parent());
+            cy.$("*").difference(allNodes).addClass("invisible");
         });
         contentPanelHeader.appendChild(highlightButton);
+
+        // if the node represents a state that contains an error, we add a button to highlight the path to that error
+        if (targetNode.hasClass("ConcreteState") && appStatus.sequenceLayerPresent) {
+            let traceButton = document.createElement("button");
+            traceButton.id = "trace-path-button";
+            traceButton.classList.add("skip");
+            traceButton.appendChild(document.createTextNode("Trace Path"));
+            traceButton.addEventListener("click", () => {
+                // get the sequence nodes that accessed this node
+                let sequenceNodes = cy.$(targetNode).incomers(".SequenceNode, .Accessed");
+                // get the complete list of sequence nodes that let to them
+                let predecessorNodes = sequenceNodes.predecessors();
+                // next get the concrete state nodes that were accessed by all these sequence nodes
+                let concreteStateNodes = predecessorNodes.outgoers();
+                let allNodes = sequenceNodes.union(predecessorNodes).union(concreteStateNodes).union(targetNode);
+                // add the parent nodes, if there are any
+                allNodes = allNodes.union(cy.$(allNodes).parent());
+                cy.$("*").difference(allNodes).addClass("invisible");
+            });
+            contentPanelHeader.appendChild(traceButton);
+        }
 
         //////////////// end add button section //////////////////
 
@@ -600,7 +630,12 @@
         // create custom labels for several classes
         // concrete state:
         cy.$(".ConcreteState").forEach(
-            (w) => w.data("customLabel", "CS-" + w.data("counter"))
+            (w) => {
+                w.data("customLabel", "CS-" + w.data("counter"));
+                if (w.data('oracleVerdictCode') && ["2", "3"].includes(w.data('oracleVerdictCode'))) {
+                    w.addClass('errorState');
+                }
+            }
         );
 
         // abstract state
