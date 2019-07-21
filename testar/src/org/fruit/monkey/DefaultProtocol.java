@@ -363,7 +363,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
 			DEBUGLOG.error("Exception: ",e);
 
-			return false;	
+			return false;
 		}
 
 		return true;
@@ -825,7 +825,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Saving the action information into the logs
-	 * 
+	 *
 	 * @param state
 	 * @param action
 	 * @param actionMode
@@ -1253,6 +1253,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
+			// for most windows applications and most jar files, this is where the SUT gets created!
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(

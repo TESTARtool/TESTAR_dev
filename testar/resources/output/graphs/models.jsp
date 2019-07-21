@@ -23,7 +23,8 @@
         <div class="col-3"><strong>Identifier</strong></div>
         <div class="col-2"><strong>Application name</strong></div>
         <div class="col-2"><strong>Application version</strong></div>
-        <div class="col-5"></div>
+        <div class="col-3"><strong>Abstraction Attributes</strong></div>
+        <div class="col-2"></div>
     </div>
     <%
         int i = 1;
@@ -33,8 +34,9 @@
             <div class="col-3"><a data-toggle="collapse" href="#sequenceRow<%= i%>"><span class="fas fa-angle-down"></span></a>&nbsp;${model.modelIdentifier}</div>
             <div class="col-2">${model.applicationName}</div>
             <div class="col-2">${model.applicationVersion}</div>
+            <div class="col-3">${model.abstractionAttributesAsString}</div>
             <div class="col1"><a data-toggle="modal" data-target="#sequenceModal<%= i %>"><span class="fas fa-layer-group"></span></a></div>
-            <div class="col-4"></div>
+            <div class="col-1"></div>
         </div>
         <!-- Collapse block -->
         <div class="collapse" id="sequenceRow<%= i %>">

@@ -1,6 +1,5 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Entity;
 
-import com.orientechnologies.common.jna.OCLibrary;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -8,6 +7,7 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.metadata.sequence.OSequence;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
@@ -17,7 +17,6 @@ import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.Exception.EntityNotFoundException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.DependencyHelper;
-import org.fruit.Pair;
 import org.fruit.alayer.Visualizer;
 
 import java.util.*;
@@ -64,6 +63,11 @@ public class EntityManager {
                 OSchema schema = db.getMetadata().getSchema();
                 for (OClass oClass : DependencyHelper.sortDependenciesForDeletion(schema.getClasses())) {
                     if ((oClass.isEdgeType() || oClass.isVertexType()) && !(oClass.getName().equals("V") || oClass.getName().equals("E"))) {
+                        System.out.println("Dropping class " + oClass.getName());
+                        schema.dropClass(oClass.getName());
+                    }
+                    // also drop the OSequence table
+                    if (oClass.getName().equals("OSequence")) {
                         System.out.println("Dropping class " + oClass.getName());
                         schema.dropClass(oClass.getName());
                     }
@@ -250,12 +254,20 @@ public class EntityManager {
                 // fetch the superclass
                 EntityClass superClass = EntityClassFactory.createEntityClass(EntityClassFactory.getEntityClassName(superClassName));
                 if (superClass != null) {
-                    propertyBlackList = superClass.getProperties().stream().map(property -> property.getPropertyName()).collect(Collectors.toSet());
+                    propertyBlackList = superClass.getProperties().stream().map(Property::getPropertyName).collect(Collectors.toSet());
                 }
             }
 
             // set the properties
             for (Property property : entityClass.getProperties()) {
+                // for the auto-increment fields, we need to create a sequence
+                if (property.isAutoIncrement()) {
+                    String sequenceName = createSequenceId(entityClass, property);
+                    System.out.println("creating sequence: " + sequenceName);
+                    db.getMetadata().getSequenceLibrary().createSequence(sequenceName, OSequence.SEQUENCE_TYPE.ORDERED, null);
+                }
+
+                // we might need to skip adding certain properties
                 // check if this property needs to be skipped
                 if (propertyBlackList.contains(property.getPropertyName())) {
                     continue;
@@ -328,6 +340,20 @@ public class EntityManager {
         for (String propertyName : entity.getPropertyNames()) {
             setProperty(oVertex, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
+
+        // check if one of the properties is an auto-increment field.
+        // in that case we need to ask a sequence to provide a value
+        for (Property property : entity.getEntityClass().getProperties()) {
+            if (property.isAutoIncrement()) {
+                // make sure the property does not have a value yet
+                if (oVertex.getProperty(property.getPropertyName()) == null) {
+                    // fetch the sequence
+                    OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
+                    setProperty(oVertex, property.getPropertyName(), sequence.next(), db);
+                }
+            }
+        }
+
         oVertex.save();
     }
 
@@ -376,6 +402,20 @@ public class EntityManager {
             for (String propertyName : entity.getSourceEntity().getPropertyNames()) {
                 setProperty(sourceVertex, propertyName, entity.getSourceEntity().getPropertyValue(propertyName).getValue(), db);
             }
+
+            // check if one of the properties is an auto-increment field.
+            // in that case we need to ask a sequence to provide a value
+            for (Property property : entity.getSourceEntity().getEntityClass().getProperties()) {
+                if (property.isAutoIncrement()) {
+                    // make sure the property does not have a value yet
+                    if (sourceVertex.getProperty(property.getPropertyName()) == null) {
+                        // fetch the sequence
+                        OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getSourceEntity().getEntityClass(), property));
+                        setProperty(sourceVertex, property.getPropertyName(), sequence.next(), db);
+                    }
+                }
+            }
+
             sourceVertex.save();
         }
 
@@ -394,6 +434,20 @@ public class EntityManager {
             for (String propertyName : entity.getTargetEntity().getPropertyNames()) {
                 setProperty(targetVertex, propertyName, entity.getTargetEntity().getPropertyValue(propertyName).getValue(), db);
             }
+
+            // check if one of the properties is an auto-increment field.
+            // in that case we need to ask a sequence to provide a value
+            for (Property property : entity.getTargetEntity().getEntityClass().getProperties()) {
+                if (property.isAutoIncrement()) {
+                    // make sure the property does not have a value yet
+                    if (targetVertex.getProperty(property.getPropertyName()) == null) {
+                        // fetch the sequence
+                        OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getTargetEntity().getEntityClass(), property));
+                        setProperty(targetVertex, property.getPropertyName(), sequence.next(), db);
+                    }
+                }
+            }
+
             targetVertex.save();
         }
 
@@ -402,6 +456,20 @@ public class EntityManager {
         for (String propertyName : entity.getPropertyNames()) {
             setProperty(edge, propertyName, entity.getPropertyValue(propertyName).getValue(), db);
         }
+
+        // check if one of the properties is an auto-increment field.
+        // in that case we need to ask a sequence to provide a value
+        for (Property property : entity.getEntityClass().getProperties()) {
+            if (property.isAutoIncrement()) {
+                // make sure the property does not have a value yet
+                if (edge.getProperty(property.getPropertyName()) == null) {
+                    // fetch the sequence
+                    OSequence sequence = db.getMetadata().getSequenceLibrary().getSequence(createSequenceId(entity.getEntityClass(), property));
+                    setProperty(edge, property.getPropertyName(), sequence.next(), db);
+                }
+            }
+        }
+
         edge.save();
     }
 
@@ -725,5 +793,10 @@ public class EntityManager {
         // get the rest of the edge
         EdgeEntity edgeEntity = processEdgeEntity(sourceVertexEntity, oEdge, true);
         return edgeEntity;
+    }
+
+    // returns a sequence id for an entity property
+    private String createSequenceId(EntityClass entityClass, Property property) {
+        return entityClass.getClassName() + "-" + property.getPropertyName() + "-seq";
     }
 }

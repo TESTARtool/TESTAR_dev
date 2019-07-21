@@ -44,13 +44,13 @@ final class UIARootElement extends UIAElement {
 	private static final long serialVersionUID = -2561441199642411403L;
 	long pid, timeStamp;
 	boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;	
-	transient Map<Long, UIAElement> windowHandlerMap;
+	transient Map<Long, UIAElement> windowHandleMap;
 	ElementMap elementMap;
 
 	public UIARootElement(){
 		super(null);
 		root = this;
-		windowHandlerMap = Util.newHashMap();
+		windowHandleMap = Util.newHashMap();
 		elementMap = ElementMap.newBuilder().build();
 		isForeground = false; // by urueda
 	}
