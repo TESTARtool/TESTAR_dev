@@ -94,15 +94,15 @@ public class NativeLinker {
 	
 	private static long lastCPUquery = 0;
 
-    private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform(); // by urueda
-	
+    private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
+	private static String osName;
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.
 	 * @author: wcoux
 	 */
 	private static EnumSet<OperatingSystems> determinePlatform() {
-		String osName = System.getProperty("os.name");
+		osName = System.getProperty("os.name");
 		switch (osName) {
 			case "Windows 10":
 				return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
@@ -137,6 +137,7 @@ public class NativeLinker {
 			}
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
 			return new AtSpiStateBuilder(timeToFreeze);
+		System.out.println("TESTAR detected OS: " + osName + " and this is not yet supported. If the detected OS is wrong, please contact the TESTAR team at info@testar.org. Exiting with Exception.");
 		throw new UnsupportedPlatformException();
 	}
 

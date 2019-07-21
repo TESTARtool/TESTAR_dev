@@ -79,6 +79,12 @@ public class ScreenshotSerialiser extends Thread {
 		alive = false;
 	}
 	
+	public static boolean isSavingQueueEmpty() {
+		if(scrshotSavingQueue.isEmpty())
+			return true;
+		return false;
+	}
+	
 	@Override
 	public void run(){		
 		while (alive || !scrshotSavingQueue.isEmpty()){

@@ -36,7 +36,7 @@ package org.fruit.monkey;
 
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
-import nl.ou.testar.tl.TemporalPanel;
+import nl.ou.testar.temporal.ui.Temporalpanel2;
 import org.fruit.Util;
 import org.fruit.monkey.dialog.*;
 
@@ -70,7 +70,7 @@ import static org.fruit.monkey.dialog.ToolTipTexts.*;
 public class SettingsDialog extends JFrame implements Observer {
   private static final long serialVersionUID = 5156320008281200950L;
 
-  static final String TESTAR_VERSION = "2.0.2 (30-Apr-19)";
+  static final String TESTAR_VERSION = "2.1.2 (23-May-2019)";
 
   private String settingsFile;
   private Settings settings;
@@ -89,7 +89,7 @@ public class SettingsDialog extends JFrame implements Observer {
   private TimingPanel timingPanel;
   private MiscPanel miscPanel;
   private StateModelPanel stateModelPanel;
-  private TemporalPanel temporalPanel;
+  private Temporalpanel2 temporalPanel;
 
   /**
    * Starts the settings Dialog.
@@ -249,6 +249,7 @@ public class SettingsDialog extends JFrame implements Observer {
     timingPanel.extractInformation(settings);
     miscPanel.extractInformation(settings);
     stateModelPanel.extractInformation(settings);
+    temporalPanel.extractInformation(settings);
   }
 
   private void initComponents() throws IOException {
@@ -274,8 +275,8 @@ public class SettingsDialog extends JFrame implements Observer {
     jTabsPane.addTab("Misc", miscPanel);
     stateModelPanel = StateModelPanel.createStateModelPanel();
     jTabsPane.addTab("State Model", stateModelPanel);
-    temporalPanel = TemporalPanel.createTemporalPanel();
-    jTabsPane.addTab("Temporal Analysis", temporalPanel);
+    temporalPanel = Temporalpanel2.createTemporalPanel();
+    jTabsPane.addTab("Temporal Oracles", temporalPanel.$$$getRootComponent$$$());
 
     setLayout(jTabsPane);
     pack();
