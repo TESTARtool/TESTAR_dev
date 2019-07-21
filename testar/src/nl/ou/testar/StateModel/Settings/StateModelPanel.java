@@ -219,7 +219,7 @@ public class StateModelPanel extends JPanel {
         });
         add(analysisButton);
 
-        stateTagsButton.setBounds(330, 242, 150, 27);
+        stateTagsButton.setBounds(330, 166, 150, 27);
         stateTagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -228,7 +228,7 @@ public class StateModelPanel extends JPanel {
         });
         add(stateTagsButton);
 
-        label14.setBounds(330, 280, 300, 27);
+        label14.setBounds(330, 204, 300, 27);
         add(label14);
 
     }
