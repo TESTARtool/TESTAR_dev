@@ -3,8 +3,8 @@ package nl.ou.testar.temporal.structure;
 import java.util.Set;
 
 public class TransitionEncoding {
-    private String edge;
-    private Set<String > edgeAPs;
+    private String transition;
+    private Set<String > transitionAPs;
     private String targetState;
     private String encodedAPConjunct;
 
@@ -22,25 +22,25 @@ public class TransitionEncoding {
     public TransitionEncoding() {
     }
 
-    public TransitionEncoding(String edge, Set<String> edgeAPs) {
-        this.edge = edge;
-        this.edgeAPs = edgeAPs;
+    public TransitionEncoding(String transition, Set<String> transitionAPs) {
+        this.transition = transition;
+        this.transitionAPs = transitionAPs;
     }
 
-    public String getEdge() {
-        return edge;
+    public String getTransition() {
+        return transition;
     }
 
-    public void setEdge(String edge) {
-        this.edge = edge;
+    public void setTransition(String transition) {
+        this.transition = transition;
     }
 
-    public Set<String> getEdgeAPs() {
-        return edgeAPs;
+    public Set<String> getTransitionAPs() {
+        return transitionAPs;
     }
 
-    public void setEdgeAPs(Set<String> edgeAPs) {
-        this.edgeAPs = edgeAPs;
+    public void setTransitionAPs(Set<String> transitionAPs) {
+        this.transitionAPs = transitionAPs;
     }
 
     public String getEncodedAPConjunct() {
@@ -53,11 +53,11 @@ public class TransitionEncoding {
     }
     public void setEncodedTransitionConjunct(Set<String> modelAPs, Set<String> stateAPs){
         StringBuilder encodedresult= new StringBuilder();
-
+        encodedresult.append("[");
         int i=0;
         for (String modelap: modelAPs                 ) {
-            boolean b = edgeAPs.stream().anyMatch(str -> str.trim().equals(modelap));
-            encodedresult.append("[");
+            boolean b = transitionAPs.stream().anyMatch(str -> str.trim().equals(modelap));
+            //encodedresult.append("[");
             if (b){
                 encodedresult.append(""+i); }
             else{
@@ -65,10 +65,11 @@ public class TransitionEncoding {
                 if(be){encodedresult.append(""+i);}
                 else{encodedresult.append("!"+i);}
             }
-            encodedresult.append("]");
+            //encodedresult.append("]");
             i++;
             if(i<modelAPs.size()) encodedresult.append("&");
         }
+        encodedresult.append("]");
         encodedAPConjunct=encodedresult.toString();
 
     }

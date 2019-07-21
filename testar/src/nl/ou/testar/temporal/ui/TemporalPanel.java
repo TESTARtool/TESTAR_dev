@@ -352,8 +352,10 @@ private void setupMiner(){
             //logCheckResult.append("model count: " + models.size()+"\n");
             //AbstractStateModel model = models.get(0);
             //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
-            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
-            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
+
+             tcontrol.computeTemporalModel(APmgr);
+             TemporalModel tmodel =tcontrol.gettModel();
+                JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             logCheckResult.append(" saving to file done\n");
 
             logCheckResult.append("\n");

@@ -558,7 +558,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             textArea12.repaint();
             config.setDatabaseDirectory(tmp);
             TemporalController tcontrol = new TemporalController(config, outputDir);
-            TemporalModel tmodel = tcontrol.getTemporalModel(APmgr);
+
+            TemporalModel tmodel;
+            tcontrol.computeTemporalModel(APmgr);
+             tmodel = tcontrol.gettModel();
             JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             textArea12.append(" saving to file done\n");
             tcontrol.shutdown();
@@ -669,10 +672,12 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
 
         APSelectorManager APmgr1;
-        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManager.json", APSelectorManager.class);
+        APmgr1 = (APSelectorManager) JSONHandler.load(outputDir + "APSelectorManagerTEST.json", APSelectorManager.class);
 
         if (APmgr1 == null) {
             textArea12.append("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir + "\n");
+            System.out.println("place a file called 'APSelectorManagerTEST.json' in the directory: " + outputDir + "\n");
+
         } else {
             textArea12.append("json loaded: \n");
             Set<WidgetFilter> wfset = APmgr1.getWidgetfilters();

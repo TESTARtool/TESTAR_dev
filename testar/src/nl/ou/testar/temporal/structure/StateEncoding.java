@@ -52,17 +52,17 @@ public class StateEncoding {
         for (TransitionEncoding trans : transitionColl) {
             String strippedDecodedTrans = decodedAPConjunct.replace(prefix, "");
             if (strippedDecodedTrans.equals(trans.getEncodedAPConjunct())) {
-                result = trans.getEdge();
+                result = trans.getTransition();
                 break;
             }
         }
         return result;
     }
 
-    public Set<String> retrieveAllEgdeAPs(){
+    public Set<String> retrieveAllTransitionAPs(){
         Set<String> edgeAPS = new LinkedHashSet<>();
         for (TransitionEncoding trans : transitionColl) {
-            edgeAPS.addAll(trans.getEdgeAPs());
+            edgeAPS.addAll(trans.getTransitionAPs());
         }
             return edgeAPS;
     }

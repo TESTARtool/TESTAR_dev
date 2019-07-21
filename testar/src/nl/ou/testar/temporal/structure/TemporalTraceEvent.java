@@ -6,9 +6,6 @@ import java.util.List;
 public class TemporalTraceEvent implements Cloneable{
 
 
-
-
-
     private String state; //
     private String transition;  //
     private List<String> properties;

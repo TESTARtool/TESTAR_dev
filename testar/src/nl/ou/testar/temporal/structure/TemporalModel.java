@@ -10,12 +10,22 @@ import java.util.*;
 public class TemporalModel extends TemporalBean{
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
+
+
+
+    private  List<String> InitialStates;
     private List<TemporalTrace> traces; //
+
     @JsonIgnore
     private Set<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion="20190713";
+    private String formatVersion="20190721";
 
 
+public  TemporalModel(){
+    super(); // needed ?
+    this.stateEncodings = new ArrayList<>();
+    this.modelAPs = new LinkedHashSet<>();  //must maintain order
+}
 
     public TemporalModel(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
         super(applicationName, applicationVersion, modelIdentifier, abstractionAttributes);
@@ -23,7 +33,13 @@ public class TemporalModel extends TemporalBean{
         this.modelAPs = new LinkedHashSet<>();  //must maintain order
     }
 
+    public List<String> getInitialStates() {
+        return InitialStates;
+    }
 
+    public void setInitialStates(List<String> initialStates) {
+        InitialStates = initialStates;
+    }
 
     public Set<String> getModelAPs() {
         return modelAPs;
@@ -50,7 +66,7 @@ public class TemporalModel extends TemporalBean{
         this.stateEncodings = stateEncodings;
         for (StateEncoding stateEnc: stateEncodings) {
             this.modelAPs.addAll(stateEnc.getStateAPs());
-            this.modelAPs.addAll(stateEnc.retrieveAllEgdeAPs());
+            this.modelAPs.addAll(stateEnc.retrieveAllTransitionAPs());
         }
         updateTransitions();
     }
@@ -66,7 +82,7 @@ public class TemporalModel extends TemporalBean{
 
         stateEncodings.add(stateEncoding);
         this.modelAPs.addAll(stateEncoding.getStateAPs());
-        this.modelAPs.addAll(stateEncoding.retrieveAllEgdeAPs());
+        this.modelAPs.addAll(stateEncoding.retrieveAllTransitionAPs());
 
 
         if (updateTransitionsImmediate) {updateTransitions();        }
