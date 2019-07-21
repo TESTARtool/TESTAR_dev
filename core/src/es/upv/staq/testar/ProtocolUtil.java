@@ -229,7 +229,7 @@ public class ProtocolUtil {
 	// #####################
 	
 	public String getStateshot(State state){
-		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID), getStateshotBinary(state));
+		return ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), getStateshotBinary(state));
 	}
 
 	/**
@@ -272,7 +272,7 @@ public class ProtocolUtil {
 				return null;
 			AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(actionArea.x, actionArea.y, actionArea.width, actionArea.height),
 														 AWTCanvas.StorageFormat.PNG, 1);
-			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID), action.get(Tags.ConcreteID), scrshot);
+			return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
 		}
 		return null;
 	}	
