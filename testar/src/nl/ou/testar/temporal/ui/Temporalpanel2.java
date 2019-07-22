@@ -120,12 +120,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 testSaveDefaultApSelectionManagerJSON();
             }
         });
-        testDBConnectionButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
+        testDBConnectionButton.addActionListener(this::testdbconnection);
         loadSelectorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
