@@ -1,7 +1,7 @@
 /***************************************************************************************************
  *
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2018 Open Universiteit - www.ou.nl
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -60,7 +60,6 @@ public class Main {
 	public static final String SETTINGS_FILE = "test.settings";
 	public static final String SUT_SETTINGS_EXT = ".sse";
 	public static String SSE_ACTIVATED = null;
-	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	//Default paths
 	public static String testarDir = "." + File.separator;
@@ -113,8 +112,6 @@ public class Main {
 		// We only want to execute TESTAR one time with the selected settings.
 		if(!settings.get(ConfigTags.ShowVisualSettingsDialogOnStartup)){
 
-			settingsLogs(settings);
-
 			setTestarDirectory(settings);
 
 			initCodingManager(settings);
@@ -130,8 +127,6 @@ public class Main {
 				settings = loadTestarSettings(args, testSettingsFileName);
 
 				setTestarDirectory(settings);
-
-				settingsLogs(settings);
 
 				initCodingManager(settings);
 
@@ -314,41 +309,6 @@ public class Main {
 			e.printStackTrace();
 		}
 		return true;
-	}
-
-	/**
-	 * If logs file doesn't exist create it
-	 * Create a log into the output/logs directory to save the information of selected settings
-	 * 
-	 * @param settings
-	 */
-	private static void settingsLogs(Settings settings) {
-		//Check if logs dir exist, if not create it
-		File logsDir = new File(outputDir + File.separator +"logs");
-		if(!logsDir.exists())
-			logsDir.mkdirs();
-		//Check if logs/debug dir exist, if not create it
-		File logsDebugDir = new File(logsDir+ File.separator + "debug");
-		if(!logsDebugDir.exists())
-			logsDebugDir.mkdirs();
-
-		// Starting the logs
-		try {
-			String logFileName = Util.dateString("yyyy_MM_dd__HH_mm_ss") + ".log";
-			File logFile = new File(logsDebugDir+ File.separator + logFileName);
-			if (logFile.exists()) {
-				logFile = Util.generateUniqueFile(outputDir, logFileName);
-			}
-			LogSerialiser.start(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFile))), settings.get(LogLevel));
-		} catch (Throwable t) {
-			System.out.println("Cannot initialize log file!");
-			t.printStackTrace(System.out);
-			exit(-1);
-		}
-		LogSerialiser.log(Util.dateString(DATE_FORMAT) + " TESTAR " + SettingsDialog.TESTAR_VERSION + " is running with the next settings:\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log("\n-- settings start ... --\n\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log(settings.toString() + "\n", LogSerialiser.LogLevel.Critical);
-		LogSerialiser.log("-- ... settings end --\n\n", LogSerialiser.LogLevel.Critical);
 	}
 
 	/**

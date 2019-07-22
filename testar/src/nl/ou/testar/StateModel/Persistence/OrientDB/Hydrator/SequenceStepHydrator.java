@@ -45,6 +45,6 @@ public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
         edgeEntity.addPropertyValue("timestamp", new PropertyValue(OType.DATETIME, date));
 
         // add the concrete action id
-        edgeEntity.addPropertyValue("concreteActionId", new PropertyValue(OType.STRING, ((SequenceStep) source).getConcreteAction()));
+        edgeEntity.addPropertyValue("concreteActionId", new PropertyValue(OType.STRING, ((SequenceStep) source).getConcreteAction().getActionId()));
     }
 }
