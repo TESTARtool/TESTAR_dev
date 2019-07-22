@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
 * Copyright (c) 2017, 2018, 2019 Open Universiteit - www.ou.nl
+* Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -80,6 +81,7 @@ public class StateModelPanel extends JPanel {
     private JButton analysisButton = new JButton("Analysis");
     private JDialog analysisDialog;
     private JButton exportDBbutton = new JButton("Export DB");
+    private JButton importDBbutton = new JButton("Import DB");
 
     private String outputDir;
 
@@ -219,6 +221,17 @@ public class StateModelPanel extends JPanel {
             }
         });
         add(exportDBbutton);
+        
+        importDBbutton.setBounds(330, 204, 150, 27);
+        importDBbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	ImportDatabaseDialog importDBdialog = new ImportDatabaseDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            	importDBdialog.setVisible(true);
+            }
+        });
+        add(importDBbutton);
 
         label14.setBounds(330, 242, 300, 27);
         add(label14);

@@ -33,49 +33,53 @@ package nl.ou.testar.StateModel.Settings;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.ODatabaseType;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
+import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 
-public class ExportDatabaseDialog extends JDialog {
+public class ImportDatabaseDialog extends JDialog {
 
-	private static final long serialVersionUID = -8694666902430381117L;
+	private static final long serialVersionUID = -6458970322120335243L;
 	private JLabel labelStoreType = new JLabel("DataStoreType");
 	private JLabel labelStoreServer = new JLabel("DataStoreServer");
 	private JLabel labelRoot = new JLabel("RootUser");
 	private JLabel labelPassword = new JLabel("RootPassword");
-	private JLabel labelStoreDB = new JLabel("Existing DB");
-
+	private JLabel labelImportDB = new JLabel("DB to import");
+	private JLabel labelNameDB = new JLabel("New DB name");
+	
 	private JTextField textFieldStoreType = new JTextField();
 	private JTextField textFieldStoreServer = new JTextField();
 	private JTextField textFieldRoot = new JTextField();
 	private JTextField textFieldPassword = new JTextField();
-
-	private JButton buttonConnect = new JButton("Connect");
-	private JButton buttonExport = new JButton("Export selected DB");
-
-	private JComboBox<String> listDatabases = new JComboBox<>();
-
+	private JTextField textFieldImportDB = new JTextField();
+	private JTextField textFieldNameDB = new JTextField();
+	
+	private JButton buttonSelectDB = new JButton("Select DB");
+	private JButton buttonImport = new JButton("Import Selected DB");
+	
 	private Set<JComponent> components;
 
-	public ExportDatabaseDialog(String storeType, String storeServer) {
+	public ImportDatabaseDialog(String storeType, String storeServer) {
 		initialize(storeType, storeServer);
 	}
-
+	
 	private void initialize(String storeType, String storeServer) {
 
 		components = new HashSet<>();
@@ -111,69 +115,75 @@ public class ExportDatabaseDialog extends JDialog {
 		add(labelPassword);
 		textFieldPassword.setBounds(160,128,125,27);
 		add(textFieldPassword);
-
-		buttonConnect.setBounds(330, 166, 150, 27);
-		buttonConnect.addActionListener(new ActionListener() {
+		
+		labelImportDB.setBounds(10,166,150,27);
+		add(labelImportDB);
+		textFieldImportDB.setBounds(160,166,325,27);
+		add(textFieldImportDB);
+		
+		buttonSelectDB.setBounds(330,204,150,27);
+		buttonSelectDB.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				obtainAvailableDatabases();
+				chooseFileToImport();
 			}
 		});
-		add(buttonConnect);
-
-		labelStoreDB.setBounds(10,204,150,27);
-		add(labelStoreDB);
-		listDatabases.setBounds(160,204,150,27);
-		add(listDatabases);
-
-		buttonExport.setBounds(330, 242, 150, 27);
-		buttonExport.addActionListener(new ActionListener() {
+		add(buttonSelectDB);
+		
+		labelNameDB.setBounds(10,242,150,27);
+		add(labelNameDB);
+		textFieldNameDB.setBounds(160,242,150,27);
+		add(textFieldNameDB);
+		
+		buttonImport.setBounds(330,280,150,27);
+		buttonImport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				exportDatabase();
+				importDatabase();
 			}
 		});
-		add(buttonExport);
+		add(buttonImport);
+
 	}
-
-	private void obtainAvailableDatabases() {
-		Config config = new Config();
-		config.setConnectionType(textFieldStoreType.getText());
-		config.setServer(textFieldStoreServer.getText());
-		config.setUser(textFieldRoot.getText());
-		config.setPassword(textFieldPassword.getText());
-
-		try {
-			
-			listDatabases.removeAllItems();
-
-			OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
-					config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
-
-			if(!orientDB.list().isEmpty())
-				for(String database : orientDB.list())
-					listDatabases.addItem(database);
-
-			
-			orientDB.close();
-			
-		}catch(Exception e) {
-			System.out.println(e.getMessage());
+	
+	private void chooseFileToImport() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = fileChooser.getSelectedFile();
+		    textFieldImportDB.setText(selectedFile.getAbsolutePath());
+		    obtainDefaultDBname(selectedFile.getAbsolutePath());
 		}
-
 	}
-
-	private void exportDatabase() {
+	
+	private void obtainDefaultDBname(String dbPath) {
+		if(dbPath.contains(".export.gz")) {
+			try {
+				int startIndex = dbPath.lastIndexOf('\\');
+				int endIndex = dbPath.lastIndexOf(".export.gz");
+				String substring = dbPath.substring(startIndex+1, endIndex);
+				textFieldNameDB.setText(substring);
+			}catch(Exception e) {}
+		}			
+	}
+	
+	private void importDatabase() {
 		Config config = new Config();
 		config.setConnectionType(textFieldStoreType.getText());
 		config.setServer(textFieldStoreServer.getText());
 		config.setUser(textFieldRoot.getText());
 		config.setPassword(textFieldPassword.getText());
-		config.setDatabase(listDatabases.getSelectedItem().toString());
-
+		
+		// First we need to create the database
+		// create database remote:localhost/notepad root testar
+		
 		OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
 				config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
-
+		
+		orientDB.create(textFieldNameDB.getText(), ODatabaseType.PLOCAL);
+		config.setDatabase(textFieldNameDB.getText());
+		
 		try {
 
 			ODatabaseDocumentTx dbDocument = new ODatabaseDocumentTx(config.getConnectionType() +
@@ -187,10 +197,9 @@ public class ExportDatabaseDialog extends JDialog {
 				}
 			};
 
-			ODatabaseExport exportDB = new ODatabaseExport(dbDocument, config.getDatabase(), listener);
-			exportDB.exportDatabase();
-			
-			exportDB.close();
+			ODatabaseImport importDB = new ODatabaseImport(dbDocument, textFieldImportDB.getText(), listener);
+			importDB.importDatabase();
+			importDB.close();
 			dbDocument.close();
 			
 		}catch(Exception e) {
@@ -198,8 +207,7 @@ public class ExportDatabaseDialog extends JDialog {
 		} finally {
 			orientDB.close();
 		}
-
-
+		
 	}
-
+	
 }
