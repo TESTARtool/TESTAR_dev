@@ -62,7 +62,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     @Override
     protected void preSequencePreparations() {
         //initializing the HTML sequence report:
-        htmlReport = new HtmlSequenceReport();
+        htmlReport = new HtmlSequenceReport(mode(), settings.get(ConfigTags.PathToReplaySequence));
     }
 
     /**
@@ -159,6 +159,16 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         // adding the action that is going to be executed into HTML report:
         htmlReport.addSelectedAction(state, action);
         return super.executeAction(system, state, action);
+    }
+    
+    /**
+     * Replay the saved action
+     */
+    @Override
+    protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+        // adding the action that is going to be executed into HTML report:
+        htmlReport.addSelectedAction(state, action);
+        return super.replayAction(system, state, action, actionWaitTime, actionDuration);
     }
 
     /**

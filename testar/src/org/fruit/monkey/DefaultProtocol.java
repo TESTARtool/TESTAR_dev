@@ -1173,9 +1173,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			bis = new BufferedInputStream(fis);
 			gis = new GZIPInputStream(bis);
 			ois = new ObjectInputStream(gis);
-
-			Canvas canvas = buildCanvas();
-			State state = getState(system);
 			
 			/**
     		 * Initialize the fragment to create a new sequence and logs
@@ -1185,8 +1182,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		generatedSequence = getAndStoreGeneratedSequence();
     		currentSeq = getAndStoreSequenceFile();
     		
+    		Canvas canvas = buildCanvas();
+			State state = getState(system);
+    		
     		//initializing new fragment for recording replayable test sequence:
-    		initFragmentForReplayableSequence(getState(system));
+    		initFragmentForReplayableSequence(state);
 
 			double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
@@ -1266,7 +1266,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 					try{
 						if(tries < 2){
-							String replayMessage = String.format("Trying to execute (%d): %s... [time window = " + rrt + "]",
+							String replayMessage = String.format("Trying to replay (%d): %s... [time window = " + rrt + "]",
 									actionCount, action.get(Desc, action.toString()));
 							LogSerialiser.log(replayMessage, LogSerialiser.LogLevel.Info);
 						}else{
@@ -1276,7 +1276,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 								LogSerialiser.log(".", LogSerialiser.LogLevel.Info);
 						}
 
-						action.run(system, state, actionDuration);
+						preSelectAction(state, actions);
+						
+						replayAction(system, state, action, actionDelay, actionDuration);
+						
 						success = true;
 						actionCount++;
 						LogSerialiser.log("Success!\n", LogSerialiser.LogLevel.Info);
@@ -1288,9 +1291,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
     				//Saving the actions and the executed action into replayable test sequence:
     				saveActionIntoFragmentForReplayableSequence(action, state, actions);
-
-    				//Save the executed action information into the logs
-    				saveActionInfoInLogs(state, action, "ReplayedAction");
     				
     				replayVerdict = getVerdict(state);
 				}
@@ -1786,6 +1786,32 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Save the executed action information into the logs
 			saveActionInfoInLogs(state, action, "ExecutedAction");
+
+			return true;
+		}catch(ActionFailedException afe){
+			return false;
+		}
+	}
+	
+	protected boolean replayAction(SUT system, State state, Action action, double actionWaitTime, double actionDuration){
+		try{
+			double halfWait = actionWaitTime == 0 ? 0.01 : actionWaitTime / 2.0; // seconds
+			Util.pause(halfWait); // help for a better match of the state' actions visualization
+			action.run(system, state, actionDuration);
+			int waitCycles = (int) (MAX_ACTION_WAIT_FRAME / halfWait);
+			long actionCPU;
+			do {
+				long CPU1[] = NativeLinker.getCPUsage(system);
+				Util.pause(halfWait);
+				long CPU2[] = NativeLinker.getCPUsage(system);
+				actionCPU = ( CPU2[0] + CPU2[1] - CPU1[0] - CPU1[1] );
+				waitCycles--;
+			} while (actionCPU > 0 && waitCycles > 0);
+
+			protocolUtil.getActionshot(state, action);
+
+			//Save the replayed action information into the logs
+			saveActionInfoInLogs(state, action, "ReplayedAction");
 
 			return true;
 		}catch(ActionFailedException afe){
