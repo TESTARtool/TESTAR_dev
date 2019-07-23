@@ -449,6 +449,7 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ApplicationTimestamp, ""));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
