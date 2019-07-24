@@ -41,7 +41,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
@@ -67,7 +70,7 @@ public class ImportDatabaseDialog extends JDialog {
 	private JTextField textFieldStoreType = new JTextField();
 	private JTextField textFieldStoreServer = new JTextField();
 	private JTextField textFieldRoot = new JTextField();
-	private JTextField textFieldPassword = new JTextField();
+	private JPasswordField textFieldPassword = new JPasswordField();
 	private JTextField textFieldImportDB = new JTextField();
 	private JTextField textFieldNameDB = new JTextField();
 	
@@ -139,7 +142,8 @@ public class ImportDatabaseDialog extends JDialog {
 		buttonImport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				importDatabase();
+				if(!checkIfDatabaseExists())
+					importDatabase();
 			}
 		});
 		add(buttonImport);
@@ -168,12 +172,43 @@ public class ImportDatabaseDialog extends JDialog {
 		}			
 	}
 	
+	private boolean checkIfDatabaseExists() {
+		
+		Config config = new Config();
+		config.setConnectionType(textFieldStoreType.getText());
+		config.setServer(textFieldStoreServer.getText());
+		config.setUser(textFieldRoot.getText());
+		config.setPassword(getPassword());
+
+		try {
+
+			OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
+					config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
+
+			if(orientDB.list().contains(textFieldNameDB.getText())) {
+				orientDB.close();
+				JFrame frame = new JFrame();
+				JOptionPane.showMessageDialog(frame, 
+						"This database already exist, please select other name to create and import");
+				return true;
+			}	
+
+			orientDB.close();
+
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return false;
+
+	}
+	
 	private void importDatabase() {
 		Config config = new Config();
 		config.setConnectionType(textFieldStoreType.getText());
 		config.setServer(textFieldStoreServer.getText());
 		config.setUser(textFieldRoot.getText());
-		config.setPassword(textFieldPassword.getText());
+		config.setPassword(getPassword());
 		
 		// First we need to create the database
 		// create database remote:localhost/notepad root testar
@@ -206,5 +241,17 @@ public class ImportDatabaseDialog extends JDialog {
 		}
 		
 	}
+	
+	/**
+     * Convert password field to string.
+     * @return password as String.
+     */
+    private String getPassword() {
+        StringBuilder result= new StringBuilder();
+        for(char c : textFieldPassword.getPassword()) {
+            result.append(c);
+        }
+        return  result.toString();
+    }
 	
 }

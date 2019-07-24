@@ -41,6 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
@@ -64,7 +65,7 @@ public class ExportDatabaseDialog extends JDialog {
 	private JTextField textFieldStoreType = new JTextField();
 	private JTextField textFieldStoreServer = new JTextField();
 	private JTextField textFieldRoot = new JTextField();
-	private JTextField textFieldPassword = new JTextField();
+	private JPasswordField textFieldPassword = new JPasswordField();
 
 	private JButton buttonConnect = new JButton("Connect");
 	private JButton buttonExport = new JButton("Export selected DB");
@@ -142,7 +143,7 @@ public class ExportDatabaseDialog extends JDialog {
 		config.setConnectionType(textFieldStoreType.getText());
 		config.setServer(textFieldStoreServer.getText());
 		config.setUser(textFieldRoot.getText());
-		config.setPassword(textFieldPassword.getText());
+		config.setPassword(getPassword());
 
 		try {
 			
@@ -168,7 +169,7 @@ public class ExportDatabaseDialog extends JDialog {
 		config.setConnectionType(textFieldStoreType.getText());
 		config.setServer(textFieldStoreServer.getText());
 		config.setUser(textFieldRoot.getText());
-		config.setPassword(textFieldPassword.getText());
+		config.setPassword(getPassword());
 		config.setDatabase(listDatabases.getSelectedItem().toString());
 
 		OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
@@ -196,5 +197,17 @@ public class ExportDatabaseDialog extends JDialog {
 		}
 
 	}
+	
+	/**
+     * Convert password field to string.
+     * @return password as String.
+     */
+    private String getPassword() {
+        StringBuilder result= new StringBuilder();
+        for(char c : textFieldPassword.getPassword()) {
+            result.append(c);
+        }
+        return  result.toString();
+    }
 
 }
