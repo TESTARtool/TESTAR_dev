@@ -45,11 +45,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
+import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.ODatabaseType;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
 import com.orientechnologies.orient.core.db.tool.ODatabaseImport;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
@@ -184,11 +184,9 @@ public class ImportDatabaseDialog extends JDialog {
 		orientDB.create(textFieldNameDB.getText(), ODatabaseType.PLOCAL);
 		config.setDatabase(textFieldNameDB.getText());
 		
-		try {
-
-			ODatabaseDocumentTx dbDocument = new ODatabaseDocumentTx(config.getConnectionType() +
-					":" + config.getServer() + "/database/" + config.getDatabase());
-			dbDocument.open(config.getUser(), config.getPassword());
+		String dbConnection = config.getConnectionType() + ":" + config.getServer() + "/database/" + config.getDatabase();
+		
+		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, config.getUser(), config.getPassword())){
 
 			OCommandOutputListener listener = new OCommandOutputListener() {
 				@Override
@@ -197,10 +195,9 @@ public class ImportDatabaseDialog extends JDialog {
 				}
 			};
 
-			ODatabaseImport importDB = new ODatabaseImport(dbDocument, textFieldImportDB.getText(), listener);
+			ODatabaseImport importDB = new ODatabaseImport((ODatabaseDocumentInternal)sessionDB, textFieldImportDB.getText(), listener);
 			importDB.importDatabase();
 			importDB.close();
-			dbDocument.close();
 			
 		}catch(Exception e) {
 			e.printStackTrace();

@@ -44,9 +44,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
+import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
+import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.tool.ODatabaseExport;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
@@ -153,7 +154,6 @@ public class ExportDatabaseDialog extends JDialog {
 			if(!orientDB.list().isEmpty())
 				for(String database : orientDB.list())
 					listDatabases.addItem(database);
-
 			
 			orientDB.close();
 			
@@ -174,11 +174,9 @@ public class ExportDatabaseDialog extends JDialog {
 		OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
 				config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
 
-		try {
-
-			ODatabaseDocumentTx dbDocument = new ODatabaseDocumentTx(config.getConnectionType() +
-					":" + config.getServer() + "/database/" + config.getDatabase());
-			dbDocument.open(config.getUser(), config.getPassword());
+		String dbConnection = config.getConnectionType() + ":" + config.getServer() + "/database/" + config.getDatabase();
+		
+		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, config.getUser(), config.getPassword())){
 
 			OCommandOutputListener listener = new OCommandOutputListener() {
 				@Override
@@ -187,18 +185,15 @@ public class ExportDatabaseDialog extends JDialog {
 				}
 			};
 
-			ODatabaseExport exportDB = new ODatabaseExport(dbDocument, config.getDatabase(), listener);
+			ODatabaseExport exportDB = new ODatabaseExport((ODatabaseDocumentInternal)sessionDB, config.getDatabase(), listener);
 			exportDB.exportDatabase();
-			
 			exportDB.close();
-			dbDocument.close();
 			
 		}catch(Exception e) {
 			e.printStackTrace();
 		} finally {
 			orientDB.close();
 		}
-
 
 	}
 
