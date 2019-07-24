@@ -76,6 +76,7 @@ public class ImportDatabaseDialog extends JDialog {
 	
 	private JButton buttonSelectDB = new JButton("Select DB");
 	private JButton buttonImport = new JButton("Import Selected DB");
+	private JButton buttonCancel = new JButton("Cancel Import");
 	
 	private Set<JComponent> components;
 
@@ -85,6 +86,8 @@ public class ImportDatabaseDialog extends JDialog {
 	
 	private void initialize(String storeType, String storeServer) {
 
+		setTitle("TESTAR Import OrientDB database");
+		
 		components = new HashSet<>();
 		components.add(textFieldStoreType);
 		components.add(textFieldStoreServer);
@@ -147,6 +150,15 @@ public class ImportDatabaseDialog extends JDialog {
 			}
 		});
 		add(buttonImport);
+		
+		buttonCancel.setBounds(330, 408, 150, 27);
+		buttonCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		add(buttonCancel);
 
 	}
 	

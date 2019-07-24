@@ -218,6 +218,7 @@ public class StateModelPanel extends JPanel {
             	ExportDatabaseDialog exportDBdialog = new ExportDatabaseDialog(
             			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
             	exportDBdialog.setVisible(true);
+            	exportDBdialog.setAlwaysOnTop(true);
             }
         });
         add(exportDBbutton);
@@ -229,6 +230,7 @@ public class StateModelPanel extends JPanel {
             	ImportDatabaseDialog importDBdialog = new ImportDatabaseDialog(
             			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
             	importDBdialog.setVisible(true);
+            	importDBdialog.setAlwaysOnTop(true);
             }
         });
         add(importDBbutton);

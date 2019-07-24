@@ -33,6 +33,8 @@ package nl.ou.testar.StateModel.Settings;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,9 +42,12 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import org.fruit.monkey.Main;
 
 import com.orientechnologies.orient.core.command.OCommandOutputListener;
 import com.orientechnologies.orient.core.db.ODatabaseDocumentInternal;
@@ -61,14 +66,18 @@ public class ExportDatabaseDialog extends JDialog {
 	private JLabel labelRoot = new JLabel("RootUser");
 	private JLabel labelPassword = new JLabel("RootPassword");
 	private JLabel labelStoreDB = new JLabel("Existing DB");
+	private JLabel labelPathExport = new JLabel("Path to Export");
 
 	private JTextField textFieldStoreType = new JTextField();
 	private JTextField textFieldStoreServer = new JTextField();
 	private JTextField textFieldRoot = new JTextField();
 	private JPasswordField textFieldPassword = new JPasswordField();
+	private JTextField textFieldPathExport = new JTextField();
 
 	private JButton buttonConnect = new JButton("Connect");
 	private JButton buttonExport = new JButton("Export selected DB");
+	private JButton buttonPathExport = new JButton("Choose Path");
+	private JButton buttonCancel = new JButton("Cancel Export");
 
 	private JComboBox<String> listDatabases = new JComboBox<>();
 
@@ -80,6 +89,8 @@ public class ExportDatabaseDialog extends JDialog {
 
 	private void initialize(String storeType, String storeServer) {
 
+		setTitle("TESTAR Export OrientDB database");
+		
 		components = new HashSet<>();
 		components.add(textFieldStoreType);
 		components.add(textFieldStoreServer);
@@ -123,12 +134,31 @@ public class ExportDatabaseDialog extends JDialog {
 		});
 		add(buttonConnect);
 
-		labelStoreDB.setBounds(10,204,150,27);
+		labelStoreDB.setBounds(10,166,150,27);
 		add(labelStoreDB);
-		listDatabases.setBounds(160,204,150,27);
+		listDatabases.setBounds(160,166,150,27);
 		add(listDatabases);
+		
+		labelPathExport.setBounds(10,204,150,27);
+		add(labelPathExport);
+		textFieldPathExport.setBounds(160,204,325,27);
+		try {
+			textFieldPathExport.setText(new File(Main.outputDir).getCanonicalPath());
+		} catch (IOException e1) {
+			textFieldPathExport.setText(Main.outputDir);
+		}
+		add(textFieldPathExport);
+		
+		buttonPathExport.setBounds(330,242,150,27);
+		buttonPathExport.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chooseDirectoryToExport();
+			}
+		});
+		add(buttonPathExport);
 
-		buttonExport.setBounds(330, 242, 150, 27);
+		buttonExport.setBounds(330, 318, 150, 27);
 		buttonExport.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -136,6 +166,26 @@ public class ExportDatabaseDialog extends JDialog {
 			}
 		});
 		add(buttonExport);
+		
+		buttonCancel.setBounds(330, 408, 150, 27);
+		buttonCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		add(buttonCancel);
+	}
+	
+	private void chooseDirectoryToExport() {
+		JFileChooser directoryChooser = new JFileChooser();
+		directoryChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int result = directoryChooser.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    File selectedFile = directoryChooser.getSelectedFile();
+		    textFieldPathExport.setText(selectedFile.getAbsolutePath());
+		}
 	}
 
 	private void obtainAvailableDatabases() {
@@ -186,7 +236,12 @@ public class ExportDatabaseDialog extends JDialog {
 				}
 			};
 
-			ODatabaseExport exportDB = new ODatabaseExport((ODatabaseDocumentInternal)sessionDB, config.getDatabase(), listener);
+			String fileNameDB = config.getDatabase();
+			
+			if(new File(textFieldPathExport.getText()).exists())
+				fileNameDB = textFieldPathExport.getText() + File.separator + config.getDatabase();
+			
+			ODatabaseExport exportDB = new ODatabaseExport((ODatabaseDocumentInternal)sessionDB, fileNameDB, listener);
 			exportDB.exportDatabase();
 			exportDB.close();
 			
