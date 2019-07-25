@@ -138,7 +138,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
-	
 	private Verdict replayVerdict = Verdict.OK;
 
 	public Verdict getReplayVerdict() {
@@ -941,6 +940,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			//Saving the actions and the executed action into replayable test sequence:
 			saveActionIntoFragmentForReplayableSequence(action, state, actions);
 
+			setReplayVerdict(getVerdict(state));
+
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
@@ -1284,8 +1285,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 		actionCount = 1;
 		faultySequence = false;
-		replayVerdict = Verdict.OK;
 
+    	setReplayVerdict(Verdict.OK);
+		
 		//Reset LogSerialiser
 		LogSerialiser.finish();
 		LogSerialiser.exit();
@@ -1307,6 +1309,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 			Canvas cv = buildCanvas();
 			State state = getState(system);
+
+			setReplayVerdict(getVerdict(state));
 
 			String replayMessage;
 
@@ -1333,46 +1337,46 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 					if(mode() == Modes.Quit) break;
 					Action action = fragment.get(ExecutedAction, new NOP());
 
-					/**
-					 * Check if we are replaying the sequence correctly,
-					 * comparing saved widgets with existing widgets in the current state
-					 */
+    				/**
+    				 * Check if we are replaying the sequence correctly,
+    				 * comparing saved widgets with existing widgets in the current state
+    				 */
+    				
+    				//Obtain the widget Title of the repayable fragment
+    				String widgetStringToFind = fragment.get(Tags.Title, "");
+    				//Could exist actions not associated with widgets
+    				boolean actionHasWidgetAssociated = false;
+    				//Check if we found the widget
+    				boolean widgetTitleFound = false;
 
-					//Obtain the widget Title of the repayable fragment
-					String widgetStringToFind = fragment.get(Tags.Title, "");
-					//Could exist actions not associated with widgets
-					boolean actionHasWidgetAssociated = false;
-					//Check if we found the widget
-					boolean widgetTitleFound = false;
+    				if (state != null){
+    					List<Finder> targets = action.get(Tags.Targets, null);
+    					if (targets != null){
+    						actionHasWidgetAssociated = true;
+    						Widget w;
+    						for (Finder f : targets){
+    							w = f.apply(state);
+    							if (w != null){			
+    								//Can be this the widget the one that we want to find?
+    								if(widgetStringToFind.equals(w.get(Tags.Title, "")))
+    									widgetTitleFound=true;
+    							}
+    						}
+    					}
+    				}
 
-					if (state != null){
-						List<Finder> targets = action.get(Tags.Targets, null);
-						if (targets != null){
-							actionHasWidgetAssociated = true;
-							Widget w;
-							for (Finder f : targets){
-								w = f.apply(state);
-								if (w != null){
-									//Can be this the widget the one that we want to find?
-									if(widgetStringToFind.equals(w.get(Tags.Title, "")))
-										widgetTitleFound=true;
-								}
-							}
-						}
-					}
+    				//If action has an associated widget and we don't find it, we are not in the correct state
+    				if(actionHasWidgetAssociated && !widgetTitleFound){
+    					success = false;
+    					String msg = "The Action " + action.get(Tags.Desc, action.toString())
+    					+ " of the replayed sequence can not been replayed into "
+    					+ " the State " + state.get(Tags.ConcreteID, state.toString());
 
-					//If action has an associated widget and we don't find it, we are not in the correct state
-					if(actionHasWidgetAssociated && !widgetTitleFound){
-						success = false;
-						String msg = "The Action " + action.get(Tags.Desc, action.toString())
-								+ " of the replayed sequence can not been replayed into "
-								+ " the State " + state.get(Tags.ConcreteID, state.toString());
-
-						replayVerdict = new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg);
-
-						break;
-					}
-
+						setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
+    					
+    					break;
+    				}
+    				
 					// In Replay-mode, we only show the red dot if visualizationOn is true:
 					if(visualizationOn) SutVisualization.visualizeSelectedAction(settings, cv, state, action);
 					if(mode() == Modes.Quit) break;
