@@ -79,6 +79,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton testDBConnectionButton;
     private JButton writeSelectorButton;
     private JButton loadSelectorButton;
+    private JButton traceCheckButton;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -134,6 +135,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 testSaveCheckedApSelectionManagerJSON();
             }
         });
+        modelCheckButton.addActionListener(this::LTLModelCheckWithSpot);
     }
 
     public static Temporalpanel2 createTemporalPanel() {
@@ -403,6 +405,62 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             while ((response = inStream.readLine()) != null) {
                 System.out.println("response: " + response);
                 textArea12.append(response);
+                textArea12.append("\n");
+            }
+
+            textArea12.append("------------Action completed---------------" + "\n");
+        } catch (IOException e) {
+            System.err.println("Error on inStream.readLine()");
+            textArea12.append("Error on inStream.readLine()");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+    }
+
+    private void LTLModelCheckWithSpot(ActionEvent evt) {
+        // code goes here
+        Process theProcess = null;
+        BufferedReader inStream = null;
+        BufferedReader errStream = null;
+
+        //String cli = "ubuntu1804 run ~/testar/spot_checker'" + "--a " +"/mnt/c/Users/c/git/TESTAR_dev/testar/target/install/testar/bin/output/temporal/APmodel.HOA" + "--f ";
+        String cli = "ubuntu1804 run ~/testar/spot_checker --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
+
+        String response;
+       String errorresponse=null;
+
+        textArea12.setText("invoking : ");
+        textArea12.append("\n");
+        textArea12.setText(cli);
+        textArea12.append("\n");
+        // call the external program
+        try {
+            theProcess = Runtime.getRuntime().exec(cli);
+        } catch (IOException e) {
+            System.err.println("Error on exec() method");
+            textArea12.append("Error on exec() method");
+            textArea12.append("\n");
+            e.printStackTrace();
+        }
+
+        // read from the called program's standard output stream
+        try {
+            inStream = new BufferedReader(new InputStreamReader
+                    (theProcess.getInputStream()));
+            errStream = new BufferedReader(new InputStreamReader
+                    (theProcess.getErrorStream()));
+            while ((response = inStream.readLine()) != null || (errorresponse=errStream.readLine())!=null ) {
+                if (response!=null) {
+                    System.out.println("response: " + response );
+                    textArea12.append(response);
+                }
+
+                if (errorresponse!=null)
+                {
+                    System.out.println("error response: " + errorresponse );
+                    textArea12.append(errorresponse);
+                }
+
                 textArea12.append("\n");
             }
 
