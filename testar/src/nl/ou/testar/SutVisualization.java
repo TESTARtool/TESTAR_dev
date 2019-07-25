@@ -72,10 +72,10 @@ public class SutVisualization {
                 cwShape.paint(canvas, Pen.PEN_MARK_ALPHA);
                 cwShape.paint(canvas, Pen.PEN_MARK_BORDER);
                 if (!showExtendedWidgetInfo){
-                    String rootText = "State: " + rootW.get(Tags.ConcreteID),
-                            widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
+                    String rootText = "State: " + rootW.get(Tags.ConcreteID, "No ConcreteID available"),
+                            widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID, "No ConcreteID available"),
                             roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-                            idxText = "Path: " + cursorWidget.get(Tags.Path);
+                            idxText = "Path: " + cursorWidget.get(Tags.Path, "No Path available");
 
                     double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
                     double miniwidgetInfoH = 80; // 20 * 4
@@ -98,12 +98,12 @@ public class SutVisualization {
                 }
 
                 // Is this really useful?:
-                if (markParentWidget){
-                    String cursorWidgetID = cursorWidget.get(Tags.ConcreteID);
+                /*if (markParentWidget){
+                    String cursorWidgetID = cursorWidget.get(Tags.ConcreteID, "No ConcreteID available");
                     boolean print = !cursorWidgetID.equals(lastPrintParentsOf);
                     if (print){
                         lastPrintParentsOf = cursorWidgetID;
-                        System.out.println("Parents of: " + cursorWidget.get(Tags.Title));
+                        System.out.println("Parents of: " + cursorWidget.get(Tags.Title, "No Title available"));
                     }
                     int lvls = protocolUtil.markParents(canvas,cursorWidget,protocolUtil.ancestorsMarkingColors.keySet().iterator(),0,print);
                     if (lvls > 0){
@@ -123,31 +123,23 @@ public class SutVisualization {
                             canvas.text(Pen.PEN_BLACK, legendShape.x()         , legendShape.y() + i*25         , 0, l);
                         }
                     }
-                }
+                }*/
 
                 int MAX_ANCESTORS_PERLINE = 6;
-                double widgetInfoW = canvas.width()/2; //550;
+                double widgetInfoW = canvas.width()/2;
                 double widgetInfoH = (1 + Util.size(cursorWidget.tags()) +
                         Util.size(Util.ancestors(cursorWidget)) / MAX_ANCESTORS_PERLINE)
                         * 20;
                 cwShape = protocolUtil.calculateWidgetInfoShape(canvas,cwShape, widgetInfoW, widgetInfoH);
 
                 if(showExtendedWidgetInfo){
-                    //canvas.rect(wpen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
-                    //canvas.rect(apen, cwShape.x(), cwShape.y() - 20, 550, Util.size(cursorWidget.tags()) * 25);
                     canvas.rect(Pen.PEN_WHITE_ALPHA, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
                     canvas.rect(Pen.PEN_BLACK, cwShape.x(), cwShape.y(), widgetInfoW, widgetInfoH);
 
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y(), 0, "Role: " + cursorWidget.get(Role, Roles.Widget).toString());
-                    //canvas.text(Pen.PEN_RED, cwShape.x(), cwShape.y() - 20, 0, "Path: " + Util.indexString(cursorWidget));
                     int pos = -20;
                     StringBuilder sb = new StringBuilder();
                     sb.append("Ancestors: ");
 
-                    //for(Widget p : Util.ancestors(cursorWidget))
-                    //	sb.append("::").append(p.get(Role, Roles.Widget));
-                    //canvas.text(apen, cwShape.x(), cwShape.y() + (pos+=20), 0, sb.toString());
-                    // (fix too many ancestors)
                     int i=0;
                     for(Widget p : Util.ancestors(cursorWidget)){
                         sb.append("::").append(p.get(Role, Roles.Widget));
@@ -165,24 +157,8 @@ public class SutVisualization {
                     for(Tag<?> t : cursorWidget.tags()){
                         canvas.text((t.isOneOf(Tags.Role,Tags.Title,Tags.Shape,Tags.Enabled,Tags.Path,Tags.ConcreteID)) ? Pen.PEN_RED : Pen.PEN_BLACK,
                                 cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " + Util.abbreviate(Util.toString(cursorWidget.get(t)), 50, "..."));
-                        // (multi-line display without abbreviation)
-							/*final int MAX_TEXT = 50;
-							String text = Util.abbreviate(Util.toString(cursorWidget.get(t)), Integer.MAX_VALUE, "NO_SENSE");
-							int fragment = 0, limit;
-							while (fragment < text.length()){
-								limit = fragment + MAX_TEXT > text.length() ? text.length() : fragment + MAX_TEXT;
-								canvas.text((t.equals(Tags.Title) || t.equals(Tags.Role)) ? rpen : apen, cwShape.x(), cwShape.y() + (pos+=20), 0, t.name() + ":   " +
-									text.substring(fragment,limit));
-								fragment = limit;
-							}*/
                     }
                 }
-
-                // Disabled functionality - not useful:
-//                    if (settings.get(ConfigTags.DrawWidgetTree)){
-//                        canvas.rect(Pen.PEN_BLACK_ALPHA, 0, 0, canvas.width(), canvas.height());
-//                        protocolUtil.drawWidgetTree(system,canvas,12,12,rootW,cursorWidget,16);
-//                    }
             }
         }
     }
@@ -198,7 +174,6 @@ public class SutVisualization {
         int zindex, minz = Integer.MAX_VALUE, maxz = Integer.MIN_VALUE;
         Map<Action,Integer> zindexes = new HashMap<Action,Integer>();
         for(Action a : actions){
-            //a.get(Visualizer, Util.NullVisualizer).run(state, canvas, Pen.PEN_IGNORE);
             zindex = getTargetZindex(state,a);
             zindexes.put(a, new Integer(zindex));
             if (zindex < minz)
@@ -208,7 +183,7 @@ public class SutVisualization {
         }
         int alfa;
         for(Action a : actions){
-            zindex = 1; // default
+            zindex = 1;
             Pen vp = Pen.PEN_IGNORE;
             a.get(Visualizer, Util.NullVisualizer).run(state, canvas, vp);
         }
@@ -225,12 +200,12 @@ public class SutVisualization {
      */
     public static int getTargetZindex(State state, Action a){
         try{
-            String targetID = a.get(Tags.TargetID);
+            String targetID = a.get(Tags.TargetID, "No TargetID available");
             Widget w;
             if (targetID != null){
                 w = getWidget(state,targetID);
                 if (w != null)
-                    return (int)w.get(Tags.ZIndex).doubleValue();
+                    return (int)w.get(Tags.ZIndex, 0.0).doubleValue();
             }
         } catch(NoSuchTagException ex){}
         return 1; // default
@@ -239,7 +214,7 @@ public class SutVisualization {
 
     private static Widget getWidget(State state, String concreteID){
         for (Widget w : state){
-            if (w.get(Tags.ConcreteID).equals(concreteID)){
+            if (w.get(Tags.ConcreteID, "No ConcreteID available").equals(concreteID)){
                 return w;
             }
         }
@@ -257,9 +232,7 @@ public class SutVisualization {
     public static void visualizeSelectedAction(Settings settings, Canvas canvas, State state, Action action){
         Pen redPen = Pen.newPen().setColor(Color.Red).setFillPattern(FillPattern.Solid).setStrokeWidth(20).build();
         Visualizer visualizer = action.get(Visualizer, Util.NullVisualizer);
-        //final int BLINK_COUNT = 3;
-        //final double BLINK_DELAY = 0.5;
-        double actionDuration = settings.get(ConfigTags.ActionDuration);
+        double actionDuration = settings.get(ConfigTags.ActionDuration, 0.1);
         final int BLINK_COUNT = 3;
         final double BLINK_DELAY = actionDuration / BLINK_COUNT;
         for(int i = 0; i < BLINK_COUNT; i++){
