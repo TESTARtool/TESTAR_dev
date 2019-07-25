@@ -180,9 +180,9 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     	String statusInfo = "";
     	
     	if(mode() == Modes.Replay) {
-    		htmlReport.addTestVerdict(replayVerdict.join(processVerdict));
-    		status = (replayVerdict.join(processVerdict)).verdictSeverityTitle();
-    		statusInfo = (replayVerdict.join(processVerdict)).info();
+    		htmlReport.addTestVerdict(getReplayVerdict().join(processVerdict));
+    		status = (getReplayVerdict().join(processVerdict)).verdictSeverityTitle();
+    		statusInfo = (getReplayVerdict().join(processVerdict)).info();
     	}
     	else {
     		htmlReport.addTestVerdict(getVerdict(latestState).join(processVerdict));

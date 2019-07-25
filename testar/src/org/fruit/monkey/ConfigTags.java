@@ -116,7 +116,6 @@ public final class ConfigTags {
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
-  public static final Tag<String> ApplicationTimestamp = Tag.from("ApplicationTimestamp", String.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   @SuppressWarnings("unchecked")

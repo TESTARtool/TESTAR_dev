@@ -146,7 +146,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
 	
-	public static Verdict replayVerdict = Verdict.OK;
+	private Verdict replayVerdict;
+
+	public Verdict getReplayVerdict() {
+		return replayVerdict;
+	}
+
+	public void setReplayVerdict(Verdict replayVerdict) {
+		this.replayVerdict = replayVerdict;
+	}
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
@@ -827,9 +835,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		fragment = new TaggableBase();
 		fragment.set(SystemState, state);
 		fragment.set(OracleVerdict, getVerdict(state));
-		fragment.set(ConfigTags.ApplicationName, OutputStructure.executedSUTname);
-		fragment.set(ConfigTags.ApplicationVersion, settings.get(ConfigTags.ApplicationVersion));
-		fragment.set(ConfigTags.ApplicationTimestamp, OutputStructure.startInnerLoopDateString);
 	}
 
 	/**
@@ -1185,7 +1190,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		Canvas canvas = buildCanvas();
 			State state = getState(system);
 
-	    	replayVerdict = getVerdict(state);
+			setReplayVerdict(getVerdict(state));
     		
     		//initializing new fragment for recording replayable test sequence:
     		initFragmentForReplayableSequence(state);
@@ -1254,7 +1259,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     					+ " of the replayed sequence can not been replayed into "
     					+ " the State " + state.get(Tags.ConcreteID, state.toString());
     					
-    					replayVerdict = new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg);
+    					setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
     					
     					break;
     				}
@@ -1295,7 +1300,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     				//Saving the actions and the executed action into replayable test sequence:
     				saveActionIntoFragmentForReplayableSequence(action, state, actions);
     				
-    				replayVerdict = getVerdict(state);
+    				setReplayVerdict(getVerdict(state));
 				}
 
 			}
@@ -1326,7 +1331,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		if(faultySequence) {
-    		String msg = "Replayed Sequence contains Errors: "+ replayVerdict.info();
+    		String msg = "Replayed Sequence contains Errors: "+ getReplayVerdict().info();
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
     		
@@ -1335,9 +1340,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-    	}else if(replayVerdict.severity() == Verdict.SEVERITY_UNREPLAYABLE){			
-			System.out.println(replayVerdict.info());
-			LogSerialiser.log(replayVerdict.info(), LogSerialiser.LogLevel.Critical);
+    	}else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+			System.out.println(getReplayVerdict().info());
+			LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
 			
     	}else{
     		String msg = "Fail replaying sequence.\n";
@@ -1352,7 +1357,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     	writeAndCloseFragmentForReplayableSequence();
 
     	//Copy sequence file into proper directory:
-    	classifyAndCopySequenceIntoAppropriateDirectory(replayVerdict, generatedSequence, currentSeq);
+    	classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
 
     	LogSerialiser.finish();
     	
