@@ -118,6 +118,8 @@ public final class ConfigTags {
   public static final Tag<String> ReportType = Tag.from("ReportType", String.class);
   public static final Tag<Integer> ReportServicePort = Tag.from("ReportServicePort", Integer.class);
   @SuppressWarnings("unchecked")
+  public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
+  @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
