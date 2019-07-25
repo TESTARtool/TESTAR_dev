@@ -145,6 +145,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
+	
+	public static Verdict replayVerdict = Verdict.OK;
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
@@ -1149,8 +1151,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		actionCount = 1;
 		boolean success = true;
 		faultySequence = false;
-    	passSeverity = Verdict.SEVERITY_OK;
-    	Verdict replayVerdict = Verdict.OK;
+    	replayVerdict = Verdict.OK;
 		
 		//Reset LogSerialiser
 		LogSerialiser.finish();
@@ -1248,11 +1249,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     				//If action has an associated widget and we don't find it, we are not in the correct state
     				if(actionHasWidgetAssociated && !widgetTitleFound){
     					success = false;
-    					String msg = "FAIL: Widget with Title \""+ widgetStringToFind+"\" not found.\n";
-    					System.out.println(msg);
-    					LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
-    					passSeverity = Verdict.SEVERITY_FAIL;
-
+    					String msg = "The Action " + action.get(Tags.Desc, action.toString())
+    					+ " of the replayed sequence can not been replayed into "
+    					+ " the State " + state.get(Tags.ConcreteID, state.toString());
+    					
+    					replayVerdict = new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg);
+    					
     					break;
     				}
     				
@@ -1325,18 +1327,21 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if(faultySequence) {
     		//Update state to obtain correctly the last verdict (this call update the verdict)
     		State state = getState(system);
-
     		String msg = "Replayed Sequence contains Errors: "+ state.get(Tags.OracleVerdict).info();
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
-    	}
-    	if(success){
+    		
+    	}else if(success){
     		String msg = "Sequence successfully replayed!\n";
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-    	} else{
-    		String msg = "Failed to replay sequence.\n";
+    	}else if(replayVerdict.severity() == Verdict.SEVERITY_UNREPLAYABLE){			
+			System.out.println(replayVerdict.info());
+			LogSerialiser.log(replayVerdict.info(), LogSerialiser.LogLevel.Critical);
+			
+    	}else{
+    		String msg = "Fail replaying sequence.\n";
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Critical);
     	}
