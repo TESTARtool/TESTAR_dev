@@ -134,8 +134,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 	protected ProcessListener processListener = new ProcessListener();
 	private boolean enabledProcessListener = false;
 	public static Verdict processVerdict = Verdict.OK;
-	
-	public static Verdict replayVerdict = Verdict.OK;
+
+	private Verdict replayVerdict;
+
+	public Verdict getReplayVerdict() {
+		return replayVerdict;
+	}
+
+	public void setReplayVerdict(Verdict replayVerdict) {
+		this.replayVerdict = replayVerdict;
+	}
 
 	protected String lastPrintParentsOf = "null-id";
 	protected int actionCount;
@@ -935,6 +943,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 			//Saving the actions and the executed action into replayable test sequence:
 			saveActionIntoFragmentForReplayableSequence(action, state, actions);
 
+			setReplayVerdict(getVerdict(state));
+
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
@@ -1266,7 +1276,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 		actionCount = 1;
 		faultySequence = false;
-    	replayVerdict = Verdict.OK;
+    	setReplayVerdict(Verdict.OK);
 		
 		//Reset LogSerialiser
 		LogSerialiser.finish();
@@ -1289,6 +1299,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
 
 			Canvas cv = buildCanvas();
 			State state = getState(system);
+
+			setReplayVerdict(getVerdict(state));
 
 			String replayMessage;
 
@@ -1349,8 +1361,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     					String msg = "The Action " + action.get(Tags.Desc, action.toString())
     					+ " of the replayed sequence can not been replayed into "
     					+ " the State " + state.get(Tags.ConcreteID, state.toString());
-    					
-    					replayVerdict = new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg);
+
+						setReplayVerdict(new Verdict(Verdict.SEVERITY_UNREPLAYABLE, msg));
     					
     					break;
     				}
@@ -1429,9 +1441,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
 
-    	}else if(replayVerdict.severity() == Verdict.SEVERITY_UNREPLAYABLE){			
-			System.out.println(replayVerdict.info());
-			LogSerialiser.log(replayVerdict.info(), LogSerialiser.LogLevel.Critical);
+    	}else if(getReplayVerdict().severity() == Verdict.SEVERITY_UNREPLAYABLE){
+			System.out.println(getReplayVerdict().info());
+			LogSerialiser.log(getReplayVerdict().info(), LogSerialiser.LogLevel.Critical);
 			
     	}else{
     		String msg = "Fail replaying sequence.\n";
@@ -1446,7 +1458,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol implements ActionRe
     	writeAndCloseFragmentForReplayableSequence();
 
     	//Copy sequence file into proper directory:
-    	classifyAndCopySequenceIntoAppropriateDirectory(replayVerdict, generatedSequence, currentSeq);
+    	classifyAndCopySequenceIntoAppropriateDirectory(getReplayVerdict(), generatedSequence, currentSeq);
 
 		LogSerialiser.finish();
 		postSequenceProcessing();
