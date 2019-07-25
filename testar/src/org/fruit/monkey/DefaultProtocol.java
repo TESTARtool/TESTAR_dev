@@ -1151,7 +1151,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		actionCount = 1;
 		boolean success = true;
 		faultySequence = false;
-    	replayVerdict = Verdict.OK;
 		
 		//Reset LogSerialiser
 		LogSerialiser.finish();
@@ -1185,6 +1184,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
     		
     		Canvas canvas = buildCanvas();
 			State state = getState(system);
+
+	    	replayVerdict = getVerdict(state);
     		
     		//initializing new fragment for recording replayable test sequence:
     		initFragmentForReplayableSequence(state);
@@ -1325,9 +1326,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		}
 
 		if(faultySequence) {
-    		//Update state to obtain correctly the last verdict (this call update the verdict)
-    		State state = getState(system);
-    		String msg = "Replayed Sequence contains Errors: "+ state.get(Tags.OracleVerdict).info();
+    		String msg = "Replayed Sequence contains Errors: "+ replayVerdict.info();
     		System.out.println(msg);
     		LogSerialiser.log(msg, LogSerialiser.LogLevel.Info);
     		
