@@ -1,4 +1,3 @@
-package desktop_image_recognition;
 /***************************************************************************************************
  *
  * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
@@ -176,6 +175,7 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 				if(word.getText().length() > 2) {
 					imageWidgets.put(rect, word.getText());
 
+
 					//System.out.println(word.getText());
 				}
 
@@ -280,6 +280,12 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 				actions.add(ac.leftClickAt(key.x(), key.y()));
 
 				System.out.println("Rect: " + key + "   Text: " + value);
+				
+				
+				if(value.length()>40 && key.width()>700)
+					for(int i=0; i<10; i++)
+						actions.add(ac.leftClickAt((key.x() + key.width() / 10 * i ), key.y()));
+				
 			}
 
 		}
