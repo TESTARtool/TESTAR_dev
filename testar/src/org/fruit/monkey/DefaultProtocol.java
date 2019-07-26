@@ -932,13 +932,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		while(mode() == Modes.Spy && system.isRunning()) {
 
-			//Instead of use getState(SUT system) method, build our own State into Spy Mode
-			//This will prevent issues with other protocols and reports
-			Assert.notNull(system);
-			State state = builder.apply(system);
-			CodingManager.buildIDs(state);
-			calculateZIndices(state);
-			setStateForClickFilterLayerProtocol(state);
+			State state = getState(system);
 
 			cv.begin(); Util.clear(cv);
 
@@ -1473,7 +1467,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		CodingManager.buildIDs(state);
 		calculateZIndices(state);
+		
+		setStateForClickFilterLayerProtocol(state);
 
+		if(mode() == Modes.Spy)
+			return state;
+		
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
@@ -1492,7 +1491,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		setStateForClickFilterLayerProtocol(state);
+		
 		return state;
 	}
 
