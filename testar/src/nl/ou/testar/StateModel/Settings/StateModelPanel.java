@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2017 Open Universiteit - www.ou.nl
+* Copyright (c) 2017, 2018, 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -59,8 +59,6 @@ public class StateModelPanel extends JPanel {
     private JLabel label7 = new JLabel("DataStorePassword");
     private JLabel label8 = new JLabel("DataStoreMode");
     private JLabel label9 = new JLabel("Reset database");
-    private JLabel label10 = new JLabel("Application name");
-    private JLabel label11 = new JLabel("Application version");
     private JLabel label12 = new JLabel("AccessBridge enabled");
     private JLabel label13 = new JLabel("DataStoreDirectory");
     private JLabel label14 = new JLabel();
@@ -73,8 +71,6 @@ public class StateModelPanel extends JPanel {
     private JTextField dataStoreUserTextfield = new JTextField();
     private JPasswordField dataStorePasswordfield = new JPasswordField();
     private JCheckBox resetDatabaseCheckbox = new JCheckBox();
-    private JTextField applicationNameField = new JTextField();
-    private JTextField applicationVersionField = new JTextField();
     private JComboBox<String> dataStoreModeBox = new JComboBox<>(new String[]{"none", "instant", "delayed", "hybrid"});
     private JComboBox<String> dataStoreTypeBox = new JComboBox<>(new String[]{"remote", "plocal"});
     private Set<JComponent> components;
@@ -114,8 +110,6 @@ public class StateModelPanel extends JPanel {
         components.add(dataStoreUserTextfield);
         components.add(dataStorePasswordfield);
         components.add(resetDatabaseCheckbox);
-        components.add(applicationNameField);
-        components.add(applicationVersionField);
         components.add(dataStoreModeBox);
         components.add(accessBridgeEnabledBox);
         components.add(dirButton);
@@ -192,28 +186,18 @@ public class StateModelPanel extends JPanel {
 
         // NEW COLUMN
 
-        label10.setBounds(330,52,150,27);
-        add(label10);
-        applicationNameField.setBounds(480, 52, 125, 27);
-        add(applicationNameField);
-
-        label11.setBounds(330,90,150,27);
-        add(label11);
-        applicationVersionField.setBounds(480, 90, 125, 27);
-        add(applicationVersionField);
-
-        label12.setBounds(330, 128, 150, 27);
+        label12.setBounds(330, 52, 150, 27);
         add(label12);
-        accessBridgeEnabledBox.setBounds(480, 128, 50, 27);
+        accessBridgeEnabledBox.setBounds(480, 52, 50, 27);
         add(accessBridgeEnabledBox);
 
-        label9.setBounds(330,166,150,27);
+        label9.setBounds(330,90,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(480, 166, 50, 27);
+        resetDatabaseCheckbox.setBounds(480, 90, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 204, 150, 27);
+        analysisButton.setBounds(330, 128, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -251,8 +235,6 @@ public class StateModelPanel extends JPanel {
                 dataStoreTypeBox.setSelectedIndex(i);
             }
         }
-        applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
-        applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
         // check if the fields should be enabled or not
         components.forEach((component) -> component.setEnabled(stateModelEnabledChkBox.isSelected()));
         checkDataType();
@@ -280,8 +262,6 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.DataStoreMode, (String)dataStoreModeBox.getSelectedItem());
         settings.set(ConfigTags.DataStoreType, (String)dataStoreTypeBox.getSelectedItem());
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
-        settings.set(ConfigTags.ApplicationName, applicationNameField.getText());
-        settings.set(ConfigTags.ApplicationVersion, applicationVersionField.getText());
         settings.set(ConfigTags.AccessBridgeEnabled, accessBridgeEnabledBox.isSelected());
     }
 

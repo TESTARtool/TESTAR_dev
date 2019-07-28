@@ -114,7 +114,7 @@ public class Protocol_desktop_simple_stategraph_sikulix extends DesktopProtocol 
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		// adding the action that is going to be executed into HTML report:
-		htmlReport.addSelectedAction(state.get(Tags.ScreenshotPath), action);
+		htmlReport.addSelectedAction(state, action);
 		double waitTime = settings().get(ConfigTags.TimeToWaitAfterAction);
 		try{
 			double halfWait = waitTime == 0 ? 0.01 : waitTime / 2.0; // seconds

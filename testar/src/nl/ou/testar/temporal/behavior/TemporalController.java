@@ -144,7 +144,8 @@ public class TemporalController {
 
         params.put("identifier", abstractStateModel.getModelIdentifier());
         // navigate from abstractstate to apply the filter.
-        stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+       // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+        stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt);
 
@@ -314,8 +315,8 @@ private AbstractStateModel getFirstAbstractStateModel(){
     private List<TemporalTrace> fetchTraces(String modelIdentifier) {
         List<TemporalTrace> traces = new ArrayList<>();
 
-
-        String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";
+        //String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";
+        String sequenceStmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier ORDER BY startDateTime ASC";
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(sequenceStmt, params);
@@ -393,15 +394,12 @@ private AbstractStateModel getFirstAbstractStateModel(){
             }
         }
 
-
-
         stmt = "SELECT FROM (TRAVERSE out('SequenceStep'),outE('SequenceStep') FROM (SELECT FROM SequenceNode WHERE @rid = :identifier) ) WHERE @class = 'SequenceStep'";
         //concreteActionId needs to be updated css 20190721
         params.put("identifier", firstSequenceNode);
         resultSet = db.query(stmt, params);
         System.out.println("debug:  edge resultset >0? : "+resultSet.hasNext());
-
-        while (resultSet.hasNext()) {
+ /*       while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
             if (result.isElement()) {
@@ -410,8 +408,8 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 OElement ele = optele.get();
                 ConcreteActions.add(ele.getProperty("concreteActionId").toString());
             }
-        }
-/* future: when the edge sequencestep reences the aculay action edge.
+        }*/
+ //future: when the edge sequencestep reences the aculay action edge.
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
@@ -419,8 +417,9 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 Optional<OElement> optele = result.getElement();
                 if (!optele.isPresent()) continue;
                 OElement ele = optele.get();
-                params.put("identifier", ele.getIdentity().toString());
-                stmt = "SELECT FROM (TRAVERSE out('Accessed') FROM (SELECT FROM ConcreteAction WHERE actionId = :identifier) ) WHERE @class ='ConcreteAction'";
+                params.put("identifier", ele.getProperty("concreteActionId").toString());
+                stmt = "SELECT FROM ConcreteAction WHERE actionId = :identifier LIMIT 1";
+                //LIMIT 1 is a debug action css 20190722. actionId is NOT unique !!!!
                 OResultSet subresultSet = db.query(stmt, params);
                 while (subresultSet.hasNext()) {
                     OResult subresult = subresultSet.next();
@@ -429,11 +428,11 @@ private AbstractStateModel getFirstAbstractStateModel(){
                         Optional<OElement> suboptele = subresult.getElement();
                         if (!suboptele.isPresent()) continue;
                         OElement subele = suboptele.get();
-                        ConcreteStates.add(subele.getIdentity().toString());
+                        ConcreteActions.add(subele.getIdentity().toString());
                     }
                 }
             }
-        }*/
+        }
 
 
 
@@ -498,7 +497,8 @@ private AbstractStateModel getFirstAbstractStateModel(){
      */
     private List<TestSequence> fetchTestSequences(String modelIdentifier) {
         List<TestSequence> sequenceList = new ArrayList<>();
-        String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
+        //String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
+        String sequenceStmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(sequenceStmt, params);
@@ -734,10 +734,13 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
             System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
            // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
             //stmtlist.add("SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier"); // select abstractstate themselves
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+            //stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE modelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+
             // the "both()" in the next stmt is needed to invoke recursion.
             // apparently , the next result set contains first a list of all nodes, then of all edge: good !
-            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
+            //stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
+            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) ");
 
         }else{
             stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) ");
