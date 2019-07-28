@@ -473,6 +473,12 @@ public class EntityClassFactory {
         concreteActionId.setIdentifier(false);
         concreteActionId.setIndexAble(true);
         entityClass.addProperty(concreteActionId);
+        Property concreteActionUid = new Property("concreteActionUid", OType.STRING);
+        concreteActionUid.setMandatory(true);
+        concreteActionUid.setNullable(false);
+        concreteActionUid.setIdentifier(false);
+        concreteActionUid.setIndexAble(true);
+        entityClass.addProperty(concreteActionUid);
         Property counter = new Property("counter", OType.INTEGER);
         counter.setMandatory(true);
         counter.setNullable(false);

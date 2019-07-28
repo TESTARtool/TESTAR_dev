@@ -195,6 +195,12 @@ div.is-child-of {
     margin-right: 10px;
 }
 
+#cd-content-panel h3 {
+    float:left;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
 img.node-img-full {
     width: 750px;
     height: inherit;
@@ -443,4 +449,16 @@ button.skip:active {
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+.attribute-filter {
+    float: right;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    font-size: 16px;
+    background-image: url(../img/searchicon.png);
+    padding: 12px 20px 12px 42px;
+    background-position: 10px 13px;
+    background-repeat: no-repeat;
 }

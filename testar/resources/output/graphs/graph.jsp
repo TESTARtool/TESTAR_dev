@@ -343,6 +343,14 @@
                 }
             },
             {
+                selector: '.connected-concrete-state-node',
+                style: {
+                    'width': '50px',
+                    'height': '50px',
+                    'border-color': '#3255ff'
+                }
+            },
+            {
                 selector: '.selected-edge',
                 style: {
                     'line-color': "#4be2ff",
@@ -400,7 +408,13 @@
         // highlight the selected node
         cy.$('edge.selected-edge').removeClass('selected-edge');
         cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
+        cy.$('node.connected-concrete-state-node').removeClass('connected-concrete-state-node');
         targetNode.addClass(targetNode.hasClass('isInitial') ? 'selected-initial-node' : 'selected-node');
+
+        // if the selected node is a sequence node, we also highlight the concrete state it accessed
+        if (targetNode.hasClass('SequenceNode')) {
+            targetNode.outgoers('.Accessed').target('.ConcreteState').addClass('connected-concrete-state-node');
+        }
 
         // remove all the current child elements for both panel and panel header
         let child = contentPanel.lastChild;
@@ -524,9 +538,21 @@
         h3.appendChild(document.createTextNode("Element data:"));
         paragraph.appendChild(h3);
 
+        // <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
+        let filterBox = document.createElement("input");
+        filterBox.type = "text";
+        filterBox.id = "attribute-filter-box";
+        filterBox.classList.add("attribute-filter");
+        filterBox.placeholder = "Filter atribute values";
+        filterBox.addEventListener("keyup", function(event) {
+            filterDataFields(event.target.value);
+        });
+        paragraph.appendChild(filterBox);
+
         // add the data into a table
         let dataTable = document.createElement("table");
         dataTable.classList.add("table-data");
+        dataTable.id = "attribute-data-table";
         let tableHeaderRow = document.createElement("tr");
         let th1 = document.createElement("th");
         th1.appendChild(document.createTextNode("Attribute name"));
@@ -577,6 +603,7 @@
         // highlight the selected node
         cy.$('edge.selected-edge').removeClass('selected-edge');
         cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
+        cy.$('node.connected-concrete-state-node').removeClass('connected-concrete-state-node');
         targetEdge.addClass('selected-edge');
 
         // remove all the current child elements for both panel and panel header
@@ -747,6 +774,32 @@
         else {
             interLayerEdgesToggle.checked = false;
             interLayerEdgesToggle.disabled = true;
+        }
+    }
+
+    function filterDataFields(filterValue) {
+        let dataTable = document.getElementById("attribute-data-table");
+        let dataTableBody = dataTable.getElementsByTagName("tbody")[0];
+        let tableRows = dataTableBody.getElementsByTagName("tr");
+        filterValue = filterValue.toLowerCase();
+        for (i = 0; i < tableRows.length; i++) {
+            if(filterValue == '') {
+                tableRows[i].style.display = "";
+            }
+            else {
+                // check if the attribute name matches
+                let tableCell = tableRows[i].getElementsByTagName("td")[0];
+                if (tableCell) {
+                    let cellContent = tableCell.textContent || tableCell.innerText;
+                    cellContent = cellContent.toLowerCase();
+                    if (cellContent.indexOf(filterValue) > -1) {
+                        tableRows[i].style.display = "";
+                    }
+                    else {
+                        tableRows[i].style.display = "none";
+                    }
+                }
+            }
         }
     }
 

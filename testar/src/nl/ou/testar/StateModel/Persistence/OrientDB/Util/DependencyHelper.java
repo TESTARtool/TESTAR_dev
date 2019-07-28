@@ -63,6 +63,17 @@ public abstract class DependencyHelper {
                 // no subclasses, we simply add it to the array
                 oClasses[i++] = oClass;
             }
+            else if (oClass.getName().equals("OSequence")) {
+                // special rule for this class: we want it to always be last
+                if (classQueue.isEmpty()) {
+                    // this was the last class, so add it to the array
+                    oClasses[i++] = oClass;
+                }
+                else {
+                    // not the last class yet..requeue
+                    classQueue.addLast(oClass);
+                }
+            }
             else {
                 // we need to make sure all the subclasses are in the array before we add this class
                 // if that is not the case, we add it to the back of the list
