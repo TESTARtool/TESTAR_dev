@@ -189,6 +189,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity concreteStateEntity = new VertexEntity(entityClass);
+        concreteStateEntity.enableUpdate(false);
 
         // hydrate the entity to a format the orient database can store
         try {
@@ -252,6 +253,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
         for (Widget childWidget : widget.getChildren()) {
             VertexEntity childWidgetEntity = persistWidget(childWidget);
+            if (childWidgetEntity == null) {
+                System.out.println("Encountered an error persisting the widget with id " + childWidget.getId());
+                return;
+            }
             childWidgetEntity.enableUpdate(false);
 
             // with the widget saved, we need to also store parent and child relationships between the two widgets
@@ -285,6 +290,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Widget);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
+        vertexEntity.enableUpdate(false);
 
         // hydrate the widget entity
         try {

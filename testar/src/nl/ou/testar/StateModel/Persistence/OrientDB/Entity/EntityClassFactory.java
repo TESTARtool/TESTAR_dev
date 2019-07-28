@@ -206,10 +206,16 @@ public class EntityClassFactory {
 
     private static EntityClass createConcreteStateClass() {
         EntityClass concreteStateClass = new EntityClass("ConcreteState", EntityClass.EntityType.Vertex);
+        Property uniqueId = new Property("uid", OType.STRING);
+        uniqueId.setMandatory(true);
+        uniqueId.setNullable(false);
+        uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
+        concreteStateClass.addProperty(uniqueId);
         Property stateId = new Property("stateId", OType.STRING);
         stateId.setMandatory(true);
         stateId.setNullable(false);
-        stateId.setIdentifier(true);
+        stateId.setIdentifier(false);
         stateId.setIndexAble(true);
         concreteStateClass.addProperty(stateId);
         Property screenshot = new Property("screenshot", OType.BINARY);
