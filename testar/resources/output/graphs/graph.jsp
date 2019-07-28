@@ -325,6 +325,37 @@
                     'border-color': '#FF0000',
                     'line-color': '#FF0000'
                 }
+            },
+            {
+                selector: '.selected-node',
+                style: {
+                    'width': '50px',
+                    'height': '50px',
+                    'border-color': '#4be2ff'
+                }
+            },
+            {
+                selector: '.selected-initial-node',
+                style : {
+                    'width': '60px',
+                    'height': '60px',
+                    'border-color': '#4be2ff'
+                }
+            },
+            {
+                selector: '.selected-edge',
+                style: {
+                    'line-color': "#4be2ff",
+                    'target-arrow-color': "#4be2ff",
+                    'line-style': 'solid',
+                    'width': 2
+                }
+            },
+            {
+                selector: '.mouse-over-concrete-action',
+                style: {
+                    'label' : 'data(Desc)'
+                }
             }
         ],
 
@@ -360,11 +391,16 @@
     });
 
     // when nodes get clicked, we need to open the side bar
-    cy.on('tap', 'node', function(evt){
+    cy.on('tap', 'node', function(evt) {
         let targetNode = evt.target;
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
         let contentPanelHeader = document.getElementById("content-panel-header");
+
+        // highlight the selected node
+        cy.$('edge.selected-edge').removeClass('selected-edge');
+        cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
+        targetNode.addClass(targetNode.hasClass('isInitial') ? 'selected-initial-node' : 'selected-node');
 
         // remove all the current child elements for both panel and panel header
         let child = contentPanel.lastChild;
@@ -387,6 +423,8 @@
         closeButton.addEventListener("click", function () {
             let cdPanel = document.getElementsByClassName("cd-panel")[0];
             cdPanel.classList.remove("cd-panel--is-visible");
+            // remove the highlight from the selected node
+            cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
         });
         contentPanelHeader.appendChild(closeButton);
 
@@ -529,13 +567,103 @@
         // console.log( 'tapped ' + node.id() );
     });
 
+    // when edges get selected, we also open the side panel, but show just the close button and the data
+    cy.on('tap', 'edge.ConcreteAction,edge.AbstractAction,edge.SequenceStep', function(evt) {
+        let targetEdge = evt.target;
+        let sidePanel = document.getElementsByClassName("cd-panel")[0];
+        let contentPanel = document.getElementById("cd-content-panel");
+        let contentPanelHeader = document.getElementById("content-panel-header");
+
+        // highlight the selected node
+        cy.$('edge.selected-edge').removeClass('selected-edge');
+        cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
+        targetEdge.addClass('selected-edge');
+
+        // remove all the current child elements for both panel and panel header
+        let child = contentPanel.lastChild;
+        while (child) {
+            contentPanel.removeChild(child);
+            child = contentPanel.lastChild;
+        }
+
+        child = contentPanelHeader.lastChild;
+        while (child) {
+            contentPanelHeader.removeChild(child);
+            child = contentPanelHeader.lastChild;
+        }
+
+        ///////////// add button section ///////////////////////////
+        let closeButton = document.createElement("button");
+        closeButton.id = "close-panel";
+        closeButton.classList.add("skip");
+        closeButton.appendChild(document.createTextNode("Close"));
+        closeButton.addEventListener("click", function () {
+            let cdPanel = document.getElementsByClassName("cd-panel")[0];
+            cdPanel.classList.remove("cd-panel--is-visible");
+            // remove the highlight from the selected node
+            cy.$('edge.selected-edge').removeClass('selected-edge');
+        });
+        contentPanelHeader.appendChild(closeButton);
+
+        //////////// end button section ///////////////////////////
+
+        ////////// data segment   //////////////
+        let paragraph = document.createElement("p");
+        paragraph.classList.add("paragraph-data");
+        let h3 = document.createElement("h3");
+        h3.appendChild(document.createTextNode("Element data:"));
+        paragraph.appendChild(h3);
+
+        // add the data into a table
+        let dataTable = document.createElement("table");
+        dataTable.classList.add("table-data");
+        let tableHeaderRow = document.createElement("tr");
+        let th1 = document.createElement("th");
+        th1.appendChild(document.createTextNode("Attribute name"));
+        let th2 = document.createElement("th");
+        th2.appendChild(document.createTextNode("Attribute value"));
+        tableHeaderRow.appendChild(th1);
+        tableHeaderRow.appendChild(th2);
+        let thead = document.createElement("thead");
+        thead.appendChild(tableHeaderRow);
+        dataTable.appendChild(thead);
+        let tbody = document.createElement("tbody");
+
+        let data = targetEdge.data();
+        // we want to sort the data first
+        const orderedData = {};
+        Object.keys(data).sort().forEach(function (key) {
+            orderedData[key] = data[key];
+        });
+
+        for (let item in orderedData) {
+            if (data.hasOwnProperty(item)) {
+                let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                td1.appendChild(document.createTextNode(item));
+                let td2 = document.createElement("td");
+                td2.appendChild(document.createTextNode(data[item]));
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tbody.appendChild(tr);
+            }
+        }
+        dataTable.appendChild(tbody);
+        paragraph.appendChild(dataTable);
+        contentPanel.appendChild(paragraph);
+        ////////// end data segment //////////
+
+        sidePanel.classList.add("cd-panel--is-visible");
+    });
+
     let showAllButton = document.getElementById("show-all");
     showAllButton.addEventListener("click", function () {
         cy.$('.invisible').removeClass('invisible');
         cy.$('.dim').removeClass('dim');
+        initLayers();
     });
 
-    cy.ready(function (event) {
+    function initLayers() {
         appStatus.nrOfAbstractStates =  cy.$('node .AbstractState').size();
         appStatus.nrOfConcreteStates = cy.$('node .ConcreteState').size();
         appStatus.nrOfSequenceNodes = cy.$('node .SequenceNode').size();
@@ -620,6 +748,10 @@
             interLayerEdgesToggle.checked = false;
             interLayerEdgesToggle.disabled = true;
         }
+    }
+
+    cy.ready(function (event) {
+        initLayers();
 
         // highlight the leaves, which in this case will be the root of the widget tree
         cy.$(".Widget").leaves().addClass("leaves");
@@ -652,6 +784,14 @@
         cy.$(".TestSequence").forEach(
             (w) => w.data("customLabel", "TS-" + w.data("counter"))
         );
+
+        // add a mouseover event to the concrete actions
+        cy.$(".ConcreteAction").on('mouseover', function(event) {
+            event.target.addClass("mouse-over-concrete-action");
+        }).
+        on('mouseout', function (event) {
+            event.target.removeClass("mouse-over-concrete-action");
+        });
 
     });
 
