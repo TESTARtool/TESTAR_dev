@@ -116,6 +116,14 @@ public final class ConfigTags {
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
+
+  // temporal oracles config tags
+  public static final Tag<String> SpotChecker = Tag.from("SpotChecker", String.class);
+  public static final Tag<String> SpotFormulaParser = Tag.from("SpotFormulaParser", String.class);
+  public static final Tag<String> PythonEnvironment = Tag.from("PythonEnvironment", String.class);
+  public static final Tag<String> PythonVisualizer = Tag.from("PythonVisualizer", String.class);
+
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   @SuppressWarnings("unchecked")

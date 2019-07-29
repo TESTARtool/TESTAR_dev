@@ -42,6 +42,13 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     String dataStoreUser;
     String dataStorePassword;
     String dataStoreType;
+
+
+    String spotChecker;
+    String spotFormulaParser;
+    String pythonEnvironment;
+    String pythonVisualizer;
+
     //**** custom
     private JPanel panel1;
     private JTabbedPane tabbedPane1;
@@ -86,9 +93,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField textField3;
     private JButton button8;
     private JCheckBox WSLPathCheckBox1;
-    private JTextField textField4;
+    private JTextField textFieldPythonEnvironment;
     private JButton button9;
-    private JTextField textField11;
+    private JTextField textFieldPythonVisualizer;
     private JButton button10;
 
     public Temporalpanel2() {
@@ -213,8 +220,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         label3.setText("Python Env. :");
         label3.setToolTipText("Path to Active Virtual environment");
         panel2.add(label3, cc.xy(1, 7));
-        textField4 = new JTextField();
-        panel2.add(textField4, cc.xy(3, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        textFieldPythonEnvironment = new JTextField();
+        panel2.add(textFieldPythonEnvironment, cc.xy(3, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         button9 = new JButton();
         button9.setText("...");
         panel2.add(button9, cc.xy(5, 7));
@@ -222,8 +229,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         label4.setText("Visualizer:");
         label4.setToolTipText("Usually this is the path to run.py");
         panel2.add(label4, cc.xy(1, 9));
-        textField11 = new JTextField();
-        panel2.add(textField11, cc.xy(3, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
+        textFieldPythonVisualizer = new JTextField();
+        panel2.add(textFieldPythonVisualizer, cc.xy(3, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
         button10 = new JButton();
         button10.setText("...");
         panel2.add(button10, cc.xy(5, 9));
@@ -403,6 +410,17 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
     //***********TESTAR generic panel code
     public void populateFrom(final Settings settings) {
+
+    /*    spotChecker= settings.get(ConfigTags.SpotChecker);
+        spotFormulaParser= settings.get(ConfigTags.SpotFormulaParser);
+        pythonEnvironment= settings.get(ConfigTags.PythonEnvironment);
+        pythonVisualizer= settings.get(ConfigTags.PythonVisualizer);*/
+
+        textField2.setText(settings.get(ConfigTags.SpotChecker));
+        textField3.setText(settings.get(ConfigTags.SpotFormulaParser));
+        textFieldPythonEnvironment.setText(settings.get(ConfigTags.PythonEnvironment));
+        textFieldPythonVisualizer.setText(settings.get(ConfigTags.PythonVisualizer));
+
         // used here, but controlled on StateModelPanel
         dataStoreText = settings.get(ConfigTags.DataStore);
         dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
@@ -411,6 +429,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         dataStoreUser = settings.get(ConfigTags.DataStoreUser);
         dataStorePassword = settings.get(ConfigTags.DataStorePassword);
         dataStoreType = settings.get(ConfigTags.DataStoreType);
+
 
 
         outputDir = settings.get(ConfigTags.OutputDir);
@@ -431,6 +450,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     }
 
     public void extractInformation(final Settings settings) {
+        settings.set(ConfigTags.SpotChecker, textField2.getText());
+        settings.set(ConfigTags.SpotFormulaParser, textField3.getText());
+        settings.set(ConfigTags.PythonEnvironment, textFieldPythonEnvironment.getText());
+        settings.set(ConfigTags.PythonVisualizer, textFieldPythonVisualizer.getText());
     }
     //***********TESTAR****************
 

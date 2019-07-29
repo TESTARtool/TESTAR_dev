@@ -163,7 +163,7 @@
                   <toolTipText value="Path to Active Virtual environment"/>
                 </properties>
               </component>
-              <component id="40d6f" class="javax.swing.JTextField" binding="textField4" default-binding="true">
+              <component id="40d6f" class="javax.swing.JTextField" binding="textFieldPythonEnvironment">
                 <constraints>
                   <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -191,7 +191,7 @@
                   <toolTipText value="Usually this is the path to run.py"/>
                 </properties>
               </component>
-              <component id="bc8ad" class="javax.swing.JTextField" binding="textField11" default-binding="true">
+              <component id="bc8ad" class="javax.swing.JTextField" binding="textFieldPythonVisualizer">
                 <constraints>
                   <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
