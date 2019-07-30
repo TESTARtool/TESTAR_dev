@@ -86,7 +86,7 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 			if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 				File outputImages = new File(Main.outputDir + File.separator + "Tesseract");
 				if(outputImages.exists())
-					outputImages.delete();
+					deleteFolder(outputImages);
 				outputImages.mkdir();
 
 
@@ -97,6 +97,20 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 		}catch(Exception e) {}
 
 		super.initialize(settings);
+	}
+	
+	public void deleteFolder(File folder) {
+	    File[] files = folder.listFiles();
+	    if(files!=null) { //some JVMs return null for empty dirs
+	        for(File f: files) {
+	            if(f.isDirectory()) {
+	                deleteFolder(f);
+	            } else {
+	                f.delete();
+	            }
+	        }
+	    }
+	    folder.delete();
 	}
 
 	/**
