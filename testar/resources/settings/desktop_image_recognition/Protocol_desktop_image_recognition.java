@@ -82,12 +82,14 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		try {
-			File outputImages = new File(Main.outputDir + File.separator + "Tesseract");
-			if(outputImages.exists())
-				outputImages.delete();
-			outputImages.mkdir();
 
 			if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+				File outputImages = new File(Main.outputDir + File.separator + "Tesseract");
+				if(outputImages.exists())
+					outputImages.delete();
+				outputImages.mkdir();
+
+
 				ScreenshotSerialiser.exit();
 				ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
 			}
@@ -156,7 +158,7 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 			if(pathImage.length() > 1)
 				new File(pathImage).delete();
 			
-			pathImage = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID,"NoConcreteID"), protocolUtil.getStateshotBinary(state));
+			pathImage = ScreenshotSerialiser.saveStateshot("TesseractState", protocolUtil.getStateshotBinary(state));
 
 			Util.pause(1);
 
@@ -224,16 +226,12 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		System.out.println("DERIVE ACTIONS IMAGE ITERATION");
-
 		if(!imageWidgets.isEmpty()) {
 			for (Entry<Rect, String> entry : imageWidgets.entrySet()) {
 				Rect key = entry.getKey();
 				String value = entry.getValue();
 
 				actions.add(ac.leftClickAt(key.x(), key.y()));
-
-				System.out.println("Rect: " + key + "   Text: " + value);
 				
 				//Specific for SUT that recognizes 10 buttons like one big text
 				if(value.length()>40 && key.width()>700)

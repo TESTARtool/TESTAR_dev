@@ -81,12 +81,14 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 	@Override
 	protected void initialize(Settings settings){
 		try {
-			File outputImages = new File(Main.outputDir + File.separator + "Tesseract");
-			if(outputImages.exists())
-				outputImages.delete();
-			outputImages.mkdir();
-
+			
 			if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+				File outputImages = new File(Main.outputDir + File.separator + "Tesseract");
+				if(outputImages.exists())
+					outputImages.delete();
+				outputImages.mkdir();
+
+
 				ScreenshotSerialiser.exit();
 				ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
 			}
@@ -155,7 +157,7 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 			if(pathImage.length() > 1)
 				new File(pathImage).delete();
 			
-			pathImage = ScreenshotSerialiser.saveStateshot(state.get(Tags.ConcreteID,"NoConcreteID"), protocolUtil.getStateshotBinary(state));
+			pathImage = ScreenshotSerialiser.saveStateshot("TesseractState", protocolUtil.getStateshotBinary(state));
 
 			Util.pause(1);
 
