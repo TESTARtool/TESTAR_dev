@@ -126,6 +126,14 @@ ApplicationName =
 ApplicationVersion =
 
 #################################################################
+# Temporal Oracle settings
+#################################################################
+SpotChecker = ubuntu1804 run ~/testar/spot_checker
+SpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
+PythonEnvironment = C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate && python
+PythonVisualizer = C:\\Users\\c\\git\\Testar_viz\\run.py
+
+#################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
@@ -134,14 +142,6 @@ ApplicationVersion =
 #################################################################
 ConcreteStateAttributes = Role,Path,Title,Enabled
 AbstractStateAttributes = Role
-
-#################################################################
-# Temporal Oracle settings
-#################################################################
-SpotChecker = ubuntu1804 run ~/testar/spot_checker
-SpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
-PythonEnvironment = C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate && python
-PythonVisualizer = C:\\Users\\c\\git\\Testar_viz\\run.py
 
 
 #################################################################

@@ -97,6 +97,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton button9;
     private JTextField textFieldPythonVisualizer;
     private JButton button10;
+    private JButton LTLModelCheckButton;
+    private JTextField aTestarTestsTest_automaton4TextField;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -237,50 +239,58 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         final Spacer spacer1 = new Spacer();
         panel2.add(spacer1, cc.xy(1, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel3.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Test", panel3);
         textField1 = new JTextField();
-        panel3.add(textField1, cc.xyw(3, 1, 8, CellConstraints.FILL, CellConstraints.DEFAULT));
+        textField1.setText("G(a->Fb)");
+        panel3.add(textField1, cc.xyw(3, 1, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         sampleOracleButton = new JButton();
         sampleOracleButton.setText("Sample Oracle");
-        panel3.add(sampleOracleButton, cc.xy(3, 7));
+        panel3.add(sampleOracleButton, cc.xy(3, 9));
         final Spacer spacer2 = new Spacer();
-        panel3.add(spacer2, cc.xy(7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel3.add(spacer2, cc.xy(7, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         parseLTLFormulaButton = new JButton();
         parseLTLFormulaButton.setText("Parse LTL Formula");
         panel3.add(parseLTLFormulaButton, cc.xy(1, 1));
         final JLabel label5 = new JLabel();
         label5.setText("Generate Files:");
-        panel3.add(label5, cc.xywh(1, 7, 1, 3));
+        panel3.add(label5, cc.xywh(1, 9, 1, 3));
         graphMLButton = new JButton();
         graphMLButton.setText("GraphML");
-        panel3.add(graphMLButton, cc.xy(7, 9));
+        panel3.add(graphMLButton, cc.xy(7, 11));
         reloadSettingsButton = new JButton();
+        reloadSettingsButton.setEnabled(false);
         reloadSettingsButton.setText("Reload Settings");
-        panel3.add(reloadSettingsButton, cc.xy(1, 5));
+        panel3.add(reloadSettingsButton, cc.xy(1, 7));
         samplePatternButton = new JButton();
         samplePatternButton.setText("Sample Pattern");
-        panel3.add(samplePatternButton, cc.xy(3, 9));
+        panel3.add(samplePatternButton, cc.xy(3, 11));
         temporalModelButton = new JButton();
         temporalModelButton.setText("TemporalModel");
         temporalModelButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
-        panel3.add(temporalModelButton, cc.xy(7, 7));
+        panel3.add(temporalModelButton, cc.xy(7, 9));
         defaultSelectorButton = new JButton();
         defaultSelectorButton.setText("Default Selector");
-        panel3.add(defaultSelectorButton, cc.xy(5, 9));
+        panel3.add(defaultSelectorButton, cc.xy(5, 11));
         AllFilesButton = new JButton();
         AllFilesButton.setText("All Files");
         AllFilesButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
-        panel3.add(AllFilesButton, cc.xy(5, 7));
+        panel3.add(AllFilesButton, cc.xy(5, 9));
         testDBConnectionButton = new JButton();
         testDBConnectionButton.setText("Test DB Connection");
-        panel3.add(testDBConnectionButton, cc.xy(1, 3));
+        panel3.add(testDBConnectionButton, cc.xy(1, 5));
         writeSelectorButton = new JButton();
         writeSelectorButton.setText("Write Selector");
-        panel3.add(writeSelectorButton, cc.xy(5, 13));
+        panel3.add(writeSelectorButton, cc.xy(5, 15));
         loadSelectorButton = new JButton();
         loadSelectorButton.setText("Load Selector");
-        panel3.add(loadSelectorButton, cc.xy(3, 13));
+        panel3.add(loadSelectorButton, cc.xy(3, 15));
+        LTLModelCheckButton = new JButton();
+        LTLModelCheckButton.setText("LTL Model Check");
+        panel3.add(LTLModelCheckButton, cc.xy(1, 3));
+        aTestarTestsTest_automaton4TextField = new JTextField();
+        aTestarTestsTest_automaton4TextField.setText(" --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt");
+        panel3.add(aTestarTestsTest_automaton4TextField, cc.xyw(3, 3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(9, 13, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane1.addTab("Miner", panel4);
@@ -431,7 +441,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         dataStoreType = settings.get(ConfigTags.DataStoreType);
 
 
-
         outputDir = settings.get(ConfigTags.OutputDir);
         // check if the output directory has a trailing line separator
         if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
@@ -463,8 +472,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         // code goes here
         Process theProcess = null;
         BufferedReader inStream = null;
-        String cli = "ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse '" + textField1.getText() + "'";
+        BufferedReader errStream = null;
+        String cli = textField3.getText() + " '" + textField1.getText() + "'";
         String response;
+        String errorresponse = null;
         textArea12.setText("invoking : ");
         textArea12.append("\n");
         textArea12.setText(cli);
@@ -483,9 +494,19 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         try {
             inStream = new BufferedReader(new InputStreamReader
                     (theProcess.getInputStream()));
-            while ((response = inStream.readLine()) != null) {
-                System.out.println("response: " + response);
-                textArea12.append(response);
+            errStream = new BufferedReader(new InputStreamReader
+                    (theProcess.getErrorStream()));
+            while ((response = inStream.readLine()) != null || (errorresponse = errStream.readLine()) != null) {
+                if (response != null) {
+                    System.out.println("response: " + response);
+                    textArea12.append(response);
+                }
+
+                if (errorresponse != null) {
+                    System.out.println("error response: " + errorresponse);
+                    textArea12.append(errorresponse);
+                }
+
                 textArea12.append("\n");
             }
 
@@ -505,7 +526,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         BufferedReader errStream = null;
 
         //String cli = "ubuntu1804 run ~/testar/spot_checker'" + "--a " +"/mnt/c/Users/c/git/TESTAR_dev/testar/target/install/testar/bin/output/temporal/APmodel.HOA" + "--f ";
-        String cli = "ubuntu1804 run ~/testar/spot_checker --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
+        String cli = textField2.getText() + " --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
 
         String response;
         String errorresponse = null;
