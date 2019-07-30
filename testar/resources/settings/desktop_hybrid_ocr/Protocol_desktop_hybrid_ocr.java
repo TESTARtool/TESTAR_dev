@@ -67,7 +67,7 @@ import net.sourceforge.tess4j.util.LoadLibs;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_image_recognition extends DesktopProtocol {
+public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 
 	private HashMap<Rect, String> imageWidgets = new HashMap<> ();
 	String pathImage = "";
@@ -220,7 +220,52 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 		// To derive actions (such as clicks, drag&drop, typing ...) we should first create an action compiler.
 		StdActionCompiler ac = new AnnotatingActionCompiler();
 
-		System.out.println("DERIVE ACTIONS IMAGE ITERATION");
+		// To find all possible actions that TESTAR can click on we should iterate through all widgets of the state.
+		//for(Widget w : getTopWidgets(state)){
+		for(Widget w : state){
+
+            /*if(w.get(Tags.Role, Roles.Widget).toString().equalsIgnoreCase("UIAMenu")){
+                // filtering out actions on menu-containers (that would add an action in the middle of the menu)
+                continue; // skip this iteration of the for-loop
+            }*/
+
+            // Only consider enabled and non-blocked widgets
+            if(w.get(Enabled, true) && !w.get(Blocked, false)){
+
+                // Do not build actions for widgets on the blacklist
+                // The blackListed widgets are those that have been filtered during the SPY mode with the
+                //CAPS_LOCK + SHIFT + Click clickfilter functionality.
+                if (!blackListed(w)){
+
+                    //For widgets that are:
+                    // - clickable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of left clicking on them
+                    if(isClickable(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a left click action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.leftClickAt(w));
+                    }
+
+                    //For widgets that are:
+                    // - typeable
+                    // and
+                    // - unFiltered by any of the regular expressions in the Filter-tab, or
+                    // - whitelisted using the clickfilter functionality in SPY mode (CAPS_LOCK + SHIFT + CNTR + Click)
+                    // We want to create actions that consist of typing into them
+                    if(isTypeable(w) && (isUnfiltered(w) || whiteListed(w))) {
+                        //Create a type action with the Action Compiler, and add it to the set of derived actions
+                        actions.add(ac.clickTypeInto(w, this.getRandomText(w), true));
+                    }
+                    //Add sliding actions (like scroll, drag and drop) to the derived actions
+                    //method defined below.
+                    addSlidingActions(actions,ac,SCROLL_ARROW_SIZE,SCROLL_THICK,w, state);
+                }
+            }
+        }
+
+		System.out.println("IMAGE ITERATION");
 
 		if(!imageWidgets.isEmpty()) {
 			for (Entry<Rect, String> entry : imageWidgets.entrySet()) {
@@ -231,7 +276,7 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 
 				System.out.println("Rect: " + key + "   Text: " + value);
 				
-				//Specific for SUT that recognizes 10 buttons like one big text
+				
 				if(value.length()>40 && key.width()>700)
 					for(int i=0; i<10; i++)
 						actions.add(ac.leftClickAt((key.x() + key.width() / 10 * i ), key.y()));
