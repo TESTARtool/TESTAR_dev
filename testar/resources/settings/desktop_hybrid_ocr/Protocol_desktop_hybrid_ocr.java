@@ -48,6 +48,7 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.windows.UIATags;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
 import org.testar.OutputStructure;
@@ -85,8 +86,10 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 				outputImages.delete();
 			outputImages.mkdir();
 
-			ScreenshotSerialiser.exit();
-			ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
+			if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+				ScreenshotSerialiser.exit();
+				ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
+			}
 
 		}catch(Exception e) {}
 
@@ -265,7 +268,7 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
             }
         }
 
-		System.out.println("IMAGE ITERATION");
+		//System.out.println("IMAGE ITERATION");
 
 		if(!imageWidgets.isEmpty()) {
 			for (Entry<Rect, String> entry : imageWidgets.entrySet()) {
@@ -274,9 +277,9 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 
 				actions.add(ac.leftClickAt(key.x(), key.y()));
 
-				System.out.println("Rect: " + key + "   Text: " + value);
+				//System.out.println("Rect: " + key + "   Text: " + value);
 				
-				
+				//Specific for SUT that recognizes 10 buttons like one big text
 				if(value.length()>40 && key.width()>700)
 					for(int i=0; i<10; i++)
 						actions.add(ac.leftClickAt((key.x() + key.width() / 10 * i ), key.y()));
@@ -348,7 +351,8 @@ public class Protocol_desktop_hybrid_ocr extends DesktopProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		ScreenshotSerialiser.exit();
+		if(mode() == Modes.Spy)
+			ScreenshotSerialiser.exit();
 		super.stopSystem(system);
 	}
 

@@ -48,8 +48,10 @@ import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.windows.UIATags;
+import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Main;
 import org.fruit.monkey.Settings;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 import org.testar.protocols.DesktopProtocol;
 
@@ -85,8 +87,10 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 				outputImages.delete();
 			outputImages.mkdir();
 
-			ScreenshotSerialiser.exit();
-			ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
+			if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+				ScreenshotSerialiser.exit();
+				ScreenshotSerialiser.start(outputImages.getAbsolutePath(), "");
+			}
 
 		}catch(Exception e) {}
 
@@ -303,7 +307,8 @@ public class Protocol_desktop_image_recognition extends DesktopProtocol {
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		ScreenshotSerialiser.exit();
+		if(mode() == Modes.Spy)
+			ScreenshotSerialiser.exit();
 		super.stopSystem(system);
 	}
 
