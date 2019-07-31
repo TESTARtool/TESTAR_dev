@@ -58,12 +58,8 @@ public abstract class DependencyHelper {
         int i = 0;
         while (!classQueue.isEmpty()) {
             OClass oClass = classQueue.remove();
-            Collection<OClass> subClasses = oClass.getAllSubclasses();
-            if (subClasses.size() == 0) {
-                // no subclasses, we simply add it to the array
-                oClasses[i++] = oClass;
-            }
-            else if (oClass.getName().equals("OSequence")) {
+
+            if (oClass.getName().equals("OSequence")) {
                 // special rule for this class: we want it to always be last
                 if (classQueue.isEmpty()) {
                     // this was the last class, so add it to the array
@@ -73,6 +69,13 @@ public abstract class DependencyHelper {
                     // not the last class yet..requeue
                     classQueue.addLast(oClass);
                 }
+                continue;
+            }
+
+            Collection<OClass> subClasses = oClass.getAllSubclasses();
+            if (subClasses.size() == 0) {
+                // no subclasses, we simply add it to the array
+                oClasses[i++] = oClass;
             }
             else {
                 // we need to make sure all the subclasses are in the array before we add this class

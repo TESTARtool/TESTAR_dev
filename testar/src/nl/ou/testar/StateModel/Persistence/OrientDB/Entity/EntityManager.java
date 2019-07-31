@@ -8,6 +8,7 @@ import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.metadata.sequence.OSequence;
+import com.orientechnologies.orient.core.metadata.sequence.OSequenceLibrary;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
@@ -61,14 +62,18 @@ public class EntityManager {
             try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
                 // drop all the classes. This will drop all the records for these classes.
                 OSchema schema = db.getMetadata().getSchema();
+                OSequenceLibrary sequenceLibrary = db.getMetadata().getSequenceLibrary();
                 for (OClass oClass : DependencyHelper.sortDependenciesForDeletion(schema.getClasses())) {
                     if ((oClass.isEdgeType() || oClass.isVertexType()) && !(oClass.getName().equals("V") || oClass.getName().equals("E"))) {
                         System.out.println("Dropping class " + oClass.getName());
+                        db.command("TRUNCATE CLASS " + oClass.getName() + " UNSAFE");
                         schema.dropClass(oClass.getName());
                     }
                     // also drop the OSequence table
                     if (oClass.getName().equals("OSequence")) {
                         System.out.println("Dropping class " + oClass.getName());
+                        // first, drop all the sequences
+                        sequenceLibrary.getSequenceNames().forEach(sequenceLibrary::dropSequence);
                         schema.dropClass(oClass.getName());
                     }
                 }
