@@ -68,6 +68,14 @@ div.layout > div.column > div.legend-text {
     margin-left: -20px;
 }
 
+div.layout > div.column div.stats-text {
+    height: 25px;
+    margin-bottom: 12px;
+    font-size: 1.2em;
+    line-height: 30px;
+    margin-left: -20px;
+}
+
 div.abstract-state {
     background-color: #1c9099;
 }
@@ -145,6 +153,14 @@ div.is-child-of {
     z-index: 999;
 }
 
+.cd-panel__content {
+    margin-top: 50px;
+}
+
+.panel-header {
+    margin-bottom: 25px;
+}
+
 .cd-panel--from-right .cd-panel__header {
     right: 0;
 }
@@ -190,7 +206,7 @@ div.is-child-of {
     transition-delay: 0s;
 }
 
-#close-panel, #toggle-visible, #highlight, #widget-tree-button, #trace-path-button {
+#close-panel, #toggle-visible, #highlight, #widget-tree-button, #trace-path-button, #popup-edge {
     float: right;
     margin-right: 10px;
 }
@@ -461,4 +477,23 @@ button.skip:active {
     padding: 12px 20px 12px 42px;
     background-position: 10px 13px;
     background-repeat: no-repeat;
+}
+
+.edge-popup {
+    position: relative;
+    background: #FFF;
+    padding: 20px;
+    width: 95%;
+    max-width: 1900px;
+    margin: 20px auto;
+}
+
+.edge-popup div.screenshot {
+    width: 40%;
+    display: inline-block;
+}
+
+.edge-popup div.action {
+    width: 15%;
+    display: inline-block;
 }

@@ -47,12 +47,19 @@
         </div>
 
         <div class="column">
+            <div class="extra-margin-left"><label for="toggle-abstract-layer" class="custom-checkbox">Show abstract layer<input type="checkbox" id="toggle-abstract-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-concrete-layer" class="custom-checkbox">Show concrete layer<input type="checkbox" id="toggle-concrete-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-sequence-layer" class="custom-checkbox">Show sequence layer<input type="checkbox" id="toggle-sequence-layer" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left"><label for="toggle-layer-transitions" class="custom-checkbox">Show inter-layer edges<input type="checkbox" id="toggle-layer-transitions" checked><span class="checkmark"></span></label></div>
+        </div>
+
+        <div class="column">
             <div class="extra-margin-left"><span class="legend">Legend:</span></div>
         </div>
 
         <div class="column">
-            <div class="legend-box abstract-state"></div>
-            <div class="legend-box concrete-state"></div>
+            <div class="legend-box abstract-state" id="legend-abstract-state"></div>
+            <div class="legend-box concrete-state" id="legend-concrete-state"></div>
             <div class="legend-box sequence-node"></div>
         </div>
 
@@ -75,13 +82,13 @@
         </div>
 
         <div class="column">
-            <div class="extra-margin-left"><label for="toggle-abstract-layer" class="custom-checkbox">Show abstract layer<input type="checkbox" id="toggle-abstract-layer" checked><span class="checkmark"></span></label></div>
-            <div class="extra-margin-left"><label for="toggle-concrete-layer" class="custom-checkbox">Show concrete layer<input type="checkbox" id="toggle-concrete-layer" checked><span class="checkmark"></span></label></div>
-            <div class="extra-margin-left"><label for="toggle-sequence-layer" class="custom-checkbox">Show sequence layer<input type="checkbox" id="toggle-sequence-layer" checked><span class="checkmark"></span></label></div>
-            <div class="extra-margin-left"><label for="toggle-layer-transitions" class="custom-checkbox">Show inter-layer edges<input type="checkbox" id="toggle-layer-transitions" checked><span class="checkmark"></span></label></div>
+            <div class="extra-margin-left">
+                <div class="stats-text" id="stats-abstract-states"></div>
+                <div class="stats-text" id="stats-abstract-actions"></div>
+                <div class="stats-text" id="stats-concrete-states"></div>
+                <div class="stats-text" id="stats-concrete-actions"></div>
+            </div>
         </div>
-
-
     </div>
 </div>
 
@@ -102,9 +109,9 @@
 
 <script>
 
+    // global object that will hold some config values
     let appStatus = {};
-
-
+    appStatus.graph = {};
     let cy = cytoscape({
         container: document.getElementById("cy"),
 
@@ -335,11 +342,33 @@
                 }
             },
             {
+                selector: '.selected-node-animated',
+                style: {
+                    'width': '50px',
+                    'height': '50px',
+                    'border-color': '#4be2ff',
+                    'transition-property' : 'width height border-color',
+                    'transition-duration' : '0.5s',
+                    'transition-timing-function': 'ease-out-sine'
+                }
+            },
+            {
                 selector: '.selected-initial-node',
                 style : {
                     'width': '60px',
                     'height': '60px',
                     'border-color': '#4be2ff'
+                }
+            },
+            {
+                selector: '.selected-initial-node-animated',
+                style : {
+                    'width': '60px',
+                    'height': '60px',
+                    'border-color': '#4be2ff',
+                    'transition-property' : 'width height border-color',
+                    'transition-duration' : '0.5s',
+                    'transition-timing-function': 'ease-out-sine'
                 }
             },
             {
@@ -356,7 +385,9 @@
                     'line-color': "#4be2ff",
                     'target-arrow-color': "#4be2ff",
                     'line-style': 'solid',
-                    'width': 2
+                    'width': 2,
+                    'font-size': '8px',
+                    'font-weight': 'bold'
                 }
             },
             {
@@ -404,6 +435,7 @@
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
         let contentPanelHeader = document.getElementById("content-panel-header");
+        appStatus.graph.selectedNode = targetNode;
 
         // highlight the selected node
         cy.$('edge.selected-edge').removeClass('selected-edge');
@@ -439,6 +471,11 @@
             cdPanel.classList.remove("cd-panel--is-visible");
             // remove the highlight from the selected node
             cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
+            if (targetNode.hasClass('SequenceNode')) {
+                targetNode.outgoers('.Accessed').target('.ConcreteState').removeClass('connected-concrete-state-node');
+            }
+            // remove the node selection
+            appStatus.graph.selectedNode = null;
         });
         contentPanelHeader.appendChild(closeButton);
 
@@ -488,7 +525,7 @@
         });
         contentPanelHeader.appendChild(highlightButton);
 
-        // if the node represents a state that contains an error, we add a button to highlight the path to that error
+        // for concrete states, we offer a button that will trace the paths leading to that state
         if (targetNode.hasClass("ConcreteState") && appStatus.sequenceLayerPresent) {
             let traceButton = document.createElement("button");
             traceButton.id = "trace-path-button";
@@ -501,10 +538,16 @@
                 let predecessorNodes = sequenceNodes.predecessors();
                 // next get the concrete state nodes that were accessed by all these sequence nodes
                 let concreteStateNodes = predecessorNodes.outgoers();
-                let allNodes = sequenceNodes.union(predecessorNodes).union(concreteStateNodes).union(targetNode);
+                // then, we have to get the concrete action nodes that correspond with the sequence steps
+                let concreteActionUids = predecessorNodes.filter((element) => element.hasClass('SequenceStep')).map((element) =>
+                    element.data('concreteActionUid'));
+                // now fetch the edges matching the collected ids
+                let concreteActions = concreteStateNodes.connectedEdges('.ConcreteAction').filter((element) =>
+                    concreteActionUids.includes(element.data('uid')));
+                let allElements = sequenceNodes.union(predecessorNodes).union(concreteStateNodes).union(targetNode).union(concreteActions);
                 // add the parent nodes, if there are any
-                allNodes = allNodes.union(cy.$(allNodes).parent());
-                cy.$("*").difference(allNodes).addClass("invisible");
+                allElements = allElements.union(cy.$(allElements).parent());
+                cy.$("*").difference(allElements).addClass("invisible");
             });
             contentPanelHeader.appendChild(traceButton);
         }
@@ -599,12 +642,18 @@
         let sidePanel = document.getElementsByClassName("cd-panel")[0];
         let contentPanel = document.getElementById("cd-content-panel");
         let contentPanelHeader = document.getElementById("content-panel-header");
+        appStatus.graph.selectedEdge = targetEdge;
 
         // highlight the selected node
         cy.$('edge.selected-edge').removeClass('selected-edge');
         cy.$('node.selected-node').union(cy.$('node.isInitial')).removeClass('selected-node').removeClass('selected-initial-node');
         cy.$('node.connected-concrete-state-node').removeClass('connected-concrete-state-node');
         targetEdge.addClass('selected-edge');
+        // if it's a sequence step, also highlight the corresponding concrete action
+        if (targetEdge.hasClass('SequenceStep')) {
+            targetEdge.source().outgoers('.ConcreteState').connectedEdges('.ConcreteAction').filter((element) =>
+                element.data('uid') == targetEdge.data('concreteActionUid')).addClass('selected-edge');
+        }
 
         // remove all the current child elements for both panel and panel header
         let child = contentPanel.lastChild;
@@ -629,8 +678,54 @@
             cdPanel.classList.remove("cd-panel--is-visible");
             // remove the highlight from the selected node
             cy.$('edge.selected-edge').removeClass('selected-edge');
+            // remove the edge selection
+            appStatus.graph.selectedEdge = null;
         });
         contentPanelHeader.appendChild(closeButton);
+
+        if (targetEdge.hasClass('ConcreteAction')) {
+            // if it is a concrete action edge, we add a popup
+            // first the content
+            let popupContent = document.createElement("div");
+            popupContent.id = 'popup-content';
+            popupContent.classList.add('edge-popup', 'mfp-hide');
+            // create divs for the source and target screenshots
+            let sourceDiv = document.createElement("div");
+            let sourceImg = document.createElement("img");
+            sourceImg.src = "${contentFolder}/" + targetEdge.source().id() + ".png";
+            sourceDiv.classList.add('screenshot');
+            sourceDiv.appendChild(sourceImg);
+
+            let targetDiv = document.createElement("div");
+            let targetImg = document.createElement("img");
+            targetImg.src = "${contentFolder}/" + targetEdge.target().id() + ".png";
+            targetDiv.classList.add('screenshot');
+            targetDiv.appendChild(targetImg);
+
+            // add the edge text
+            let descDiv = document.createElement("div");
+            descDiv.appendChild(document.createTextNode(targetEdge.data('Desc')));
+            descDiv.classList.add('action');
+
+            // add the divs in order
+            popupContent.appendChild(sourceDiv);
+            popupContent.appendChild(descDiv);
+            popupContent.appendChild(targetDiv);
+            contentPanelHeader.appendChild(popupContent);
+
+            // then a button to initialize it
+            let popupButton = document.createElement("button");
+            popupButton.id = "popup-edge";
+            popupButton.classList.add("skip");
+            popupButton.appendChild(document.createTextNode("Show"));
+            contentPanelHeader.appendChild(popupButton);
+            $('#popup-edge').magnificPopup({
+                items: {
+                    src: '#popup-content',
+                    type: 'inline'
+                }
+            });
+        }
 
         //////////// end button section ///////////////////////////
 
@@ -691,9 +786,11 @@
     });
 
     function initLayers() {
-        appStatus.nrOfAbstractStates =  cy.$('node .AbstractState').size();
-        appStatus.nrOfConcreteStates = cy.$('node .ConcreteState').size();
-        appStatus.nrOfSequenceNodes = cy.$('node .SequenceNode').size();
+        appStatus.nrOfAbstractStates =  cy.$('node.AbstractState').size();
+        appStatus.nrOfConcreteStates = cy.$('node.ConcreteState').size();
+        appStatus.nrOfSequenceNodes = cy.$('node.SequenceNode').size();
+        appStatus.nrOfAbstractActions = cy.$('edge.AbstractAction').size();
+        appStatus.nrOfConcreteActions = cy.$('edge.ConcreteAction').size();
         appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
         appStatus.concreteLayerPresent = appStatus.nrOfConcreteStates > 0;
         appStatus.sequenceLayerPresent = appStatus.nrOfSequenceNodes > 0;
@@ -777,6 +874,24 @@
         }
     }
 
+    function initStats() {
+        let div = document.getElementById('stats-abstract-states');
+        let text = document.createTextNode("Nr of abstract states: " + appStatus.nrOfAbstractStates);
+        div.append(text);
+
+        div = document.getElementById('stats-abstract-actions');
+        text = document.createTextNode("Nr of abstract actions: " + appStatus.nrOfAbstractActions);
+        div.append(text);
+
+        div = document.getElementById('stats-concrete-states');
+        text = document.createTextNode('Nr of concrete states:  ' + appStatus.nrOfConcreteStates);
+        div.append(text);
+
+        div = document.getElementById('stats-concrete-actions');
+        text = document.createTextNode('Nr of concrete actions: ' + appStatus.nrOfConcreteActions);
+        div.append(text);
+    }
+
     function filterDataFields(filterValue) {
         let dataTable = document.getElementById("attribute-data-table");
         let dataTableBody = dataTable.getElementsByTagName("tbody")[0];
@@ -805,6 +920,7 @@
 
     cy.ready(function (event) {
         initLayers();
+        initStats();
 
         // highlight the leaves, which in this case will be the root of the widget tree
         cy.$(".Widget").leaves().addClass("leaves");
@@ -846,7 +962,87 @@
             event.target.removeClass("mouse-over-concrete-action");
         });
 
+        // add a highlight when mousing over nodes
+        cy.$('node').on('mouseover', (event) => {
+            // if there is currently a selected node or edge, we don't highlight, as there will already be a highlight in place
+            if ("selectedNode" in appStatus.graph && appStatus.graph.selectedNode != null) return;
+            if ("selectedEdge" in appStatus.graph && appStatus.graph.selectedEdge != null) return;
+            if (event.target.is(':parent')) return;
+            event.target.addClass(event.target.hasClass('isInitial') ? 'selected-initial-node' : 'selected-node');
+
+            // if the node is a sequence node, we want to also highlight the corresponding concrete action node
+            if (event.target.hasClass('SequenceNode')) {
+                cy.$(event.target).outgoers('.ConcreteState').addClass('selected-node');
+            }
+        });
+        cy.$('node').on('mouseout', (event) => {
+            // no action taken if there is a selected node or edge
+            if ("selectedNode" in appStatus.graph && appStatus.graph.selectedNode != null) return;
+            if ("selectedEdge" in appStatus.graph && appStatus.graph.selectedEdge != null) return;
+            if (event.target.is(':parent')) return;
+
+            if (event.target.hasClass('selected-node')) {
+                event.target.removeClass('selected-node');
+            }
+            if (event.target.hasClass('selected-initial-node')) {
+                event.target.removeClass('selected-initial-node');
+            }
+
+            if (event.target.hasClass('SequenceNode')) {
+                cy.$(event.target).outgoers('.ConcreteState').removeClass('selected-node');
+            }
+        });
+
+        cy.$('edge').on('mouseover', (event) => {
+            // if there is currently a selected node or edge, we don't highlight, as there will already be a highlight in place
+            if ("selectedNode" in appStatus.graph && appStatus.graph.selectedNode != null) return;
+            if ("selectedEdge" in appStatus.graph && appStatus.graph.selectedEdge != null) return;
+
+            if (event.target.hasClass('isAbstractedBy') || event.target.hasClass('Accessed')) return;
+            event.target.addClass('selected-edge');
+
+            // we also want to highlight the concrete action if
+            if (event.target.hasClass('SequenceStep')) {
+                event.target.source().outgoers('.ConcreteState').connectedEdges('.ConcreteAction').filter((element) =>
+                    element.data('uid') == event.target.data('concreteActionUid')).addClass('selected-edge').addClass('mouse-over-concrete-action');
+            }
+        });
+        cy.$('edge').on('mouseout', (event) => {
+            // no action taken if there is a selected node or edge
+            if ("selectedNode" in appStatus.graph && appStatus.graph.selectedNode != null) return;
+            if ("selectedEdge" in appStatus.graph && appStatus.graph.selectedEdge != null) return;
+
+            if (event.target.hasClass('isAbstractedBy') || event.target.hasClass('Accessed')) return;
+            event.target.removeClass('selected-edge');
+
+            if (event.target.hasClass('SequenceStep')) {
+                event.target.source().outgoers('.ConcreteState').connectedEdges('.ConcreteAction').filter((element) =>
+                    element.data('uid') == event.target.data('concreteActionUid')).removeClass('selected-edge').removeClass('mouse-over-concrete-action');
+            }
+        });
+
+        // legend boxes
+        let abstractStateLegendBox = document.getElementById("legend-abstract-state");
+        abstractStateLegendBox.addEventListener('click', () => {
+            let initialNodes = cy.$('node.isInitial');
+            let abstractStateNodes = cy.$('node.AbstractState').difference(initialNodes);
+            abstractStateNodes.addClass('selected-node-animated');
+            initialNodes.addClass('selected-initial-node-animated');
+            setTimeout(() => {
+                abstractStateNodes.removeClass('selected-node-animated');
+                initialNodes.removeClass('selected-initial-node-animated');
+            }, 1000);
+        });
+
+        let concreteStateLegendBox = document.getElementById("legend-concrete-state");
+        concreteStateLegendBox.addEventListener('click', () => {
+            let  concreteStates = cy.$('node.ConcreteState');
+            concreteStates.addClass('selected-node-animated');
+            setTimeout(() => concreteStates.removeClass('selected-node-animated'), 1000);
+        });
+
     });
+
 
 </script>
 </body>
