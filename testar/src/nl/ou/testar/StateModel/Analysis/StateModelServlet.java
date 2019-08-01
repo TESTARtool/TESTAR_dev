@@ -20,6 +20,7 @@ public class StateModelServlet extends HttpServlet {
 
         ServletContext servletContext = getServletContext();
         // todo: this needs proper error handling
+        // fetch a list of the generated models from the analysismanager
         AnalysisManager analysisManager = (AnalysisManager)servletContext.getAttribute("analysisManager");
         List<AbstractStateModel> models = analysisManager.fetchModels();
 

@@ -68,8 +68,8 @@ final class UIAState extends UIAWidget implements State {
 	}
 
 	void invalidate(UIAWidget w){
-		if(w.element != null)
-			w.element.backRef = null;
+		if(w.uiaElement != null)
+			w.uiaElement.backRef = null;
 		w.root = null;
 		for(UIAWidget c : w.children)
 			invalidate(c);
@@ -107,112 +107,124 @@ final class UIAState extends UIAWidget implements State {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T> T get(UIAWidget w, Tag<T> t, T defaultValue) {
-		Object ret = w.tags.get(t);
+	<T> T get(UIAWidget widget, Tag<T> tag, T defaultValue) {
+		// first we check if it is a state management tag that has been mapped to an automation tag
+		Tag<T> stateManagementTag = UIAMapping.getMappedStateTag(tag);
+		if (stateManagementTag != null) {
+			tag = stateManagementTag;
+		}
 
-		if(ret != null){
-			return (T)ret;
-		}else if(w.element == null || w.tags.containsKey(t)){
+		Object returnObject = widget.tags.get(tag);
+
+		if(returnObject != null){
+			return (T)returnObject;
+		}else if(widget.uiaElement == null || widget.tags.containsKey(tag)){
 			return defaultValue;
 		}
-		
-		if(t.equals(Tags.Desc)){
-			ret = w.element.name;
-		}else if(t.equals(Tags.Role)){
-			ret = UIARoles.fromTypeId(w.element.ctrlId);
-		}else if(t.equals(Tags.HitTester)){
-			ret = new UIAHitTester(w.element);
-		}else if(t.equals(Tags.Shape)){	
-			ret = w.element.rect;
-		}else if(t.equals(Tags.Blocked)){
-			ret = w.element.blocked;
-		}else if(t.equals(Tags.Enabled)){
-			ret = w.element.enabled;
-		}else if(t.equals(Tags.Title)){
-			ret = w.element.name;
-		}else if (t.equals(Tags.ValuePattern)) {
-			ret = w.element.valuePattern;
-		}else if(t.equals(Tags.ToolTipText)){
-			ret = w.element.helpText;
-		}else if(t.equals(Tags.PID)){
-			ret = w == this ? ((UIARootElement)element).pid : null;
-		}else if(t.equals(Tags.IsRunning)){
-			ret = w == this ? ((UIARootElement)element).isRunning : null;
-		}else if(t.equals(Tags.TimeStamp)){
-			ret = w == this ? ((UIARootElement)element).timeStamp : null;
-		}else if(t.equals(Tags.Foreground)){
-			ret = w == this ? ((UIARootElement)element).isForeground : null;
-		}else if(t.equals(Tags.HasStandardKeyboard)){
-			ret = w == this ? ((UIARootElement)element).hasStandardKeyboard : null;	
-		}else if(t.equals(Tags.HasStandardMouse)){
-			ret = w == this ? ((UIARootElement)element).hasStandardMouse : null;				
-		}else if(t.equals(UIATags.UIAName)){ 
-			ret = w.element.name;
-		}else if(t.equals(UIATags.UIAOrientation)){
-			ret = w.element.orientation;
-		// begin by urueda
-		}else if(t.equals(Tags.ZIndex)){
-			ret = w.element.zindex;
-		}else if(t.equals(UIATags.UIAIsWindowModal)){
-			ret = w.element.isModal;
-		}else if(t.equals(UIATags.UIAIsTopmostWindow)){
-			ret = w.element.isTopmostWnd;
-		}else if(t.equals(UIATags.UIAIsContentElement)){
-			ret = w.element.isContentElement;
-		}else if(t.equals(UIATags.UIAIsControlElement)){
-			ret = w.element.isControlElement;
-		}else if(t.equals(UIATags.UIAScrollPattern)){
-			ret = w.element.scrollPattern;
-		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
-		//	ret = w.element.scrollbarInfo;
-		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
-		//	ret = w.element.scrollbarInfoH;
-		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
-		//	ret = w.element.scrollbarInfoV;
-		}else if(t.equals(UIATags.UIAHorizontallyScrollable)){
-			ret = w.element.hScroll;
-		}else if(t.equals(UIATags.UIAVerticallyScrollable)){
-			ret = w.element.vScroll;
-		}else if(t.equals(UIATags.UIAScrollHorizontalViewSize)){
-			ret = w.element.hScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollVerticalViewSize)){
-			ret = w.element.vScrollViewSize;
-		}else if(t.equals(UIATags.UIAScrollHorizontalPercent)){
-			ret = w.element.hScrollPercent;
-		}else if(t.equals(UIATags.UIAScrollVerticalPercent)){
-			ret = w.element.vScrollPercent;
-		// end by urueda
-		}else if(t.equals(UIATags.UIAHelpText)){
-			ret = w.element.helpText;
-		}else if(t.equals(UIATags.UIAClassName)){
-			ret = w.element.className;
-		}else if(t.equals(UIATags.UIAControlType)){
-			ret = w.element.ctrlId;
-		}else if(t.equals(UIATags.UIACulture)){
-			ret = w.element.culture;
-		}else if(t.equals(UIATags.UIAFrameworkId)){
-			ret = w.element.frameworkId;
-		}else if(t.equals(UIATags.UIAHasKeyboardFocus)){
-			ret = w.element.hasKeyboardFocus;
-		}else if(t.equals(UIATags.UIAIsKeyboardFocusable)){
-			ret = w.element.isKeyboardFocusable;
-		}else if(t.equals(UIATags.UIAProviderDescription)){
-			ret = w.element.providerDesc;
-		}else if(t.equals(UIATags.UIAWindowInteractionState)){
-			ret = w.element.wndInteractionState;
-		}else if(t.equals(UIATags.UIAWindowVisualState)){
-			ret = w.element.wndVisualState;
-		}else if(t.equals(UIATags.UIAAutomationId)){
-			ret = w.element.automationId;
-		}else if(t.equals(UIATags.UIAAcceleratorKey)){
-			ret = w.element.acceleratorKey;
-		}else if(t.equals(UIATags.UIAAccessKey)){
-			ret = w.element.accessKey;
+
+		// check the automation element for the tag
+		returnObject = uiaElement.get(tag, null);
+		if (returnObject != null) {
+			return (T)returnObject;
 		}
 		
-		cacheTag(w, t, ret);
+		if(tag.equals(Tags.Desc)){
+			returnObject = widget.uiaElement.name;
+		}else if(tag.equals(Tags.Role)){
+			returnObject = UIARoles.fromTypeId(widget.uiaElement.ctrlId);
+		}else if(tag.equals(Tags.HitTester)){
+			returnObject = new UIAHitTester(widget.uiaElement);
+		}else if(tag.equals(Tags.Shape)){
+			returnObject = widget.uiaElement.rect;
+		}else if(tag.equals(Tags.Blocked)){
+			returnObject = widget.uiaElement.blocked;
+		}else if(tag.equals(Tags.Enabled)){
+			returnObject = widget.uiaElement.enabled;
+		}else if(tag.equals(Tags.Title)){
+			returnObject = widget.uiaElement.name;
+		}else if (tag.equals(Tags.ValuePattern)) {
+			returnObject = widget.uiaElement.valuePattern;
+		}else if(tag.equals(Tags.ToolTipText)){
+			returnObject = widget.uiaElement.helpText;
+		}else if(tag.equals(Tags.PID)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).pid : null;
+		}else if(tag.equals(Tags.IsRunning)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).isRunning : null;
+		}else if(tag.equals(Tags.TimeStamp)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).timeStamp : null;
+		}else if(tag.equals(Tags.Foreground)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).isForeground : null;
+		}else if(tag.equals(Tags.HasStandardKeyboard)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).hasStandardKeyboard : null;
+		}else if(tag.equals(Tags.HasStandardMouse)){
+			returnObject = widget == this ? ((UIARootElement) uiaElement).hasStandardMouse : null;
+		}else if(tag.equals(UIATags.UIAName)){
+			returnObject = widget.uiaElement.name;
+		}else if(tag.equals(UIATags.UIAOrientation)){
+			returnObject = widget.uiaElement.orientation;
+		// begin by urueda
+		}else if(tag.equals(Tags.ZIndex)){
+			returnObject = widget.uiaElement.zindex;
+		}else if(tag.equals(UIATags.UIAIsWindowModal)){
+			returnObject = widget.uiaElement.isModal;
+		}else if(tag.equals(UIATags.UIAIsTopmostWindow)){
+			returnObject = widget.uiaElement.isTopmostWnd;
+		}else if(tag.equals(UIATags.UIAIsContentElement)){
+			returnObject = widget.uiaElement.isContentElement;
+		}else if(tag.equals(UIATags.UIAIsControlElement)){
+			returnObject = widget.uiaElement.isControlElement;
+		}else if(tag.equals(UIATags.UIAIsScrollPatternAvailable)){
+			returnObject = widget.uiaElement.scrollPattern;
+		//}else if(t.equals(UIATags.UIAScrollbarInfo)){
+		//	ret = w.uiaElement.scrollbarInfo;
+		//}else if(t.equals(UIATags.UIAScrollbarInfoH)){
+		//	ret = w.uiaElement.scrollbarInfoH;
+		//}else if(t.equals(UIATags.UIAScrollbarInfoV)){
+		//	ret = w.uiaElement.scrollbarInfoV;
+		}else if(tag.equals(UIATags.UIAHorizontallyScrollable)){
+			returnObject = widget.uiaElement.hScroll;
+		}else if(tag.equals(UIATags.UIAVerticallyScrollable)){
+			returnObject = widget.uiaElement.vScroll;
+		}else if(tag.equals(UIATags.UIAScrollHorizontalViewSize)){
+			returnObject = widget.uiaElement.hScrollViewSize;
+		}else if(tag.equals(UIATags.UIAScrollVerticalViewSize)){
+			returnObject = widget.uiaElement.vScrollViewSize;
+		}else if(tag.equals(UIATags.UIAScrollHorizontalPercent)){
+			returnObject = widget.uiaElement.hScrollPercent;
+		}else if(tag.equals(UIATags.UIAScrollVerticalPercent)){
+			returnObject = widget.uiaElement.vScrollPercent;
+		// end by urueda
+		}else if(tag.equals(UIATags.UIAHelpText)){
+			returnObject = widget.uiaElement.helpText;
+		}else if(tag.equals(UIATags.UIAClassName)){
+			returnObject = widget.uiaElement.className;
+		}else if(tag.equals(UIATags.UIAControlType)){
+			returnObject = widget.uiaElement.ctrlId;
+		}else if(tag.equals(UIATags.UIACulture)){
+			returnObject = widget.uiaElement.culture;
+		}else if(tag.equals(UIATags.UIAFrameworkId)){
+			returnObject = widget.uiaElement.frameworkId;
+		}else if(tag.equals(UIATags.UIAHasKeyboardFocus)){
+			returnObject = widget.uiaElement.hasKeyboardFocus;
+		}else if(tag.equals(UIATags.UIAIsKeyboardFocusable)){
+			returnObject = widget.uiaElement.isKeyboardFocusable;
+		}else if(tag.equals(UIATags.UIAProviderDescription)){
+			returnObject = widget.uiaElement.providerDesc;
+		}else if(tag.equals(UIATags.UIAWindowInteractionState)){
+			returnObject = widget.uiaElement.wndInteractionState;
+		}else if(tag.equals(UIATags.UIAWindowVisualState)){
+			returnObject = widget.uiaElement.wndVisualState;
+		}else if(tag.equals(UIATags.UIAAutomationId)){
+			returnObject = widget.uiaElement.automationId;
+		}else if(tag.equals(UIATags.UIAAcceleratorKey)){
+			returnObject = widget.uiaElement.acceleratorKey;
+		}else if(tag.equals(UIATags.UIAAccessKey)){
+			returnObject = widget.uiaElement.accessKey;
+		}
 		
-		return (ret == null) ? defaultValue : (T)ret;
+		cacheTag(widget, tag, returnObject);
+		
+		return (returnObject == null) ? defaultValue : (T)returnObject;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -236,32 +248,32 @@ final class UIAState extends UIAWidget implements State {
 	UIAWidget getParent(UIAWidget w){ return w.parent; }
 
 
-	Iterable<Tag<?>> tags(final UIAWidget w){
-		Assert.notNull(w);
+	Iterable<Tag<?>> tags(final UIAWidget widget){
+		Assert.notNull(widget);
 
 		// compile a query set
 		final Set<Tag<?>> queryTags = new HashSet<Tag<?>>();
-		queryTags.addAll(tags.keySet());
-		queryTags.addAll(Tags.tagSet());
-		queryTags.addAll(UIATags.tagSet());
+		queryTags.addAll(tags.keySet());  // the tags that have been set on this widget (state is also a widget)
+		queryTags.addAll(Tags.tagSet()); // the tags defined in org.fruit.alayer.Tags
+		queryTags.addAll(UIATags.tagSet()); // the tags defined in org.fruit.alayer.windows.UIATags
 
-		Iterable<Tag<?>> ret = new Iterable<Tag<?>>(){
+		Iterable<Tag<?>> returnTags = new Iterable<Tag<?>>(){
 			public Iterator<Tag<?>> iterator() {
 				return new Iterator<Tag<?>>(){
-					Iterator<Tag<?>> i = queryTags.iterator();
-					UIAWidget target = w;
-					Tag<?> next;
+					Iterator<Tag<?>> tagIterator = queryTags.iterator();
+					UIAWidget targetWidget = widget;
+					Tag<?> nextTag;
 
 					private Tag<?> fetchNext(){
-						if(next == null){
-							while(i.hasNext()){
-								next = i.next();
-								if(target.get(next, null) != null)
-									return next;
+						if(nextTag == null){
+							while(tagIterator.hasNext()){
+								nextTag = tagIterator.next();
+								if(targetWidget.get(nextTag, null) != null)
+									return nextTag;
 							}
-							next = null;
+							nextTag = null;
 						}
-						return next;
+						return nextTag;
 					}
 
 					public boolean hasNext() {
@@ -269,20 +281,18 @@ final class UIAState extends UIAWidget implements State {
 					}
 
 					public Tag<?> next() {
-						Tag<?> ret = fetchNext();
-						if(ret == null)
+						Tag<?> returnTag = fetchNext();
+						if(returnTag == null)
 							throw new NoSuchElementException();
-						next = null;
-						return ret;
+						nextTag = null;
+						return returnTag;
 					}
 
 					public void remove() { throw new UnsupportedOperationException(); }
-
 				};
 			}
-
 		};
-		return ret;
+		return returnTags;
 	}
 
 	//public String toString(){ return Util.treeDesc(this, 2, Tags.Desc); }
