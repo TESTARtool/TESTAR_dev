@@ -122,6 +122,8 @@ public final class ConfigTags {
   public static final Tag<String> SpotFormulaParser = Tag.from("SpotFormulaParser", String.class);
   public static final Tag<String> PythonEnvironment = Tag.from("PythonEnvironment", String.class);
   public static final Tag<String> PythonVisualizer = Tag.from("PythonVisualizer", String.class);
+  public static final Tag<String> PythonVisualizerPort = Tag.from("PythonVisualizerPort", String.class);
+  public static final Tag<String> PythonVisualizerStop = Tag.from("PythonVisualizerStop", String.class);
 
 
   @SuppressWarnings("unchecked")

@@ -66,6 +66,10 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:d:grow"/>
@@ -153,6 +157,30 @@
                   <text value="WSL path"/>
                 </properties>
               </component>
+              <component id="bc9fd" class="javax.swing.JButton" binding="button9" default-binding="true">
+                <constraints>
+                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="9972d" class="javax.swing.JButton" binding="button10" default-binding="true">
+                <constraints>
+                  <grid row="12" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <vspacer id="b076b">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-vert="false"/>
+                </constraints>
+              </vspacer>
               <component id="b3b24" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -172,23 +200,24 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="bc9fd" class="javax.swing.JButton" binding="button9" default-binding="true">
-                <constraints>
-                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
               <component id="5222b" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Visualizer:"/>
+                  <text value="Start a Visualizer:"/>
                   <toolTipText value="Usually this is the path to run.py"/>
+                </properties>
+              </component>
+              <component id="bf3f5" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Stop Visualizers:"/>
+                  <toolTipText value="url path to stop all Visualizers. Usually &quot;/shutdown&quot;"/>
                 </properties>
               </component>
               <component id="bc8ad" class="javax.swing.JTextField" binding="textFieldPythonVisualizer">
@@ -200,21 +229,38 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="9972d" class="javax.swing.JButton" binding="button10" default-binding="true">
+              <component id="49c3f" class="javax.swing.JTextField" binding="textFieldVisualizersStop">
                 <constraints>
-                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="/shutdown"/>
+                </properties>
+              </component>
+              <component id="4e886" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="..."/>
+                  <text value="Start Port:"/>
+                  <toolTipText value="Port number of the first Visualizer.&#10;Additional Visualizers wil run at Port+3"/>
                 </properties>
               </component>
-              <vspacer id="b076b">
+              <component id="82f76" class="javax.swing.JTextField" binding="textFieldStartPort">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-vert="false"/>
+                  <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
-              </vspacer>
+                <properties>
+                  <text value="8050"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="a344f" layout-manager="FormLayout">

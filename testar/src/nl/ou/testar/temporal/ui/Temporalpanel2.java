@@ -99,6 +99,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton button10;
     private JButton LTLModelCheckButton;
     private JTextField aTestarTestsTest_automaton4TextField;
+    private JTextField textFieldVisualizersStop;
+    private JTextField textFieldStartPort;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -430,6 +432,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         textField3.setText(settings.get(ConfigTags.SpotFormulaParser));
         textFieldPythonEnvironment.setText(settings.get(ConfigTags.PythonEnvironment));
         textFieldPythonVisualizer.setText(settings.get(ConfigTags.PythonVisualizer));
+        textFieldStartPort.setText(settings.get(ConfigTags.PythonVisualizerPort));
+        textFieldVisualizersStop.setText(settings.get(ConfigTags.PythonVisualizerStop));
+
 
         // used here, but controlled on StateModelPanel
         dataStoreText = settings.get(ConfigTags.DataStore);
@@ -463,6 +468,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         settings.set(ConfigTags.SpotFormulaParser, textField3.getText());
         settings.set(ConfigTags.PythonEnvironment, textFieldPythonEnvironment.getText());
         settings.set(ConfigTags.PythonVisualizer, textFieldPythonVisualizer.getText());
+        settings.set(ConfigTags.PythonVisualizerPort, textFieldStartPort.getText());
+        settings.set(ConfigTags.PythonVisualizerStop, textFieldVisualizersStop.getText());
+
+
     }
     //***********TESTAR****************
 
