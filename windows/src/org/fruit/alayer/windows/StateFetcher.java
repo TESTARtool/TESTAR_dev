@@ -366,7 +366,12 @@ public class StateFetcher implements Callable<UIAState>{
 				UIATags.getChildTags(availabilityTag).stream().filter(UIATags::tagIsActive).forEach(patternPropertyTag -> {
 					Object propertyObject = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
 					if (propertyObject != null) {
-						setConvertedObjectValue(patternPropertyTag, object, uiaElement);
+						try {
+							setConvertedObjectValue(patternPropertyTag, propertyObject, uiaElement);
+						} catch (Exception e) {
+							System.out.println("Exception while setting tag " + patternPropertyTag.name());
+							System.out.println(e.getMessage());
+						}
 					}
 				});
 			}
