@@ -484,16 +484,26 @@ button.skip:active {
     background: #FFF;
     padding: 20px;
     width: 95%;
-    max-width: 1900px;
+    max-width: 100%;
     margin: 20px auto;
 }
 
 .edge-popup div.screenshot {
     width: 40%;
+    max-width: 40%;
     display: inline-block;
+}
+
+.edge-popup img {
+    max-width: 100%;
 }
 
 .edge-popup div.action {
     width: 15%;
+    max-width: 15%;
     display: inline-block;
+    overflow-wrap: break-word;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
 }

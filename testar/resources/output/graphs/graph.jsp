@@ -581,7 +581,6 @@
         h3.appendChild(document.createTextNode("Element data:"));
         paragraph.appendChild(h3);
 
-        // <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
         let filterBox = document.createElement("input");
         filterBox.type = "text";
         filterBox.id = "attribute-filter-box";
@@ -736,9 +735,20 @@
         h3.appendChild(document.createTextNode("Element data:"));
         paragraph.appendChild(h3);
 
+        let filterBox = document.createElement("input");
+        filterBox.type = "text";
+        filterBox.id = "attribute-filter-box";
+        filterBox.classList.add("attribute-filter");
+        filterBox.placeholder = "Filter atribute values";
+        filterBox.addEventListener("keyup", function(event) {
+            filterDataFields(event.target.value);
+        });
+        paragraph.appendChild(filterBox);
+
         // add the data into a table
         let dataTable = document.createElement("table");
         dataTable.classList.add("table-data");
+        dataTable.id = "attribute-data-table";
         let tableHeaderRow = document.createElement("tr");
         let th1 = document.createElement("th");
         th1.appendChild(document.createTextNode("Attribute name"));
