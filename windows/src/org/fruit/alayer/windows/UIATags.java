@@ -703,11 +703,11 @@ public final class UIATags extends TagsBase {
 
 	// range value control pattern
 	public static final Tag<Boolean> UIARangeValueIsReadOnly = from("UIARangeValueIsReadOnly", Boolean.class);
-	public static final Tag<Long> UIARangeValueLargeChange = from("UIARangeValueLargeChange", Long.class);
-	public static final Tag<Long> UIARangeValueMaximum = from("UIARangeValueMaximum", Long.class);
-	public static final Tag<Long> UIARangeValueMinimum = from("UIARangeValueMinimum", Long.class);
-	public static final Tag<Long> UIARangeValueSmallChange = from("UIARangeValueSmallChange", Long.class);
-	public static final Tag<Long> UIARangeValueValue = from("UIARangeValueValue", Long.class);
+	public static final Tag<Double> UIARangeValueLargeChange = from("UIARangeValueLargeChange", Double.class);
+	public static final Tag<Double> UIARangeValueMaximum = from("UIARangeValueMaximum", Double.class);
+	public static final Tag<Double> UIARangeValueMinimum = from("UIARangeValueMinimum", Double.class);
+	public static final Tag<Double> UIARangeValueSmallChange = from("UIARangeValueSmallChange", Double.class);
+	public static final Tag<Double> UIARangeValueValue = from("UIARangeValueValue", Double.class);
 
 	// selection control pattern
 	public static final Tag<Boolean> UIASelectionCanSelectMultiple = from("UIASelectionCanSelectMultiple", Boolean.class);
@@ -759,9 +759,9 @@ public final class UIATags extends TagsBase {
 
 	//transform 2 pattern
 	public static final Tag<Boolean> UIATransform2CanZoom = from("UIATransform2CanZoom", Boolean.class);
-	public static final Tag<Long> UIATransform2ZoomLevel = from("UIATransform2ZoomLevel", Long.class);
-	public static final Tag<Long> UIATransform2ZoomMaximum = from("UIATransform2ZoomMaximum", Long.class);
-	public static final Tag<Long> UIATransform2ZoomMinimum = from("UIATransform2ZoomMinimum", Long.class);
+	public static final Tag<Double> UIATransform2ZoomLevel = from("UIATransform2ZoomLevel", Double.class);
+	public static final Tag<Double> UIATransform2ZoomMaximum = from("UIATransform2ZoomMaximum", Double.class);
+	public static final Tag<Double> UIATransform2ZoomMinimum = from("UIATransform2ZoomMinimum", Double.class);
 
 	// Value control pattern
 	public static final Tag<Boolean> UIAValueIsReadOnly = from("UIAValueIsReadOnly", Boolean.class);
@@ -812,7 +812,7 @@ public final class UIATags extends TagsBase {
 		}
 	};
 
-	public static Set<Tag<Boolean>> getPatternAvailabilityTags() {
+	static Set<Tag<Boolean>> getPatternAvailabilityTags() {
 		return patternAvailabilityTags;
 	}
 

@@ -155,12 +155,12 @@ public final class UIAStateBuilder implements StateBuilder {
 
 		// the following properties are left in for backwards compatibility
 		// scroll control pattern properties
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticallyScrollablePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontalViewSizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticalViewSizePropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
-		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontallyScrollablePropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticallyScrollablePropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontalViewSizePropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticalViewSizePropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollHorizontalScrollPercentPropertyId);
+//		Windows.IUIAutomationCacheRequest_AddProperty(cacheRequestPointer, Windows.UIA_ScrollVerticalScrollPercentPropertyId);
 		// end by urueda
 
 		// window control pattern properties
