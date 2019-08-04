@@ -34,17 +34,6 @@
  */
 package org.fruit.monkey;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import es.upv.staq.testar.CodingManager;
 import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
@@ -53,6 +42,10 @@ import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -460,7 +453,7 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.AbstractStateAttributes)
+		return tag.equals(ConfigTags.AbstractStateAttributes)||tag.equals(ConfigTags.ConcreteStateAttributes)
 				? "," : ";";
 	}
 }

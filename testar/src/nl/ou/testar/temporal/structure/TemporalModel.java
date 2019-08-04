@@ -108,15 +108,22 @@ public  TemporalModel(){
 
     }
 
-    private String makeHOAOutput(){
+    public String makeHOAOutput(){
         //see http://adl.github.io/hoaf/
         StringBuilder result=new StringBuilder();
-        result.append("HOA v1\n");
+        result.append("HOA: v1\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
-        result.append("Start: 0\n");
-        result.append("Acceptance: 1 Inf(1))\n");  //==Buchi
+
+        String initState = InitialStates.get(0);
+        int stateindex =0;
+        for (StateEncoding se: stateEncodings )
+        {if (se.getState().equals(initState)) break;
+            stateindex++;
+        }
+        result.append("Start: "+stateindex+"\n");
+        result.append("Acceptance: 1 Inf(0)\n");  //==Buchi
         result.append("AP: ");
         result.append(modelAPs.size());
         int i=0;
@@ -127,7 +134,9 @@ public  TemporalModel(){
             i++;
         }
         result.append("\n");
-        result.append("--BODY--");
+        result.append("--BODY--\n");
+
+
         int s=0;
         for (StateEncoding stateenc: stateEncodings) {
             result.append("State: ");
@@ -135,12 +144,20 @@ public  TemporalModel(){
             result.append("\n");
             for (TransitionEncoding trans:stateenc.getTransitionColl()  ) {
                 result.append(trans.getEncodedAPConjunct());
-                int targetstateindex= stateEncodings.indexOf(trans.getTargetState());
-                result.append(" "+targetstateindex);
+
+                String targetState = trans.getTargetState();
+                int targetStateindex =0;
+                for (StateEncoding se: stateEncodings )
+                {if (se.getState().equals(targetState)) break;
+                    targetStateindex++;
+                }
+
+                result.append(" "+targetStateindex);
                 result.append(" {0}\n");  //all are in the same buchi acceptance set
             }
+            s++;
         }
-        result.append("--END--");
+        result.append("--END--\n");
         result.append("EOF_HOA");
         return result.toString();
     }

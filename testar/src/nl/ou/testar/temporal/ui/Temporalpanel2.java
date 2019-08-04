@@ -715,8 +715,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
             TemporalModel tmodel;
             tcontrol.computeTemporalModel(APmgr);
-            tmodel = tcontrol.gettModel();
-            JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
+            tcontrol.saveModelAsJSON("APEncodedModel.json");
+            tcontrol.saveModelAsHOA("Model.hoa");
+
+
             textArea12.append(" saving to file done\n");
             tcontrol.shutdown();
         } catch (Exception e) {

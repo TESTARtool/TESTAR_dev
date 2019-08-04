@@ -140,8 +140,12 @@ PythonVisualizer = C:\\Users\\c\\git\\Testar_viz\\run.py
 # the widget and state hash strings. Use a comma separated list.
 # Allowed value are: Role,Path,Title,Enabled
 #################################################################
-ConcreteStateAttributes = Role,Path,Title,Enabled
-AbstractStateAttributes = Role
+#ConcreteStateAttributes = Role,Path,Title,Enabled
+#AbstractStateAttributes = Role
+#ConcreteStateAttributes = WidgetControlType,WidgetPath,WidgetTitle
+#ConcreteStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+#AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
+AbstractStateAttributes = WidgetControlType
 
 
 #################################################################

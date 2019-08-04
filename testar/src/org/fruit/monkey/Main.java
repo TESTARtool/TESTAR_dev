@@ -44,20 +44,16 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
-import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import org.fruit.alayer.windows.UIATags;
-
-import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -469,6 +465,13 @@ public class Main {
 					add("WidgetControlType");
 				}
 			}));
+			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<String>() {
+				{
+					add("WidgetControlType");
+					add("WidgetPath");
+					add("WidgetTitle");
+				}
+			}));
 
 			//Overwrite the default settings with those from the file
 			Settings settings = Settings.fromFile(defaults, file);
@@ -656,17 +659,30 @@ public class Main {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 		int i;
+		// concrete state id from settings file
+		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
+			System.out.println("debug concrete atribs: not empty ");
+			Tag<?>[] concreteTags = settings.get(ConcreteStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
+			CodingManager.setCustomTagsForConcreteId(concreteTags);
+			System.out.println("debug concr tags: "+concreteTags.length+"<");
 
-        Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
-        // for the concrete state tags we use all the state management tags that are available
-		if (!stateManagementTags.isEmpty()) {
-			CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 		}
+		else {
+			System.out.println("debug concrete atribs: was empty");
+
+			Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+			// for the concrete state tags we use all the state management tags that are available
+			if (!stateManagementTags.isEmpty()) {
+				CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
+			}
+		}
+
 
         // then the attributes for the abstract state id
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
             Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
-            CodingManager.setCustomTagsForAbstractId(abstractTags);
+			System.out.println("debug abstract tags: "+abstractTags.length+"<");
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
     }
 

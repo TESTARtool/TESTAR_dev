@@ -23,10 +23,8 @@ import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
 import org.fruit.alayer.Tags;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -409,7 +407,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 ConcreteActions.add(ele.getProperty("concreteActionId").toString());
             }
         }*/
- //future: when the edge sequencestep reences the aculay action edge.
+ //future: when the edge sequencestep references the actual action edge. test 20190804
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
@@ -417,9 +415,9 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 Optional<OElement> optele = result.getElement();
                 if (!optele.isPresent()) continue;
                 OElement ele = optele.get();
-                params.put("identifier", ele.getProperty("concreteActionId").toString());
-                stmt = "SELECT FROM ConcreteAction WHERE actionId = :identifier LIMIT 1";
-                //LIMIT 1 is a debug action css 20190722. actionId is NOT unique !!!!
+                params.put("identifier", ele.getProperty("concreteActionUid").toString());
+                stmt = "SELECT FROM ConcreteAction WHERE uid = :identifier";    // LIMIT 1";
+                //LIMIT 1 was a debug action css 20190722. actionId is NOT unique !!!!
                 OResultSet subresultSet = db.query(stmt, params);
                 while (subresultSet.hasNext()) {
                     OResult subresult = subresultSet.next();
@@ -735,7 +733,7 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
            // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
             //stmtlist.add("SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier"); // select abstractstate themselves
             //stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE modelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
 
             // the "both()" in the next stmt is needed to invoke recursion.
             // apparently , the next result set contains first a list of all nodes, then of all edge: good !
@@ -743,6 +741,7 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
             stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) ");
 
         }else{
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
             stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) ");
             //stmtlist.add("SELECT  FROM V ");//  stmtlist.add("SELECT  FROM E ");
         }
@@ -830,5 +829,25 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
 
 return true;
     }
+    public  void saveModelAsJSON(String toFile){
+        JSONHandler.save(tModel, outputDir + toFile);
+    }
+    public void saveModelAsHOA(String file){
+
+        String contents = tModel.makeHOAOutput();
+        try {
+            File output = new File(outputDir + file);
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
+                writer.append(contents);
+                writer.close();
+            }
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+
+    };
+
 
 }
