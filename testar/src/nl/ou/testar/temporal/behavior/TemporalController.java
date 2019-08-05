@@ -179,6 +179,7 @@ public class TemporalController {
                     if (deadstate) {
                         stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
                         System.out.println("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
+                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
                         computeProps(propertyName, stateVertex, propositions, false,false);
@@ -186,10 +187,29 @@ public class TemporalController {
                     propositions.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
                     senc.setStateAPs(propositions);
                     senc.setTransitionColl(getTransitions(senc.getState()));
+
+
+
                     tModel.addStateEncoding(senc, false);
                 }
             }
             tModel.updateTransitions(); //update once. this is a costly operation
+            for (StateEncoding stenc:tModel.getStateEncodings()
+                 ) {
+
+
+                List<String> encodedConjuncts = new ArrayList<>();
+                for (TransitionEncoding tren : stenc.getTransitionColl()
+                ) {
+                    String enc = tren.getEncodedAPConjunct();
+                    if (encodedConjuncts.contains(enc)) {
+                        System.out.println("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
+                        tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
+                    } else encodedConjuncts.add(enc);
+
+                }
+            }
+
             tModel.setTraces(fetchTraces(tModel.getModelIdentifier()));
             List<String> initStates =new ArrayList<>();
             for (TemporalTrace trace:tModel.getTraces()
