@@ -661,27 +661,19 @@ public class Main {
 		int i;
 		// concrete state id from settings file
 		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-			System.out.println("debug concrete atribs: not empty ");
 			Tag<?>[] concreteTags = settings.get(ConcreteStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
 			CodingManager.setCustomTagsForConcreteId(concreteTags);
-			System.out.println("debug concr tags: "+concreteTags.length+"<");
-
 		}
 		else {
-			System.out.println("debug concrete atribs: was empty");
-
 			Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
 			// for the concrete state tags we use all the state management tags that are available
 			if (!stateManagementTags.isEmpty()) {
 				CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 			}
 		}
-
-
         // then the attributes for the abstract state id
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
             Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
-			System.out.println("debug abstract tags: "+abstractTags.length+"<");
 			CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
     }
