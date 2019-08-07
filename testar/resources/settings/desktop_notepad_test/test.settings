@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = C:\\Windows\\System32\\notepad.exe
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -51,7 +51,7 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -62,7 +62,7 @@ SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 #################################################################
 
 ProcessListenerEnabled = false
-SuspiciousProcessOutput = (?!x)x
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
 
 #################################################################
 # Process Logs
@@ -92,7 +92,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+SUTProcesses = 
 
 #################################################################
 # Protocolclass
@@ -100,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_temporaloracles/Protocol_desktop_generic_temporaloracles
+ProtocolClass = desktop_notepad_test/Protocol_desktop_notepad_test
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -117,36 +117,21 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = C:\\orientdb-tp3-3.0.18\\databases
+DataStoreDirectory = C:\\orientdb\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = instant
-ApplicationName =
-ApplicationVersion =
-
-#################################################################
-# Temporal Oracle settings
-#################################################################
-SpotChecker = ubuntu1804 run ~/testar/spot_checker
-SpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
-PythonEnvironment = C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate && python
-PythonVisualizer = C:\\Users\\c\\git\\Testar_viz\\run.py
+DataStoreMode = delayed
+ApplicationName = Notepad
+ApplicationVersion = 1.0.0
 
 #################################################################
 # State identifier attributes
 #
 # Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
-# Allowed value are: Role,Path,Title,Enabled
 #################################################################
-#ConcreteStateAttributes = Role,Path,Title,Enabled
-#AbstractStateAttributes = Role
-#ConcreteStateAttributes = WidgetControlType,WidgetPath,WidgetTitle
-#ConcreteStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
-#AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
-AbstractStateAttributes = WidgetControlType
-
+AbstractStateAttributes = WidgetClassName,WidgetIsEnabled,WidgetControlType
 
 #################################################################
 # Other more advanced settings
@@ -166,10 +151,10 @@ DrawWidgetInfo = false
 MaxReward = 9999999.0
 LogLevel = 1
 VisualizeSelectedAction = true
-Delete =
+Delete = 
 MyClassPath = ./settings
 ReplayRetryTime = 30.0
-ProcessesToKillDuringTest =
+ProcessesToKillDuringTest = 
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
 OutputDir = ./output
@@ -180,12 +165,12 @@ ActionDuration = 0.0
 NonReactingUIThreshold = 100
 GraphsActivated = true
 GraphResuming = true
-CopyFromTo =
+CopyFromTo = 
 TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
-ResetDataStore = false
-TimeToWaitAfterAction = 0.1
+ResetDataStore = true
+TimeToWaitAfterAction = 0.0
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
 PathToReplaySequence = ./output/temp

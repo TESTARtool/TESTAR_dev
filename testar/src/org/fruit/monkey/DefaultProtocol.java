@@ -378,7 +378,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
 			//INDEXLOG.error("Exception: ",e);
 
-			return false;	
+			return false;
 		}
 
 		return true;
@@ -889,7 +889,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Saving the action information into the logs
-	 * 
+	 *
 	 * @param state
 	 * @param action
 	 * @param actionMode
@@ -932,13 +932,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		while(mode() == Modes.Spy && system.isRunning()) {
 
-			//Instead of use getState(SUT system) method, build our own State into Spy Mode
-			//This will prevent issues with other protocols and reports
-			Assert.notNull(system);
-			State state = builder.apply(system);
-			CodingManager.buildIDs(state);
-			calculateZIndices(state);
-			setStateForClickFilterLayerProtocol(state);
+			State state = getState(system);
 
 			cv.begin(); Util.clear(cv);
 
@@ -1327,6 +1321,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
+			// for most windows applications and most jar files, this is where the SUT gets created!
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
@@ -1473,7 +1468,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		CodingManager.buildIDs(state);
 		calculateZIndices(state);
+		
+		setStateForClickFilterLayerProtocol(state);
 
+		if(mode() == Modes.Spy)
+			return state;
+		
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
@@ -1492,7 +1492,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		setStateForClickFilterLayerProtocol(state);
+		
 		return state;
 	}
 

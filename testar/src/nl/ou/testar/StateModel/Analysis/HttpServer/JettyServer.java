@@ -20,25 +20,24 @@ import org.fruit.alayer.State;
 public class JettyServer {
     private Server server;
 
+    /**
+     * Call this method to start running the jetty server.
+     * @param resourceBase
+     * @param analysisManager
+     * @throws Exception
+     */
     public void start(String resourceBase, AnalysisManager analysisManager) throws Exception {
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(8090);
         server.setConnectors(new Connector[]{connector});
 
+        // the resource handler will handle static file requests
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
-//        resource_handler.setWelcomeFiles(new String[]{ "index.html" });
         resourceHandler.setResourceBase(resourceBase);
 
-//        ServletHandler servletHandler = new ServletHandler();
-//        servletHandler.addServletWithMapping(StateModelServlet.class, "/status");
-//        ServletContextHandler contextHandler = new ServletContextHandler();
-//        contextHandler.setContextPath("/");
-//        contextHandler.setResourceBase(resourceBase);
-//        contextHandler.addServlet(StateModelServlet.class, "/status");
-
-
+        // the webapp context handler will handle requests for our controllers
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
         webAppContext.setResourceBase(resourceBase);
@@ -55,10 +54,9 @@ public class JettyServer {
                 "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",
                 ".*/[^/]*servlet-api-[^/]*\\.jar$|.*/javax.servlet.jsp.jstl-.*\\.jar$|.*/[^/]*taglibs.*\\.jar$" );
 
+        // create a handler list and pass it to the server to start it
         HandlerList handlerList = new HandlerList();
-
         handlerList.addHandler(resourceHandler);
-//        handlerList.addHandler(contextHandler);
         handlerList.addHandler(webAppContext);
         handlerList.addHandler(new DefaultHandler());
         server.setHandler(handlerList);

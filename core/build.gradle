@@ -1,0 +1,3 @@
+dependencies {
+    compile 'com.google.guava:guava:26.0-jre'
+}

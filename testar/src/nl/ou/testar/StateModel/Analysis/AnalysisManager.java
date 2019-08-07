@@ -31,8 +31,10 @@ public class AnalysisManager {
     // orient db instance that will create database sessions
     private OrientDB orientDB;
 
+    // orient db configuration object
     private Config dbConfig;
 
+    // the location of the directory where we need to store output files
     private String outputDir;
 
     /**
@@ -178,24 +180,7 @@ public class AnalysisManager {
         builder.append(Instant.now().toEpochMilli());
         builder.append("_elements.json");
         String filename = builder.toString();
-        File output = new File(outputDir + filename);
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(elements);
-            // let's write the resulting json to a file
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                writer.write(result);
-                writer.close();
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return filename;
+        return writeJson(elements, filename, modelIdentifier);
     }
 
     /**
@@ -209,7 +194,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the abstract layer
         if (showCompoundGraph) {
-            Vertex abstractStateParent = new Vertex("A1");
+            Vertex abstractStateParent = new Vertex("AbstractLayer");
             elements.add(new Element(Element.GROUP_NODES, abstractStateParent, "Parent"));
         }
 
@@ -218,7 +203,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "A1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
@@ -228,7 +213,7 @@ public class AnalysisManager {
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "A1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
 
 
         // unvisited abstract actions
@@ -250,7 +235,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the concrete layer
         if (showCompoundGraph) {
-            Vertex concreteStateParent = new Vertex("C1");
+            Vertex concreteStateParent = new Vertex("ConcreteLayer");
             elements.add(new Element(Element.GROUP_NODES, concreteStateParent, "Parent"));
         }
 
@@ -259,7 +244,7 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "C1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "ConcreteLayer" : null, modelIdentifier));
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
@@ -280,7 +265,7 @@ public class AnalysisManager {
 
         // optionally add a parent node for the sequence layer
         if (showCompoundGraph) {
-            Vertex sequenceParent = new Vertex("S1");
+            Vertex sequenceParent = new Vertex("SequenceLayer");
             elements.add(new Element(Element.GROUP_NODES, sequenceParent, "Parent"));
         }
 
@@ -289,12 +274,12 @@ public class AnalysisManager {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "S1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
-        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "S1" : null, modelIdentifier));
+        elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
@@ -345,6 +330,35 @@ public class AnalysisManager {
         elements.addAll(fetchEdges(resultSet, "Accessed"));
 
         return elements;
+    }
+
+    public String fetchWidgetTree(String concreteStateIdentifier) {
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            ArrayList<Element> elements = new ArrayList<>();
+
+            // convert the concrete state identifier to an internal id if needed
+            String internalId = concreteStateIdentifier.indexOf("n") == 0 ? unformatId(concreteStateIdentifier) : concreteStateIdentifier;
+
+            // first get all the widgets
+            String stmt = "SELECT FROM (TRAVERSE IN('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid))";
+            Map<String, Object> params = new HashMap<>();
+            params.put("rid", internalId);
+            OResultSet resultSet = db.query(stmt, params);
+            elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
+
+            // then get the parent/child relationship between the widgets
+            stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
+            resultSet = db.query(stmt, params);
+            elements.addAll(fetchEdges(resultSet, "isChildOf"));
+
+            // create a filename
+            StringBuilder builder = new StringBuilder(concreteStateIdentifier);
+            builder.append("_");
+            builder.append(Instant.now().toEpochMilli());
+            builder.append("_elements.json");
+            String filename = builder.toString();
+            return writeJson(elements, filename, concreteStateIdentifier);
+        }
     }
 
     /**
@@ -456,10 +470,17 @@ public class AnalysisManager {
 
     }
 
+    // this helper method formats the @RID property into something that can be used in a web frontend
     private String formatId(String id) {
         if (id.indexOf("#") != 0) return id; // not an orientdb id
         id = id.replaceAll("[#]", "");
         return id.replaceAll("[:]", "_");
+    }
+
+    // and this helper method formats a web frontend node id into one that is useable for internal orientdb use
+    private String unformatId(String id) {
+        id = id.replaceAll("n", "#");
+        return id.replaceAll("_", ":");
     }
 
     /**
@@ -496,5 +517,32 @@ public class AnalysisManager {
                 break;
         }
         return  convertedValue;
+    }
+
+    // this helper method will write elements to a file in json format
+    private String writeJson(ArrayList<Element> elements, String filename, String subFolderName) {
+        // check if the subfolder already exists
+        File subFolder = new File(outputDir + subFolderName);
+        if (!subFolder.isDirectory() && !subFolder.mkdir()) {
+            return "";
+        }
+
+        File output = new File(subFolder, filename);
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String result = mapper.writeValueAsString(elements);
+            // let's write the resulting json to a file
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
+                writer.write(result);
+                writer.close();
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filename;
     }
 }
