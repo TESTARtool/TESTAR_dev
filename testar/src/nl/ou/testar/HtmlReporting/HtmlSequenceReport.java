@@ -28,6 +28,18 @@ public class HtmlSequenceReport {
     private static final String REPORT_FILENAME_PRE = "TESTAR_sequence_";
     private static final String REPORT_FILENAME_AFT = ".html";
 
+    public HtmlSequenceReport(String filename) {
+        try{
+            out = new PrintWriter(filename, HTMLReporter.CHARSET);
+            for(String s:HEADER){
+                write(s);
+            }
+            write("<h1>TESTAR execution sequence report</h1>");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public HtmlSequenceReport() {
         try{
             //TODO put filename into settings, name with sequence number

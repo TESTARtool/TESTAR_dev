@@ -72,10 +72,21 @@ class UIAElement implements Serializable {
 	}
 
 	private void writeObject(ObjectOutputStream oos) throws IOException{
-		oos.defaultWriteObject();
+	    oos.defaultWriteObject();
 	}
 
 	private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException{
 		ois.defaultReadObject();
+	}
+	
+	private boolean notParent(UIAElement element, UIAElement parent) {
+	  if (parent == null) {
+	    // root parent reached
+	    return false;
+	  } else if (element == parent) {
+	    return true;
+	  } else {
+	    return notParent(element, parent.parent);
+	  }
 	}
 }

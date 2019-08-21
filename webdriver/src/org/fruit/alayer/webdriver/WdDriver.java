@@ -134,6 +134,8 @@ public class WdDriver extends SUTBase {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("load-extension=" + extensionPath);
     options.addArguments("disable-infobars");
+    options.addArguments("start-fullscreen");
+    options.setBinary("C:\\tools\\chrome-win\\chrome.exe");
 
     Map<String, Object> prefs = new HashMap<>();
     prefs.put("profile.default_content_setting_values.notifications", 1);

@@ -133,6 +133,7 @@ public final class ConfigTags {
   public static final Tag<String> TestarTestRun = Tag.from("TestarTestRun", String.class);
 
   public static final Tag<String> SutServerRestart = Tag.from("SutServerRestart", String.class);
+  public static final Tag<String> SutServerPerformance = Tag.from("SutServerPerformance", String.class);
   public static final Tag<String> SutServerUsername = Tag.from("SutServerUsername", String.class);
   public static final Tag<String> SutServerHostname = Tag.from("SutServerHostname", String.class);
   public static final Tag<String> SutServerPort = Tag.from("SutServerPort", String.class);

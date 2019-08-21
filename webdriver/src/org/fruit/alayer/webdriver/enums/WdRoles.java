@@ -74,6 +74,7 @@ public class WdRoles {
       WdDEL = from("del", "WdDEL", WdWidget, Roles.Control),
       WdDETAILS = from("details", "WdDETAILS", WdWidget, Roles.Control),
       WdDFN = from("dfn", "WdDFN", WdWidget, Roles.Control),
+      WdDIALOG = from("dialog", "WdDIALOG", WdWidget, Roles.Control),
       WdDIR = from("dir", "WdDIR", WdWidget, Roles.Control),
       WdDIV = from("div", "WdDIV", WdWidget, Roles.Control),
       WdDL = from("dl", "WdDL", WdWidget, Roles.Control),

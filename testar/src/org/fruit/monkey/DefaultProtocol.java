@@ -539,7 +539,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
          ***** OUTER LOOP - STARTING A NEW SEQUENCE
          */
         while (mode() != Modes.Quit && moreSequences()) {
-
             //empty method in defaultProtocol - allowing implementation in application specific protocols:
             preSequencePreparations();
 
@@ -616,12 +615,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
             }
         }
         // notify the statemodelmanager that the testing has finished
+        DEBUGLOG.info("OUTER-LOOP: Testing done!!");
         stateModelManager.notifyTestingEnded();
         //allowing close-up in the end of test session:
+        DEBUGLOG.info("Close test session!");
         closeTestSession();
         //Closing TESTAR internal test session:
         closeTestarTestSession();
         mode = Modes.Quit;
+        DEBUGLOG.info("Leave runGenerateOuterLoop()");
     }
 
     private void classifyAndCopySequenceIntoAppropriateDirectory(Verdict finalVerdict,String generatedSequence,File currentSeq){
@@ -1687,8 +1689,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreSequences() {
-//        System.out.println("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
-//                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
+        DEBUGLOG.info("DEBUG: moreSequences(), sequenceCount="+sequenceCount()+", config sequences="+settings().get(ConfigTags.Sequences)
+                +", timeElapsed="+timeElapsed()+", maxTime="+settings().get(ConfigTags.MaxTime));
 		return sequenceCount() <= settings().get(ConfigTags.Sequences) &&
 				timeElapsed() < settings().get(ConfigTags.MaxTime);
 	}

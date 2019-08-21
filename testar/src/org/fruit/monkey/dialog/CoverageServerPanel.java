@@ -34,7 +34,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -107,7 +106,7 @@ public class CoverageServerPanel extends JPanel {
     txtCoverageServerPort = new JTextField();
     PlainDocument portDocument = (PlainDocument)txtCoverageServerPort.getDocument();
     portDocument.setDocumentFilter(new TexInputIntFilter());
-    lblCoverageServerKeyFile = new JLabel("Key file:");
+    lblCoverageServerKeyFile = new JLabel("SSH key file:");
     txtCoverageServerKeyFile = new JTextField();
  
     btnSetCoverageServerKeyFile = new JButton("Select");

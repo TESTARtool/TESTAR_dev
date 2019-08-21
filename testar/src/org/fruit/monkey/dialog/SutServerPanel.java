@@ -30,6 +30,7 @@
 
 package org.fruit.monkey.dialog;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -54,8 +55,6 @@ public class SutServerPanel extends JPanel {
 
   private File currentDirectory;
 
-  private JLabel lblSutServerRestart;
-  private JTextField txtSutServerRestart;
   private JLabel lblSutServerUsername;
   private JTextField txtSutServerUsername;
   private JLabel lblSutServerHostname;
@@ -65,67 +64,119 @@ public class SutServerPanel extends JPanel {
   private JLabel lblSutServerKeyFile;
   private JTextField txtSutServerKeyFile;
   private JButton btnSetSutServerKeyFile;
+  private JLabel lblSutCommands;
+  private JLabel lblSutCommandRestart;
+  private JTextField txtSutCommandRestart;
+  private JLabel lblSutCommandPerformance;
+  private JTextField txtSutCommandPerformance;
 
   public SutServerPanel() {
-    addSutServer();
-    
-    GroupLayout layout = new GroupLayout(this);
-    this.setLayout(layout);
-    layout.setAutoCreateGaps(true);
-    layout.setAutoCreateContainerGaps(true);
-    layout.setHorizontalGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(lblSutServerRestart)
-            .addComponent(lblSutServerUsername)
-            .addComponent(lblSutServerHostname)
-            .addComponent(lblSutServerPort)
-            .addComponent(lblSutServerKeyFile))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(txtSutServerRestart)
-            .addComponent(txtSutServerUsername)
-            .addComponent(txtSutServerHostname)
-            .addComponent(txtSutServerPort)
-            .addComponent(txtSutServerKeyFile))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(btnSetSutServerKeyFile))
-    );
-    layout.setVerticalGroup(layout.createSequentialGroup()
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addComponent(lblSutServerRestart)
-            .addComponent(txtSutServerRestart))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addComponent(lblSutServerUsername)
-            .addComponent(txtSutServerUsername))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addComponent(lblSutServerHostname)
-            .addComponent(txtSutServerHostname))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addComponent(lblSutServerPort)
-            .addComponent(txtSutServerPort))
-        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-            .addComponent(lblSutServerKeyFile)
-            .addComponent(txtSutServerKeyFile)
-            .addComponent(btnSetSutServerKeyFile))
-        );
+      setLayout(null);
+
+      JPanel coverageServerPanel = addSutServer();
+      JPanel coverageCommandsPanel = addSutCommands();
+      
+      GroupLayout layout = new GroupLayout(this);
+      this.setLayout(layout);
+      layout.setAutoCreateGaps(true);
+      layout.setAutoCreateContainerGaps(true);
+      layout.setHorizontalGroup(layout.createSequentialGroup()
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(coverageServerPanel)
+              .addComponent(coverageCommandsPanel))
+              );
+      layout.setVerticalGroup(layout.createSequentialGroup()
+              .addComponent(coverageServerPanel)
+              .addComponent(coverageCommandsPanel));
   }
 
-  private void addSutServer() {
-    lblSutServerRestart = new JLabel("Restart command:");
-    txtSutServerRestart = new JTextField();
-    lblSutServerUsername = new JLabel("User name:");
-    txtSutServerUsername = new JTextField();
-    lblSutServerHostname = new JLabel("Host name:");
-    txtSutServerHostname = new JTextField();
-    lblSutServerPort = new JLabel("Port:");
-    txtSutServerPort = new JTextField();
-    PlainDocument portDocument = (PlainDocument)txtSutServerPort.getDocument();
-    portDocument.setDocumentFilter(new TexInputIntFilter());
-    lblSutServerKeyFile = new JLabel("Key file");
-    txtSutServerKeyFile = new JTextField();
-    btnSetSutServerKeyFile = new JButton("Select");
-    btnSetSutServerKeyFile.addActionListener(this::btnSetSutServerKeyFileActionPerformed);
-    btnSetSutServerKeyFile.setEnabled(true);
-  }
+  private JPanel addSutServer() {
+      JPanel  coverageServerPanel = new JPanel();
+
+      lblSutServerUsername = new JLabel("User name:");
+      txtSutServerUsername = new JTextField();
+      lblSutServerHostname = new JLabel("Host name:");
+      txtSutServerHostname = new JTextField();
+      lblSutServerPort = new JLabel("Port:");
+      txtSutServerPort = new JTextField();
+      PlainDocument portDocument = (PlainDocument)txtSutServerPort.getDocument();
+      portDocument.setDocumentFilter(new TexInputIntFilter());
+      lblSutServerKeyFile = new JLabel("SSH key file:");
+      txtSutServerKeyFile = new JTextField();
+   
+      btnSetSutServerKeyFile = new JButton("Select");
+      btnSetSutServerKeyFile.addActionListener(this::btnSetSutServerKeyFileActionPerformed);
+      btnSetSutServerKeyFile.setEnabled(true);
+      
+      GroupLayout layout = new GroupLayout(coverageServerPanel);
+      coverageServerPanel.setLayout(layout);
+      layout.setAutoCreateGaps(true);
+      layout.setAutoCreateContainerGaps(true);
+      layout.setHorizontalGroup(layout.createSequentialGroup()
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(lblSutServerUsername)
+              .addComponent(lblSutServerHostname)
+              .addComponent(lblSutServerPort)
+              .addComponent(lblSutServerKeyFile))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(txtSutServerUsername)
+              .addComponent(txtSutServerHostname)
+              .addComponent(txtSutServerPort)
+              .addComponent(txtSutServerKeyFile))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(btnSetSutServerKeyFile))
+      );
+      layout.setVerticalGroup(layout.createSequentialGroup()
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutServerUsername)
+              .addComponent(txtSutServerUsername))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutServerHostname)
+              .addComponent(txtSutServerHostname))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutServerPort)
+              .addComponent(txtSutServerPort))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutServerKeyFile)
+              .addComponent(txtSutServerKeyFile)
+              .addComponent(btnSetSutServerKeyFile)));
+      return coverageServerPanel;
+    }
+
+    private JPanel addSutCommands() {
+      JPanel  coverageCommandsPanel = new JPanel();
+
+      lblSutCommands = new JLabel("Commands");
+      Font f = lblSutCommands.getFont();
+      lblSutCommands.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+      lblSutCommandRestart = new JLabel("Restart command:");
+      txtSutCommandRestart = new JTextField();
+      lblSutCommandPerformance = new JLabel("Performance command:");
+      txtSutCommandPerformance = new JTextField();
+
+      GroupLayout layout = new GroupLayout(coverageCommandsPanel);
+      coverageCommandsPanel.setLayout(layout);
+      layout.setAutoCreateGaps(true);
+      layout.setAutoCreateContainerGaps(true);
+      layout.setHorizontalGroup(layout.createSequentialGroup()
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(lblSutCommands)
+              .addComponent(lblSutCommandRestart)
+              .addComponent(lblSutCommandPerformance))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+              .addComponent(txtSutCommandRestart)
+              .addComponent(txtSutCommandPerformance))
+      );
+      layout.setVerticalGroup(layout.createSequentialGroup()
+          .addComponent(lblSutCommands)
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutCommandRestart)
+              .addComponent(txtSutCommandRestart))
+          .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+              .addComponent(lblSutCommandPerformance)
+              .addComponent(txtSutCommandPerformance)));
+      return coverageCommandsPanel;
+    }
 
   /**
    * Populate JPanelGeneral from Settings structure.
@@ -136,7 +187,8 @@ public class SutServerPanel extends JPanel {
     currentDirectory = new File(settings.get(ConfigTags.OutputDir)).getParentFile();
 
     // SUT server
-    txtSutServerRestart.setText(settings.get(ConfigTags.SutServerRestart));
+    txtSutCommandRestart.setText(settings.get(ConfigTags.SutServerRestart));
+    txtSutCommandPerformance.setText(settings.get(ConfigTags.SutServerPerformance));
     txtSutServerUsername.setText(settings.get(ConfigTags.SutServerUsername));
     txtSutServerHostname.setText(settings.get(ConfigTags.SutServerHostname));
     txtSutServerPort.setText(settings.get(ConfigTags.SutServerPort));
@@ -150,7 +202,8 @@ public class SutServerPanel extends JPanel {
    */
   public void extractInformation(final Settings settings) {
     // SUT server
-    settings.set(ConfigTags.SutServerRestart, txtSutServerRestart.getText());
+    settings.set(ConfigTags.SutServerRestart, txtSutCommandRestart.getText());
+    settings.set(ConfigTags.SutServerPerformance, txtSutCommandPerformance.getText());
     settings.set(ConfigTags.SutServerUsername, txtSutServerUsername.getText());
     settings.set(ConfigTags.SutServerHostname, txtSutServerHostname.getText());
     settings.set(ConfigTags.SutServerPort, txtSutServerPort.getText());
