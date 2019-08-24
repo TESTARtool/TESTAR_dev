@@ -556,15 +556,16 @@
 
         /////////// screenshot segment //////////
 
-        // create a popup anchor
-        let popupAnchor = document.createElement("a");
-        popupAnchor.href = "${contentFolder}/" + targetNode.id() + ".png";
-        $(popupAnchor).magnificPopup(
-            {type: "image"}
-        );
-
         // add the screenshot image if the node is a concrete state
-        if (targetNode.hasClass("ConcreteState")) { // add the screenshot full image
+        if (targetNode.hasClass("ConcreteState")) {
+            // create a popup anchor
+            let popupAnchor = document.createElement("a");
+            popupAnchor.href = "${contentFolder}/" + targetNode.id() + ".png";
+            $(popupAnchor).magnificPopup(
+                {type: "image"}
+            );
+
+            // add the screenshot full image
             let nodeImage = document.createElement("img");
             nodeImage.alt = "Image for node " + targetNode.id();
             nodeImage.src = "${contentFolder}/" + targetNode.id() + ".png";
@@ -572,6 +573,54 @@
             popupAnchor.appendChild(nodeImage);
             contentPanel.appendChild(popupAnchor);
         }
+
+        // add a series of screenshots if the node is an abstract state
+        if (targetNode.hasClass("AbstractState")) {
+            // first retrieve all the concrete states that are abstracted by this abstract state
+            let concreteNodes = targetNode.incomers(".ConcreteState");
+            if (concreteNodes.size() > 0) {
+                let div =  document.createElement('div');
+                div.classList.add('popup-gallery');
+                concreteNodes.forEach(
+                    (element) => {
+                        // create an anchor element for each screenshot
+                        let popupAnchor = document.createElement("a");
+                        popupAnchor.href = "${contentFolder}/" + element.id() + ".png";
+
+                        // add the image thumbnail
+                        // add the screenshot full image
+                        let nodeImage = document.createElement("img");
+                        nodeImage.alt = "Image for node " + element.id();
+                        nodeImage.src = "${contentFolder}/" + element.id() + ".png";
+                        nodeImage.classList.add("node-img-thumb");
+                        popupAnchor.appendChild(nodeImage);
+                        div.appendChild(popupAnchor);
+                    }
+                );
+
+                // now add the popup code
+                $(div).magnificPopup({
+                    delegate: 'a',
+                    type: 'image',
+                    tLoading: 'Loading image #%curr%...',
+                    mainClass: 'mfp-img-mobile',
+                    gallery: {
+                        enabled: true,
+                        navigateByImgClick: true,
+                        preload: [0,1] // Will preload 0 - before current, and 1 after the current image
+                    },
+                    image: {
+                        tError: 'The image could not be loaded.',
+                        titleSrc: function(item) {
+                            return item.el.attr('title');
+                        }
+                    }
+                });
+
+                contentPanel.appendChild(div);
+            }
+        }
+
         /////////// end screenshot segment /////////////
 
         ////////// data segment   //////////////

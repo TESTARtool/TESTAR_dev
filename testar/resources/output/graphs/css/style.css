@@ -507,3 +507,14 @@ button.skip:active {
     padding-right: 5px;
     text-align: center;
 }
+
+.node-img-thumb {
+    width: 75px;
+    height: 75px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    margin-right: 3px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
