@@ -850,6 +850,7 @@
         appStatus.nrOfSequenceNodes = cy.$('node.SequenceNode').size();
         appStatus.nrOfAbstractActions = cy.$('edge.AbstractAction').size();
         appStatus.nrOfConcreteActions = cy.$('edge.ConcreteAction').size();
+        appStatus.nrOfUnvisitedAbstractActions = cy.$('edge.UnvisitedAbstractAction').size();
         appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
         appStatus.concreteLayerPresent = appStatus.nrOfConcreteStates > 0;
         appStatus.sequenceLayerPresent = appStatus.nrOfSequenceNodes > 0;
