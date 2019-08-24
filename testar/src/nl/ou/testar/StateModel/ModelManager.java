@@ -11,6 +11,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
+import java.util.Collection;
 import java.util.Set;
 
 public class ModelManager implements StateModelManager {
@@ -138,6 +139,11 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution);
         currentConcreteState = newConcreteState;
         concreteActionUnderExecution = null;
+
+        // temporarily output the number of unvisited actions still left
+        System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
+                Collection::stream
+        ).count() + " unvisited actions left");
     }
 
     /**
