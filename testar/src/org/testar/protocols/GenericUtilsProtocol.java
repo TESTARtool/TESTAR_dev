@@ -40,6 +40,7 @@ import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
 import org.fruit.alayer.actions.NOP;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.exceptions.ActionBuildException;
 import org.fruit.monkey.ConfigTags;
 
 import java.util.ArrayList;
@@ -277,5 +278,20 @@ public class GenericUtilsProtocol extends ClickFilterLayerProtocol {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * This methods prepares for deriving actions, but does not really derive them yet. This is left for lower
+     * level protocols. Here the parameters are set in case unwanted processes need to be killed or the SUT needs to be brought back
+     * to foreground. The latter is then done by selectActions in the AbstractProtocol.
+     *
+     * @param system
+     * @param state
+     * @return
+     * @throws ActionBuildException
+     */
+    @Override
+    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
+        return super.deriveActions(system, state);
     }
 }

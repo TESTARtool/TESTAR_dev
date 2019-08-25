@@ -1,4 +1,4 @@
-package nl.ou.testar.SimpleGuiStateGraph;
+package nl.ou.testar.ReinforcementLearning;
 
 public class QlearningValuesForAction {
     private double qValue;

@@ -1,5 +1,6 @@
-package nl.ou.testar.SimpleGuiStateGraph;
+package nl.ou.testar.ReinforcementLearning;
 
+import nl.ou.testar.SimpleGuiStateGraph.GuiStateTransition;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;

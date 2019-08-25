@@ -35,6 +35,8 @@ import es.upv.staq.testar.EventHandler;
 import es.upv.staq.testar.FlashFeedback;
 import es.upv.staq.testar.IEventListener;
 import es.upv.staq.testar.serialisation.LogSerialiser;
+import org.fruit.alayer.Action;
+import org.fruit.alayer.State;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.MouseButtons;
 import java.util.Arrays;
@@ -51,6 +53,11 @@ public abstract class RuntimeControlsProtocol extends AbstractProtocol implement
     protected Object[] userEvent = null;
     protected boolean markParentWidget = false;
     protected boolean visualizationOn = false;
+
+    @Override
+    protected Action selectAction(State state, Set<Action> actions) {
+        return null;
+    }
 
     public enum Modes{
         Spy,

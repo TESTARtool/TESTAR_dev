@@ -1,4 +1,4 @@
-/***************************************************************************************************
+package desktop_qlearning; /***************************************************************************************************
 *
 * Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
 * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
@@ -29,19 +29,21 @@
 *******************************************************************************************************/
 
 
-import java.util.Set;
-
-import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
-import nl.ou.testar.SimpleGuiStateGraph.QLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.ActionSelector;
+import nl.ou.testar.ReinforcementLearning.GuiStateGraphForQlearning;
+import nl.ou.testar.ReinforcementLearning.QLearningActionSelector;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.ActionBuildException;
-import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-import org.fruit.alayer.Tags;
 import org.testar.protocols.DesktopProtocol;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Set;
 
 /**
  * This is a small change to Desktop Generic Protocol to use a simple in-memory state model
@@ -53,7 +55,11 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_qlearning extends DesktopProtocol {
 
-	private QLearningActionSelector actionSelector;
+	private ActionSelector actionSelector;
+
+	final double R_MAX = settings.get(ConfigTags.MaxReward);
+	final double gammaDiscount=settings.get(ConfigTags.Discount);
+	private final GuiStateGraphForQlearning graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
 
 	/** 
 	 * Called once during the life time of TESTAR
@@ -64,7 +70,7 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	protected void initialize(Settings settings){
 		// initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
-		actionSelector = new QLearningActionSelector(settings.get(ConfigTags.MaxReward),settings.get(ConfigTags.Discount));
+		actionSelector = new QLearningActionSelector(settings, graph);
 		super.initialize(settings);
 	}
 	
@@ -114,15 +120,22 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	 * @return  the selected action (non-null!)
 	 */
 	@Override
-	protected Action selectAction(State state, Set<Action> actions){
+	@Nullable
+	protected Action selectAction(@Nonnull State state, @Nonnull Set<Action> actions){
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
-		Action retAction = preSelectAction(state, actions);
-		if (retAction== null) {
-			//if no preSelected actions are needed, then implement your own action selection strategy
-			// Maintaining memory of visited states and selected actions, and selecting randomly from unvisited actions:
-			retAction = actionSelector.selectAction(state,actions);
+		Action preSelectedAction = preSelectAction(state, actions);
+		if (preSelectedAction != null) {
+			return preSelectedAction;
 		}
-		return retAction;
+
+			return  actionSelector.selectAction(state,actions);
+	}
+
+	private void saveStartingNode(State state) {
+		// saving the starting node of the graph:
+		if(graph.getStartingStateConcreteId() ==null){
+			graph.setStartingStateConcreteId(state.get(Tags.ConcreteID));
+		}
 	}
 }

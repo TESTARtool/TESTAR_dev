@@ -1,18 +1,50 @@
-package nl.ou.testar.SimpleGuiStateGraph;
+package nl.ou.testar.ReinforcementLearning;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 public class GuiStateGraphForQlearning {
-    protected Set<QlearningGuiState> qlearningGuiStates;
-    protected String startingStateConcreteId;
-    protected String previousStateConcreteId;
-    protected String previousActionConcreteId;
+    private String previousStateConcreteId;
+    private String previousActionConcreteId;
     private double R_MAX;
     private double gammaDiscount;
+
+    private Set<QlearningGuiState> qlearningGuiStates;
+    private String startingStateConcreteId;
+
+    protected Set<QlearningGuiState> getQlearningGuiStates() {
+        return qlearningGuiStates;
+    }
+
+    public String getStartingStateConcreteId() {
+        return startingStateConcreteId;
+    }
+
+    public void setStartingStateConcreteId(String startingStateConcreteId) {
+        this.startingStateConcreteId = startingStateConcreteId;
+    }
+
+    public String getPreviousActionConcreteId() {
+        return previousActionConcreteId;
+    }
+
+    public void setPreviousActionConcreteId(String previousActionConcreteId) {
+        this.previousActionConcreteId = previousActionConcreteId;
+    }
+
+    public String getPreviousStateConcreteId() {
+        return previousStateConcreteId;
+    }
+
+    public void setPreviousStateConcreteId(String previousStateConcreteId) {
+        this.previousStateConcreteId = previousStateConcreteId;
+    }
 
     public GuiStateGraphForQlearning(double R_MAX, double gammaDiscount) {
         this.R_MAX = R_MAX;
@@ -83,4 +115,16 @@ public class GuiStateGraphForQlearning {
         return false;
     }
 
+    /**
+     * This method retrieves for a set of actions the q-values for the State action combination
+     * @param state The current state
+     * @param actions The list of actions
+     * @return A map containing actions and their q-value, the default return value is 0
+     */
+    @Nonnull
+    public Multimap<Double, Action> getActionQValues(@Nonnull State state, @Nonnull Set<Action> actions) {
+        Multimap <Double, Action> qvalues = HashMultimap.create();
+        // TODO Aaron get get Q-values for selected actions
+        return qvalues;
+    }
 }
