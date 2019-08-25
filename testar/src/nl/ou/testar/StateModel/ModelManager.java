@@ -140,6 +140,9 @@ public class ModelManager implements StateModelManager {
         currentConcreteState = newConcreteState;
         concreteActionUnderExecution = null;
 
+        // temporarily output the nr of states in the model
+        System.out.println(abstractStateModel.getStates().size() + " number of abstract states in the model");
+
         // temporarily output the number of unvisited actions still left
         System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
                 Collection::stream

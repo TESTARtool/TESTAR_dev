@@ -751,7 +751,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state = getState(system))) {
+		while (mode() != Modes.Quit && moreActions(state)) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
@@ -805,6 +805,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
+
+			// fetch the new state
+            state = getState(system);
 		}
 
 		// notify to state model the last state
