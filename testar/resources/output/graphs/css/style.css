@@ -206,7 +206,7 @@ div.is-child-of {
     transition-delay: 0s;
 }
 
-#close-panel, #toggle-visible, #highlight, #widget-tree-button, #trace-path-button, #popup-edge {
+#close-panel, #toggle-visible, #highlight, #widget-tree-button, #trace-path-button, #popup-edge, #trace-sequence-button {
     float: right;
     margin-right: 10px;
 }

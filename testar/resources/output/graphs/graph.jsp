@@ -126,9 +126,16 @@
                     'background-color': '#F6EFF7',
                     'border-width': "1px",
                     'border-color': '#000000',
-                    'label': 'data(counter)',
+                    'label': '',
                     'color': '#5d574d',
                     'font-size': '0.4em'
+                }
+            },
+
+            {
+                selector: 'node[counter]',
+                style: {
+                    'label': 'data(counter)',
                 }
             },
 
@@ -150,9 +157,15 @@
                     'target-arrow-shape': 'triangle',
                     'curve-style': 'unbundled-bezier',
                     'text-rotation' : 'autorotate',
-                    'label': 'data(counter)',
+                    'label': '',
                     'color': '#5d574d',
                     'font-size': '0.3em'
+                }
+            },
+            {
+                selector: 'edge[counter]',
+                style: {
+                    'label': 'data(counter)',
                 }
             },
             {
@@ -519,7 +532,34 @@
         highlightButton.classList.add("skip");
         highlightButton.appendChild(document.createTextNode("Highlight"));
         highlightButton.addEventListener("click", function () {
+            // we want to select the clicked node and its neighborhood
             let allNodes = cy.$(targetNode).closedNeighborhood();
+
+            // next, in the case of a concrete action or an abstract action, we want to also fetch their concrete and
+            // abstract counterparts for the neighborhood
+            if (targetNode.hasClass('ConcreteState')) {
+                // get the connect abstract states and their connected abstract actions
+                let abstractStateNodes = allNodes.nodes('.ConcreteState').outgoers('.AbstractState');
+                let abstractionEdges = allNodes.nodes('.ConcreteState').outgoers('.isAbstractedBy');
+                let abstractActionNodes = abstractStateNodes.connectedEdges('.AbstractAction');
+
+                // next, for each concrete action in the neighborhoor, attempt to fetch the corresponding abstract action
+                let selectedAbstractActionNodes = [];
+                allNodes.edges('.ConcreteAction').forEach(
+                    (edge) => abstractActionNodes.forEach(
+                        (abstractActionNode) => {
+                            if (abstractActionNode.data('concreteActionIds').indexOf(edge.data('actionId')) != -1) {
+                                selectedAbstractActionNodes.push(abstractActionNode);
+                            }
+                        }
+                    )
+                );
+
+                // now join the nodes
+                allNodes = allNodes.union(abstractStateNodes).union(selectedAbstractActionNodes).union(abstractionEdges);
+            }
+
+            // we also need to select the parent nodes in case of a compound graph.
             allNodes = allNodes.union(allNodes.parent());
             cy.$("*").difference(allNodes).addClass("invisible");
         });
@@ -549,6 +589,65 @@
                 allElements = allElements.union(cy.$(allElements).parent());
                 cy.$("*").difference(allElements).addClass("invisible");
             });
+            contentPanelHeader.appendChild(traceButton);
+        }
+
+        // if the clicked node is a test sequence, we show a button that will show just the nodes of that test sequence
+        if (targetNode.hasClass('TestSequence') && appStatus.concreteLayerPresent) {
+            let traceButton = document.createElement('button');
+            traceButton.id = 'trace-sequence-button';
+            traceButton.classList.add('skip');
+            traceButton.appendChild(document.createTextNode('Trace Sequence'));
+            traceButton.addEventListener('click', () => {
+                // first, get all the nodes and edges in the sequence
+                let sequenceElements = targetNode.successors('.SequenceNode, .SequenceStep, .FirstNode');
+                // add the targetnode itself and the parents
+                sequenceElements = sequenceElements.union(targetNode);
+
+                // now get all the corresponding elements on the concrete layer
+                let concreteStateNodes = sequenceElements.nodes('.SequenceNode').outgoers('.ConcreteState');
+                let accessedEdges = sequenceElements.nodes('.SequenceNode').outgoers('.Accessed');
+                let concreteActionNodes = concreteStateNodes.connectedEdges('.ConcreteAction');
+
+                // for each sequence step, fetch the corresponding concrete action
+                let selectedConcreteActionNodes = [];
+                sequenceElements.edges('.SequenceStep').forEach(
+                    (edge) => concreteActionNodes.forEach(
+                        (concreteActionNode) => {
+                            if (concreteActionNode.data('uid') == edge.data('concreteActionUid')) {
+                                selectedConcreteActionNodes.push(concreteActionNode);
+                            }
+                        }
+                    )
+                );
+
+                sequenceElements = sequenceElements.union(concreteStateNodes).union(accessedEdges).union(selectedConcreteActionNodes);
+
+                // get all the corresponding elements on the abstract layer
+                let abstractStateNodes = sequenceElements.nodes('.ConcreteState').outgoers('.AbstractState');
+                let abstractionEdges = sequenceElements.nodes('.ConcreteState').outgoers('.isAbstractedBy');
+                let abstractActionNodes = abstractStateNodes.connectedEdges('.AbstractAction');
+
+                // next, for each concrete action in the neighborhoor, attempt to fetch the corresponding abstract action
+                let selectedAbstractActionNodes = [];
+                sequenceElements.edges('.ConcreteAction').forEach(
+                    (edge) => abstractActionNodes.forEach(
+                        (abstractActionNode) => {
+                            if (abstractActionNode.data('concreteActionIds').indexOf(edge.data('actionId')) != -1) {
+                                selectedAbstractActionNodes.push(abstractActionNode);
+                            }
+                        }
+                    )
+                );
+
+                // now join the nodes
+                sequenceElements = sequenceElements.union(abstractStateNodes).union(selectedAbstractActionNodes).union(abstractionEdges);
+
+                // add the parents
+                sequenceElements = sequenceElements.union(sequenceElements.parent());
+                cy.$("*").difference(sequenceElements).addClass("invisible");
+            });
+
             contentPanelHeader.appendChild(traceButton);
         }
 
