@@ -13,18 +13,6 @@ public class TestSequence {
 
     public static final int VERDICT_UNKNOWN = 4;
 
-    public TestSequence(String sequenceId, String startDateTime, String numberOfSteps, int verdict) {
-        this.sequenceId = sequenceId;
-        this.startDateTime = startDateTime;
-        this.numberOfSteps = numberOfSteps;
-        if (IntStream.of(VERDICT_SUCCESS, VERDICT_INTERRUPT_BY_USER, VERDICT_INTERRUPT_BY_SYSTEM).anyMatch(x -> x == verdict)) {
-            this.verdict = verdict;
-        }
-        else {
-            this.verdict = VERDICT_UNKNOWN;
-        }
-    }
-
     /**
      * The id for the test sequence.
      */
@@ -41,9 +29,26 @@ public class TestSequence {
     private String numberOfSteps;
 
     /**
+     * The amount of errors or unexpected results that where encountered.
+     */
+    private int nrOfErrors;
+
+    /**
      * An integer value representing the execution verdict for this test sequence.
      */
     private int verdict;
+
+    public TestSequence(String sequenceId, String startDateTime, String numberOfSteps, int verdict) {
+        this.sequenceId = sequenceId;
+        this.startDateTime = startDateTime;
+        this.numberOfSteps = numberOfSteps;
+        if (IntStream.of(VERDICT_SUCCESS, VERDICT_INTERRUPT_BY_USER, VERDICT_INTERRUPT_BY_SYSTEM).anyMatch(x -> x == verdict)) {
+            this.verdict = verdict;
+        }
+        else {
+            this.verdict = VERDICT_UNKNOWN;
+        }
+    }
 
     public String getSequenceId() {
         return sequenceId;
@@ -105,5 +110,11 @@ public class TestSequence {
         }
     }
 
+    public int getNrOfErrors() {
+        return nrOfErrors;
+    }
 
+    public void setNrOfErrors(int nrOfErrors) {
+        this.nrOfErrors = nrOfErrors;
+    }
 }

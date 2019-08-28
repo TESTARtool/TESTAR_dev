@@ -147,7 +147,21 @@ public class AnalysisManager {
                 else {
                     verdict = TestSequence.VERDICT_UNKNOWN;
                 }
-                sequenceList.add(new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict));
+
+                // fetch the number of errors that were encountered during the test run
+                String errorStmt = "SELECT COUNT(*) as nr FROM(TRAVERSE out(\"FirstNode\"), out(\"SequenceStep\") FROM ( SELECT FROM TestSequence WHERE sequenceId = :sequenceId)) WHERE @class = \"SequenceNode\" AND containsErrors = true";
+                params = new HashMap<>();
+                params.put("sequenceId", getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId")));
+                OResultSet errorResultSet = db.query(errorStmt, params);
+                int nrOfErrors = 0;
+                if (errorResultSet.hasNext()) {
+                    OResult errorResult = errorResultSet.next();
+                    nrOfErrors = (int)getConvertedValue(OType.INTEGER, errorResult.getProperty("nr"));
+                }
+                TestSequence testSequence = new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict);
+                testSequence.setNrOfErrors(nrOfErrors);
+
+                sequenceList.add(testSequence);
             }
         }
         return sequenceList;
