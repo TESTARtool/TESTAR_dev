@@ -41,6 +41,7 @@ public class EventHelper {
                 break;
 
             case SEQUENCE_STARTED:
+            case SEQUENCE_ENDED:
                 if (!(event.getPayload() instanceof Sequence)) {
                     throw new InvalidEventException();
                 }
@@ -53,6 +54,7 @@ public class EventHelper {
                 break;
 
             case SEQUENCE_NODE_ADDED:
+            case SEQUENCE_NODE_UPDATED:
                 if (!(event.getPayload() instanceof SequenceNode)) {
                     throw new InvalidEventException();
                 }

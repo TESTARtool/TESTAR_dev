@@ -408,6 +408,16 @@ public class EntityClassFactory {
         counter.setNullable(false);
         counter.setAutoIncrement(true);
         entityClass.addProperty(counter);
+        Property verdict = new Property("verdict", OType.STRING);
+        verdict.setMandatory(true);
+        verdict.setNullable(false);
+        verdict.setIndexAble(true);
+        entityClass.addProperty(verdict);
+        Property terminationMessage = new Property("terminationMessage", OType.STRING);
+        terminationMessage.setMandatory(false);
+        terminationMessage.setNullable(true);
+        terminationMessage.setIndexAble(false);
+        entityClass.addProperty(terminationMessage);
         entityClasses.put(EntityClassName.TestSequence, entityClass);
         return entityClass;
     }
@@ -449,6 +459,16 @@ public class EntityClassFactory {
         counter.setNullable(false);
         counter.setAutoIncrement(true);
         entityClass.addProperty(counter);
+        Property errorMessages = new Property("errorMessage", OType.STRING);
+        errorMessages.setMandatory(false);
+        errorMessages.setNullable(true);
+        errorMessages.setIndexAble(false);
+        entityClass.addProperty(errorMessages);
+        Property containsErrors = new Property("containsErrors", OType.BOOLEAN);
+        containsErrors.setMandatory(true);
+        containsErrors.setNullable(false);
+        containsErrors.setIndexAble(true);
+        entityClass.addProperty(containsErrors);
         entityClasses.put(EntityClassName.SequenceNode, entityClass);
         return entityClass;
     }
@@ -484,6 +504,11 @@ public class EntityClassFactory {
         counter.setNullable(false);
         counter.setAutoIncrement(true);
         entityClass.addProperty(counter);
+        Property actionDescription = new Property("actionDescription", OType.STRING);
+        actionDescription.setMandatory(false);
+        actionDescription.setNullable(true);
+        actionDescription.setIndexAble(false);
+        entityClass.addProperty(actionDescription);
         entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
     }

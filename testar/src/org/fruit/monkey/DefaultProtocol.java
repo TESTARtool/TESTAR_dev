@@ -189,6 +189,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 
+	protected boolean exceptionThrown = false;
+
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
@@ -638,6 +640,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+			exceptionThrown = false;
 
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
@@ -711,12 +714,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				sequenceCount++;
 
 			} catch (Exception e) {
-				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
+				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+				System.out.println(message);
+				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
+				stackTrace.add(message);
+				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
+				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+				exceptionThrown = true;
 				e.printStackTrace();
-				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
+		if (mode() == Modes.Quit && !exceptionThrown) {
+			// the user initiated the shutdown
+			stateModelManager.notifyTestSequenceInterruptedByUser();
+		}
+
+
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
 		//allowing close-up in the end of test session:

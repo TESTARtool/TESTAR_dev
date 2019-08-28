@@ -11,8 +11,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 public class ModelManager implements StateModelManager {
 
@@ -43,6 +42,8 @@ public class ModelManager implements StateModelManager {
     // manager that is responsible for recording test sequences as they are executed
     private SequenceManager sequenceManager;
 
+    private StringJoiner errorMessages;
+
     /**
      * Constructor
      * @param abstractStateModel
@@ -55,6 +56,7 @@ public class ModelManager implements StateModelManager {
         this.persistenceManager = persistenceManager;
         this.concreteStateTags = concreteStateTags;
         this.sequenceManager = sequenceManager;
+        errorMessages = new StringJoiner(", ");
         init();
     }
 
@@ -141,12 +143,14 @@ public class ModelManager implements StateModelManager {
         concreteActionUnderExecution = null;
 
         // temporarily output the nr of states in the model
-        System.out.println(abstractStateModel.getStates().size() + " number of abstract states in the model");
+        System.out.println(abstractStateModel.getStates().size() + " abstract states in the model");
 
         // temporarily output the number of unvisited actions still left
         System.out.println(abstractStateModel.getStates().stream().map(AbstractState::getUnvisitedActions).flatMap(
                 Collection::stream
         ).count() + " unvisited actions left");
+        System.out.println("----------------------------");
+        System.out.println();
     }
 
     /**
@@ -162,11 +166,20 @@ public class ModelManager implements StateModelManager {
         }
         catch (ActionNotFoundException ex) {
             System.out.println("Action not found in state model");
+            errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
+        System.out.println("Executing action: " + action.get(Tags.Desc));
+        System.out.println("----------------------------------");
+
+        // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
+        if (errorMessages.length() > 0) {
+            sequenceManager.notifyErrorInCurrentState(errorMessages.toString());
+            errorMessages = new StringJoiner(", ");
+        }
     }
 
     @Override
@@ -194,6 +207,8 @@ public class ModelManager implements StateModelManager {
                 }
             }
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
+            errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
+                    "unable to find the action in its executable actions");
         } catch (ActionNotFoundException e) {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
         }
@@ -214,5 +229,13 @@ public class ModelManager implements StateModelManager {
         sequenceManager.stopSequence();
     }
 
+    @Override
+    public void notifyTestSequenceInterruptedByUser() {
+        sequenceManager.notifyInterruptionByUser();
+    }
 
+    @Override
+    public void notifyTestSequenceInterruptedBySystem(String message) {
+        sequenceManager.notifyInterruptionBySystem(message);
+    }
 }
