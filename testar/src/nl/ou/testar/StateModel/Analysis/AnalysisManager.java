@@ -12,13 +12,13 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import nl.ou.testar.StateModel.Analysis.HttpServer.JettyServer;
 import nl.ou.testar.StateModel.Analysis.Json.Edge;
 import nl.ou.testar.StateModel.Analysis.Json.Element;
 import nl.ou.testar.StateModel.Analysis.Json.Vertex;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
+import nl.ou.testar.StateModel.Sequence.SequenceVerdict;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -131,7 +131,23 @@ public class AnalysisManager {
 
                 String sequenceId = (String) getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId"));
                 Date startDateTime = (Date) getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"));
-                sequenceList.add(new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes)));
+
+                // not the best piece of code, but it works for now
+                int verdict;
+                String verdictValue = (String) getConvertedValue(OType.ANY.STRING, sequenceVertex.getProperty("verdict"));
+                if (verdictValue.equals(SequenceVerdict.COMPLETED_SUCCESFULLY.toString())) {
+                    verdict =TestSequence.VERDICT_SUCCESS;
+                }
+                else if (verdictValue.equals(SequenceVerdict.INTERRUPTED_BY_USER.toString())) {
+                    verdict = TestSequence.VERDICT_INTERRUPT_BY_USER;
+                }
+                else if (verdictValue.equals(SequenceVerdict.INTERRUPTED_BY_ERROR.toString())) {
+                    verdict = TestSequence.VERDICT_INTERRUPT_BY_SYSTEM;
+                }
+                else {
+                    verdict = TestSequence.VERDICT_UNKNOWN;
+                }
+                sequenceList.add(new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict));
             }
         }
         return sequenceList;

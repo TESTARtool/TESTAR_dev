@@ -518,3 +518,19 @@ button.skip:active {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+
+.fa-thumbs-up {
+    color: #1c7430;
+}
+
+.fa-hand-paper {
+    color: grey;
+}
+
+.fa-exclamation {
+    color: #942a25;
+}
+
+.fa-question {
+    color: #0c5460;
+}

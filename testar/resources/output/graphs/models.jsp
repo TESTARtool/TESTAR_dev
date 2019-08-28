@@ -41,7 +41,7 @@
         <!-- Collapse block -->
         <div class="collapse" id="sequenceRow<%= i %>">
             <div class="row">
-                <div class="col-6"><h5>Sequences</h5></div>
+                <div class="col-6 mt-1"><h5>Sequences</h5></div>
             </div>
             <div class="row">
                 <div class="col-1"></div>
@@ -50,7 +50,7 @@
             </div>
             <c:forEach var="seq" items="${model.sequences}">
                 <div class="row">
-                    <div class="col-1"></div>
+                    <div class="col-1 text-right"><span class="fas ${seq.verdictIcon}" title="${seq.verdictTooltip}"></span></div>
                     <div class="col-3">${seq.startDateTime}</div>
                     <div class="col-2">${seq.numberOfSteps}</div>
                 </div>
