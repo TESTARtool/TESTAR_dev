@@ -93,6 +93,7 @@ public class AnalysisManager {
                     abstractStateModels.add(abstractStateModel);
                 }
             }
+            resultSet.close();
         }
         return abstractStateModels;
     }
@@ -130,6 +131,7 @@ public class AnalysisManager {
                         nrOfNodes--;
                     }
                 }
+                nodeResultSet.close();
 
                 String sequenceId = (String) getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId"));
                 Date startDateTime = (Date) getConvertedValue(OType.DATETIME, sequenceVertex.getProperty("startDateTime"));
@@ -160,12 +162,14 @@ public class AnalysisManager {
                     OResult errorResult = errorResultSet.next();
                     nrOfErrors = (int)getConvertedValue(OType.INTEGER, errorResult.getProperty("nr"));
                 }
+                errorResultSet.close();
                 TestSequence testSequence = new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict);
                 testSequence.setNrOfErrors(nrOfErrors);
 
                 sequenceList.add(testSequence);
             }
         }
+        resultSet.close();
         return sequenceList;
     }
 
@@ -238,6 +242,7 @@ public class AnalysisManager {
                 counterSource++;
                 counterTarget++;
             }
+            resultSet.close();
             return visualizations;
         }
     }
@@ -309,22 +314,26 @@ public class AnalysisManager {
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "AbstractState", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
+        resultSet.close();
 
         // abstract actions
         stmt = "SELECT FROM AbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "AbstractAction"));
+        resultSet.close();
 
         // Black hole class
         stmt = "SELECT FROM (TRAVERSE out() FROM  (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'BlackHole'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "BlackHole", showCompoundGraph ? "AbstractLayer" : null, modelIdentifier));
+        resultSet.close();
 
 
         // unvisited abstract actions
         stmt = "SELECT FROM UnvisitedAbstractAction WHERE modelIdentifier = :identifier";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "UnvisitedAbstractAction"));
+        resultSet.close();
 
         return elements;
     }
@@ -350,11 +359,13 @@ public class AnalysisManager {
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "ConcreteState", showCompoundGraph ? "ConcreteLayer" : null, modelIdentifier));
+        resultSet.close();
 
         // concrete actions
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').outE('ConcreteAction') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteAction'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "ConcreteAction"));
+        resultSet.close();
 
         return elements;
     }
@@ -380,21 +391,25 @@ public class AnalysisManager {
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "TestSequence", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
+        resultSet.close();
 
         // sequence nodes
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceNode'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchNodes(resultSet, "SequenceNode", showCompoundGraph ? "SequenceLayer" : null, modelIdentifier));
+        resultSet.close();
 
         // sequence steps
         stmt = "SELECT FROM (TRAVERSE in('isAbstractedBy').in('Accessed').outE('SequenceStep') FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'SequenceStep'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "SequenceStep"));
+        resultSet.close();
 
         // first node
         stmt = "SELECT FROM (TRAVERSE outE('FirstNode') FROM (SELECT FROM TestSequence WHERE modelIdentifier = :identifier)) WHERE @class = 'FirstNode'";
         resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "FirstNode"));
+        resultSet.close();
 
         return elements;
     }
@@ -433,6 +448,7 @@ public class AnalysisManager {
         params.put("identifier", modelIdentifier);
         OResultSet resultSet = db.query(stmt, params);
         elements.addAll(fetchEdges(resultSet, "Accessed"));
+        resultSet.close();
 
         return elements;
     }
@@ -450,11 +466,13 @@ public class AnalysisManager {
             params.put("rid", internalId);
             OResultSet resultSet = db.query(stmt, params);
             elements.addAll(fetchNodes(resultSet, "Widget", null, concreteStateIdentifier));
+            resultSet.close();
 
             // then get the parent/child relationship between the widgets
             stmt = "SELECT FROM isChildOf WHERE in IN(SELECT @RID FROM (TRAVERSE in('isChildOf') FROM (SELECT FROM Widget WHERE @RID = :rid)))";
             resultSet = db.query(stmt, params);
             elements.addAll(fetchEdges(resultSet, "isChildOf"));
+            resultSet.close();
 
             // create a filename
             StringBuilder builder = new StringBuilder(concreteStateIdentifier);
