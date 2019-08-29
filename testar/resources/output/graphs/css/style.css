@@ -492,6 +492,15 @@ button.skip:active {
     width: 40%;
     max-width: 40%;
     display: inline-block;
+    position: relative;
+}
+
+.edge-popup div.screenshot div.top-left-text  {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    color: red;
+    font-size: 1.5em;
 }
 
 .edge-popup img {

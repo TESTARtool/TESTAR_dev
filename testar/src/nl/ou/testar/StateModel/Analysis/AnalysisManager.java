@@ -6,6 +6,7 @@ import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
@@ -16,6 +17,7 @@ import nl.ou.testar.StateModel.Analysis.Json.Edge;
 import nl.ou.testar.StateModel.Analysis.Json.Element;
 import nl.ou.testar.StateModel.Analysis.Json.Vertex;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
+import nl.ou.testar.StateModel.Analysis.Representation.ActionViz;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.StateModel.Sequence.SequenceVerdict;
@@ -165,6 +167,79 @@ public class AnalysisManager {
             }
         }
         return sequenceList;
+    }
+
+    public List<ActionViz> fetchTestSequence(String sequenceId) {
+        List<ActionViz> visualizations = new ArrayList<>();
+        // fetch the first sequence node belonging to a given test sequence
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            String sequenceStmt = "SELECT FROM(TRAVERSE out(\"FirstNode\") FROM ( SELECT FROM TestSequence WHERE sequenceId = :sequenceId)) WHERE @class = \"SequenceNode\"";
+            Map<String, Object> params = new HashMap<>();
+            params.put("sequenceId", sequenceId);
+            OResultSet resultSet = db.query(sequenceStmt, params);
+
+            if (!resultSet.hasNext()) {
+                return visualizations; // no sequence node found
+            }
+
+            OResult nodeResult = resultSet.next();
+            if (!nodeResult.isVertex()) return visualizations;
+            Optional<OVertex> nodeVertexOptional = nodeResult.getVertex();
+            if (!nodeVertexOptional.isPresent()) {
+                return visualizations;
+            }
+
+            // alright, we have a node
+            OVertex nodeVertex = nodeVertexOptional.get();
+            int counterSource = 1;
+            int counterTarget = 2;
+
+            while(true) {
+                // pffff..alright, now that we have our node vertex, we need to get two things:
+                // 1) the concrete state node that is connected to our sequence node, as we need the screenshot
+                // 2) the sequence step going out, for the description
+
+                // first, see if we have another sequence step from this node
+                OEdge sequenceStepEdge = null;
+                for(OEdge edge : nodeVertex.getEdges(ODirection.OUT, "SequenceStep")) {
+                    sequenceStepEdge = edge;
+                    break; // there should at most be one edge
+                }
+
+                if (sequenceStepEdge == null) {
+                    break; // nothing left to do
+                }
+
+                // next, get the vertex that is at the received end of the step edge
+                OVertex targetVertex = sequenceStepEdge.getTo();
+                // now, fetch the concrete states for both the vertices
+                OVertex sourceState = null;
+                OVertex targetState = null;
+                for(OEdge edge : nodeVertex.getEdges(ODirection.OUT, "Accessed")) {
+                    sourceState = edge.getTo();
+                    break; // there should at most be one edge
+                }
+                for(OEdge edge: targetVertex.getEdges(ODirection.OUT, "Accessed")) {
+                    targetState = edge.getTo();
+                    break; // there should at most be one edge
+                }
+                if (sourceState == null || targetState == null) {
+                    return visualizations;
+                }
+
+                String sourceScreenshot = "n" + formatId(sourceState.getIdentity().toString());
+                processScreenShot(sourceState.getProperty("screenshot"), sourceScreenshot, sequenceId);
+                String targetScreenshot = "n" + formatId(targetState.getIdentity().toString());
+                processScreenShot(targetState.getProperty("screenshot"), targetScreenshot, sequenceId);
+                String actionDescription = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("actionDescription"));
+                ActionViz actionViz = new ActionViz(sourceScreenshot, targetScreenshot, actionDescription, counterSource, counterTarget);
+                visualizations.add(actionViz);
+                nodeVertex = targetVertex;
+                counterSource++;
+                counterTarget++;
+            }
+            return visualizations;
+        }
     }
 
     /**
@@ -486,6 +561,9 @@ public class AnalysisManager {
 
         // save the file to disk
         File screenshotFile = new File( screenshotDir, identifier + ".png");
+        if (screenshotFile.exists()) {
+            return;
+        }
         try {
             FileOutputStream outputStream = new FileOutputStream(screenshotFile);
             outputStream.write(recordBytes.toStream());
