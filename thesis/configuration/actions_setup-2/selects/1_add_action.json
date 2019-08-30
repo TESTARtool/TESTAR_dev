@@ -1,0 +1,110 @@
+{
+	"id": "AddAction",
+	"description": "Add action from overview",
+	"actionSelects": [
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Add",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Complete"
+			],
+			"widgetIds": [
+				"WP27tp7n5b1613311477"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Name",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Description"
+			],
+			"widgetIds": [
+				"WP1ten80p62231866821"
+			],
+			"actionType": "TYPEINTO",
+			"value": "${testrun} ${unique}",
+			"maxWait": 1000
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Description",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdTEXTAREA",
+			"neighbours": [
+				"Name"
+			],
+			"widgetIds": [
+				"WPdpgqgj6f1976448178"
+			],
+			"actionType": "TYPEINTO",
+			"value": "This is a test"
+		},
+		{
+			"selectType": "ATTRIBUTES",
+			"attributes" : {
+				"aria-label": "Location Data"
+			},
+			"neighbours": [
+				"Description"
+			],
+			"widgetIds": [
+				"WPiucjvi5b1915961555"
+			],
+			"actionType": "LEFTCLICK",
+			"maxWait": 1000
+		},
+		{
+			"selectType": "NAME",
+			"widgetName": "huaweiGsm",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbours": [
+				"Add action"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "ATTRIBUTES",
+			"attributes" : {
+				"aria-label": "Add"
+			},
+			"neighbours": [
+				"Add action"
+			],
+			"widgetIds": [
+				"WP1ua5js953351568842"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "ATTRIBUTES",
+			"attributes" : {
+				"aria-label": "Store"
+			},
+			"neighbours": [
+				"Add action"
+			],
+			"widgetIds": [
+				"WP1lx5o94531754637841"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		90,
+		80,
+		70,
+		60,
+		50,
+		40,
+		30,
+		20,
+		10,
+		5
+	]
+}

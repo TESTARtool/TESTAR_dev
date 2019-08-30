@@ -1,0 +1,13 @@
+{
+	"id": "Data import sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Data Import",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WPk1iwlj4e3971115681"
+	]
+}

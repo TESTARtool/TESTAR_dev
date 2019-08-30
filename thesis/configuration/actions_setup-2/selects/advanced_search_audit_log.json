@@ -1,0 +1,56 @@
+{
+	"id": "AuditLogAdvancedSearch",
+	"description": "Advanced search audit log",
+	"actionSelects": [
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Type",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Lima"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "User",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "TYPEINTO",
+			"value": "admin"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Search",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Clear",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

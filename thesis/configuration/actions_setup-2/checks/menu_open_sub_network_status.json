@@ -1,0 +1,13 @@
+{
+	"id": "Network status sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Network Status",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WP1bl7t78502070142374"
+	]
+}

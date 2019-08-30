@@ -1,0 +1,13 @@
+{
+	"id": "Privileges sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Privileges",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User management"
+	],
+	"widgetIds": [
+		"WP1k797m14d1898514194"
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "Import history sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Import History",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User managment"
+	],
+	"widgetIds": [
+		"WP9vrh4q512169413341"
+	]
+}

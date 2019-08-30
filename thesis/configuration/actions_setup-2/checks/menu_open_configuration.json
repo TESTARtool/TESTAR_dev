@@ -1,0 +1,13 @@
+{
+	"id": "Configuration main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Configuration",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"NMT"
+	],
+	"widgetIds": [
+		"WP1p0df7d3a4211458407"
+	]
+}

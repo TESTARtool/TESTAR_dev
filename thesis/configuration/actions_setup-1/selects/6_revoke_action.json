@@ -1,0 +1,31 @@
+{
+	"id": "RevokeAction",
+	"description": "Revoke action from overview",
+	"actionSelects": [
+		{
+			"widgetName": "Revoke",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Add", "Complete"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Yes",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Confirm revoke"
+			],
+			"actionType": "LEFTCLICK",
+			"maxWait": 2000
+		}
+	],
+	"probabilities": [
+		100,
+		100,
+		90,
+		80,
+		50,
+		30
+	]
+}

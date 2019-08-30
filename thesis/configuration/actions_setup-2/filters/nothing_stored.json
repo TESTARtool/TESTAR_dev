@@ -1,0 +1,9 @@
+{
+	"id": "AddNothingStored",
+	"selectType": "NAME",
+	"widgetName": "Error",
+	"widgetNameMatchType": "STARTSWITH",
+	"neighbours": [
+		"A barring cannot be stored without selected"
+	]
+}

@@ -1,0 +1,6 @@
+{
+	"id": "SnmpTraps",
+	"widgetName" : "SNMP traps",
+	"widgetNameMatchType" : "STARTSWITH",
+	"children" : [ "Trap name" ]
+}

@@ -1,0 +1,11 @@
+{
+	"id": "AddPredefinedLocations",
+	"selectType": "NAME",
+	"widgetName": "Select a predefined location",
+	"widgetNameMatchType": "EQUALS",
+	"neighbours": [
+		"Cancel",
+		"Select",
+		"Available predefined location"
+	]
+}

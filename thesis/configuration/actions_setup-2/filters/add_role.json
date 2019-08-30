@@ -1,0 +1,9 @@
+{
+	"id": "AddRole",
+	"selectType": "NAME",
+	"widgetName": "Add role",
+	"widgetNameMatchType": "STARTSWITH",
+	"neighbours": [
+		"Create"
+	]
+}

@@ -1,0 +1,9 @@
+{
+	"id": "No",
+	"eventType": "TERMINATION",
+	"selectType": "NAME",
+	"widgetName": "NO",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+	]
+}

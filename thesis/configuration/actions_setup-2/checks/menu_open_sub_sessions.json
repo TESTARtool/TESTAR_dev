@@ -1,0 +1,13 @@
+{
+	"id": "Sessions sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Sessions",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User management"
+	],
+	"widgetIds": [
+		"WPjc7wpk4b2477789735"
+	]
+}

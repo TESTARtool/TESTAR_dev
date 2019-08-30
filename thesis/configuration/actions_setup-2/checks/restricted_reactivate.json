@@ -1,0 +1,10 @@
+{
+	"id": "Reactivate",
+	"eventType": "RESTRICTED",
+	"selectType": "NAME",
+	"widgetName": "Reactivate",
+	"widgetNameMatchType": "EQUALS",
+	"neighbours": [
+		"Add", "Invoke"
+	]
+}

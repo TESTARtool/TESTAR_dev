@@ -1,0 +1,53 @@
+Counters
+Filter counter(s)
+  Trap details: 9
+  Add account: 0
+  Select a predefined location: 0
+  Add privilege: 0
+  Add role: 0
+  Confirm: 38
+  NMT Alerts: 0
+  Error: 0
+  Error: 0
+  SNMP traps: 750
+Action selects counter(s)
+ Action sequence 'Add action from overview'
+  Add: 97
+  Name: 89
+  Description: 88
+  Location Data: 88
+  huaweiGsm: 82
+  Add: 82
+  Store: 82
+ Action sequence 'Invoke action from overview'
+  Invoke: 68
+  Yes: 2
+ Action sequence 'Clear action from overview'
+  Clear: 38
+  Yes: 4
+ Action sequence 'Shutdown action from overview'
+  Shutdown: 41
+  Yes: 2
+ Action sequence 'Reactivate action from overview'
+  Reactivate: 25
+  Yes: 0
+ Action sequence 'Revoke action from overview'
+  Revoke: 4
+  Yes: 0
+ Action sequence 'Advanced search action overview'
+  Name: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search audit log'
+  Type: 0
+  User: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search predefined location'
+  Typee: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Login into SUT'
+  Username: 121
+  Password: 121
+  Login: 121

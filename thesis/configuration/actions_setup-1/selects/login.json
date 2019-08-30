@@ -1,0 +1,41 @@
+{
+	"id": "Login",
+	"description": "Login into SUT",
+	"actionSelects": [
+		{
+			"widgetName": "Username",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Password",
+				"Login"
+			],
+			"actionType": "TYPEINTO",
+			"value": "admin"
+		},
+		{
+			"widgetName": "Password",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Username",
+				"Login"
+			],
+			"actionType": "TYPEINTO",
+			"value": "<password>"
+		},
+		{
+			"widgetName": "Login",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Username",
+				"Password"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100
+	]
+}

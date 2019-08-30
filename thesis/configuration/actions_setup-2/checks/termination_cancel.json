@@ -1,0 +1,9 @@
+{
+	"id": "CANCEL",
+	"eventType": "TERMINATION",
+	"selectType": "NAME",
+	"widgetName": "CANCEL",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+	]
+}

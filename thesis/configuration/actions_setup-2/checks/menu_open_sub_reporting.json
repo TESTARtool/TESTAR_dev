@@ -1,0 +1,13 @@
+{
+	"id": "Reporting sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "reporting",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Information"
+	],
+	"widgetIds": [
+		"WP1pf663z4b3465782782"
+	]
+}

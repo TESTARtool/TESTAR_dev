@@ -1,0 +1,39 @@
+{
+  "actionFilters" : [ {
+    "widgetName" : "Confirm",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Yes" ]
+  }, {
+    "widgetName" : "Trap details",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Cancel" ]
+  }, {
+    "widgetName" : "SNMP traps",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Trap name" ]
+  }, {
+    "widgetName" : "NP Alerts",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Task description" ]
+  }, {
+    "widgetName" : "Add account",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Create" ]
+  }, {
+    "widgetName" : "Add role",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Create" ]
+  }, {
+    "widgetName" : "Add privilege",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Create" ]
+  }, {
+    "widgetName" : "Error",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "No cells selected" ]
+  }, {
+    "widgetName" : "Error",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "A barring cannot be stored without selected" ]
+  } ]
+}

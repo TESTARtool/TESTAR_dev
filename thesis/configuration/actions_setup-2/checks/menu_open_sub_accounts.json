@@ -1,0 +1,13 @@
+{
+	"id": "Accounts sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Accounts",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User management"
+	],
+	"widgetIds": [
+		"WP1n46myv4b4264214877"
+	]
+}

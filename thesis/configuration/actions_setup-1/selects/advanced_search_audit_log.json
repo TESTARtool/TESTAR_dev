@@ -1,0 +1,52 @@
+{
+	"id": "AuditLogAdvancedSearch",
+	"description": "Advanced search audit log",
+	"actionSelects": [
+		{
+			"widgetName": "Type",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Lima"
+		},
+		{
+			"widgetName": "User",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "TYPEINTO",
+			"value": "admin"
+		},
+		{
+			"widgetName": "Search",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Clear",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Audit log"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

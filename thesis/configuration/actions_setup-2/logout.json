@@ -1,0 +1,6 @@
+{
+    "id": "Logout",
+    "widgetName" : "LIMA NP Management System",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Yes, logout", "Cancel" ]
+}

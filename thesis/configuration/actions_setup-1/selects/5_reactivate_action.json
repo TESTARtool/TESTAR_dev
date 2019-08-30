@@ -1,0 +1,31 @@
+{
+	"id": "ReactivateAction",
+	"description": "Reactivate action from overview",
+	"actionSelects": [
+		{
+			"widgetName": "Reactivate",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Add", "Complete"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Yes",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Confirm reactivate"
+			],
+			"actionType": "LEFTCLICK",
+			"maxWait": 2000
+		}
+	],
+	"probabilities": [
+		100,
+		100,
+		90,
+		80,
+		50,
+		30
+	]
+}

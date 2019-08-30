@@ -1,0 +1,8 @@
+{
+	"id": "AddNoCellsSelected",
+	"widgetName": "Error",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"No cells selected"
+	]
+}

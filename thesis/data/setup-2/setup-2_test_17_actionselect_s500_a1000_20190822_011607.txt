@@ -1,0 +1,82 @@
+Counters
+Filter counter(s)
+  TrapDetails: 84
+  AddAccount: 0
+  AddPredefinedLocations: 0
+  AddProvilege: 0
+  AddRole: 0
+  ConfirmPopup: 57
+  AddNothingStored: 0
+  AddNoCellsSelected: 4
+Action selects counter(s)
+ Action sequence 'AddAction' (Add action from overview)
+  Add: 24
+  Name WdINPUT: 18
+  Description WdTEXTAREA: 18
+  {aria-label=Location Data}: 16
+  huaweiGsm: 16
+  {aria-label=Add}: 16
+  {aria-label=Store}: 16
+ Action sequence 'InvokeAction' (Invoke action from overview)
+  Invoke: 107
+  Yes: 46
+ Action sequence 'ClearAction' (Clear action from overview)
+  Clear: 72
+  Yes: 5
+ Action sequence 'ShutdownAction' (Shutdown action from overview)
+  Shutdown: 49
+  Yes: 4
+ Action sequence 'ReactivateAction' (Reactivate action from overview)
+  Reactivate: 30
+  Yes: 0
+ Action sequence 'RevokeAction' (Revoke action from overview)
+  Revoke: 18
+  Yes: 0
+ Action sequence 'ActionAdvancedSearch' (Advanced search action overview)
+  Name WdINPUT: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'AuditLogAdvancedSearch' (Advanced search audit log)
+  Type WdINPUT: 0
+  User WdBUTTON: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'PredefinedLocationAdvancedSearch' (Advanced search predefined location)
+  Type WdINPUT: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'Login' (Login into SUT)
+  Username WdINPUT: 298
+  Password WdINPUT: 297
+  Login WdBUTTON: 0
+Action check counter(s)
+  Configuration main menu: 9
+  Information main menu: 8
+  NMT main menu: 8
+  Accounts sub main menu: 4
+  Audit log sub main menu: 2
+  Blocked IPs sub main menu: 0
+  Data import sub main menu: 1
+  Import history sub main menu: 3
+  Network status sub main menu: 4
+  NMT action sub main menu: 9
+  Operators sub main menu: 2
+  Predefined locations main menu: 0
+  Privileges sub main menu: 2
+  Property management sub main menu: 5
+  Reporting sub main menu: 3
+  Roles sub main menu: 3
+  Sessions sub main menu: 2
+  Technologies sub main menu: 1
+  User management main menu: 5
+  Clear: 0
+  Invoke: 0
+  Reactivate: 0
+  Revoke: 0
+  Shutdown: 0
+  CANCEL: 0
+  No: 0
+  OK: 0
+  Yes: 0
+  NMT Alert: 0
+  SNMP Traps: 0

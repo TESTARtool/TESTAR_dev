@@ -1,0 +1,11 @@
+{
+	"id": "AddNoCellsSelected",
+	"selectType": "ATTRIBUTES",
+	"attributes": {
+		"role": "dialog",
+		"class": "G2KWindow"
+	},
+	"neighbours": [
+		"Error:"
+	]
+}

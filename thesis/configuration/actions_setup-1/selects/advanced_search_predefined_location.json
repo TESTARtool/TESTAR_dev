@@ -1,0 +1,41 @@
+{
+	"id": "PredefinedLocationAdvancedSearch",
+	"description": "Advanced search predefined location",
+	"actionSelects": [
+		{
+			"widgetName": "Typee",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Limq"
+		},
+		{
+			"widgetName": "Search",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Clear",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

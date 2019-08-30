@@ -1,0 +1,8 @@
+{
+	"id": "AddNothingStored",
+	"widgetName": "Error",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"A barring cannot be stored without selected"
+	]
+}

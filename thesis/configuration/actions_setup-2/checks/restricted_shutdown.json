@@ -1,0 +1,10 @@
+{
+	"id": "Shutdown",
+	"eventType": "RESTRICTED",
+	"selectType": "NAME",
+	"widgetName": "Shutdown",
+	"widgetNameMatchType": "EQUALS",
+	"neighbours": [
+		"Add", "Invoke"
+	]
+}

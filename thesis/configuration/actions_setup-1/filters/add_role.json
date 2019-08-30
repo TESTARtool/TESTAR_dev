@@ -1,0 +1,8 @@
+{
+	"id": "AddRole",
+	"widgetName": "Add role",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"Create"
+	]
+}

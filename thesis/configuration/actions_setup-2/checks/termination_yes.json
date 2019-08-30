@@ -1,0 +1,9 @@
+{
+	"id": "Yes",
+	"eventType": "TERMINATION",
+	"selectType": "NAME",
+	"widgetName": "YES",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "NMT Alert",
+	"eventType": "UNRESTRICTED",
+	"selectType": "NAME",
+	"widgetName": "NMT Alert",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"SNMP Traps"
+	],
+	"widgetIds": [
+		"WP1yo96mp533692178661"
+	]
+}

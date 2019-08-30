@@ -1,0 +1,13 @@
+{
+	"id": "Technologies sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Technologies",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WPhu68p4e2626754695"
+	]
+}

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for FILE in *widgetlist*.txt
+do
+echo -n $FILE:
+grep "timesSelected.*: [^0]" $FILE | awk -F: 'BEGIN {sum=0} {sum+=$2} END {print sum}' 
+done

@@ -1,0 +1,47 @@
+{
+	"id": "Login",
+	"description": "Login into SUT",
+	"actionSelects": [
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Username",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Password",
+				"Login"
+			],
+			"actionType": "TYPEINTO",
+			"value": "admin"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Password",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Username",
+				"Login"
+			],
+			"actionType": "TYPEINTO",
+			"value": "<password>"
+		},
+		{
+			"selectType": "ATTRIBUTES",
+				"attributes" : {
+					"class": "button"
+				},
+			"neighbours": [
+				"Username",
+				"Password"
+			],
+			"actionType": "LEFTCLICK",
+			"widgetIds": [
+					"WP1uruu993f2961318514"
+				]
+		}
+	],
+	"probabilities": [
+		100
+	]
+}

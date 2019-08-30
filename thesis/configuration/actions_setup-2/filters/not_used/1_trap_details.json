@@ -1,0 +1,7 @@
+{
+    "id": "TrapDetails",
+    "selectType": "NAME",
+    "widgetName" : "Trap details",
+    "widgetNameMatchType" : "STARTSWITH",
+    "neighbours" : [ "Cancel" ]
+}

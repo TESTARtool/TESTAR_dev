@@ -1,0 +1,6 @@
+{
+    "id": "TrapDetails",
+    "widgetName" : "Trap details",
+    "widgetNameMatchType" : "STARTSWITH",
+    "children" : [ "Cancel" ]
+}

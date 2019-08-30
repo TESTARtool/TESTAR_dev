@@ -1,0 +1,13 @@
+{
+	"id": "Roles sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Roles",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User management"
+	],
+	"widgetIds": [
+		"WPj6y2pp481333851823"
+	]
+}

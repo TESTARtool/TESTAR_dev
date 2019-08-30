@@ -1,0 +1,51 @@
+Counters
+Filter counter(s)
+  Trap details: 248
+  Add account: 0
+  Select a predefined location: 0
+  Add privilege: 0
+  Add role: 0
+  Confirm: 172
+  Error: 0
+  Error: 0
+Action selects counter(s)
+ Action sequence 'Add action from overview'
+  Add: 59
+  Name: 18
+  Description: 18
+  Location Data: 18
+  huaweiGsm: 18
+  Add: 18
+  Store: 18
+ Action sequence 'Invoke action from overview'
+  Invoke: 45
+  Yes: 20
+ Action sequence 'Clear action from overview'
+  Clear: 26
+  Yes: 0
+ Action sequence 'Shutdown action from overview'
+  Shutdown: 26
+  Yes: 0
+ Action sequence 'Reactivate action from overview'
+  Reactivate: 19
+  Yes: 0
+ Action sequence 'Revoke action from overview'
+  Revoke: 11
+  Yes: 0
+ Action sequence 'Advanced search action overview'
+  Name: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search audit log'
+  Type: 1
+  User: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search predefined location'
+  Typee: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Login into SUT'
+  Username: 17
+  Password: 17
+  Login: 17

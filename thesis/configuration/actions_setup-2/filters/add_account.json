@@ -1,0 +1,9 @@
+{
+	"id": "AddAccount",
+	"selectType": "NAME",
+	"widgetName": "Add account",
+	"widgetNameMatchType": "STARTSWITH",
+	"neighbours": [
+		"Create"
+	]
+}

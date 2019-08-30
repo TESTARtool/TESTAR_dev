@@ -1,0 +1,82 @@
+Counters
+Filter counter(s)
+  Trap details: 0
+  Add account: 0
+  Select a predefined location: 0
+  Add privilege: 0
+  Add role: 0
+  null: 35
+  Error: 0
+  null: 4
+Action selects counter(s)
+ Action sequence 'Add action from overview'
+  Add: 35
+  Name WdINPUT: 25
+  Description WdTEXTAREA: 25
+  {aria-label=Location Data}: 25
+  huaweiGsm: 25
+  {aria-label=Add}: 25
+  {aria-label=Store}: 25
+ Action sequence 'Invoke action from overview'
+  Invoke: 97
+  Yes: 25
+ Action sequence 'Clear action from overview'
+  Clear: 73
+  Yes: 0
+ Action sequence 'Shutdown action from overview'
+  Shutdown: 49
+  Yes: 0
+ Action sequence 'Reactivate action from overview'
+  Reactivate: 34
+  Yes: 0
+ Action sequence 'Revoke action from overview'
+  Revoke: 22
+  Yes: 8
+ Action sequence 'Advanced search action overview'
+  Name WdINPUT: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'Advanced search audit log'
+  Type WdINPUT: 0
+  User WdBUTTON: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'Advanced search predefined location'
+  Type WdINPUT: 0
+  Search WdBUTTON: 0
+  Clear WdBUTTON: 0
+ Action sequence 'Login into SUT'
+  Username WdINPUT: 0
+  Password WdINPUT: 0
+  Login WdBUTTON: 0
+Action check counter(s)
+  Configuration main menu: 0
+  Information main menu: 0
+  NMT main menu: 0
+  Accounts sub main menu: 0
+  Audit log sub main menu: 0
+  Blocked IPs sub main menu: 0
+  Data import sub main menu: 0
+  Import history sub main menu: 0
+  Network status sub main menu: 0
+  NMT action sub main menu: 1
+  Operators sub main menu: 0
+  Predefined locations main menu: 0
+  Privileges sub main menu: 0
+  Property management sub main menu: 0
+  Reporting sub main menu: 0
+  Roles sub main menu: 0
+  Sessions sub main menu: 0
+  Technologies sub main menu: 0
+  User management main menu: 1
+  Clear: 0
+  Invoke: 0
+  Reactivate: 0
+  Revoke: 0
+  Shutdown: 0
+  CANCEL: 0
+  NO: 0
+  OK: 0
+  Yes: 0
+  NMT Alert: 0
+  SNMP Traps: 0

@@ -1,0 +1,41 @@
+{
+	"id": "ActionAdvancedSearch",
+	"description": "Advanced search action overview",
+	"actionSelects": [
+		{
+			"widgetName": "Name",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Maintenance"
+		},
+		{
+			"widgetName": "Search",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Clear",
+			"roleName": "UIAButton",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "Property management sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Property Management",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WPgg6asz563100291077"
+	]
+}

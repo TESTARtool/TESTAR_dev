@@ -1,0 +1,13 @@
+{
+	"id": "Operators sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Operators",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WP1s2y91r4b2549017111"
+	]
+}

@@ -1,0 +1,8 @@
+{
+	"id": "AddAccount",
+	"widgetName": "Add account",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"Create"
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "Blocked IPs sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Blocked IPs",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"User management"
+	],
+	"widgetIds": [
+		"WP1s59e2y4e398997274"
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"id": "Predefined locations main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Predefined locations",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"NMT"
+	],
+	"widgetIds": [
+		"WP1vnilsq564187085894"
+	]
+}

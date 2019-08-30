@@ -1,0 +1,13 @@
+{
+	"id": "Information main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Information",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WP1gndjo83a1711939601"
+	]
+}

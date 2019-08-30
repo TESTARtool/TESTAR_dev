@@ -1,0 +1,8 @@
+{
+	"id": "ConfirmAction",
+	"widgetName": "Confirm",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"Yes"
+	]
+}

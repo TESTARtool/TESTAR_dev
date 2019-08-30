@@ -1,0 +1,36 @@
+Counters
+Filter counter(s)
+  Add account: 0
+  Select a predefined location: 0
+  Add privilege: 0
+  Add role: 0
+  Confirm: 0
+  NMT Alerts: 0
+  Error: 0
+  Error: 0
+Action selects counter(s)
+ Action sequence 'Add action from overview'
+  Add: 100
+  Name: 35
+  Description: 35
+  Location Data: 35
+  huaweiGsm: 35
+  Add: 35
+  Store: 35
+ Action sequence 'Advanced search action overview'
+  Name: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search audit log'
+  Type: 7
+  User: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Advanced search predefined location'
+  Typee: 0
+  Search: 0
+  Clear: 0
+ Action sequence 'Login'
+  Username: 1
+  Password: 1
+  Login: 1

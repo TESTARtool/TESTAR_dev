@@ -1,0 +1,44 @@
+{
+	"id": "PredefinedLocationAdvancedSearch",
+	"description": "Advanced search predefined location",
+	"actionSelects": [
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Type",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Limq"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Search",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Clear",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Predefined Location Overview"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

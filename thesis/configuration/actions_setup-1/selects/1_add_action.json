@@ -1,0 +1,75 @@
+{
+	"id": "AddAction",
+	"description": "Add action from overview",
+	"actionSelects": [
+		{
+			"widgetName": "Add",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Complete"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Name",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Description"
+			],
+			"actionType": "TYPEINTO",
+			"value": "${testrun} ${unique}",
+			"maxWait": 1000
+		},
+		{
+			"widgetName": "Description",
+			"roleName": "UIAEdit",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Name"
+			],
+			"actionType": "TYPEINTO",
+			"value": "This is a test"
+		},
+		{
+			"widgetName": "Location Data",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Description"
+			],
+			"actionType": "LEFTCLICK",
+			"maxWait": 1000
+		},
+		{
+			"widgetName": "huaweiGsm",
+			"widgetNameMatchType": "STARTSWITH",
+			"neighbourWidgets": [
+				"Search"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Add",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Search"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"widgetName": "Store",
+			"widgetNameMatchType": "EQUALS",
+			"neighbourWidgets": [
+				"Search"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		80,
+		70,
+		50,
+		30
+	]
+}

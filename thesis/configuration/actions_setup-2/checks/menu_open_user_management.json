@@ -1,0 +1,13 @@
+{
+	"id": "User management main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "User management",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WP18ado533a443221450"
+	]
+}

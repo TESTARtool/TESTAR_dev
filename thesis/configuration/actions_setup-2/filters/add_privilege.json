@@ -1,0 +1,9 @@
+{
+	"id": "AddProvilege",
+	"selectType": "NAME",
+	"widgetName": "Add privilege",
+	"widgetNameMatchType": "STARTSWITH",
+	"neighbours": [
+		"Create"
+	]
+}

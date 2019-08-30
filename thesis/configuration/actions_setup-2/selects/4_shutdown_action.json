@@ -1,0 +1,38 @@
+{
+	"id": "ShutdownAction",
+	"description": "Shutdown action from overview",
+	"actionSelects": [
+		{
+			"selectType": "NAME",
+			"widgetName": "Shutdown",
+			"widgetNameMatchType": "EQUALS",
+			"neighbours": [
+				"Add", "Complete"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "NAME",
+			"widgetName": "Yes",
+			"widgetNameMatchType": "EQUALS",
+			"neighbours": [
+				"Confirm shutdown"
+			],
+			"actionType": "LEFTCLICK",
+			"maxWait": 2000
+		}
+	],
+	"probabilities": [
+		100,
+		100,
+		90,
+		80,
+		50,
+		30,
+		20,
+		20,
+		20,
+		10,
+		5
+	]
+}

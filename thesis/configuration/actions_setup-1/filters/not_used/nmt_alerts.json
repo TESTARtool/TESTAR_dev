@@ -1,0 +1,8 @@
+{
+	"id": "NmtAlerts",
+	"widgetName": "NMT Alerts",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"Task description"
+	]
+}

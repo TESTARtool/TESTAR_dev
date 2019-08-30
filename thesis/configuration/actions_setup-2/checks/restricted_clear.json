@@ -1,0 +1,10 @@
+{
+	"id": "Clear",
+	"eventType": "RESTRICTED",
+	"selectType": "NAME",
+	"widgetName": "Clear",
+	"widgetNameMatchType": "EQUALS",
+	"neighbours": [
+		"Add", "Invoke"
+	]
+}

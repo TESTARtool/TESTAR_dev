@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for i in {1..30}
+do
+    echo "    {"
+    echo "        name: 'Test-$i'",
+    echo -n "        data: ["
+
+    awk -F, '{print $7}'  setup-2_test_${i}_*.txt | paste -d, -s
+    echo "        ]"
+    echo "    },"
+done

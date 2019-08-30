@@ -1,0 +1,13 @@
+{
+	"id": "Audit log sub main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "Audit log",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Information"
+	],
+	"widgetIds": [
+		"WP14cwy8w4c761651538"
+	]
+}

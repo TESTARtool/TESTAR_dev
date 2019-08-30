@@ -1,0 +1,8 @@
+{
+	"id": "AddProvilege",
+	"widgetName": "Add privilege",
+	"widgetNameMatchType": "STARTSWITH",
+	"children": [
+		"Create"
+	]
+}

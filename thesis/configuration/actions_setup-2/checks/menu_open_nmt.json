@@ -1,0 +1,13 @@
+{
+	"id": "NMT main menu",
+	"eventType": "MENU_OPEN",
+	"selectType": "NAME",
+	"widgetName": "NMT",
+	"widgetNameMatchType": "EQUALS_IC",
+	"neighbours": [
+		"Configuration"
+	],
+	"widgetIds": [
+		"WP1xddaqi3a2663934887"
+	]
+}

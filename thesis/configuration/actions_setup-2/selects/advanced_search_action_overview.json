@@ -1,0 +1,44 @@
+{
+	"id": "ActionAdvancedSearch",
+	"description": "Advanced search action overview",
+	"actionSelects": [
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Name",
+			"widgetNameMatchType": "STARTSWITH",
+			"roleName": "WdINPUT",
+			"neighbours": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "TYPEINTO",
+			"value": "Maintenance"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Search",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "LEFTCLICK"
+		},
+		{
+			"selectType": "NAME_ROLE",
+			"widgetName": "Clear",
+			"widgetNameMatchType": "EQUALS",
+			"roleName": "WdBUTTON",
+			"neighbours": [
+				"Advanced search",
+				"Cell Barrings"
+			],
+			"actionType": "LEFTCLICK"
+		}
+	],
+	"probabilities": [
+		100,
+		25
+	]
+}

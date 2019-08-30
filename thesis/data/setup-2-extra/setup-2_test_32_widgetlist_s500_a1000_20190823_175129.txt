@@ -1,0 +1,3241 @@
+Widgets: 180, visited: 7, 3
+Widget: 
+Abstract ID  : WPzkcaxs5b2472379518
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:898.0 y:109.0 w:166.0 h:17.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP12ab2c8443527540494
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:50.0 y:961.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPq2ookx542026354468
+title        : 
+tooltip      : 
+role         : WdBUTTON
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : button
+type         : null
+helpText     : null
+attributeMap : {class=olControlDragPanItemActive olButton}
+clickable    : false
+cssClasses   : [olControlDragPanItemActive, olButton]
+shape        : Rect [x:558.0 y:207.0 w:36.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP18ixwre442920482630
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:0.0 y:921.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1bky5uc58392638331
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1459.0 y:158.0 w:80.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1od9e5v71604021180
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:484.0 y:613.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPcjm6o94f815565475
+title        : +
+tooltip      : 
+role         : WdA
+UIActionType : Clickable
+name         : +
+display      : block
+textContent  : +
+tagName      : a
+type         : null
+helpText     : null
+attributeMap : {href=#zoomIn, class=olControlZoomIn olButton}
+clickable    : false
+cssClasses   : [olControlZoomIn, olButton]
+shape        : Rect [x:565.0 y:118.0 w:22.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1vdgzb16a2610786517
+title        : OpenLayers_Layer_Vector_54
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_54
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 355; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_54, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP13hvm814f2950112983
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_0.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:221.0 y:620.0 w:35.0 h:33.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP72nhht59585739210
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:454.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1e6k27m443288149986
+title        : Add action
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : Add action
+display      : table-cell
+textContent  : Add action
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:378.0 y:19.0 w:53.0 h:14.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPusd5u4594030681359
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:232.0 y:647.0 w:302.0 h:17.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPdidv2k6f1732056094
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:746.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPqo9q696b1970457930
+title        : OpenLayers_Layer_Vector_128
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_128
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 365; display: block; left: 0px; top: 0px;, id=OpenLayers_Layer_Vector_128, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP18ado533a443221450
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:left;vertical-align:middle;white-space:nowrap, class=sectionHeaderclosed}
+clickable    : false
+cssClasses   : [sectionHeaderclosed]
+shape        : Rect [x:0.0 y:866.0 w:200.0 h:39.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP7j3d8o6f1122871928
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:526.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1bxmk4f642297208814
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:519.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPchg4zy6f1491323311
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:698.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP13p4uks712479314271
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:238.0 y:613.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1saxwwm583707534075
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1299.0 y:158.0 w:80.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1xddaqi3a2663934887
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:left;vertical-align:middle;white-space:nowrap, class=sectionHeaderopened}
+clickable    : false
+cssClasses   : [sectionHeaderopened]
+shape        : Rect [x:0.0 y:48.0 w:200.0 h:38.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1w5mcls501438608192
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_6.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:491.0 y:620.0 w:35.0 h:33.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPbgiexc6f1302954688
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:650.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1pp8fkz6b3769331824
+title        : OpenLayers_Layer_Vector_156
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_156
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 385; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_156, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1p0df7d3a4211458407
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:left;vertical-align:middle;white-space:nowrap, class=sectionHeaderclosed}
+clickable    : false
+cssClasses   : [sectionHeaderclosed]
+shape        : Rect [x:0.0 y:786.0 w:200.0 h:39.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPwhv0t4711157248854
+title        : Endtime
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : Endtime
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_ComboBoxItem_7, autocomplete=OFF, tabindex=2376, $9a=$9b, type=TEXT, oninput=isc_ComboBoxItem_7._handleInput(), onselect=if (window.isc_ComboBoxItem_7 == null) return;isc_ComboBoxItem_7.$1162(), spellcheck=true, name=Endtime, style=width:39px;height:16px;, handlenativeevents=false, id=isc_G8, class=selectItemLiteText}
+clickable    : false
+cssClasses   : [selectItemLiteText]
+shape        : Rect [x:424.0 y:322.0 w:48.0 h:20.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPpzao34713199590379
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:443.0 y:613.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPiphvt064206565763
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:409.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPbyz9yn6f3221122872
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:674.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPdur36i742596736159
+title        : Start date
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : Start date
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_20, autocomplete=OFF, tabindex=2288, $9a=$9b, type=TEXT, oninput=isc_TextItem_20._handleInput(), onselect=if (window.isc_TextItem_20 == null) return;isc_TextItem_20.$1162(), spellcheck=true, name=startDate_dateTextField, style=width:71px;height:16px;text-align:right;, handlenativeevents=false, id=isc_FN, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:303.0 y:293.0 w:91.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP8rr5bw6c1884374928
+title        : OpenLayers_Layer_Vector_176
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_176
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 425; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_176, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ii03q1703070727406
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:428.0 y:413.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPtktsik3a3012207542
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-left:6px;width:12px, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:431.0 y:19.0 w:28.0 h:14.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP27tp7n5b1613311477
+title        : Add
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : Add
+display      : table-cell
+textContent  : Add
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_G2KToolStripButton_0.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:234.0 y:132.0 w:20.0 h:18.0]
+timesSelected: 2
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPiz64xt631817832438
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:321.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ii03qw702921113007
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:443.0 y:413.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP3b3c7i59292427073
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:322.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP296dvj632814557814
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:365.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP12akbz0752337237017
+title        : isc_TextItem_8
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : isc_TextItem_8
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_9, autocomplete=OFF, tabindex=2420, $9a=$9b, type=TEXT, oninput=isc_TextItem_9._handleInput(), onselect=if (window.isc_TextItem_9 == null) return;isc_TextItem_9.$1162(), spellcheck=true, name=isc_TextItem_8, style=width:490px;height:16px;, handlenativeevents=false, id=isc_EB, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:896.0 y:137.0 w:510.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPaci09v642436894965
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:431.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP8ndsz8704185048958
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:270.0 y:413.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1innbfz781912677822
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:301.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1tq46076a2064417486
+title        : OpenLayers_Layer_Vector_80
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_80
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 330; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_80, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1aanfwu78241172581
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:323.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP142cb3j59330089111
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:608.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPz2t8l7581482626198
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:301.0 y:158.0 w:538.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1rnhy6l7d1271384949
+title        : isc_TextItem_14
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : isc_TextItem_14
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_15, autocomplete=OFF, tabindex=2806, $9a=$9b, type=TEXT, oninput=isc_TextItem_15._handleInput(), onselect=if (window.isc_TextItem_15 == null) return;isc_TextItem_15.$1162(), spellcheck=true, name=isc_TextItem_14, style=width:4px;height:16px;, handlenativeevents=false, id=isc_OK, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:327.0 y:609.0 w:24.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1p8c88d594276083426
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:520.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPahcocd5b4013728165
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1408.0 y:109.0 w:169.0 h:17.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPokc7k23d3316539619
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {valign=middle, align=left, class=sidemenuLink}
+clickable    : false
+cssClasses   : [sidemenuLink]
+shape        : Rect [x:0.0 y:130.0 w:200.0 h:43.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPftrgl3441728843769
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:150.0 y:921.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPm3dio6571290503276
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {class=glyphicons glyphicons-search g2k_tableheader_icon g2k_glyphicons-search clickable}
+clickable    : false
+cssClasses   : [glyphicons, glyphicons-search, g2k_tableheader_icon, g2k_glyphicons-search, clickable]
+shape        : Rect [x:1850.0 y:99.0 w:30.0 h:26.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP3sn962701383054397
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:245.0 y:822.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1pgxt6y6f1804548559
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:387.0 y:138.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPicthix582694668064
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:899.0 y:158.0 w:120.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPq2ook2541641842277
+title        : 
+tooltip      : 
+role         : WdBUTTON
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : button
+type         : null
+helpText     : null
+attributeMap : {class=olControlZoomBoxItemInactive olButton}
+clickable    : false
+cssClasses   : [olControlZoomBoxItemInactive, olButton]
+shape        : Rect [x:558.0 y:169.0 w:36.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1lkrhzp64559735173
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_14.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:255.0 y:410.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1tzg1q6c2498322676
+title        : OpenLayers_Layer_Vector_166
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_166
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 390; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_166, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP51jkaf44459208625
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:100.0 y:961.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPehn1zv642719551171
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:607.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP8vwadu73182260162
+title        : startTime
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : startTime
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_ComboBoxItem_6, autocomplete=OFF, tabindex=2310, $9a=$9b, type=TEXT, oninput=isc_ComboBoxItem_6._handleInput(), onselect=if (window.isc_ComboBoxItem_6 == null) return;isc_ComboBoxItem_6.$1162(), spellcheck=true, name=startTime, style=width:39px;height:16px;, handlenativeevents=false, id=isc_FU, class=selectItemLiteText}
+clickable    : false
+cssClasses   : [selectItemLiteText]
+shape        : Rect [x:424.0 y:294.0 w:48.0 h:20.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP15i76k641089103192
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_17.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:469.0 y:410.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP5zos4r6f2964998016
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:454.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP14ypzal591455034929
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1644.0 y:158.0 w:80.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ttj8kd582744711694
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:190.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP13p4uln712329699358
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:253.0 y:613.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1hp7xnr593693415952
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:256.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPrc60gy63272158253
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:299.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPmumxj0641058467765
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:585.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP11fy8s171465417351
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:460.0 y:613.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP8ndsyd703765040703
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:255.0 y:413.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPz71djo642801412806
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_13.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:238.0 y:410.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP11fy8r67144467654
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:445.0 y:613.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1825rj8633908732315
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:255.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPhuuruj70883547128
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:484.0 y:413.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPczx0196f2149626505
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:722.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP10gq4256f2658844779
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:387.0 y:190.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPtknouk784137831379
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:367.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1gndjo83a1711939601
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:left;vertical-align:middle;white-space:nowrap, class=sectionHeaderclosed}
+clickable    : false
+cssClasses   : [sectionHeaderclosed]
+shape        : Rect [x:0.0 y:826.0 w:200.0 h:39.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPw78bhm671775934293
+title        : OpenLayers_Layer_OSM_46
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_OSM_46
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 100; display: block;, id=OpenLayers_Layer_OSM_46, dir=ltr, class=olLayerDiv olLayerGrid}
+clickable    : true
+cssClasses   : [olLayerDiv, olLayerGrid]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1dbputq593417699143
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1539.0 y:158.0 w:105.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1i3ej0o66569468560
+title        : isc_TextItem_6
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : isc_TextItem_6
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_7, autocomplete=OFF, tabindex=2109, $9a=$9b, type=TEXT, oninput=isc_TextItem_7._handleInput(), onselect=if (window.isc_TextItem_7 == null) return;isc_TextItem_7.$1162(), spellcheck=true, name=isc_TextItem_6, style=width:24px;height:16px;, handlenativeevents=false, id=isc_5Y, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:327.0 y:626.0 w:44.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP51fvtl641381287498
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_15.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:428.0 y:410.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1lgs2y2594020416667
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:388.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPlvd72w753427614439
+title        : isc_TextItem_4
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : isc_TextItem_4
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : search
+helpText     : null
+attributeMap : {$89=isc_TextItem_5, autocomplete=OFF, tabindex=1106, $9a=$9b, type=search, oninput=isc_TextItem_5._handleInput(), onselect=if (window.isc_TextItem_5 == null) return;isc_TextItem_5.$1162(), spellcheck=true, name=isc_TextItem_4, style=width:131px;height:22px;, handlenativeevents=false, id=isc_3P, class=searchBox}
+clickable    : false
+cssClasses   : [searchBox]
+shape        : Rect [x:1712.0 y:101.0 w:131.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1f5sfak713923492154
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:270.0 y:613.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP4ga70u6f2100525001
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:382.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPll3nt76b3766627405
+title        : OpenLayers_Layer_Vector_100
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_100
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 340; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_100, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1kamfnk64367230616
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:497.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1bw3ecg612718550188
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1408.0 y:139.0 w:166.0 h:17.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP182jl8s654273315501
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_18.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:238.0 y:610.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1x55e4n632493227072
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:189.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPfvmhn06f84486847
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:237.0 y:190.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1rwkpg84c922262135
+title        : NMT action
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : NMT action
+display      : inline
+textContent  : NMT action
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {name=, style=cursor: pointer;, class=sideMenuClickable horizontalSpaced upperCase}
+clickable    : false
+cssClasses   : [sideMenuClickable, horizontalSpaced, upperCase]
+shape        : Rect [x:10.0 y:102.0 w:78.0 h:12.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ten80p62231866821
+title        : Name
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : Name
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_19, autocomplete=OFF, tabindex=2221, $9a=$9b, type=TEXT, oninput=isc_TextItem_19._handleInput(), onselect=if (window.isc_TextItem_19 == null) return;isc_TextItem_19.$1162(), spellcheck=true, name=CELLBARRINGNAME, style=width:196px;height:16px;, handlenativeevents=false, id=isc_F6, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:299.0 y:154.0 w:216.0 h:22.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ug9pot652031310318
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_19.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:255.0 y:610.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1pvlqo24f678555028
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_1.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:255.0 y:620.0 w:35.0 h:33.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPneg3r2701969214639
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:598.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP11xnkdp782473582867
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:345.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1vni1sq564187085894
+title        : Predefined locations
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : Predefined locations
+display      : inline
+textContent  : Predefined locations
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {name=, style=cursor: pointer;, class=sideMenuClickable horizontalSpaced upperCase}
+clickable    : false
+cssClasses   : [sideMenuClickable, horizontalSpaced, upperCase]
+shape        : Rect [x:10.0 y:145.0 w:156.0 h:12.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP4yr2256f2405734961
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:406.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1i3qde04f2403687068
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_4.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:410.0 y:620.0 w:35.0 h:33.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPau7ms4591986095191
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:586.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1w68f4o3e589738322
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:100.0 y:921.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP7lny3s593445122153
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:300.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPzp5w03632369204059
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:277.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPux7iqn6a2292911357
+title        : OpenLayers_Layer_Vector_62
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_62
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 360; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_62, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPq2ools541407902951
+title        : 
+tooltip      : 
+role         : WdBUTTON
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : button
+type         : null
+helpText     : null
+attributeMap : {class=polygonButtonItemInactive olButton}
+clickable    : false
+cssClasses   : [polygonButtonItemInactive, olButton]
+shape        : Rect [x:558.0 y:245.0 w:36.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1w7ua8k702205036315
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:238.0 y:413.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP17ft44c58608055629
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:251.0 y:158.0 w:50.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPwuvhk7693236464221
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:228.0 y:164.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP9ztlzs581033027158
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1019.0 y:158.0 w:140.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPf4s8oe592857834879
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:564.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPv7mt25641770150723
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:563.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPpzao29712813259434
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:428.0 y:613.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPm17rsc6b2704713081
+title        : OpenLayers_Layer_Vector_120
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_120
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 350; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_120, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPge3cob6f4150183751
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:237.0 y:214.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP3a6e4r702688045509
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:245.0 y:798.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPm1dgfm723980193851
+title        : End date
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : End date
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_21, autocomplete=OFF, tabindex=2354, $9a=$9b, type=TEXT, oninput=isc_TextItem_21._handleInput(), onselect=if (window.isc_TextItem_21 == null) return;isc_TextItem_21.$1162(), spellcheck=true, name=endDate_dateTextField, style=width:71px;height:16px;text-align:right;, handlenativeevents=false, id=isc_G1, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:303.0 y:321.0 w:91.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP14vu6rt6f4043100955
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxTrue}
+clickable    : false
+cssClasses   : [checkboxTrue]
+shape        : Rect [x:237.0 y:138.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPqiad192e2839938418
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=CellBarringPresentationadd.$47(), valign=middle, align=center, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:368.0 y:14.0 w:101.0 h:23.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPs8nemn592322537051
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:366.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1sxakbi63986537728
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:387.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP10as5t8591193541898
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:476.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPi467tn3a3498932882
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-left:6px;width:12px, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:325.0 y:19.0 w:28.0 h:14.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1f5sf9p714039150715
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:255.0 y:613.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP13kmola644102928949
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:541.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1a5ct077c3776211502
+title        : isc_TextItem_12
+tooltip      : 
+role         : WdINPUT
+UIActionType : Clickable
+name         : isc_TextItem_12
+display      : inline-block
+textContent  : 
+tagName      : input
+type         : TEXT
+helpText     : null
+attributeMap : {$89=isc_TextItem_13, autocomplete=OFF, tabindex=2482, $9a=$9b, type=TEXT, oninput=isc_TextItem_13._handleInput(), onselect=if (window.isc_TextItem_13 == null) return;isc_TextItem_13.$1162(), spellcheck=true, name=isc_TextItem_12, style=width:4px;height:16px;, handlenativeevents=false, id=isc_MQ, class=textItemLite}
+clickable    : false
+cssClasses   : [textItemLite]
+shape        : Rect [x:327.0 y:409.0 w:24.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ph6dkz6b945757739
+title        : OpenLayers_Layer_Vector_146
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_146
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 380; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_146, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1p94bkz6b2547553633
+title        : OpenLayers_Layer_Vector_136
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : OpenLayers_Layer_Vector_136
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {style=position: absolute; width: 100%; height: 100%; z-index: 370; left: 0px; top: 0px; display: block;, id=OpenLayers_Layer_Vector_136, dir=ltr, class=olLayerDiv}
+clickable    : true
+cssClasses   : [olLayerDiv]
+shape        : Rect [x:554.0 y:107.0 w:0.0 h:0.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPrf609m6430318030
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_16.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:445.0 y:410.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1snmb6p641882117208
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:475.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP10ao7yq651501637029
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_21.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:445.0 y:610.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP6i5n626f1470619927
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:478.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1vnrk3d3e3513867434
+title        : 
+tooltip      : 
+role         : WdDIV
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : div
+type         : null
+helpText     : 
+attributeMap : {title=, class=sideMenuButton clickable}
+clickable    : false
+cssClasses   : [sideMenuButton, clickable]
+shape        : Rect [x:50.0 y:921.0 w:50.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1zi4qq643978376494
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:453.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP70mi7d6f2783972591
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:502.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPam69eo634048947840
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:343.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1lx5o94531754637841
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:232.0 y:973.0 w:302.0 h:17.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1bjq1d7f1303658151
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {class=glyphicons glyphicons-question-sign g2k_help_icon g2k_glyphicons-question-sign}
+clickable    : false
+cssClasses   : [glyphicons, glyphicons-question-sign, g2k_help_icon, g2k_glyphicons-question-sign]
+shape        : Rect [x:1872.0 y:53.0 w:34.0 h:30.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1os5ili63160710966
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:211.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP44k8l82e786484785
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=CellBarringPresentationlist.$47(), valign=middle, align=center, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:211.0 y:14.0 w:152.0 h:23.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1kvfspt4f4094184308
+title        : ?
+tooltip      : 
+role         : WdA
+UIActionType : Clickable
+name         : ?
+display      : block
+textContent  : ?
+tagName      : a
+type         : null
+helpText     : null
+attributeMap : {href=#zoomOut, class=olControlZoomOut olButton}
+clickable    : false
+cssClasses   : [olControlZoomOut, olButton]
+shape        : Rect [x:565.0 y:141.0 w:22.0 h:22.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPwlq3rg59719009770
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1724.0 y:158.0 w:80.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1od9e50711025216765
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:469.0 y:613.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPphfikm51269135464
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {class=glyphicons glyphicons-show-lines g2k_table_icon g2k_glyphicons-show-lines clickable}
+clickable    : false
+cssClasses   : [glyphicons, glyphicons-show-lines, g2k_table_icon, g2k_glyphicons-show-lines, clickable]
+shape        : Rect [x:1882.0 y:99.0 w:30.0 h:26.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPqptd22583310417376
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:839.0 y:158.0 w:60.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1kxrmc3593483022271
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:542.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1mtqgn581106484109
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1159.0 y:158.0 w:140.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPa10evo65413520179
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_22.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:469.0 y:610.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1tynoey70303038338
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:445.0 y:413.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP5gcfux4f1237805385
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_5.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:447.0 y:620.0 w:35.0 h:33.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPr7cfen5b240280840
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1068.0 y:109.0 w:166.0 h:17.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1jxy1dh582322124301
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1379.0 y:158.0 w:80.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1tynoft70185913027
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:460.0 y:413.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPo0juwo583327480014
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:212.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP19uwsz2803200181888
+title        : huaweiGsm1Cell1
+tooltip      : 
+role         : WdDIV
+UIActionType : None
+name         : huaweiGsm1Cell1
+display      : block
+textContent  : huaweiGsm1Cell1
+tagName      : div
+type         : null
+helpText     : null
+attributeMap : {role=presentation, cellclipdiv=true, style=overflow:hidden;white-space:nowrap;text-overflow:ellipsis;WIDTH:220px;}
+clickable    : false
+cssClasses   : []
+shape        : Rect [x:264.0 y:281.0 w:220.0 h:12.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPdpgqgj6f1976448178
+title        : Description
+tooltip      : 
+role         : WdTEXTAREA
+UIActionType : Typeable
+name         : Description
+display      : block
+textContent  : 
+tagName      : textarea
+type         : null
+helpText     : null
+attributeMap : {$89=isc_TextAreaItem_1, autocomplete=OFF, spellcheck=true, tabindex=2222, name=comments, style=resize:none;margin:0px;WIDTH:196px;HEIGHT:66px;display:block;white-space:pre-wrap;, handlenativeevents=false, id=isc_FA, $9a=$9b, class=textAreaItemLite, wrap=SOFT, oninput=isc_TextAreaItem_1._handleInput()}
+clickable    : false
+cssClasses   : [textAreaItemLite]
+shape        : Rect [x:299.0 y:180.0 w:216.0 h:76.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP26m3413d1107864480
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {valign=middle, align=left, class=sidemenuLink}
+clickable    : false
+cssClasses   : [sidemenuLink]
+shape        : Rect [x:0.0 y:87.0 w:200.0 h:43.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1h67h1s59865386931
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:410.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1gf5n2d631979016429
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:229.0 y:233.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPhuurto70766700217
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;font-size:1px;padding-right:0px, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:469.0 y:413.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPw07jwy592601676834
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:498.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPl7ntbf781806543525
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:389.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP8k13ba6f672815733
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:574.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP81k89z6f3473407202
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:550.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1denbrh592828390057
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:278.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPdwy3ip65169570849
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, onfocus=isc_ToolStripButton_20.$47(), valign=middle, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:428.0 y:610.0 w:15.0 h:21.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPo8q88b593084179100
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;padding-right:18px;text-align:left;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:1804.0 y:158.0 w:105.0 h:27.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPbd83e3591448700787
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:432.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP5h7x3g6f1752775846
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:245.0 y:430.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPiucjvi5b1915961555
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1238.0 y:109.0 w:166.0 h:17.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1w7ua9f702591366746
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=toolStripButton}
+clickable    : false
+cssClasses   : [toolStripButton]
+shape        : Rect [x:253.0 y:413.0 w:0.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPoh39cc593119031504
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:234.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPyg99cq4d3183007489
+title        : NMT action overview
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : NMT action overview
+display      : table-cell
+textContent  : NMT action overview
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {nowrap=true, style=margin:0px;border:0px;padding:0px;background-image:none;background-color:transparent;-webkit-box-shadow:none;box-shadow:none;, align=center, class=tabButtonTopSelected}
+clickable    : false
+cssClasses   : [tabButtonTopSelected]
+shape        : Rect [x:221.0 y:19.0 w:104.0 h:14.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1fssznh583107049531
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=headerButton}
+clickable    : false
+cssClasses   : [headerButton]
+shape        : Rect [x:221.0 y:158.0 w:30.0 h:28.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPq2ooni5495437665
+title        : 
+tooltip      : 
+role         : WdBUTTON
+UIActionType : Clickable
+name         : 
+display      : block
+textContent  : 
+tagName      : button
+type         : null
+helpText     : null
+attributeMap : {class=predefinedLocationButtonItemInactive olButton}
+clickable    : false
+cssClasses   : [predefinedLocationButtonItemInactive, olButton]
+shape        : Rect [x:558.0 y:321.0 w:36.0 h:36.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WPwj80ix591956888449
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:1306.0 y:344.0 w:66.0 h:13.0]
+timesSelected: 0
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1ua5js953351568842
+title        : 
+tooltip      : 
+role         : WdTD
+UIActionType : Clickable
+name         : 
+display      : table-cell
+textContent  : 
+tagName      : td
+type         : null
+helpText     : null
+attributeMap : {style=border:none;border-radius:inherit;padding-top:0px;padding-bottom:0px;text-align:center;vertical-align:middle;white-space:nowrap, class=button}
+clickable    : false
+cssClasses   : [button]
+shape        : Rect [x:232.0 y:447.0 w:302.0 h:17.0]
+timesSelected: 1
+-----------------------------------------------------------------
+Widget: 
+Abstract ID  : WP1r0n6z4784010722504
+title        : 
+tooltip      : 
+role         : WdSPAN
+UIActionType : Clickable
+name         : 
+display      : inline-block
+textContent  : 
+tagName      : span
+type         : null
+helpText     : null
+attributeMap : {style=vertical-align:top;display:inline-block;transform-origin:left top;;width:25px;height:25px;;transform:scale(0.6, 0.6);, class=checkboxFalse}
+clickable    : false
+cssClasses   : [checkboxFalse]
+shape        : Rect [x:239.0 y:279.0 w:15.0 h:15.0]
+timesSelected: 0
+-----------------------------------------------------------------
