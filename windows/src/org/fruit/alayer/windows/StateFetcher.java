@@ -364,6 +364,11 @@ public class StateFetcher implements Callable<UIAState>{
 			// if a pattern is present, we also want to store the properties that are specific to that pattern
 			if (uiaElement.get(availabilityTag)) {
 				UIATags.getChildTags(availabilityTag).stream().filter(UIATags::tagIsActive).forEach(patternPropertyTag -> {
+					if (patternPropertyTag.equals(UIATags.UIAValueValue)) {
+						// this property for some reason cannot be retrieved using the getCurrentPropertyValue method
+						// that is why we use the value that was directly received
+						uiaElement.set(UIATags.UIAValueValue, uiaElement.valuePattern);
+					}
 					Object propertyObject = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
 					if (propertyObject != null) {
 						try {

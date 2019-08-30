@@ -123,7 +123,7 @@ final class UIAState extends UIAWidget implements State {
 		}
 
 		// check the automation element for the tag
-		returnObject = uiaElement.get(tag, null);
+		returnObject = widget.uiaElement.get(tag, null);
 		if (returnObject != null) {
 			return (T)returnObject;
 		}
