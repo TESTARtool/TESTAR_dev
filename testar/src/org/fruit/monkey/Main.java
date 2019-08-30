@@ -651,7 +651,6 @@ public class Main {
 	private static void initCodingManager(Settings settings) {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
-		int i;
 
         Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
         // for the concrete state tags we use all the state management tags that are available
@@ -661,7 +660,7 @@ public class Main {
 
         // then the attributes for the abstract state id
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(Objects::nonNull).toArray(Tag<?>[]::new);
             CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
     }
