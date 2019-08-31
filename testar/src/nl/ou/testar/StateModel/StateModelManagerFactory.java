@@ -61,7 +61,7 @@ public class StateModelManagerFactory {
                 settings.get(ConfigTags.ApplicationVersion),
                 abstractTags,
                 persistenceManager instanceof StateModelEventListener ? (StateModelEventListener) persistenceManager : null);
-        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector();
+        ActionSelector actionSelector = CompoundFactory.getCompoundActionSelector(settings);
 
         return new ModelManager(abstractStateModel, actionSelector, persistenceManager, concreteStateTags, sequenceManager);
     }
