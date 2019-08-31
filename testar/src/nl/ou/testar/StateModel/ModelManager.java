@@ -42,6 +42,7 @@ public class ModelManager implements StateModelManager {
     // manager that is responsible for recording test sequences as they are executed
     private SequenceManager sequenceManager;
 
+    // if there any irregularities that occur during runs, they should be appended here
     private StringJoiner errorMessages;
 
     /**

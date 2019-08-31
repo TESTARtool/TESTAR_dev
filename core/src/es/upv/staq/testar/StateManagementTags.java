@@ -275,7 +275,7 @@ public class StateManagementTags {
     private static Set<Tag<?>> stateManagementTags = new HashSet<Tag<?>>() {
         {
             add(WidgetControlType);
-            add(WidgetWindowHandle);
+//            add(WidgetWindowHandle); // this property changes between different executions of the sut
             add(WidgetIsEnabled);
             add(WidgetTitle);
             add(WidgetHelpText);
