@@ -34,3 +34,8 @@ This folder contains the action filters (filters), action select sequences (sele
 
 This folder contains all the data collected during the tests split-up into different setups and collecting steps.
  
+### TESTAR configuration
+
+The webdrivergwt protocol version with adaptions chrashed during long test runs (around 3 hours testing). Adding the following environment variable solved the problem.
+
+> JAVA_OPTS=-Xss256m
