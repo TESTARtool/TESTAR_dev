@@ -1,42 +1,43 @@
-package desktop_qlearning; /***************************************************************************************************
-*
-* Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
-* Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+package desktop_qlearning;
+/**
+ Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ 3. Neither the name of the copyright holder nor the names of its
+ contributors may be used to endorse or promote products derived from
+ this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ */
 
 import nl.ou.testar.ReinforcementLearning.ActionSelector;
 import nl.ou.testar.ReinforcementLearning.GuiStateGraphForQlearning;
+import nl.ou.testar.ReinforcementLearning.QFunctions.QLearningQFunction;
 import nl.ou.testar.ReinforcementLearning.QLearningActionSelector;
+import nl.ou.testar.ReinforcementLearning.RewardFunctions.QLearningRewardFunction;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
-import org.fruit.alayer.Tags;
 import org.fruit.alayer.exceptions.ActionBuildException;
+import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.DesktopProtocol;
@@ -54,23 +55,24 @@ import java.util.Set;
  *  It changes the initialize() and selectAction() methods.
  */
 public class Protocol_desktop_qlearning extends DesktopProtocol {
-
+	private State fromState;
+	private Action action;
 	private ActionSelector actionSelector;
 
-	final double R_MAX = settings.get(ConfigTags.MaxReward);
-	final double gammaDiscount=settings.get(ConfigTags.Discount);
-	private final GuiStateGraphForQlearning graph = new GuiStateGraphForQlearning(R_MAX,gammaDiscount);
+	//TODO remove
+	private final double R_MAX = settings.get(ConfigTags.MaxReward);
+	private final double GAMMA_DISCOUNT = settings.get(ConfigTags.Discount);
 
 	/** 
 	 * Called once during the life time of TESTAR
 	 * This method can be used to perform initial setup work
-	 * @param   settings  the current TESTAR settings as specified by the user.
+	 * @param settings the current TESTAR settings as specified by the user.
 	 */
 	@Override
 	protected void initialize(Settings settings){
 		// initializing simple GUI state graph for Q-learning:
 		// this implementation uses concreteStateID for state abstraction, so it may find too many states:
-		actionSelector = new QLearningActionSelector(settings, graph);
+		actionSelector = new QLearningActionSelector(settings, new QLearningRewardFunction(), new QLearningQFunction(settings), new GuiStateGraphForQlearning(R_MAX, GAMMA_DISCOUNT));
 		super.initialize(settings);
 	}
 	
@@ -122,20 +124,40 @@ public class Protocol_desktop_qlearning extends DesktopProtocol {
 	@Override
 	@Nullable
 	protected Action selectAction(@Nonnull State state, @Nonnull Set<Action> actions){
+		Action actionToExecute;
+		fromState = state;
+
 		//Call the preSelectAction method from the DefaultProtocol so that, if necessary,
 		//unwanted processes are killed and SUT is put into foreground.
 		Action preSelectedAction = preSelectAction(state, actions);
 		if (preSelectedAction != null) {
-			return preSelectedAction;
+			actionToExecute = preSelectedAction;
+			return actionToExecute;
 		}
 
-			return  actionSelector.selectAction(state,actions);
+		// select action based on algorithm
+		actionToExecute =  actionSelector.selectAction(state, actions);
+
+		action = actionToExecute;
+		return actionToExecute;
 	}
 
-	private void saveStartingNode(State state) {
-		// saving the starting node of the graph:
-		if(graph.getStartingStateConcreteId() ==null){
-			graph.setStartingStateConcreteId(state.get(Tags.ConcreteID));
-		}
+	/**
+	 * This method gets the state of the SUT
+	 * It also call getVerdict() and saves it into the state
+	 *
+	 * @param system
+	 * @return
+	 * @throws StateBuildException
+	 */
+	@Override
+	protected State getState(SUT system) throws StateBuildException {
+		State toState = super.getState(system);
+
+		// save q-values
+		actionSelector.updateQValue(fromState, toState, action);
+
+		return toState;
 	}
+
 }

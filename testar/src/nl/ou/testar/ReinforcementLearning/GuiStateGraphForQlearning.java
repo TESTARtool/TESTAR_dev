@@ -2,6 +2,7 @@ package nl.ou.testar.ReinforcementLearning;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import nl.ou.testar.GraphDB;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tags;
@@ -9,7 +10,7 @@ import org.fruit.alayer.Tags;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public class GuiStateGraphForQlearning {
+public class GuiStateGraphForQlearning extends GraphDB {
     private String previousStateConcreteId;
     private String previousActionConcreteId;
     private double R_MAX;
@@ -47,6 +48,7 @@ public class GuiStateGraphForQlearning {
     }
 
     public GuiStateGraphForQlearning(double R_MAX, double gammaDiscount) {
+        super(true,"memory:demo","admin","admin");
         this.R_MAX = R_MAX;
         this.gammaDiscount=gammaDiscount;
 
@@ -126,5 +128,25 @@ public class GuiStateGraphForQlearning {
         Multimap <Double, Action> qvalues = HashMultimap.create();
         // TODO Aaron get get Q-values for selected actions
         return qvalues;
+    }
+
+    public int getExecutionCounter(State fromState, State toState, Action action) {
+        if (fromState == null) {
+            return 0;
+        }
+        return 0;
+    }
+
+    public void saveqValue(Action action, double qValue) {
+        // TODO implement
+    }
+
+    public double getQValue(State fromState, Action action) {
+        // TODO implement
+        return 0;
+    }
+
+    public double getMaxQvalues(Action action) {
+        return 0;
     }
 }

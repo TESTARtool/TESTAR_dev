@@ -4,6 +4,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Set;
 
 public interface ActionSelector {
@@ -14,17 +15,11 @@ public interface ActionSelector {
      * @param actions Set with available actions
      * @return Selected action to execute
      */
-    @Nonnull
+    @Nullable
     public Action selectAction(@Nonnull State state, @Nonnull Set<Action> actions);
 
     /**
-     * Determine the reward for the current state action combination
-     * @return the reward, the default is 0
+     * Upates the q-value
      */
-    public double getReward(@Nonnull State startingState, @Nonnull State endState, @Nonnull Action action);
-
-    /**
-     * Gets the q-value based on the reward, the default is 0
-     */
-    public double saveQValue(@Nonnull State startingState, @Nonnull State endState, @Nonnull Action action, double reward);
+    public void updateQValue(@Nullable State beginState, @Nullable State endState, @Nullable Action action);
 }
