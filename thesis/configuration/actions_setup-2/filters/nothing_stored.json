@@ -4,6 +4,6 @@
 	"widgetName": "Error",
 	"widgetNameMatchType": "STARTSWITH",
 	"neighbours": [
-		"A barring cannot be stored without selected"
+		"An action cannot be stored without selected"
 	]
 }

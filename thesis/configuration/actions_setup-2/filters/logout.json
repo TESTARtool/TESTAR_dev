@@ -3,7 +3,7 @@
 	"selectType": "ATTRIBUTES",
 	"attributes": {
 		"role": "dialog",
-		"class": "G2KWindow"
+		"class": "NmtWindow"
 	},
 	"neighbours": [
 		"Cancel", "Yes, logout"
