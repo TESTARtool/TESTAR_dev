@@ -1649,7 +1649,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceToForeground = false;
 			return a;
 		}

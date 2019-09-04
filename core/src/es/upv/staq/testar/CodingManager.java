@@ -231,6 +231,21 @@ public class CodingManager {
 //		action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
 //					CodingManager.codify(state.get(Tags.AbstractIDCustom), action, ROLES_ABSTRACT_ACTION));
 	}
+	
+	/**
+	 * Builds IDs (abstract, concrete, precise) for an environment action.
+	 * @param action An action.
+	 */
+	public static synchronized void buildEnvironmentActionIDs(State state, Action action){		
+		action.set(Tags.ConcreteID, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE +
+				   CodingManager.codify(state.get(Tags.ConcreteID), action));
+		action.set(Tags.ConcreteIDCustom, ID_PREFIX_ACTION + ID_PREFIX_CONCRETE_CUSTOM +
+					CodingManager.codify(state.get(Tags.ConcreteIDCustom), action));
+		action.set(Tags.AbstractID, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT +
+				   CodingManager.codify(state.get(Tags.ConcreteID), action, ROLES_ABSTRACT_ACTION));
+		action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+					CodingManager.codify(state.get(Tags.AbstractIDCustom), action, ROLES_ABSTRACT_ACTION));
+	}
 
 	/**
 	 * This method will increment or initialize a role counter mapping for a given action.
