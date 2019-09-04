@@ -6,6 +6,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.VertexEntity;
 import nl.ou.testar.StateModel.Sequence.Sequence;
+import nl.ou.testar.StateModel.Sequence.SequenceVerdict;
 
 import java.util.Date;
 
@@ -33,5 +34,13 @@ public class SequenceHydrator implements EntityHydrator<VertexEntity> {
         // fetch the abstract level identifier for the current state model
         String modelIdentifier = ((Sequence) source).getModelIdentifier();
         entity.addPropertyValue("modelIdentifier", new PropertyValue(OType.STRING, modelIdentifier));
+
+        // fetch the sequence's verdict and if needed, a termination message
+        SequenceVerdict verdict = ((Sequence) source).getSequenceVerdict();
+        entity.addPropertyValue("verdict", new PropertyValue(OType.STRING, verdict.toString()));
+
+        if (verdict == SequenceVerdict.INTERRUPTED_BY_ERROR) {
+            entity.addPropertyValue("terminationMessage", new PropertyValue(OType.STRING, ((Sequence) source).getTerminationMessage()));
+        }
     }
 }

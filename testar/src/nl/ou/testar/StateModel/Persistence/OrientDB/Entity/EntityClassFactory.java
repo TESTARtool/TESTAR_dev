@@ -138,6 +138,11 @@ public class EntityClassFactory {
         concreteStateIds.setMandatory(false);
         concreteStateIds.setNullable(false);
         abstractStateClass.addProperty(concreteStateIds);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        abstractStateClass.addProperty(counter);
         entityClasses.put(EntityClassName.AbstractState, abstractStateClass);
         return abstractStateClass;
     }
@@ -164,6 +169,11 @@ public class EntityClassFactory {
         concreteActionIds.setMandatory(false);
         concreteActionIds.setNullable(false);
         abstractActionClass.addProperty(concreteActionIds);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        abstractActionClass.addProperty(counter);
         entityClasses.put(EntityClassName.AbstractAction, abstractActionClass);
         return abstractActionClass;
     }
@@ -196,10 +206,16 @@ public class EntityClassFactory {
 
     private static EntityClass createConcreteStateClass() {
         EntityClass concreteStateClass = new EntityClass("ConcreteState", EntityClass.EntityType.Vertex);
+        Property uniqueId = new Property("uid", OType.STRING);
+        uniqueId.setMandatory(true);
+        uniqueId.setNullable(false);
+        uniqueId.setIdentifier(true);
+        uniqueId.setIndexAble(true);
+        concreteStateClass.addProperty(uniqueId);
         Property stateId = new Property("stateId", OType.STRING);
         stateId.setMandatory(true);
         stateId.setNullable(false);
-        stateId.setIdentifier(true);
+        stateId.setIdentifier(false);
         stateId.setIndexAble(true);
         concreteStateClass.addProperty(stateId);
         Property screenshot = new Property("screenshot", OType.BINARY);
@@ -207,7 +223,18 @@ public class EntityClassFactory {
         screenshot.setNullable(true);
         screenshot.setIdentifier(false);
         concreteStateClass.addProperty(screenshot);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        concreteStateClass.addProperty(counter);
         concreteStateClass.setSuperClassName("Widget");
+        Property oracleVerdictCode = new Property("oracleVerdictCode", OType.INTEGER);
+        oracleVerdictCode.setMandatory(true);
+        oracleVerdictCode.setNullable(false);
+        oracleVerdictCode.setIdentifier(false);
+        oracleVerdictCode.setIndexAble(true);
+        concreteStateClass.addProperty(oracleVerdictCode);
         entityClasses.put(EntityClassName.ConcreteState, concreteStateClass);
         return concreteStateClass;
     }
@@ -225,6 +252,11 @@ public class EntityClassFactory {
         actionId.setNullable(false);
         actionId.setIdentifier(false);
         concreteActionClass.addProperty(actionId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        concreteActionClass.addProperty(counter);
         entityClasses.put(EntityClassName.ConcreteAction, concreteActionClass);
         return concreteActionClass;
     }
@@ -237,6 +269,11 @@ public class EntityClassFactory {
         widgetId.setIdentifier(true);
         widgetId.setIndexAble(true);
         widgetClass.addProperty(widgetId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        widgetClass.addProperty(counter);
         entityClasses.put(EntityClassName.Widget, widgetClass);
         return widgetClass;
     }
@@ -249,6 +286,11 @@ public class EntityClassFactory {
         edgeId.setIdentifier(true);
         edgeId.setIndexAble(true);
         parentClass.addProperty(edgeId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        parentClass.addProperty(counter);
         entityClasses.put(EntityClassName.isParentOf, parentClass);
         return parentClass;
     }
@@ -261,6 +303,11 @@ public class EntityClassFactory {
         edgeId.setIdentifier(true);
         edgeId.setIndexAble(true);
         childClass.addProperty(edgeId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        childClass.addProperty(counter);
         entityClasses.put(EntityClassName.isChildOf, childClass);
         return childClass;
     }
@@ -273,6 +320,11 @@ public class EntityClassFactory {
         edgeId.setIdentifier(true);
         edgeId.setIndexAble(true);
         entityClass.addProperty(edgeId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
         entityClasses.put(EntityClassName.isAbstractedBy, entityClass);
         return entityClass;
     }
@@ -285,6 +337,11 @@ public class EntityClassFactory {
         accessId.setIdentifier(true);
         accessId.setIndexAble(true);
         entityClass.addProperty(accessId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
         entityClasses.put(EntityClassName.Accessed, entityClass);
         return entityClass;
     }
@@ -346,6 +403,21 @@ public class EntityClassFactory {
         modelIdentifier.setNullable(false);
         modelIdentifier.setIndexAble(true);
         entityClass.addProperty(modelIdentifier);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
+        Property verdict = new Property("verdict", OType.STRING);
+        verdict.setMandatory(true);
+        verdict.setNullable(false);
+        verdict.setIndexAble(true);
+        entityClass.addProperty(verdict);
+        Property terminationMessage = new Property("terminationMessage", OType.STRING);
+        terminationMessage.setMandatory(false);
+        terminationMessage.setNullable(true);
+        terminationMessage.setIndexAble(false);
+        entityClass.addProperty(terminationMessage);
         entityClasses.put(EntityClassName.TestSequence, entityClass);
         return entityClass;
     }
@@ -382,6 +454,21 @@ public class EntityClassFactory {
         stateId.setIdentifier(false);
         stateId.setIndexAble(true);
         entityClass.addProperty(stateId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
+        Property errorMessages = new Property("errorMessage", OType.STRING);
+        errorMessages.setMandatory(false);
+        errorMessages.setNullable(true);
+        errorMessages.setIndexAble(false);
+        entityClass.addProperty(errorMessages);
+        Property containsErrors = new Property("containsErrors", OType.BOOLEAN);
+        containsErrors.setMandatory(true);
+        containsErrors.setNullable(false);
+        containsErrors.setIndexAble(true);
+        entityClass.addProperty(containsErrors);
         entityClasses.put(EntityClassName.SequenceNode, entityClass);
         return entityClass;
     }
@@ -406,20 +493,41 @@ public class EntityClassFactory {
         concreteActionId.setIdentifier(false);
         concreteActionId.setIndexAble(true);
         entityClass.addProperty(concreteActionId);
+        Property concreteActionUid = new Property("concreteActionUid", OType.STRING);
+        concreteActionUid.setMandatory(true);
+        concreteActionUid.setNullable(false);
+        concreteActionUid.setIdentifier(false);
+        concreteActionUid.setIndexAble(true);
+        entityClass.addProperty(concreteActionUid);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
+        Property actionDescription = new Property("actionDescription", OType.STRING);
+        actionDescription.setMandatory(false);
+        actionDescription.setNullable(true);
+        actionDescription.setIndexAble(false);
+        entityClass.addProperty(actionDescription);
         entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
     }
 
     private static EntityClass createFirstNodeClass() {
-        EntityClass childClass = new EntityClass("FirstNode", EntityClass.EntityType.Edge);
+        EntityClass entityClass = new EntityClass("FirstNode", EntityClass.EntityType.Edge);
         Property edgeId = new Property("firstNodeId", OType.STRING);
         edgeId.setMandatory(true);
         edgeId.setNullable(false);
         edgeId.setIdentifier(true);
         edgeId.setIndexAble(true);
-        childClass.addProperty(edgeId);
-        entityClasses.put(EntityClassName.FirstNode, childClass);
-        return childClass;
+        entityClass.addProperty(edgeId);
+        Property counter = new Property("counter", OType.INTEGER);
+        counter.setMandatory(true);
+        counter.setNullable(false);
+        counter.setAutoIncrement(true);
+        entityClass.addProperty(counter);
+        entityClasses.put(EntityClassName.FirstNode, entityClass);
+        return entityClass;
     }
 
 }

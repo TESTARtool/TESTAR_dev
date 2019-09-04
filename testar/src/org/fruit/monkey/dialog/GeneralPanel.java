@@ -53,8 +53,6 @@ public class GeneralPanel extends JPanel {
   private JTextArea txtSutPath;
   private JSpinner spnNumSequences;
   private JSpinner spnSequenceLength;
-  private JSpinner esiSpinner;
-  private JComboBox<String> comboboxVerbosity;
   //private JCheckBox checkStopOnFault;
   private JComboBox<String> comboBoxProtocol;
   private JCheckBox compileCheckBox;
@@ -101,29 +99,14 @@ public class GeneralPanel extends JPanel {
     spnSequenceLength.setToolTipText(sequencesActionsTTT);
     add(spnSequenceLength);
 
-    esiSpinner = new JSpinner();
-    esiSpinner.setBounds(160, 237, 71, 25);
-    esiSpinner.setValue(10);
-    esiSpinner.setToolTipText(intervalTTT);
-    add(esiSpinner);
-
-    comboboxVerbosity = new JComboBox<>();
-    comboboxVerbosity.setModel(new DefaultComboBoxModel<>(
-        new String[]{"Critical", "Information", "Debug"}));
-    comboboxVerbosity.setSelectedIndex(1);
-    comboboxVerbosity.setBounds(160, 275, 107, 25);
-    comboboxVerbosity.setMaximumRowCount(3);
-    comboboxVerbosity.setToolTipText(loggingVerbosityTTT);
-    add(comboboxVerbosity);
-
     comboBoxProtocol = new JComboBox<>();
     comboBoxProtocol.setBounds(350, 161, 260, 25);
- //   String[] sutSettings = new File("./settings/")
     String[] sutSettings = new File(Main.settingsDir)
         .list((current, name) -> new File(current, name).isDirectory());
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
+    
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
@@ -185,16 +168,6 @@ public class GeneralPanel extends JPanel {
     lblNofSequences.setToolTipText(nofSequencesTTT);
     add(lblNofSequences);
 
-    JLabel lblSamplingInterval = new JLabel("Sampling interval:");
-    lblSamplingInterval.setBounds(10, 240, 100, 14);
-    lblSamplingInterval.setToolTipText(intervalTTT);
-    add(lblSamplingInterval);
-
-    JLabel lblLoggingVerbosity = new JLabel("Logging Verbosity:");
-    lblLoggingVerbosity.setBounds(10, 278, 120, 14);
-    lblLoggingVerbosity.setToolTipText(lblLoggingVerbosityTTT);
-    add(lblLoggingVerbosity);
-
     JLabel lblSequenceActions = new JLabel("Sequence actions:");
     lblSequenceActions.setBounds(10, 202, 148, 14);
     lblSequenceActions.setToolTipText(sequencesActionsTTT);
@@ -237,10 +210,8 @@ public class GeneralPanel extends JPanel {
     //checkStopOnFault.setSelected(settings.get(ConfigTags.StopGenerationOnFault));
     txtSutPath.setText(settings.get(ConfigTags.SUTConnectorValue));
     comboBoxProtocol.setSelectedItem(settings.get(ConfigTags.ProtocolClass).split("/")[0]);
-    esiSpinner.setValue(settings.get(ConfigTags.ExplorationSampleInterval));
     spnNumSequences.setValue(settings.get(ConfigTags.Sequences));
     spnSequenceLength.setValue(settings.get(ConfigTags.SequenceLength));
-    comboboxVerbosity.setSelectedIndex(settings.get(ConfigTags.LogLevel));
     compileCheckBox.setSelected(settings.get(ConfigTags.AlwaysCompile));
     applicationNameField.setText(settings.get(ConfigTags.ApplicationName));
     applicationVersionField.setText(settings.get(ConfigTags.ApplicationVersion));
@@ -256,9 +227,7 @@ public class GeneralPanel extends JPanel {
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
     //settings.set(ConfigTags.StopGenerationOnFault, checkStopOnFault.isSelected());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());
-    settings.set(ConfigTags.ExplorationSampleInterval, (Integer) esiSpinner.getValue());
     settings.set(ConfigTags.Sequences, (Integer) spnNumSequences.getValue());
-    settings.set(ConfigTags.LogLevel, comboboxVerbosity.getSelectedIndex());
     settings.set(ConfigTags.SequenceLength, (Integer) spnSequenceLength.getValue());
     settings.set(ConfigTags.AlwaysCompile, compileCheckBox.isSelected());
     settings.set(ConfigTags.ApplicationName, applicationNameField.getText());

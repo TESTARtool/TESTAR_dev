@@ -72,6 +72,7 @@ public class SettingsDialog extends JFrame implements Observer {
 
   static final String TESTAR_VERSION = "2.1.5 (04-Sep-2019)";
 
+
   private String settingsFile;
   private Settings settings;
   //TODO: what is this ret variable. Cant you just return settings in the run method?
