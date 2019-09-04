@@ -44,14 +44,14 @@ final class UIARootElement extends UIAElement {
 	private static final long serialVersionUID = -2561441199642411403L;
 	long pid, timeStamp;
 	boolean isRunning, isForeground, hasStandardMouse, hasStandardKeyboard;	
-	transient Map<Long, UIAElement> hwndMap;
-	ElementMap tlc;
+	transient Map<Long, UIAElement> windowHandleMap;
+	ElementMap elementMap;
 
 	public UIARootElement(){
 		super(null);
 		root = this;
-		hwndMap = Util.newHashMap();
-		tlc = ElementMap.newBuilder().build();
+		windowHandleMap = Util.newHashMap();
+		elementMap = ElementMap.newBuilder().build();
 		isForeground = false; // by urueda
 	}
 
@@ -63,7 +63,7 @@ final class UIARootElement extends UIAElement {
 		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
 			return false;
 		
-		UIAElement topLevelContainer = tlc.at(x, y);				
+		UIAElement topLevelContainer = elementMap.at(x, y);
 		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex) && !obscuredByChildren(el, x, y);
 	}
 
@@ -73,7 +73,7 @@ final class UIARootElement extends UIAElement {
 		if(el.rect == null || !el.rect.contains(x, y) || !this.rect.contains(x, y))
 			return false;
 				
-		UIAElement topLevelContainer = tlc.at(x, y);
+		UIAElement topLevelContainer = elementMap.at(x, y);
 		return (topLevelContainer == null || topLevelContainer.zindex <= el.zindex ||
 				!obscuredByChildFeature || !obscuredByChildren(el, x, y));
 	}
