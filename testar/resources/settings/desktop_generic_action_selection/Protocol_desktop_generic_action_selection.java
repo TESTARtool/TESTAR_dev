@@ -60,12 +60,12 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		System.out.println("DEBUG: *** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
+		System.out.println("*** Sequence "+sequenceCount+", Action "+actionCount()+" ***");
 		Set<Action> prioritizedActions = new HashSet<Action> ();
 		//checking if it is the first round of actions:
 		if(previousActions==null) {
 			//all actions are new actions:
-			System.out.println("DEBUG: the first round of actions");
+			//System.out.println("DEBUG: the first round of actions");
 			prioritizedActions = actions;
 		}else{
 			//if not the first round, get the new actions compared to previous state:
@@ -77,17 +77,17 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 		}
 		if(prioritizedActions.size()>0){
 			// found new actions that have not been executed before - choose randomly
-			System.out.println("DEBUG: found NEW actions that have not been executed before");
+			//System.out.println("DEBUG: found NEW actions that have not been executed before");
 		}else{
 			// no new unexecuted actions, checking if any unexecuted actions:
 			prioritizedActions = ActionSelectionUtils.getSetOfNewActions(actions, executedActions);
 		}
 		if(prioritizedActions.size()>0){
 			// found actions that have not been executed before - choose randomly
-			System.out.println("DEBUG: found actions that have not been executed before");
+			//System.out.println("DEBUG: found actions that have not been executed before");
 		}else{
 			// no unexecuted actions, choose randomly on any of the available actions:
-			System.out.println("DEBUG: NO actions that have not been executed before");
+			//System.out.println("DEBUG: NO actions that have not been executed before");
 			prioritizedActions = actions;
 		}
 		//saving the current actions for the next round:
@@ -108,7 +108,7 @@ public class Protocol_desktop_generic_action_selection extends DesktopProtocol {
 	@Override
 	protected boolean executeAction(SUT system, State state, Action action){
 		executedActions.add(action);
-		System.out.println("DEBUG: executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
+		System.out.println("executed action: "+action.get(Tags.Desc, "NoCurrentDescAvailable"));
 		return super.executeAction(system, state, action);
 	}
 }

@@ -56,8 +56,6 @@ public class ActionSelectionUtils {
                     currentTargetDesc = currentTargetDesc.substring(currentTargetDesc.indexOf("into"));
                     String previousTargetDesc = previousAction.get(Tags.Desc, "previousDescNotAvailable");
                     previousTargetDesc = previousTargetDesc.substring(previousTargetDesc.indexOf("into"));
-                    System.out.println("DEBUG: current="+currentTargetDesc);
-                    System.out.println("DEBUG: prvious="+previousTargetDesc);
                     if(currentTargetDesc.equalsIgnoreCase(previousTargetDesc)){
                         // match found -> the action is not a new action
                         matchingActionFound = true;
