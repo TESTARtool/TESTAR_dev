@@ -75,7 +75,11 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        latestState = super.getState(system);
+        //Spy mode didn't use the html report
+    	if(mode() == Modes.Spy)
+        	return super.getState(system);
+    	
+    	latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
