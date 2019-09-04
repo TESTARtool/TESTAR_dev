@@ -203,9 +203,13 @@ public class ModelManager implements StateModelManager {
             String abstractIdCustom = actionSelector.selectAction(currentAbstractState, abstractStateModel).getActionId();
             System.out.println("Finding action with abstractIdCustom : " + abstractIdCustom);
             for(Action action : actions) {
+            	try {
                 if (action.get(Tags.AbstractIDCustom).equals(abstractIdCustom)) {
                     return action;
                 }
+            	}catch (Exception e) {
+            		System.out.println(" ERROR getAbstractActionToExecute : " + action.get(Tags.Desc, "No description"));
+            	}
             }
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
             errorMessages.add("The actions selector returned the action with abstractIdCustom: " + abstractIdCustom + " . However, TESTAR was " +
