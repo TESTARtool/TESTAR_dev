@@ -75,7 +75,8 @@ public class GeneralPanel extends JPanel {
     cboxSUTconnector.setModel(new DefaultComboBoxModel<>(new String[]{
         Settings.SUT_CONNECTOR_CMDLINE,
         Settings.SUT_CONNECTOR_PROCESS_NAME,
-        Settings.SUT_CONNECTOR_WINDOW_TITLE
+        Settings.SUT_CONNECTOR_WINDOW_TITLE,
+        Settings.SUT_CONNECTOR_WEBDRIVER
     }));
     cboxSUTconnector.setSelectedIndex(0);
     cboxSUTconnector.setBounds(114, 12, 171, 25);
@@ -187,8 +188,17 @@ public class GeneralPanel extends JPanel {
     if (fd.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
       String file = fd.getSelectedFile().getAbsolutePath();
 
-      // Set the text from settings in txtSutPath
-      txtSutPath.setText(file);
+      if (settings.get(ConfigTags.SUTConnector)
+          .equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
+        // When useing the WEB_DRIVER connector, only replace webdriver path
+        String[] orgSettingParts = txtSutPath.getText().split(" ");
+        orgSettingParts[0] = "\"" + file + "\"";
+        txtSutPath.setText(String.join(" ", orgSettingParts));
+      }
+      else {
+        // Set the text from settings in txtSutPath
+        txtSutPath.setText(file);
+      }
     }
   }
 
