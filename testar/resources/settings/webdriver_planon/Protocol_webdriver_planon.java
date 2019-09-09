@@ -38,6 +38,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
@@ -220,19 +221,19 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
-        continue;
+    	  continue;
       }
 
       // type into text boxes
-      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
-        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+      if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
       }
 
       // left clicks, but ignore links outside domain
-      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isClickable(widget))) {
-        if (!isLinkDenied(widget)) {
-          actions.add(ac.leftClickAt(widget));
-        }
+      if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+    	  if (!isLinkDenied(widget)) {
+    		  actions.add(ac.leftClickAt(widget));
+    	  }
       }
     }
 
@@ -459,9 +460,9 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     }
 
     // Widget must be completely visible on viewport for screenshots
-    return shape.x() >= 0 && shape.x() + shape.width() <= CanvasDimensions.getCanvasWidth() &&
-           shape.y() >= 0 && shape.y() + shape.height() <= CanvasDimensions.getInnerHeight();
+    return widget.get(WdTags.WebIsFullOnScreen, false);
   }
+
 
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);

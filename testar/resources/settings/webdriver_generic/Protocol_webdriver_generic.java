@@ -207,19 +207,19 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
 
       // If the element is blocked, Testar can't click on or type in the widget
       if (widget.get(Blocked, false)) {
-        continue;
+    	  continue;
       }
 
       // type into text boxes
-      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isTypeable(widget))) {
-        actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
+      if (isAtBrowserCanvas(widget) && isTypeable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+    	  actions.add(ac.clickTypeInto(widget, this.getRandomText(widget), true));
       }
 
       // left clicks, but ignore links outside domain
-      if (isAtBrowserCanvas(widget) && (whiteListed(widget) || isClickable(widget))) {
-        if (!isLinkDenied(widget)) {
-          actions.add(ac.leftClickAt(widget));
-        }
+      if (isAtBrowserCanvas(widget) && isClickable(widget) && (whiteListed(widget) || isUnfiltered(widget))) {
+    	  if (!isLinkDenied(widget)) {
+    		  actions.add(ac.leftClickAt(widget));
+    	  }
       }
     }
 
