@@ -190,7 +190,7 @@ public class GeneralPanel extends JPanel {
 
       if (settings.get(ConfigTags.SUTConnector)
           .equals(Settings.SUT_CONNECTOR_WEBDRIVER)) {
-        // When useing the WEB_DRIVER connector, only replace webdriver path
+        // When using the WEB_DRIVER connector, only replace webdriver path
         String[] orgSettingParts = txtSutPath.getText().split(" ");
         orgSettingParts[0] = "\"" + file + "\"";
         txtSutPath.setText(String.join(" ", orgSettingParts));

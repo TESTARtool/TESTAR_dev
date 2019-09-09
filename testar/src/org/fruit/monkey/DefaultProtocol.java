@@ -107,6 +107,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -1489,7 +1490,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		setStateForClickFilterLayerProtocol(state);
 
-		if(mode() == Modes.Spy)
+		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
 		
 		Verdict verdict = getVerdict(state);

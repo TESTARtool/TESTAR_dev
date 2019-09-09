@@ -1,6 +1,6 @@
-/*
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+/**
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -208,7 +208,6 @@ public class WdWidget implements Widget, Serializable {
   /**
    * @param tab A tabulator for indentation.
    * @return Computes a string representation of the widget properties.
-   * @author urueda
    */
   private String getPropertiesRepresentation(String tab) {
     StringBuilder pr = new StringBuilder();
@@ -235,7 +234,6 @@ public class WdWidget implements Widget, Serializable {
   /**
    * @param tab tabulator for indentation.
    * @return Computes a string representation for the widget.
-   * @author urueda
    */
   public String getRepresentation(String tab) {
     return tab + "WIDGET = " + this.get(Tags.ConcreteID) + ", " +

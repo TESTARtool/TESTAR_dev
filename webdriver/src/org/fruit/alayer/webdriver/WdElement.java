@@ -1,6 +1,6 @@
-/*
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+/**
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,10 @@ package org.fruit.alayer.webdriver;
 import org.fruit.alayer.Rect;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class WdElement implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
@@ -70,6 +73,7 @@ public class WdElement implements Serializable {
   Rect rect;
   boolean scrollPattern, hScroll, vScroll;
   public double hScrollViewSize, vScrollViewSize, hScrollPercent, vScrollPercent;
+  boolean isFullVisibleOnScreen;
 
   // Keep these here for fillScrollValues
   protected String overflowX, overflowY;
@@ -87,9 +91,7 @@ public class WdElement implements Serializable {
     this.root = root;
     this.parent = parent;
 
-    // Cast object to Map, create new HashMap as casted map is not serializable
-    attributeMap = new HashMap<>(
-        (Map<String, String>) packedElement.get("attributeMap"));
+    attributeMap = (Map<String, String>) packedElement.get("attributeMap");
 
     id = attributeMap.getOrDefault("id", "");
     name = (String) packedElement.get("name");
@@ -112,6 +114,8 @@ public class WdElement implements Serializable {
     zindex = (double) (long) packedElement.get("zIndex");
     fillRect(packedElement);
     fillDimensions(packedElement);
+    
+    isFullVisibleOnScreen = isFullVisibleAtCanvasBrowser();
 
     blocked = (Boolean) packedElement.get("isBlocked");
     isClickable = (Boolean) packedElement.get("isClickable");
@@ -170,16 +174,16 @@ public class WdElement implements Serializable {
               (scrollOn.contains(overflowX) || hasHorizontalScrollbar);
     if (scrollWidth != clientWidth) {
       hScrollPercent = 100.0 * scrollLeft / (scrollWidth - clientWidth);
-      hScrollViewSize = clientWidth;
     }
+    hScrollViewSize = 100.0 * clientWidth / scrollWidth;
 
     boolean hasVerticalScrollbar = offsetWidth > (clientWidth + borderWidth);
     vScroll = scrollHeight > clientHeight &&
               (scrollOn.contains(overflowY) || hasVerticalScrollbar);
     if (scrollHeight != clientHeight) {
       vScrollPercent = 100.0 * scrollTop / (scrollHeight - clientHeight);
-      vScrollViewSize = clientHeight;
     }
+    vScrollViewSize = 100.0 * clientHeight / scrollHeight;
 
     scrollPattern = hScroll || vScroll;
   }
@@ -192,6 +196,11 @@ public class WdElement implements Serializable {
 
   public boolean visibleAt(double x, double y, boolean obscuredByChildFeature) {
     return visibleAt(x, y);
+  }
+  
+  private boolean isFullVisibleAtCanvasBrowser() {
+	  return rect.x() >= 0 && rect.x() + rect.width() <= CanvasDimensions.getCanvasWidth() &&
+	           rect.y() >= 0 && rect.y() + rect.height() <= CanvasDimensions.getInnerHeight();
   }
 
   @SuppressWarnings("unchecked")
@@ -219,13 +228,13 @@ public class WdElement implements Serializable {
     borderWidth = castDimensionsToLong(dims.get("borderWidth"));
     borderHeight = castDimensionsToLong(dims.get("borderHeight"));
   }
-
+  
   private long castDimensionsToLong(Object o) {
 	  if(o instanceof Double)
 		  return ((Double) o).longValue();
 	  else if(o instanceof Long)
 		  return ((Long) o).longValue();
-
+	  
 	  return (long)o;
   }
 }

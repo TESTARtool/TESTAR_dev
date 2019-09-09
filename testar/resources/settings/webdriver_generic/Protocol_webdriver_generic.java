@@ -1,6 +1,6 @@
-/*
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+/**
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,6 +38,7 @@ import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.webdriver.*;
 import org.fruit.alayer.webdriver.enums.WdRoles;
+import org.fruit.alayer.webdriver.enums.WdTags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 import org.testar.protocols.WebdriverProtocol;
@@ -445,8 +446,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
     }
 
     // Widget must be completely visible on viewport for screenshots
-    return shape.x() >= 0 && shape.x() + shape.width() <= CanvasDimensions.getCanvasWidth() &&
-           shape.y() >= 0 && shape.y() + shape.height() <= CanvasDimensions.getInnerHeight();
+    return widget.get(WdTags.WebIsFullOnScreen, false);
   }
 
   protected boolean isClickable(Widget widget) {

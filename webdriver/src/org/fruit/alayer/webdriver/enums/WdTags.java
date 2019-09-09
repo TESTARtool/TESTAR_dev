@@ -1,6 +1,6 @@
-/*
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
- * Copyright (c) 2019 Open Universiteit - www.ou.nl
+/**
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -146,7 +146,7 @@ public class WdTags extends TagsBase {
   /**
    * Whether this widget is currently visible on the screen.
    */
-  public static final Tag<Boolean> WebIsOffscreen = from("WebIsOffscreen", Boolean.class);
+  public static final Tag<Boolean> WebIsFullOnScreen = from("WebIsFullOnScreen", Boolean.class);
 
   /**
    * Whether this widget can be focused, such that it will receive keyboard input

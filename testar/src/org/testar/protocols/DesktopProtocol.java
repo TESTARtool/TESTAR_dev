@@ -76,7 +76,7 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
         //Spy mode didn't use the html report
-    	if(mode() == Modes.Spy)
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
         	return super.getState(system);
     	
     	latestState = super.getState(system);

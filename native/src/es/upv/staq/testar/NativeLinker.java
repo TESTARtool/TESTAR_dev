@@ -1,31 +1,32 @@
 /***************************************************************************************************
-*
-* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Universitat Politecnica de Valencia - www.upv.es
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistributions of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-* notice, this list of conditions and the following disclaimer in the
-* documentation and/or other materials provided with the distribution.
-* 3. Neither the name of the copyright holder nor the names of its
-* contributors may be used to endorse or promote products derived from
-* this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*******************************************************************************************************/
+ *
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************************************/
 
 
 package es.upv.staq.testar;
@@ -48,14 +49,14 @@ import static org.fruit.alayer.windows.UIARoles.*;
 
 /**
  * A native connector.
- *
- * @author Urko Rueda Molina (alias: urueda)
  */
 public class NativeLinker {
+	
 	private static long lastCPUquery = 0;
 
-  private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
+	private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
 	private static String osName;
+	
 	/**
 	 * Determines the platform this executable is currently running on.
 	 * @return The Operating system the executable is currently running on.
@@ -64,17 +65,17 @@ public class NativeLinker {
 	private static EnumSet<OperatingSystems> determinePlatform() {
 		osName = System.getProperty("os.name");
 		switch (osName) {
-			case "Windows 10":
-				return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
-			case "Windows 7":
-				return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_7);
-			default:
-				if (osName.contains("Windows"))
-					return EnumSet.of(OperatingSystems.WINDOWS);
-				else if(osName.contains("Linux"))
-					return EnumSet.of(OperatingSystems.UNIX);
-				else
-					return EnumSet.of(OperatingSystems.UNKNOWN);
+		case "Windows 10":
+			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_10);
+		case "Windows 7":
+			return EnumSet.of(OperatingSystems.WINDOWS, OperatingSystems.WINDOWS_7);
+		default:
+			if (osName.contains("Windows"))
+				return EnumSet.of(OperatingSystems.WINDOWS);
+			else if(osName.contains("Linux"))
+				return EnumSet.of(OperatingSystems.UNIX);
+			else
+				return EnumSet.of(OperatingSystems.UNKNOWN);
 		}
 	}
 
@@ -90,8 +91,8 @@ public class NativeLinker {
 	 * @return A StateBuilder instance.
 	 */
 	public static StateBuilder getNativeStateBuilder(Double timeToFreeze,
-													 boolean accessBridgeEnabled,
-													 String SUTProcesses){
+			boolean accessBridgeEnabled,
+			String SUTProcesses){
 		if (PLATFORM_OS.contains(OperatingSystems.WEBDRIVER))
 			return new WdStateBuilder(timeToFreeze);
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS)) {
@@ -169,7 +170,7 @@ public class NativeLinker {
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return WinProcess.fromProcName(processName);
 		//else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			// TODO
+		// TODO
 		throw new UnsupportedPlatformException();
 	}
 
@@ -227,7 +228,7 @@ public class NativeLinker {
 		if (PLATFORM_OS.contains(OperatingSystems.WINDOWS))
 			return UIARoles.rolesSet();
 		// else if (PLATFORM_OS.contains(OperatingSystems.UNIX))
-			// TODO
+		// TODO
 		throw new UnsupportedPlatformException();
 	}
 
@@ -351,8 +352,8 @@ public class NativeLinker {
 					UIACustomControl}; // be careful on custom control (we do not know what they are)
 		} else if (PLATFORM_OS.contains(OperatingSystems.UNIX)) {
 			return new Role[]{AtSpiCheckBox, AtSpiCheckMenuItem, AtSpiComboBox, AtSpiMenuItem,
-			AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
-			AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
+					AtSpiListItem, AtSpiSpinButton, AtSpiToggleButton, AtSpiTreeItem, AtSpiListBox,
+					AtSpiPushButton, AtSpiLink, AtSpiScrollBar};
 		}
 		throw new UnsupportedPlatformException();
 	}

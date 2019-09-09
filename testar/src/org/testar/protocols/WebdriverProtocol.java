@@ -40,6 +40,7 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
@@ -71,7 +72,11 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        latestState = super.getState(system);
+        //Spy mode didn't use the html report
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
+        	return super.getState(system);
+    	
+    	latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
