@@ -117,6 +117,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	 *
 	 * @return a started SUT, ready to be tested.
 	 */
+	@Override
 	protected SUT startSystem() throws SystemStartException {
 		SUT sut = super.startSystem();
 
@@ -406,7 +407,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		return widget.get(WdTags.WebIsFullOnScreen, false);
 	}
 
-
+	@Override
 	protected boolean isClickable(Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -428,6 +429,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 		return clickSet.size() > 0;
 	}
 
+	@Override
 	protected boolean isTypeable(Widget widget) {
 		Role role = widget.get(Tags.Role, Roles.Widget);
 		if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {

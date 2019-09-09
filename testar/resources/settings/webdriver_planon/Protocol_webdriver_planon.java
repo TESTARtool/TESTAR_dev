@@ -105,6 +105,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
    *
    * @param settings the current TESTAR settings as specified by the user.
    */
+  @Override
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
     super.initialize(settings);
@@ -129,6 +130,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
    *
    * @return a started SUT, ready to be tested.
    */
+  @Override
   protected SUT startSystem() throws SystemStartException {
     SUT sut = super.startSystem();
 
@@ -136,51 +138,6 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     mouse = sut.get(Tags.StandardMouse);
 
     return sut;
-  }
-
-  /**
-   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-   * This can be used for example for bypassing a login screen by filling the username and password
-   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuration files etc.)
-   */
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
-  }
-
-  /**
-   * This method is called when TESTAR requests the state of the SUT.
-   * Here you can add additional information to the SUT's state or write your
-   * own state fetching routine. The state should have attached an oracle
-   * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-   * state is erroneous and if so why.
-   *
-   * @return the current state of the SUT with attached oracle.
-   */
-  protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
-
-    return state;
-  }
-
-  /**
-   * This is a helper method used by the default implementation of <code>buildState()</code>
-   * It examines the SUT's current state and returns an oracle verdict.
-   *
-   * @return oracle verdict, which determines whether the state is erroneous and why.
-   */
-  protected Verdict getVerdict(State state) {
-
-    Verdict verdict = super.getVerdict(state); // by urueda
-    // system crashes, non-responsiveness and suspicious titles automatically detected!
-
-    //-----------------------------------------------------------------------------
-    // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-    //-----------------------------------------------------------------------------
-
-    // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-    return verdict;
   }
 
   /**
@@ -194,6 +151,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
    * @param state  the SUT's current state
    * @return a set of actions
    */
+  @Override
   protected Set<Action> deriveActions(SUT system, State state)
       throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
@@ -463,7 +421,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     return widget.get(WdTags.WebIsFullOnScreen, false);
   }
 
-
+  @Override
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -490,6 +448,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     return clickSet.size() > 0;
   }
 
+  @Override
   protected boolean isTypeable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
@@ -502,57 +461,5 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     }
 
     return false;
-  }
-
-  /**
-   * Select one of the possible actions (e.g. at random)
-   *
-   * @param state   the SUT's current state
-   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-   * @return the selected action (non-null!)
-   */
-  protected Action selectAction(State state, Set<Action> actions) {
-    return super.selectAction(state, actions);
-  }
-
-  /**
-   * Execute the selected action.
-   *
-   * @param system the SUT
-   * @param state  the SUT's current state
-   * @param action the action to execute
-   * @return whether or not the execution succeeded
-   */
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the generation of actions for the
-   * current sequence. You could stop the sequence's generation after a given amount of executed
-   * actions or after a specific time etc.
-   *
-   * @return if <code>true</code> continue generation, else stop
-   */
-  protected boolean moreActions(State state) {
-    return super.moreActions(state);
-  }
-
-  /**
-   * This method is invoked each time after TESTAR finished the generation of a sequence.
-   */
-  protected void finishSequence() {
-    super.finishSequence();
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the entire test.
-   * You could stop the test after a given amount of generated sequences or
-   * after a specific time etc.
-   *
-   * @return if <code>true</code> continue test, else stop
-   */
-  protected boolean moreSequences() {
-    return super.moreSequences();
   }
 }

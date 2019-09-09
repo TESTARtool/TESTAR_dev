@@ -1,6 +1,6 @@
 /**
- * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
  * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -91,6 +91,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @param settings the current TESTAR settings as specified by the user.
    */
+  @Override
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
     super.initialize(settings);
@@ -115,6 +116,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @return a started SUT, ready to be tested.
    */
+  @Override
   protected SUT startSystem() throws SystemStartException {
     SUT sut = super.startSystem();
 
@@ -130,6 +132,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
    * the SUT's configuration files etc.)
    */
+  @Override
   protected void beginSequence(SUT system, State state) {
     super.beginSequence(system, state);
   }
@@ -143,6 +146,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @return the current state of the SUT with attached oracle.
    */
+  @Override
   protected State getState(SUT system) throws StateBuildException {
     State state = super.getState(system);
 
@@ -155,6 +159,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @return oracle verdict, which determines whether the state is erroneous and why.
    */
+  @Override
   protected Verdict getVerdict(State state) {
 
     Verdict verdict = super.getVerdict(state); // by urueda
@@ -180,6 +185,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * @param state  the SUT's current state
    * @return a set of actions
    */
+  @Override
   protected Set<Action> deriveActions(SUT system, State state)
       throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
@@ -449,6 +455,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
     return widget.get(WdTags.WebIsFullOnScreen, false);
   }
 
+  @Override
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -470,6 +477,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
     return clickSet.size() > 0;
   }
 
+  @Override
   protected boolean isTypeable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
@@ -491,6 +499,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
    * @return the selected action (non-null!)
    */
+  @Override
   protected Action selectAction(State state, Set<Action> actions) {
     return super.selectAction(state, actions);
   }
@@ -503,6 +512,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    * @param action the action to execute
    * @return whether or not the execution succeeded
    */
+  @Override
   protected boolean executeAction(SUT system, State state, Action action) {
     return super.executeAction(system, state, action);
   }
@@ -514,6 +524,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @return if <code>true</code> continue generation, else stop
    */
+  @Override
   protected boolean moreActions(State state) {
     return super.moreActions(state);
   }
@@ -521,6 +532,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
   /**
    * This method is invoked each time after TESTAR finished the generation of a sequence.
    */
+  @Override
   protected void finishSequence() {
     super.finishSequence();
   }
@@ -532,6 +544,7 @@ public class Protocol_webdriver_generic extends WebdriverProtocol {
    *
    * @return if <code>true</code> continue test, else stop
    */
+  @Override
   protected boolean moreSequences() {
     return super.moreSequences();
   }

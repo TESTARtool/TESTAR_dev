@@ -1,24 +1,31 @@
-/*
- * *
- * COPYRIGHT (2017):                                                                     *
- * Universitat Politecnica de Valencia                                                   *
- * Camino de Vera, s/n                                                                   *
- * 46022 Valencia, Spain                                                                 *
- * www.upv.es                                                                            *
- *                                                                                       *
- * D I S C L A I M E R:                                                                  *
- * This software has been developed by the Universitat Politecnica de Valencia (UPV)     *
- * in the context of the TESTAR Proof of Concept project:                                *
- * "UPV, Programa de Prueba de Concepto 2014, SP20141402"                                *
- * This software is distributed FREE of charge under the TESTAR license, as an open      *
- * source project under the BSD3 licence (http://opensource.org/licenses/BSD-3-Clause)   *                                                                                        *
- * *
+/**
+ * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
- */
-
-/*
- *  @author (base) Sebastian Bauersfeld
- *  @author Govert Buijs
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 import es.upv.staq.testar.NativeLinker;
@@ -92,6 +99,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
    *
    * @param settings the current TESTAR settings as specified by the user.
    */
+  @Override
   protected void initialize(Settings settings) {
     NativeLinker.addWdDriverOS();
     super.initialize(settings);
@@ -116,6 +124,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
    *
    * @return a started SUT, ready to be tested.
    */
+  @Override
   protected SUT startSystem() throws SystemStartException {
     SUT sut = super.startSystem();
 
@@ -123,51 +132,6 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
     mouse = sut.get(Tags.StandardMouse);
 
     return sut;
-  }
-
-  /**
-   * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
-   * This can be used for example for bypassing a login screen by filling the username and password
-   * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-   * the SUT's configuration files etc.)
-   */
-  protected void beginSequence(SUT system, State state) {
-    super.beginSequence(system, state);
-  }
-
-  /**
-   * This method is called when TESTAR requests the state of the SUT.
-   * Here you can add additional information to the SUT's state or write your
-   * own state fetching routine. The state should have attached an oracle
-   * (TagName: <code>Tags.OracleVerdict</code>) which describes whether the
-   * state is erroneous and if so why.
-   *
-   * @return the current state of the SUT with attached oracle.
-   */
-  protected State getState(SUT system) throws StateBuildException {
-    State state = super.getState(system);
-
-    return state;
-  }
-
-  /**
-   * This is a helper method used by the default implementation of <code>buildState()</code>
-   * It examines the SUT's current state and returns an oracle verdict.
-   *
-   * @return oracle verdict, which determines whether the state is erroneous and why.
-   */
-  protected Verdict getVerdict(State state) {
-
-    Verdict verdict = super.getVerdict(state); // by urueda
-    // system crashes, non-responsiveness and suspicious titles automatically detected!
-
-    //-----------------------------------------------------------------------------
-    // MORE SOPHISTICATED ORACLES CAN BE PROGRAMMED HERE (the sky is the limit ;-)
-    //-----------------------------------------------------------------------------
-
-    // ... YOU MAY WANT TO CHECK YOUR CUSTOM ORACLES HERE ...
-
-    return verdict;
   }
 
   /**
@@ -181,6 +145,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
    * @param state  the SUT's current state
    * @return a set of actions
    */
+  @Override
   protected Set<Action> deriveActions(SUT system, State state)
       throws ActionBuildException {
     // Kill unwanted processes, force SUT to foreground
@@ -448,7 +413,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
     return widget.get(WdTags.WebIsFullOnScreen, false);
   }
 
-
+  @Override
   protected boolean isClickable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeClickableRoles())) {
@@ -472,6 +437,7 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
     return clickSet.size() > 0;
   }
 
+  @Override
   protected boolean isTypeable(Widget widget) {
     Role role = widget.get(Tags.Role, Roles.Widget);
     if (Role.isOneOf(role, NativeLinker.getNativeTypeableRoles())) {
@@ -484,57 +450,5 @@ public class Protocol_webdriver_gwt extends WebdriverProtocol {
     }
 
     return false;
-  }
-
-  /**
-   * Select one of the possible actions (e.g. at random)
-   *
-   * @param state   the SUT's current state
-   * @param actions the set of available actions as computed by <code>buildActionsSet()</code>
-   * @return the selected action (non-null!)
-   */
-  protected Action selectAction(State state, Set<Action> actions) {
-    return super.selectAction(state, actions);
-  }
-
-  /**
-   * Execute the selected action.
-   *
-   * @param system the SUT
-   * @param state  the SUT's current state
-   * @param action the action to execute
-   * @return whether or not the execution succeeded
-   */
-  protected boolean executeAction(SUT system, State state, Action action) {
-    return super.executeAction(system, state, action);
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the generation of actions for the
-   * current sequence. You could stop the sequence's generation after a given amount of executed
-   * actions or after a specific time etc.
-   *
-   * @return if <code>true</code> continue generation, else stop
-   */
-  protected boolean moreActions(State state) {
-    return super.moreActions(state);
-  }
-
-  /**
-   * This method is invoked each time after TESTAR finished the generation of a sequence.
-   */
-  protected void finishSequence() {
-    super.finishSequence();
-  }
-
-  /**
-   * TESTAR uses this method to determine when to stop the entire test.
-   * You could stop the test after a given amount of generated sequences or
-   * after a specific time etc.
-   *
-   * @return if <code>true</code> continue test, else stop
-   */
-  protected boolean moreSequences() {
-    return super.moreSequences();
   }
 }
