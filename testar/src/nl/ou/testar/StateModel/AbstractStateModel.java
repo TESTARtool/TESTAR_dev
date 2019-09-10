@@ -179,6 +179,14 @@ public class AbstractStateModel {
     }
 
     /**
+     * This method returns all the states in the abstract state model
+     * @return
+     */
+    public Set<AbstractState> getStates() {
+        return new HashSet<>(states.values());
+    }
+
+    /**
      * This method returns true if a requested state is contained in this model
      * @param abstractStateId the identifier for the state
      * @return

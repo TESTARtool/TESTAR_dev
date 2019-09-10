@@ -206,7 +206,7 @@ public class AccessBridgeControlTypes {
 	final static String ACCESSIBLE_LIST  = "list";
 
 	/**
-	 * An object that presents an element in a list.  A list is usually
+	 * An object that presents an uiaElement in a list.  A list is usually
 	 * contained within a scroll pane.
 	 * see ACCESSIBLE_SCROLL_PANE
 	 * see ACCESSIBLE_LIST

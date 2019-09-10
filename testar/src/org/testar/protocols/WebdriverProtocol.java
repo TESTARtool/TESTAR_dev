@@ -34,10 +34,9 @@ package org.testar.protocols;
 import java.io.File;
 import java.util.Set;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.SUT;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Verdict;
+import org.fruit.Drag;
+import org.fruit.alayer.*;
+import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.StateBuildException;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
@@ -71,8 +70,12 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
+        //Spy mode didn't use the html report
+        if(mode() == Modes.Spy) {
+            return super.getState(system);
+        }
+
         latestState = super.getState(system);
-        //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
     }
@@ -133,5 +136,30 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 				+ " " + settings.get(ConfigTags.Mode, mode())
 				+ " " + sequencesPath
 				+ " " + status + " \"" + statusInfo + "\"" );
+    }
+
+    /**
+     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+     * @param actions
+     * @param ac
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @param widget
+     */
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac,
+                                     double scrollArrowSize, double scrollThick,
+                                     Widget widget, State state){
+        Drag[] drags = widget.scrollDrags(scrollArrowSize,scrollThick);
+        // If there are scroll (drags/drops) actions possible
+        if (drags != null){
+            // For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                // Create a slide action with the Action Compiler, and add it to the set of derived actions
+                actions.add(ac.slideFromTo(
+                    new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                    new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                    widget));
+            }
+        }
     }
 }

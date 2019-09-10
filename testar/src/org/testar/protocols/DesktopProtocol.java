@@ -75,7 +75,11 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        latestState = super.getState(system);
+        //Spy mode didn't use the html report
+    	if(mode() == Modes.Spy)
+        	return super.getState(system);
+    	
+    	latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
@@ -320,18 +324,19 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
      * @param ac
      * @param scrollArrowSize
      * @param scrollThick
-     * @param w
+     * @param widget
      */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
         Drag[] drags = null;
         //If there are scroll (drags/drops) actions possible
-        if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
+        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
             //For each possible drag, create an action and add it to the derived actions
             for (Drag drag : drags){
                 //Create a slide action with the Action Compiler, and add it to the set of derived actions
                 actions.add(ac.slideFromTo(
                         new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
                 ));
 
             }
