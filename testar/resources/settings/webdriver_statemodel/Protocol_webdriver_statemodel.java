@@ -68,7 +68,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
 	private static List<String> domainsAllowed =
-			Arrays.asList("www.w3schools.com", "www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+			Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)

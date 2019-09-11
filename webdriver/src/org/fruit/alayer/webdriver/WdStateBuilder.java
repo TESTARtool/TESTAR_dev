@@ -59,6 +59,7 @@ public class WdStateBuilder implements StateBuilder {
       return future.get((long) (timeOut), TimeUnit.SECONDS);
     }
     catch (InterruptedException | ExecutionException e) {
+    	e.printStackTrace();
       throw new StateBuildException(e.getMessage());
     }
     catch (TimeoutException e) {
