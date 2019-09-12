@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -70,12 +72,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField textField9;
     private JButton button5;
     private JComboBox comboBox1;
-    private JRadioButton graphDBModelRadioButton;
-    private JRadioButton fileModelRadioButton;
-    private JTextField textField10;
+    private JLabel fileModelLabel;
     private JTextField textField12;
     private JButton button6;
-    private JButton AllFilesButton;
     private JButton reloadSettingsButton;
     private JButton modelCheckButton;
     private JButton sampleOracleButton;
@@ -88,17 +87,17 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton loadSelectorButton;
     private JButton traceCheckButton;
     private JTextField textField2;
-    private JButton button7;
     private JCheckBox WSLPathCheckBox;
     private JTextField textField3;
-    private JButton button8;
-    private JCheckBox WSLPathCheckBox1;
     private JTextField textFieldPythonEnvironment;
     private JButton button9;
     private JTextField textFieldPythonVisualizer;
     private JButton button10;
     private JButton LTLModelCheckButton;
-    private JTextField aTestarTestsTest_automaton4TextField;
+    private JTextField Test_automaton4;
+    private JTextField Test_Formulas;
+    private JButton button11;
+    private JButton button12;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -106,7 +105,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         parseLTLFormulaButton.addActionListener(this::performTemporalCheck);
         startAnalyzerButton.addActionListener(this::startTemporalWebAnalyzer);
         stopAnalyzerButton.addActionListener(this::stopTemporalWebAnalyzer);
-        AllFilesButton.addActionListener(this::testdb);
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -141,20 +139,39 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             }
         });
         testDBConnectionButton.addActionListener(this::testdbconnection);
-        loadSelectorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                APSelectorManager apmgr = testLoadApSelectionManagerJSON();
-                textArea12.append("loaded selector manager: " + apmgr.getComments().toString());
-            }
-        });
-        writeSelectorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testSaveCheckedApSelectionManagerJSON();
-            }
-        });
+
         modelCheckButton.addActionListener(this::LTLModelCheckWithSpot);
+        LTLModelCheckButton.addActionListener(this::LTLModelCheckWithSpot);
+        button11.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //
+                JFileChooser fd = new JFileChooser();
+                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fd.setCurrentDirectory(new File("."));//.getParentFile());
+
+                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
+                    String file = fd.getSelectedFile().getAbsolutePath();
+                    Test_automaton4.setText(file);
+                }
+                //
+            }
+        });
+        button12.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //
+                JFileChooser fd = new JFileChooser();
+                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fd.setCurrentDirectory(new File("."));//.getParentFile());
+
+                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
+                    String file = fd.getSelectedFile().getAbsolutePath();
+                    Test_Formulas.setText(file);
+                }
+                //
+            }
+        });
     }
 
     public static Temporalpanel2 createTemporalPanel() {
@@ -195,29 +212,21 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:grow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Setup", panel2);
         final JLabel label1 = new JLabel();
-        label1.setText("SPOT Checker:");
-        label1.setToolTipText("Used for LTL model check. Usually command to invoke spot_checker");
+        label1.setText("LTL Checker:");
+        label1.setToolTipText("Used for LTL model check. the usual command to invoke is:  spot_checker");
         panel2.add(label1, cc.xy(1, 1));
         textField2 = new JTextField();
         panel2.add(textField2, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        button7 = new JButton();
-        button7.setText("...");
-        panel2.add(button7, cc.xy(5, 1));
         WSLPathCheckBox = new JCheckBox();
         WSLPathCheckBox.setText("WSL path");
+        WSLPathCheckBox.setToolTipText("Does this command need a WSL path? \ne.g. starting with \"/mnt/C/...\"");
         panel2.add(WSLPathCheckBox, cc.xy(7, 1));
         final JLabel label2 = new JLabel();
-        label2.setText("SPOT  Parser:");
+        label2.setText("LTL  Parser:");
         label2.setToolTipText("used for testing syntax of  a LTL formula");
         panel2.add(label2, cc.xy(1, 3));
         textField3 = new JTextField();
         panel2.add(textField3, cc.xy(3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
-        button8 = new JButton();
-        button8.setText("...");
-        panel2.add(button8, cc.xy(5, 3));
-        WSLPathCheckBox1 = new JCheckBox();
-        WSLPathCheckBox1.setText("WSL path");
-        panel2.add(WSLPathCheckBox1, cc.xy(7, 3));
         final JLabel label3 = new JLabel();
         label3.setText("Python Env. :");
         label3.setToolTipText("Path to Active Virtual environment");
@@ -239,149 +248,150 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         final Spacer spacer1 = new Spacer();
         panel2.add(spacer1, cc.xy(1, 5, CellConstraints.DEFAULT, CellConstraints.FILL));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel3.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:m:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,center:max(m;4px):noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Test", panel3);
-        textField1 = new JTextField();
-        textField1.setText("G(a->Fb)");
-        panel3.add(textField1, cc.xyw(3, 1, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        sampleOracleButton = new JButton();
-        sampleOracleButton.setText("Sample Oracle");
-        panel3.add(sampleOracleButton, cc.xy(3, 9));
-        final Spacer spacer2 = new Spacer();
-        panel3.add(spacer2, cc.xy(7, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
-        parseLTLFormulaButton = new JButton();
-        parseLTLFormulaButton.setText("Parse LTL Formula");
-        panel3.add(parseLTLFormulaButton, cc.xy(1, 1));
         final JLabel label5 = new JLabel();
         label5.setText("Generate Files:");
-        panel3.add(label5, cc.xywh(1, 9, 1, 3));
-        graphMLButton = new JButton();
-        graphMLButton.setText("GraphML");
-        panel3.add(graphMLButton, cc.xy(7, 11));
-        reloadSettingsButton = new JButton();
-        reloadSettingsButton.setEnabled(false);
-        reloadSettingsButton.setText("Reload Settings");
-        panel3.add(reloadSettingsButton, cc.xy(1, 7));
+        panel3.add(label5, cc.xywh(1, 11, 1, 3));
         samplePatternButton = new JButton();
         samplePatternButton.setText("Sample Pattern");
-        panel3.add(samplePatternButton, cc.xy(3, 11));
+        panel3.add(samplePatternButton, cc.xy(3, 13));
+        Test_automaton4 = new JTextField();
+        Test_automaton4.setText("~/testar/tests/test_automaton4.txt");
+        panel3.add(Test_automaton4, cc.xyw(3, 3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        Test_Formulas = new JTextField();
+        Test_Formulas.setText("~/testar/tests/formulas-abc-100.txt");
+        panel3.add(Test_Formulas, cc.xyw(3, 5, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label6 = new JLabel();
+        label6.setText("Model File");
+        panel3.add(label6, cc.xy(1, 3));
+        final JLabel label7 = new JLabel();
+        label7.setText("Formula File");
+        panel3.add(label7, cc.xy(1, 5));
+        button11 = new JButton();
+        button11.setMinimumSize(new Dimension(30, 30));
+        button11.setText("...");
+        panel3.add(button11, cc.xy(9, 3));
+        button12 = new JButton();
+        button12.setMinimumSize(new Dimension(30, 30));
+        button12.setText("...");
+        panel3.add(button12, cc.xy(9, 5));
+        graphMLButton = new JButton();
+        graphMLButton.setText("GraphML");
+        panel3.add(graphMLButton, cc.xy(3, 11));
         temporalModelButton = new JButton();
         temporalModelButton.setText("TemporalModel");
         temporalModelButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
-        panel3.add(temporalModelButton, cc.xy(7, 9));
+        panel3.add(temporalModelButton, cc.xy(7, 11));
         defaultSelectorButton = new JButton();
         defaultSelectorButton.setText("Default Selector");
         panel3.add(defaultSelectorButton, cc.xy(5, 11));
-        AllFilesButton = new JButton();
-        AllFilesButton.setText("All Files");
-        AllFilesButton.setToolTipText("requires APSelectorManagerTEST.json file in directory temporal");
-        panel3.add(AllFilesButton, cc.xy(5, 9));
+        sampleOracleButton = new JButton();
+        sampleOracleButton.setText("Sample Oracle");
+        panel3.add(sampleOracleButton, cc.xy(5, 13));
         testDBConnectionButton = new JButton();
         testDBConnectionButton.setText("Test DB Connection");
-        panel3.add(testDBConnectionButton, cc.xy(1, 5));
-        writeSelectorButton = new JButton();
-        writeSelectorButton.setText("Write Selector");
-        panel3.add(writeSelectorButton, cc.xy(5, 15));
-        loadSelectorButton = new JButton();
-        loadSelectorButton.setText("Load Selector");
-        panel3.add(loadSelectorButton, cc.xy(3, 15));
+        panel3.add(testDBConnectionButton, cc.xy(5, 9));
+        reloadSettingsButton = new JButton();
+        reloadSettingsButton.setEnabled(false);
+        reloadSettingsButton.setOpaque(true);
+        reloadSettingsButton.setText("Reload Settings");
+        panel3.add(reloadSettingsButton, cc.xy(7, 9));
+        final Spacer spacer2 = new Spacer();
+        panel3.add(spacer2, cc.xy(7, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
+        parseLTLFormulaButton = new JButton();
+        parseLTLFormulaButton.setHideActionText(false);
+        parseLTLFormulaButton.setText("Parse LTL Formula");
+        parseLTLFormulaButton.setVisible(true);
+        panel3.add(parseLTLFormulaButton, cc.xy(1, 9));
+        textField1 = new JTextField();
+        textField1.setText("G(a->Fb)");
+        textField1.setVisible(true);
+        panel3.add(textField1, cc.xy(3, 9, CellConstraints.FILL, CellConstraints.DEFAULT));
         LTLModelCheckButton = new JButton();
-        LTLModelCheckButton.setText("LTL Model Check");
-        panel3.add(LTLModelCheckButton, cc.xy(1, 3));
-        aTestarTestsTest_automaton4TextField = new JTextField();
-        aTestarTestsTest_automaton4TextField.setText(" --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt");
-        panel3.add(aTestarTestsTest_automaton4TextField, cc.xyw(3, 3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
+        LTLModelCheckButton.setText("LTL Model Check:");
+        panel3.add(LTLModelCheckButton, cc.xy(1, 1));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(9, 13, new Insets(0, 0, 0, 0), -1, -1));
+        panel4.setLayout(new GridLayoutManager(6, 13, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane1.addTab("Miner", panel4);
-        final JLabel label6 = new JLabel();
-        label6.setText("Pattern File");
-        panel4.add(label6, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label8 = new JLabel();
+        label8.setText("Pattern File");
+        panel4.add(label8, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer3 = new Spacer();
-        panel4.add(spacer3, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        panel4.add(spacer3, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         textField5 = new JTextField();
         panel4.add(textField5, new GridConstraints(1, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JSeparator separator2 = new JSeparator();
         panel4.add(separator2, new GridConstraints(0, 1, 1, 12, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        textField6 = new JTextField();
-        panel4.add(textField6, new GridConstraints(4, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JSeparator separator3 = new JSeparator();
-        panel4.add(separator3, new GridConstraints(5, 1, 1, 12, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         textField7 = new JTextField();
-        panel4.add(textField7, new GridConstraints(6, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JLabel label7 = new JLabel();
-        label7.setText("Candidate Oracle");
-        panel4.add(label7, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label8 = new JLabel();
-        label8.setText("TemporalType");
-        panel4.add(label8, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(textField7, new GridConstraints(3, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        final JLabel label9 = new JLabel();
+        label9.setText("Candidate Oracle");
+        panel4.add(label9, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label10 = new JLabel();
+        label10.setText("TemporalType");
+        panel4.add(label10, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         comboBox1 = new JComboBox();
-        panel4.add(comboBox1, new GridConstraints(7, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        textField10 = new JTextField();
-        textField10.setEditable(false);
-        panel4.add(textField10, new GridConstraints(3, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        graphDBModelRadioButton = new JRadioButton();
-        graphDBModelRadioButton.setText("GraphDB Model");
-        panel4.add(graphDBModelRadioButton, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        fileModelRadioButton = new JRadioButton();
-        fileModelRadioButton.setText("File Model");
-        panel4.add(fileModelRadioButton, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final Spacer spacer4 = new Spacer();
-        panel4.add(spacer4, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        panel4.add(comboBox1, new GridConstraints(4, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         modelCheckButton = new JButton();
         modelCheckButton.setText("Model Check");
         modelCheckButton.setToolTipText("Checks the Candidates on the Model. ");
-        panel4.add(modelCheckButton, new GridConstraints(7, 8, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(modelCheckButton, new GridConstraints(4, 8, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         mineOraclesButton = new JButton();
         mineOraclesButton.setText("Mine Oracles");
         mineOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
-        panel4.add(mineOraclesButton, new GridConstraints(7, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(mineOraclesButton, new GridConstraints(4, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         button1 = new JButton();
         button1.setText("...");
-        panel4.add(button1, new GridConstraints(1, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        button2 = new JButton();
-        button2.setText("...");
-        panel4.add(button2, new GridConstraints(4, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(button1, new GridConstraints(1, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(43, 30), null, 0, false));
         button3 = new JButton();
         button3.setText("...");
-        panel4.add(button3, new GridConstraints(6, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(button3, new GridConstraints(3, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(43, 30), null, 0, false));
         traceCheckButton = new JButton();
         traceCheckButton.setText("Trace Check");
         traceCheckButton.setToolTipText("Checks the Candidates on the Model. ");
-        panel4.add(traceCheckButton, new GridConstraints(7, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(traceCheckButton, new GridConstraints(5, 8, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        fileModelLabel = new JLabel();
+        fileModelLabel.setText("File Model");
+        panel4.add(fileModelLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        textField6 = new JTextField();
+        panel4.add(textField6, new GridConstraints(2, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        button2 = new JButton();
+        button2.setText("...");
+        panel4.add(button2, new GridConstraints(2, 9, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(20, 30), null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Visualizer", panel5);
-        final JLabel label9 = new JLabel();
-        label9.setText("Input Oracle File");
-        panel5.add(label9, cc.xy(1, 5));
+        final JLabel label11 = new JLabel();
+        label11.setText("Input Oracle File");
+        panel5.add(label11, cc.xy(1, 5));
         textField8 = new JTextField();
         panel5.add(textField8, cc.xy(3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         button4 = new JButton();
         button4.setText("...");
         panel5.add(button4, cc.xy(7, 5));
-        final JLabel label10 = new JLabel();
-        label10.setText("GraphML File");
-        panel5.add(label10, cc.xy(1, 7));
+        final JLabel label12 = new JLabel();
+        label12.setText("GraphML File");
+        panel5.add(label12, cc.xy(1, 7));
         textField9 = new JTextField();
         panel5.add(textField9, cc.xy(3, 7, CellConstraints.FILL, CellConstraints.DEFAULT));
         button5 = new JButton();
         button5.setText("...");
         panel5.add(button5, cc.xy(7, 7));
-        final Spacer spacer5 = new Spacer();
-        panel5.add(spacer5, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final Spacer spacer4 = new Spacer();
+        panel5.add(spacer4, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JSeparator separator3 = new JSeparator();
+        panel5.add(separator3, cc.xyw(3, 9, 6, CellConstraints.FILL, CellConstraints.FILL));
         final JSeparator separator4 = new JSeparator();
-        panel5.add(separator4, cc.xyw(3, 9, 6, CellConstraints.FILL, CellConstraints.FILL));
-        final JSeparator separator5 = new JSeparator();
-        panel5.add(separator5, cc.xyw(3, 3, 6, CellConstraints.FILL, CellConstraints.FILL));
+        panel5.add(separator4, cc.xyw(3, 3, 6, CellConstraints.FILL, CellConstraints.FILL));
         textField12 = new JTextField();
         panel5.add(textField12, cc.xy(3, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
         button6 = new JButton();
         button6.setText("...");
         panel5.add(button6, cc.xy(7, 11));
-        final JLabel label11 = new JLabel();
-        label11.setText("Output Oracle File");
-        panel5.add(label11, cc.xy(1, 11));
+        final JLabel label13 = new JLabel();
+        label13.setText("Output Oracle File");
+        panel5.add(label13, cc.xy(1, 11));
         stopAnalyzerButton = new JButton();
         stopAnalyzerButton.setText("Stop Analyzer");
         panel5.add(stopAnalyzerButton, cc.xy(1, 15));
@@ -395,10 +405,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         clearButton = new JButton();
         clearButton.setText("Clear");
         panel1.add(clearButton, cc.xy(13, 8));
-        ButtonGroup buttonGroup;
-        buttonGroup = new ButtonGroup();
-        buttonGroup.add(graphDBModelRadioButton);
-        buttonGroup.add(fileModelRadioButton);
     }
 
     /**
@@ -526,7 +532,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         BufferedReader errStream = null;
 
         //String cli = "ubuntu1804 run ~/testar/spot_checker'" + "--a " +"/mnt/c/Users/c/git/TESTAR_dev/testar/target/install/testar/bin/output/temporal/APmodel.HOA" + "--f ";
-        String cli = textField2.getText() + " --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
+        String cli = textField2.getText() + " --a " + toWSLPath(Test_automaton4.getText()) + " --ff " + toWSLPath(Test_Formulas.getText()); //" --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
 
         String response;
         String errorresponse = null;
@@ -846,6 +852,16 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         return APmgr1;
     }
 
+    public String toWSLPath(String windowsFilePath) {
+        Path winpath = Paths.get(windowsFilePath);
+        StringBuilder wslpath = new StringBuilder();
+        wslpath.append("/mnt/");
+        wslpath.append(winpath.getRoot().toString().split(":")[0].toLowerCase());  // convert C:\\ --> c
+        for (int i = 0; i < winpath.getNameCount(); i++) {
+            wslpath.append("/" + winpath.getName(i));
+        }
+        return wslpath.toString();
+    }
 //*******************Eventhandlers
 
 
