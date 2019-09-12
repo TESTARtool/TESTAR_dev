@@ -110,6 +110,7 @@ public class WdStateFetcher implements Callable<WdState> {
     WdRootElement rootElement = buildRoot(system);
 
     if (rootElement == null) {
+      system.set(Tags.Desc, " ");
       return new WdState(null);
     }
 

@@ -48,13 +48,16 @@ function traverseElementTestar(parentWrapped, rootElement, ignoredTags) {
         }
         if (childElement.nodeType !== 1 ||
             ignoredTags.includes(childElement.nodeName.toLowerCase())) {
-            continue
+            continue;
         }
 
         var childWrapped = wrapElementTestar(childElement, parentWrapped["xOffset"], parentWrapped["yOffset"]);
         traverseElementTestar(childWrapped, rootElement, ignoredTags);
         parentWrapped.wrappedChildren.push(childWrapped);
     }
+
+    // No need for it anymore, save serialization effort
+    delete parentWrapped['element'];
 }
 
 /*
