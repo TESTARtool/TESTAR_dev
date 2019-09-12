@@ -88,4 +88,15 @@ public class WdProtocolUtil extends ProtocolUtil {
     AWTCanvas scrshot = WdScreenshot.fromScreenshot(rect);
     return ScreenshotSerialiser.saveActionshot(state.get(Tags.ConcreteID, "NoConcreteIdAvailable"), action.get(Tags.ConcreteID, "NoConcreteIdAvailable"), scrshot);
   }
+  
+  @Override
+  public AWTCanvas getStateshotBinary(State state) {
+	  double width = CanvasDimensions.getCanvasWidth() + (
+			  state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
+	  double height = CanvasDimensions.getCanvasHeight() + (
+			  state.get(WdTags.WebHorizontallyScrollable) ? scrollThick : 0);
+	  Rect rect = Rect.from(0, 0, width, height);
+	  AWTCanvas screenshot = WdScreenshot.fromScreenshot(rect);
+	  return screenshot;
+  }
 }

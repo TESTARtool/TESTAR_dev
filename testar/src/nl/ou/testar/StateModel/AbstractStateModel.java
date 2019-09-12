@@ -23,6 +23,9 @@ public class AbstractStateModel {
 
     // the version of the application that is being modelled
     private String applicationVersion;
+    
+    // the API platform that is being used to model the application
+    private String applicationPlatform;
 
     // a set of tags that was used to `form` the abstract state model
     private Set<Tag<?>> tags;
@@ -52,11 +55,13 @@ public class AbstractStateModel {
     public AbstractStateModel(String modelIdentifier,
                               String applicationName,
                               String applicationVersion,
+                              String applicationPlatform,
                               Set<Tag<?>> tags,
                               StateModelEventListener ...eventListeners) {
         this.modelIdentifier = modelIdentifier;
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
+        this.applicationPlatform = applicationPlatform;
         this.tags = tags;
         // sets are empty when the model is just created
         stateTransitions = new HashSet<>();
@@ -300,5 +305,13 @@ public class AbstractStateModel {
      */
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+    
+    /**
+     * This method returns the API platform that is being used to model the application
+     * @return
+     */
+    public String getApplicationPlatform() {
+    	return applicationPlatform;
     }
 }

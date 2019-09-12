@@ -1394,13 +1394,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
+		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
+			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
 		} else // unable to kill SUT
-			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
+			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc, "No SUT Desc available") + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
 	}
 
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
