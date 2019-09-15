@@ -157,6 +157,8 @@ public class TemporalController {
 
             //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
             this.apSelectorManager = Apmgr;
+            boolean firstDeadState=true;
+            StateEncoding deadStateEnc;
             while (resultSet.hasNext()) {
                 OResult result = resultSet.next();
                 // we're expecting a vertex
@@ -172,12 +174,32 @@ public class TemporalController {
 
                     boolean deadstate = false;
 
-                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT);
+                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT,"ConcreteAction"); //could be a SQL- like query as well
                     Iterator<OEdge> edgeiter = outedges.iterator();
-                    deadstate = !edgeiter.hasNext();
+                    deadstate=!edgeiter.hasNext();
 
                     if (deadstate) {
+                        if (firstDeadState){
+                            //add stateenc for 'Dead', inclusive dead transition selfloop;
+                            deadStateEnc = new StateEncoding("#dead");
+                            Set<String> deadStatePropositions = new LinkedHashSet<>();
+                            //deadStatePropositions.add("dead");   //redundant on transitionbased automatons
+                            deadStateEnc.setStateAPs(deadStatePropositions);
+
+                            TransitionEncoding deadTrenc = new TransitionEncoding();
+                            deadTrenc.setTransition("dead_selfloop");
+                            deadTrenc.setTargetState("#dead");
+                            Set<String> deadTransitionPropositions = new LinkedHashSet<>();
+                            deadTransitionPropositions.add("dead");
+                            deadTrenc.setTransitionAPs(deadTransitionPropositions);
+                            List<TransitionEncoding> deadTrencList = new ArrayList<>();
+                            deadTrencList.add(deadTrenc);
+                            deadStateEnc.setTransitionColl(deadTrencList);
+                            tModel.addStateEncoding(deadStateEnc, false);
+                            firstDeadState=false;
+                        }
                         stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
+
                         System.out.println("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
                         tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
                     }
@@ -185,8 +207,20 @@ public class TemporalController {
                         computeProps(propertyName, stateVertex, propositions, false,false);
                     }
                     propositions.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
-                    senc.setStateAPs(propositions);
-                    senc.setTransitionColl(getTransitions(senc.getState()));
+                    senc.setStateAPs(propositions); // to be decided:  whether to include current AP's on a deadstate
+                    if (deadstate) {
+                        TransitionEncoding deadTrenc = new TransitionEncoding();
+                        deadTrenc.setTransition("dead_"+stateVertex.getIdentity().toString());
+                        deadTrenc.setTargetState("#dead");
+                        Set<String> deadTransitionPropositions = new LinkedHashSet<>();
+                        deadTransitionPropositions.add("dead");
+                        deadTrenc.setTransitionAPs(deadTransitionPropositions);
+                        List<TransitionEncoding> deadTrencList = new ArrayList<>();
+                        deadTrencList.add(deadTrenc);
+                        senc.setTransitionColl(deadTrencList);
+
+                    }
+                    else senc.setTransitionColl(getTransitions(senc.getState()));
 
 
 

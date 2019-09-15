@@ -145,6 +145,7 @@ public static TemporalOracle getSampleOracle(){
     to.setSubstitutions(Arrays.asList("a:UIButton_OK", "b:UIWindow_Title_main_exists"));
     List<String> comments= new ArrayList<String>();
     comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
+    comments.add("avoid using 'X,F,G,U,W,R,M' as parameters, as they are used in LTL syntax");
     comments.add("CSV editor of choice is LibreCalc as this tool can explicitly quote all text field");
     comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
     to.setComments(comments);
