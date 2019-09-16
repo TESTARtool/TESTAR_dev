@@ -91,7 +91,16 @@ public class WdElement implements Serializable {
     this.root = root;
     this.parent = parent;
 
-    attributeMap = (Map<String, String>) packedElement.get("attributeMap");
+    try {
+    	attributeMap = (Map<String, String>) packedElement.get("attributeMap");
+    }catch(ClassCastException e) {
+    	System.out.println("-------------------------------------------------------------------------------------");
+    	System.out.println("- POSSIBLE KNOWN ERROR: We cannot access the current URL through Selenium WebDriver");
+    	System.out.println("- URL: " + WdDriver.getCurrentUrl());
+    	System.out.println("- INFO: https://github.com/TESTARtool/TESTAR_dev/issues/203");
+    	System.out.println("-------------------------------------------------------------------------------------");
+    	throw e;
+    }
 
     id = attributeMap.getOrDefault("id", "");
     name = (String) packedElement.get("name");

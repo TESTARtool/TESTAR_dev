@@ -318,28 +318,4 @@ public class DesktopProtocol extends ClickFilterLayerProtocol {
         return actions;
     }
 
-    /**
-     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-     * @param actions
-     * @param ac
-     * @param scrollArrowSize
-     * @param scrollThick
-     * @param widget
-     */
-    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
-        Drag[] drags = null;
-        //If there are scroll (drags/drops) actions possible
-        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
-            //For each possible drag, create an action and add it to the derived actions
-            for (Drag drag : drags){
-                //Create a slide action with the Action Compiler, and add it to the set of derived actions
-                actions.add(ac.slideFromTo(
-                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
-                        widget
-                ));
-
-            }
-        }
-    }
 }
