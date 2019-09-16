@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
+ * Copyright (c) 2019 Open Universiteit - www.ou.nl
  * Copyright (c) 2019 Universitat Politecnica de Valencia - www.upv.es
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,45 +30,17 @@
 
 package org.fruit.alayer.actions;
 
-import org.fruit.alayer.*;
-import org.fruit.alayer.exceptions.ActionFailedException;
-import org.fruit.alayer.webdriver.WdDriver;
+import org.fruit.alayer.Role;
 
-public class WdAttributeAction extends TaggableBase implements Action {
-  private String elementId;
-  private String key;
-  private String value;
+public class WdActionRoles {
+	private WdActionRoles(){}
 
-  public WdAttributeAction(String elementId, String key, String value) {
-    this.elementId = elementId;
-    this.key = key;
-    this.value = value;
-    this.set(Tags.Role, WdActionRoles.SetAttributeScript);
-    this.set(Tags.Desc, "Execute Webdriver script to set into " + elementId + " values " + key + " " + value);
-  }
-
-  @Override
-  public void run(SUT system, State state, double duration)
-      throws ActionFailedException {
-    WdDriver.executeScript(String.format(
-        "document.getElementById('%s').setAttribute('%s', '%s');",
-        elementId, key, value));
-  }
-
-  @Override
-  public String toShortString() {
-    return "Set attribute on id '" + elementId +
-           "' for '" + key +
-           "' to '" + value + "'";
-  }
-
-  @Override
-  public String toParametersString() {
-    return toShortString();
-  }
-
-  @Override
-  public String toString(Role... discardParameters) {
-    return toShortString();
-  }
+	public static final Role
+	
+	ExecuteScript = Role.from("ExecuteScript", ActionRoles.Action), 
+	CloseTabScript = Role.from("CloseTabScript", ExecuteScript),
+	HistoryBackScript = Role.from("HistoryBackScript", ExecuteScript),
+	SubmitScript = Role.from("SubmitScript", ExecuteScript),
+	SetAttributeScript = Role.from("SetAttributeScript", ExecuteScript);
+	
 }

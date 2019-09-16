@@ -39,6 +39,8 @@ public class WdSubmitAction extends TaggableBase implements Action {
 
   public WdSubmitAction(String formId) {
     this.formId = formId;
+    this.set(Tags.Role, WdActionRoles.SubmitScript);
+    this.set(Tags.Desc, "Execute Webdriver script to submit an action into " + formId);
   }
 
   @Override

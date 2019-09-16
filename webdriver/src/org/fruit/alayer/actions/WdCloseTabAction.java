@@ -36,7 +36,8 @@ import org.fruit.alayer.webdriver.WdDriver;
 
 public class WdCloseTabAction extends TaggableBase implements Action {
   public WdCloseTabAction() {
-
+	  this.set(Tags.Role, WdActionRoles.CloseTabScript);
+	  this.set(Tags.Desc, "Execute Webdriver script to close the current tab");
   }
 
   @Override

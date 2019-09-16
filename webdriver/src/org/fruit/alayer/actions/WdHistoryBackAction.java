@@ -36,7 +36,8 @@ import org.fruit.alayer.webdriver.WdDriver;
 
 public class WdHistoryBackAction extends TaggableBase implements Action {
   public WdHistoryBackAction() {
-
+	  this.set(Tags.Role, WdActionRoles.HistoryBackScript);
+	  this.set(Tags.Desc, "Execute Webdriver script to load the previous URL in the history list");
   }
 
   @Override
