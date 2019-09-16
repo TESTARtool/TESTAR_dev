@@ -198,20 +198,24 @@ public class CodingManager {
 		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
 		// and then set their ids using incremental counters
 		Map<Role, Integer> roleCounter = new HashMap<>();
-		actions.stream().sorted(Comparator.comparing(action -> {
-			try {
-				action.get(Tags.OriginWidget);
-			}
-			catch (NoSuchTagException ex) {
-				System.out.println("No origin widget found for action role: ");
-				System.out.println(action.get(Tags.Role));
-				System.out.println(action.get(Tags.Desc));
-			}
-			return action.get(Tags.OriginWidget).get(Tags.Path);
-		})).forEach(
-				action -> {
-					updateRoleCounter(action, roleCounter);
-					action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+		actions.stream().
+				filter(action -> {
+					try {
+						action.get(Tags.OriginWidget).get(Tags.Path);
+						return true;
+					}
+					catch (NoSuchTagException ex) {
+						System.out.println("No origin widget found for action role: ");
+						System.out.println(action.get(Tags.Role));
+						System.out.println(action.get(Tags.Desc));
+						return false;
+					}
+				}).
+				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
+				forEach(
+					action -> {
+						updateRoleCounter(action, roleCounter);
+						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
 							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
 				}
 		);
