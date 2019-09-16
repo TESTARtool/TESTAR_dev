@@ -194,8 +194,6 @@ public class ModelManager implements StateModelManager {
      */
     @Override
     public Action getAbstractActionToExecute(Set<Action> actions) {
-        //@todo we will probably want to replace this method with one that returns the actual actions to execute
-
         if (currentAbstractState == null) {
             return null;
         }
@@ -208,7 +206,9 @@ public class ModelManager implements StateModelManager {
                     return action;
                 }
             	}catch (Exception e) {
-            		System.out.println(" ERROR getAbstractActionToExecute : " + action.get(Tags.Desc, "No description"));
+            	    String message = "ERROR getAbstractActionToExecute : " + action.get(Tags.Desc, "No description");
+            		System.out.println(message);
+            		errorMessages.add(message);
             	}
             }
             System.out.println("Could not find action with abstractIdCustom : " +abstractIdCustom);
