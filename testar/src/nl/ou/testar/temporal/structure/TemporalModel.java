@@ -112,10 +112,11 @@ public  TemporalModel(){
         //see http://adl.github.io/hoaf/
         StringBuilder result=new StringBuilder();
         result.append("HOA: v1\n");
+        result.append("tool: TESTAR-CSS20190914\n");
+        result.append("name: "+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getModelIdentifier()+", abstraction= "+this.getAbstractionAttributes()+"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
-
         String initState = InitialStates.get(0);
         int stateindex =0;
         for (StateEncoding se: stateEncodings )
