@@ -95,7 +95,7 @@ evaluated expressions.
 Pony GP Parameters
 ------------------
 
-The pattern_Parameters for Pony GP are in a dictionary.
+The parameters for Pony GP are in a dictionary.
 
 
 .. codeauthor:: Erik Hemberg <hembergerik@csail.mit.edu>
@@ -576,7 +576,7 @@ def initialize_population(param):
     population are initialized using the grow or the full method for
     each depth value (ramped) up to max_depth.
 
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: List of individuals
     :rtype: list
@@ -631,7 +631,7 @@ def evaluate_fitness(individuals, param, cache):
 
     :param individuals: Population to evaluate
     :type individuals: list
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :param cache: Cache for fitness evaluations
     :type cache: dict
@@ -668,7 +668,7 @@ def search_loop(population, param):
 
     :param population: Initial population of individuals
     :type population: list
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: Best individual
     :rtype: Individual
@@ -796,7 +796,7 @@ def subtree_mutation(individual, param):
 
     :param individual: Individual to mutate
     :type individual: dict
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: Mutated individual
     :rtype: dict
@@ -861,7 +861,7 @@ def subtree_crossover(parent1, parent2, param):
     :type parent1: dict
     :param parent2: Parent two to crossover
     :type parent2: dict
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :return: Children from the crossed over parents
     :rtype: tuple
@@ -923,7 +923,7 @@ def tournament_selection(population, param):
 
     :param population: Population to select from
     :type population: list
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: selected individuals
     :rtype: list
@@ -953,7 +953,7 @@ def generational_replacement(new_population, old_population, param):
     :type new_population: list
     :param old_population: the old population
     :type old_population: list
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: the new population with the best from the old population
     :rtype: list
@@ -985,7 +985,7 @@ def run(param):
     Return the best solution. Create an initial
     population. Perform an evolutionary search.
 
-    :param param: pattern_Parameters for pony gp
+    :param param: parameters for pony gp
     :type param: dict
     :returns: Best solution
     :rtype: dict
@@ -1126,10 +1126,10 @@ def get_test_and_train_data(fitness_cases_file, test_train_split):
 
 def parse_arguments():
     """
-    Returns a dictionary of the default pattern_Parameters, or the ones set by
+    Returns a dictionary of the default parameters, or the ones set by
     commandline arguments
 
-    :return: pattern_Parameters for the GP run
+    :return: parameters for the GP run
     :rtype: dict
     """
     # Command line arguments
