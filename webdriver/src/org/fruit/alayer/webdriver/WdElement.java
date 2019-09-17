@@ -83,7 +83,7 @@ public class WdElement implements Serializable {
   public long scrollLeft, scrollTop;
   private long borderWidth, borderHeight;
 
-  public Map<String, String> attributeMap;
+  public transient Map<String, String> attributeMap;
 
   @SuppressWarnings("unchecked")
   public WdElement(Map<String, Object> packedElement,

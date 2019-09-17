@@ -88,7 +88,6 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.StateBuilder;
 import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
@@ -379,7 +378,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
 
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-			//INDEXLOG.error("Exception: ",e);
 
 			return false;
 		}
@@ -540,7 +538,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private Taggable fragment; // Fragment is used for saving a replayable sequence:
+	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -853,15 +851,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ExecutedAction,action);
+		fragment.set(ExecutedAction, action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 		fragment.set(SystemState, state);
-		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
-		fragment =new TaggableBase();
+		fragment = new TaggableBase();
 	}
 
 
@@ -1161,9 +1159,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
 			while(success && mode() != Modes.Quit){
-				Taggable fragment;
+				TaggableBase fragment;
 				try{
-					fragment = (Taggable) ois.readObject();
+					fragment = (TaggableBase) ois.readObject();
 				} catch(IOException ioe){
 					success = true;
 					break;
