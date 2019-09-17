@@ -72,7 +72,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField textField9;
     private JButton button5;
     private JComboBox comboBox1;
-    private JLabel fileModelLabel;
+    private JLabel modelFromDBLabel;
     private JTextField textField12;
     private JButton button6;
     private JButton reloadSettingsButton;
@@ -98,6 +98,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField Test_Formulas;
     private JButton button11;
     private JButton button12;
+    private JTextField AlivepropositionTextField;
+    private JButton oraclesFormulasButton;
+    private JButton testDbButton;
+    private JButton parseLTL;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -121,7 +125,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         sampleOracleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                testOracleCSV();
+                testPatternCSV();testOracleCSV();
             }
         });
         samplePatternButton.addActionListener(new ActionListener() {
@@ -131,7 +135,14 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             }
         });
         graphMLButton.addActionListener(this::testgraphml);
-        temporalModelButton.addActionListener(this::testtemporalmodel);
+        temporalModelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testgraphml(e);
+                testtemporalmodel(e);
+            }
+        }
+        );
         defaultSelectorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -170,6 +181,24 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                     Test_Formulas.setText(file);
                 }
                 //
+            }
+        });
+        oraclesFormulasButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        parseLTL.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+             performTemporalCheck(e);
+            }
+        });
+        testDbButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testdbconnection(e);
             }
         });
     }
@@ -351,9 +380,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         traceCheckButton.setText("Trace Check");
         traceCheckButton.setToolTipText("Checks the Candidates on the Model. ");
         panel4.add(traceCheckButton, new GridConstraints(5, 8, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        fileModelLabel = new JLabel();
-        fileModelLabel.setText("File Model");
-        panel4.add(fileModelLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        modelFromDBLabel = new JLabel();
+        modelFromDBLabel.setText("File Model");
+        panel4.add(modelFromDBLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textField6 = new JTextField();
         panel4.add(textField6, new GridConstraints(2, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         button2 = new JButton();
@@ -531,8 +560,13 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         BufferedReader inStream = null;
         BufferedReader errStream = null;
 
-        //String cli = "ubuntu1804 run ~/testar/spot_checker'" + "--a " +"/mnt/c/Users/c/git/TESTAR_dev/testar/target/install/testar/bin/output/temporal/APmodel.HOA" + "--f ";
-        String cli = textField2.getText() + " --a " + toWSLPath(Test_automaton4.getText()) + " --ff " + toWSLPath(Test_Formulas.getText()); //" --a ~/testar/tests/test_automaton4.txt --ff ~/testar/tests/formulas-abc-100.txt";
+        //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead";
+        String cli;
+        if (AlivepropositionTextField.getText().equals("")){
+            cli = textField2.getText() + " --a " + toWSLPath(Test_automaton4.getText()) + " --ff " + toWSLPath(Test_Formulas.getText()) + " --ltlf "+AlivepropositionTextField.getText();
+
+
+        }else  cli = textField2.getText() + " --a " + toWSLPath(Test_automaton4.getText()) + " --ff " + toWSLPath(Test_Formulas.getText());
 
         String response;
         String errorresponse = null;

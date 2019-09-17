@@ -3,10 +3,12 @@ package nl.ou.testar.temporal.structure;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
+import nl.ou.testar.temporal.util.CSVConvertMap;
 import nl.ou.testar.temporal.util.CSVConvertTemporalType;
 import nl.ou.testar.temporal.util.TemporalType;
 
 import java.util.List;
+import java.util.Map;
 
 public class TemporalPattern extends TemporalBean implements Cloneable{
 
@@ -24,8 +26,8 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     private String pattern_Formula;  // e.g. G(b0->Fb1)
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> pattern_Parameters; //b0,b1,b2,bn
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> pattern_Substitutions; //b0,b1,b2,bn; //b25-> 'Button_OK_ParentTitle'
+    @CsvCustomBindByName( converter = CSVConvertMap.class)
+    private Map<String, String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
 
 
 
@@ -78,11 +80,11 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     public List<String> getPattern_Parameters() {
         return pattern_Parameters;
     }
-    public List<String> getPattern_Substitutions() {
+    public Map<String, String> getPattern_Substitutions() {
         return pattern_Substitutions;
     }
 
-    public void setPattern_Substitutions(List<String> pattern_Substitutions) {
+    public void setPattern_Substitutions(Map<String, String> pattern_Substitutions) {
         this.pattern_Substitutions = pattern_Substitutions;
     }
 
