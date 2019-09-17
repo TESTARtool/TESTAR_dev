@@ -540,7 +540,7 @@ class GP(object):
         :returns: Max depth of the binary tree
         :rtype: int
         """
-        return int(math.log(size, 2))
+        return int(math.application_log(size, 2))
 
     def initialize_population(self):
         """
