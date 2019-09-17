@@ -114,6 +114,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
@@ -284,7 +285,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
+			
+		}catch(SessionNotCreatedException e) {
+			
+    		if(e.getMessage().contains("Chrome version")) {
+    			
+    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
+    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
+    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "\n"
+    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
+    					+ "You can use Task Manager to finish it.";
+    			
+    			popupMessage(msg);
+    			
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
+    			
+    		}else {
+    			System.out.println("********** ERROR starting Selenium WebDriver ********");
+    			System.out.println(e.getMessage());
+    		}
+    		
+		}catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+				
+				String msg = "Exception: Check if chromedriver.exe path: \n"
+				+settings.get(ConfigTags.SUTConnectorValue)
+				+"\n exists or if is a correct definition";
 
+				popupMessage(msg);
+
+				System.out.println(msg);
+			
+			}else {
+				e.printStackTrace();
+			}
+		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			//INDEXLOG.error("Exception: ",SystemStartException);
