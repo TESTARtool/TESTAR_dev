@@ -780,7 +780,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             textArea12.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir + "\n");
         } else {
             textArea12.append("csv loaded: \n");
-            textArea12.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism() + "\n");
+            textArea12.append("Formalism that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism() + "\n");
             CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
             textArea12.append("csv saved: \n");
 
@@ -804,8 +804,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             textArea12.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir + "\n");
         } else {
             textArea12.append("csv loaded: \n");
-            textArea12.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism() + "\n");
-            textArea12.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString() + "\n");
+            textArea12.append("pattern that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism() + "\n");
+            textArea12.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getParameter_WidgetRoleConstraints().toString() + "\n");
 
             CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
             textArea12.append("csv saved: \n");

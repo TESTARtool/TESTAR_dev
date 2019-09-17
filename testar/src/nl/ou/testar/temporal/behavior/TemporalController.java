@@ -152,8 +152,8 @@ public class TemporalController {
 
             tModel.setApplicationName(abstractStateModel.getApplicationName());
             tModel.setApplicationVersion(abstractStateModel.getApplicationVersion());
-            tModel.setModelIdentifier(abstractStateModel.getModelIdentifier());
-            tModel.setAbstractionAttributes(abstractStateModel.getAbstractionAttributes());
+            tModel.setApplication_ModelIdentifier(abstractStateModel.getModelIdentifier());
+            tModel.setApplication_AbstractionAttributes(abstractStateModel.getAbstractionAttributes());
 
             //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
             this.apSelectorManager = Apmgr;
@@ -210,7 +210,7 @@ public class TemporalController {
                     senc.setStateAPs(propositions); // to be decided:  whether to include current AP's on a deadstate
                     if (deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
-                        deadTrenc.setTransition("dead_"+stateVertex.getIdentity().toString());
+                        deadTrenc.setTransition("#dead_"+stateVertex.getIdentity().toString());
                         deadTrenc.setTargetState("#dead");
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                         deadTransitionPropositions.add("dead");
@@ -244,7 +244,7 @@ public class TemporalController {
                 }
             }
 
-            tModel.setTraces(fetchTraces(tModel.getModelIdentifier()));
+            tModel.setTraces(fetchTraces(tModel.getApplication_ModelIdentifier()));
             List<String> initStates =new ArrayList<>();
             for (TemporalTrace trace:tModel.getTraces()
             ) {
