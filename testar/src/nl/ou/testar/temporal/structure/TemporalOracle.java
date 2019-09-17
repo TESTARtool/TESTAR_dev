@@ -9,114 +9,110 @@ import java.util.*;
 
 public class TemporalOracle extends TemporalPattern{
 
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> substitutions; //b0,b1,b2,bn; //b25-> 'Button_OK_ParentTitle'
-    @CsvCustomBindByName(converter = CSVConvertValStatus.class)
-    private ValStatus validationStatus;
-    @CsvCustomBindByName(converter = CSVConvertVerdict.class)
-    private Verdict verdict;
-    @CsvBindByName
-    private double traceSupport;
-    @CsvBindByName
-    private double traceConfidence;
-    @CsvBindByName
-    private double traceLift;
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> testsequenceIDs;
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> prefixOfRun; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> cycleOfRun;  // idem
-    @CsvBindByName
-    private String runDate;
 
+    @CsvCustomBindByName(converter = CSVConvertValStatus.class)
+    private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
+    @CsvCustomBindByName(converter = CSVConvertVerdict.class)
+    private Verdict oracle_verdict;         //strange case sensitivity problem with CSV converter: leave all lowercase
     @CsvBindByName
-    private String formatVersion="20190629";
+    private double log_TraceSupport;
+    @CsvBindByName
+    private double log_TraceConfidence;
+    @CsvBindByName
+    private double log_TraceLift;
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
+    private List<String> log_TestsequenceIDs;
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
+    private List<String> log_PrefixOfRun; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
+    private List<String> log_CycleOfRun;  // idem
+    @CsvBindByName
+    private String log_RunDate;
+
+
 
     public TemporalOracle() {
+
         super();
-    }
-
-
-    public List<String> getSubstitutions() {
-        return substitutions;
-    }
-
-    public void setSubstitutions(List<String> substitutions) {
-        this.substitutions = substitutions;
-    }
-    public List<String> getTestsequenceIDs() {
-        return testsequenceIDs;
-    }
-
-    public void setTestsequenceIDs(List<String> testsequenceIDs) {
-        this.testsequenceIDs = testsequenceIDs;
+        this.set_formatVersion("20190629");
     }
 
 
 
-    public ValStatus getValidationStatus() {
-        return validationStatus;
+    public List<String> getLog_TestsequenceIDs() {
+        return log_TestsequenceIDs;
     }
 
-    public void setValidationStatus(ValStatus validationStatus) {
-        this.validationStatus = validationStatus;
+    public void setLog_TestsequenceIDs(List<String> log_TestsequenceIDs) {
+        this.log_TestsequenceIDs = log_TestsequenceIDs;
     }
 
-    public Verdict getVerdict() {
-        return verdict;
+
+
+
+    public ValStatus getOracle_validationstatus() {
+        return oracle_validationstatus;
     }
 
-    public void setVerdict(Verdict verdict) {
-        this.verdict = verdict;
+    public void setOracle_validationstatus(ValStatus oracle_validationstatus) {
+        this.oracle_validationstatus = oracle_validationstatus;
     }
 
-    public double getTraceSupport() {
-        return traceSupport;
+
+    public Verdict getOracle_verdict() {
+        return oracle_verdict;
     }
 
-    public void setTraceSupport(double traceSupport) {
-        this.traceSupport = traceSupport;
+    public void setOracle_verdict(Verdict oracle_verdict) {
+        this.oracle_verdict = oracle_verdict;
     }
 
-    public double getTraceConfidence() {
-        return traceConfidence;
+    public double getLog_TraceSupport() {
+        return log_TraceSupport;
     }
 
-    public void setTraceConfidence(double traceConfidence) {
-        this.traceConfidence = traceConfidence;
+    public void setLog_TraceSupport(double log_TraceSupport) {
+        this.log_TraceSupport = log_TraceSupport;
     }
 
-    public double getTraceLift() {
-        return traceLift;
+    public double getLog_TraceConfidence() {
+        return log_TraceConfidence;
     }
 
-    public void setTraceLift(double traceLift) {
-        this.traceLift = traceLift;
+    public void setLog_TraceConfidence(double log_TraceConfidence) {
+        this.log_TraceConfidence = log_TraceConfidence;
     }
 
-    public List<String> getPrefixOfRun() {
-        return prefixOfRun;
+    public double getLog_TraceLift() {
+        return log_TraceLift;
     }
 
-    public void setPrefixOfRun(List<String> prefixOfRun) {
-        this.prefixOfRun = prefixOfRun;
+    public void setLog_TraceLift(double log_TraceLift) {
+        this.log_TraceLift = log_TraceLift;
     }
 
-    public List<String> getCycleOfRun() {
-        return cycleOfRun;
+    public List<String> getLog_PrefixOfRun() {
+        return log_PrefixOfRun;
     }
 
-    public void setCycleOfRun(List<String> cycleOfRun) {
-        this.cycleOfRun = cycleOfRun;
+    public void setLog_PrefixOfRun(List<String> log_PrefixOfRun) {
+        this.log_PrefixOfRun = log_PrefixOfRun;
     }
 
-    public String getRunDate() {
-        return runDate;
+    public List<String> getLog_CycleOfRun() {
+        return log_CycleOfRun;
     }
 
-    public void setRunDate(String runDate) {
-        this.runDate = runDate;
+    public void setLog_CycleOfRun(List<String> log_CycleOfRun) {
+        this.log_CycleOfRun = log_CycleOfRun;
+    }
+
+    public String getLog_RunDate() {
+        return log_RunDate;
+    }
+
+    public void setLog_RunDate(String log_RunDate) {
+        this.log_RunDate = log_RunDate;
     }
 
     public Object clone() throws            CloneNotSupportedException
@@ -133,22 +129,22 @@ public static TemporalOracle getSampleOracle(){
     to.setApplicationName("notepad");
     to.setApplicationVersion("v10");
 
-    to.setModelIdentifier("34edf5");
-    to.setAbstractionAttributes(attrib);
-    to.setTemporalFormalism(TemporalType.LTL);
-    to.setValidationStatus(ValStatus.ACCEPTED);
-    to.setDescription("a precedes b");
-    to.setScope("globally");
-    to.setPatternclass("precedence");
-    to.setPattern("!b U a");
-    to.setParameters(Arrays.asList("a", "b"));
-    to.setSubstitutions(Arrays.asList("a:UIButton_OK", "b:UIWindow_Title_main_exists"));
+    to.setApplication_ModelIdentifier("34edf5");
+    to.setApplication_AbstractionAttributes(attrib);
+    to.setPattern_TemporalFormalism(TemporalType.LTL);
+    to.setOracle_validationstatus(ValStatus.ACCEPTED);
+    to.setPattern_Description("a precedes b");
+    to.setPattern_Scope("globally");
+    to.setPattern_Class("precedence");
+    to.setPattern_Formula("!b U a");
+    to.setPattern_Parameters(Arrays.asList("a", "b"));
+    to.setPattern_Substitutions(Arrays.asList("a:UIButton_OK", "b:UIWindow_Title_main_exists"));
     List<String> comments= new ArrayList<String>();
     comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
     comments.add("avoid using 'X,F,G,U,W,R,M' as parameters, as they are used in LTL syntax");
     comments.add("CSV editor of choice is LibreCalc as this tool can explicitly quote all text field");
     comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
-    to.setComments(comments);
+    to.set_comments(comments);
     return to;
 }
 

@@ -351,7 +351,7 @@ private void setupMiner(){
 
             //logCheckResult.append("model count: " + models.size()+"\n");
             //AbstractStateModel model = models.get(0);
-            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getApplication_ModelIdentifier()+"\n");
 
              tcontrol.computeTemporalModel(APmgr);
              TemporalModel tmodel =tcontrol.gettModel();
@@ -394,7 +394,7 @@ private void setupMiner(){
             logCheckResult.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir+"\n");
         } else {
             logCheckResult.append("csv loaded: \n");
-            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
+            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism()+"\n");
             CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
             logCheckResult.append("csv saved: \n");
 
@@ -417,8 +417,8 @@ private void setupMiner(){
             logCheckResult.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir+"\n");
         } else {
             logCheckResult.append("csv loaded: \n");
-            logCheckResult.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
-            logCheckResult.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString()+"\n");
+            logCheckResult.append("pattern that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism()+"\n");
+            logCheckResult.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getParameter_WidgetRoleConstraints().toString()+"\n");
 
             CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
             logCheckResult.append("csv saved: \n");

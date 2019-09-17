@@ -72,9 +72,9 @@ public  TemporalModel(){
     }
 
 
-    public String getFormatVersion() {        return formatVersion;   }
+    public String get_formatVersion() {        return formatVersion;   }
 
-    public void setFormatVersion(String formatVersion) {    this.formatVersion = formatVersion;    }
+    public void set_formatVersion(String _formatVersion) {    this.formatVersion = _formatVersion;    }
 
 
     //custom
@@ -113,7 +113,7 @@ public  TemporalModel(){
         StringBuilder result=new StringBuilder();
         result.append("HOA: v1\n");
         result.append("tool: TESTAR-CSS20190914\n");
-        result.append("name: "+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getModelIdentifier()+", abstraction= "+this.getAbstractionAttributes()+"\n");
+        result.append("name: "+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");

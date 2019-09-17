@@ -757,7 +757,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				runRecordLoop(system);
 			}
 
-			// getState() including getVerdict() that is saved into the state:
+			// getState() including getOracle_verdict() that is saved into the state:
 			LogSerialiser.log("Obtained system state in inner loop of TESTAR...\n", LogSerialiser.LogLevel.Debug);
 			cv.begin(); Util.clear(cv);
 			//Not visualizing the widget info under cursor while in Generate-mode:
@@ -1455,7 +1455,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * This method gets the state of the SUT
-	 * It also call getVerdict() and saves it into the state
+	 * It also call getOracle_verdict() and saves it into the state
 	 *
 	 * @param system
 	 * @return

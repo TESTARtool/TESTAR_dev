@@ -13,12 +13,12 @@ public class TemporalOracleCollection extends TemporalBean {
     private List<TemporalOracle> propertyCollection;
     private String formatVersion="20190603";
 
-    public String getFormatVersion() {
+    public String get_formatVersion() {
         return formatVersion;
     }
 
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
+    public void set_formatVersion(String _formatVersion) {
+        this.formatVersion = _formatVersion;
     }
 
 
