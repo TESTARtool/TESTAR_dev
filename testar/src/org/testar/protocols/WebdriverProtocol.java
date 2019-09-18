@@ -32,20 +32,24 @@
 package org.testar.protocols;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import org.fruit.Drag;
-import org.fruit.alayer.AbsolutePosition;
 import org.fruit.alayer.Action;
-import org.fruit.alayer.Point;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
-import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.webdriver.WdElement;
+import org.fruit.alayer.webdriver.WdWidget;
 import org.fruit.monkey.ConfigTags;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 import org.testar.OutputStructure;
 
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
@@ -57,6 +61,8 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     protected static double SCROLL_THICK = 16; //scroll thickness
     protected HtmlSequenceReport htmlReport;
     protected State latestState;
+    
+    protected static Set<String> existingCssClasses = new HashSet<>();
 
     /**
      * This methods is called before each test sequence, allowing for example using external profiling software on the SUT
@@ -77,9 +83,20 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
-        //Spy mode didn't use the html report
-    	if(settings.get(ConfigTags.Mode) == Modes.Spy)
-        	return super.getState(system);
+    	//Spy mode didn't use the html report
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+    		
+    		State state = super.getState(system);
+    		
+    		for(Widget w : state) {
+    			WdElement element = ((WdWidget) w).element;
+    			for(String s : element.cssClasses) {
+    				existingCssClasses.add(s);
+    			}
+    		}
+    		
+        	return state;
+    	}
     	
     	latestState = super.getState(system);
         //adding state to the HTML sequence report:
@@ -144,5 +161,33 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 				+ " " + sequencesPath
 				+ " " + status + " \"" + statusInfo + "\"" );
     }
-    
+
+    @Override
+    protected void stopSystem(SUT system) {
+    	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
+
+    		try {
+    			
+    			File folder = new File(settings.getSettingsPath());
+    			File file = new File(folder, "existingCssClasses.txt");
+    			if(!file.exists())
+    				file.createNewFile();
+
+    			Stream<String> stream = Files.lines(Paths.get(file.getCanonicalPath()));
+    			stream.forEach(line -> existingCssClasses.add(line));
+    			stream.close();
+    			
+    			PrintWriter write = new PrintWriter(new FileWriter(file.getCanonicalPath()));
+    			for(String s : existingCssClasses)
+    			    write.println(s);
+    			write.close();
+    		
+    		} catch (IOException e) {System.out.println(e.getMessage());}
+    		
+    		//System.out.println("* " + existingCssClasses.size()+ " * Existing Css Classes: " + existingCssClasses.toString());
+
+    	}
+    	super.stopSystem(system);
+    }
+
 }
