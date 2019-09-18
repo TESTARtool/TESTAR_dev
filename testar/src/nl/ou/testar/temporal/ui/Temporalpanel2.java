@@ -72,7 +72,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JTextField textField9;
     private JButton button5;
     private JComboBox comboBox1;
-    private JLabel modelFromDBLabel;
+    private JLabel oracleResultsLabel;
     private JTextField textField12;
     private JButton button6;
     private JButton reloadSettingsButton;
@@ -102,6 +102,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton oraclesFormulasButton;
     private JButton testDbButton;
     private JButton parseLTL;
+    private JTextField textField4;
+    private JButton button7;
 
     public Temporalpanel2() {
         System.out.println("debug creating temporal panel2 instance");
@@ -380,9 +382,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         traceCheckButton.setText("Trace Check");
         traceCheckButton.setToolTipText("Checks the Candidates on the Model. ");
         panel4.add(traceCheckButton, new GridConstraints(5, 8, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        modelFromDBLabel = new JLabel();
-        modelFromDBLabel.setText("File Model");
-        panel4.add(modelFromDBLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        oracleResultsLabel = new JLabel();
+        oracleResultsLabel.setText("File Model");
+        panel4.add(oracleResultsLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         textField6 = new JTextField();
         panel4.add(textField6, new GridConstraints(2, 1, 1, 8, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         button2 = new JButton();
