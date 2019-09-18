@@ -121,7 +121,7 @@ public class TemporalOracle extends TemporalPattern{
     }
 public static TemporalOracle getSampleOracle(){
     TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
-    Set attrib = new HashSet();
+    Set attrib = new HashSet<String>();
     attrib.add("R");
     attrib.add("T");
     attrib.add("P");
@@ -138,7 +138,8 @@ public static TemporalOracle getSampleOracle(){
     to.setPattern_Class("precedence");
     to.setPattern_Formula("!b U a");
     to.setPattern_Parameters(Arrays.asList("a", "b"));
-    to.setPattern_Substitutions(Arrays.asList("a:UIButton_OK", "b:UIWindow_Title_main_exists"));
+    Map<String,String> mappie = new HashMap<String,String>() {{put("a", "UIButton_OK");put("b", "UIWindow_Title_main_exists");}};
+    to.setPattern_Substitutions(mappie);
     List<String> comments= new ArrayList<String>();
     comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
     comments.add("avoid using 'X,F,G,U,W,R,M' as parameters, as they are used in LTL syntax");
