@@ -3,7 +3,13 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import nl.ou.testar.temporal.util.CSVHandler;
+import nl.ou.testar.temporal.util.TemporalType;
+import nl.ou.testar.temporal.util.ValStatus;
+import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
@@ -161,6 +167,67 @@ public  TemporalModel(){
         result.append("--END--\n");
         result.append("EOF_HOA");
         return result.toString();
+    }
+
+    public String makeFormulaOutput(String oracleFile, TemporalType tmpType) {
+        List<TemporalOracle> oracleColl = new ArrayList<>();
+        List<TemporalOracle> checkedOracleColl = new ArrayList<>();
+        TemporalOracle checkedOracle;
+        StringBuilder Formulas=new StringBuilder();
+
+        oracleColl = CSVHandler.load(oracleFile, TemporalOracle.class);
+        for (TemporalOracle candidateOracle : oracleColl) {
+            try {
+                checkedOracle = candidateOracle.clone();
+                String formula;
+
+                List<String> sortedparameters = candidateOracle.getPattern_Parameters();
+                Collections.sort(sortedparameters);
+                List<String> sortedsubstitionkeys = (List<String>) candidateOracle.getPattern_Substitutions().keySet();
+                boolean importStatus;
+                importStatus = candidateOracle.getPattern_TemporalFormalism() == tmpType;
+                if (importStatus) {
+                    //parameter consistency
+
+                    importStatus = sortedparameters.equals(sortedsubstitionkeys);
+                }
+                if (!importStatus) {
+                    checkedOracle.addLog("inconsistent parameter<-> substitutions setup ");
+                    checkedOracle.setOracle_validationstatus(ValStatus.ERROR);
+                }
+
+                if (importStatus)
+                    importStatus = getModelAPs().containsAll(candidateOracle.getPattern_Substitutions().values());
+                if (!importStatus)
+                    checkedOracle.addLog("not all propositions (parameter-substitutions) are found in the Model");
+                    checkedOracle.setOracle_validationstatus(ValStatus.ERROR);
+
+              formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(), (String[])sortedparameters.toArray(),(String[])sortedsubstitionkeys.toArray());
+                Formulas.append(formula);
+                Formulas.append("\n");
+                LocalDateTime localDateTime=LocalDateTime.now();
+                String localDateString = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMDD-hhmmss"));
+                CSVHandler.save(checkedOracleColl,oracleFile+"_checked_"+localDateString);
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return Formulas.toString();
+    }
+    public List<TemporalOracle> ReadModelCheckerResults(String results){
+        List<TemporalOracle> oracleresults = new ArrayList<>();
+        TemporalOracle oracleresult=new TemporalOracle();
+
+// add to log file.
+        // parse header block
+        //parseformulablock
+       // while (formulablock){ }
+
+
+
+    return oracleresults ;
     }
 
     @JsonGetter("modelAPs")

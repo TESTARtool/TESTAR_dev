@@ -115,9 +115,9 @@ public class TemporalOracle extends TemporalPattern{
         this.log_RunDate = log_RunDate;
     }
 
-    public Object clone() throws            CloneNotSupportedException
+    public TemporalOracle clone() throws            CloneNotSupportedException
     {
-        return super.clone();
+        return (TemporalOracle)super.clone();
     }
 public static TemporalOracle getSampleOracle(){
     TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
