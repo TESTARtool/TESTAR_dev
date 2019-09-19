@@ -87,7 +87,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton loadSelectorButton;
     private JButton traceCheckButton;
     private JTextField textField2;
-    private JCheckBox WSLPathCheckBox;
+    private JCheckBox WSLNeededCheckBox;
     private JTextField textField3;
     private JTextField textFieldPythonEnvironment;
     private JButton button9;
@@ -248,10 +248,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         panel2.add(label1, cc.xy(1, 1));
         textField2 = new JTextField();
         panel2.add(textField2, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
-        WSLPathCheckBox = new JCheckBox();
-        WSLPathCheckBox.setText("WSL path");
-        WSLPathCheckBox.setToolTipText("Does this command need a WSL path? \ne.g. starting with \"/mnt/C/...\"");
-        panel2.add(WSLPathCheckBox, cc.xy(7, 1));
+        WSLNeededCheckBox = new JCheckBox();
+        WSLNeededCheckBox.setText("WSL path");
+        WSLNeededCheckBox.setToolTipText("Does this command need a WSL path? \ne.g. starting with \"/mnt/C/...\"");
+        panel2.add(WSLNeededCheckBox, cc.xy(7, 1));
         final JLabel label2 = new JLabel();
         label2.setText("LTL  Parser:");
         label2.setToolTipText("used for testing syntax of  a LTL formula");
