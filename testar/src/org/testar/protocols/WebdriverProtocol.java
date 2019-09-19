@@ -161,6 +161,11 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
 				+ " " + sequencesPath
 				+ " " + status + " \"" + statusInfo + "\"" );
     }
+    
+    @Override
+	protected void finishSequence(){
+    	//With webdriver version we don't use the call SystemProcessHandling.killTestLaunchedProcesses
+	}
 
     @Override
     protected void stopSystem(SUT system) {

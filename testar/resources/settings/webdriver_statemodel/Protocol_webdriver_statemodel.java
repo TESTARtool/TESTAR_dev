@@ -67,8 +67,7 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 	// Define a whitelist of allowed domains for links and pages
 	// An empty list will be filled with the domain from the sut connector
 	// Set to null to ignore this feature
-	private static List<String> domainsAllowed =
-			Arrays.asList("www.ou.nl", "mijn.awo.ou.nl", "login.awo.ou.nl");
+	private static List<String> domainsAllowed = Arrays.asList("www.w3schools.com");
 
 	// If true, follow links opened in new tabs
 	// If false, stay with the original (ignore links opened in new tabs)
@@ -76,15 +75,14 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 
 	// URL + form name, username input id + value, password input id + value
 	// Set login to null to disable this feature
-	private static Pair<String, String> login = Pair.from(
-			"https://login.awo.ou.nl/SSO/login", "OUinloggen");
+	private static Pair<String, String> login = null;
 	private static Pair<String, String> username = Pair.from("username", "");
 	private static Pair<String, String> password = Pair.from("password", "");
 
 	// List of atributes to identify and close policy popups
 	// Set to null to disable this feature
 	private static Map<String, String> policyAttributes = new HashMap<String, String>() {{ 
-		put("id", "_cookieDisplay_WAR_corpcookieportlet_okButton"); }};
+		put("id", "sncmp-banner-btn-agree"); }};
 
 	/**
 	 * Called once during the life time of TESTAR

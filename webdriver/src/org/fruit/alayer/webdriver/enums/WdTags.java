@@ -57,32 +57,87 @@ public class WdTags extends TagsBase {
   public static final Tag<String> WebTagName = from("WebTagName", String.class);
 
   /**
-   * Styled class of a widget
+   * Web identifier of a widget.
+   */
+  public static final Tag<String> WebId = from("WebId", String.class);
+  
+  /**
+   * Styled class of a widget.
    */
   public static final Tag<String> WebCssClasses = from("WebCssClasses", String.class);
   
   /**
-   * Help text of a widget
+   * Help text of a widget.
    */
   public static final Tag<String> WebHelpText = from("WebHelpText", String.class);
 
   /**
-   * Title or name of a widget.
+   * Web name of a widget.
    */
   public static final Tag<String> WebName = from("WebName", String.class);
+  
+  /**
+   * Web title of a widget.
+   */
+  public static final Tag<String> WebTitle = from("WebTitle", String.class);
+  
+  /**
+   * Web text context of a widget.
+   */
+  public static final Tag<String> WebTextContext = from("WebTextContext", String.class);
+  
+  /**
+   * Web Hypertext Reference of a widget.
+   */
+  public static final Tag<String> WebHref = from("WebHref", String.class);
+  
+  /**
+   * Web value of a widget.
+   */
+  public static final Tag<String> WebValue = from("WebValue", String.class);
+  
+  /**
+   * Web style of a widget.
+   */
+  public static final Tag<String> WebStyle = from("WebStyle", String.class);
+  
+  /**
+   * Web target of a widget.
+   */
+  public static final Tag<String> WebTarget = from("WebTarget", String.class);
+  
+  /**
+   * Web alternative information of a widget.
+   */
+  public static final Tag<String> WebAlt = from("WebAlt", String.class);
+  
+  /**
+   * Web display style of a widget.
+   */
+  public static final Tag<String> WebDisplay = from("WebDisplay", String.class);
+  
+  /**
+   * Web type of input of a widget.
+   */
+  public static final Tag<String> WebType = from("WebType", String.class);
+  
+  /**
+   * Web zIndex of a widget
+   */
+  public static final Tag<Double> WebZIndex = from("WebZIndex", Double.class);
 
   /**
-   * Web Control Type Identifier of a widget
+   * Web Control Type Identifier of a widget.
    */
   public static final Tag<Long> WebControlType = from("WebControlType", Long.class);
 
   /**
-   * Web Culture Identifier of a widget
+   * Web Culture Identifier of a widget.
    */
   public static final Tag<Long> WebCulture = from("WebCulture", Long.class);
 
   /**
-   * If the widget is a Win32 widget, this will be its native handle
+   * If the widget is a Win32 widget, this will be its native handle.
    */
   public static final Tag<Long> WebNativeWindowHandle = from("WebNativeWindowHandle", Long.class);
   public static final Tag<Long> WebOrientation = from("WebOrientation", Long.class);
@@ -117,19 +172,19 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsControlElement = from("WebIsControlElement", Boolean.class);
 
   /**
-   * If the widget is a window, this tells whether it is the top-most window
+   * If the widget is a window, this tells whether it is the top-most window.
    */
   public static final Tag<Boolean> WebIsTopmostWindow = from("WebIsTopmostWindow", Boolean.class);
 
   /**
-   * If the widget is a window, this tells it is modal (such as a message box)
+   * If the widget is a window, this tells it is modal (such as a message box).
    */
   public static final Tag<Boolean> WebIsWindowModal = from("WebIsWindowModal", Boolean.class);
   public static final Tag<Long> WebWindowInteractionState = from("WebWindowInteractionState", Long.class);
   public static final Tag<Long> WebWindowVisualState = from("WebWindowVisualState", Long.class);
 
   /**
-   * Bounding rectangle of a widget
+   * Bounding rectangle of a widget.
    */
   public static final Tag<Rect> WebBoundingRectangle = from("WebBoundingRectangle", Rect.class);
 
@@ -138,6 +193,16 @@ public class WdTags extends TagsBase {
    */
   public static final Tag<Boolean> WebIsEnabled = from("WebIsEnabled", Boolean.class);
 
+  /**
+   * Whether this widget is currently blocked.
+   */
+  public static final Tag<Boolean> WebIsBlocked = from("WebIsBlocked", Boolean.class);
+  
+  /**
+   * Whether this widget is currently clickable.
+   */
+  public static final Tag<Boolean> WebIsClickable = from("WebIsClickable", Boolean.class);
+  
   /**
    * Whether this widget has keyboard focus (i.e. will receive keyboard input)
    */
@@ -149,7 +214,7 @@ public class WdTags extends TagsBase {
   public static final Tag<Boolean> WebIsFullOnScreen = from("WebIsFullOnScreen", Boolean.class);
 
   /**
-   * Whether this widget can be focused, such that it will receive keyboard input
+   * Whether this widget can be focused, such that it will receive keyboard input.
    */
   public static final Tag<Boolean> WebIsKeyboardFocusable = from("WebIsKeyboardFocusable", Boolean.class);
 

@@ -58,7 +58,7 @@ public class WdElement implements Serializable {
   long culture = 0L;
   boolean isModal = false; // i.c.w. access key
 
-  public String id, name, tagName, textContent, helpText;
+  public String id, name, tagName, textContent, helpText, title;
   public List<String> cssClasses = new ArrayList<>();
   public String display, type;
 
@@ -67,7 +67,7 @@ public class WdElement implements Serializable {
   boolean isContentElement, isControlElement;
   boolean hasKeyboardFocus, isKeyboardFocusable;
   String acceleratorKey, accessKey;
-  String valuePattern;
+  String valuePattern, href, value, style, target, alt;
 
   double zindex;
   Rect rect;
@@ -87,7 +87,7 @@ public class WdElement implements Serializable {
 
   @SuppressWarnings("unchecked")
   public WdElement(Map<String, Object> packedElement,
-                   WdRootElement root, WdElement parent) {
+		  			WdRootElement root, WdElement parent) {
     this.root = root;
     this.parent = parent;
 
@@ -105,13 +105,20 @@ public class WdElement implements Serializable {
     id = attributeMap.getOrDefault("id", "");
     name = (String) packedElement.get("name");
     tagName = (String) packedElement.get("tagName");
-    textContent = ((String) packedElement.get("textContent"))
-        .replaceAll("\\s+", " ").trim();
+    textContent = ((String) packedElement.get("textContent")).replaceAll("\\s+", " ").trim();
     helpText = attributeMap.get("title");
+    title = attributeMap.getOrDefault("title","");
+    
     valuePattern = attributeMap.getOrDefault("href", "");
     if (valuePattern == null || valuePattern.equals("")) {
       valuePattern = String.valueOf(packedElement.getOrDefault("value", ""));
     }
+    
+    href = attributeMap.getOrDefault("href", "");
+    value = String.valueOf(packedElement.getOrDefault("value", ""));
+    style = attributeMap.getOrDefault("style", "");
+    target = attributeMap.getOrDefault("target", "");
+    alt = attributeMap.getOrDefault("alt", "");
 
     String classesString = attributeMap.getOrDefault("class", "");
     if (classesString != null) {

@@ -241,6 +241,48 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebAccessKey)) {
 			ret = w.element.accessKey;
 		}
+		else if (t.equals(WdTags.WebId)) {
+			ret = w.element.id;
+		}
+		else if (t.equals(WdTags.WebTextContext)) {
+			ret = w.element.textContent;
+		}
+		else if (t.equals(WdTags.WebTitle)) {
+			ret = w.element.title;
+		}
+		else if (t.equals(WdTags.WebHref)) {
+			ret = w.element.href;
+		}
+		else if (t.equals(WdTags.WebValue)) {
+			ret = w.element.value;
+		}
+		else if (t.equals(WdTags.WebStyle)) {
+			ret = w.element.style;
+		}
+		else if (t.equals(WdTags.WebTarget)) {
+			ret = w.element.target;
+		}
+		else if (t.equals(WdTags.WebAlt)) {
+			ret = w.element.alt;
+		}
+		else if (t.equals(WdTags.WebDisplay)) {
+			ret = w.element.display;
+		}
+		else if (t.equals(WdTags.WebType)) {
+			ret = w.element.type;
+		}
+		else if (t.equals(WdTags.WebZIndex)) {
+			ret = w.element.zindex;
+		}
+		else if (t.equals(WdTags.WebIsEnabled)) {
+			ret = w.element.enabled;
+		}
+		else if (t.equals(WdTags.WebIsBlocked)) {
+			ret = w.element.blocked;
+		}
+		else if (t.equals(WdTags.WebIsClickable)) {
+			ret = w.element.isClickable;
+		}
 
 		cacheTag(w, t, ret);
 

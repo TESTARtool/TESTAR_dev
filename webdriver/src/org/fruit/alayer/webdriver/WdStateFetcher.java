@@ -164,6 +164,8 @@ public class WdStateFetcher implements Callable<WdState> {
 	  widget.set(StateManagementTags.WidgetIsOffscreen, getValueOrDefault(!element.isFullVisibleOnScreen, false));
 	  widget.set(StateManagementTags.WidgetIsContentElement, getValueOrDefault(element.isContentElement, false));
 	  widget.set(StateManagementTags.WidgetIsControlElement, getValueOrDefault(element.isControlElement, false));
+	  widget.set(StateManagementTags.WidgetAutomationId, getValueOrDefault(element.id, ""));
+	  widget.set(StateManagementTags.WidgetItemType, getValueOrDefault(element.type, ""));
   }
 
   private static <T> T getValueOrDefault(T value, T defaultValue) {
