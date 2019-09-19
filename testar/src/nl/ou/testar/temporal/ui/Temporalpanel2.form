@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="FormLayout">
     <rowspec value="center:d:noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="center:max(d;4px):noGrow"/>
+    <rowspec value="center:204px:noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
@@ -19,10 +19,10 @@
     <colspec value="fill:max(d;4px):noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:227px:grow"/>
-    <colspec value="left:5dlu:noGrow"/>
+    <colspec value="left:6dlu:noGrow"/>
     <colspec value="fill:10px:noGrow"/>
-    <colspec value="left:4dlu:noGrow"/>
-    <colspec value="fill:max(d;4px):noGrow"/>
+    <colspec value="left:32dlu:noGrow"/>
+    <colspec value="right:max(p;42px):noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="left:4dlu:noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
@@ -62,18 +62,16 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:d:grow"/>
+            <rowspec value="top:m:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:grow"/>
+            <colspec value="left:330px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="right:max(m;4px):noGrow"/>
             <constraints>
               <tabbedpane title="Setup"/>
             </constraints>
@@ -98,16 +96,6 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
-              </component>
-              <component id="3f853" class="javax.swing.JCheckBox" binding="WSLPathCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="WSL path"/>
-                  <toolTipText value="Does this command need a WSL path? &#10;e.g. starting with &quot;/mnt/C/...&quot;"/>
-                </properties>
               </component>
               <component id="f5c8d" class="javax.swing.JLabel">
                 <constraints>
@@ -149,8 +137,8 @@
               </component>
               <component id="bc9fd" class="javax.swing.JButton" binding="button9" default-binding="true">
                 <constraints>
-                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="..."/>
@@ -177,8 +165,8 @@
               </component>
               <component id="9972d" class="javax.swing.JButton" binding="button10" default-binding="true">
                 <constraints>
-                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="..."/>
@@ -186,10 +174,20 @@
               </component>
               <vspacer id="b076b">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-vert="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
                 </constraints>
               </vspacer>
+              <component id="3f853" class="javax.swing.JCheckBox" binding="WSLNeededCheckBox" default-binding="true">
+                <constraints>
+                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="WSL needed?"/>
+                  <toolTipText value="Does this command need a WSL path? &#10;e.g. starting with &quot;/mnt/C/...&quot;"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="22207" layout-manager="FormLayout">
@@ -197,7 +195,7 @@
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="center:15px:noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
@@ -206,51 +204,64 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:m:grow"/>
+            <colspec value="left:m:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:grow"/>
+            <colspec value="fill:d:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <constraints>
-              <tabbedpane title="Peek"/>
+              <tabbedpane title="Test Prerequisites"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
               <component id="7835d" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="4" column="0" row-span="6" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="3" col-span="31" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
                   <text value="Generate Files:"/>
                 </properties>
               </component>
-              <component id="a2cd4" class="javax.swing.JButton" binding="defaultSelectorButton" default-binding="true">
-                <constraints>
-                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Default Selector"/>
-                </properties>
-              </component>
               <component id="bd684" class="javax.swing.JButton" binding="temporalModelButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="9" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
-                  <text value="TemporalModel from DB"/>
-                  <toolTipText value="requires APSelectorManagerTEST.json file in directory temporal"/>
+                  <text value="TemporalModel"/>
+                  <toolTipText value="Make a model from the graphDB. Requires APSelectorManagerTEST.json file in directory temporal"/>
                 </properties>
               </component>
               <component id="6af6c" class="javax.swing.JButton" binding="sampleOracleButton" default-binding="true">
                 <constraints>
-                  <grid row="7" column="2" row-span="3" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="9" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Sample Oracle"/>
@@ -258,8 +269,8 @@
               </component>
               <component id="8f668" class="javax.swing.JButton" binding="oraclesFormulasButton" default-binding="true">
                 <constraints>
-                  <grid row="7" column="4" row-span="3" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="9" column="10" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Oracles-&gt;Formulas"/>
@@ -267,8 +278,8 @@
               </component>
               <component id="e2af0" class="javax.swing.JButton" binding="testDbButton" custom-create="true">
                 <constraints>
-                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="Test DB Connection"/>
@@ -276,8 +287,8 @@
               </component>
               <component id="8cd3b" class="javax.swing.JButton" binding="parseLTL">
                 <constraints>
-                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <hideActionText value="false"/>
@@ -287,7 +298,7 @@
               </component>
               <component id="fb502" class="javax.swing.JTextField" binding="textField1" default-binding="true">
                 <constraints>
-                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="2" column="2" row-span="1" col-span="25" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -295,6 +306,15 @@
                 <properties>
                   <text value="G(a-&gt;Fb)"/>
                   <visible value="true"/>
+                </properties>
+              </component>
+              <component id="a2cd4" class="javax.swing.JButton" binding="defaultSelectorButton" default-binding="true">
+                <constraints>
+                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties>
+                  <text value="Default Selector"/>
                 </properties>
               </component>
             </children>
@@ -309,11 +329,11 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:283px:grow"/>
-            <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:133px:grow"/>
+            <colspec value="left:330px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <colspec value="fill:31px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
@@ -321,20 +341,20 @@
             <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <constraints>
-              <tabbedpane title="Test"/>
+              <tabbedpane title="Test LTL"/>
             </constraints>
             <properties/>
             <border type="none"/>
             <children>
               <hspacer id="4ef44">
                 <constraints>
-                  <grid row="6" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms defaultalign-horz="false"/>
                 </constraints>
               </hspacer>
               <component id="1867a" class="javax.swing.JButton" binding="button11" default-binding="true">
                 <constraints>
-                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -344,7 +364,7 @@
               </component>
               <component id="9bd30" class="javax.swing.JButton" binding="button12" default-binding="true">
                 <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -415,17 +435,39 @@
               </component>
               <component id="b3939" class="javax.swing.JButton" binding="LTLModelCheckButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="LTL Model Check:"/>
+                  <text value="LTL Model Check"/>
                 </properties>
               </component>
             </children>
           </grid>
-          <grid id="d3094" layout-manager="GridLayoutManager" row-count="6" column-count="13" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="0" left="0" bottom="0" right="0"/>
+          <grid id="d3094" layout-manager="FormLayout">
+            <rowspec value="center:d:grow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:d:grow"/>
+            <colspec value="left:117px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:d:grow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:d:grow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:d:grow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:50px:noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="left:20px:grow"/>
             <constraints>
               <tabbedpane title="Miner"/>
             </constraints>
@@ -434,50 +476,116 @@
             <children>
               <component id="7250a" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
-                  <text value="Pattern File"/>
+                  <text value="Oracle Patterns"/>
                 </properties>
               </component>
-              <vspacer id="90c4b">
-                <constraints>
-                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-                </constraints>
-              </vspacer>
               <component id="55810" class="javax.swing.JTextField" binding="textField5" default-binding="true">
                 <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="0" column="2" row-span="1" col-span="6" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
-              <component id="bbfcf" class="javax.swing.JSeparator">
+              <component id="1e04" class="javax.swing.JTextField" binding="textField6" default-binding="true">
                 <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="12" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="2" row-span="1" col-span="6" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
+              </component>
+              <component id="45e25" class="javax.swing.JTextField" binding="textField4" default-binding="true">
+                <constraints>
+                  <grid row="8" column="2" row-span="1" col-span="6" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                  <forms defaultalign-horz="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="8b8e4" class="javax.swing.JLabel" default-binding="true">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="APSelectorManager"/>
+                </properties>
+              </component>
+              <component id="db39f" class="javax.swing.JLabel" binding="oracleResultsLabel" default-binding="true">
+                <constraints>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="Oracle Results"/>
+                </properties>
               </component>
               <component id="b9b70" class="javax.swing.JTextField" binding="textField7" default-binding="true">
                 <constraints>
-                  <grid row="3" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="2" column="2" row-span="1" col-span="6" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
               <component id="dd5b0" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
-                  <text value="Candidate Oracle"/>
+                  <text value="Candidate Oracles"/>
+                </properties>
+              </component>
+              <component id="3c50" class="javax.swing.JButton" binding="button3" default-binding="true">
+                <constraints>
+                  <grid row="4" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="d20dc" class="javax.swing.JButton" binding="button2" default-binding="true">
+                <constraints>
+                  <grid row="2" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
+                </properties>
+              </component>
+              <component id="25d53" class="javax.swing.JButton" binding="button1" default-binding="true">
+                <constraints>
+                  <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <text value="..."/>
                 </properties>
               </component>
               <component id="d76bf" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
                   <text value="TemporalType"/>
@@ -485,38 +593,38 @@
               </component>
               <component id="2214e" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
                 <constraints>
-                  <grid row="4" column="1" row-span="1" col-span="5" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties/>
               </component>
+              <component id="74941" class="javax.swing.JButton" binding="button7" default-binding="true">
+                <constraints>
+                  <grid row="8" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                    <preferred-size width="17" height="30"/>
+                    <maximum-size width="30" height="-1"/>
+                  </grid>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <horizontalAlignment value="0"/>
+                  <text value="..."/>
+                </properties>
+              </component>
               <component id="11461" class="javax.swing.JButton" binding="mineOraclesButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="11" row-span="5" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
                   <text value="Mine Oracles"/>
                   <toolTipText value="Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. "/>
                 </properties>
               </component>
-              <component id="db39f" class="javax.swing.JLabel" binding="modelFromDBLabel" default-binding="true">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Model from DB"/>
-                </properties>
-              </component>
-              <component id="1e04" class="javax.swing.JTextField" binding="textField6" default-binding="true">
-                <constraints>
-                  <grid row="2" column="1" row-span="1" col-span="7" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                </constraints>
-                <properties/>
-              </component>
               <component id="d0655" class="javax.swing.JButton" binding="modelCheckButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
                   <text value="Model Check"/>
@@ -525,41 +633,12 @@
               </component>
               <component id="70d56" class="javax.swing.JButton" binding="traceCheckButton" default-binding="true">
                 <constraints>
-                  <grid row="4" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <forms/>
                 </constraints>
                 <properties>
                   <text value="Trace Check"/>
                   <toolTipText value="Checks the Candidates on the Model. "/>
-                </properties>
-              </component>
-              <component id="3c50" class="javax.swing.JButton" binding="button3" default-binding="true">
-                <constraints>
-                  <grid row="3" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="45" height="30"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="d20dc" class="javax.swing.JButton" binding="button2" default-binding="true">
-                <constraints>
-                  <grid row="2" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="45" height="30"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="..."/>
-                </properties>
-              </component>
-              <component id="25d53" class="javax.swing.JButton" binding="button1" default-binding="true">
-                <constraints>
-                  <grid row="1" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="26" height="30"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="..."/>
                 </properties>
               </component>
             </children>
@@ -574,17 +653,12 @@
             <rowspec value="center:max(d;4px):noGrow"/>
             <rowspec value="top:4dlu:noGrow"/>
             <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
-            <rowspec value="top:4dlu:noGrow"/>
-            <rowspec value="center:max(d;4px):noGrow"/>
             <colspec value="fill:d:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:d:grow"/>
+            <colspec value="left:330px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
-            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="right:40px:noGrow"/>
             <colspec value="left:4dlu:noGrow"/>
             <constraints>
               <tabbedpane title="Visualizer"/>
@@ -594,7 +668,7 @@
             <children>
               <component id="b33c1" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -603,7 +677,7 @@
               </component>
               <component id="a5b46" class="javax.swing.JTextField" binding="textField8" default-binding="true">
                 <constraints>
-                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -612,8 +686,8 @@
               </component>
               <component id="48d47" class="javax.swing.JButton" binding="button4" default-binding="true">
                 <constraints>
-                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="..."/>
@@ -621,7 +695,7 @@
               </component>
               <component id="6feb1" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -630,7 +704,7 @@
               </component>
               <component id="19fcc" class="javax.swing.JTextField" binding="textField9" default-binding="true">
                 <constraints>
-                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -639,30 +713,16 @@
               </component>
               <component id="eea8b" class="javax.swing.JButton" binding="button5" default-binding="true">
                 <constraints>
-                  <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <forms/>
+                  <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
                   <text value="..."/>
                 </properties>
               </component>
-              <component id="53aee" class="javax.swing.JSeparator">
-                <constraints>
-                  <grid row="6" column="2" row-span="1" col-span="6" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties/>
-              </component>
-              <component id="b45fd" class="javax.swing.JSeparator">
-                <constraints>
-                  <grid row="0" column="2" row-span="1" col-span="6" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                  <forms defaultalign-horz="false" defaultalign-vert="false"/>
-                </constraints>
-                <properties/>
-              </component>
               <component id="c1d7b" class="javax.swing.JButton" binding="stopAnalyzerButton" default-binding="true">
                 <constraints>
-                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -671,7 +731,7 @@
               </component>
               <component id="6a418" class="javax.swing.JButton" binding="startAnalyzerButton" default-binding="true">
                 <constraints>
-                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -680,7 +740,7 @@
               </component>
               <component id="f5c61" class="javax.swing.JLabel">
                 <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -689,7 +749,7 @@
               </component>
               <component id="98c59" class="javax.swing.JTextField" binding="textField12" default-binding="true">
                 <constraints>
-                  <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                  <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
                   </grid>
                   <forms defaultalign-horz="false"/>
@@ -698,7 +758,7 @@
               </component>
               <component id="c2fa5" class="javax.swing.JButton" binding="button6" default-binding="true">
                 <constraints>
-                  <grid row="8" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
@@ -711,7 +771,7 @@
       </tabbedpane>
       <scrollpane id="bb4fa">
         <constraints>
-          <grid row="7" column="0" row-span="2" col-span="10" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="7" column="0" row-span="2" col-span="12" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <forms defaultalign-horz="false" defaultalign-vert="false"/>
         </constraints>
         <properties/>
@@ -727,13 +787,16 @@
       </scrollpane>
       <component id="2a88" class="javax.swing.JButton" binding="clearButton" default-binding="true">
         <constraints>
-          <grid row="8" column="12" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="8" column="12" row-span="1" col-span="4" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
-          <minimumSize width="60" height="38"/>
+          <horizontalAlignment value="0"/>
+          <maximumSize width="-1" height="-1"/>
+          <minimumSize width="-1" height="-1"/>
           <preferredSize width="60" height="38"/>
-          <text value="Clear"/>
+          <text value="Clr"/>
+          <toolTipText value="Clear the Log"/>
         </properties>
       </component>
     </children>

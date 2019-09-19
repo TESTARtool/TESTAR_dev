@@ -144,7 +144,7 @@
             data_y.push(parsed_row.slice(nVariables - 1, nVariables));
             inputData.push([data_x[i], data_y[i]]);
         });
-        console.application_log(JSON.stringify(inputData));
+        console.log(JSON.stringify(inputData));
 
         // Create Symbolic Regression fitness function object based on data
         gpParams["fitnessFunction"] = new SymbolicRegression(inputData);
@@ -153,7 +153,7 @@
         $.each($("#gpParamsFrm").serializeArray(), function (key, val) {
             gpParams[val.name] = parseFloat(val.value);
         });
-        console.application_log(gpParams);
+        console.log(gpParams);
 
         // Create GP object
         var gp = new GP(gpParams);
@@ -179,8 +179,8 @@
         inputData = _.sortBy(inputData, function(num) {return parseFloat(num)});
         gpData = _.sortBy(gpData, function(num) {return parseFloat(num)});
         //TODO Assert sorting is correct
-        console.application_log(JSON.stringify(inputData));
-        console.application_log(JSON.stringify(gpData));
+        console.log(JSON.stringify(inputData));
+        console.log(JSON.stringify(gpData));
 
         // Plot input data and model predictions
         var options = {

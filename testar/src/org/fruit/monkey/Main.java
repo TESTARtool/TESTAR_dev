@@ -455,7 +455,10 @@ public class Main {
 			defaults.add(Pair.from(SpotFormulaParser, ""));
 			defaults.add(Pair.from(PythonEnvironment, ""));
 			defaults.add(Pair.from(PythonVisualizer, ""));
-			defaults.add(Pair.from(AlwaysCompile, true));
+            defaults.add(Pair.from(PythonVisualizerPort, ""));
+            defaults.add(Pair.from(PythonVisualizerStop, ""));
+
+            defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
