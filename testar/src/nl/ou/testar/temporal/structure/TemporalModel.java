@@ -3,6 +3,8 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.TemporalType;
 import nl.ou.testar.temporal.util.ValStatus;
@@ -25,6 +27,7 @@ public class TemporalModel extends TemporalBean{
     @JsonIgnore
     private Set<String> modelAPs; //AP<digits> to widget property map:
     private String formatVersion="20190721";
+    private static String APPrefix = "ap";
 
 
 public  TemporalModel(){
@@ -135,7 +138,7 @@ public  TemporalModel(){
         result.append(modelAPs.size());
         int i=0;
         for (String ap: modelAPs) {
-            result.append(" \"ap");
+            result.append(" \""+APPrefix);
             result.append(i);
             result.append("\"");
             i++;
@@ -169,53 +172,70 @@ public  TemporalModel(){
         return result.toString();
     }
 
-    public String makeFormulaOutput(String oracleFile, TemporalType tmpType) {
-        List<TemporalOracle> oracleColl = new ArrayList<>();
-        List<TemporalOracle> checkedOracleColl = new ArrayList<>();
-        TemporalOracle checkedOracle;
+    public String makeFormulaOutput(List<TemporalOracle> oracleColl, TemporalType tmpType) {
+
         StringBuilder Formulas=new StringBuilder();
-
-        oracleColl = CSVHandler.load(oracleFile, TemporalOracle.class);
         for (TemporalOracle candidateOracle : oracleColl) {
-            try {
-                checkedOracle = candidateOracle.clone();
-                String formula;
+            String formula;
+            List<String> sortedparameters = candidateOracle.getPattern_Parameters();
+            Collections.sort(sortedparameters);
+            List<String> sortedsubstitionkeys = new ArrayList<String>( candidateOracle.getPattern_Substitutions().keySet());
+            List<String> sortedsubstitionvalues = new ArrayList<String>( candidateOracle.getPattern_Substitutions().values());
 
-                List<String> sortedparameters = candidateOracle.getPattern_Parameters();
-                Collections.sort(sortedparameters);
-                List<String> sortedsubstitionkeys = (List<String>) candidateOracle.getPattern_Substitutions().keySet();
-                boolean importStatus;
-                importStatus = candidateOracle.getPattern_TemporalFormalism() == tmpType;
-                if (importStatus) {
-                    //parameter consistency
-
-                    importStatus = sortedparameters.equals(sortedsubstitionkeys);
-                }
-                if (!importStatus) {
-                    checkedOracle.addLog("inconsistent parameter<-> substitutions setup ");
-                    checkedOracle.setOracle_validationstatus(ValStatus.ERROR);
-                }
-
-                if (importStatus)
-                    importStatus = getModelAPs().containsAll(candidateOracle.getPattern_Substitutions().values());
-                if (!importStatus)
-                    checkedOracle.addLog("not all propositions (parameter-substitutions) are found in the Model");
-                    checkedOracle.setOracle_validationstatus(ValStatus.ERROR);
-
-              formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(), (String[])sortedparameters.toArray(),(String[])sortedsubstitionkeys.toArray());
-                Formulas.append(formula);
-                Formulas.append("\n");
-                LocalDateTime localDateTime=LocalDateTime.now();
-                String localDateString = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMDD-hhmmss"));
-                CSVHandler.save(checkedOracleColl,oracleFile+"_checked_"+localDateString);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+            boolean importStatus;
+            importStatus = candidateOracle.getPattern_TemporalFormalism() == tmpType;
+            if (importStatus) {
+                //parameter consistency
+                importStatus = sortedparameters.equals(sortedsubstitionkeys);
             }
+            if (!importStatus) {
+                candidateOracle.addLog("inconsistent parameter<-> substitutions setup ");
+                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
+            }
+            if (importStatus)
+                importStatus = getModelAPs().containsAll(candidateOracle.getPattern_Substitutions().values());
+
+
+            if (!importStatus) {
+                candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model");
+                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
+            }
+            HashBiMap<Integer, String> aplookup = HashBiMap.create();
+            aplookup.putAll(getSimpleModelMap());
+            ArrayList<String> apindex=new ArrayList<>();
+
+            for (String v:sortedsubstitionvalues
+                 ) {
+                apindex.add(APPrefix+aplookup.inverse().get(v));
+            }
+
+            formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(),
+                    sortedparameters.stream().toArray(String[]::new),
+                    apindex.stream().toArray(String[]::new));
+
+            Formulas.append(formula);
+            Formulas.append("\n");
+/*            LocalDateTime localDateTime=LocalDateTime.now();
+            String localDateString = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMDD-hhmmss"));
+            CSVHandler.save(checkedOracleColl,oracleFile+"_checked_"+localDateString);*/
         }
 
-
         return Formulas.toString();
+
     }
+    public String getAliveProposition(String alive){
+        HashBiMap<Integer, String> aplookup = HashBiMap.create();
+        aplookup.putAll(getSimpleModelMap());
+        // we encode alive as not dead "!dead"
+        // so we strip the negation from the alive property, by default: "!dead"
+       if (aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
+           return "";
+        }
+        else
+            return  APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
+        };
+
+
     public List<TemporalOracle> ReadModelCheckerResults(String results){
         List<TemporalOracle> oracleresults = new ArrayList<>();
         TemporalOracle oracleresult=new TemporalOracle();

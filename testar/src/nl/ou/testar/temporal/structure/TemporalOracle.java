@@ -9,6 +9,8 @@ import java.util.*;
 
 public class TemporalOracle extends TemporalPattern{
 
+    @CsvCustomBindByName( converter = CSVConvertMap.class)
+    private Map<String, String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
 
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
@@ -49,7 +51,13 @@ public class TemporalOracle extends TemporalPattern{
 
 
 
+    public Map<String, String> getPattern_Substitutions() {
+        return pattern_Substitutions;
+    }
 
+    public void setPattern_Substitutions(Map<String, String> pattern_Substitutions) {
+        this.pattern_Substitutions = pattern_Substitutions;
+    }
     public ValStatus getOracle_validationstatus() {
         return oracle_validationstatus;
     }

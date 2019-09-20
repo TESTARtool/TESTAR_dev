@@ -132,7 +132,7 @@ public class TemporalController {
 
 
     //*********************************
-    public  void computeTemporalModel(APSelectorManager Apmgr) {
+    public  void computeTemporalModel(APSelectorManager Apmgr ) {
 
 
         AbstractStateModel abstractStateModel =getFirstAbstractStateModel();
@@ -903,5 +903,21 @@ return true;
 
     };
 
+    public void saveFormulaFile(List<TemporalOracle> oracleColl, TemporalType tmpType ,String file){
+
+        String contents = tModel.makeFormulaOutput(oracleColl, tmpType);
+        try {
+            File output = new File(outputDir + file);
+            if (output.exists() || output.createNewFile()) {
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
+                writer.append(contents);
+                writer.close();
+            }
+        } catch (
+                IOException e) {
+            e.printStackTrace();
+        }
+
+    };
 
 }

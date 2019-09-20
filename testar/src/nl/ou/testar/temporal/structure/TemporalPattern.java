@@ -26,8 +26,6 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     private String pattern_Formula;  // e.g. G(b0->Fb1)
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> pattern_Parameters; //b0,b1,b2,bn
-    @CsvCustomBindByName( converter = CSVConvertMap.class)
-    private Map<String, String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
 
 
 
@@ -80,13 +78,7 @@ public class TemporalPattern extends TemporalBean implements Cloneable{
     public List<String> getPattern_Parameters() {
         return pattern_Parameters;
     }
-    public Map<String, String> getPattern_Substitutions() {
-        return pattern_Substitutions;
-    }
 
-    public void setPattern_Substitutions(Map<String, String> pattern_Substitutions) {
-        this.pattern_Substitutions = pattern_Substitutions;
-    }
 
     public int getParamcount() {
         return pattern_Parameters.size();
