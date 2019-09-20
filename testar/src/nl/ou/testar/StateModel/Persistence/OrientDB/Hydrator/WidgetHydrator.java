@@ -1,6 +1,8 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB.Hydrator;
 
 import com.orientechnologies.orient.core.metadata.schema.OType;
+import nl.ou.testar.StateModel.AbstractState;
+import nl.ou.testar.StateModel.ConcreteState;
 import nl.ou.testar.StateModel.Exception.HydrationException;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
@@ -25,10 +27,22 @@ public class WidgetHydrator implements EntityHydrator<VertexEntity> {
             throw new HydrationException("No identifying properties were provided for entity class " + target.getEntityClass().getClassName());
         }
 
+        // fetch the root widget, being the concrete state
+        ConcreteState concreteState = ((Widget) source).getRootWidget();
+        if (concreteState == null) {
+            throw new HydrationException("Could not find a concrete state root widget for widget with id " + ((Widget) source).getId());
+        }
+        // then fetch the abstract state, as it has our model identifier
+        AbstractState abstractState = concreteState.getAbstractState();
+        if (abstractState == null) {
+            throw new HydrationException("No abstract state is connected to the concrete state with id " + concreteState.getId());
+        }
+
         // we are going to combine the identifier for the concrete state and the concrete widget id into one joint identifier.
-        String stateId = ((Widget) source).getRootWidget().getId();
+        String stateId = concreteState.getId();
         String widgetId = ((Widget) source).getId();
-        String uniqueId = stateId + "-" + widgetId;
+        String modelIdentifier = abstractState.getModelIdentifier();
+        String uniqueId = modelIdentifier + "-" + stateId + "-" + widgetId;
 
         // make sure the java and orientdb property types are compatible
         OType identifierType = TypeConvertor.getInstance().getOrientDBType(uniqueId.getClass());

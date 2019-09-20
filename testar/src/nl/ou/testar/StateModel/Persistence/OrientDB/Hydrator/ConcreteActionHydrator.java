@@ -8,6 +8,7 @@ import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Property;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.PropertyValue;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.TypeConvertor;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
+import nl.ou.testar.StateModel.Util.HydrationHelper;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
@@ -33,7 +34,7 @@ public class ConcreteActionHydrator implements EntityHydrator<EdgeEntity> {
         Property targetIdentifier = edgeEntity.getTargetEntity().getEntityClass().getIdentifier();
         String targetId = (String)edgeEntity.getTargetEntity().getPropertyValue(targetIdentifier.getPropertyName()).getValue();
 
-        String edgeId = sourceId + "-" + ((ConcreteAction) source).getActionId() + "-" + targetId;
+        String edgeId = HydrationHelper.createOrientDbActionId(sourceId, targetId, ((ConcreteAction) source).getActionId(), null);
         // make sure the java and orientdb property types are compatible
         OType identifierType = TypeConvertor.getInstance().getOrientDBType(edgeId.getClass());
         if (identifierType != identifier.getPropertyType()) {

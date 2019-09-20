@@ -27,10 +27,16 @@ public class SequenceStep implements Persistable {
      */
     private Instant timestamp;
 
-    public SequenceStep(ConcreteAction concreteAction, SequenceNode sourceNode, SequenceNode targetNode) {
+    /**
+     * A string offering a description of the concrete action that this step represents.
+     */
+    private String actionDescription;
+
+    public SequenceStep(ConcreteAction concreteAction, SequenceNode sourceNode, SequenceNode targetNode, String actionDescription) {
         this.concreteAction = concreteAction;
         this.sourceNode = sourceNode;
         this.targetNode = targetNode;
+        this.actionDescription = actionDescription;
         timestamp = Instant.now();
     }
 
@@ -53,5 +59,9 @@ public class SequenceStep implements Persistable {
     @Override
     public boolean canBeDelayed() {
         return true;
+    }
+
+    public String getActionDescription() {
+        return actionDescription;
     }
 }

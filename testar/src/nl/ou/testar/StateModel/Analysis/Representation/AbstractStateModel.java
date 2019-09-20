@@ -62,4 +62,12 @@ public class AbstractStateModel {
     public void setSequences(List<TestSequence> sequences) {
         this.sequences = sequences;
     }
+
+    /**
+     * This method will return a string containing the abstraction attributes used in creating the model.
+     * @return
+     */
+    public String getAbstractionAttributesAsString() {
+        return (String)abstractionAttributes.stream().sorted().reduce("", (base, string) -> base.equals("") ? string : base + ", " + string);
+    }
 }
