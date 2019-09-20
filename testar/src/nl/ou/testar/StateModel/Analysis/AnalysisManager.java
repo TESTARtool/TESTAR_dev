@@ -45,7 +45,7 @@ public class AnalysisManager {
      * @param outputDir
      */
     public AnalysisManager(final Config config, String outputDir) {
-        String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
+        String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         dbConfig = config;
