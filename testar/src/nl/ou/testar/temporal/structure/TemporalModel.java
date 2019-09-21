@@ -3,15 +3,11 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.TemporalType;
 import nl.ou.testar.temporal.util.ValStatus;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 //@JsonRootName(value="TemporalProperties")
@@ -121,8 +117,8 @@ public  TemporalModel(){
         //see http://adl.github.io/hoaf/
         StringBuilder result=new StringBuilder();
         result.append("HOA: v1\n");
-        result.append("tool: TESTAR-CSS20190914\n");
-        result.append("name: "+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\n");
+        result.append("tool: \"TESTAR-CSS20190914\"\n");
+        result.append("name: \""+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");

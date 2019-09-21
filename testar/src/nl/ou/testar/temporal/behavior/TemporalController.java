@@ -422,8 +422,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
         //(SELECT FROM SequenceStep WHERE @rid = :identifier??
         // inner query is needed as the single query collapses multiple refeences to concretestate
         resultSet = db.query(stmt, params);
-        System.out.println("debug:  state resultset >0? : "+resultSet.hasNext());
-        while (resultSet.hasNext()) {
+                while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
             if (result.isElement()) {
@@ -450,7 +449,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
         //concreteActionId needs to be updated css 20190721
         params.put("identifier", firstSequenceNode);
         resultSet = db.query(stmt, params);
-        System.out.println("debug:  edge resultset >0? : "+resultSet.hasNext());
+
  /*       while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
