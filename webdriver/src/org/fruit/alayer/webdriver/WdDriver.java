@@ -89,10 +89,10 @@ public class WdDriver extends SUTBase {
       String tmp = parts[1].replace("\"", "").toLowerCase();
       String[] dims = tmp.split("\\+")[0].split("x");
       screenDimensions =
-          new Dimension(Integer.valueOf(dims[0]), Integer.valueOf(dims[1]));
+          new Dimension(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
       try {
-        screenPosition = new Point(Integer.valueOf(tmp.split("\\+")[1]),
-            Integer.valueOf(tmp.split("\\+")[2]));
+        screenPosition = new Point(Integer.parseInt(tmp.split("\\+")[1]),
+            Integer.parseInt(tmp.split("\\+")[2]));
       }
       catch (ArrayIndexOutOfBoundsException aioobe) {
 

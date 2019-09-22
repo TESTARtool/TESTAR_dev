@@ -10,5 +10,5 @@ dependencies {
     compile project(':core')
 
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
-    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.11.0'
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
 }
