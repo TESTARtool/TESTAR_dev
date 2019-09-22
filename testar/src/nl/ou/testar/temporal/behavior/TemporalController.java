@@ -42,6 +42,10 @@ public class TemporalController {
     private  TemporalModel tModel;
 
 
+
+    private List<TemporalOracle> oracleColl;
+
+
     /**
      * Constructor
      *
@@ -75,6 +79,13 @@ public class TemporalController {
 
     public void loadApSelectorManager(String filename) {
         this.apSelectorManager =  (APSelectorManager) JSONHandler.load(outputDir + filename, apSelectorManager.getClass());
+    }
+    public List<TemporalOracle> getOracleColl() {
+        return oracleColl;
+    }
+
+    public void setOracleColl(List<TemporalOracle> oracleColl) {
+        this.oracleColl = oracleColl;
     }
     public void setDefaultAPSelectormanager(){
         this.apSelectorManager =new APSelectorManager(true);
@@ -200,8 +211,7 @@ public class TemporalController {
                         }
                         stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
 
-                        System.out.println("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
-                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has as no outgoing edge. \n");
+                        tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
                         computeProps(propertyName, stateVertex, propositions, false,false);
@@ -237,7 +247,6 @@ public class TemporalController {
                 ) {
                     String enc = tren.getEncodedAPConjunct();
                     if (encodedConjuncts.contains(enc)) {
-                        System.out.println("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
                         tModel.addLog("State: " + stenc.getState() + " has  non-deterministic transition: " + tren.getTransition());
                     } else encodedConjuncts.add(enc);
 
