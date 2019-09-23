@@ -83,11 +83,13 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
      */
     @Override
     protected State getState(SUT system) throws StateBuildException {
+    	
+    	State state = super.getState(system);
+    	latestState = state;
+    	
     	//Spy mode didn't use the html report
     	if(settings.get(ConfigTags.Mode) == Modes.Spy) {
-    		
-    		State state = super.getState(system);
-    		
+
     		for(Widget w : state) {
     			WdElement element = ((WdWidget) w).element;
     			for(String s : element.cssClasses) {
@@ -98,7 +100,6 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
         	return state;
     	}
     	
-    	latestState = super.getState(system);
         //adding state to the HTML sequence report:
         htmlReport.addState(latestState);
         return latestState;
