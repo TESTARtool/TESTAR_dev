@@ -131,7 +131,7 @@ public class ModelManager implements StateModelManager {
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state and possibly the action
-        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, abstractStateModel.getApplicationPlatform());
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState);
         if (concreteActionUnderExecution == null) {
             persistenceManager.persistConcreteState(newConcreteState);
         }

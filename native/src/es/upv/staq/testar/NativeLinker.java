@@ -82,6 +82,10 @@ public class NativeLinker {
 	public static void addWdDriverOS() {
 		PLATFORM_OS.add(OperatingSystems.WEBDRIVER);
 	}
+	
+	public static Set<OperatingSystems> getPLATFORM_OS() {
+		return PLATFORM_OS;
+	}
 
 	/**
 	 * Retrieves a StateBuilder instance which will be used to determine the state of the application.

@@ -1,13 +1,13 @@
 package nl.ou.testar.StateModel;
 
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.ProtocolUtil;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.webdriver.WdProtocolUtil;
-import org.fruit.monkey.Settings;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;
@@ -20,7 +20,7 @@ public abstract class ConcreteStateFactory {
      * @param tags the tags containing the atributes that were used in the construction of the concrete state id
      * @return the new concrete state
      */
-    public static ConcreteState createConcreteState(State newState, Set<Tag<?>> tags, AbstractState abstractState, String applicationPlatform) {
+    public static ConcreteState createConcreteState(State newState, Set<Tag<?>> tags, AbstractState abstractState) {
         String concreteStateId = newState.get(Tags.ConcreteIDCustom);
         ConcreteState concreteState = new ConcreteState(concreteStateId, tags, abstractState);
 
@@ -32,7 +32,7 @@ public abstract class ConcreteStateFactory {
         ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
         ProtocolUtil protocolUtil = new ProtocolUtil();
         
-        if(applicationPlatform.equals(Settings.SUT_CONNECTOR_WEBDRIVER))
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER))
         	protocolUtil = new WdProtocolUtil();
         
         AWTCanvas screenshot = protocolUtil.getStateshotBinary(newState);
