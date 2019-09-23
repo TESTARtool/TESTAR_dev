@@ -904,6 +904,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             File automatonfile = new File(outputDir + "Model.hoa");
             File formulafile = new File(outputDir + "Formulas.txt");
             File resultsfile = new File(outputDir + "results.txt");
+
             String aliveprop = tcontrol.gettModel().getAliveProposition("!dead");
             ModelCheckWithSpot(automatonfile.getAbsolutePath(),formulafile.getAbsolutePath(),aliveprop,resultsfile.getAbsolutePath());
             //decode results
@@ -923,8 +924,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             {
                 f.printStackTrace();
             }
-           // return contentBuilder.toString();
-           // sParse.parse(resultsAsString);
+           resultsAsString= contentBuilder.toString();
+             System.out.println("debug: resultsfile: "+resultsfile.toString());
+             System.out.println("debug: resultsfile exist: "+resultsfile.exists());
+            sParse.parse(resultsAsString);
             // add to oraclecoll.
 
 
