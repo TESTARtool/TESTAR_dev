@@ -50,13 +50,16 @@ public class ModelManager implements StateModelManager {
     // use this to monitor non-determinism in the model
     private int nrOfNonDeterministicActions;
 
+    // should the widgets of concrete states be stored in the model?
+    boolean storeWidgets;
+
     /**
      * Constructor
      * @param abstractStateModel
      * @param actionSelector
      */
     public ModelManager(AbstractStateModel abstractStateModel, ActionSelector actionSelector, PersistenceManager persistenceManager,
-                        Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager) {
+                        Set<Tag<?>> concreteStateTags, SequenceManager sequenceManager, boolean storeWidgets) {
         this.abstractStateModel = abstractStateModel;
         this.actionSelector = actionSelector;
         this.persistenceManager = persistenceManager;
@@ -64,6 +67,7 @@ public class ModelManager implements StateModelManager {
         this.sequenceManager = sequenceManager;
         errorMessages = new StringJoiner(", ");
         nrOfNonDeterministicActions = 0;
+        this.storeWidgets = storeWidgets;
         init();
     }
 
@@ -142,7 +146,7 @@ public class ModelManager implements StateModelManager {
         currentAbstractState = newAbstractState;
 
         // and then we store the concrete state and possibly the action
-        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState);
+        ConcreteState newConcreteState = ConcreteStateFactory.createConcreteState(newState, concreteStateTags, newAbstractState, storeWidgets);
         if (concreteActionUnderExecution == null) {
             persistenceManager.persistConcreteState(newConcreteState);
         }
