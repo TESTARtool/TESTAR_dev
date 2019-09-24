@@ -83,6 +83,8 @@ public final class CompoundAction extends TaggableBase implements Action {
 	private CompoundAction(Builder b){
 		this.actions = b.actions;
 		this.relativeDurations = b.relativeDurations;
+		this.set(Tags.Role, ActionRoles.CompoundAction);
+		this.set(Tags.Desc, actions.toString());
 	}
 	
 	public CompoundAction(Action... actions){
