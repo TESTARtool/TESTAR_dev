@@ -4,6 +4,7 @@ import nl.ou.testar.StateModel.ActionSelection.ActionSelector;
 import nl.ou.testar.StateModel.Exception.ActionNotFoundException;
 import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Persistence.PersistenceManager;
+import nl.ou.testar.StateModel.Sequence.SequenceError;
 import nl.ou.testar.StateModel.Sequence.SequenceManager;
 import nl.ou.testar.StateModel.Util.AbstractStateService;
 import org.fruit.alayer.Action;
@@ -45,6 +46,10 @@ public class ModelManager implements StateModelManager {
     // if there any irregularities that occur during runs, they should be appended here
     private StringJoiner errorMessages;
 
+    // the number of actions in the model that end in more than one unique state
+    // use this to monitor non-determinism in the model
+    private int nrOfNonDeterministicActions;
+
     /**
      * Constructor
      * @param abstractStateModel
@@ -58,6 +63,7 @@ public class ModelManager implements StateModelManager {
         this.concreteStateTags = concreteStateTags;
         this.sequenceManager = sequenceManager;
         errorMessages = new StringJoiner(", ");
+        nrOfNonDeterministicActions = 0;
         init();
     }
 
@@ -65,7 +71,12 @@ public class ModelManager implements StateModelManager {
      * Initialization logic needs to go here
      */
     private void init() {
-        // initialization logic here
+        // check if the model is deterministic
+        boolean modelIsDeterministic = persistenceManager.modelIsDeterministic(abstractStateModel);
+        System.out.println("Model is deterministic: " + persistenceManager.modelIsDeterministic(abstractStateModel));
+        if (!modelIsDeterministic) {
+            nrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+        }
     }
 
     /**
@@ -139,7 +150,18 @@ public class ModelManager implements StateModelManager {
             ConcreteStateTransition concreteStateTransition = new ConcreteStateTransition(currentConcreteState, newConcreteState, concreteActionUnderExecution);
             persistenceManager.persistConcreteStateTransition(concreteStateTransition);
         }
-        sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution);
+
+        // check if non-determinism was introduced into the model
+        int currentNrOfNonDeterministicActions = persistenceManager.getNrOfNondeterministicActions(abstractStateModel);
+        if (currentNrOfNonDeterministicActions > nrOfNonDeterministicActions) {
+            System.out.println("Non-deterministic action was executed!");
+            sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution, SequenceError.NON_DETERMINISTIC_ACTION);
+            nrOfNonDeterministicActions = currentNrOfNonDeterministicActions;
+        }
+        else {
+            sequenceManager.notifyStateReached(newConcreteState, concreteActionUnderExecution);
+        }
+
         currentConcreteState = newConcreteState;
         concreteActionUnderExecution = null;
 
@@ -243,4 +265,5 @@ public class ModelManager implements StateModelManager {
     public void notifyTestSequenceInterruptedBySystem(String message) {
         sequenceManager.notifyInterruptionBySystem(message);
     }
+
 }

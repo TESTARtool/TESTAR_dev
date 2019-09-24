@@ -21,7 +21,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     /**
      * Constructor
      */
-    public ImprovedUnvisitedActionSelector() {
+    ImprovedUnvisitedActionSelector() {
         executionPath = new LinkedList<>();
     }
 
@@ -49,6 +49,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
         if (executionPath.isEmpty()) {
             throw new ActionNotFoundException();
         }
+        System.out.println("New execution path: " + executionPath.stream().map(AbstractAction::getActionId).reduce("", (base, next) -> base + ", " + next));
         // remove the first action in the execution path
         return executionPath.removeFirst();
     }

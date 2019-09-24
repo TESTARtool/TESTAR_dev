@@ -92,12 +92,12 @@ public class SequenceManager {
      * @param concreteState the concrete state reached
      * @param concreteAction (Optionally) a concrete action that was executed.
      */
-    public void notifyStateReached(ConcreteState concreteState, ConcreteAction concreteAction) {
+    public void notifyStateReached(ConcreteState concreteState, ConcreteAction concreteAction, SequenceError ...sequenceErrors) {
         if (concreteState == null || currentSequence == null || !currentSequence.isRunning()) {
             return;
         }
 
-        currentSequence.addNode(concreteState, concreteAction);
+        currentSequence.addNode(concreteState, concreteAction, sequenceErrors);
     }
 
     /**

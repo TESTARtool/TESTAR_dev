@@ -163,7 +163,25 @@ public class AnalysisManager {
                     nrOfErrors = (int)getConvertedValue(OType.INTEGER, errorResult.getProperty("nr"));
                 }
                 errorResultSet.close();
-                TestSequence testSequence = new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict);
+
+                // check if the sequence was deterministic
+                String deterministicQuery = "SELECT FROM (TRAVERSE outE(\"SequenceStep\") FROM (\n" +
+                        "\n" +
+                        "TRAVERSE out(\"SequenceStep\")\n" +
+                        "FROM(\n" +
+                        "\n" +
+                        "SELECT FROM (\n" +
+                        "TRAVERSE out(\"FirstNode\")\n" +
+                        "\n" +
+                        "FROM (\n" +
+                        "select from TestSequence where sequenceId = :sequenceId)) where @class = \"SequenceNode\"))) where @class = \"SequenceStep\" AND nonDeterministic = true";
+                params = new HashMap<>();
+                params.put("sequenceId", getConvertedValue(OType.STRING, sequenceVertex.getProperty("sequenceId")));
+                OResultSet determinismResultSet = db.query(deterministicQuery, params);
+                boolean sequenceIsDeterministic = !determinismResultSet.hasNext();
+                determinismResultSet.close();
+
+                TestSequence testSequence = new TestSequence(sequenceId, DateFormat.getDateTimeInstance().format(startDateTime), String.valueOf(nrOfNodes), verdict, sequenceIsDeterministic);
                 testSequence.setNrOfErrors(nrOfErrors);
 
                 sequenceList.add(testSequence);
@@ -236,7 +254,8 @@ public class AnalysisManager {
                 String targetScreenshot = "n" + formatId(targetState.getIdentity().toString());
                 processScreenShot(targetState.getProperty("screenshot"), targetScreenshot, sequenceId);
                 String actionDescription = (String) getConvertedValue(OType.STRING, sequenceStepEdge.getProperty("actionDescription"));
-                ActionViz actionViz = new ActionViz(sourceScreenshot, targetScreenshot, actionDescription, counterSource, counterTarget);
+                boolean deterministic = !(boolean)getConvertedValue(OType.BOOLEAN, sequenceStepEdge.getProperty("nonDeterministic"));
+                ActionViz actionViz = new ActionViz(sourceScreenshot, targetScreenshot, actionDescription, counterSource, counterTarget, deterministic);
                 visualizations.add(actionViz);
                 nodeVertex = targetVertex;
                 counterSource++;

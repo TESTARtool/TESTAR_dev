@@ -76,5 +76,8 @@ public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
 
         // add the description of the action performed
         edgeEntity.addPropertyValue("actionDescription", new PropertyValue(OType.STRING, ((SequenceStep) source).getActionDescription()));
+
+        // add whether the step introduced non-determinism
+        edgeEntity.addPropertyValue("nonDeterministic", new PropertyValue(OType.BOOLEAN, ((SequenceStep) source).isNonDeterministic()));
     }
 }

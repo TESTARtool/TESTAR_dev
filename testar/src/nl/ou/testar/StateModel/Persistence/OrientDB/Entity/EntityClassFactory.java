@@ -509,6 +509,12 @@ public class EntityClassFactory {
         actionDescription.setNullable(true);
         actionDescription.setIndexAble(false);
         entityClass.addProperty(actionDescription);
+        Property nonDeterministic = new Property("nonDeterministic", OType.BOOLEAN);
+        nonDeterministic.setMandatory(true);
+        nonDeterministic.setNullable(false);
+        nonDeterministic.setIndexAble(true);
+        nonDeterministic.setIdentifier(false);
+        entityClass.addProperty(nonDeterministic);
         entityClasses.put(EntityClassName.SequenceStep, entityClass);
         return entityClass;
     }
