@@ -127,6 +127,16 @@ public class QueueManager implements PersistenceManager, StateModelEventListener
     }
 
     @Override
+    public boolean modelIsDeterministic(AbstractStateModel abstractStateModel) {
+        return delegateManager.modelIsDeterministic(abstractStateModel);
+    }
+
+    @Override
+    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
+        return delegateManager.getNrOfNondeterministicActions(abstractStateModel);
+    }
+
+    @Override
     public void eventReceived(StateModelEvent event) {
         if (!listening) return;
 

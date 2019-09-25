@@ -528,7 +528,7 @@ button.skip:active {
     margin-bottom: 5px;
 }
 
-.fa-thumbs-up {
+.fa-thumbs-up, .fa-check {
     color: #1c7430;
 }
 
@@ -536,7 +536,7 @@ button.skip:active {
     color: grey;
 }
 
-.fa-exclamation {
+.fa-exclamation, .fa-times {
     color: #942a25;
 }
 

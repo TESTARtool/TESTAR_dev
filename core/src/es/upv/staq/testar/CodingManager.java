@@ -33,12 +33,7 @@ package es.upv.staq.testar;
 import java.util.*;
 import java.util.zip.CRC32;
 
-import org.fruit.alayer.Action;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.State;
-import org.fruit.alayer.Tag;
-import org.fruit.alayer.Tags;
-import org.fruit.alayer.Widget;
+import org.fruit.alayer.*;
 import org.fruit.alayer.actions.ActionRoles;
 import org.fruit.alayer.exceptions.NoSuchTagException;
 
@@ -198,20 +193,24 @@ public class CodingManager {
 		// for the custom abstract action identifier, we first sort the actions by their path in the widget tree
 		// and then set their ids using incremental counters
 		Map<Role, Integer> roleCounter = new HashMap<>();
-		actions.stream().sorted(Comparator.comparing(action -> {
-			try {
-				action.get(Tags.OriginWidget);
-			}
-			catch (NoSuchTagException ex) {
-				System.out.println("No origin widget found for action role: ");
-				System.out.println(action.get(Tags.Role));
-				System.out.println(action.get(Tags.Desc));
-			}
-			return action.get(Tags.OriginWidget).get(Tags.Path);
-		})).forEach(
-				action -> {
-					updateRoleCounter(action, roleCounter);
-					action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
+		actions.stream().
+				filter(action -> {
+					try {
+						action.get(Tags.OriginWidget).get(Tags.Path);
+						return true;
+					}
+					catch (NoSuchTagException ex) {
+						System.out.println("No origin widget found for action role: ");
+						System.out.println(action.get(Tags.Role));
+						System.out.println(action.get(Tags.Desc));
+						return false;
+					}
+				}).
+				sorted(Comparator.comparing(action -> action.get(Tags.OriginWidget).get(Tags.Path))).
+				forEach(
+					action -> {
+						updateRoleCounter(action, roleCounter);
+						action.set(Tags.AbstractIDCustom, ID_PREFIX_ACTION + ID_PREFIX_ABSTRACT_CUSTOM +
 							lowCollisionID(state.get(Tags.AbstractIDCustom) + getAbstractActionIdentifier(action, roleCounter)));
 				}
 		);
@@ -253,8 +252,15 @@ public class CodingManager {
 	 * @param roleCounter
 	 */
 	private static void updateRoleCounter(Action action, Map<Role, Integer> roleCounter) {
+		Role role;
+		try {
+			role = action.get(Tags.OriginWidget).get(Tags.Role);
+		}
+		catch (NoSuchTagException e) {
+			role = action.get(Tags.Role, Roles.Invalid);
+		}
 		// if the role as key is not present, this will initialize with 1, otherwise it will increment with 1
-		roleCounter.merge(action.get(Tags.Role), 1, Integer::sum);
+		roleCounter.merge(role, 1, Integer::sum);
 	}
 
 	/**
@@ -264,8 +270,14 @@ public class CodingManager {
 	 * @return
 	 */
 	private static String getAbstractActionIdentifier(Action action, Map<Role, Integer> roleCounter) {
-		Role actionRole = action.get(Tags.Role);
-		return actionRole.toString() + roleCounter.getOrDefault(actionRole, 999);
+		Role role;
+		try {
+			role = action.get(Tags.OriginWidget).get(Tags.Role);
+		}
+		catch (NoSuchTagException e) {
+			role = action.get(Tags.Role, Roles.Invalid);
+		}
+		return role.toString() + roleCounter.getOrDefault(role, 999);
 	}
 	
 	// ###############

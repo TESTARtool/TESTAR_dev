@@ -34,11 +34,16 @@ public class TestSequence {
     private int nrOfErrors;
 
     /**
+     * Indicates whether this test sequence was deterministic -> no non-determinism in the model was introduced
+     */
+    private boolean deterministic;
+
+    /**
      * An integer value representing the execution verdict for this test sequence.
      */
     private int verdict;
 
-    public TestSequence(String sequenceId, String startDateTime, String numberOfSteps, int verdict) {
+    public TestSequence(String sequenceId, String startDateTime, String numberOfSteps, int verdict, boolean deterministic) {
         this.sequenceId = sequenceId;
         this.startDateTime = startDateTime;
         this.numberOfSteps = numberOfSteps;
@@ -48,6 +53,7 @@ public class TestSequence {
         else {
             this.verdict = VERDICT_UNKNOWN;
         }
+        this.deterministic = deterministic;
     }
 
     public String getSequenceId() {
@@ -116,5 +122,9 @@ public class TestSequence {
 
     public void setNrOfErrors(int nrOfErrors) {
         this.nrOfErrors = nrOfErrors;
+    }
+
+    public String getDeterministicIcon() {
+        return deterministic ? "fa-check" : "fa-times";
     }
 }

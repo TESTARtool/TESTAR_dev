@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class Sequence implements Persistable {
 
@@ -136,12 +137,12 @@ public class Sequence implements Persistable {
      * @param concreteState the state that was reached and has to be connected to the node
      * @param concreteAction (Optionally) the action that was executed to reach the node
      */
-    public void addNode(ConcreteState concreteState, ConcreteAction concreteAction) {
+    public void addNode(ConcreteState concreteState, ConcreteAction concreteAction, SequenceError ...sequenceErrors) {
         if (concreteAction == null) {
             addFirstNode(concreteState);
         }
         else {
-            addStep(concreteState, concreteAction);
+            addStep(concreteState, concreteAction, sequenceErrors);
         }
     }
 
@@ -152,9 +153,16 @@ public class Sequence implements Persistable {
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
 
-    private void addStep(ConcreteState concreteState, ConcreteAction concreteAction) {
+    private void addStep(ConcreteState concreteState, ConcreteAction concreteAction, SequenceError ...sequenceErrors) {
         SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, null, eventListeners);
         SequenceStep sequenceStep = new SequenceStep(concreteAction, currentNode, targetNode, concreteAction.getAttributes().get(Tags.Desc));
+        if (sequenceErrors.length > 0) {
+            Stream.of(sequenceErrors).forEach(sequenceError -> {
+                if (sequenceError.equals(SequenceError.NON_DETERMINISTIC_ACTION)) {
+                    sequenceStep.setNonDeterministic(true);
+                }
+            });
+        }
         nodes.add(targetNode);
         currentNode = targetNode;
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_STEP_ADDED, sequenceStep));

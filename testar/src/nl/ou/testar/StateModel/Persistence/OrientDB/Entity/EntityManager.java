@@ -25,10 +25,8 @@ import java.util.stream.Collectors;
 
 public class EntityManager {
 
-    // orient db instance that will create database sessions
-    private OrientDB orientDB;
-
-    private Config dbConfig;
+    // the connection object holding the datastore instance and the connection configuration information
+    private Connection connection;
 
     /**
      * Constructor
@@ -37,8 +35,8 @@ public class EntityManager {
     public EntityManager(Config config) {
         String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
                 config.getServer() : config.getDatabaseDirectory()) + "/";
-        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
-        dbConfig = config;
+        OrientDB orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+        connection = new Connection(orientDB, config);
         init();
     }
 
@@ -47,9 +45,7 @@ public class EntityManager {
      * Should be called before the entity manager itself becomes unused.
      */
     public void releaseConnection() {
-        if (orientDB.isOpen()) {
-            orientDB.close();
-        }
+        connection.releaseConnection();
     }
 
     /**
@@ -58,8 +54,8 @@ public class EntityManager {
     private void init() {
         //init code here
         // check if the database needs to be reset
-        if (dbConfig.resetDataStore()) {
-            try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        if (connection.getConfig().resetDataStore()) {
+            try (ODatabaseSession db = connection.getDatabaseSession()) {
                 // drop all the classes. This will drop all the records for these classes.
                 OSchema schema = db.getMetadata().getSchema();
                 OSequenceLibrary sequenceLibrary = db.getMetadata().getSequenceLibrary();
@@ -242,7 +238,7 @@ public class EntityManager {
      * @param entityClass
      */
     public void createClass(EntityClass entityClass) {
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        try (ODatabaseSession db = connection.getDatabaseSession()) {
             // check if the class already exists
             OClass oClass = db.getClass(entityClass.getClassName());
             if (oClass != null) return;
@@ -310,7 +306,7 @@ public class EntityManager {
      * @param entity
      */
     public void saveEntity(DocumentEntity entity) {
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        try (ODatabaseSession db = connection.getDatabaseSession()) {
             if (entity.getEntityClass().isVertex()) {
                 saveVertexEntity((VertexEntity) entity, db);
             }
@@ -498,7 +494,7 @@ public class EntityManager {
      * @param idValues
      */
     public void deleteEntities(EntityClass entityClass, Set<Object> idValues) {
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        try (ODatabaseSession db = connection.getDatabaseSession()) {
             String typeName;
             if (entityClass.getEntityType() == EntityClass.EntityType.Vertex) {
                 typeName = "VERTEX";
@@ -621,7 +617,7 @@ public class EntityManager {
      */
     public Set<DocumentEntity> retrieveAllOfClass(EntityClass entityClass, Map<String, PropertyValue> entityProperties) {
         HashSet<DocumentEntity> documents = new HashSet<>();
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        try (ODatabaseSession db = connection.getDatabaseSession()) {
             String stmt = "SELECT FROM " + entityClass.getClassName();
 
             OResultSet rs;
@@ -662,7 +658,7 @@ public class EntityManager {
      * @return
      */
     public DocumentEntity retrieveEntity(EntityClass entityClass, Object idValue) {
-        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+        try (ODatabaseSession db = connection.getDatabaseSession()) {
             // first we have to retrieve the identifying field
             Property identifier = entityClass.getIdentifier();
             if (identifier == null) return null; // cannot search without an id field
@@ -782,7 +778,7 @@ public class EntityManager {
         OEdge oEdge = result.getEdge().get();
 
         // get the source vertex
-        OVertex sourceVertex = oEdge.getTo();
+        OVertex sourceVertex = oEdge.getFrom();
         // check for the presence of a class
         if (!sourceVertex.getSchemaType().isPresent()) return null;
 
@@ -803,5 +799,13 @@ public class EntityManager {
     // returns a sequence id for an entity property
     private String createSequenceId(EntityClass entityClass, Property property) {
         return entityClass.getClassName() + "-" + property.getPropertyName() + "-seq";
+    }
+
+    /**
+     * Returns the connection object currently used by the entity manager
+     * @return Connection
+     */
+    public Connection getConnection() {
+        return connection;
     }
 }
