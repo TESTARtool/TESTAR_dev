@@ -34,11 +34,7 @@ package nl.ou.testar.StateModel.Settings;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -78,7 +74,11 @@ public class ImportDatabaseDialog extends JDialog {
 	private JButton buttonImport = new JButton("Import Selected DB");
 	private JButton buttonCancel = new JButton("Cancel Import");
 	
-	private Set<JComponent> components;
+	// orient db instance that will create database sessions
+    private transient OrientDB orientDB;
+
+    // orient db configuration object
+    private transient Config dbConfig;
 
 	public ImportDatabaseDialog(String storeType, String storeServer) {
 		initialize(storeType, storeServer);
@@ -87,12 +87,6 @@ public class ImportDatabaseDialog extends JDialog {
 	private void initialize(String storeType, String storeServer) {
 
 		setTitle("TESTAR Import OrientDB database");
-		
-		components = new HashSet<>();
-		components.add(textFieldStoreType);
-		components.add(textFieldStoreServer);
-		components.add(textFieldRoot);
-		components.add(textFieldPassword);
 
 		setSize(500, 500);
 		setLayout(null);
@@ -155,10 +149,18 @@ public class ImportDatabaseDialog extends JDialog {
 		buttonCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				closeOrientDB();
 				dispose();
 			}
 		});
 		add(buttonCancel);
+		
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+	        @Override
+	        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+	        	closeOrientDB();
+	        }
+	    });
 
 	}
 	
@@ -186,29 +188,30 @@ public class ImportDatabaseDialog extends JDialog {
 	
 	private boolean checkIfDatabaseExists() {
 		
-		Config config = new Config();
-		config.setConnectionType(textFieldStoreType.getText());
-		config.setServer(textFieldStoreServer.getText());
-		config.setUser(textFieldRoot.getText());
-		config.setPassword(getPassword());
+		dbConfig = new Config();
+		dbConfig.setConnectionType(textFieldStoreType.getText());
+		dbConfig.setServer(textFieldStoreServer.getText());
+		dbConfig.setUser(textFieldRoot.getText());
+		dbConfig.setPassword(getPassword());
 
 		try {
 
-			OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
-					config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
+			orientDB = new OrientDB(dbConfig.getConnectionType() + ":" + dbConfig.getServer(), 
+					dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 
 			if(orientDB.list().contains(textFieldNameDB.getText())) {
 				orientDB.close();
 				JFrame frame = new JFrame();
 				JOptionPane.showMessageDialog(frame, 
 						"This database already exist, please select other name to create and import");
+				frame.setAlwaysOnTop(true);
 				return true;
 			}	
 
-			orientDB.close();
-
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
+		}finally {
+			orientDB.close();
 		}
 		
 		return false;
@@ -216,24 +219,23 @@ public class ImportDatabaseDialog extends JDialog {
 	}
 	
 	private void importDatabase() {
-		Config config = new Config();
-		config.setConnectionType(textFieldStoreType.getText());
-		config.setServer(textFieldStoreServer.getText());
-		config.setUser(textFieldRoot.getText());
-		config.setPassword(getPassword());
+		dbConfig = new Config();
+		dbConfig.setConnectionType(textFieldStoreType.getText());
+		dbConfig.setServer(textFieldStoreServer.getText());
+		dbConfig.setUser(textFieldRoot.getText());
+		dbConfig.setPassword(getPassword());
 		
-		// First we need to create the database
-		// create database remote:localhost/notepad root testar
+		 orientDB = new OrientDB(dbConfig.getConnectionType() + ":" + dbConfig.getServer(), 
+				 dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 		
-		OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
-				config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
-		
+		//First we need to create the database
 		orientDB.create(textFieldNameDB.getText(), ODatabaseType.PLOCAL);
-		config.setDatabase(textFieldNameDB.getText());
+		dbConfig.setDatabase(textFieldNameDB.getText());
 		
-		String dbConnection = config.getConnectionType() + ":" + config.getServer() + "/database/" + config.getDatabase();
+		String dbConnection = dbConfig.getConnectionType() + ":" + dbConfig.getServer() +
+				"/database/" + dbConfig.getDatabase();
 		
-		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, config.getUser(), config.getPassword())){
+		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, dbConfig.getUser(), dbConfig.getPassword())){
 
 			OCommandOutputListener listener = new OCommandOutputListener() {
 				@Override
@@ -264,6 +266,11 @@ public class ImportDatabaseDialog extends JDialog {
             result.append(c);
         }
         return  result.toString();
+    }
+    
+    private void closeOrientDB() {
+    	if(orientDB!=null && orientDB.isOpen())
+    		orientDB.close();
     }
 	
 }

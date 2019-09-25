@@ -35,12 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -80,8 +76,12 @@ public class ExportDatabaseDialog extends JDialog {
 	private JButton buttonCancel = new JButton("Cancel Export");
 
 	private JComboBox<String> listDatabases = new JComboBox<>();
+	
+	// orient db instance that will create database sessions
+    private transient OrientDB orientDB;
 
-	private Set<JComponent> components;
+    // orient db configuration object
+    private transient Config dbConfig;
 
 	public ExportDatabaseDialog(String storeType, String storeServer) {
 		initialize(storeType, storeServer);
@@ -90,12 +90,6 @@ public class ExportDatabaseDialog extends JDialog {
 	private void initialize(String storeType, String storeServer) {
 
 		setTitle("TESTAR Export OrientDB database");
-		
-		components = new HashSet<>();
-		components.add(textFieldStoreType);
-		components.add(textFieldStoreServer);
-		components.add(textFieldRoot);
-		components.add(textFieldPassword);
 
 		setSize(500, 500);
 		setLayout(null);
@@ -171,10 +165,18 @@ public class ExportDatabaseDialog extends JDialog {
 		buttonCancel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				closeOrientDB();
 				dispose();
 			}
 		});
 		add(buttonCancel);
+		
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+	        @Override
+	        public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+	        	closeOrientDB();
+	        }
+	    });
 	}
 	
 	private void chooseDirectoryToExport() {
@@ -189,45 +191,46 @@ public class ExportDatabaseDialog extends JDialog {
 	}
 
 	private void obtainAvailableDatabases() {
-		Config config = new Config();
-		config.setConnectionType(textFieldStoreType.getText());
-		config.setServer(textFieldStoreServer.getText());
-		config.setUser(textFieldRoot.getText());
-		config.setPassword(getPassword());
+		dbConfig = new Config();
+		dbConfig.setConnectionType(textFieldStoreType.getText());
+		dbConfig.setServer(textFieldStoreServer.getText());
+		dbConfig.setUser(textFieldRoot.getText());
+		dbConfig.setPassword(getPassword());
 
-		try {
+		try{
 			
 			listDatabases.removeAllItems();
 
-			OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
-					config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
+			orientDB = new OrientDB(dbConfig.getConnectionType() + ":" + dbConfig.getServer(), 
+					dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 
 			if(!orientDB.list().isEmpty())
 				for(String database : orientDB.list())
 					listDatabases.addItem(database);
 			
-			orientDB.close();
-			
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
+		}finally {
+			orientDB.close();
 		}
 
 	}
 
 	private void exportDatabase() {
-		Config config = new Config();
-		config.setConnectionType(textFieldStoreType.getText());
-		config.setServer(textFieldStoreServer.getText());
-		config.setUser(textFieldRoot.getText());
-		config.setPassword(getPassword());
-		config.setDatabase(listDatabases.getSelectedItem().toString());
+		dbConfig = new Config();
+		dbConfig.setConnectionType(textFieldStoreType.getText());
+		dbConfig.setServer(textFieldStoreServer.getText());
+		dbConfig.setUser(textFieldRoot.getText());
+		dbConfig.setPassword(getPassword());
+		dbConfig.setDatabase(listDatabases.getSelectedItem().toString());
 
-		OrientDB orientDB = new OrientDB(config.getConnectionType() + ":" + config.getServer(), 
-				config.getUser(), config.getPassword(), OrientDBConfig.defaultConfig());
+		orientDB = new OrientDB(dbConfig.getConnectionType() + ":" + dbConfig.getServer(), 
+				dbConfig.getUser(), dbConfig.getPassword(), OrientDBConfig.defaultConfig());
 
-		String dbConnection = config.getConnectionType() + ":" + config.getServer() + "/database/" + config.getDatabase();
+		String dbConnection = dbConfig.getConnectionType() + ":" + dbConfig.getServer() +
+				"/database/" + dbConfig.getDatabase();
 		
-		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, config.getUser(), config.getPassword())){
+		try (ODatabaseSession sessionDB = orientDB.open(dbConnection, dbConfig.getUser(), dbConfig.getPassword())){
 
 			OCommandOutputListener listener = new OCommandOutputListener() {
 				@Override
@@ -236,10 +239,10 @@ public class ExportDatabaseDialog extends JDialog {
 				}
 			};
 
-			String fileNameDB = config.getDatabase();
+			String fileNameDB = dbConfig.getDatabase();
 			
 			if(new File(textFieldPathExport.getText()).exists())
-				fileNameDB = textFieldPathExport.getText() + File.separator + config.getDatabase();
+				fileNameDB = textFieldPathExport.getText() + File.separator + dbConfig.getDatabase();
 			
 			ODatabaseExport exportDB = new ODatabaseExport((ODatabaseDocumentInternal)sessionDB, fileNameDB, listener);
 			exportDB.exportDatabase();
@@ -263,6 +266,11 @@ public class ExportDatabaseDialog extends JDialog {
             result.append(c);
         }
         return  result.toString();
+    }   
+    
+    private void closeOrientDB() {
+    	if(orientDB!=null && orientDB.isOpen())
+    		orientDB.close();
     }
 
 }

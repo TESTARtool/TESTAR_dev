@@ -252,26 +252,24 @@ public class StateModelPanel extends JPanel {
         label14.setBounds(330, 280, 300, 27);
         add(label14);
         
-        exportDBbutton.setBounds(330, 270, 150, 27);
+        exportDBbutton.setBounds(330, 285, 150, 27);
         exportDBbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	ExportDatabaseDialog exportDBdialog = new ExportDatabaseDialog(
             			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
             	exportDBdialog.setVisible(true);
-            	exportDBdialog.setAlwaysOnTop(true);
             }
         });
         add(exportDBbutton);
         
-        importDBbutton.setBounds(330, 298, 150, 27);
+        importDBbutton.setBounds(330, 320, 150, 27);
         importDBbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	ImportDatabaseDialog importDBdialog = new ImportDatabaseDialog(
             			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
             	importDBdialog.setVisible(true);
-            	importDBdialog.setAlwaysOnTop(true);
             }
         });
         add(importDBbutton);
