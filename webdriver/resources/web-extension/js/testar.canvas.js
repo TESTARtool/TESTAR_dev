@@ -7,6 +7,7 @@
 function addCanvasTestar() {
     // Only add when needed
     if (typeof testar_canvas === 'object') {
+        ensureCanvasOnTop();
         return typeof testar_canvas;
     }
 
@@ -23,7 +24,22 @@ function addCanvasTestar() {
     window.addEventListener('resize', resizeCanvasTestar, true);
     window.addEventListener('scroll', resizeCanvasTestar, true);
 
+    ensureCanvasOnTop();
     return typeof testar_canvas;
+}
+
+/*
+ * This ensures the canvas is always on top, as some scripts
+ * will try to get their element the highest z-index
+ */
+function ensureCanvasOnTop() {
+    var lengths = Array.from(document.querySelectorAll('body *'))
+        .map(a => parseFloat(window.getComputedStyle(a).zIndex))
+        .filter(a => !isNaN(a));
+    var maxIndex = Math.max.apply(null, lengths);
+    if (testar_canvas.style.zIndex < maxIndex) {
+        testar_canvas.style.zIndex = maxIndex + 1;
+    }
 }
 
 /*
