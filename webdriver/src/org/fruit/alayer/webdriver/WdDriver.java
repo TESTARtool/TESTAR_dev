@@ -87,7 +87,6 @@ public class WdDriver extends SUTBase {
 
     String osName = System.getProperty("os.name");
     if(!driverPath.contains(".exe") && osName.contains("Windows")) {
-      System.out.println("hier !!");
     	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
     	driverPath = driverPath.replace("\"", "");
     	parts = sutConnector.substring(sutConnector.indexOf(".exe")).split(" ");
