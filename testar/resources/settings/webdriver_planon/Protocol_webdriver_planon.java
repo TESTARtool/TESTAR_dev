@@ -235,6 +235,11 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
       // Set username and password
       for (Widget widget : state) {
         WdWidget wdWidget = (WdWidget) widget;
+        // Only enabled, visible widgets
+        if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
+          continue;
+        }
+
         if (username.left().equals(wdWidget.getAttribute("id"))) {
           builder.add(new WdAttributeAction(
               username.left(), "value", username.right()), 1);
@@ -265,6 +270,7 @@ public class Protocol_webdriver_planon extends WebdriverProtocol {
     }
 
     for (Widget widget : state) {
+      // Only enabled, visible widgets
       if (!widget.get(Enabled, true) || widget.get(Blocked, false)) {
         continue;
       }
