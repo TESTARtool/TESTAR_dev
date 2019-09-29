@@ -45,15 +45,28 @@ public class AnalysisManager {
      * @param outputDir
      */
     public AnalysisManager(final Config config, String outputDir) {
-        String connectionString = config.getConnectionType() + ":" + (config.getConnectionType().equals("remote") ?
-                config.getServer() : config.getDatabaseDirectory()) + "/";
-        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         dbConfig = config;
+        startUp();
         this.outputDir = outputDir;
 
         // check if the credentials are valid
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             // if there is no connection possible this will throw an exception
+        }
+
+        // if the connection type is local, we have to shutdown the orientdb connection now, because it will interfere
+        // with the running of TESTAR
+        checkShutDown();
+    }
+
+    /**
+     * Starts up an orientDB connection using the given configuration information.
+     */
+    private void startUp() {
+        if (orientDB == null || !orientDB.isOpen()) {
+            String connectionString = dbConfig.getConnectionType() + ":" + (dbConfig.getConnectionType().equals("remote") ?
+                    dbConfig.getServer() : dbConfig.getDatabaseDirectory()) + "/";
+            orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         }
     }
 
@@ -61,7 +74,18 @@ public class AnalysisManager {
      * Shuts down the orientDB connection.
      */
     public void shutdown() {
-        orientDB.close();
+        if (orientDB.isOpen()) {
+            orientDB.close();
+        }
+    }
+
+    /**
+     * Checks whether the connection should be shutdown.
+     */
+    private void checkShutDown() {
+        if (dbConfig.getConnectionType().equals(Config.CONNECTION_TYPE_LOCAL)) {
+            shutdown();
+        }
     }
 
     /**
@@ -69,6 +93,7 @@ public class AnalysisManager {
      * @return
      */
     public List<AbstractStateModel> fetchModels() {
+        startUp();
         ArrayList<AbstractStateModel> abstractStateModels = new ArrayList<>();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             OResultSet resultSet = db.query("SELECT FROM AbstractStateModel");
@@ -95,6 +120,7 @@ public class AnalysisManager {
             }
             resultSet.close();
         }
+        checkShutDown();
         return abstractStateModels;
     }
 
@@ -191,7 +217,13 @@ public class AnalysisManager {
         return sequenceList;
     }
 
+    /**
+     * This method fetches a single test sequence.
+     * @param sequenceId
+     * @return
+     */
     public List<ActionViz> fetchTestSequence(String sequenceId) {
+        startUp();
         List<ActionViz> visualizations = new ArrayList<>();
         // fetch the first sequence node belonging to a given test sequence
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
@@ -201,6 +233,7 @@ public class AnalysisManager {
             OResultSet resultSet = db.query(sequenceStmt, params);
 
             if (!resultSet.hasNext()) {
+                checkShutDown();
                 return visualizations; // no sequence node found
             }
 
@@ -208,6 +241,7 @@ public class AnalysisManager {
             if (!nodeResult.isVertex()) return visualizations;
             Optional<OVertex> nodeVertexOptional = nodeResult.getVertex();
             if (!nodeVertexOptional.isPresent()) {
+                checkShutDown();
                 return visualizations;
             }
 
@@ -246,6 +280,7 @@ public class AnalysisManager {
                     break; // there should at most be one edge
                 }
                 if (sourceState == null || targetState == null) {
+                    checkShutDown();
                     return visualizations;
                 }
 
@@ -262,6 +297,7 @@ public class AnalysisManager {
                 counterTarget++;
             }
             resultSet.close();
+            checkShutDown();
             return visualizations;
         }
     }
@@ -275,6 +311,7 @@ public class AnalysisManager {
      * @return
      */
     public String fetchGraphForModel(String modelIdentifier, boolean abstractLayerRequired, boolean concreteLayerRequired, boolean sequenceLayerRequired, boolean showCompoundGraph) {
+        startUp();
         ArrayList<Element> elements = new ArrayList<>();
         if (abstractLayerRequired || concreteLayerRequired || sequenceLayerRequired) {
             try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
@@ -309,6 +346,7 @@ public class AnalysisManager {
         builder.append(Instant.now().toEpochMilli());
         builder.append("_elements.json");
         String filename = builder.toString();
+        checkShutDown();
         return writeJson(elements, filename, modelIdentifier);
     }
 
@@ -472,7 +510,13 @@ public class AnalysisManager {
         return elements;
     }
 
+    /**
+     * This method fetches a complete widget tree for a given concrete state id.
+     * @param concreteStateIdentifier
+     * @return
+     */
     public String fetchWidgetTree(String concreteStateIdentifier) {
+        startUp();
         try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
             ArrayList<Element> elements = new ArrayList<>();
 
@@ -499,6 +543,7 @@ public class AnalysisManager {
             builder.append(Instant.now().toEpochMilli());
             builder.append("_elements.json");
             String filename = builder.toString();
+            checkShutDown();
             return writeJson(elements, filename, concreteStateIdentifier);
         }
     }
