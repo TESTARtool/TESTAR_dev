@@ -341,6 +341,11 @@ public class Protocol_webdriver_statemodel extends WebdriverProtocol {
 			return false;
 		}
 
+    // Deny the link based on extension
+    if (isExtensionDenied(linkUrl)) {
+      return true;
+    }
+
 		// Mail link, deny
 		if (linkUrl.startsWith("mailto:")) {
 			return true;
