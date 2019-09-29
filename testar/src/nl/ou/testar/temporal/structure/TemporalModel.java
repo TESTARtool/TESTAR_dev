@@ -175,25 +175,31 @@ public  TemporalModel(){
             String formula;
             List<String> sortedparameters = candidateOracle.getPattern_Parameters();
             Collections.sort(sortedparameters);
-            List<String> sortedsubstitionkeys = new ArrayList<String>( candidateOracle.getPattern_Substitutions().keySet());
-            List<String> sortedsubstitionvalues = new ArrayList<String>( candidateOracle.getPattern_Substitutions().values());
+            //List<String> sortedsubstitionkeys = new ArrayList<>( candidateOracle.getPattern_Substitutions().keySet());
+            List<String> sortedsubstitionvalues =  candidateOracle.getPattern_Substitutions();
 
             boolean importStatus;
             importStatus = candidateOracle.getPattern_TemporalFormalism() == tmpType;
             if (importStatus) {
                 //parameter consistency
-                importStatus = sortedparameters.equals(sortedsubstitionkeys);
+                importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
             }
             if (!importStatus) {
-                candidateOracle.addLog("inconsistent parameter<-> substitutions setup ");
+                candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             }
             if (importStatus)
-                importStatus = getModelAPs().containsAll(candidateOracle.getPattern_Substitutions().values());
+                importStatus = getModelAPs().containsAll(sortedsubstitionvalues);
 
 
             if (!importStatus) {
-                candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model");
+                System.out.println("debug substitutions: "+sortedsubstitionvalues);
+                candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
+                for (String subst:sortedsubstitionvalues
+                     ) {
+                    if (!getModelAPs().contains(subst))  candidateOracle.addLog("not found: "+ subst);
+                }
+
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             }
             HashBiMap<Integer, String> aplookup = HashBiMap.create();
@@ -211,9 +217,6 @@ public  TemporalModel(){
 
             Formulas.append(formula);
             Formulas.append("\n");
-/*            LocalDateTime localDateTime=LocalDateTime.now();
-            String localDateString = localDateTime.format(DateTimeFormatter.ofPattern("YYYYMMDD-hhmmss"));
-            CSVHandler.save(checkedOracleColl,oracleFile+"_checked_"+localDateString);*/
         }
 
         return Formulas.toString();
@@ -224,11 +227,12 @@ public  TemporalModel(){
         aplookup.putAll(getSimpleModelMap());
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
+
        if (aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
-           return "";
+           return APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
         }
         else
-            return  APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
+            return "";
         };
 
 
