@@ -9,12 +9,13 @@ import java.util.*;
 
 public class TemporalOracle extends TemporalPattern{
 
-    @CsvCustomBindByName( converter = CSVConvertMap.class)
-    private Map<String, String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
+   // @CsvCustomBindByName( converter = CSVConvertMap.class)
+   @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"=+"+csvsep, writeDelimiter = csvsep+"====="+csvsep)
+    private List<String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
 
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
-    @CsvCustomBindByName(converter = CSVConvertVerdict.class)
+    @CsvCustomBindByName(converter = CSVConvertVerdict.class )
     private Verdict oracle_verdict;         //strange case sensitivity problem with CSV converter: leave all lowercase
     @CsvBindByName
     private double log_TraceSupport;
@@ -51,11 +52,11 @@ public class TemporalOracle extends TemporalPattern{
 
 
 
-    public Map<String, String> getPattern_Substitutions() {
+    public List<String> getPattern_Substitutions() {
         return pattern_Substitutions;
     }
 
-    public void setPattern_Substitutions(Map<String, String> pattern_Substitutions) {
+    public void setPattern_Substitutions(List<String> pattern_Substitutions) {
         this.pattern_Substitutions = pattern_Substitutions;
     }
     public ValStatus getOracle_validationstatus() {
@@ -134,10 +135,9 @@ public static TemporalOracle getSampleOracle(){
     attrib.add("T");
     attrib.add("P");
     attrib.add("E");
-    to.setApplicationName("notepad");
-    to.setApplicationVersion("v10");
-
-    to.setApplication_ModelIdentifier("34edf5");
+    to.setApplicationName("my app");
+    to.setApplicationVersion("my version");
+    to.setApplication_ModelIdentifier("my modelidentifier");
     to.setApplication_AbstractionAttributes(attrib);
     to.setPattern_TemporalFormalism(TemporalType.LTL);
     to.setOracle_validationstatus(ValStatus.ACCEPTED);
@@ -146,13 +146,14 @@ public static TemporalOracle getSampleOracle(){
     to.setPattern_Class("precedence");
     to.setPattern_Formula("!b U a");
     to.setPattern_Parameters(Arrays.asList("a", "b"));
-    Map<String,String> mappie = new HashMap<String,String>() {{put("a", "UIButton_OK");put("b", "UIWindow_Title_main_exists");}};
+    //List<String> mappie = new HashMap<String,String>() {{put("a", "UIButton_OK");put("b", "UIWindow_Title_main_exists");}};
+    List<String> mappie = new ArrayList<String>(){{add("UIButton_OK");add("UIWindow_Title_main_exists");}};
     to.setPattern_Substitutions(mappie);
     List<String> comments= new ArrayList<String>();
     comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
     comments.add("avoid using 'X,F,G,U,W,R,M' as parameters, as they are used in LTL syntax");
-    comments.add("CSV editor of choice is LibreCalc as this tool can explicitly quote all text field");
-    comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
+    comments.add("the separator for substitutions is hardcoded set as regex ';=+;'  so ;===========; is considered a valid separator");
+    //comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
     to.set_comments(comments);
     return to;
 }

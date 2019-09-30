@@ -702,13 +702,13 @@
                   <text value="..."/>
                 </properties>
               </component>
-              <component id="11461" class="javax.swing.JButton" binding="mineOraclesButton" default-binding="true">
+              <component id="11461" class="javax.swing.JButton" binding="generateOraclesButton" default-binding="true">
                 <constraints>
                   <grid row="3" column="11" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="&lt;html&gt;Mine Oracles&lt;/html&gt;"/>
+                  <text value="&lt;html&gt;Generate Oracles&lt;/html&gt;"/>
                   <toolTipText value="Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. "/>
                 </properties>
               </component>
@@ -731,7 +731,7 @@
                     <item value="Random10000"/>
                     <item value="Random100000"/>
                     <item value="Random1000000"/>
-                    <item value="All(carthesian)"/>
+                    <item value="All(combinatorial)"/>
                   </model>
                 </properties>
               </component>

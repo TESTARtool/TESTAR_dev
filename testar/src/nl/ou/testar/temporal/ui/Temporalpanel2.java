@@ -63,7 +63,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton button2;
     private JTextField textField7;
     private JButton button3;
-    private JButton mineOraclesButton;
+    private JButton generateOraclesButton;
     private JTextField textField8;
     private JButton button4;
     private JButton startAnalyzerButton;
@@ -320,9 +320,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         modelCheckButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(((String)comboBox1.getSelectedItem()).equals("LTL")){
+                if (((String) comboBox1.getSelectedItem()).equals("LTL")) {
                     ModelCheck(e);
-                }else  textArea12.append("TemporalType: "+(String)comboBox1.getSelectedItem()+" is not implemented");
+                } else
+                    textArea12.append("TemporalType: " + (String) comboBox1.getSelectedItem() + " is not implemented");
             }
         });
     }
@@ -541,10 +542,10 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         button2 = new JButton();
         button2.setText("...");
         panel5.add(button2, cc.xy(10, 4));
-        mineOraclesButton = new JButton();
-        mineOraclesButton.setText("<html>Mine Oracles</html>");
-        mineOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
-        panel5.add(mineOraclesButton, cc.xyw(12, 4, 3));
+        generateOraclesButton = new JButton();
+        generateOraclesButton.setText("<html>Generate Oracles</html>");
+        generateOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
+        panel5.add(generateOraclesButton, cc.xyw(12, 4, 3));
         comboBox2 = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
         defaultComboBoxModel2.addElement("OraclesPerPattern1");
@@ -559,7 +560,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         defaultComboBoxModel2.addElement("Random10000");
         defaultComboBoxModel2.addElement("Random100000");
         defaultComboBoxModel2.addElement("Random1000000");
-        defaultComboBoxModel2.addElement("All(carthesian)");
+        defaultComboBoxModel2.addElement("All(combinatorial)");
         comboBox2.setModel(defaultComboBoxModel2);
         panel5.add(comboBox2, cc.xy(14, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
         final JLabel label16 = new JLabel();
@@ -738,7 +739,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             e.printStackTrace();
         }
     }
-    private void ModelCheckWithSpot(String automatonFile, String formulaFile, String alivePropositionLTLF,String resultsFile) {
+
+    private void ModelCheckWithSpot(String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
         // code goes here
         Process theProcess = null;
         BufferedReader inStream = null;
@@ -858,7 +860,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         }
     }
 
-    private void ModelCheck(ActionEvent e){
+    private void ModelCheck(ActionEvent e) {
         try {
 
             APSelectorManager APmgr = loadApSelectionManagerJSON(textField6.getText());
@@ -904,32 +906,31 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             File automatonfile = new File(outputDir + "Model.hoa");
             File formulafile = new File(outputDir + "Formulas.txt");
             File resultsfile = new File(outputDir + "results.txt");
-
             String aliveprop = tcontrol.gettModel().getAliveProposition("!dead");
-            ModelCheckWithSpot(automatonfile.getAbsolutePath(),formulafile.getAbsolutePath(),aliveprop,resultsfile.getAbsolutePath());
+            ModelCheckWithSpot(automatonfile.getAbsolutePath(), formulafile.getAbsolutePath(), aliveprop, resultsfile.getAbsolutePath());
             //decode results
-            Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(tcontrol.gettModel(),fromcoll);
-            String resultsAsString="";
+            Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(tcontrol.gettModel(), fromcoll);
+            String resultsAsString = "";
             StringBuilder contentBuilder = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new FileReader(resultsfile)))
-            {
+            try (BufferedReader br = new BufferedReader(new FileReader(resultsfile))) {
 
                 String sCurrentLine;
-                while ((sCurrentLine = br.readLine()) != null)
-                {
+                while ((sCurrentLine = br.readLine()) != null) {
                     contentBuilder.append(sCurrentLine).append("\n");
                 }
-            }
-            catch (IOException f)
-            {
+            } catch (IOException f) {
                 f.printStackTrace();
             }
-           resultsAsString= contentBuilder.toString();
-             System.out.println("debug: resultsfile: "+resultsfile.toString());
-             System.out.println("debug: resultsfile exist: "+resultsfile.exists());
-            sParse.parse(resultsAsString);
-            // add to oraclecoll.
 
+             List<TemporalOracle> modelCheckedOracles =sParse.parse(contentBuilder.toString());
+            if (modelCheckedOracles==null){
+                System.err.println("Error detected in modelcheck results");
+                textArea12.append("Error detected in modelcheck results");
+                textArea12.append("\n");
+            }else
+            {
+                // add to oraclecoll.
+            }
 
 
 

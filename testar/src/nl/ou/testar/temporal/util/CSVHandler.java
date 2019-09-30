@@ -20,7 +20,7 @@ public class CSVHandler {
 
                 FileInputStream fis = new FileInputStream(fromFile);
                      InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                List result  = new CsvToBeanBuilder(isr).withType(cls).build().parse();
+                List result  = new CsvToBeanBuilder(isr).withType(cls).withSeparator(';').build().parse();
                // List result  = new CsvToBeanBuilder(reader).withType(cls).build().parse();
                 return result;
             }
@@ -40,7 +40,7 @@ public class CSVHandler {
 
                 //BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
                 //StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-                StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(osw).build();
+                StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(osw).withSeparator(';').build();
                 beanToCsv.write(content);
                 //writer.close();
                 osw.close();

@@ -112,7 +112,7 @@ prepareOracles.dependsOn(oracleClasses)
 startScripts {
     if(System.getProperty('DEBUG', 'false') ) {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml",
-                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
+                                     '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5008']
     } else {
         applicationDefaultJvmArgs = ["-Dlogback.configurationFile=logback.xml"]
     }

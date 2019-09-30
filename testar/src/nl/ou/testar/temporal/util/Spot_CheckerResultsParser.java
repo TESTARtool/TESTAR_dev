@@ -63,33 +63,62 @@ public class Spot_CheckerResultsParser {
     public List<TemporalOracle> parse(String rawInput){
         this.rawInput = rawInput;
         Scanner scanner = new Scanner(rawInput);
-        scanner.useDelimiter("\\s*=== Automaton Loading\\s*");
-        String firstLine="";
-        if (scanner.hasNext()){firstLine = scanner.next();   }
+        scanner.useDelimiter("\\s*=== Automaton\\s*");
+        String headerLines="";
+        if (scanner.hasNext()){headerLines = scanner.next();   }
         String automaton="";
         if (scanner.hasNext()){automaton = scanner.next();   }
         String remainder = "";
-        if (scanner.hasNext()){remainder = scanner.next();   }
+      //  if (scanner.hasNext()){remainder = scanner.next();   }
 
-        System.out.println("debug: firstline: "+firstLine);
+        System.out.println("debug: headerlines: "+headerLines);
         System.out.println("debug: automaton: "+automaton);
-        System.out.println("debug: remainder: "+remainder);
+      //  System.out.println("debug: remainder: "+remainder);
+        if (automaton.contains("=== ERROR")){
+            return null;
+        }else {
 
-        List<String> formularesults=new ArrayList<>();
-        scanner.useDelimiter("\\s*=== Formula Checking\\s*");
-        while (scanner.hasNext()){
-            formularesults.add(scanner.next());
-        }
-        System.out.println("debug: formularesults.size: "+formularesults.size());
-        String lastLine="";
-        lastLine=formularesults.get(formularesults.size());
-        formularesults.remove(formularesults.size());
-        int i=0;
-        for (String f:formularesults )
-        {
-        String[] formulacomponents =f.split("\\s*===\\s*");
-        System.out.println("part "+i+":"+formulacomponents[i]);
-        i++;
+
+            List<String> formularesults = new ArrayList<>();
+            scanner.useDelimiter("\\s*=== Formula\\s*");  //change the delimiter and now load chunks of formulas
+            while (scanner.hasNext()) {
+                formularesults.add(scanner.next());
+            }
+            System.out.println("debug: formularesults.size: " + formularesults.size());
+            String lastLine = "";
+            lastLine = formularesults.get(formularesults.size()-1);
+            formularesults.remove(0); // dispose the === Automaton separator
+            formularesults.remove(formularesults.size()-1);
+
+            for (String f : formularesults) {
+                int i = 0;
+                String[] formulacomponents = f.split("\\s*===\\s*");
+                for (String fcmp:formulacomponents
+                     ) {
+                    System.out.println("part " + i + ":" + fcmp);
+                    i++;
+                }
+
+            }
+            //this.oracleColl;
+            System.out.println("debug: lastlines: " + lastLine);
+            if (formularesults.size()!=oracleColl.size()){
+                return null;
+            }
+            int i=0;
+            for (String fResult:formularesults
+                 ) {
+                TemporalOracle Oracle = oracleColl.get(i);
+                // get result status
+                //get run: decode prefix and decode cycle..... use the model
+                // note that transition ap is a 'Set' or      use the encoded string ...maybe better as this was also supplied to the HOA file.
+                // update oracle
+                // add to coll? .. not needed
+
+                i++;
+
+
+            }
         }
 
 
