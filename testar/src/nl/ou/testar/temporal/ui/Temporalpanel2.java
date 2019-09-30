@@ -884,6 +884,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
 
             List<TemporalOracle> fromcoll;
             String file = textField7.getText();
+            String[] fileparts = file.split("\\.");
+            String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length());
             fromcoll = CSVHandler.load(file, TemporalOracle.class);
             if (fromcoll == null) {
                 textArea12.append("verify the file at location '" + file + "' \n");
@@ -893,8 +895,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 textArea12.append("formulas saved: \n");
                 tcontrol.saveFormulaFile(fromcoll, TemporalType.LTL, "Formulas.txt");
 
-                String[] fileparts = file.split("\\.");
-                String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length());
+
 
                 CSVHandler.save(fromcoll, strippedfile + "_inputvalidation.csv");
                 textArea12.append("input validation results csv saved: \n");
@@ -930,6 +931,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             }else
             {
                 // add to oraclecoll.
+                CSVHandler.save(modelCheckedOracles, strippedfile + "_modelchecked.csv");
+                textArea12.append("input validation results csv saved: \n");
+
             }
 
 
@@ -1103,7 +1107,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 tcontrol.saveFormulaFile(fromcoll, TemporalType.LTL, "Formulas.txt");
 
                 String[] fileparts = file.split("\\.");
-                String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length());
+                String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length()-1);
 
                 CSVHandler.save(fromcoll, strippedfile + "_inputvalidation.csv");
                 textArea12.append("inputvalidation results csv saved: \n");

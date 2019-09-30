@@ -26,9 +26,17 @@ public class TemporalOracle extends TemporalPattern{
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> log_TestsequenceIDs;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> log_PrefixOfRun; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
+    private List<String> exampleRun_Prefix_States; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> log_CycleOfRun;  // idem
+    private List<String> exampleRun_Prefix_Transitions; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
+
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
+    private List<String> exampleRun_Cycle_States;  // idem
+
+
+
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
+    private List<String> exampleRun_Cycle_Transitions;  // idem
     @CsvBindByName
     private String log_RunDate;
 
@@ -50,7 +58,21 @@ public class TemporalOracle extends TemporalPattern{
         this.log_TestsequenceIDs = log_TestsequenceIDs;
     }
 
+    public List<String> getExampleRun_Prefix_Transitions() {
+        return exampleRun_Prefix_Transitions;
+    }
 
+    public void setExampleRun_Prefix_Transitions(List<String> exampleRun_Prefix_Transitions) {
+        this.exampleRun_Prefix_Transitions = exampleRun_Prefix_Transitions;
+    }
+
+    public List<String> getExampleRun_Cycle_Transitions() {
+        return exampleRun_Cycle_Transitions;
+    }
+
+    public void setExampleRun_Cycle_Transitions(List<String> exampleRun_Cycle_Transitions) {
+        this.exampleRun_Cycle_Transitions = exampleRun_Cycle_Transitions;
+    }
 
     public List<String> getPattern_Substitutions() {
         return pattern_Substitutions;
@@ -100,20 +122,20 @@ public class TemporalOracle extends TemporalPattern{
         this.log_TraceLift = log_TraceLift;
     }
 
-    public List<String> getLog_PrefixOfRun() {
-        return log_PrefixOfRun;
+    public List<String> getExampleRun_Prefix_States() {
+        return exampleRun_Prefix_States;
     }
 
-    public void setLog_PrefixOfRun(List<String> log_PrefixOfRun) {
-        this.log_PrefixOfRun = log_PrefixOfRun;
+    public void setExampleRun_Prefix_States(List<String> exampleRun_Prefix_States) {
+        this.exampleRun_Prefix_States = exampleRun_Prefix_States;
     }
 
-    public List<String> getLog_CycleOfRun() {
-        return log_CycleOfRun;
+    public List<String> getExampleRun_Cycle_States() {
+        return exampleRun_Cycle_States;
     }
 
-    public void setLog_CycleOfRun(List<String> log_CycleOfRun) {
-        this.log_CycleOfRun = log_CycleOfRun;
+    public void setExampleRun_Cycle_States(List<String> exampleRun_Cycle_States) {
+        this.exampleRun_Cycle_States = exampleRun_Cycle_States;
     }
 
     public String getLog_RunDate() {
