@@ -44,14 +44,19 @@ import java.util.stream.Stream;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.SUT;
 import org.fruit.alayer.State;
+import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
+import org.fruit.alayer.webdriver.WdDriver;
 import org.fruit.alayer.webdriver.WdElement;
 import org.fruit.alayer.webdriver.WdWidget;
+import org.fruit.alayer.windows.WinProcess;
+import org.fruit.alayer.windows.Windows;
 import org.fruit.monkey.ConfigTags;
 import org.testar.OutputStructure;
 
+import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
@@ -74,6 +79,25 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     }
 
     /**
+     * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+     * This can be used for example for bypassing a login screen by filling the username and password
+     * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+     * the SUT's configuration files etc.)
+     */
+    @Override
+    protected void beginSequence(SUT system, State state) {
+    	super.beginSequence(system, state);
+    	if(settings.get(ConfigTags.ForceForeground) && System.getProperty("os.name").contains("Windows")) {
+    		long hwnd = Windows.GetForegroundWindow();
+    		long pid = Windows.GetWindowProcessId(Windows.GetForegroundWindow());
+    		if(WinProcess.procName(pid).contains("chrome")) {
+    			system.set(Tags.HWND, hwnd);
+    			system.set(Tags.PID, pid);
+    		}
+    	}
+    }
+    
+    /**
      * This method is called when the TESTAR requests the state of the SUT.
      * Here you can add additional information to the SUT's state or write your
      * own state fetching routine. The state should have attached an oracle
@@ -84,7 +108,18 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     @Override
     protected State getState(SUT system) throws StateBuildException {
     	
+    	WdDriver.waitDocumentReady();
+    	
     	State state = super.getState(system);
+
+    	if(settings.get(ConfigTags.ForceForeground)
+    			&& System.getProperty("os.name").contains("Windows")
+    			&& system.get(Tags.PID, (long)-1) != (long)-1 
+    			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
+    			&& !WinProcess.isForeground(system.get(Tags.PID))){
+    		WinProcess.politelyToForeground(system.get(Tags.HWND));
+    	}
+
     	latestState = state;
     	
     	//Spy mode didn't use the html report
@@ -195,5 +230,11 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     	}
     	super.stopSystem(system);
     }
+    
+    @Override
+	protected void closeTestSession() {
+    	super.closeTestSession();
+    	NativeLinker.cleanWdDriverOS();
+	}
 
 }

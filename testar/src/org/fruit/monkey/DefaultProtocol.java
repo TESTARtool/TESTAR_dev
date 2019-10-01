@@ -332,6 +332,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Quit;
 		}
 
+		//allowing close-up in the end of test session:
+		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
 	}
@@ -770,10 +772,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
-		//allowing close-up in the end of test session:
-		closeTestSession();
-		//Closing TESTAR internal test session:
-		closeTestarTestSession();
+
 		mode = Modes.Quit;
 	}
 

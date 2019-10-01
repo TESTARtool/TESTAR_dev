@@ -52,6 +52,8 @@ import static org.fruit.alayer.windows.UIARoles.*;
  */
 public class NativeLinker {
 	
+	private NativeLinker() {}
+	
 	private static long lastCPUquery = 0;
 
 	private static EnumSet<OperatingSystems> PLATFORM_OS = determinePlatform();
@@ -81,6 +83,10 @@ public class NativeLinker {
 
 	public static void addWdDriverOS() {
 		PLATFORM_OS.add(OperatingSystems.WEBDRIVER);
+	}
+	
+	public static void cleanWdDriverOS() {
+		PLATFORM_OS.remove(OperatingSystems.WEBDRIVER);
 	}
 	
 	public static Set<OperatingSystems> getPLATFORM_OS() {

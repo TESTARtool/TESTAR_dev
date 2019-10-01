@@ -44,7 +44,7 @@ public class WdAttributeAction extends TaggableBase implements Action {
     this.key = key;
     this.value = value;
     this.set(Tags.Role, WdActionRoles.SetAttributeScript);
-    this.set(Tags.Desc, "Execute Webdriver script to set into " + elementId + " values " + key + " " + value);
+    this.set(Tags.Desc, "Execute Webdriver script to set into " + elementId + " " + key + " " + value);
   }
 
   @Override

@@ -1,6 +1,7 @@
 /***************************************************************************************************
 *
-* Copyright (c) 2013, 2014, 2015, 2016, 2017 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2013, 2014, 2015, 2016, 2017, 2019 Universitat Politecnica de Valencia - www.upv.es
+* Copyright (c) 2019 Open Universiteit - www.ou.nl
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions are met:
@@ -84,7 +85,12 @@ public final class CompoundAction extends TaggableBase implements Action {
 		this.actions = b.actions;
 		this.relativeDurations = b.relativeDurations;
 		this.set(Tags.Role, ActionRoles.CompoundAction);
-		this.set(Tags.Desc, actions.toString());
+		
+		int index = 1;
+		StringBuilder sbDesc = new StringBuilder("");
+		for(Action a : actions)
+			sbDesc.append("[(Action n" + (index++) + ") " + a.get(Tags.Desc,"") + "] ");
+		this.set(Tags.Desc, sbDesc.toString());
 	}
 	
 	public CompoundAction(Action... actions){
@@ -113,7 +119,6 @@ public final class CompoundAction extends TaggableBase implements Action {
 		return sb.toString();
 	}
 	
-	// by urueda
 	@Override
 	public String toString(Role... discardParameters) {
 		StringBuilder sb = new StringBuilder();
@@ -123,7 +128,6 @@ public final class CompoundAction extends TaggableBase implements Action {
 		return sb.toString();
 	}	
 
-	// by urueda
 	@Override
 	public String toShortString() {
 		StringBuilder sb = new StringBuilder();
@@ -132,7 +136,7 @@ public final class CompoundAction extends TaggableBase implements Action {
 			sb.append(r.toString());
 		else
 			sb.append("UNDEF");
-		HashSet<String> parameters = new HashSet<String>();
+		HashSet<String> parameters = new HashSet<>();
 		for (Action a : actions)
 			parameters.add(a.toParametersString());
 		for (String p : parameters)
@@ -140,12 +144,11 @@ public final class CompoundAction extends TaggableBase implements Action {
 		return sb.toString();
 	}
 
-	// by urueda
 	@Override
 	public String toParametersString() {
-		String params = "";
+		StringBuilder params = new StringBuilder("");
 		for (Action a : actions)
-			params += a.toParametersString();
-		return params;
+			params.append(a.toParametersString());
+		return params.toString();
 	}
 }
