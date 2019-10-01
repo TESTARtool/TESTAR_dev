@@ -87,7 +87,7 @@ public class TaggableBase implements Taggable, Serializable {
 
 	public <T> void set(Tag<T> tag, T value) {
 		Assert.notNull(tag, value);
-		Assert.isTrue(tag.type().isInstance(value), "Value not of type required by this tag!");
+		Assert.isTrue(tag.type().isInstance(value), "Value not of type required by this tag!"+"css tag: "+tag.name()+"css value: >>>"+value+"<<<");
 		tagValues.put(tag, value);
 	}
 

@@ -896,7 +896,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 tcontrol.saveFormulaFile(fromcoll, TemporalType.LTL, "Formulas.txt");
 
 
-
                 CSVHandler.save(fromcoll, strippedfile + "_inputvalidation.csv");
                 textArea12.append("input validation results csv saved: \n");
 
@@ -923,19 +922,17 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 f.printStackTrace();
             }
 
-             List<TemporalOracle> modelCheckedOracles =sParse.parse(contentBuilder.toString());
-            if (modelCheckedOracles==null){
+            List<TemporalOracle> modelCheckedOracles = sParse.parse(contentBuilder.toString());
+            if (modelCheckedOracles == null) {
                 System.err.println("Error detected in modelcheck results");
                 textArea12.append("Error detected in modelcheck results");
                 textArea12.append("\n");
-            }else
-            {
+            } else {
                 // add to oraclecoll.
                 CSVHandler.save(modelCheckedOracles, strippedfile + "_modelchecked.csv");
                 textArea12.append("input validation results csv saved: \n");
 
             }
-
 
 
             tcontrol.shutdown();
@@ -1107,7 +1104,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 tcontrol.saveFormulaFile(fromcoll, TemporalType.LTL, "Formulas.txt");
 
                 String[] fileparts = file.split("\\.");
-                String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length()-1);
+                String strippedfile = file.substring(0, file.length() - fileparts[fileparts.length - 1].length() - 1);
 
                 CSVHandler.save(fromcoll, strippedfile + "_inputvalidation.csv");
                 textArea12.append("inputvalidation results csv saved: \n");

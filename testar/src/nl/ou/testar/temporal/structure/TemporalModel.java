@@ -193,7 +193,7 @@ public  TemporalModel(){
 
 
             if (!importStatus) {
-                System.out.println("debug substitutions: "+sortedsubstitionvalues);
+                //System.out.println("debug substitutions: "+sortedsubstitionvalues);
                 candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
                 for (String subst:sortedsubstitionvalues
                      ) {
@@ -208,7 +208,12 @@ public  TemporalModel(){
 
             for (String v:sortedsubstitionvalues
                  ) {
-                apindex.add(APPrefix+aplookup.inverse().get(v));
+
+                if(aplookup.inverse().containsKey(v)){
+                    apindex.add(APPrefix+aplookup.inverse().get(v));
+                }else
+                    apindex.add(APPrefix+"_indexNotFound");
+
             }
 
             formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(),
