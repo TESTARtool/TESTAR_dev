@@ -31,6 +31,7 @@
 package org.fruit.alayer.webdriver;
 
 import org.fruit.alayer.Rect;
+import org.fruit.alayer.TaggableBase;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class WdElement implements Serializable {
+public class WdElement extends TaggableBase implements Serializable {
   private static final long serialVersionUID = 2695983969893321255L;
 
   private static final List<String> scrollOn = Arrays.asList("auto", "scroll");

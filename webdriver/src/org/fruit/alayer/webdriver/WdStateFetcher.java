@@ -36,10 +36,6 @@ import org.fruit.alayer.SUT;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.exceptions.StateBuildException;
-import org.fruit.alayer.webdriver.enums.WdRoles;
-
-import es.upv.staq.testar.StateManagementTags;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,29 +142,8 @@ public class WdStateFetcher implements Callable<WdState> {
     WdWidget w = parent.root().addChild(parent, element);
     element.backRef = w;
     
-    setStateManagementTags(w, element);
-    
     for (WdElement child : element.children) {
       createWidgetTree(w, child);
     }
-  }
-  
-  private void setStateManagementTags(WdWidget widget, WdElement element) {
-	  widget.set(StateManagementTags.WidgetControlType, getValueOrDefault(WdRoles.fromTypeId(element.tagName).toString(),""));
-	  widget.set(StateManagementTags.WidgetIsEnabled, getValueOrDefault(element.enabled, false));
-	  widget.set(StateManagementTags.WidgetTitle, getValueOrDefault(element.name, ""));
-	  widget.set(StateManagementTags.WidgetHelpText, getValueOrDefault(element.helpText, ""));
-	  widget.set(StateManagementTags.WidgetClassName, getValueOrDefault(element.cssClasses.toString(), ""));
-	  widget.set(StateManagementTags.WidgetBoundary, getValueOrDefault(element.rect.toString(), ""));
-	  widget.set(StateManagementTags.WidgetValueValue, getValueOrDefault(element.valuePattern, ""));
-	  widget.set(StateManagementTags.WidgetIsOffscreen, getValueOrDefault(!element.isFullVisibleOnScreen, false));
-	  widget.set(StateManagementTags.WidgetIsContentElement, getValueOrDefault(element.isContentElement, false));
-	  widget.set(StateManagementTags.WidgetIsControlElement, getValueOrDefault(element.isControlElement, false));
-	  widget.set(StateManagementTags.WidgetAutomationId, getValueOrDefault(element.id, ""));
-	  widget.set(StateManagementTags.WidgetItemType, getValueOrDefault(element.type, ""));
-  }
-
-  private static <T> T getValueOrDefault(T value, T defaultValue) {
-	  return value == null ? defaultValue : value;
   }
 }

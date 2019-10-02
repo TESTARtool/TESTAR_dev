@@ -58,6 +58,7 @@ import org.testar.OutputStructure;
 
 import es.upv.staq.testar.NativeLinker;
 import es.upv.staq.testar.protocols.ClickFilterLayerProtocol;
+import es.upv.staq.testar.serialisation.LogSerialiser;
 import nl.ou.testar.HtmlReporting.HtmlSequenceReport;
 
 public class WebdriverProtocol extends ClickFilterLayerProtocol {
@@ -118,6 +119,8 @@ public class WebdriverProtocol extends ClickFilterLayerProtocol {
     			&& WinProcess.procName(system.get(Tags.PID)).contains("chrome") 
     			&& !WinProcess.isForeground(system.get(Tags.PID))){
     		WinProcess.politelyToForeground(system.get(Tags.HWND));
+    		LogSerialiser.log("Trying to set Chrome Browser to Foreground... " 
+    		+ WinProcess.procName(system.get(Tags.PID)) + "\n");
     	}
 
     	latestState = state;

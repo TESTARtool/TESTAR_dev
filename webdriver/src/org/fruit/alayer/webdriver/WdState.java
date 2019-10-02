@@ -34,6 +34,7 @@ import org.fruit.Assert;
 import org.fruit.Util;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.NoSuchTagException;
+import org.fruit.alayer.webdriver.enums.WdMapping;
 import org.fruit.alayer.webdriver.enums.WdRoles;
 import org.fruit.alayer.webdriver.enums.WdTags;
 
@@ -112,11 +113,18 @@ public final class WdState extends WdWidget implements State {
 
 	@SuppressWarnings("unchecked")
 	public <T> T get(WdWidget w, Tag<T> t, T defaultValue) {
-		Object ret = w.tags.get(t);
-
-		if (ret != null) {
-			return (T) ret;
+		
+		Tag<T> stateManagementTag = WdMapping.getMappedStateTag(t);
+		if (stateManagementTag != null) {
+			t = stateManagementTag;
 		}
+
+		Object ret = w.tags.get(t);
+		
+		if (ret != null) {
+			return (T)ret;
+		}
+
 		else if (w.element == null || w.tags.containsKey(t)) {
 			return defaultValue;
 		}
@@ -232,6 +240,9 @@ public final class WdState extends WdWidget implements State {
 		else if (t.equals(WdTags.WebIsFullOnScreen)) {
 			ret = w.element.isFullVisibleOnScreen;
 		}
+		else if (t.equals(WdTags.WebIsOffScreen)) {
+			ret = !w.element.isFullVisibleOnScreen;
+		}
 		else if (t.equals(WdTags.WebIsKeyboardFocusable)) {
 			ret = w.element.isKeyboardFocusable;
 		}
@@ -282,6 +293,12 @@ public final class WdState extends WdWidget implements State {
 		}
 		else if (t.equals(WdTags.WebIsClickable)) {
 			ret = w.element.isClickable;
+		}
+		else if (t.equals(WdTags.WebBoundingRectangle)) {
+			ret = w.element.rect;
+		}
+		else if (t.equals(WdTags.WebBoundary)) {
+			ret = w.element.rect.toString();
 		}
 
 		cacheTag(w, t, ret);

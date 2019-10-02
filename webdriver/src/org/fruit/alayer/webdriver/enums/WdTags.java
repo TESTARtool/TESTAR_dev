@@ -187,6 +187,7 @@ public class WdTags extends TagsBase {
    * Bounding rectangle of a widget.
    */
   public static final Tag<Rect> WebBoundingRectangle = from("WebBoundingRectangle", Rect.class);
+  public static final Tag<String> WebBoundary = from("WebBoundary", String.class);
 
   /**
    * Whether this widget is currently enabled or disabled (e.g. "greyed out")
@@ -212,6 +213,7 @@ public class WdTags extends TagsBase {
    * Whether this widget is currently visible on the screen.
    */
   public static final Tag<Boolean> WebIsFullOnScreen = from("WebIsFullOnScreen", Boolean.class);
+  public static final Tag<Boolean> WebIsOffScreen = from("WebIsOffScreen", Boolean.class);
 
   /**
    * Whether this widget can be focused, such that it will receive keyboard input.
