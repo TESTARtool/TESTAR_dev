@@ -104,7 +104,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private JButton loadTestSelectorButton;
     private JTextField APSelectorManagerTESTJSONTextField;
     private JTextField temporalOracleTESTCsvTextField;
-    private JButton button7;
+    private JButton defaultSelectorButton1;
+    private JButton sampleOracleButton1;
+    private JButton graphMLButton1;
 
     public Temporalpanel2() {
         $$$setupUI$$$();
@@ -302,21 +304,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 //
             }
         });
-        button7.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //
-                JFileChooser fd = new JFileChooser();
-                fd.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fd.setCurrentDirectory(new File("./" + outputDir));//.getParentFile());
 
-                if (fd.showOpenDialog(panel1) == JFileChooser.APPROVE_OPTION) {
-                    String file = fd.getSelectedFile().getAbsolutePath();
-                    textField4.setText(file);
-                }
-                //
-            }
-        });
         modelCheckButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -326,6 +314,20 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                     textArea12.append("TemporalType: " + (String) comboBox1.getSelectedItem() + " is not implemented");
             }
         });
+        defaultSelectorButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                testSaveDefaultApSelectionManagerJSON();
+            }
+        });
+        sampleOracleButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        graphMLButton1.addActionListener(this::testgraphml);
+
     }
 
     public static Temporalpanel2 createTemporalPanel() {
@@ -344,7 +346,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
      */
     private void $$$setupUI$$$() {
         panel1 = new JPanel();
-        panel1.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:227px:grow,left:6dlu:noGrow,fill:10px:noGrow,left:32dlu:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:207px:noGrow,top:161px:noGrow"));
+        panel1.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:227px:grow,left:6dlu:noGrow,fill:10px:noGrow,left:32dlu:noGrow,right:max(p;42px):noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:283px:noGrow,top:161px:noGrow"));
         panel1.setPreferredSize(new Dimension(621, 340));
         panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 2, 2, 2), null));
         final JSeparator separator1 = new JSeparator();
@@ -354,9 +356,11 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         tabbedPane1.setMinimumSize(new Dimension(617, 275));
         tabbedPane1.setPreferredSize(new Dimension(617, 275));
         tabbedPane1.setRequestFocusEnabled(true);
+        tabbedPane1.setVisible(true);
         panel1.add(tabbedPane1, cc.xyw(1, 2, 16));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:330px:noGrow,left:4dlu:noGrow,right:95px:noGrow", "center:d:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:d:noGrow"));
+        panel2.setVisible(false);
         tabbedPane1.addTab("Setup", panel2);
         final JLabel label1 = new JLabel();
         label1.setText("LTL Checker:");
@@ -394,6 +398,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         panel2.add(WSLCheckBox, cc.xy(5, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new FormLayout("fill:143px:noGrow,left:4dlu:noGrow,fill:d:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:5dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:31px:noGrow,left:5dlu:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:15px:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:max(m;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,center:max(d;4px):noGrow"));
+        panel3.setVisible(true);
         tabbedPane1.addTab("Alpha Explore", panel3);
         testDbButton = new JButton();
         testDbButton.setText("Test DB Connection");
@@ -445,6 +450,7 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         panel3.add(label7, cc.xy(1, 12));
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:330px:noGrow,left:4dlu:noGrow,fill:31px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+        panel4.setVisible(false);
         tabbedPane1.addTab("Alpha LTL", panel4);
         final Spacer spacer1 = new Spacer();
         panel4.add(spacer1, cc.xy(5, 11, CellConstraints.FILL, CellConstraints.DEFAULT));
@@ -491,38 +497,65 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         button12.setText("...");
         panel4.add(button12, cc.xy(5, 3));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new FormLayout("left:117px:noGrow,left:4dlu:noGrow,fill:p:grow,left:4dlu:noGrow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,right:38px:noGrow,left:4dlu:noGrow,right:p:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:4dlu:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:d:grow"));
+        panel5.setLayout(new FormLayout("left:117px:noGrow,left:4dlu:noGrow,fill:p:grow,left:4dlu:noGrow,fill:37px:noGrow,left:4dlu:noGrow,left:4dlu:noGrow,fill:41px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:5dlu:noGrow,fill:d:grow,fill:d:grow,right:38px:noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,right:p:noGrow,fill:max(d;4px):noGrow", "center:d:noGrow,top:4dlu:noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:d:noGrow,top:4dlu:noGrow,center:d:noGrow"));
         tabbedPane1.addTab("Miner", panel5);
         final JLabel label12 = new JLabel();
         label12.setText("Oracle Patterns");
         panel5.add(label12, cc.xy(1, 1));
         textField5 = new JTextField();
-        panel5.add(textField5, cc.xyw(3, 1, 6, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel5.add(textField5, cc.xyw(3, 1, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         textField6 = new JTextField();
-        panel5.add(textField6, cc.xyw(3, 7, 6, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel5.add(textField6, cc.xyw(3, 7, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         textField4 = new JTextField();
         textField4.setEditable(false);
         textField4.setEnabled(true);
-        panel5.add(textField4, cc.xyw(3, 9, 6, CellConstraints.FILL, CellConstraints.DEFAULT));
+        panel5.add(textField4, cc.xyw(3, 9, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         final JLabel label13 = new JLabel();
         label13.setText("APSelectorManager");
         panel5.add(label13, cc.xy(1, 7));
         potentialOraclesLabel = new JLabel();
         potentialOraclesLabel.setText("Potential Oracles");
         panel5.add(potentialOraclesLabel, cc.xy(1, 9));
-        button3 = new JButton();
-        button3.setText("...");
-        panel5.add(button3, cc.xy(10, 7));
+        final JSeparator separator2 = new JSeparator();
+        panel5.add(separator2, cc.xyw(1, 6, 18, CellConstraints.FILL, CellConstraints.FILL));
+        final JLabel label14 = new JLabel();
+        label14.setText("Raw Oracles");
+        panel5.add(label14, cc.xy(1, 4));
+        textField7 = new JTextField();
+        panel5.add(textField7, cc.xyw(3, 4, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
+        final JLabel label15 = new JLabel();
+        label15.setText("Generate Files:");
+        panel5.add(label15, cc.xy(1, 11));
+        defaultSelectorButton1 = new JButton();
+        defaultSelectorButton1.setText("Default Selector");
+        defaultSelectorButton1.setToolTipText("Generate default APSelectionManager");
+        panel5.add(defaultSelectorButton1, cc.xy(3, 11, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        sampleOracleButton1 = new JButton();
+        sampleOracleButton1.setText("Sample Oracle");
+        panel5.add(sampleOracleButton1, cc.xyw(4, 11, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        button2 = new JButton();
+        button2.setText("...");
+        panel5.add(button2, cc.xy(8, 4));
         button1 = new JButton();
         button1.setText("...");
-        panel5.add(button1, cc.xy(10, 1));
-        final JLabel label14 = new JLabel();
-        label14.setText("Type");
-        panel5.add(label14, cc.xy(12, 7));
+        panel5.add(button1, cc.xy(8, 1));
+        button3 = new JButton();
+        button3.setText("...");
+        panel5.add(button3, cc.xy(8, 7));
+        final JLabel label16 = new JLabel();
+        label16.setText("Tactic");
+        panel5.add(label16, cc.xy(10, 1));
+        final JLabel label17 = new JLabel();
+        label17.setText("Type");
+        panel5.add(label17, cc.xy(10, 7));
+        generateOraclesButton = new JButton();
+        generateOraclesButton.setText("<html>Generate Oracles</html>");
+        generateOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
+        panel5.add(generateOraclesButton, cc.xyw(10, 4, 8));
         modelCheckButton = new JButton();
         modelCheckButton.setText("Model Check");
         modelCheckButton.setToolTipText("Checks the Candidates on the Model. ");
-        panel5.add(modelCheckButton, cc.xyw(12, 9, 3));
+        panel5.add(modelCheckButton, cc.xyw(10, 9, 8));
         comboBox1 = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         defaultComboBoxModel1.addElement("LTL");
@@ -531,29 +564,16 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         defaultComboBoxModel1.addElement("CTL");
         defaultComboBoxModel1.addElement("MUCALC");
         comboBox1.setModel(defaultComboBoxModel1);
-        panel5.add(comboBox1, cc.xy(14, 7, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JSeparator separator2 = new JSeparator();
-        panel5.add(separator2, cc.xyw(1, 6, 14, CellConstraints.FILL, CellConstraints.FILL));
-        final JLabel label15 = new JLabel();
-        label15.setText("Raw Oracles");
-        panel5.add(label15, cc.xy(1, 4));
-        textField7 = new JTextField();
-        panel5.add(textField7, cc.xyw(3, 4, 6, CellConstraints.FILL, CellConstraints.DEFAULT));
-        button2 = new JButton();
-        button2.setText("...");
-        panel5.add(button2, cc.xy(10, 4));
-        generateOraclesButton = new JButton();
-        generateOraclesButton.setText("<html>Generate Oracles</html>");
-        generateOraclesButton.setToolTipText("Combines the Patterns and the Model to generate Potential Oracles. Then checks the Candidates on the Model. ");
-        panel5.add(generateOraclesButton, cc.xyw(12, 4, 3));
+        comboBox1.setToolTipText("Type of Check to perform");
+        panel5.add(comboBox1, cc.xyw(12, 7, 7, CellConstraints.LEFT, CellConstraints.DEFAULT));
         comboBox2 = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
-        defaultComboBoxModel2.addElement("OraclesPerPattern1");
-        defaultComboBoxModel2.addElement("OraclesPerPattern5");
-        defaultComboBoxModel2.addElement("OraclesPerPattern10");
-        defaultComboBoxModel2.addElement("OraclesPerPattern100");
-        defaultComboBoxModel2.addElement("OraclesPerPattern1000");
-        defaultComboBoxModel2.addElement("OraclesPerPattern10000");
+        defaultComboBoxModel2.addElement("RndPerPattern1");
+        defaultComboBoxModel2.addElement("RndPerPattern5");
+        defaultComboBoxModel2.addElement("RndPerPattern10");
+        defaultComboBoxModel2.addElement("RndPerPattern100");
+        defaultComboBoxModel2.addElement("RndPerPattern1000");
+        defaultComboBoxModel2.addElement("RndPerPattern10000");
         defaultComboBoxModel2.addElement("Random10");
         defaultComboBoxModel2.addElement("Random100");
         defaultComboBoxModel2.addElement("Random1000");
@@ -562,27 +582,27 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         defaultComboBoxModel2.addElement("Random1000000");
         defaultComboBoxModel2.addElement("All(combinatorial)");
         comboBox2.setModel(defaultComboBoxModel2);
-        panel5.add(comboBox2, cc.xy(14, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label16 = new JLabel();
-        label16.setText("Tactic");
-        panel5.add(label16, cc.xy(12, 1));
-        button7 = new JButton();
-        button7.setText("...");
-        panel5.add(button7, cc.xy(10, 9));
+        comboBox2.setToolTipText("tactic to generate oracles from the supplied Pattern collection");
+        comboBox2.setVerifyInputWhenFocusTarget(true);
+        panel5.add(comboBox2, cc.xyw(12, 1, 2, CellConstraints.LEFT, CellConstraints.DEFAULT));
+        graphMLButton1 = new JButton();
+        graphMLButton1.setText("GraphML");
+        graphMLButton1.setToolTipText("Make a model from the graphDB. Requires APSelectorManagerTEST.json file in directory temporal");
+        panel5.add(graphMLButton1, cc.xyw(12, 11, 5, CellConstraints.LEFT, CellConstraints.DEFAULT));
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new FormLayout("fill:d:noGrow,left:4dlu:noGrow,left:330px:noGrow,left:4dlu:noGrow,left:4dlu:noGrow,right:40px:noGrow,left:4dlu:noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
         tabbedPane1.addTab("Visualizer", panel6);
-        final JLabel label17 = new JLabel();
-        label17.setText("Input Oracle File");
-        panel6.add(label17, cc.xy(1, 1));
+        final JLabel label18 = new JLabel();
+        label18.setText("Input Oracle File");
+        panel6.add(label18, cc.xy(1, 1));
         textField8 = new JTextField();
         panel6.add(textField8, cc.xy(3, 1, CellConstraints.FILL, CellConstraints.DEFAULT));
         button4 = new JButton();
         button4.setText("...");
         panel6.add(button4, cc.xy(6, 1, CellConstraints.RIGHT, CellConstraints.DEFAULT));
-        final JLabel label18 = new JLabel();
-        label18.setText("GraphML File");
-        panel6.add(label18, cc.xy(1, 3));
+        final JLabel label19 = new JLabel();
+        label19.setText("GraphML File");
+        panel6.add(label19, cc.xy(1, 3));
         textField9 = new JTextField();
         panel6.add(textField9, cc.xy(3, 3, CellConstraints.FILL, CellConstraints.DEFAULT));
         button5 = new JButton();
@@ -594,9 +614,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         startAnalyzerButton = new JButton();
         startAnalyzerButton.setText("Start Analyzer");
         panel6.add(startAnalyzerButton, cc.xy(1, 7));
-        final JLabel label19 = new JLabel();
-        label19.setText("Output Oracle File");
-        panel6.add(label19, cc.xy(1, 5));
+        final JLabel label20 = new JLabel();
+        label20.setText("Output Oracle File");
+        panel6.add(label20, cc.xy(1, 5));
         textField12 = new JTextField();
         panel6.add(textField12, cc.xy(3, 5, CellConstraints.FILL, CellConstraints.DEFAULT));
         button6 = new JButton();
@@ -1110,7 +1130,6 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
                 textArea12.append("inputvalidation results csv saved: \n");
 
             }
-
 
             textArea12.append(" saving to file done\n");
             tcontrol.shutdown();

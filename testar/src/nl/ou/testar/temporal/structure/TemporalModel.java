@@ -149,8 +149,9 @@ public  TemporalModel(){
             result.append(s);
             result.append("\n");
             for (TransitionEncoding trans:stateenc.getTransitionColl()  ) {
+                result.append("[");
                 result.append(trans.getEncodedAPConjunct());
-
+                result.append("]");
                 String targetState = trans.getTargetState();
                 int targetStateindex =0;
                 for (StateEncoding se: stateEncodings )

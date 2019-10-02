@@ -125,8 +125,8 @@ public class Spot_CheckerResultsParser {
                             String conjunctStr = prefixLines[j + 1].
                                     split("\\s*\\|\\s*")[1].    //cutoff leading pipe symbol
                                     split("\\s*\\{\\s*")[0];  //cutoff acceptanceset
-                            conjunctStr.replaceAll("\\s", "").replaceAll("ap", "");
-                            prefixAPConjunctList.add(conjunctStr);
+                            prefixAPConjunctList.add(conjunctStr.replaceAll("\\s", "").replaceAll("ap", ""));
+
 
                         }
                     } // else : noprefix?
@@ -145,8 +145,8 @@ public class Spot_CheckerResultsParser {
                             String conjunctStr = cycleLines[j + 1].
                                     split("\\s*\\|\\s*")[1].    //cutoff leading pipe symbol
                                     split("\\s*\\{\\s*")[0];  //cutoff acceptanceset
-                            conjunctStr.replaceAll("\\s", "").replaceAll("ap", "");
-                            cycleAPConjunctList.add(conjunctStr);
+                            cycleAPConjunctList.add(conjunctStr.replaceAll("\\s", "").replaceAll("ap", ""));
+
 
                         }
                     } // else: nocycle?
