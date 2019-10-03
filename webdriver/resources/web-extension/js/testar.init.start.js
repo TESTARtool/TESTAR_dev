@@ -4,8 +4,8 @@
  * scripts or inline declarations
  */
 var actualCode = '(' + function () {
-    Element.prototype._addEventListener = Element.prototype.addEventListener;
-    Element.prototype.addEventListener = function (a, b, c) {
+    EventTarget.prototype._addEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function (a, b, c) {
         if (c === undefined)
             c = false;
         this._addEventListener(a, b, c);
@@ -16,14 +16,14 @@ var actualCode = '(' + function () {
         this.eventListenerList[a].push({listener: b, useCapture: c});
     };
 
-    Element.prototype.getEventListeners = function (a) {
+    EventTarget.prototype.getEventListeners = function (a) {
         if (!this.eventListenerList)
             this.eventListenerList = {};
         if (a === undefined)
             return this.eventListenerList;
         return this.eventListenerList[a];
     };
-    Element.prototype.clearEventListeners = function (a) {
+    EventTarget.prototype.clearEventListeners = function (a) {
         if (!this.eventListenerList)
             this.eventListenerList = {};
         if (a === undefined) {
@@ -39,8 +39,8 @@ var actualCode = '(' + function () {
         }
     };
 
-    Element.prototype._removeEventListener = Element.prototype.removeEventListener;
-    Element.prototype.removeEventListener = function (a, b, c) {
+    EventTarget.prototype._removeEventListener = EventTarget.prototype.removeEventListener;
+    EventTarget.prototype.removeEventListener = function (a, b, c) {
         if (c === undefined)
             c = false;
         this._removeEventListener(a, b, c);
