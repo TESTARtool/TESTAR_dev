@@ -388,6 +388,19 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
+					+"# Temporal Oracle settings\n"
+					+"#################################################################\n"
+					+"LTLChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
+					+"LTLCheckerWSL = true" + Util.lineSep()
+					+"LTLVerbose = true" + Util.lineSep()
+					+"TemporalDirectory = temporal" + Util.lineSep()
+					+"SpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()
+					+"PythonEnvironment = python.exe" + Util.lineSep()
+					+"PythonVisualizer = run.py" + Util.lineSep()
+					+"PythonVisualizerURL = localhost:8050" + Util.lineSep()
+					+"PythonVisualizerURLStop = localhost:8050/shutdown" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"

@@ -36,7 +36,6 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 public final class ConfigTags {
@@ -118,12 +117,15 @@ public final class ConfigTags {
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
 
   // temporal oracles config tags
-  public static final Tag<String> SpotChecker = Tag.from("SpotChecker", String.class);
+  public static final Tag<String> LTLChecker = Tag.from("LTLChecker", String.class);
+  public static final Tag<Boolean> LTLCheckerWSL = Tag.from("LTLCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> LTLVerbose = Tag.from("LTLVerbose", Boolean.class);
+  public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
   public static final Tag<String> SpotFormulaParser = Tag.from("SpotFormulaParser", String.class);
   public static final Tag<String> PythonEnvironment = Tag.from("PythonEnvironment", String.class);
   public static final Tag<String> PythonVisualizer = Tag.from("PythonVisualizer", String.class);
-  public static final Tag<String> PythonVisualizerPort = Tag.from("PythonVisualizerPort", String.class);
-  public static final Tag<String> PythonVisualizerStop = Tag.from("PythonVisualizerStop", String.class);
+  public static final Tag<String> PythonVisualizerURL = Tag.from("PythonVisualizerURL", String.class);
+  public static final Tag<String> PythonVisualizerURLStop = Tag.from("PythonVisualizerURLStop", String.class);
 
 
   @SuppressWarnings("unchecked")

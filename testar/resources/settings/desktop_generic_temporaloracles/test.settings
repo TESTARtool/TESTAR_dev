@@ -122,16 +122,21 @@ DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName =
-ApplicationVersion =
+#ApplicationName =
+#ApplicationVersion =
 
 #################################################################
 # Temporal Oracle settings
 #################################################################
-SpotChecker = ubuntu1804 run ~/testar/spot_checker
+LTLChecker = ubuntu1804 run ~/testar/spot_checker
+LTLCheckerWSL = true
+LTLVerbose = true
+TemporalDirectory = temporal
 SpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
-PythonEnvironment = C:\\Users\\c\\Anaconda3\\condabin\\conda.bat activate && python
+PythonEnvironment = C:\\Users\\c\\AppData\\Local\\Programs\\Python\\Python37\\python.exe
 PythonVisualizer = C:\\Users\\c\\git\\Testar_viz\\run.py
+PythonVisualizerURL = http://localhost:8050
+PythonVisualizerURLStop = http://localhost:8050/shutdown
 
 #################################################################
 # State identifier attributes
