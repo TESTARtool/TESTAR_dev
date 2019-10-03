@@ -149,6 +149,7 @@ public class TreeWalker {
         }
 
 
+        List<Integer> foundPID = new ArrayList<>();
         // Activate each application through AT-SPI and find the PID for each active application through xdotool.
         // Once verified that the node activated the instance of the application launched by us - stop.
         for (AtSpiAccessible application : applicationNodes) {
@@ -173,6 +174,7 @@ public class TreeWalker {
                 if (pid == activePID) {
                     return application;
                 }
+                foundPID.add(activePID);
 
 
             } else {
@@ -182,6 +184,10 @@ public class TreeWalker {
 
         }
 
+        System.out.println("Found PIDs: " + foundPID.toString());
+        if(foundPID.contains(-1))
+        	System.out.println("Verify that xdotool is installed in your environment: man xdotool \n"
+        			+ "If not, please install with: sudo apt-get install xdotool \n");
 
         System.out.println("Cannot find an application node in the list belonging to an application with PID '" + pid + "'.");
         return null;

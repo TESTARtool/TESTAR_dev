@@ -23,7 +23,7 @@ Mode = Spy
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = geany
 
 #################################################################
 # Sequences
@@ -31,7 +31,7 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 8
+Sequences = 1
 SequenceLength = 10
 
 #################################################################
@@ -40,7 +40,7 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+SuspiciousTitles = .*[eE]xcepti[o?]n.*
 
 #################################################################
 # Oracles based on Suspicious Outputs detected by Process Listeners
@@ -112,9 +112,7 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 
 ProcessesToKillDuringTest =
-OutputDir = ./output
 PathToReplaySequence = ./output/temp
-TempDir = ./output/temp
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
 LogLevel = 1
@@ -130,7 +128,7 @@ Delete =
 MaxTime = 3.1536E7
 ShowSettingsAfterTest = true
 TimeToWaitAfterAction = 0.1
-StartupTime = 10.0
+StartupTime = 2.0
 DrawWidgetInfo = false
 TimeToFreeze = 30.0
 StopGenerationOnFault = true

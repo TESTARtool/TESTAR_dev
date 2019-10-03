@@ -75,7 +75,7 @@ public class SutVisualization {
                     String rootText = "State: " + rootW.get(Tags.ConcreteID),
                             widConcreteText = CodingManager.CONCRETE_ID + ": " + cursorWidget.get(Tags.ConcreteID),
                             roleText = "Role: " + cursorWidget.get(Role, Roles.Widget).toString(),
-                            idxText = "Path: " + cursorWidget.get(Tags.Path);
+                            idxText = "Path: " + cursorWidget.get(Tags.Path,"");
 
                     double miniwidgetInfoW = Math.max(Math.max(Math.max(rootText.length(), widConcreteText.length()), roleText.length()),idxText.length()) * 8; if (miniwidgetInfoW < 256) miniwidgetInfoW = 256;
                     double miniwidgetInfoH = 80; // 20 * 4

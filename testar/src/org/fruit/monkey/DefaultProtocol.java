@@ -1343,16 +1343,16 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
-			String printSutInfo = "Waiting for the SUT to be accessible ...";
+			/*String printSutInfo = "Waiting for the SUT to be accessible ...";
 			double startupTime = settings().get(ConfigTags.StartupTime)*1000;
-			int timeFlash = (int)startupTime;
+			int timeFlash = (int)startupTime;*/
 
 			//Refresh the flash information, to avoid that SUT hide the information
-			int countTimeFlash = 0;
+			/*int countTimeFlash = 0;
 			while(countTimeFlash<timeFlash) {
 				FlashFeedback.flash(printSutInfo, 2000);
 				countTimeFlash += 2000;
-			}
+			}*/
 
 			final long now = System.currentTimeMillis(),
 					ENGAGE_TIME = tryToKillIfRunning ? Math.round(maxEngageTime / 2.0) : maxEngageTime; // half time is expected for the implementation
@@ -1360,8 +1360,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					do{
 						if (sut.isRunning()){
 							//Print info to the user to know that TESTAR is READY for its use :-)
-							printSutInfo = "SUT is READY";
-							FlashFeedback.flash(printSutInfo,2000);
+							//printSutInfo = "SUT is READY";
+							//FlashFeedback.flash(printSutInfo,2000);
 							System.out.println("SUT is running after <" + (System.currentTimeMillis() - now) + "> ms ... waiting UI to be accessible");
 							state = builder.apply(sut);
 							if (state != null && state.childCount() > 0){
@@ -1371,8 +1371,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							}
 						}else {
 							//Print info to the user to know that TESTAR is NOT READY for its use :-(
-							printSutInfo = "Waiting for the SUT to be accessible ...";
-							FlashFeedback.flash(printSutInfo, 500);
+							//printSutInfo = "Waiting for the SUT to be accessible ...";
+							//FlashFeedback.flash(printSutInfo, 500);
 						}
 						Util.pauseMs(500);
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);

@@ -33,14 +33,14 @@ import java.util.Set;
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.Settings;
-import org.testar.protocols.DesktopProtocol;
+import org.testar.protocols.LinuxProtocol;
 
 /**
  * This protocol provides default TESTAR behaviour to test Windows desktop applications.
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic extends DesktopProtocol {
+public class Protocol_desktop_generic extends LinuxProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR

@@ -71,7 +71,7 @@ public class Main {
 	public static String testarDir = "." + File.separator;
 	public static String settingsDir = testarDir + "settings" + File.separator;
 	public static String outputDir = testarDir + "output" + File.separator;
-	public static String tempDir = outputDir + "temp" + File.separator;
+	public static String tempDir = outputDir + "Temp" + File.separator;
 
 
 	/**
@@ -108,6 +108,17 @@ public class Main {
 		isValidJavaEnvironment();
 
 		initTestarSSE(args);
+		
+		try {
+			outputDir = new File(outputDir).getCanonicalPath();
+			if(!new File(outputDir).exists())
+				new File(outputDir).mkdir();
+			
+			tempDir = new File(tempDir).getCanonicalPath();
+			if(!new File(tempDir).exists())
+				new File(tempDir).mkdir();
+			
+		}catch (Exception e ) {}
 
 		String testSettingsFileName = getTestSettingsFile();
 		System.out.println("Test settings is <" + testSettingsFileName + ">");
@@ -157,8 +168,8 @@ public class Main {
 			//if(!System.getenv("JAVA_HOME").contains("1.8"))
 				//System.out.println("Java version is not JDK 1.8, please install ");
 		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
-				+"Check if JAVA_HOME system variable is correctly defined \n \n"
-				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
+				+"export JAVA_HOME=\""+File.separatorChar+"usr"+File.separatorChar+"lib"+File.separatorChar+
+				"jvm"+File.separatorChar+"java\" \n \n");}
 
 		return true;
 	}
