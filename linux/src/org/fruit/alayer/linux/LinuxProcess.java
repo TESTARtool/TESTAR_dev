@@ -465,7 +465,8 @@ public class LinuxProcess extends SUTBase {
         LinuxProcess lp = new LinuxProcess(pid);
 
         // Set a different description tag on the instance - process name + PID.
-        lp.set(Tags.Desc, getProcessName(pid) + " (PID: " + pid + ")");
+        //lp.set(Tags.Desc, getProcessName(pid) + " (PID: " + pid + ")");
+        lp.set(Tags.Desc, getProcessName(pid));
 
         return lp;
 
@@ -546,7 +547,7 @@ public class LinuxProcess extends SUTBase {
             //Invalid PID.
             return null;
         }
-        return new LinuxProcess(pid);
+        return fromPid(pid);
 
 
     }

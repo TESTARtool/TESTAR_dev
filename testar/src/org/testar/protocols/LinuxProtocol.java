@@ -70,7 +70,7 @@ public class LinuxProtocol extends ClickFilterLayerProtocol {
 		super.initialize(settings);
 		if(settings.get(ConfigTags.Mode) == Modes.Spy) {
 			JFrame frame = new JFrame();
-			JOptionPane.showMessageDialog(frame, "SPY mode does unfortunately not work on Linux /n d:-( ");
+			JOptionPane.showMessageDialog(frame, "SPY mode does unfortunately not work on Linux");
 			this.mode = Modes.Quit;
 		}
 		

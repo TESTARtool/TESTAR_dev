@@ -161,7 +161,7 @@ public class AtSpiStateFetcher implements Callable<AtSpiState> {
 
 
                 currentTry += 1;
-                System.out.println("AT-SPI did not find the application with name: " + applicationName + "! Retrying, try " + currentTry +  "/ " + _retryCountFindSut + "...");
+                System.out.println("AT-SPI did not find the application with name: " + applicationName + "  Retrying, try " + currentTry +  "/ " + _retryCountFindSut + "...");
 
 
                 // Short pause to give the AT-SPI time to update.

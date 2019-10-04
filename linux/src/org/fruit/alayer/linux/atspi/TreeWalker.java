@@ -65,6 +65,7 @@ public class TreeWalker {
      */
     public static List<AtSpiAccessible> getApplicationNodes(String applicationName, boolean createTree) {
 
+    	System.out.println("Searching... " + applicationName);
 
         // The list that will hold the requested application nodes.
         ArrayList<AtSpiAccessible> applicationNodes = new ArrayList<>();
@@ -178,7 +179,7 @@ public class TreeWalker {
 
 
             } else {
-                System.out.println("Cannot activate an application with the same name - continuing loop...");
+                System.out.println("Cannot activate an application with the name" + application + "- continuing loop...");
             }
 
 

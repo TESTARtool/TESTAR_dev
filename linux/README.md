@@ -2,17 +2,16 @@
 
 ### Prerequisites
 
+To allow testar compilation
 gradle: `sudo apt-get install gradle`
 
-To allow testar compilation
-
+To allow SUT interactions
 xdotool: `sudo apt-get install xdotool`
 
-To allow SUT interactions
 
+SUT as example
 geany: `sudo apt-get install geany`
-
-As initial SUT
+mypaint: `sudo apt-get install mypaint`
 
 ### Gradle build
 
