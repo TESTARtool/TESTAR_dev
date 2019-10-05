@@ -451,15 +451,16 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
-			defaults.add(Pair.from(LTLChecker, ""));
-			defaults.add(Pair.from(LTLCheckerWSL, false));
-			defaults.add(Pair.from(LTLVerbose, false));
+			defaults.add(Pair.from(TemporalEnabled, false));
+			defaults.add(Pair.from(TemporalLTLChecker, ""));
+			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTLVerbose, false));
 			defaults.add(Pair.from(TemporalDirectory, ""));
-			defaults.add(Pair.from(SpotFormulaParser, ""));
-			defaults.add(Pair.from(PythonEnvironment, ""));
-			defaults.add(Pair.from(PythonVisualizer, ""));
-            defaults.add(Pair.from(PythonVisualizerURL, ""));
-            defaults.add(Pair.from(PythonVisualizerURLStop, ""));
+			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
+			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
+			defaults.add(Pair.from(TemporalVisualizerServer, ""));
+            defaults.add(Pair.from(TemporalVisualizerURL, ""));
+            defaults.add(Pair.from(TemporalVisualizerURLStop, ""));
 
             defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));

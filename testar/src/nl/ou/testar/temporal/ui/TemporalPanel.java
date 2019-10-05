@@ -36,6 +36,7 @@ import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.JSONHandler;
+import nl.ou.testar.temporal.util.StreamConsumer;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 

@@ -390,15 +390,18 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Temporal Oracle settings\n"
 					+"#################################################################\n"
-					+"LTLChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
-					+"LTLCheckerWSL = true" + Util.lineSep()
-					+"LTLVerbose = true" + Util.lineSep()
+					+"TemporalEnabled = false" + Util.lineSep()
+					+"TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
+					+"TemporalLTLCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTLVerbose = true" + Util.lineSep()
+					+"TemporalLTLOracles = LTLTemporalOracles.csv" + Util.lineSep()
+					+"TemporalLTLAPSelectorManager = LTLAPSelectorManager.json"+ Util.lineSep()
 					+"TemporalDirectory = temporal" + Util.lineSep()
-					+"SpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()
-					+"PythonEnvironment = python.exe" + Util.lineSep()
-					+"PythonVisualizer = run.py" + Util.lineSep()
-					+"PythonVisualizerURL = localhost:8050" + Util.lineSep()
-					+"PythonVisualizerURLStop = localhost:8050/shutdown" + Util.lineSep()
+					+"TemporalSpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()
+					+"TemporalPythonEnvironment = python.exe" + Util.lineSep()
+					+"TemporalVisualizerServer = run.py --port 8050"+ Util.lineSep()
+					+"TemporalVisualizerURL = localhost:8050" + Util.lineSep()
+					+"TemporalVisualizerURLStop = localhost:8050/shutdown" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"

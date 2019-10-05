@@ -117,15 +117,19 @@ public final class ConfigTags {
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
 
   // temporal oracles config tags
-  public static final Tag<String> LTLChecker = Tag.from("LTLChecker", String.class);
-  public static final Tag<Boolean> LTLCheckerWSL = Tag.from("LTLCheckerWSL", Boolean.class);
-  public static final Tag<Boolean> LTLVerbose = Tag.from("LTLVerbose", Boolean.class);
+  public static final Tag<Boolean> TemporalEnabled = Tag.from("TemporalEnabled", Boolean.class);
+  public static final Tag<String> TemporalLTLChecker = Tag.from("TemporalLTLChecker", String.class);
+  public static final Tag<Boolean> TemporalLTLCheckerWSL = Tag.from("TemporalLTLCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalLTLVerbose = Tag.from("TemporalLTLVerbose", Boolean.class);
+  public static final Tag<String> TemporalLTLOracles = Tag.from("TemporalLTLOracles", String.class);
+  public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
+
   public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
-  public static final Tag<String> SpotFormulaParser = Tag.from("SpotFormulaParser", String.class);
-  public static final Tag<String> PythonEnvironment = Tag.from("PythonEnvironment", String.class);
-  public static final Tag<String> PythonVisualizer = Tag.from("PythonVisualizer", String.class);
-  public static final Tag<String> PythonVisualizerURL = Tag.from("PythonVisualizerURL", String.class);
-  public static final Tag<String> PythonVisualizerURLStop = Tag.from("PythonVisualizerURLStop", String.class);
+  public static final Tag<String> TemporalSpotFormulaParser = Tag.from("TemporalSpotFormulaParser", String.class);
+  public static final Tag<String> TemporalPythonEnvironment = Tag.from("TemporalPythonEnvironment", String.class);
+  public static final Tag<String> TemporalVisualizerServer = Tag.from("TemporalVisualizerServer", String.class);
+  public static final Tag<String> TemporalVisualizerURL = Tag.from("TemporalVisualizerURL", String.class);
+  public static final Tag<String> TemporalVisualizerURLStop = Tag.from("TemporalVisualizerURLStop", String.class);
 
 
   @SuppressWarnings("unchecked")

@@ -39,8 +39,7 @@ public class TemporalController {
     private String outputDir;
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
-    private  TemporalModel tModel;
-
+    private TemporalModel tModel;
 
 
     private List<TemporalOracle> oracleColl;
@@ -66,30 +65,36 @@ public class TemporalController {
         setDefaultAPSelectormanager();
         tModel = new TemporalModel();
     }
+
     public TemporalModel gettModel() {
         return tModel;
     }
 
-    private  void settModel(TemporalModel tModel) {
+    private void settModel(TemporalModel tModel) {
         this.tModel = tModel;
     }
-    public void saveAPSelectorManager (String filename) {
-        JSONHandler.save(apSelectorManager, outputDir + filename,true);
+
+    public void saveAPSelectorManager(String filename) {
+        JSONHandler.save(apSelectorManager, outputDir + filename, true);
     }
 
     public void loadApSelectorManager(String filename) {
-        this.apSelectorManager =  (APSelectorManager) JSONHandler.load(outputDir + filename, apSelectorManager.getClass());
+        this.apSelectorManager = (APSelectorManager) JSONHandler.load(outputDir + filename, apSelectorManager.getClass());
     }
+
     public List<TemporalOracle> getOracleColl() {
         return oracleColl;
     }
 
     public void setOracleColl(List<TemporalOracle> oracleColl) {
         this.oracleColl = oracleColl;
+        this.oracleColl.sort(Comparator.comparing(TemporalOracle::getPattern_TemporalFormalism)); //sort by type
     }
-    public void setDefaultAPSelectormanager(){
-        this.apSelectorManager =new APSelectorManager(true);
+
+    public void setDefaultAPSelectormanager() {
+        this.apSelectorManager = new APSelectorManager(true);
     }
+
     /**
      * Shuts down the orientDB connection.
      */
@@ -97,13 +102,14 @@ public class TemporalController {
         db.close();
         orientDB.close();
     }
-    public String pingDB(){
-       StringBuilder sb = new StringBuilder();
+
+    public String pingDB() {
+        StringBuilder sb = new StringBuilder();
         List<AbstractStateModel> models = fetchAbstractModels();
 
-        sb.append("model count: " + models.size()+"\n");
+        sb.append("model count: " + models.size() + "\n");
         AbstractStateModel model = models.get(0);
-        sb.append("Model0 info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+        sb.append("Model0 info:" + model.getApplicationName() + ", " + model.getModelIdentifier() + "\n");
         return sb.toString();
     }
 
@@ -143,22 +149,22 @@ public class TemporalController {
 
 
     //*********************************
-    public  void computeTemporalModel(APSelectorManager Apmgr ) {
+    public void computeTemporalModel(APSelectorManager Apmgr) {
 
 
-        AbstractStateModel abstractStateModel =getFirstAbstractStateModel();
+        AbstractStateModel abstractStateModel = getFirstAbstractStateModel();
         String stmt;
         Map<String, Object> params = new HashMap<>();
 
 
         params.put("identifier", abstractStateModel.getModelIdentifier());
         // navigate from abstractstate to apply the filter.
-       // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-        stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+        // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+        stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
 
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt);
 
-        if (abstractStateModel!=null){
+        if (abstractStateModel != null) {
 
 
             tModel.setApplicationName(abstractStateModel.getApplicationName());
@@ -168,7 +174,7 @@ public class TemporalController {
 
             //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
             this.apSelectorManager = Apmgr;
-            boolean firstDeadState=true;
+            boolean firstDeadState = true;
             StateEncoding deadStateEnc;
             while (resultSet.hasNext()) {
                 OResult result = resultSet.next();
@@ -185,12 +191,12 @@ public class TemporalController {
 
                     boolean deadstate = false;
 
-                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT,"ConcreteAction"); //could be a SQL- like query as well
+                    Iterable<OEdge> outedges = stateVertex.getEdges(ODirection.OUT, "ConcreteAction"); //could be a SQL- like query as well
                     Iterator<OEdge> edgeiter = outedges.iterator();
-                    deadstate=!edgeiter.hasNext();
+                    deadstate = !edgeiter.hasNext();
 
                     if (deadstate) {
-                        if (firstDeadState){
+                        if (firstDeadState) {
                             //add stateenc for 'Dead', inclusive dead transition selfloop;
                             deadStateEnc = new StateEncoding("#dead");
                             Set<String> deadStatePropositions = new LinkedHashSet<>();
@@ -207,20 +213,20 @@ public class TemporalController {
                             deadTrencList.add(deadTrenc);
                             deadStateEnc.setTransitionColl(deadTrencList);
                             tModel.addStateEncoding(deadStateEnc, false);
-                            firstDeadState=false;
+                            firstDeadState = false;
                         }
                         stateVertex.setProperty(TagBean.IsDeadState.name(), true);  //candidate for refactoring
 
                         tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
-                        computeProps(propertyName, stateVertex, propositions, false,false);
+                        computeProps(propertyName, stateVertex, propositions, false, false);
                     }
                     propositions.addAll(getWidgetPropositions(senc.getState()));// concrete widgets
                     senc.setStateAPs(propositions); // to be decided:  whether to include current AP's on a deadstate
                     if (deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
-                        deadTrenc.setTransition("#dead_"+stateVertex.getIdentity().toString());
+                        deadTrenc.setTransition("#dead_" + stateVertex.getIdentity().toString());
                         deadTrenc.setTargetState("#dead");
                         Set<String> deadTransitionPropositions = new LinkedHashSet<>();
                         deadTransitionPropositions.add("dead");
@@ -229,17 +235,15 @@ public class TemporalController {
                         deadTrencList.add(deadTrenc);
                         senc.setTransitionColl(deadTrencList);
 
-                    }
-                    else senc.setTransitionColl(getTransitions(senc.getState()));
-
+                    } else senc.setTransitionColl(getTransitions(senc.getState()));
 
 
                     tModel.addStateEncoding(senc, false);
                 }
             }
             tModel.updateTransitions(); //update once. this is a costly operation
-            for (StateEncoding stenc:tModel.getStateEncodings()
-                 ) {
+            for (StateEncoding stenc : tModel.getStateEncodings()
+            ) {
 
 
                 List<String> encodedConjuncts = new ArrayList<>();
@@ -254,10 +258,10 @@ public class TemporalController {
             }
 
             tModel.setTraces(fetchTraces(tModel.getApplication_ModelIdentifier()));
-            List<String> initStates =new ArrayList<>();
-            for (TemporalTrace trace:tModel.getTraces()
+            List<String> initStates = new ArrayList<>();
+            for (TemporalTrace trace : tModel.getTraces()
             ) {
-                TemporalTraceEvent traceevent =trace.getTraceEvents().get(0);
+                TemporalTraceEvent traceevent = trace.getTraceEvents().get(0);
                 initStates.add(traceevent.getState());
 
             }
@@ -276,24 +280,23 @@ public class TemporalController {
     }
 
 
+    private AbstractStateModel getFirstAbstractStateModel() {
+        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
+        AbstractStateModel abstractStateModel;
+        if (abstractStateModels.size() == 0) {
+            System.out.println("ERROR: Number of Models in the graph database " + db.toString() + " is ZERO");
+            tModel.addLog("ERROR: Number of Models in the graph database " + db.toString() + " is ZERO");
+            abstractStateModel = null;
+        } else {
+            abstractStateModel = abstractStateModels.get(0);
+        }
 
-private AbstractStateModel getFirstAbstractStateModel(){
-    List<AbstractStateModel> abstractStateModels= fetchAbstractModels();
-    AbstractStateModel abstractStateModel;
-    if (abstractStateModels.size()==0 ) {
-        System.out.println("ERROR: Number of Models in the graph database "+db.toString()+" is ZERO");
-        tModel.addLog("ERROR: Number of Models in the graph database "+db.toString()+" is ZERO");
-        abstractStateModel=null;
-    }else{
-        abstractStateModel =abstractStateModels.get(0);
+        if (abstractStateModels.size() > 1) {
+            System.out.println("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
+            tModel.addLog("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
+        }
+        return abstractStateModel;
     }
-
-    if (abstractStateModels.size()>1) {
-        System.out.println("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
-        tModel.addLog("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
-    }
-    return abstractStateModel;
-}
 
 
     private Set<String> getWidgetPropositions(String state) {
@@ -317,7 +320,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                   computeProps(propertyName,stateVertex,propositions,true,false);
+                    computeProps(propertyName, stateVertex, propositions, true, false);
                 }
             }
         }
@@ -339,7 +342,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
             if (result.isEdge()) {
                 Optional<OEdge> op = result.getEdge();
                 if (!op.isPresent()) {
-                   // System.out.println("debug state;" + state + " waiting on edgde");
+                    // System.out.println("debug state;" + state + " waiting on edgde");
                     continue;
                 }
                 OEdge actionEdge = op.get();
@@ -351,8 +354,8 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                        computeProps(propertyName,actionEdge,propositions,false,true);
-                    }
+                    computeProps(propertyName, actionEdge, propositions, false, true);
+                }
                 trenc.setTransitionAPs(propositions);
 
                 trenclist.add(trenc);
@@ -383,7 +386,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
         OResultSet resultSet = db.query(sequenceStmt, params);
         while (resultSet.hasNext()) {
             OResult sequenceResult = resultSet.next();
-            TemporalTrace trace= new TemporalTrace();
+            TemporalTrace trace = new TemporalTrace();
             // we're expecting a vertex
             if (sequenceResult.isVertex()) {
                 Optional<OVertex> sequenceOp = sequenceResult.getVertex();
@@ -410,14 +413,14 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 trace.setRunDate(sequenceVertex.getProperty("startDateTime").toString());
                 trace.setTestSequenceNode(sequenceVertex.getIdentity().toString());
                 trace.setTraceEvents(fetchTraceEvents(trace));
-               traces.add(trace);
+                traces.add(trace);
             }
         }
         return traces;
     }
 
-    private List<TemporalTraceEvent> fetchTraceEvents(TemporalTrace trace){
-        List<TemporalTraceEvent> traceEvents =new ArrayList<>();
+    private List<TemporalTraceEvent> fetchTraceEvents(TemporalTrace trace) {
+        List<TemporalTraceEvent> traceEvents = new ArrayList<>();
         String firstSequenceNode = getFirstSequenceNode(trace);
         List<String> ConcreteStates = new ArrayList<>();
         List<String> ConcreteActions = new ArrayList<>();
@@ -431,7 +434,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
         //(SELECT FROM SequenceStep WHERE @rid = :identifier??
         // inner query is needed as the single query collapses multiple refeences to concretestate
         resultSet = db.query(stmt, params);
-                while (resultSet.hasNext()) {
+        while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
             if (result.isElement()) {
@@ -469,7 +472,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 ConcreteActions.add(ele.getProperty("concreteActionId").toString());
             }
         }*/
- //future: when the edge sequencestep references the actual action edge. test 20190804
+        //future: when the edge sequencestep references the actual action edge. test 20190804
         while (resultSet.hasNext()) {
             OResult result = resultSet.next();
             // we're expecting an element
@@ -495,23 +498,22 @@ private AbstractStateModel getFirstAbstractStateModel(){
         }
 
 
-
-        if ((ConcreteStates.size()-ConcreteActions.size())!=1){
-            System.out.println("debug: trace count not matching nodes and edges for sequence:  "+trace.getSequenceID());
-            System.out.println("debug:  ConcreteStates.size(): "+ConcreteStates.size());
-            System.out.println("debug:  ConcreteAction.size(): "+ConcreteActions.size());
-        }else{
+        if ((ConcreteStates.size() - ConcreteActions.size()) != 1) {
+            System.out.println("debug: trace count not matching nodes and edges for sequence:  " + trace.getSequenceID());
+            System.out.println("debug:  ConcreteStates.size(): " + ConcreteStates.size());
+            System.out.println("debug:  ConcreteAction.size(): " + ConcreteActions.size());
+        } else {
             int i = 0;
-            for (String cs: ConcreteStates
-                 ) {
+            for (String cs : ConcreteStates
+            ) {
                 TemporalTraceEvent traceEvent = new TemporalTraceEvent();
                 traceEvent.setState(cs);
                 String trans;
 
-                if ((i+1)==ConcreteStates.size()){
-                trans=""; // we end with a state :-)
-                }else {
-                    trans=ConcreteActions.get(i);
+                if ((i + 1) == ConcreteStates.size()) {
+                    trans = ""; // we end with a state :-)
+                } else {
+                    trans = ConcreteActions.get(i);
                 }
                 i++;
                 traceEvent.setTransition(trans);
@@ -523,7 +525,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
         return traceEvents;
     }
 
-    private String getFirstSequenceNode(TemporalTrace trace){
+    private String getFirstSequenceNode(TemporalTrace trace) {
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", trace.getSequenceID());
         String stmt = "SELECT FROM (TRAVERSE out('FirstNode') FROM (SELECT FROM TestSequence WHERE sequenceId = :identifier))";
@@ -541,7 +543,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 Optional<OElement> ele = result.getElement();
                 if (!ele.isPresent()) continue;
                 OElement firstsequenceNode = ele.get();
-                firstNode=firstsequenceNode.getIdentity().toString();
+                firstNode = firstsequenceNode.getIdentity().toString();
             }
         }
         return firstNode;
@@ -552,7 +554,6 @@ private AbstractStateModel getFirstAbstractStateModel(){
      * This method fetches the test sequences for a given abstract state model.
      *
      * @param modelIdentifier
-     *
      * @return
      */
     private List<TestSequence> fetchTestSequences(String modelIdentifier) {
@@ -669,8 +670,8 @@ private AbstractStateModel getFirstAbstractStateModel(){
         return convertedValue;
     }
 
-    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget,boolean isEdge ) {
-        computeProps(propertyName, graphElement,  globalPropositions, isWidget, isEdge, false);
+    private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isEdge) {
+        computeProps(propertyName, graphElement, globalPropositions, isWidget, isEdge, false);
     }
 
     private void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isEdge, boolean isDeadState) {
@@ -686,7 +687,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 Object concreteprop;
                 if (isWidget) {
                     concreteprop = graphElement.getProperty(Tags.ConcreteID.name()); // must exists for state/widget
-                }else
+                } else
                     concreteprop = graphElement.getProperty("actionId"); // must exists for concrete edge/action
                 if (concreteprop == null) {
                     fallback = "undefined";
@@ -695,8 +696,7 @@ private AbstractStateModel getFirstAbstractStateModel(){
                 }
                 apkey.append(fallback);
                 apkey.append(apSelectorManager.getApEncodingSeparator());
-            }
-            else {
+            } else {
                 apkey.append(prop);
                 apkey.append(apSelectorManager.getApEncodingSeparator());
             }
@@ -709,52 +709,53 @@ private AbstractStateModel getFirstAbstractStateModel(){
                     //graphElement.getProperty(Tags.Path.name().toString() // dummy, parenttitle is not implemented yet
             );
 
-            if (passedWidgetFilters!=null && passedWidgetFilters.size()>0 ){
-                for (WidgetFilter wf: passedWidgetFilters) // add the filter specific elected attributes and expressions
+            if (passedWidgetFilters != null && passedWidgetFilters.size() > 0) {
+                for (WidgetFilter wf : passedWidgetFilters) // add the filter specific elected attributes and expressions
                 {// candidate for refactoring as this requires a double iteration of widget filter
-                    globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+                    globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
                 }
             }
         }
-        if (!isWidget && isEdge){
-            globalPropositions.addAll(apSelectorManager.getTransitionFilter().getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+        if (!isWidget && isEdge) {
+            globalPropositions.addAll(apSelectorManager.getTransitionFilter().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
-        if (!isWidget && !isEdge){
-            globalPropositions.addAll(apSelectorManager.getStateFilter().getAPsOfAttribute(apkey.toString(),propertyName,graphElement.getProperty(propertyName).toString()));
+        if (!isWidget && !isEdge) {
+            globalPropositions.addAll(apSelectorManager.getStateFilter().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
         }
 
     }
+
     @Deprecated
-    private void testgraphmlexport(String file){  // inferior css 20190713
+    private void testgraphmlexport(String file) {  // inferior css 20190713
         String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
                 dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
-String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
-        OrientGraph grap = new OrientGraph(dbconnectstring,dbConfig.getUser(),dbConfig.getPassword());
-        System.out.println("debug connectionstring: "+dbconnectstring+" \n");
+        String dbconnectstring = connectionString + "\\" + dbConfig.getDatabase();
+        OrientGraph grap = new OrientGraph(dbconnectstring, dbConfig.getUser(), dbConfig.getPassword());
+        System.out.println("debug connectionstring: " + dbconnectstring + " \n");
 
         //Graph graph = new OrientGraph(connectionString+"/"+dbConfig.getDatabase(),dbConfig.getUser(),dbConfig.getPassword());
-        Map<String,Object> conf = new HashMap<String,Object>();
+        Map<String, Object> conf = new HashMap<String, Object>();
         conf.put("blueprints.graph", "com.tinkerpop.blueprints.impls.orient.OrientGraph");
-        conf.put("blueprints.orientdb.url",dbconnectstring);
-        conf.put("blueprints.orientdb.username",dbConfig.getUser());
-        conf.put("blueprints.orientdb.password",dbConfig.getPassword());
+        conf.put("blueprints.orientdb.url", dbconnectstring);
+        conf.put("blueprints.orientdb.username", dbConfig.getUser());
+        conf.put("blueprints.orientdb.password", dbConfig.getPassword());
 
         //Graph graph = GraphFactory.open(conf);
         Graph graph = GraphFactory.open(conf);
         //GraphTraversalSource gts = graph.traversal();
         //final GraphWriter writer = graph.io(IoCore.graphson()).writer();
-       // final OutputStream os = new FileOutputStream("tinkerpop-modern.json");
-       // writer.writeObject(os, graph);
+        // final OutputStream os = new FileOutputStream("tinkerpop-modern.json");
+        // writer.writeObject(os, graph);
 
 
         System.out.println("debug writing graphml file \n");
         try {
             try {
-            File output = new File(file);
-            FileOutputStream fos = new FileOutputStream(output.getAbsolutePath());
-            //GraphMLWriter writer = new GraphMLWriter(graph); //GraphMLWriter.outputGraph(grap,fos);
+                File output = new File(file);
+                FileOutputStream fos = new FileOutputStream(output.getAbsolutePath());
+                //GraphMLWriter writer = new GraphMLWriter(graph); //GraphMLWriter.outputGraph(grap,fos);
                 GraphMLWriter writer = GraphMLWriter.build().create();
-                writer.writeGraph(fos,graph);
+                writer.writeGraph(fos, graph);
 
                 //writer.outputGraph(fos);
 
@@ -765,60 +766,61 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
 
         } finally {
             try {
-               grap.shutdown();
+                grap.shutdown();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-    public boolean saveToGraphMLFile(String file){
+
+    public boolean saveToGraphMLFile(String file) {
 
 
         //init
 
-        List<AbstractStateModel> abstractStateModels= fetchAbstractModels();
+        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
         AbstractStateModel abstractStateModel;
-        if (abstractStateModels.size()==0 ) {
+        if (abstractStateModels.size() == 0) {
             System.out.println("ERROR: Number of Models in the graph database is ZERO");
             return false;
         }
-        abstractStateModel =abstractStateModels.get(0);
+        abstractStateModel = abstractStateModels.get(0);
         String stmt;
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
         //!!!!!!!!!!!!!!!!!!!!!!get nodes , then get edges. this is required for postprocessing a graphml by python package networkx.
-        List<String> stmtlist= new ArrayList<>();
+        List<String> stmtlist = new ArrayList<>();
 
 
-        if (abstractStateModels.size()>1){// navigate from abstractstate to be able to apply the filter.
+        if (abstractStateModels.size() > 1) {// navigate from abstractstate to be able to apply the filter.
             System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
-           // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
+            // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
             //stmtlist.add("SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier"); // select abstractstate themselves
             //stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
 
             // the "both()" in the next stmt is needed to invoke recursion.
             // apparently , the next result set contains first a list of all nodes, then of all edge: good !
             //stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
             stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) ");
 
-        }else{
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
+        } else {
+            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
             stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) ");
             //stmtlist.add("SELECT  FROM V ");//  stmtlist.add("SELECT  FROM E ");
         }
 
 
-        Set<GraphML_DocKey> docnodekeys=new HashSet<>() ;
-        Set<GraphML_DocKey> docedgekeys=new HashSet<>() ;
-        List<GraphML_DocNode> nodes = new ArrayList<>() ;
-        List<GraphML_DocEdge> edges = new ArrayList<>() ;
+        Set<GraphML_DocKey> docnodekeys = new HashSet<>();
+        Set<GraphML_DocKey> docedgekeys = new HashSet<>();
+        List<GraphML_DocNode> nodes = new ArrayList<>();
+        List<GraphML_DocEdge> edges = new ArrayList<>();
 
-        for (String stm:stmtlist
-             ) {
+        for (String stm : stmtlist
+        ) {
             //Map<String, Object> params = new HashMap<>();
             //OResultSet resultSet = db.query(stmt, params);
-            OResultSet resultSet = db.query(stm,params);
+            OResultSet resultSet = db.query(stm, params);
             String source = "";
             String target = "";
             String keyname;
@@ -841,19 +843,19 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
                         keyname = propertyName;
                         String rawattributeType = graphElement.getProperty(propertyName).getClass().getSimpleName().toLowerCase();
                         //if(rawattributeType.equals("date")||rawattributeType.startsWith("orecord")||rawattributeType.startsWith("otracked")){
-                        if(!rawattributeType.equals("boolean")&&
+                        if (!rawattributeType.equals("boolean") &&
                                 !rawattributeType.equals("long") &&
-                                !rawattributeType.equals("double")&&
-                                !rawattributeType.equals("string")){
-                            attributeType="string"; // unknown types are converted to string
-                        }else
-                            attributeType=rawattributeType;
+                                !rawattributeType.equals("double") &&
+                                !rawattributeType.equals("string")) {
+                            attributeType = "string"; // unknown types are converted to string
+                        } else
+                            attributeType = rawattributeType;
 
                         if (result.isEdge() && (propertyName.startsWith("in") || propertyName.startsWith("out"))) {
                             // these are probably edge indicators. Ignore
                             continue;
                         }
-                        if (result.isVertex() &&(propertyName.contains("in_") || propertyName.contains("out_"))) {
+                        if (result.isVertex() && (propertyName.contains("in_") || propertyName.contains("out_"))) {
                             // these are probably edge indicators. Ignore
                             continue;
                         }
@@ -880,21 +882,32 @@ String dbconnectstring = connectionString+"\\"+dbConfig.getDatabase();
             }
 
         }
-        GraphML_DocGraph graph= new GraphML_DocGraph(dbConfig.getDatabase(),nodes,edges);
+        GraphML_DocGraph graph = new GraphML_DocGraph(dbConfig.getDatabase(), nodes, edges);
         Set<GraphML_DocKey> tempset = new LinkedHashSet<GraphML_DocKey>();
         docnodekeys.add(new GraphML_DocKey("labelV", "node", "labelV", "string"));
         docedgekeys.add(new GraphML_DocKey("labelE", "edge", "labelE", "string"));
         tempset.addAll(docnodekeys);
         tempset.addAll(docedgekeys);
-        GraphML_DocRoot root = new GraphML_DocRoot(tempset,graph);
-        XMLHandler.save(root,file);
+        GraphML_DocRoot root = new GraphML_DocRoot(tempset, graph);
+        XMLHandler.save(root, file);
 
-return true;
+        return true;
     }
-    public  void saveModelAsJSON(String toFile){
-        JSONHandler.save(tModel, outputDir + toFile);
+
+    public void saveModelAsJSON(String toFile) {
+        JSONHandler.save(tModel, toFile);
     }
-    public void saveModelAsHOA(String file){
+
+    public boolean exportModel(TemporalType tmptype, String file) {
+        boolean b = true;
+        if (tmptype.equals(TemporalType.LTL)) saveModelAsHOA(file);
+        else b = false;
+        return b;
+}
+
+
+
+        public void saveModelAsHOA(String file){
 
         String contents = tModel.makeHOAOutput();
         try {
@@ -911,11 +924,15 @@ return true;
 
     };
 
-    public void saveFormulaFile(List<TemporalOracle> oracleColl, TemporalType tmpType ,String file){
+    public void saveFormulaFiles(List<TemporalOracle> oracleColl, String file){
+            File output = new File( file);
+            saveFormulaFiles(oracleColl,output);
+    }
+    public void saveFormulaFiles(List<TemporalOracle> oracleColl, File output){
 
-        String contents = tModel.makeFormulaOutput(oracleColl, tmpType);
+        String contents = tModel.makeFormulaOutput(oracleColl);
         try {
-            File output = new File(outputDir + file);
+
             if (output.exists() || output.createNewFile()) {
                 BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
                 writer.append(contents);
@@ -926,6 +943,6 @@ return true;
             e.printStackTrace();
         }
 
-    };
+    }
 
 }

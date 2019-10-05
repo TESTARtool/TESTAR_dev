@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
-import nl.ou.testar.temporal.util.TemporalType;
 import nl.ou.testar.temporal.util.ValStatus;
 import org.apache.commons.lang3.StringUtils;
 
@@ -169,7 +168,7 @@ public  TemporalModel(){
         return result.toString();
     }
 
-    public String makeFormulaOutput(List<TemporalOracle> oracleColl, TemporalType tmpType) {
+    public String makeFormulaOutput(List<TemporalOracle> oracleColl) {
 
         StringBuilder Formulas=new StringBuilder();
         for (TemporalOracle candidateOracle : oracleColl) {
@@ -180,11 +179,8 @@ public  TemporalModel(){
             List<String> sortedsubstitionvalues =  candidateOracle.getPattern_Substitutions();
 
             boolean importStatus;
-            importStatus = candidateOracle.getPattern_TemporalFormalism() == tmpType;
-            if (importStatus) {
-                //parameter consistency
+
                 importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
-            }
             if (!importStatus) {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);

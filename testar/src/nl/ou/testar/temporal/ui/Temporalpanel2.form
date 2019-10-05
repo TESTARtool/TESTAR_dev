@@ -257,18 +257,6 @@
                 </constraints>
                 <properties/>
               </component>
-              <component id="45e25" class="javax.swing.JTextField" binding="textField4" default-binding="true">
-                <constraints>
-                  <grid row="8" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                  <forms defaultalign-horz="false"/>
-                </constraints>
-                <properties>
-                  <editable value="false"/>
-                  <enabled value="true"/>
-                </properties>
-              </component>
               <component id="8b8e4" class="javax.swing.JLabel" default-binding="true">
                 <constraints>
                   <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -276,15 +264,6 @@
                 </constraints>
                 <properties>
                   <text value="APSelectorManager"/>
-                </properties>
-              </component>
-              <component id="db39f" class="javax.swing.JLabel" binding="potentialOraclesLabel" default-binding="true">
-                <constraints>
-                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                  <forms/>
-                </constraints>
-                <properties>
-                  <text value="Potential Oracles"/>
                 </properties>
               </component>
               <component id="4d89b" class="javax.swing.JSeparator">
@@ -410,8 +389,8 @@
                   <forms/>
                 </constraints>
                 <properties>
-                  <text value="Model Check"/>
-                  <toolTipText value="Checks the Candidates on the Model. "/>
+                  <text value="Check Raw Oracles"/>
+                  <toolTipText value="&lt;html&gt;Checks the Candidate (Raw Oracles) on the Model. &lt;BR&gt;(The model is  computed just before by applying the filters from the APSelectorManager to a transformed model of the graph DB)"/>
                 </properties>
               </component>
               <component id="2214e" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
@@ -944,7 +923,7 @@
                   <text value="'Alive' proposition"/>
                 </properties>
               </component>
-              <component id="69a33" class="javax.swing.JTextField" binding="AlivepropositionTextField">
+              <component id="69a33" class="javax.swing.JTextField" binding="AlivePropositionTextField">
                 <constraints>
                   <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
