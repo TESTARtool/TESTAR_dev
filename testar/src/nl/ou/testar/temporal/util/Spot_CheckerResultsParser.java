@@ -5,7 +5,10 @@ import nl.ou.testar.temporal.structure.TemporalModel;
 import nl.ou.testar.temporal.structure.TemporalOracle;
 import nl.ou.testar.temporal.structure.TransitionEncoding;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -211,4 +214,18 @@ public class Spot_CheckerResultsParser {
         }
         return this.oracleColl;
     }
+    public List<TemporalOracle> parse(File rawInput){
+        StringBuilder contentBuilder = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(rawInput))) {
+            String sCurrentLine;
+            while ((sCurrentLine = br.readLine()) != null) {
+                contentBuilder.append(sCurrentLine).append("\n");
+            }
+        } catch (IOException f) {
+            f.printStackTrace();
+        }
+      return parse(contentBuilder.toString());
+
+    }
 }
+

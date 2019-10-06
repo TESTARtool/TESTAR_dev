@@ -455,6 +455,9 @@ public class Main {
 			defaults.add(Pair.from(TemporalLTLChecker, ""));
 			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
 			defaults.add(Pair.from(TemporalLTLVerbose, false));
+			defaults.add(Pair.from(TemporalLTLOracles, ""));
+			defaults.add(Pair.from(TemporalLTLPatterns, ""));
+			defaults.add(Pair.from(TemporalLTLAPSelectorManager, ""));
 			defaults.add(Pair.from(TemporalDirectory, ""));
 			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
 			defaults.add(Pair.from(TemporalPythonEnvironment, ""));

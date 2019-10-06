@@ -133,6 +133,7 @@ TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker
 TemporalLTLCheckerWSL = true
 TemporalLTLVerbose = true
 TemporalLTLOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
+TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
 TemporalLTLAPSelectorManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
 TemporalDirectory = temporal
 TemporalSpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse

@@ -122,8 +122,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> TemporalLTLCheckerWSL = Tag.from("TemporalLTLCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalLTLVerbose = Tag.from("TemporalLTLVerbose", Boolean.class);
   public static final Tag<String> TemporalLTLOracles = Tag.from("TemporalLTLOracles", String.class);
+  public static final Tag<String> TemporalLTLPatterns = Tag.from("TemporalLTLPatterns", String.class);
   public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
-
   public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
   public static final Tag<String> TemporalSpotFormulaParser = Tag.from("TemporalSpotFormulaParser", String.class);
   public static final Tag<String> TemporalPythonEnvironment = Tag.from("TemporalPythonEnvironment", String.class);
