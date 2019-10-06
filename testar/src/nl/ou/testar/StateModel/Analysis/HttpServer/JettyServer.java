@@ -36,6 +36,7 @@ public class JettyServer {
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
         resourceHandler.setResourceBase(resourceBase);
+        resourceHandler.setCacheControl("max-age=0, public");
 
         // the webapp context handler will handle requests for our controllers
         WebAppContext webAppContext = new WebAppContext();
