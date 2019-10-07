@@ -89,6 +89,14 @@
                 <div class="stats-text" id="stats-concrete-actions"></div>
             </div>
         </div>
+        <div class="column">
+            <div class="extra-margin-left legend-text">
+                <form id="id-form"><label for="search">Element id: <input type="text" id="search"></label></form>
+            </div>
+            <div class="extra-margin-left legend-text">
+                <button id="show-doubles" type="button" class="button_custom">Non-deterministic actions</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -380,6 +388,18 @@
                     'height': '60px',
                     'border-color': '#4be2ff',
                     'transition-property' : 'width height border-color',
+                    'transition-duration' : '0.5s',
+                    'transition-timing-function': 'ease-out-sine'
+                }
+            },
+            {
+                selector: '.selected-edge-animated',
+                style: {
+                    'line-color': "#999527",
+                    'target-arrow-color': "#999527",
+                    'line-style': 'solid',
+                    'width': 3,
+                    'transition-property' : 'width line-color',
                     'transition-duration' : '0.5s',
                     'transition-timing-function': 'ease-out-sine'
                 }
@@ -1198,6 +1218,49 @@
             let  concreteStates = cy.$('node.ConcreteState');
             concreteStates.addClass('selected-node-animated');
             setTimeout(() => concreteStates.removeClass('selected-node-animated'), 1000);
+        });
+
+        // id search form
+        let idSearchForm = document.getElementById("id-form");
+        let idInputField = document.getElementById("search");
+        idSearchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            let matchingNodes = cy.$('*').filter((element) => element.id() === idInputField.value && element.isNode());
+            let matchingEdges = cy.$('*').filter((element) => element.id() === idInputField.value && element.isEdge());
+
+            matchingNodes.addClass('selected-node-animated');
+            matchingEdges.addClass('selected-edge-animated');
+            setTimeout(() => {
+                matchingNodes.removeClass('selected-node-animated');
+                matchingEdges.removeClass('selected-edge-animated');
+            }, 1000);
+        });
+
+        // button to show non-deterministic actions
+        let buttonDoubles = document.getElementById('show-doubles');
+        buttonDoubles.addEventListener('click', () => {
+            // group all the abstract actions by their action id
+            let actionGrouping = {};
+            cy.$('.AbstractAction').forEach((element) => {
+                if (actionGrouping[element.data('actionId')] === undefined) {
+                    actionGrouping[element.data('actionId')] = [];
+                }
+                actionGrouping[element.data('actionId')].push(element);
+            });
+
+            // highlight the actions that occur more than once
+            for (let prop in actionGrouping) {
+                if (actionGrouping.hasOwnProperty(prop) && actionGrouping[prop].length > 1) {
+                    for (let edge of actionGrouping[prop]) {
+                        edge.addClass('selected-edge-animated');
+                        setTimeout(() => {
+                            edge.removeClass('selected-edge-animated');
+                        }, 1000);
+                    }
+                }
+            }
+
+            console.log(actionGrouping);
         });
 
     });
