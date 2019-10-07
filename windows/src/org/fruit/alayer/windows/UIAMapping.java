@@ -49,6 +49,7 @@ public class UIAMapping {
             put(WidgetSetPosition, UIAPositionInSet);
             put(WidgetSetSize, UIASizeOfSet);
             put(WidgetRotation, UIARotation);
+            put(WidgetZIndex, Tags.ZIndex);
 
             // patterns
             put(WidgetAnnotationPattern, UIAIsAnnotationPatternAvailable);

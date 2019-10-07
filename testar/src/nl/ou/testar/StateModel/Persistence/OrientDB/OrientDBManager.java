@@ -404,9 +404,11 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
     public boolean modelIsDeterministic(AbstractStateModel abstractStateModel) {
         // we will use a custom query to search for states in which the same action occurs more than once, leading to
         // different target states
-        String query = "SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1";
+        String query = "SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate WHERE modelIdentifier = :modelIdentifier UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1";
         try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
-            OResultSet resultSet = db.query(query);
+            Map<Object, Object> params = new HashMap<>();
+            params.put("modelIdentifier", abstractStateModel.getModelIdentifier());
+            OResultSet resultSet = db.query(query, params);
             boolean isDeterministic = !resultSet.hasNext(); // no states were found where the same action occurs twice
             resultSet.close();
             return isDeterministic;

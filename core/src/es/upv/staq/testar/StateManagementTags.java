@@ -111,6 +111,9 @@ public class StateManagementTags {
     // the angle of the widget's rotation
     public static final Tag<Long> WidgetRotation = Tag.from("Widget's rotation (degrees)", Long.class);
 
+    // the z-index of a widget
+    public static final Tag<Double> WidgetZIndex = Tag.from("Widget's z-index", Double.class);
+
     // widget pattern tags
     public static final Tag<Boolean> WidgetAnnotationPattern = Tag.from("Widget Annotation Pattern", Boolean.class);
     public static final Tag<Boolean> WidgetDockPattern = Tag.from("Widget Dock Pattern", Boolean.class);
@@ -452,6 +455,7 @@ public class StateManagementTags {
             put(WidgetSetPosition, Group.General);
             put(WidgetSetSize, Group.General);
             put(WidgetRotation, Group.General);
+            put(WidgetZIndex, Group.General);
             put(WidgetAnnotationPattern, Group.ControlPattern);
             put(WidgetDockPattern, Group.ControlPattern);
             put(WidgetDragPattern, Group.ControlPattern);
