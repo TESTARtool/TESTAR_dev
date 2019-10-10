@@ -207,6 +207,8 @@ public class Spot_CheckerResultsParser {
                     }
                     Oracle.setExampleRun_Cycle_States(cycleStateList);
                     Oracle.setExampleRun_Cycle_Transitions(cycleTransitionList);  //test only
+                    if (formulaStatus.equals(Verdict.FAIL.toString()))  Oracle.setOracle_verdict(Verdict.FAIL);
+                    if (formulaStatus.equals(Verdict.PASS.toString()))  Oracle.setOracle_verdict(Verdict.PASS);
 
                 }
                 i++;

@@ -423,11 +423,13 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         modelCheckButton.setToolTipText("<html>Perform a ModelCheck of the Potential Oracles. <BR>\nThe model is computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html> ");
         minerPanel.add(modelCheckButton, cc.xyw(12, 5, 12));
         generateButton = new JButton();
+        generateButton.setEnabled(false);
         generateButton.setHorizontalTextPosition(0);
         generateButton.setText("<html>Generate</html>");
         generateButton.setToolTipText("<html>Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. \n<BR>The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB </html>");
         minerPanel.add(generateButton, cc.xyw(12, 3, 12));
         comboBox2 = new JComboBox();
+        comboBox2.setEnabled(false);
         comboBox2.setMinimumSize(new Dimension(130, 38));
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         defaultComboBoxModel1.addElement("RndPerPattern1");

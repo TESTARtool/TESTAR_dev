@@ -36,7 +36,7 @@ public class JSONHandler {
 
             // let's write the resulting json to a file
             if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()))); //, StandardCharsets.UTF_8));
                 writer.append(result);
                 writer.close();
             }

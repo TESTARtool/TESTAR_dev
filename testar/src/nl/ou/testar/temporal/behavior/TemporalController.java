@@ -47,11 +47,12 @@ public class TemporalController {
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
         dbConfig = config;
         this.outputDir = outputDir;
+        tDBHelper = new TemporalDBHelper();
         setDefaultAPSelectormanager();
         tModel = new TemporalModel();
-        tDBHelper = new TemporalDBHelper();
-        tDBHelper.setApSelectorManager(apSelectorManager);
-        dbReopen();// check if the credentials are valid?
+
+
+        //dbReopen();// check if the credentials are valid?
     }
 
     public TemporalModel gettModel() {
@@ -68,6 +69,7 @@ public class TemporalController {
 
     public void loadApSelectorManager(String filename) {
         this.apSelectorManager = (APSelectorManager) JSONHandler.load( filename, apSelectorManager.getClass());
+        tDBHelper.setApSelectorManager(apSelectorManager);
     }
 
     public List<TemporalOracle> getOracleColl() {
@@ -81,6 +83,7 @@ public class TemporalController {
 
     public void setDefaultAPSelectormanager() {
         this.apSelectorManager = new APSelectorManager(true);
+        tDBHelper.setApSelectorManager(apSelectorManager);
     }
 
     public void dbClose() {

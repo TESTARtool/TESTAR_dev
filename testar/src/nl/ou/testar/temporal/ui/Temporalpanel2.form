@@ -344,6 +344,7 @@
                   <forms/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <horizontalTextPosition value="0"/>
                   <text value="&lt;html&gt;Generate&lt;/html&gt;"/>
                   <toolTipText value="&lt;html&gt;Instantiated the Pattern parameters with Atomic Propositions (AP's) from the Model to generate (Potential) Oracles. &#10;&lt;BR&gt;The list of  AP's in the model is  computed by applying the filters from the APSelectorManager to a transformed model of the graph DB &lt;/html&gt;"/>
@@ -355,6 +356,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <enabled value="false"/>
                   <minimumSize width="130" height="38"/>
                   <model>
                     <item value="RndPerPattern1"/>
