@@ -307,13 +307,7 @@ public class WdDriver extends SUTBase {
 
   @Override
   public boolean isRunning() {
-    if (webDriver == null) {
-      return false;
-    }
-
     try {
-      updateHandlesList();
-      activate();
       webDriver.getCurrentUrl();
     }
     catch (NullPointerException | WebDriverException ignored) {
@@ -407,12 +401,12 @@ public class WdDriver extends SUTBase {
    * Make sure the last tab has focus
    */
   public static void activate() {
+    updateHandlesList();
+
     // Nothing to activate
     if (windowHandles.size() < 1) {
       return;
     }
-
-    updateHandlesList();
 
     String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
     try {
@@ -443,9 +437,6 @@ public class WdDriver extends SUTBase {
 
   public static Object executeScript(String script, Object... args) {
     try {
-      // Update the list with window handles
-      updateHandlesList();
-
       // Choose first or last tab, depending on user prefs
       activate();
 
@@ -455,6 +446,11 @@ public class WdDriver extends SUTBase {
       return webDriver.executeScript(script, args);
     }
     catch (NullPointerException | WebDriverException ignored) {
+      // We need this for WdSubmitAction
+      if (ignored instanceof WebDriverException &&
+          script.contains("getElementById")) {
+        throw ignored;
+      }
       return null;
     }
   }
@@ -470,9 +466,6 @@ public class WdDriver extends SUTBase {
 
   public static void executeCanvasScript(String script, Object... args) {
     try {
-      // Update the list with window handles
-      updateHandlesList();
-
       // Choose first or last tab, depending on user prefs
       activate();
 
