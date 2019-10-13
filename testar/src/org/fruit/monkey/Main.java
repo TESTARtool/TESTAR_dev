@@ -451,21 +451,8 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
-			defaults.add(Pair.from(TemporalEnabled, false));
-			defaults.add(Pair.from(TemporalLTLChecker, ""));
-			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
-			defaults.add(Pair.from(TemporalLTLVerbose, false));
-			defaults.add(Pair.from(TemporalLTLOracles, ""));
-			defaults.add(Pair.from(TemporalLTLPatterns, ""));
-			defaults.add(Pair.from(TemporalLTLAPSelectorManager, ""));
-			defaults.add(Pair.from(TemporalDirectory, ""));
-			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
-			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
-			defaults.add(Pair.from(TemporalVisualizerServer, ""));
-            defaults.add(Pair.from(TemporalVisualizerURL, ""));
-            defaults.add(Pair.from(TemporalVisualizerURLStop, ""));
-
-            defaults.add(Pair.from(AlwaysCompile, true));
+			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));

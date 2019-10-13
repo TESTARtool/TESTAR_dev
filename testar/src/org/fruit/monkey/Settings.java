@@ -386,6 +386,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStoreMode = instant" + Util.lineSep()
 					+"ApplicationName = Buggy calculator" + Util.lineSep()
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
+					+"ActionSelectionAlgorithm =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Temporal Oracle settings\n"

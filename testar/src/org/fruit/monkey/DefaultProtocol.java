@@ -189,6 +189,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
 
+	protected boolean exceptionThrown = false;
+
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
 
@@ -412,12 +414,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String path = settings.get(ConfigTags.PathToReplaySequence);
 		if(path.contains(".testar")) {
 			path = path.replace(".testar", ".html");
-			
+
 			int startIndex = path.indexOf(File.separator + "sequences");
 			int endIndex = path.indexOf(File.separator, startIndex+2);
-			
+
 			String replace = path.substring(startIndex, endIndex+1);
-			
+
 			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
@@ -458,7 +460,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-		String generatedSequenceName = OutputStructure.sequencesOutputDir 
+		String generatedSequenceName = OutputStructure.sequencesOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
@@ -579,8 +581,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
 
 	}
@@ -612,8 +614,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -638,6 +640,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+			exceptionThrown = false;
 
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
@@ -711,12 +714,24 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				sequenceCount++;
 
 			} catch (Exception e) {
-				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
+				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+				System.out.println(message);
+				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
+				stackTrace.add(message);
+				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
+				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+				exceptionThrown = true;
 				e.printStackTrace();
-				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
+		if (mode() == Modes.Quit && !exceptionThrown) {
+			// the user initiated the shutdown
+			stateModelManager.notifyTestSequenceInterruptedByUser();
+		}
+
+
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
 		//allowing close-up in the end of test session:
@@ -751,7 +766,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state = getState(system))) {
+		while (mode() != Modes.Quit && moreActions(state)) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
@@ -805,6 +820,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
+
+			// fetch the new state
+            state = getState(system);
 		}
 
 		// notify to state model the last state
@@ -914,7 +932,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
-		//bin folder 
+		//bin folder
 		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
 				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
 
@@ -1356,7 +1374,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							printSutInfo = "Waiting for the SUT to be accessible ...";
 							FlashFeedback.flash(printSutInfo, 500);
 						}
-						Util.pauseMs(500);				
+						Util.pauseMs(500);
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
 					if (sut.isRunning())
 						sut.stop();
@@ -1369,7 +1387,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
 						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
 					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
 		}
 	}
 
@@ -1403,7 +1421,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
+		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
 	}
 
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
@@ -1433,7 +1451,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
+		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");
 	}
 
 	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
@@ -1511,7 +1529,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Assert.notNull(state);
 		//-------------------
 		// ORACLES FOR FREE
-		//-------------------		
+		//-------------------
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
@@ -1568,10 +1586,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
-		Set<Action> actions = new HashSet<Action>();	
-
-		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+		Set<Action> actions = new HashSet<Action>();
 
 		// If there is an unwanted process running, we need to kill it.
 		// This is an unwanted process that is defined in the filter.
@@ -1583,7 +1598,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name
-					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
@@ -1595,7 +1609,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			//actions.add(ac.activateSystem());
 			this.forceToForeground = true;
 			return actions;
 		}
@@ -1636,7 +1649,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceToForeground = false;
 			return a;
 		}
@@ -1811,7 +1824,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
+		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&

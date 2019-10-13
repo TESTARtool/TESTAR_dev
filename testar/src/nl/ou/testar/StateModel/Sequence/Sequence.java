@@ -7,6 +7,7 @@ import nl.ou.testar.StateModel.Event.StateModelEventListener;
 import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Persistence.Persistable;
 import org.fruit.alayer.Tag;
+import org.fruit.alayer.Tags;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -59,6 +60,16 @@ public class Sequence implements Persistable {
     private SequenceNode currentNode;
 
     /**
+     * The execution verdict, ie: did the sequence execute succesfully.
+     */
+    private SequenceVerdict verdict;
+
+    /**
+     * If the sequence was interrupted by the system, this should hold the termination message generated.
+     */
+    private String terminationMessage;
+
+    /**
      * A set of event listeners to notify of changes in the sequence.
      */
     private Set<StateModelEventListener> eventListeners;
@@ -68,6 +79,7 @@ public class Sequence implements Persistable {
         this.eventListeners = eventListeners;
         this.currentSequenceNr = currentSequenceNr;
         this.modelIdentifier = modelIdentifier;
+        verdict = SequenceVerdict.CURRENTLY_EXECUTING;
         nodes = new ArrayList<>();
     }
 
@@ -116,7 +128,7 @@ public class Sequence implements Persistable {
 
     public void stop() {
         active = false;
-        //todo event here?
+        emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_ENDED, this));
     }
 
     /**
@@ -134,15 +146,15 @@ public class Sequence implements Persistable {
     }
 
     private void addFirstNode(ConcreteState concreteState) {
-        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, this);
+        SequenceNode node = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, this, eventListeners);
         currentNode = node;
         nodes.add(node);
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_ADDED, node));
     }
 
     private void addStep(ConcreteState concreteState, ConcreteAction concreteAction) {
-        SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, null);
-        SequenceStep sequenceStep = new SequenceStep(concreteAction, currentNode, targetNode);
+        SequenceNode targetNode = new SequenceNode(currentSequenceId, ++currentNodeNr, concreteState, null, eventListeners);
+        SequenceStep sequenceStep = new SequenceStep(concreteAction, currentNode, targetNode, concreteAction.getAttributes().get(Tags.Desc));
         nodes.add(targetNode);
         currentNode = targetNode;
         emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_STEP_ADDED, sequenceStep));
@@ -158,6 +170,45 @@ public class Sequence implements Persistable {
      * @return
      */
     public SequenceNode getFirstNode() {
-        return nodes.get(0);
+        return !nodes.isEmpty() ?  nodes.get(0) : null;
+    }
+
+    /**
+     * This method will return the last node in the sequence.
+     * @return
+     */
+    public SequenceNode getLastNode() {
+        return !nodes.isEmpty() ? nodes.get(nodes.size() - 1) : null;
+    }
+
+    /**
+     * Set the final sequence verdict.
+     * @param verdict
+     */
+    public void setSequenceVerdict(SequenceVerdict verdict) {
+        this.verdict = verdict;
+    }
+
+    /**
+     * Returns the final sequence verdict.
+     * @return
+     */
+    public SequenceVerdict getSequenceVerdict() {
+        return verdict;
+    }
+
+    /**
+     * Set the termination message when the sequence has been interrupted by the system.
+     * @param terminationMessage
+     */
+    public void setTerminationMessage(String terminationMessage) {
+        this.terminationMessage = terminationMessage;
+    }
+
+    /**
+     * Return the message that was provided for termination by the system.
+     */
+    public String getTerminationMessage() {
+        return terminationMessage;
     }
 }

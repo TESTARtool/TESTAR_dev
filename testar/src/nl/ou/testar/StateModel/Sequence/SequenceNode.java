@@ -1,9 +1,14 @@
 package nl.ou.testar.StateModel.Sequence;
 
 import nl.ou.testar.StateModel.ConcreteState;
+import nl.ou.testar.StateModel.Event.StateModelEvent;
+import nl.ou.testar.StateModel.Event.StateModelEventListener;
+import nl.ou.testar.StateModel.Event.StateModelEventType;
 import nl.ou.testar.StateModel.Persistence.Persistable;
 
 import java.time.Instant;
+import java.util.Set;
+import java.util.StringJoiner;
 
 public class SequenceNode implements Persistable {
 
@@ -33,17 +38,29 @@ public class SequenceNode implements Persistable {
     private int nodeNr;
 
     /**
+     * A sequence of error messages that may apply to this node.
+     */
+    private StringJoiner errorMessages;
+
+    /**
      * The sequence this node is part of.
      */
     private Sequence sequence;
 
-    public SequenceNode(String sequenceId, int nodeNr, ConcreteState concreteState, Sequence sequence) {
+    /**
+     * A set of event listeners to notify of changes in the sequence.
+     */
+    private Set<StateModelEventListener> eventListeners;
+
+    public SequenceNode(String sequenceId, int nodeNr, ConcreteState concreteState, Sequence sequence, Set<StateModelEventListener> eventListeners) {
         timestamp = Instant.now();
         this.nodeNr = nodeNr;
         nodeId = sequenceId + '-' + nodeNr;
         this.sequenceId = sequenceId;
         this.concreteState = concreteState;
         this.sequence = sequence;
+        errorMessages = new StringJoiner(", ");
+        this.eventListeners = eventListeners;
     }
 
     public Instant getTimestamp() {
@@ -90,4 +107,40 @@ public class SequenceNode implements Persistable {
     public Sequence getSequence() {
         return sequence;
     }
+
+    /**
+     * Add a new error message to this node.
+     * @param message
+     */
+    public void addErrorMessage(String message) {
+        errorMessages.add(message);
+        emitEvent(new StateModelEvent(StateModelEventType.SEQUENCE_NODE_UPDATED, this));
+    }
+
+    /**
+     * This method returns true if errors were detected in the current sequence node.
+     * @return
+     */
+    public boolean containsErrors() {
+        return errorMessages.length() > 0;
+    }
+
+    /**
+     * Returns the error message for this sequence node.
+     * @return
+     */
+    public String getErrorMessage() {
+        return errorMessages.toString();
+    }
+
+    /**
+     * Notify our listeners of emitted events
+     * @param event
+     */
+    private void emitEvent(StateModelEvent event) {
+        for (StateModelEventListener eventListener: eventListeners) {
+            eventListener.eventReceived(event);
+        }
+    }
+
 }

@@ -36,6 +36,7 @@ package org.fruit.monkey;
 import org.fruit.Pair;
 import org.fruit.alayer.Tag;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 public final class ConfigTags {
@@ -115,6 +116,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
+  public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
 
   // temporal oracles config tags
   public static final Tag<Boolean> TemporalEnabled = Tag.from("TemporalEnabled", Boolean.class);

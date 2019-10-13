@@ -4,26 +4,37 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Spy
+Mode = Record
 
 #################################################################
 # Connect to the System Under Test (SUT)
 #
 # Indicate how you want to connect to the SUT:
 #
-# SUTCONNECTOR = COMMAND_LINE, SUTConnectorValue property must be a command line that
+# SUTCONNECTOR = COMMAND_LINE, SUTCONNECTORValue property must be a command line that
 # starts the SUT.
 # It should work from a Command Prompt terminal window (e.g. java - jar SUTs/calc.jar ).
 # For web applications, follow the next format: web_browser_path SUT_URL.
 #
-# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTConnectorValue property must be the title displayed
+# SUTCONNECTOR = SUT_WINDOW_TITLE, then SUTCONNECTORValue property must be the title displayed
 # in the SUT main window. The SUT must be manually started and closed.
 #
-# SUTCONNECTOR = SUT_PROCESS_NAME: SUTConnectorValue property must be the process name of the SUT.
+# SUTCONNECTOR = SUT_PROCESS_NAME: SUTCONNECTORValue property must be the process name of the SUT.
 # The SUT must be manually started and closed.
 #################################################################
 SUTConnector = COMMAND_LINE
-SUTConnectorValue = c:\\windows\\system32\\notepad.exe
+SUTConnectorValue = C:\\Windows\\System32\\notepad.exe
+
+#################################################################
+# Java Swing applications & Access Bridge Enabled
+#
+# Activate the Java Access Bridge in your Windows System:
+#		(Control Panel / Ease of Access / Ease of Access Center / Make the computer easier to see)
+#
+# Enable the variable Access Bridge Enabled in TESTAR as true
+#################################################################
+
+AccessBridgeEnabled = false
 
 #################################################################
 # Sequences
@@ -31,8 +42,8 @@ SUTConnectorValue = c:\\windows\\system32\\notepad.exe
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 1
-SequenceLength = 10
+Sequences = 3
+SequenceLength = 30
 
 #################################################################
 # Oracles based on suspicious titles
@@ -40,7 +51,30 @@ SequenceLength = 10
 # Regular expression
 #################################################################
 
-SuspiciousTitles = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+SuspiciousTitles = .*[eE]rror.*|.*[eE]xcepti[o?]n.*
+
+#################################################################
+# Oracles based on Suspicious Outputs detected by Process Listeners
+#
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Regular expression defines the suspicious outputs
+#################################################################
+
+ProcessListenerEnabled = false
+SuspiciousProcessOutput = .*[eE]rror.*|.*[eE]xcep[ct]i[o?]n.*
+
+#################################################################
+# Process Logs
+#
+# Required ProcessListenerEnabled
+# (Only available for desktop applications through COMMAND_LINE)
+#
+# Allow TESTAR to store in its logs other possible matches found in the process
+# Use the regular expression .*.* if you want to store all the possible outputs of the process
+#################################################################
+
+ProcessLogs = .*.*
 
 #################################################################
 # Actionfilter
@@ -58,7 +92,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses =
+SUTProcesses = 
 
 #################################################################
 # Protocolclass
@@ -66,7 +100,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_generic_statemodel/Protocol_desktop_generic_statemodel
+ProtocolClass = desktop_orientdb/Protocol_desktop_orientdb
 
 #################################################################
 # Graphdatabase settings (experimental)
@@ -76,22 +110,25 @@ GraphDBUrl = remote:/localhost/testar
 GraphDBUser = testar
 GraphDBPassword = testar
 
-#################################################################\n"
+#################################################################
 # State model inference settings
-#################################################################\n"
+#################################################################
 StateModelEnabled = true
 DataStore = OrientDB
-DataStoreType = remote
+DataStoreType = plocal
 DataStoreServer = localhost
+DataStoreDirectory = C:\\orientdb\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = instant
+DataStoreMode = delayed
+ApplicationName = Buggy calculator
+ApplicationVersion = 1.0.0
 
 #################################################################
-# State identifier selectedAttributes
+# State identifier attributes
 #
-# Specify the widget selectedAttributes that you wish to use in constructing
+# Specify the widget attributes that you wish to use in constructing
 # the widget and state hash strings. Use a comma separated list.
 #################################################################
 AbstractStateAttributes = WidgetControlType
@@ -99,33 +136,45 @@ AbstractStateAttributes = WidgetControlType
 #################################################################
 # Other more advanced settings
 #################################################################
-
-ProcessesToKillDuringTest =
-OutputDir = ./output
-PathToReplaySequence = ./output/temp
+TypingTextsForExecutedAction = 10
+Discount = 0.95
 TempDir = ./output/temp
+MaxTime = 3.1536E7
+StopGenerationOnFault = true
+ExecuteActions = true
+DrawWidgetTree = false
 UseRecordedActionDurationAndWaitTimeDuringReplay = false
 ForceForeground = true
-LogLevel = 1
-ExecuteActions = true
-FaultThreshold = 0.000000001
-DrawWidgetUnderCursor = true
-MyClassPath = ./settings
-OnlySaveFaultySequences = false
-ActionDuration = 0.0
-ShowVisualSettingsDialogOnStartup = true
-ReplayRetryTime = 30.0
-Delete =
-MaxTime = 3.1536E7
-ShowSettingsAfterTest = true
-TimeToWaitAfterAction = 0.1
-StartupTime = 2.0
+AlgorithmFormsFilling = false
+FaultThreshold = 1.0E-9
 DrawWidgetInfo = false
-TimeToFreeze = 30.0
-StopGenerationOnFault = true
-CopyFromTo =
-VisualizeActions = false
+MaxReward = 9999999.0
+LogLevel = 1
 VisualizeSelectedAction = true
+Delete = 
+MyClassPath = ./settings
+ReplayRetryTime = 30.0
+ProcessesToKillDuringTest = 
+ShowSettingsAfterTest = true
+ForceToSequenceLength = true
+OutputDir = ./output
+UnattendedTests = false
 TestGenerator = random
-MaxReward = 9999999
-Discount = .95
+StartupTime = 2.0
+ActionDuration = 0.0
+NonReactingUIThreshold = 100
+GraphsActivated = true
+GraphResuming = true
+CopyFromTo = 
+TimeToFreeze = 30.0
+StateScreenshotSimilarityThreshold = 1.4E-45
+ShowVisualSettingsDialogOnStartup = true
+ResetDataStore = false
+TimeToWaitAfterAction = 0.0
+DrawWidgetUnderCursor = true
+AlwaysCompile = true
+PathToReplaySequence = ./output/temp
+VisualizeActions = false
+ExplorationSampleInterval = 1
+OnlySaveFaultySequences = false
+OfflineGraphConversion = true

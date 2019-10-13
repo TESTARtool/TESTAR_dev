@@ -126,9 +126,16 @@
                     'background-color': '#F6EFF7',
                     'border-width': "1px",
                     'border-color': '#000000',
-                    'label': 'data(counter)',
+                    'label': '',
                     'color': '#5d574d',
                     'font-size': '0.4em'
+                }
+            },
+
+            {
+                selector: 'node[counter]',
+                style: {
+                    'label': 'data(counter)',
                 }
             },
 
@@ -150,9 +157,15 @@
                     'target-arrow-shape': 'triangle',
                     'curve-style': 'unbundled-bezier',
                     'text-rotation' : 'autorotate',
-                    'label': 'data(counter)',
+                    'label': '',
                     'color': '#5d574d',
                     'font-size': '0.3em'
+                }
+            },
+            {
+                selector: 'edge[counter]',
+                style: {
+                    'label': 'data(counter)',
                 }
             },
             {
@@ -519,7 +532,34 @@
         highlightButton.classList.add("skip");
         highlightButton.appendChild(document.createTextNode("Highlight"));
         highlightButton.addEventListener("click", function () {
+            // we want to select the clicked node and its neighborhood
             let allNodes = cy.$(targetNode).closedNeighborhood();
+
+            // next, in the case of a concrete action or an abstract action, we want to also fetch their concrete and
+            // abstract counterparts for the neighborhood
+            if (targetNode.hasClass('ConcreteState')) {
+                // get the connect abstract states and their connected abstract actions
+                let abstractStateNodes = allNodes.nodes('.ConcreteState').outgoers('.AbstractState');
+                let abstractionEdges = allNodes.nodes('.ConcreteState').outgoers('.isAbstractedBy');
+                let abstractActionNodes = abstractStateNodes.connectedEdges('.AbstractAction');
+
+                // next, for each concrete action in the neighborhoor, attempt to fetch the corresponding abstract action
+                let selectedAbstractActionNodes = [];
+                allNodes.edges('.ConcreteAction').forEach(
+                    (edge) => abstractActionNodes.forEach(
+                        (abstractActionNode) => {
+                            if (abstractActionNode.data('concreteActionIds').indexOf(edge.data('actionId')) != -1) {
+                                selectedAbstractActionNodes.push(abstractActionNode);
+                            }
+                        }
+                    )
+                );
+
+                // now join the nodes
+                allNodes = allNodes.union(abstractStateNodes).union(selectedAbstractActionNodes).union(abstractionEdges);
+            }
+
+            // we also need to select the parent nodes in case of a compound graph.
             allNodes = allNodes.union(allNodes.parent());
             cy.$("*").difference(allNodes).addClass("invisible");
         });
@@ -552,19 +592,79 @@
             contentPanelHeader.appendChild(traceButton);
         }
 
+        // if the clicked node is a test sequence, we show a button that will show just the nodes of that test sequence
+        if (targetNode.hasClass('TestSequence') && appStatus.concreteLayerPresent) {
+            let traceButton = document.createElement('button');
+            traceButton.id = 'trace-sequence-button';
+            traceButton.classList.add('skip');
+            traceButton.appendChild(document.createTextNode('Trace Sequence'));
+            traceButton.addEventListener('click', () => {
+                // first, get all the nodes and edges in the sequence
+                let sequenceElements = targetNode.successors('.SequenceNode, .SequenceStep, .FirstNode');
+                // add the targetnode itself and the parents
+                sequenceElements = sequenceElements.union(targetNode);
+
+                // now get all the corresponding elements on the concrete layer
+                let concreteStateNodes = sequenceElements.nodes('.SequenceNode').outgoers('.ConcreteState');
+                let accessedEdges = sequenceElements.nodes('.SequenceNode').outgoers('.Accessed');
+                let concreteActionNodes = concreteStateNodes.connectedEdges('.ConcreteAction');
+
+                // for each sequence step, fetch the corresponding concrete action
+                let selectedConcreteActionNodes = [];
+                sequenceElements.edges('.SequenceStep').forEach(
+                    (edge) => concreteActionNodes.forEach(
+                        (concreteActionNode) => {
+                            if (concreteActionNode.data('uid') == edge.data('concreteActionUid')) {
+                                selectedConcreteActionNodes.push(concreteActionNode);
+                            }
+                        }
+                    )
+                );
+
+                sequenceElements = sequenceElements.union(concreteStateNodes).union(accessedEdges).union(selectedConcreteActionNodes);
+
+                // get all the corresponding elements on the abstract layer
+                let abstractStateNodes = sequenceElements.nodes('.ConcreteState').outgoers('.AbstractState');
+                let abstractionEdges = sequenceElements.nodes('.ConcreteState').outgoers('.isAbstractedBy');
+                let abstractActionNodes = abstractStateNodes.connectedEdges('.AbstractAction');
+
+                // next, for each concrete action in the neighborhoor, attempt to fetch the corresponding abstract action
+                let selectedAbstractActionNodes = [];
+                sequenceElements.edges('.ConcreteAction').forEach(
+                    (edge) => abstractActionNodes.forEach(
+                        (abstractActionNode) => {
+                            if (abstractActionNode.data('concreteActionIds').indexOf(edge.data('actionId')) != -1) {
+                                selectedAbstractActionNodes.push(abstractActionNode);
+                            }
+                        }
+                    )
+                );
+
+                // now join the nodes
+                sequenceElements = sequenceElements.union(abstractStateNodes).union(selectedAbstractActionNodes).union(abstractionEdges);
+
+                // add the parents
+                sequenceElements = sequenceElements.union(sequenceElements.parent());
+                cy.$("*").difference(sequenceElements).addClass("invisible");
+            });
+
+            contentPanelHeader.appendChild(traceButton);
+        }
+
         //////////////// end add button section //////////////////
 
         /////////// screenshot segment //////////
 
-        // create a popup anchor
-        let popupAnchor = document.createElement("a");
-        popupAnchor.href = "${contentFolder}/" + targetNode.id() + ".png";
-        $(popupAnchor).magnificPopup(
-            {type: "image"}
-        );
-
         // add the screenshot image if the node is a concrete state
-        if (targetNode.hasClass("ConcreteState")) { // add the screenshot full image
+        if (targetNode.hasClass("ConcreteState")) {
+            // create a popup anchor
+            let popupAnchor = document.createElement("a");
+            popupAnchor.href = "${contentFolder}/" + targetNode.id() + ".png";
+            $(popupAnchor).magnificPopup(
+                {type: "image"}
+            );
+
+            // add the screenshot full image
             let nodeImage = document.createElement("img");
             nodeImage.alt = "Image for node " + targetNode.id();
             nodeImage.src = "${contentFolder}/" + targetNode.id() + ".png";
@@ -572,6 +672,54 @@
             popupAnchor.appendChild(nodeImage);
             contentPanel.appendChild(popupAnchor);
         }
+
+        // add a series of screenshots if the node is an abstract state
+        if (targetNode.hasClass("AbstractState")) {
+            // first retrieve all the concrete states that are abstracted by this abstract state
+            let concreteNodes = targetNode.incomers(".ConcreteState");
+            if (concreteNodes.size() > 0) {
+                let div =  document.createElement('div');
+                div.classList.add('popup-gallery');
+                concreteNodes.forEach(
+                    (element) => {
+                        // create an anchor element for each screenshot
+                        let popupAnchor = document.createElement("a");
+                        popupAnchor.href = "${contentFolder}/" + element.id() + ".png";
+
+                        // add the image thumbnail
+                        // add the screenshot full image
+                        let nodeImage = document.createElement("img");
+                        nodeImage.alt = "Image for node " + element.id();
+                        nodeImage.src = "${contentFolder}/" + element.id() + ".png";
+                        nodeImage.classList.add("node-img-thumb");
+                        popupAnchor.appendChild(nodeImage);
+                        div.appendChild(popupAnchor);
+                    }
+                );
+
+                // now add the popup code
+                $(div).magnificPopup({
+                    delegate: 'a',
+                    type: 'image',
+                    tLoading: 'Loading image #%curr%...',
+                    mainClass: 'mfp-img-mobile',
+                    gallery: {
+                        enabled: true,
+                        navigateByImgClick: true,
+                        preload: [0,1] // Will preload 0 - before current, and 1 after the current image
+                    },
+                    image: {
+                        tError: 'The image could not be loaded.',
+                        titleSrc: function(item) {
+                            return item.el.attr('title');
+                        }
+                    }
+                });
+
+                contentPanel.appendChild(div);
+            }
+        }
+
         /////////// end screenshot segment /////////////
 
         ////////// data segment   //////////////
@@ -801,6 +949,7 @@
         appStatus.nrOfSequenceNodes = cy.$('node.SequenceNode').size();
         appStatus.nrOfAbstractActions = cy.$('edge.AbstractAction').size();
         appStatus.nrOfConcreteActions = cy.$('edge.ConcreteAction').size();
+        appStatus.nrOfUnvisitedAbstractActions = cy.$('edge.UnvisitedAbstractAction').size();
         appStatus.abstractLayerPresent = appStatus.nrOfAbstractStates > 0;
         appStatus.concreteLayerPresent = appStatus.nrOfConcreteStates > 0;
         appStatus.sequenceLayerPresent = appStatus.nrOfSequenceNodes > 0;

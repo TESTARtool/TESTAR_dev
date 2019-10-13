@@ -627,6 +627,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case SEQUENCE_STARTED:
+            case SEQUENCE_ENDED:
                 persistSequence((Sequence) event.getPayload());
                 break;
 
@@ -635,6 +636,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case SEQUENCE_NODE_ADDED:
+            case SEQUENCE_NODE_UPDATED:
                 persistSequenceNode((SequenceNode) event.getPayload());
                 break;
 

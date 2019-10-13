@@ -73,5 +73,8 @@ public class SequenceStepHydrator implements EntityHydrator<EdgeEntity> {
         // construct the unique action id
         String concreteActionUid = HydrationHelper.createOrientDbActionId(concreteStateSourceId, concreteStateTargetId, concreteAction.getActionId(), null);
         edgeEntity.addPropertyValue("concreteActionUid", new PropertyValue(OType.STRING, concreteActionUid));
+
+        // add the description of the action performed
+        edgeEntity.addPropertyValue("actionDescription", new PropertyValue(OType.STRING, ((SequenceStep) source).getActionDescription()));
     }
 }
