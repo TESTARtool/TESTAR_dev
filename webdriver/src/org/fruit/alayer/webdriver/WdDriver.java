@@ -36,8 +36,8 @@ import org.fruit.alayer.devices.Keyboard;
 import org.fruit.alayer.devices.Mouse;
 import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.SystemStopException;
-import org.openqa.selenium.*;
-import org.openqa.selenium.Dimension;
+import org.fruit.alayer.windows.WinProcess;
+import org.fruit.alayer.windows.Windows;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -58,17 +58,17 @@ public class WdDriver extends SUTBase {
 
   private WdDriver(String sutConnector) {
     String[] parts = sutConnector.split(" ");
-    
+
     String driverPath = parts[0].replace("\"", "");
 
     String osName = System.getProperty("os.name");
-    if(!driverPath.contains(".exe") && osName.contains("Windows")) {
-    	driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe")+4);
-    	driverPath = driverPath.replace("\"", "");
-    	parts = sutConnector.substring(sutConnector.indexOf(".exe")).split(" ");
-    	parts[0] = driverPath;
+    if (!driverPath.contains(".exe") && osName.contains("Windows")) {
+      driverPath = sutConnector.substring(0, sutConnector.indexOf(".exe") + 4);
+      driverPath = driverPath.replace("\"", "");
+      parts = sutConnector.substring(sutConnector.indexOf(".exe")).split(" ");
+      parts[0] = driverPath;
     }
-    
+
     String url = parts[parts.length - 1].replace("\"", "");
     Dimension screenDimensions = null;
     Point screenPosition = null;
@@ -96,17 +96,16 @@ public class WdDriver extends SUTBase {
       webDriver = WdRemoteDriver.startEdgeDriver(driverPath);
     }
     else {
-		String msg = " \n ******** Not a valid webdriver Exception ********"
-				+ "\n Something looks wrong with the webdriver path: \n "
-				+ sutConnector
-				+ "\n Allowed webdrivers: chromedriver.exe"
-				+ "\n Readed path: " + driverPath
-				+ "\n Verify if it exists or if the path is a correct definition. "
-				+ "\n Please follow this structure (spaces, quotes, characters...):"
-				+ "\n \"C:\\Windows\\chromedriver.exe\" \"1920x900+0+0\" \"https://www.testar.org\" \n";
+      String msg = " \n ******** Not a valid webdriver Exception ********"
+                   + "\n Something looks wrong with the webdriver path: \n "
+                   + sutConnector
+                   + "\n Allowed webdrivers: chromedriver.exe"
+                   + "\n Readed path: " + driverPath
+                   + "\n Verify if it exists or if the path is a correct definition. "
+                   + "\n Please follow this structure (spaces, quotes, characters...):"
+                   + "\n \"C:\\Windows\\chromedriver.exe\" \"1920x900+0+0\" \"https://www.testar.org\" \n";
+      System.out.println(msg);
 
-		System.out.println(msg);
-    	
       throw new SystemStartException("Not a valid webdriver");
     }
 
@@ -118,6 +117,11 @@ public class WdDriver extends SUTBase {
     }
 
     webDriver.get(url);
+
+    if (System.getProperty("os.name").contains("Windows") &&
+        this.get(Tags.HWND, (long) -1) == (long) -1) {
+        this.set(Tags.HWND, Windows.GetForegroundWindow());
+    }
 
     CanvasDimensions.startThread();
 
@@ -223,7 +227,7 @@ public class WdDriver extends SUTBase {
   }
 
   /*
-   * Make sure the last tab has focus
+   * Make sure the browser window and correct tab has focus
    */
   public static void activate() {
     updateHandlesList();
@@ -233,9 +237,23 @@ public class WdDriver extends SUTBase {
       return;
     }
 
-    String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
     try {
-      webDriver.switchTo().window(handle);
+      if (System.getProperty("os.name").contains("Windows")) {
+        // Detect if the browser has focus
+        long hwnd = wdDriver.get(Tags.HWND, (long) -1);
+        if (hwnd != -1 && hwnd != Windows.GetForegroundWindow()) {
+          WinProcess.toForeground(Windows.GetWindowProcessId(hwnd));
+        }
+      }
+
+      // Check if document not in foreground
+      boolean hasFocus = (Boolean)
+          webDriver.executeScript("return document.hasFocus();");
+      if (!hasFocus) {
+        // On OSX and Linux this also forces the browser to the foreground
+        String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
+        webDriver.switchTo().window(handle);
+      }
     }
     catch (NullPointerException | WebDriverException ignored) {
       webDriver = null;
