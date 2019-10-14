@@ -156,7 +156,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	 	boolean ponsseGUIready = false;
 	 	while(!ponsseGUIready){
 			for(Widget widget:state){
-				if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase("RPM")){
+				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase("btnShutDown")){
 					System.out.println("DEBUG: Ponsse GUI ready!");
 					ponsseGUIready=true;
 				}
