@@ -8,6 +8,7 @@ sourceSets {
 
 dependencies {
     compile project(':core')
+    compile project(':windows')
 
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.14.0'
