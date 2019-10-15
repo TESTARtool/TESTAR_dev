@@ -1,3 +1,4 @@
+
 #################################################################
 # TESTAR mode
 #
@@ -24,7 +25,6 @@ Mode = Generate
 #################################################################
 SUTConnector = SUT_PROCESS_NAME
 SUTConnectorValue = Ponsse.Opti5G.exe
-# c:\\Program Files\\Ponsse\\Opti5G\\Ponsse.Opti5G.exe
 
 #################################################################
 # Java Swing applications & Access Bridge Enabled
@@ -93,7 +93,7 @@ ClickFilter = .*[sS]istema.*|.*[sS]ystem.*|.*[cC]errar.*|.*[cC]lose.*|.*[sS]alir
 # but that you do not want to test.
 #################################################################
 
-SUTProcesses = 
+SUTProcesses =
 
 #################################################################
 # Protocolclass
@@ -107,24 +107,26 @@ ProtocolClass = desktop_generic_opti5g_SpeciesGroup/Protocol_desktop_generic_opt
 # Graphdatabase settings (experimental)
 #################################################################
 GraphDBEnabled = false
-GraphDBUrl = 
-GraphDBUser = 
-GraphDBPassword = 
+GraphDBUrl =
+GraphDBUser =
+GraphDBPassword =
 
 #################################################################
 # State model inference settings
 #################################################################
-StateModelEnabled = false
+StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = remote
 DataStoreServer = localhost
-DataStoreDirectory = 
+DataStoreDirectory =
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
 DataStoreMode = instant
-ApplicationName = 
-ApplicationVersion = 
+ApplicationName =
+ApplicationVersion =
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -152,10 +154,10 @@ DrawWidgetInfo = false
 MaxReward = 9999999.0
 LogLevel = 1
 VisualizeSelectedAction = true
-Delete = 
+Delete =
 MyClassPath = ./settings
 ReplayRetryTime = 30.0
-ProcessesToKillDuringTest = 
+ProcessesToKillDuringTest =
 ShowSettingsAfterTest = true
 ForceToSequenceLength = true
 OutputDir = ./output
@@ -166,11 +168,11 @@ ActionDuration = 0.1
 NonReactingUIThreshold = 100
 GraphsActivated = true
 GraphResuming = true
-CopyFromTo = 
+CopyFromTo =
 TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
-ResetDataStore = true
+ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
