@@ -29,6 +29,7 @@
  *******************************************************************************************************/
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.fruit.Util;
@@ -104,6 +105,15 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		return false;
 	}
 
+	boolean widgetWithAutomationIdFound(String automationId, State state){
+			for(Widget widget:state){
+				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
+					System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
+					return true;
+				}
+			}
+		return false;
+	}
 
 	/**
 	 * This method waits until the widget with given title is found or retry limit is reached
@@ -419,7 +429,26 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	 */
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
-		return(super.selectAction(state, actions));
+		//checking if the state is in "SpeciesGroupsWindow"
+		boolean isSpeciesGroupsWindow = false;
+		if(widgetWithAutomationIdFound("SpeciesGroupsWindow",state)){
+			System.out.println("GUI is in SpeciesGroupsWindow - filtering back button");
+			isSpeciesGroupsWindow=true;
+		}
+
+		Set<Action> filteredActions = new HashSet<Action>();
+		for(Action action:actions){
+			// filtering back button and help button away from available actions:
+			if(action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")){
+				// filtering help button away
+			}else if(isSpeciesGroupsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
+				// filtering back button away
+			}
+			else{
+				filteredActions.add(action);
+			}
+		}
+		return(super.selectAction(state, filteredActions));
 	}
 
 	/**
