@@ -104,17 +104,51 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		return false;
 	}
 
+
+	/**
+	 * This method waits until the widget with given title is found or retry limit is reached
+	 * If widget is found, it clicks left mouse button on it and returns true
+	 * Else returns false
+	 *
+	 * @param title
+	 * @param state
+	 * @param system
+	 * @param maxNumberOfRetries
+	 * @return
+	 */
+	boolean waitAndClickButtonByTitle(String title, State state, SUT system, int maxNumberOfRetries){
+		boolean uiElementFound = false;
+		int numberOfRetries = 0;
+		while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
+			for(Widget widget:state){
+				if(widget.get(Tags.Title, "NoTitleAvailable").equalsIgnoreCase(title)){
+					uiElementFound=true;
+					StdActionCompiler ac = new AnnotatingActionCompiler();
+					System.out.println("DEBUG: waitAndClickButtonByTitle: left mouse click on " + title);
+					executeAction(system,state,ac.leftClickAt(widget));
+					Util.pause(1);
+					return true;
+				}
+			}
+			if(!uiElementFound){
+				Util.pause(1);
+				state = getState(system);
+				numberOfRetries++;
+			}
+		}
+		return false;
+	}
+
 	/**Ponsse: This method clicks a button in Opti5G UI*/
-	boolean waitAndClickButton(String automationId, State state,  SUT system, int maxNumberOfRetries){
+	boolean waitAndClickButtonByAutomationId(String automationId, State state, SUT system, int maxNumberOfRetries){
 		boolean uiElementFound = false;
 		int numberOfRetries = 0;
 	 	while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
 			for(Widget widget:state){
 				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
-					System.out.println("DEBUG: UI Element found!");
 					uiElementFound=true;
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					System.out.println("DEBUG: waitAndClickButton: left mouse click on " + automationId);
+					System.out.println("DEBUG: waitAndClickButtonByAutomationId: left mouse click on " + automationId);
 					executeAction(system,state,ac.leftClickAt(widget));
 					Util.pause(1);
 					return true;
@@ -130,16 +164,15 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	}
 
 	/**Ponsse: This method types text to UI element */
-	boolean waitAndTypeText(String automationId, String text, State state, SUT system, int maxNumberOfRetries){
+	boolean waitAndTypeTextByAutomationId(String automationId, String text, State state, SUT system, int maxNumberOfRetries){
 		boolean uiElementFound = false;
 		int numberOfRetries = 0;
 		while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
 			for(Widget widget:state){
 				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
-					System.out.println("DEBUG: UI Element found!");
 					uiElementFound=true;
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					System.out.println("DEBUG: waitAndClickButton: left mouse click on " + automationId);
+					System.out.println("DEBUG: waitAndTypeTextByAutomationId: left mouse click on " + automationId);
 					executeAction(system,state,ac.clickTypeInto(widget, text, true));
 					Util.pause(1);
 					return true;
@@ -205,34 +238,34 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		if(!widgetWithAutomationIdFound("btntestar", state, system, 1)){
 			// Ponsse GUI ready and testar button not found - creating testar user
 			System.out.println("DEBUG: looking for btnAddUser");
-			waitAndClickButton("btnAddUser", state, system, 20);
+			waitAndClickButtonByAutomationId("btnAddUser", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: typing first name");
-			waitAndTypeText("txtBoxFirstName", "testar", state, system, 20);
+			waitAndTypeTextByAutomationId("txtBoxFirstName", "testar", state, system, 20);
 
 			System.out.println("DEBUG: typing last name");
-			waitAndTypeText("txtBoxLastName", "test", state, system, 20);
+			waitAndTypeTextByAutomationId("txtBoxLastName", "test", state, system, 20);
 
 			System.out.println("DEBUG: typing user ID");
-			waitAndTypeText("txtBoxUserId", "testar@ponsse.com", state, system, 20);
+			waitAndTypeTextByAutomationId("txtBoxUserId", "testar@ponsse.com", state, system, 20);
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
@@ -242,65 +275,65 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 			executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: looking for NextButton");
-			waitAndClickButton("NextButton", state, system, 20);
+			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
 			//updating TESTAR state:
 			state=getState(system);
 
 			System.out.println("DEBUG: typing new PIN code");
-			waitAndTypeText("passwordBoxPinBox1", "1111", state, system, 20);
+			waitAndTypeTextByAutomationId("passwordBoxPinBox1", "1111", state, system, 20);
 
 			System.out.println("DEBUG: typing new PIN code again");
-			waitAndTypeText("passwordBoxPinBox2", "1111", state, system, 20);
+			waitAndTypeTextByAutomationId("passwordBoxPinBox2", "1111", state, system, 20);
 
 			System.out.println("DEBUG: looking for buttonFinish");
-			waitAndClickButton("buttonFinish", state, system, 20);
+			waitAndClickButtonByAutomationId("buttonFinish", state, system, 20);
 		}
 
 
 
 		// Ponsse user created - selecting testar user
 		 System.out.println("DEBUG: looking for btntestar");
-		 waitAndClickButton("btntestar", state, system, 20);
+		 waitAndClickButtonByAutomationId("btntestar", state, system, 20);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
 		 System.out.println("DEBUG: looking for pin code");
-		 waitAndTypeText("passwordBoxPinBoxCode", "1111", state, system, 20);
+		 waitAndTypeTextByAutomationId("passwordBoxPinBoxCode", "1111", state, system, 20);
 		 
 		 System.out.println("DEBUG: looking for btnLogOn");
-		 waitAndClickButton("btnLogOn", state, system, 20);
+		 waitAndClickButtonByAutomationId("btnLogOn", state, system, 20);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 
 		 System.out.println("DEBUG: looking for btnPlanningView");
-		 waitAndClickButton("btnPlanningView", state, system, 20);
+		 waitAndClickButtonByAutomationId("btnPlanningView", state, system, 20);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
 		 System.out.println("DEBUG: looking for contextMenuHandle");
-		 waitAndClickButton("contextMenuHandle", state, system, 20);
+		 waitAndClickButtonByAutomationId("contextMenuHandle", state, system, 20);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
 		 System.out.println("DEBUG: looking for buttonSpeciesGroups");
-		 waitAndClickButton("buttonSpeciesGroups", state, system, 20);
+		 waitAndClickButtonByAutomationId("buttonSpeciesGroups", state, system, 20);
 
 	}
 
@@ -438,14 +471,15 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		//super.stopSystem(system);
 		// pushing back button until in logout screen:
 		State state = getState(system);
-		while(waitAndClickButton("ButtonBack", state, system, 1)
-				|| waitAndClickButton("btnCancelClose", state, system, 1)
-				|| waitAndClickButton("btnOk", state, system, 1)){
+		while(waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
+				|| waitAndClickButtonByAutomationId("btnCancelClose", state, system, 1)
+				|| waitAndClickButtonByAutomationId("btnOk", state, system, 1)
+				|| waitAndClickButtonByTitle("Cancel", state, system, 1)){
 			System.out.println("Pushing back button until in logout screen");
 			//update TESTAR state:
 			state = getState(system);
 		}
-		while(waitAndClickButton("ButtonLogOut", state, system, 1)){
+		while(waitAndClickButtonByAutomationId("ButtonLogOut", state, system, 1)){
 			System.out.println("Pushing logout button");
 			//update TESTAR state:
 			state = getState(system);
