@@ -250,6 +250,7 @@ public class Protocol_desktop_generic_opti5g_Assortments extends PonsseDesktopPr
 		// pushing back button until in logout screen:
 		State state = getState(system);
 		while(widgetWithAutomationIdFound("MessageDialog", state) && waitAndClickButtonByAutomationId("btnOk", state, system, 1)
+				|| waitAndClickButtonByAutomationId("ExpanderButtonCancel", state, system, 1)
 				|| waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
 				|| waitAndClickButtonByAutomationId("btnCancelClose", state, system, 1)
 				|| waitAndClickButtonByTitle("Cancel", state, system, 1)){
