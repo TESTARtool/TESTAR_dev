@@ -11,6 +11,7 @@ import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.windows.UIATags;
 
 import java.util.*;
 
@@ -199,7 +200,7 @@ public class ModelManager implements StateModelManager {
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
         actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
-        System.out.println("Executing action: " + action.get(Tags.Desc));
+        System.out.println("Executing action: " + action.get(Tags.Desc, "NoDescAvailable") + ", AutomationId="+action.get(UIATags.UIAAutomationId, "NoIdAvailable"));
         System.out.println("----------------------------------");
 
         // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
