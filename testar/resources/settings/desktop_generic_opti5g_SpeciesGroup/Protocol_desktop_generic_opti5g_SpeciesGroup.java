@@ -101,6 +101,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 			if(!uiElementFound){
 				Util.pause(1);
 				state = getState(system);
+				numberOfRetries++;
 			}
 		}
 		return false;
