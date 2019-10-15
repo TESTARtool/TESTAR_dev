@@ -1349,7 +1349,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Refresh the flash information, to avoid that SUT hide the information
 			int countTimeFlash = 0;
-			while(countTimeFlash<timeFlash) {
+			while(countTimeFlash<timeFlash&&!sut.isRunning()) {
 				FlashFeedback.flash(printSutInfo, 2000);
 				countTimeFlash += 2000;
 			}
