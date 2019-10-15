@@ -100,6 +100,7 @@ public class Protocol_desktop_generic_opti5g_Assortments extends DesktopProtocol
 			if(!uiElementFound){
 				Util.pause(1);
 				state = getState(system);
+				numberOfRetries++;
 			}
 		}
 		return false;
