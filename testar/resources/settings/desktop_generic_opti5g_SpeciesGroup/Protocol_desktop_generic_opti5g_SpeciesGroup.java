@@ -38,6 +38,10 @@ import org.fruit.alayer.actions.StdActionCompiler;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.alayer.windows.UIATags;
 import org.fruit.monkey.Settings;
+import org.sikuli.script.FindFailed;
+import org.sikuli.script.Pattern;
+import org.sikuli.script.Region;
+import org.sikuli.script.Screen;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -133,6 +137,40 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	}
 
 	/**
+	 * Using SikuliX library to click on text on screen
+	 * @param textToFindOrImagePath
+	 */
+	public static void executeClickOnTextOrImagePath(String textToFindOrImagePath){
+		Screen sikuliScreen = new Screen();
+		try {
+			//System.out.println("DEBUG: sikuli clicking on text (or image path): "+textToFindOrImagePath);
+			sikuliScreen.click(textToFindOrImagePath);
+		} catch (FindFailed findFailed) {
+			findFailed.printStackTrace();
+		}
+	}
+
+	public static boolean textOrImageExists(String textOrImagePath){
+		if(getRegionOfTextOrImage(textOrImagePath)==null){
+			// text or image not found
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 *
+	 * @param textOrImagePath
+	 * @return null if not found
+	 */
+	public static Region getRegionOfTextOrImage(String textOrImagePath){
+		Screen sikuliScreen = new Screen();
+		Pattern pattern = new Pattern(textOrImagePath).similar(new Float(0.90));
+		Region region = sikuliScreen.exists(pattern);
+		return region;
+	}
+
+	/**
 	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
 	 * This can be used for example for bypassing a login screen by filling the username and password
 	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
@@ -190,7 +228,8 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		 state=getState(system);
 
 		 System.out.println("DEBUG: closing virtual keyboard");
-		 waitAndClickButton("btnHideVkb", state, system, 20);
+//		 waitAndClickButton("btnHideVkb", state, system, 20);
+		 executeClickOnTextOrImagePath("desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
 
 		 System.out.println("DEBUG: looking for NextButton");
 		 waitAndClickButton("NextButton", state, system, 20);
