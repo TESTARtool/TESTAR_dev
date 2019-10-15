@@ -152,7 +152,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	 */
 	 @Override
 	protected void beginSequence(SUT system, State state){
-		System.out.println("DEBUG 0: Begin sequence");
+		System.out.println("DEBUG: Begin sequence, looking if shutdown button is available");
 	 	boolean ponsseGUIready = false;
 	 	while(!ponsseGUIready){
 			for(Widget widget:state){
@@ -167,37 +167,98 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 			}
 		}
 
+		 // Ponsse GUI ready - creating testar user
+		 System.out.println("DEBUG: looking for btnAddUser");
+		 waitAndClickButton("btnAddUser", state, system);
 
-		// Ponsse GUI ready - selecting testar user
-		 System.out.println("DEBUG 1: looking for btntestar");
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: typing first name");
+		 waitAndTypeText("txtBoxFirstName", "testar", state, system);
+
+		 System.out.println("DEBUG: typing last name");
+		 waitAndTypeText("txtBoxLastName", "test", state, system);
+
+		 System.out.println("DEBUG: typing user ID");
+		 waitAndTypeText("txtBoxUserId", "testar@ponsse.com", state, system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: looking for NextButton");
+		 waitAndClickButton("NextButton", state, system);
+
+		 //updating TESTAR state:
+		 state=getState(system);
+
+		 System.out.println("DEBUG: typing new PIN code");
+		 waitAndTypeText("passwordBoxPinBox1", "1111", state, system);
+
+		 System.out.println("DEBUG: typing new PIN code again");
+		 waitAndTypeText("passwordBoxPinBox2", "1111", state, system);
+
+		 System.out.println("DEBUG: looking for buttonFinish");
+		 waitAndClickButton("buttonFinish", state, system);
+
+
+
+		// Ponsse user created - selecting testar user
+		 System.out.println("DEBUG: looking for btntestar");
 		 waitAndClickButton("btntestar", state, system);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
-		 System.out.println("DEBUG 2: looking for pin code");
+		 System.out.println("DEBUG: looking for pin code");
 		 waitAndTypeText("passwordBoxPinBoxCode", "1111", state, system);
 		 
-		 System.out.println("DEBUG 3: looking for btnLogOn");
+		 System.out.println("DEBUG: looking for btnLogOn");
 		 waitAndClickButton("btnLogOn", state, system);
-		 
 
 		 //updating TESTAR state:
 		 state=getState(system);
 
-		 System.out.println("DEBUG 4: looking for btnPlanningView");
+		 System.out.println("DEBUG: looking for btnPlanningView");
 		 waitAndClickButton("btnPlanningView", state, system);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
-		 System.out.println("DEBUG 5: looking for contextMenuHandle");
+		 System.out.println("DEBUG: looking for contextMenuHandle");
 		 waitAndClickButton("contextMenuHandle", state, system);
 
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
-		 System.out.println("DEBUG 6: looking for buttonSpeciesGroups");
+		 System.out.println("DEBUG: looking for buttonSpeciesGroups");
 		 waitAndClickButton("buttonSpeciesGroups", state, system);
 
 	}
