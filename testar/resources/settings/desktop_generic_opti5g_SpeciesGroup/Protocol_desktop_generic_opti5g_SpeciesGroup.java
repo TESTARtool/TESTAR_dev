@@ -88,6 +88,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	}
 
 	boolean widgetWithAutomationIdFound(String automationId, State state,  SUT system, int maxNumberOfRetries){
+		System.out.println("DEBUG: trying to find widget with automation ID="+automationId);
 		boolean uiElementFound = false;
 		int numberOfRetries = 0;
 		while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
@@ -106,6 +107,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	}
 
 	boolean widgetWithAutomationIdFound(String automationId, State state){
+		System.out.println("DEBUG: trying to find widget with automation ID="+automationId);
 			for(Widget widget:state){
 				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
 					System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
@@ -438,14 +440,18 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 
 		Set<Action> filteredActions = new HashSet<Action>();
 		for(Action action:actions){
-			// filtering back button and help button away from available actions:
-			if(action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")){
-				// filtering help button away
-			}else if(isSpeciesGroupsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
-				// filtering back button away
-			}
-			else{
-				filteredActions.add(action);
+			try{
+				// filtering back button and help button away from available actions:
+				if(action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")){
+					// filtering help button away
+				}else if(isSpeciesGroupsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
+					// filtering back button away
+				}
+				else{
+					filteredActions.add(action);
+				}
+			}catch (Exception e){
+				e.printStackTrace();
 			}
 		}
 		return(super.selectAction(state, filteredActions));
