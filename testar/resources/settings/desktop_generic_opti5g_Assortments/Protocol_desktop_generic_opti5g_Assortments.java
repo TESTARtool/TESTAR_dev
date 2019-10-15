@@ -102,6 +102,10 @@ public class Protocol_desktop_generic_opti5g_Assortments extends PonsseDesktopPr
 			//updating TESTAR state:
 			state=getState(system);
 
+			System.out.println("DEBUG: closing virtual keyboard");
+//		 waitAndClickButton("btnHideVkb", state, system, 20);
+			executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
+
 			System.out.println("DEBUG: looking for NextButton");
 			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
