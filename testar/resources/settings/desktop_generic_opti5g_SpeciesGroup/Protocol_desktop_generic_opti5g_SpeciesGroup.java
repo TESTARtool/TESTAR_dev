@@ -86,6 +86,24 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		return super.startSystem();
 	}
 
+	boolean widgetWithAutomationIdFound(String automationId, State state,  SUT system, int maxNumberOfRetries){
+		boolean uiElementFound = false;
+		int numberOfRetries = 0;
+		while(!uiElementFound&&numberOfRetries<maxNumberOfRetries){
+			for(Widget widget:state){
+				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase(automationId)){
+					System.out.println("DEBUG: widget with automationId="+ automationId +" found!");
+					return true;
+				}
+			}
+			if(!uiElementFound){
+				Util.pause(1);
+				state = getState(system);
+			}
+		}
+		return false;
+	}
+
 	/**Ponsse: This method clicks a button in Opti5G UI*/
 	boolean waitAndClickButton(String automationId, State state,  SUT system, int maxNumberOfRetries){
 		boolean uiElementFound = false;
@@ -179,84 +197,77 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	 @Override
 	protected void beginSequence(SUT system, State state){
 		System.out.println("DEBUG: Begin sequence, looking if shutdown button is available");
-	 	boolean ponsseGUIready = false;
-	 	while(!ponsseGUIready){
-			for(Widget widget:state){
-				if(widget.get(UIATags.UIAAutomationId, "NoAutomationIdAvailable").equalsIgnoreCase("btnShutDown")){
-					System.out.println("DEBUG: Ponsse GUI ready!");
-					ponsseGUIready=true;
-				}
-			}
-			if(!ponsseGUIready){
-				Util.pause(1);
-				state = getState(system);
-			}
+		if(widgetWithAutomationIdFound("btnShutDown", state, system, 20)){
+			System.out.println("DEBUG: Ponsse UI ready!");
 		}
 
-		 // Ponsse GUI ready - creating testar user
-		 System.out.println("DEBUG: looking for btnAddUser");
-		 waitAndClickButton("btnAddUser", state, system, 20);
+		// if testar button is not found, creating new user:
+		if(!widgetWithAutomationIdFound("btntestar", state, system, 1)){
+			// Ponsse GUI ready and testar button not found - creating testar user
+			System.out.println("DEBUG: looking for btnAddUser");
+			waitAndClickButton("btnAddUser", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: typing first name");
-		 waitAndTypeText("txtBoxFirstName", "testar", state, system, 20);
+			System.out.println("DEBUG: typing first name");
+			waitAndTypeText("txtBoxFirstName", "testar", state, system, 20);
 
-		 System.out.println("DEBUG: typing last name");
-		 waitAndTypeText("txtBoxLastName", "test", state, system, 20);
+			System.out.println("DEBUG: typing last name");
+			waitAndTypeText("txtBoxLastName", "test", state, system, 20);
 
-		 System.out.println("DEBUG: typing user ID");
-		 waitAndTypeText("txtBoxUserId", "testar@ponsse.com", state, system, 20);
+			System.out.println("DEBUG: typing user ID");
+			waitAndTypeText("txtBoxUserId", "testar@ponsse.com", state, system, 20);
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: closing virtual keyboard");
+			System.out.println("DEBUG: closing virtual keyboard");
 //		 waitAndClickButton("btnHideVkb", state, system, 20);
-		 executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
+			executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: looking for NextButton");
-		 waitAndClickButton("NextButton", state, system, 20);
+			System.out.println("DEBUG: looking for NextButton");
+			waitAndClickButton("NextButton", state, system, 20);
 
-		 //updating TESTAR state:
-		 state=getState(system);
+			//updating TESTAR state:
+			state=getState(system);
 
-		 System.out.println("DEBUG: typing new PIN code");
-		 waitAndTypeText("passwordBoxPinBox1", "1111", state, system, 20);
+			System.out.println("DEBUG: typing new PIN code");
+			waitAndTypeText("passwordBoxPinBox1", "1111", state, system, 20);
 
-		 System.out.println("DEBUG: typing new PIN code again");
-		 waitAndTypeText("passwordBoxPinBox2", "1111", state, system, 20);
+			System.out.println("DEBUG: typing new PIN code again");
+			waitAndTypeText("passwordBoxPinBox2", "1111", state, system, 20);
 
-		 System.out.println("DEBUG: looking for buttonFinish");
-		 waitAndClickButton("buttonFinish", state, system, 20);
+			System.out.println("DEBUG: looking for buttonFinish");
+			waitAndClickButton("buttonFinish", state, system, 20);
+		}
 
 
 
@@ -424,7 +435,26 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	 */
 	@Override
 	protected void stopSystem(SUT system) {
-		super.stopSystem(system);
+		//super.stopSystem(system);
+		// pushing back button until in logout screen:
+		State state = getState(system);
+		while(waitAndClickButton("ButtonBack", state, system, 1)
+				|| waitAndClickButton("btnCancelClose", state, system, 1)
+				|| waitAndClickButton("btnOk", state, system, 1)){
+			System.out.println("Pushing back button until in logout screen");
+			//update TESTAR state:
+			state = getState(system);
+		}
+		while(waitAndClickButton("ButtonLogOut", state, system, 1)){
+			System.out.println("Pushing logout button");
+			//update TESTAR state:
+			state = getState(system);
+		}
+		if(widgetWithAutomationIdFound("btnShutDown", state, system, 1)){
+			System.out.println("Shutdown button found - graceful logout successful!");
+		}else{
+			System.out.println("ERROR: graceful logout failed!");
+		}
 	}
 
 	/**
