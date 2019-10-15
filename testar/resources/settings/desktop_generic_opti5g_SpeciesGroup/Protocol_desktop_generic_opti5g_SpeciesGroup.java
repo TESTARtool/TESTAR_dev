@@ -102,10 +102,6 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends PonsseDesktopP
 			//updating TESTAR state:
 			state=getState(system);
 
-			System.out.println("DEBUG: closing virtual keyboard");
-//		 waitAndClickButton("btnHideVkb", state, system, 20);
-			executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
-
 			System.out.println("DEBUG: looking for NextButton");
 			waitAndClickButtonByAutomationId("NextButton", state, system, 20);
 
@@ -134,7 +130,9 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends PonsseDesktopP
 			waitAndClickButtonByAutomationId("buttonFinish", state, system, 20);
 		}
 
-
+		 System.out.println("DEBUG: closing virtual keyboard if visible");
+//		 waitAndClickButton("btnHideVkb", state, system, 20);
+		 executeClickOnTextOrImagePath("settings/desktop_generic_opti5g_SpeciesGroup/nappain_keyboard.PNG");
 
 		// Ponsse user created - selecting testar user
 		 System.out.println("DEBUG: looking for btntestar");
