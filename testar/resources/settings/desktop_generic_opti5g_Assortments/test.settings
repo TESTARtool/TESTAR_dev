@@ -121,10 +121,11 @@ DataStoreDirectory =
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = hybrid
+DataStoreMode = instant
 ApplicationName = 
 ApplicationVersion = 
 ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = false
 
 #################################################################
 # State identifier attributes
@@ -170,7 +171,7 @@ CopyFromTo =
 TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
-ResetDataStore = true
+ResetDataStore = false
 TimeToWaitAfterAction = 0.1
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
