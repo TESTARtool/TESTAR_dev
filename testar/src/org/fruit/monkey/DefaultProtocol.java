@@ -1660,7 +1660,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceNextActionESC = false;
 			return a;
 		} else

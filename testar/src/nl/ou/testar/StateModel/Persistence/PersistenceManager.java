@@ -85,4 +85,19 @@ public interface PersistenceManager {
      */
     void persistSequenceStep(SequenceStep sequenceStep);
 
+    /**
+     * This method returns true if the model is deterministic, meaning no transitions lead to more than one target state.
+     * @param abstractStateModel
+     * @return
+     */
+    boolean modelIsDeterministic(AbstractStateModel abstractStateModel);
+
+    /**
+     * This method returns the nr of non-deterministic actions in the model, meaning the same actions ends in more
+     * than one unique abstract states.
+     * @param abstractStateModel
+     * @return
+     */
+    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel);
+
 }

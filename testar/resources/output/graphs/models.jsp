@@ -49,6 +49,7 @@
                 <div class="col-3"><strong>Start date/time</strong></div>
                 <div class="col-2"><strong>Nr of steps</strong></div>
                 <div class="col-2"><strong>Quirks</strong> &nbsp; <span class="fas fa-info-circle" title="Strange results encountered during test execution."></span></div>
+                <div class="col-2"><strong>Deterministic run</strong></div>
                 <div class="col-1"></div>
             </div>
             <c:forEach var="seq" items="${model.sequences}">
@@ -57,6 +58,7 @@
                     <div class="col-3">${seq.startDateTime}</div>
                     <div class="col-2">${seq.numberOfSteps}</div>
                     <div class="col-2">${seq.nrOfErrors}</div>
+                    <div class="col-2"><span class="fas ${seq.deterministicIcon}"></span></div>
                     <div class="col-1"><span class="fas fa-eye" data-sequenceId="${seq.sequenceId}"></span></div>
                 </div>
             </c:forEach>

@@ -69,9 +69,11 @@ public class StateModelPanel extends JPanel {
     private JLabel label13 = new JLabel("DataStoreDirectory");
     private JLabel label14 = new JLabel();
     private JLabel label15 = new JLabel("Action selection");
+    private JLabel label16 = new JLabel("Store Widgets");
 
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
+    private JCheckBox stateModelWidgetStoreChkBox = new JCheckBox();
     private JTextField dataStoreTextfield = new JTextField();
     private JTextField dataStoreServerTextfield = new JTextField();
     private JTextField dataStoreDBTextfield = new JTextField();
@@ -129,6 +131,7 @@ public class StateModelPanel extends JPanel {
         components.add(analysisButton);
         components.add(stateTagsButton);
         components.add(actionSelectionBox);
+        components.add(stateModelWidgetStoreChkBox);
 
         // add the components to the panel
         setLayout(null);
@@ -200,19 +203,23 @@ public class StateModelPanel extends JPanel {
         add(dataStoreModeBox);
 
         // NEW COLUMN
+        label16.setBounds(330, 52, 150, 27);
+        add(label16);
+        stateModelWidgetStoreChkBox.setBounds(480, 52, 50, 27);
+        add(stateModelWidgetStoreChkBox);
 
-        label12.setBounds(330, 52, 150, 27);
+        label12.setBounds(330, 90, 150, 27);
         add(label12);
-        accessBridgeEnabledBox.setBounds(480, 52, 50, 27);
+        accessBridgeEnabledBox.setBounds(480, 90, 50, 27);
         add(accessBridgeEnabledBox);
 
-        label9.setBounds(330,90,150,27);
+        label9.setBounds(330,128,150,27);
         add(label9);
-        resetDatabaseCheckbox.setBounds(480, 90, 50, 27);
+        resetDatabaseCheckbox.setBounds(480, 128, 50, 27);
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 128, 150, 27);
+        analysisButton.setBounds(330, 166, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -222,7 +229,7 @@ public class StateModelPanel extends JPanel {
         });
         add(analysisButton);
 
-        stateTagsButton.setBounds(330, 166, 150, 27);
+        stateTagsButton.setBounds(330, 204, 150, 27);
         stateTagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -231,12 +238,12 @@ public class StateModelPanel extends JPanel {
         });
         add(stateTagsButton);
 
-        label15.setBounds(330,204,100,27);
+        label15.setBounds(330,242,100,27);
         add(label15);
-        actionSelectionBox.setBounds(430, 204,175,27);
+        actionSelectionBox.setBounds(430, 242,175,27);
         add(actionSelectionBox);
 
-        label14.setBounds(330, 242, 300, 27);
+        label14.setBounds(330, 280, 300, 27);
         add(label14);
 
     }
@@ -247,6 +254,7 @@ public class StateModelPanel extends JPanel {
      */
     public void populateFrom(final Settings settings) {
         stateModelEnabledChkBox.setSelected(settings.get(ConfigTags.StateModelEnabled));
+        stateModelWidgetStoreChkBox.setSelected(settings.get(ConfigTags.StateModelStoreWidgets));
         accessBridgeEnabledBox.setSelected(settings.get(ConfigTags.AccessBridgeEnabled));
         dataStoreTextfield.setText(settings.get(ConfigTags.DataStore));
         dataStoreServerTextfield.setText(settings.get(ConfigTags.DataStoreServer));
@@ -306,6 +314,7 @@ public class StateModelPanel extends JPanel {
      */
     public void extractInformation(final Settings settings) {
         settings.set(ConfigTags.StateModelEnabled, stateModelEnabledChkBox.isSelected());
+        settings.set(ConfigTags.StateModelStoreWidgets, stateModelWidgetStoreChkBox.isSelected());
         settings.set(ConfigTags.DataStore, dataStoreTextfield.getText());
         settings.set(ConfigTags.DataStoreServer, dataStoreServerTextfield.getText());
         settings.set(ConfigTags.DataStoreDirectory, dataStoreDirectoryField.getText());
