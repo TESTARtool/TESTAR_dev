@@ -438,14 +438,17 @@ public class Protocol_desktop_generic_opti5g_Assortments extends DesktopProtocol
 
 		Set<Action> filteredActions = new HashSet<Action>();
 		for(Action action:actions){
-			// filtering back button and help button away from available actions:
-			if(action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")){
-				// filtering help button away
-			}else if(isAssortmentsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
-				// filtering back button away
-			}
-			else{
-				filteredActions.add(action);
+			try {
+				// filtering back button and help button away from available actions:
+				if (action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")) {
+					// filtering help button away
+				} else if (isAssortmentsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")) {
+					// filtering back button away
+				} else {
+					filteredActions.add(action);
+				}
+			}catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 		return(super.selectAction(state, filteredActions));
