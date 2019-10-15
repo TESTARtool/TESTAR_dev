@@ -500,7 +500,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		//super.stopSystem(system);
 		// pushing back button until in logout screen:
 		State state = getState(system);
-		while(waitAndClickButtonByAutomationId("btnOk", state, system, 1)
+		while(widgetWithAutomationIdFound("MessageDialog", state) && waitAndClickButtonByAutomationId("btnOk", state, system, 1)
 				|| waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
 				|| waitAndClickButtonByAutomationId("btnCancelClose", state, system, 1)
 				|| waitAndClickButtonByTitle("Cancel", state, system, 1)){
