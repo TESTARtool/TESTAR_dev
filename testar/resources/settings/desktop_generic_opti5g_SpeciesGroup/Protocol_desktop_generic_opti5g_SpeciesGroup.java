@@ -500,9 +500,9 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		//super.stopSystem(system);
 		// pushing back button until in logout screen:
 		State state = getState(system);
-		while(waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
+		while(waitAndClickButtonByAutomationId("btnOk", state, system, 1)
+				|| waitAndClickButtonByAutomationId("ButtonBack", state, system, 1)
 				|| waitAndClickButtonByAutomationId("btnCancelClose", state, system, 1)
-				|| waitAndClickButtonByAutomationId("btnOk", state, system, 1)
 				|| waitAndClickButtonByTitle("Cancel", state, system, 1)){
 			System.out.println("Pushing back button until in logout screen");
 			//update TESTAR state:
