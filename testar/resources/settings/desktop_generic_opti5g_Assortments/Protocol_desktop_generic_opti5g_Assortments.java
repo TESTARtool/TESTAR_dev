@@ -50,7 +50,7 @@ import org.testar.protocols.DesktopProtocol;
  *
  * It uses random action selection algorithm.
  */
-public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtocol {
+public class Protocol_desktop_generic_opti5g_Assortments extends DesktopProtocol {
 
 	/**
 	 * Called once during the life time of TESTAR
@@ -342,8 +342,8 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 		 //updating TESTAR state:
 		 state=getState(system);
 		 
-		 System.out.println("DEBUG: looking for buttonSpeciesGroups");
-		 waitAndClickButtonByAutomationId("buttonSpeciesGroups", state, system, 20);
+		 System.out.println("DEBUG: looking for buttonProducts");
+		 waitAndClickButtonByAutomationId("buttonProducts", state, system, 20);
 
 	}
 
@@ -430,10 +430,10 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 	@Override
 	protected Action selectAction(State state, Set<Action> actions){
 		//checking if the state is in "SpeciesGroupsWindow"
-		boolean isSpeciesGroupsWindow = false;
-		if(widgetWithAutomationIdFound("SpeciesGroupsWindow",state)){
-			System.out.println("GUI is in SpeciesGroupsWindow - filtering back button");
-			isSpeciesGroupsWindow=true;
+		boolean isAssortmentsWindow = false;
+		if(widgetWithAutomationIdFound("productDlg",state)){
+			System.out.println("GUI is in productDlg - filtering back button");
+			isAssortmentsWindow=true;
 		}
 
 		Set<Action> filteredActions = new HashSet<Action>();
@@ -441,7 +441,7 @@ public class Protocol_desktop_generic_opti5g_SpeciesGroup extends DesktopProtoco
 			// filtering back button and help button away from available actions:
 			if(action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnHelp")){
 				// filtering help button away
-			}else if(isSpeciesGroupsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
+			}else if(isAssortmentsWindow && action.get(Tags.OriginWidget).get(UIATags.UIAAutomationId).equalsIgnoreCase("btnCancelClose")){
 				// filtering back button away
 			}
 			else{
