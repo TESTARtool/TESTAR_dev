@@ -247,8 +247,14 @@ public class WdDriver extends SUTBase {
       }
 
       // Check if document not in foreground
-      boolean hasFocus = (Boolean)
-          webDriver.executeScript("return document.hasFocus();");
+      boolean hasFocus;
+      try {
+        hasFocus = (Boolean) webDriver.executeScript("return document.hasFocus();");
+      }
+      catch (NoSuchWindowException ignored) {
+        // This happens when tab is closed
+        hasFocus = false;
+      }
       if (!hasFocus) {
         // On OSX and Linux this also forces the browser to the foreground
         String handle = windowHandles.get(followLinks ? windowHandles.size() - 1 : 0);
@@ -256,6 +262,7 @@ public class WdDriver extends SUTBase {
       }
     }
     catch (NullPointerException | WebDriverException ignored) {
+      // Browser is already closed
       webDriver = null;
     }
   }
