@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.*;
 
 //import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -68,7 +67,7 @@ public  class TemporalDBHelper {
                 String modelIdentifier = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
                 Set abstractionAttributes = (Set) getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
                 // fetch the test sequences
-                List<TestSequence> sequenceList = fetchTestSequences(modelIdentifier);
+                List<TestSequence> sequenceList = new ArrayList<>(); // css, trace are fetched in our own way.just for reuse of AbstractStateModel
 
                 AbstractStateModel abstractStateModel = new AbstractStateModel(
                         applicationName, applicationVersion, modelIdentifier, abstractionAttributes, sequenceList
@@ -327,7 +326,7 @@ public  class TemporalDBHelper {
      * @param modelIdentifier
      * @return
      */
-    private List<TestSequence> fetchTestSequences(String modelIdentifier) {
+   /* private List<TestSequence> fetchTestSequences(String modelIdentifier) {
         List<TestSequence> sequenceList = new ArrayList<>();
         //String sequenceStmt = "SELECT FROM TestSequence WHERE abstractionLevelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
         String sequenceStmt = "SELECT FROM TestSequence WHERE modelIdentifier = :identifier ORDER BY startDateTime ASC";//abstractionLevelIdentifier
@@ -363,7 +362,7 @@ public  class TemporalDBHelper {
         }
         return sequenceList;
     }
-
+*/
 
     /**
      * This method saves screenshots to disk.
