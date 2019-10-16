@@ -3,6 +3,9 @@ package nl.ou.testar.temporal.structure;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.google.common.collect.HashBiMap;
+import nl.ou.testar.temporal.util.ValStatus;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -19,6 +22,7 @@ public class TemporalModel extends TemporalBean{
     @JsonIgnore
     private Set<String> modelAPs; //AP<digits> to widget property map:
     private String formatVersion="20190721";
+    private static String APPrefix = "ap";
 
 
 public  TemporalModel(){
@@ -72,9 +76,9 @@ public  TemporalModel(){
     }
 
 
-    public String getFormatVersion() {        return formatVersion;   }
+    public String get_formatVersion() {        return formatVersion;   }
 
-    public void setFormatVersion(String formatVersion) {    this.formatVersion = formatVersion;    }
+    public void set_formatVersion(String _formatVersion) {    this.formatVersion = _formatVersion;    }
 
 
     //custom
@@ -108,41 +112,144 @@ public  TemporalModel(){
 
     }
 
-    private String makeHOAOutput(){
+    public String makeHOAOutput(){
         //see http://adl.github.io/hoaf/
         StringBuilder result=new StringBuilder();
-        result.append("HOA v1\n");
+        result.append("HOA: v1\n");
+        result.append("tool: \"TESTAR-CSS20190914\"\n");
+        result.append("name: \""+ "app= "+this.getApplicationName()+", ver="+this.getApplicationVersion()+", modelid= "+this.getApplication_ModelIdentifier()+", abstraction= "+this.getApplication_AbstractionAttributes()+"\"\n");
         result.append("States: ");
         result.append(stateEncodings.size());
         result.append("\n");
-        result.append("Start: 0\n");
-        result.append("Acceptance: 1 Inf(1))\n");  //==Buchi
+        String initState = InitialStates.get(0);
+        int stateindex =0;
+        for (StateEncoding se: stateEncodings )
+        {if (se.getState().equals(initState)) break;
+            stateindex++;
+        }
+        result.append("Start: "+stateindex+"\n");
+        result.append("Acceptance: 1 Inf(0)\n");  //==Buchi
         result.append("AP: ");
         result.append(modelAPs.size());
         int i=0;
         for (String ap: modelAPs) {
-            result.append(" \"ap");
+            result.append(" \""+APPrefix);
             result.append(i);
             result.append("\"");
             i++;
         }
         result.append("\n");
-        result.append("--BODY--");
+        result.append("--BODY--\n");
+
+
         int s=0;
         for (StateEncoding stateenc: stateEncodings) {
             result.append("State: ");
             result.append(s);
             result.append("\n");
             for (TransitionEncoding trans:stateenc.getTransitionColl()  ) {
+                result.append("[");
                 result.append(trans.getEncodedAPConjunct());
-                int targetstateindex= stateEncodings.indexOf(trans.getTargetState());
-                result.append(" "+targetstateindex);
+                result.append("]");
+                String targetState = trans.getTargetState();
+                int targetStateindex =0;
+                for (StateEncoding se: stateEncodings )
+                {if (se.getState().equals(targetState)) break;
+                    targetStateindex++;
+                }
+
+                result.append(" "+targetStateindex);
                 result.append(" {0}\n");  //all are in the same buchi acceptance set
             }
+            s++;
         }
-        result.append("--END--");
+        result.append("--END--\n");
         result.append("EOF_HOA");
         return result.toString();
+    }
+
+    public String makeFormulaOutput(List<TemporalOracle> oracleColl) {
+
+        StringBuilder Formulas=new StringBuilder();
+        for (TemporalOracle candidateOracle : oracleColl) {
+            String formula;
+            List<String> sortedparameters = candidateOracle.getPattern_Parameters();
+            Collections.sort(sortedparameters);
+            //List<String> sortedsubstitionkeys = new ArrayList<>( candidateOracle.getPattern_Substitutions().keySet());
+            List<String> sortedsubstitionvalues =  candidateOracle.getPattern_Substitutions();
+
+            boolean importStatus;
+
+                importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
+            if (!importStatus) {
+                candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
+                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
+            }
+            if (importStatus)
+                importStatus = getModelAPs().containsAll(sortedsubstitionvalues);
+
+
+            if (!importStatus) {
+                //System.out.println("debug substitutions: "+sortedsubstitionvalues);
+                candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
+                for (String subst:sortedsubstitionvalues
+                     ) {
+                    if (!getModelAPs().contains(subst))  candidateOracle.addLog("not found: "+ subst);
+                }
+
+                candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
+            }
+            HashBiMap<Integer, String> aplookup = HashBiMap.create();
+            aplookup.putAll(getSimpleModelMap());
+            ArrayList<String> apindex=new ArrayList<>();
+
+            for (String v:sortedsubstitionvalues
+                 ) {
+
+                if(aplookup.inverse().containsKey(v)){
+                    apindex.add(APPrefix+aplookup.inverse().get(v));
+                }else
+                    apindex.add(APPrefix+"_indexNotFound");
+
+            }
+
+            formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(),
+                    sortedparameters.stream().toArray(String[]::new),
+                    apindex.stream().toArray(String[]::new));
+
+            Formulas.append(formula);
+            Formulas.append("\n");
+        }
+
+        return Formulas.toString();
+
+    }
+    public String getAliveProposition(String alive){
+        HashBiMap<Integer, String> aplookup = HashBiMap.create();
+        aplookup.putAll(getSimpleModelMap());
+        // we encode alive as not dead "!dead"
+        // so we strip the negation from the alive property, by default: "!dead"
+
+       if (aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
+           return APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
+        }
+        else
+            return "";
+        };
+
+
+    public List<TemporalOracle> ReadModelCheckerResults(String results){
+        List<TemporalOracle> oracleresults = new ArrayList<>();
+        TemporalOracle oracleresult=new TemporalOracle();
+
+// add to log file.
+        // parse header block
+        //parseformulablock
+       // while (formulablock){ }
+
+
+
+    return oracleresults ;
     }
 
     @JsonGetter("modelAPs")

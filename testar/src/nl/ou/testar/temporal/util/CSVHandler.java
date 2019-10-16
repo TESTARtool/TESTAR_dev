@@ -7,6 +7,7 @@ import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class CSVHandler {
@@ -16,7 +17,11 @@ public class CSVHandler {
             if (input.exists()) {
                 BufferedReader reader = new BufferedReader(new FileReader(input.getAbsoluteFile()));
 
-                List result  = new CsvToBeanBuilder(reader).withType(cls).build().parse();
+
+                FileInputStream fis = new FileInputStream(fromFile);
+                     InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                List result  = new CsvToBeanBuilder(isr).withType(cls).withSeparator(';').build().parse();
+               // List result  = new CsvToBeanBuilder(reader).withType(cls).build().parse();
                 return result;
             }
         }  catch (
@@ -27,14 +32,19 @@ public class CSVHandler {
     }
     public static void save(List content, String toFile) {
         try {
-            File output = new File(toFile);
-            if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
-                StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
-                beanToCsv.write(content);
+            //File output = new File(toFile);
+            //if (output.exists() || output.createNewFile()) {
 
-                writer.close();
-            }
+                FileOutputStream fos = new FileOutputStream(toFile);
+                OutputStreamWriter osw = new OutputStreamWriter(fos,StandardCharsets.UTF_8);
+
+                //BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
+                //StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
+                StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(osw).withSeparator(';').build();
+                beanToCsv.write(content);
+                //writer.close();
+                osw.close();
+           // }
         } catch (
                 IOException | CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
             e.printStackTrace();

@@ -28,14 +28,16 @@
 *******************************************************************************************************/
 
 
-package nl.ou.testar.temporal.ui;
+package nl.ou.testar.temporal.scratch;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.StateModel.Settings.StateModelPanel;
 import nl.ou.testar.temporal.behavior.TemporalController;
 import nl.ou.testar.temporal.structure.*;
+import nl.ou.testar.temporal.structure.TemporalOracle;
 import nl.ou.testar.temporal.util.CSVHandler;
 import nl.ou.testar.temporal.util.JSONHandler;
+import nl.ou.testar.temporal.util.StreamConsumer;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -351,9 +353,9 @@ private void setupMiner(){
 
             //logCheckResult.append("model count: " + models.size()+"\n");
             //AbstractStateModel model = models.get(0);
-            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getModelIdentifier()+"\n");
+            //logCheckResult.append("Model info:" + model.getApplicationName() + ", " + model.getApplication_ModelIdentifier()+"\n");
 
-             tcontrol.computeTemporalModel(APmgr);
+             tcontrol.computeTemporalModel();
              TemporalModel tmodel =tcontrol.gettModel();
                 JSONHandler.save(tmodel, outputDir + "APEncodedModel.json");
             logCheckResult.append(" saving to file done\n");
@@ -366,7 +368,7 @@ private void setupMiner(){
             logCheckResult.append(" saving to  graphml file done with result:"+res+"\n");
 
             logCheckResult.append("\n");
-            tcontrol.shutdown();
+            tcontrol.dbClose();
         }
         catch(Exception e)
         {
@@ -381,20 +383,20 @@ private void setupMiner(){
         logCheckResult.append("performing a small test: writing an oracle to CSV file and read back\n");
 
 
-        TemporalOracle to= TemporalOracle.getSampleOracle();
-        List<TemporalOracle> tocoll = new ArrayList<>();
+        nl.ou.testar.temporal.structure.TemporalOracle to= nl.ou.testar.temporal.structure.TemporalOracle.getSampleOracle();
+        List<nl.ou.testar.temporal.structure.TemporalOracle> tocoll = new ArrayList<>();
         tocoll.add(to);
 
         CSVHandler.save(tocoll, outputDir + "temporalOracleSample.csv");
         logCheckResult.append("csv saved: \n");
 
-        List<TemporalOracle> fromcoll;
+        List<nl.ou.testar.temporal.structure.TemporalOracle> fromcoll;
         fromcoll = CSVHandler.load(outputDir + "temporalOracle3.csv", TemporalOracle.class);
         if (fromcoll == null) {
             logCheckResult.append("place a file called 'temporalOracle3.csv' in the directory: " + outputDir+"\n");
         } else {
             logCheckResult.append("csv loaded: \n");
-            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
+            logCheckResult.append("Formalism that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism()+"\n");
             CSVHandler.save(fromcoll, outputDir + "temporalOracle2.csv");
             logCheckResult.append("csv saved: \n");
 
@@ -417,8 +419,8 @@ private void setupMiner(){
             logCheckResult.append("place a file called 'temporalPattern1.csv' in the directory: " + outputDir+"\n");
         } else {
             logCheckResult.append("csv loaded: \n");
-            logCheckResult.append("pattern that was read from file: " + fromcoll.get(0).getTemporalFormalism()+"\n");
-            logCheckResult.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getWidgetRoleParameterConstraints().toString()+"\n");
+            logCheckResult.append("pattern that was read from file: " + fromcoll.get(0).getPattern_TemporalFormalism()+"\n");
+            logCheckResult.append("widgetrole constraints that was read from file: " + fromcoll.get(0).getParameter_WidgetRoleConstraints().toString()+"\n");
 
             CSVHandler.save(fromcoll, outputDir + "temporalPattern2.csv");
             logCheckResult.append("csv saved: \n");

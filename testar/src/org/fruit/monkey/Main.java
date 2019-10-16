@@ -36,6 +36,7 @@
 package org.fruit.monkey;
 
 import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.StateManagementTags;
 import es.upv.staq.testar.serialisation.LogSerialiser;
 import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
@@ -46,12 +47,13 @@ import org.fruit.Util;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -449,15 +451,35 @@ public class Main {
 			defaults.add(Pair.from(ResetDataStore, false));
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
+			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(TemporalEnabled, false));
+			defaults.add(Pair.from(TemporalLTLChecker, ""));
+			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
+			defaults.add(Pair.from(TemporalLTLVerbose, false));
+			defaults.add(Pair.from(TemporalLTLOracles, ""));
+			defaults.add(Pair.from(TemporalLTLPatterns, ""));
+			defaults.add(Pair.from(TemporalLTLAPSelectorManager, ""));
+			defaults.add(Pair.from(TemporalDirectory, ""));
+			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
+			defaults.add(Pair.from(TemporalPythonEnvironment, ""));
+			defaults.add(Pair.from(TemporalVisualizerServer, ""));
+			defaults.add(Pair.from(TemporalVisualizerURL, ""));
+			defaults.add(Pair.from(TemporalVisualizerURLStop, ""));
 			defaults.add(Pair.from(AlwaysCompile, true));
 			defaults.add(Pair.from(ProcessListenerEnabled, false));
 			defaults.add(Pair.from(SuspiciousProcessOutput, "(?!x)x"));
 			defaults.add(Pair.from(ProcessLogs, ".*.*"));
 
-			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<>(CodingManager.allowedStateTags.keySet())));
 			defaults.add(Pair.from(AbstractStateAttributes, new ArrayList<String>() {
 				{
-					add("Role");
+					add("WidgetControlType");
+				}
+			}));
+			defaults.add(Pair.from(ConcreteStateAttributes, new ArrayList<String>() {
+				{
+					add("WidgetControlType");
+					add("WidgetPath");
+					add("WidgetTitle");
 				}
 			}));
 
@@ -482,11 +504,6 @@ public class Main {
 			//PrologActivated is ALWAYS false.
 			//Evidently it will now be IMPOSSIBLE for it to be true hahahahahahaha
 			settings.set(ConfigTags.PrologActivated, false);
-
-			// check that the abstract state properties and the abstract action properties have at least 1 value
-			if ((settings.get(ConcreteStateAttributes)).isEmpty()) {
-				throw new ConfigException("Please provide at least 1 valid concrete state attribute or leave the key out of the settings file");
-			}
 
 			// check that the abstract state properties and the abstract action properties have at least 1 value
 			if ((settings.get(AbstractStateAttributes)).isEmpty()) {
@@ -652,30 +669,23 @@ public class Main {
 		// we look if there are user-provided custom state tags in the settings
 		// if so, we provide these to the coding manager
 		int i;
-
-		// first the attributes for the concrete state id
+		// concrete state id from settings file
 		if (!settings.get(ConfigTags.ConcreteStateAttributes).isEmpty()) {
-			i = 0;
-
-			Tag<?>[] concreteTags = new Tag<?>[settings.get(ConfigTags.ConcreteStateAttributes).size()];
-			for (String concreteStateAttribute : settings.get(ConfigTags.ConcreteStateAttributes)) {
-				concreteTags[i++] = CodingManager.allowedStateTags.get(concreteStateAttribute);
-			}
-
+			Tag<?>[] concreteTags = settings.get(ConcreteStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
 			CodingManager.setCustomTagsForConcreteId(concreteTags);
 		}
-
-		// then the attributes for the abstract state id
-		if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
-			i = 0;
-
-			Tag<?>[] abstractTags = new Tag<?>[settings.get(ConfigTags.AbstractStateAttributes).size()];
-			for (String abstractStateAttribute : settings.get(ConfigTags.AbstractStateAttributes)) {
-				abstractTags[i++] = CodingManager.allowedStateTags.get(abstractStateAttribute);
+		else {
+			Set<Tag<?>> stateManagementTags = StateManagementTags.getAllTags();
+			// for the concrete state tags we use all the state management tags that are available
+			if (!stateManagementTags.isEmpty()) {
+				CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 			}
-
-			CodingManager.setCustomTagsForAbstractId(abstractTags);
 		}
-	}
+        // then the attributes for the abstract state id
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
+			CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+    }
 
 }

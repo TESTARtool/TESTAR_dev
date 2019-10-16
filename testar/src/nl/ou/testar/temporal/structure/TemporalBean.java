@@ -18,34 +18,35 @@ protected static final String csvsep=";";
     @CsvBindByName
     private String applicationVersion;
     @CsvBindByName
-    private String modelIdentifier;
+    private String application_ModelIdentifier;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = HashSet.class)
-    private Set<String> abstractionAttributes;
+    private Set<String> application_AbstractionAttributes;
    //@CsvCustomBindByName( converter = CSVConvertMultiLine.class)
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> log;
+    private List<String> application_log;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     //@CsvCustomBindByName( converter = CSVConvertMultiLine.class)
-    private List<String> comments;
+    private List<String> _comments;
     @CsvBindByName
-    private String modifieddate;
+    private String _modifieddate;
     @CsvBindByName
-    private String formatVersion="20190629";
+    private String _formatVersion;
 
 
 
     public TemporalBean() {
-        this.log = new ArrayList<String>();
-        this.comments = new ArrayList<String>();
+        this.application_log = new ArrayList<String>();
+        this._comments = new ArrayList<String>();
+        _formatVersion ="20190629";
     }
 
     public TemporalBean(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
         this();
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
-        this.modelIdentifier = modelIdentifier;
-        this.abstractionAttributes = abstractionAttributes;
-        this.modifieddate = LocalDateTime.now().toString();
+        this.application_ModelIdentifier = modelIdentifier;
+        this.application_AbstractionAttributes = abstractionAttributes;
+        this._modifieddate = LocalDateTime.now().toString();
 
 
     }
@@ -66,58 +67,58 @@ protected static final String csvsep=";";
             this.applicationVersion = applicationVersion;
         }
 
-        public String getModelIdentifier () {
-            return modelIdentifier;
+        public String getApplication_ModelIdentifier() {
+            return application_ModelIdentifier;
         }
 
-        public void setModelIdentifier (String modelIdentifier){
-            this.modelIdentifier = modelIdentifier;
+        public void setApplication_ModelIdentifier(String application_ModelIdentifier){
+            this.application_ModelIdentifier = application_ModelIdentifier;
         }
 
-        public Set getAbstractionAttributes () {
-            return abstractionAttributes;
+        public Set getApplication_AbstractionAttributes() {
+            return application_AbstractionAttributes;
         }
 
-        public void setAbstractionAttributes (Set abstractionAttributes){
-            this.abstractionAttributes = abstractionAttributes;
+        public void setApplication_AbstractionAttributes(Set application_AbstractionAttributes){
+            this.application_AbstractionAttributes = application_AbstractionAttributes;
         }
 
 
-        public List<String> getLog () {
-            return log;
+        public List<String> getApplication_log() {
+            return application_log;
         }
 
-        public void setLog (List < String > log) {
-            this.log = log;
+        public void setApplication_log(List < String > application_log) {
+            this.application_log = application_log;
         }
     public void addLog ( String  log) {
-        this.log.add( log);
+        this.application_log.add( log);
     }
 
-        public List<String> getComments () {
-            return comments;
+        public List<String> get_comments() {
+            return _comments;
         }
 
-        public void setComments (List < String > comments) {
-            this.comments = comments;
+        public void set_comments(List < String > _comments) {
+            this._comments = _comments;
         }
     public void addComments ( String  comment) {
-        this.comments.add( comment);
+        this._comments.add( comment);
     }
 
-        public String getModifieddate () {
-            return modifieddate;
+        public String get_modifieddate() {
+            return _modifieddate;
         }
 
-        public void setModifieddate (String modifieddate){
-            this.modifieddate = modifieddate;
+        public void set_modifieddate(String _modifieddate){
+            this._modifieddate = _modifieddate;
         }
-    public String getFormatVersion() {
-        return formatVersion;
+    public String get_formatVersion() {
+        return _formatVersion;
     }
 
-    public void setFormatVersion(String formatVersion) {
-        this.formatVersion = formatVersion;
+    public void set_formatVersion(String _formatVersion) {
+        this._formatVersion = _formatVersion;
     }
         //custom
 

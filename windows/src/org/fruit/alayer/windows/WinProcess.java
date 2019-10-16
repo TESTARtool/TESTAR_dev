@@ -127,48 +127,45 @@ public final class WinProcess extends SUTBase {
 			if(!ProcessListenerEnabled) {
 
 				long handles[] = Windows.CreateProcess(null, path, false, 0, null, null, null, "unknown title", new long[14]);
-				long hProcess = handles[0];
-				long hThread = handles[1];
-				Windows.CloseHandle(hThread);
+				long processHandle = handles[0];
+				long threadHandle = handles[1];
+				Windows.CloseHandle(threadHandle);
 
-				WinProcess ret = new WinProcess(hProcess, true);
+				WinProcess ret = new WinProcess(processHandle, true);
 				ret.set(Tags.Desc, path);
 				return ret;
 			}
 			
 			//Associate Output / Error from SUT
 
-			final Process p = Runtime.getRuntime().exec(path);
-			Field f = p.getClass().getDeclaredField("handle");
-			f.setAccessible(true);
+			final Process process = Runtime.getRuntime().exec(path);
+			Field field = process.getClass().getDeclaredField("handle");
+			field.setAccessible(true);
 			
-			long procHandle = f.getLong(p);
+			long processHandle = field.getLong(process);
 			
 			//TODO: WaitForInputIdle is not working with java app, investigate this issue.
 			//TODO: Read Util.pause with new "Tags.SUTwaitInput" (think Tag name) from settings file
 			if(path.contains("java -jar"))
 				Util.pause(5);
 			else
-				Windows.WaitForInputIdle(procHandle);
+				Windows.WaitForInputIdle(processHandle);
 			
-			long pid = Windows.GetProcessId(procHandle);
+			long pid = Windows.GetProcessId(processHandle);
 			
-			WinProcess ret = fromPID(pid);
+			WinProcess returnProcess = fromPID(pid);
 			
-			ret.set(Tags.StdErr,p.getErrorStream());
-			ret.set(Tags.StdOut, p.getInputStream());
-			ret.set(Tags.StdIn, p.getOutputStream());
+			returnProcess.set(Tags.StdErr,process.getErrorStream());
+			returnProcess.set(Tags.StdOut, process.getInputStream());
+			returnProcess.set(Tags.StdIn, process.getOutputStream());
 		    
 			//Investigate why this cause issue with cpu
 		    //Windows.CloseHandle(procHandle);
 			
-			ret.set(Tags.Path, path);
-			ret.set(Tags.Desc, path);
-			return ret;
-		}catch(WinApiException we){
-			throw new WinApiException(we.getMessage());
-		}
-		catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
+			returnProcess.set(Tags.Path, path);
+			returnProcess.set(Tags.Desc, path);
+			return returnProcess;
+		}catch(FruitException | IOException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException  fe){
 			throw new SystemStartException(fe);
 		}
 	}
@@ -235,7 +232,7 @@ public final class WinProcess extends SUTBase {
 	public static boolean isForeground(long pid){
 		long hwnd = Windows.GetForegroundWindow();
 		long wpid = Windows.GetWindowProcessId(hwnd);
-		//System.out.println("foreground pid wanted: " + pid + "- hwnd: " + hwnd + " - wpid: " + wpid);
+		//System.out.println("foreground pid wanted: " + pid + "- windowHandle: " + windowHandle + " - wpid: " + wpid);
 		return !Windows.IsIconic(hwnd) && (wpid == pid);
 	}
 
@@ -409,7 +406,7 @@ public final class WinProcess extends SUTBase {
 			@Override
 			public void nativeReleaseAutomationElement(long elementPtr){
 				/*long refCount =*/ Windows.IUnknown_Release(elementPtr);
-				//System.out.println("Released automation element <" + elementPtr + " > reference count: " + refCount);
+				//System.out.println("Released automation uiaElement <" + elementPtr + " > reference count: " + refCount);
 			}
 			@Override
 			public long nativeGetAutomationElementFromHandle(long automationPtr, long hwndPtr){

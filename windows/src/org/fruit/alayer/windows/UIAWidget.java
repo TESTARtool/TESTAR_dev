@@ -33,14 +33,6 @@
  */
 package org.fruit.alayer.windows;
 
-import static org.fruit.alayer.windows.UIATags.UIAHorizontallyScrollable;
-import static org.fruit.alayer.windows.UIATags.UIAScrollHorizontalPercent;
-import static org.fruit.alayer.windows.UIATags.UIAScrollHorizontalViewSize;
-import static org.fruit.alayer.windows.UIATags.UIAScrollPattern;
-import static org.fruit.alayer.windows.UIATags.UIAScrollVerticalPercent;
-import static org.fruit.alayer.windows.UIATags.UIAScrollVerticalViewSize;
-import static org.fruit.alayer.windows.UIATags.UIAVerticallyScrollable;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -57,17 +49,19 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 
+import static org.fruit.alayer.windows.UIATags.*;
+
 class UIAWidget implements Widget, Serializable {
 	private static final long serialVersionUID = 8840515358018797073L;
 	UIAState root;
 	UIAWidget parent;
 	Map<Tag<?>, Object> tags = Util.newHashMap();
 	List<UIAWidget> children = new ArrayList<UIAWidget>();
-	UIAElement element;
+	UIAElement uiaElement;
 		
-	protected UIAWidget(UIAState root, UIAWidget parent, UIAElement element){
+	protected UIAWidget(UIAState root, UIAWidget parent, UIAElement uiaElement){
 		this.parent = parent;
-		this.element = element;
+		this.uiaElement = uiaElement;
 		this.root = root;
 		
 		if(parent != null)
@@ -153,7 +147,7 @@ class UIAWidget implements Widget, Serializable {
 	// by urueda
 	@Override
 	public Drag[] scrollDrags(double scrollArrowSize, double scrollThick) {		
-		boolean hasScroll = get(UIAScrollPattern, null);
+		boolean hasScroll = get(UIAIsScrollPatternAvailable, null);
 		if (!hasScroll)
 			return null;
 

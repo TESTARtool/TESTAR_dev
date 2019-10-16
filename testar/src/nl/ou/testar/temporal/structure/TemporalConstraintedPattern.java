@@ -1,6 +1,5 @@
 package nl.ou.testar.temporal.structure;
 
-import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
 import nl.ou.testar.temporal.util.CSVConvertMap;
 import nl.ou.testar.temporal.util.TemporalType;
@@ -12,50 +11,48 @@ public class TemporalConstraintedPattern extends TemporalPattern{
 
 
     @CsvCustomBindByName( converter = CSVConvertMap.class)
-    private Map<String,String> concreteParameterConstraints; //a:Button_OK_IsWindowsModel b: Window_Main_Exists
+    private Map<String,String> parameter_ConcreteConstraints; //a:Button_OK_IsWindowsModel b: Window_Main_Exists
 
     @CsvCustomBindByName( converter = CSVConvertMap.class)
-    private Map<String,String> widgetRoleParameterConstraints; //a:UIAButton b: UIAWindow
+    private Map<String,String> parameter_WidgetRoleConstraints; //a:UIAButton b: UIAWindow
 
 
 
     @CsvCustomBindByName( converter = CSVConvertMap.class)
-    private Map<String,String> attributeParameterConstraints; //a:<*>_IsWindowsModal b:<*>zIndex
+    private Map<String,String> parameter_AttributeConstraints; //a:<*>_IsWindowsModal b:<*>zIndex
 
-
-    @CsvBindByName
-    private String formatVersion="20190629";
 
 
     public TemporalConstraintedPattern() {
         super();
+        this.set_formatVersion("20190629");
 
     }
 
 
 
-    public Map<String, String> getConcreteParameterConstraints() {
-        return concreteParameterConstraints;
+    public Map<String, String> getParameter_ConcreteConstraints() {
+        return parameter_ConcreteConstraints;
     }
 
-    public void setConcreteParameterConstraints(Map<String, String> concreteParameterConstraints) {
-        this.concreteParameterConstraints = concreteParameterConstraints;
+    public void setParameter_ConcreteConstraints(Map<String, String> parameter_ConcreteConstraints) {
+        this.parameter_ConcreteConstraints = parameter_ConcreteConstraints;
     }
 
-    public Map<String, String> getWidgetRoleParameterConstraints() {
-        return widgetRoleParameterConstraints;
+    public Map<String, String> getParameter_WidgetRoleConstraints() {
+        return parameter_WidgetRoleConstraints;
     }
 
-    public void setWidgetRoleParameterConstraints(Map<String, String> widgetRoleParameterConstraints) {
-        this.widgetRoleParameterConstraints = widgetRoleParameterConstraints;
+    public void setParameter_WidgetRoleConstraints(Map<String, String> parameter_WidgetRoleConstraints) {
+        this.parameter_WidgetRoleConstraints = parameter_WidgetRoleConstraints;
     }
 
-    public Map<String, String> getAttributeParameterConstraints() {
-        return attributeParameterConstraints;
+    public Map<String, String> getParameter_AttributeConstraints() {
+        return parameter_AttributeConstraints;
     }
 
-    public void setAttributeParameterConstraints(Map<String, String> attributeParameterConstraints) {
-        this.attributeParameterConstraints = attributeParameterConstraints;
+    public void setParameter_AttributeConstraints(Map<String, String> parameter_AttributeConstraints) {
+        this.parameter_AttributeConstraints = parameter_AttributeConstraints;
     }
     public Object clone() throws            CloneNotSupportedException
     {
@@ -70,14 +67,14 @@ public class TemporalConstraintedPattern extends TemporalPattern{
         attributeConstraint.put("b","ZIndex_value_lt_10");
         Map<String,String> concreteConstraint = new HashMap<>();
         concreteConstraint.put("b","UIAWindow_SAVE_[0,1]_ZIndex_value_lt_10");
-        pat.setWidgetRoleParameterConstraints(widgetConstraint);
-        pat.setAttributeParameterConstraints(attributeConstraint);
-        pat.setConcreteParameterConstraints(concreteConstraint);
-        pat.setTemporalFormalism(TemporalType.LTL);
-        pat.setDescription("a precedes b");
-        pat.setScope("globally");
-        pat.setPatternclass("precedence");
-        pat.setPattern("!b U a");
+        pat.setParameter_WidgetRoleConstraints(widgetConstraint);
+        pat.setParameter_AttributeConstraints(attributeConstraint);
+        pat.setParameter_ConcreteConstraints(concreteConstraint);
+        pat.setPattern_TemporalFormalism(TemporalType.LTL);
+        pat.setPattern_Description("a precedes b");
+        pat.setPattern_Scope("globally");
+        pat.setPattern_Class("precedence");
+        pat.setPattern_Formula("!b U a");
         List<String> comments= new ArrayList<String>();
         List<String> log= new ArrayList<String>();
         comments.add("constraints are optional and used to reduce the number of potential oracles during mining.");
@@ -85,11 +82,11 @@ public class TemporalConstraintedPattern extends TemporalPattern{
 
 
         LocalDateTime localDateTime = LocalDateTime.now();
-pat.setModifieddate(localDateTime.toString());
+        pat.set_modifieddate(localDateTime.toString());
         log.add("temporal pattern generated");
-        pat.setComments(comments);
-        pat.setLog(log);
-        pat.setParameters(Arrays.asList("a", "b"));
+        pat.set_comments(comments);
+        pat.setApplication_log(log);
+        pat.setPattern_Parameters(Arrays.asList("a", "b"));
 
       return   pat;
     }

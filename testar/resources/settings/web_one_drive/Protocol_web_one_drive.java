@@ -96,6 +96,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	 *      seconds until they have finished loading)
 	 * @return  a started SUT, ready to be tested.
 	 */
+	@Override
 	protected SUT startSystem() throws SystemStartException{
 
 		SUT sut = super.startSystem();
@@ -212,6 +213,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
+	@Override
 	protected State getState(SUT system) throws StateBuildException{
 
 		State state = super.getState(system);
@@ -231,6 +233,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	 * It examines the SUT's current state and returns an oracle verdict.
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
 	 */
+	@Override
 	protected Verdict getVerdict(State state){
 
 		Verdict verdict = super.getVerdict(state);
@@ -308,6 +311,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	 * @param state the SUT's current state
 	 * @return  a set of actions
 	 */
+	@Override
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 
 		Set<Action> actions = super.deriveActions(system,state);

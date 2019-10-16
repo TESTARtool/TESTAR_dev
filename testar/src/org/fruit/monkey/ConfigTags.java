@@ -116,6 +116,24 @@ public final class ConfigTags {
   public static final Tag<Boolean> ResetDataStore = Tag.from("ResetDataStore", Boolean.class);
   public static final Tag<String> ApplicationName = Tag.from("ApplicationName", String.class);
   public static final Tag<String> ApplicationVersion = Tag.from("ApplicationVersion", String.class);
+  public static final Tag<String> ActionSelectionAlgorithm = Tag.from("ActionSelectionAlgorithm", String.class);
+
+  // temporal oracles config tags
+  public static final Tag<Boolean> TemporalEnabled = Tag.from("TemporalEnabled", Boolean.class);
+  public static final Tag<String> TemporalLTLChecker = Tag.from("TemporalLTLChecker", String.class);
+  public static final Tag<Boolean> TemporalLTLCheckerWSL = Tag.from("TemporalLTLCheckerWSL", Boolean.class);
+  public static final Tag<Boolean> TemporalLTLVerbose = Tag.from("TemporalLTLVerbose", Boolean.class);
+  public static final Tag<String> TemporalLTLOracles = Tag.from("TemporalLTLOracles", String.class);
+  public static final Tag<String> TemporalLTLPatterns = Tag.from("TemporalLTLPatterns", String.class);
+  public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
+  public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
+  public static final Tag<String> TemporalSpotFormulaParser = Tag.from("TemporalSpotFormulaParser", String.class);
+  public static final Tag<String> TemporalPythonEnvironment = Tag.from("TemporalPythonEnvironment", String.class);
+  public static final Tag<String> TemporalVisualizerServer = Tag.from("TemporalVisualizerServer", String.class);
+  public static final Tag<String> TemporalVisualizerURL = Tag.from("TemporalVisualizerURL", String.class);
+  public static final Tag<String> TemporalVisualizerURLStop = Tag.from("TemporalVisualizerURLStop", String.class);
+
+
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> ConcreteStateAttributes = Tag.from("ConcreteStateAttributes", (Class<List<String>>) (Class<?>) List.class);
   @SuppressWarnings("unchecked")

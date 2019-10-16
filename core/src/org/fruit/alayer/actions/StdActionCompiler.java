@@ -67,7 +67,9 @@ public class StdActionCompiler {
 		Finder wf = abstractor.apply(w);
 		Position position = new WidgetPosition(wf, Tags.Shape, 0.5, 0.5, true);
 		position.obscuredByChildFeature(false); // even if any other widget is at foreground
-		return mouseMove(w,position);
+		Action ret = mouseMove(w, position);
+		ret.set(Tags.OriginWidget, w);
+		return ret;
 	}
 	
 	public Action mouseMove(Widget w, Position position){
@@ -111,6 +113,7 @@ public class StdActionCompiler {
 		Action ret = leftClickAt(new WidgetPosition(wf, Tags.Shape, relX, relY, true));
 		ret.set(Tags.Targets, Util.newArrayList(wf));
 		ret.set(Tags.TargetID, w.get(Tags.ConcreteID));
+		ret.set(Tags.OriginWidget, w);
 		return ret;
 	}
 
@@ -228,7 +231,11 @@ public class StdActionCompiler {
 		return action;
 	}
 
-
+	public Action slideFromTo(Position from, Position to, Widget widget){
+		Action action = slideFromTo(from, to);
+		action.set(Tags.OriginWidget, widget);
+		return action;
+	}
 
 	/**
 	 *

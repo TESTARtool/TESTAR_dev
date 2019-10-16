@@ -34,16 +34,7 @@
  */
 package org.fruit.monkey;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.*;
-
-import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.StateManagementTags;
 import org.fruit.Assert;
 import org.fruit.FruitException;
 import org.fruit.Pair;
@@ -51,6 +42,10 @@ import org.fruit.Util;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.exceptions.NoSuchTagException;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -213,32 +208,32 @@ public class Settings extends TaggableBase implements Serializable {
 	public Settings(List<Pair<?, ?>> defaults, Properties props){
 		Assert.notNull(props, defaults);
 
-		for(Pair<?, ?> p : defaults){
-			Assert.notNull(p.left(), p.right());
-			Assert.isTrue(p.left() instanceof Tag);			
-			Tag<Object> t = (Tag<Object>)p.left();
-			Object v = p.right();
-			Assert.isTrue(t.type().isAssignableFrom(v.getClass()), "Wrong value type for tag " + t.name());
-			set(t, v);			
+		for(Pair<?, ?> pair : defaults){
+			Assert.notNull(pair.left(), pair.right());
+			Assert.isTrue(pair.left() instanceof Tag);
+			Tag<Object> tag = (Tag<Object>)pair.left();
+			Object value = pair.right();
+			Assert.isTrue(tag.type().isAssignableFrom(value.getClass()), "Wrong value type for tag " + tag.name());
+			set(tag, value);
 		}
 
 		for(String key : props.stringPropertyNames()){
 			String value = props.getProperty(key);
 			
-			Tag<?> defTag = null;
+			Tag<?> defaultTag = null;
 			
-			for(Pair<?, ?> p : defaults){
-				Tag<?> t = (Tag<?>)p.left();
-				if(t.name().equals(key)){
-					defTag = t;
+			for(Pair<?, ?> pair : defaults){
+				Tag<?> tag = (Tag<?>)pair.left();
+				if(tag.name().equals(key)){
+					defaultTag = tag;
 					break;
 				}
 			}
 
-			if(defTag == null){
+			if(defaultTag == null){
 				set(Tag.from(key, String.class), value);
 			}else{
-				set((Tag)defTag, parse(value, defTag));
+				set((Tag)defaultTag, parse(value, defaultTag));
 			}
 		}
 
@@ -391,15 +386,31 @@ public class Settings extends TaggableBase implements Serializable {
 					+"DataStoreMode = instant" + Util.lineSep()
 					+"ApplicationName = Buggy calculator" + Util.lineSep()
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
+					+"ActionSelectionAlgorithm =" + Util.lineSep()
+					+"\n"
+					+"#################################################################\n"
+					+"# Temporal Oracle settings\n"
+					+"#################################################################\n"
+					+"TemporalEnabled = false" + Util.lineSep()
+					+"TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
+					+"TemporalLTLCheckerWSL = true" + Util.lineSep()
+					+"TemporalLTLVerbose = true" + Util.lineSep()
+					+"TemporalLTLOracles = LTLTemporalOracles.csv" + Util.lineSep()
+					+"TemporalLTLPatterns = LTLTemporalPatterns.csv" + Util.lineSep()
+					+"TemporalLTLAPSelectorManager = LTLAPSelectorManager.json"+ Util.lineSep()
+					+"TemporalDirectory = temporal" + Util.lineSep()
+					+"TemporalSpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()
+					+"TemporalPythonEnvironment = python.exe" + Util.lineSep()
+					+"TemporalVisualizerServer = run.py --port 8050"+ Util.lineSep()
+					+"TemporalVisualizerURL = localhost:8050" + Util.lineSep()
+					+"TemporalVisualizerURLStop = localhost:8050/shutdown" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
 					+"#\n"
 					+"# Specify the widget attributes that you wish to use in constructing\n"
 					+"# the widget and state hash strings. Use a comma separated list.\n"
-					+"# Allowed value are: Role,Path,Title,Enabled\n"
                     +"#################################################################\n"
-			        +"ConcreteStateAttributes =" + Util.lineSep()
 			        +"AbstractStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
@@ -440,27 +451,11 @@ public class Settings extends TaggableBase implements Serializable {
 	 */
 	private void verifySettings() {
 		// verify the concrete and abstract state settings
-		// the values provided should be allowed by the Coding Manager
-        Set<String> stateSet = new HashSet<>();
-        Set<String> allowedStateAttributes = CodingManager.allowedStateTags.keySet();
+		// the values provided should be valid state management tags
+        Set<String> allowedStateAttributes = StateManagementTags.getAllTags().stream().map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toSet());
 
-        // first the concrete states
-		try {
-			List<String> concreteStateAttributes = get(ConfigTags.ConcreteStateAttributes);
-			for (String concreteStateAttribute : concreteStateAttributes) {
-                if (allowedStateAttributes.contains(concreteStateAttribute)) {
-                    stateSet.add(concreteStateAttribute);
-                }
-			}
-			set(ConfigTags.ConcreteStateAttributes, new ArrayList<>(stateSet));
-		}
-		catch (NoSuchTagException ex) {
-			// no need to do anything, nothing to verify
-		}
-
-        stateSet.clear();
-
-		// then the abstract states
+		// add only the state management tags that are available
+		Set<String> stateSet = new HashSet<>();
         try {
             List<String> abstractStateAttributes = get(ConfigTags.AbstractStateAttributes);
             for (String abstractStateAttribute : abstractStateAttributes) {
@@ -476,7 +471,7 @@ public class Settings extends TaggableBase implements Serializable {
 	}
 
 	private static String getStringSeparator(Tag<?> tag) {
-		return tag.equals(ConfigTags.ConcreteStateAttributes) || tag.equals(ConfigTags.AbstractStateAttributes)
+		return tag.equals(ConfigTags.AbstractStateAttributes)||tag.equals(ConfigTags.ConcreteStateAttributes)
 				? "," : ";";
 	}
 }

@@ -3,90 +3,91 @@ package nl.ou.testar.temporal.structure;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
+import nl.ou.testar.temporal.util.CSVConvertMap;
 import nl.ou.testar.temporal.util.CSVConvertTemporalType;
 import nl.ou.testar.temporal.util.TemporalType;
 
 import java.util.List;
+import java.util.Map;
 
 public class TemporalPattern extends TemporalBean implements Cloneable{
 
 
-
     @CsvCustomBindByName(converter = CSVConvertTemporalType.class)
-    private TemporalType temporalFormalism;
+    private TemporalType pattern_TemporalFormalism;
     @CsvBindByName
-    private String description; //short description e.g. spec pattern name
+    private String pattern_Description; //short pattern_Description e.g. spec pattern_Formula name
 
     @CsvBindByName
-    private String scope;  // see spec pattern http://patterns.projects.cs.ksu.edu
+    private String pattern_Scope;  // see spec pattern_Formula http://patterns.projects.cs.ksu.edu
     @CsvBindByName
-    private String patternclass; // see taxonomy http://patterns.projects.cs.ksu.edu
+    private String pattern_Class; // see taxonomy http://patterns.projects.cs.ksu.edu
     @CsvBindByName
-    private String pattern;  // e.g. G(b0->Fb1)
+    private String pattern_Formula;  // e.g. G(b0->Fb1)
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> parameters; //b0,b1,b2,bn
+    private List<String> pattern_Parameters; //b0,b1,b2,bn
 
-    @CsvBindByName
-    private String formatVersion="20190629";
 
 
     public TemporalPattern() {
     super();
+    this.set_formatVersion("20190629");
     }
 
-    public TemporalType getTemporalFormalism() {
-        return temporalFormalism;
+    public TemporalType getPattern_TemporalFormalism() {
+        return pattern_TemporalFormalism;
     }
 
-    public void setTemporalFormalism(TemporalType temporalFormalism) {
-        this.temporalFormalism = temporalFormalism;
+    public void setPattern_TemporalFormalism(TemporalType pattern_TemporalFormalism) {
+        this.pattern_TemporalFormalism = pattern_TemporalFormalism;
     }
 
-    public String getScope() {
-        return scope;
+    public String getPattern_Scope() {
+        return pattern_Scope;
     }
 
-    public void setScope(String scope) {
-        this.scope = scope;
+    public void setPattern_Scope(String pattern_Scope) {
+        this.pattern_Scope = pattern_Scope;
     }
 
-    public String getPatternclass() {
-        return patternclass;
+    public String getPattern_Class() {
+        return pattern_Class;
     }
 
-    public void setPatternclass(String patternclass) {
-        this.patternclass = patternclass;
+    public void setPattern_Class(String pattern_Class) {
+        this.pattern_Class = pattern_Class;
     }
 
 
-    public String getDescription() {
-        return description;
+    public String getPattern_Description() {
+        return pattern_Description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPattern_Description(String pattern_Description) {
+        this.pattern_Description = pattern_Description;
     }
 
-    public String getPattern() {
-        return pattern;
+    public String getPattern_Formula() {
+        return pattern_Formula;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
+    public void setPattern_Formula(String pattern_Formula) {
+        this.pattern_Formula = pattern_Formula;
     }
 
-    public List<String> getParameters() {
-        return parameters;
+    public List<String> getPattern_Parameters() {
+        return pattern_Parameters;
     }
+
 
     public int getParamcount() {
-        return parameters.size();
+        return pattern_Parameters.size();
     }
 
 
 
-    public void setParameters(List<String> parameters) {
-        this.parameters = parameters;
+    public void setPattern_Parameters(List<String> pattern_Parameters) {
+        this.pattern_Parameters = pattern_Parameters;
     }
 
 

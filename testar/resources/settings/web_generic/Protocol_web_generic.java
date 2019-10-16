@@ -50,6 +50,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 	 * This method can be used to perform initial setup work
 	 * @param   settings   the current TESTAR settings as specified by the user.
 	 */
+	@Override
 	protected void initialize(Settings settings){
 		super.initialize(settings);
 		initBrowser();
@@ -73,6 +74,7 @@ public class Protocol_web_generic extends DesktopProtocol {
 	 * state is erroneous and if so why.
 	 * @return  the current state of the SUT with attached oracle.
 	 */
+	@Override
 	protected State getState(SUT system) throws StateBuildException{
 		
 		State state = super.getState(system);

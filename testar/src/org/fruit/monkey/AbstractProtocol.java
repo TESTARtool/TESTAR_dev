@@ -125,7 +125,7 @@ public abstract class AbstractProtocol implements UnProc<Settings>	{
 	protected abstract State getState(SUT system) throws StateBuildException;
 
 	/**
-	 * The getVerdict methods implements the online state oracles that
+	 * The getOracle_verdict methods implements the online state oracles that
 	 * examine the SUT's current state and returns an oracle verdict.
 	 *
 	 * @return oracle verdict, which determines whether the state is erroneous and why.
