@@ -88,7 +88,6 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.StateBuilder;
 import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
@@ -107,6 +106,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -114,6 +114,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
@@ -284,7 +285,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
+			
+		}catch(SessionNotCreatedException e) {
+			
+    		if(e.getMessage().contains("Chrome version")) {
+    			
+    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
+    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
+    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "\n"
+    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
+    					+ "You can use Task Manager to finish it.";
+    			
+    			popupMessage(msg);
+    			
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
+    			
+    		}else {
+    			System.out.println("********** ERROR starting Selenium WebDriver ********");
+    			System.out.println(e.getMessage());
+    		}
+    		
+		}catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+				
+				String msg = "Exception: Check if chromedriver.exe path: \n"
+				+settings.get(ConfigTags.SUTConnectorValue)
+				+"\n exists or if is a correct definition";
 
+				popupMessage(msg);
+
+				System.out.println(msg);
+			
+			}else {
+				e.printStackTrace();
+			}
+		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			//INDEXLOG.error("Exception: ",SystemStartException);
@@ -295,6 +332,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Quit;
 		}
 
+		//allowing close-up in the end of test session:
+		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
 	}
@@ -378,7 +417,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
 
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-			//INDEXLOG.error("Exception: ",e);
 
 			return false;
 		}
@@ -539,7 +577,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private Taggable fragment; // Fragment is used for saving a replayable sequence:
+	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -734,10 +772,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
-		//allowing close-up in the end of test session:
-		closeTestSession();
-		//Closing TESTAR internal test session:
-		closeTestarTestSession();
+
 		mode = Modes.Quit;
 	}
 
@@ -852,15 +887,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ExecutedAction,action);
+		fragment.set(ExecutedAction, action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 		fragment.set(SystemState, state);
-		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
-		fragment =new TaggableBase();
+		fragment = new TaggableBase();
 	}
 
 
@@ -1160,9 +1195,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
 			while(success && mode() != Modes.Quit){
-				Taggable fragment;
+				TaggableBase fragment;
 				try{
-					fragment = (Taggable) ois.readObject();
+					fragment = (TaggableBase) ois.readObject();
 				} catch(IOException ioe){
 					success = true;
 					break;
@@ -1393,13 +1428,13 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
+		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
+			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
 		} else // unable to kill SUT
-			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
+			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc, "No SUT Desc available") + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
 	}
 
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
@@ -1489,7 +1524,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		
 		setStateForClickFilterLayerProtocol(state);
 
-		if(mode() == Modes.Spy)
+		if(settings.get(ConfigTags.Mode) == Modes.Spy)
 			return state;
 		
 		Verdict verdict = getVerdict(state);
@@ -1985,27 +2020,28 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
+     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+     * @param actions
+     * @param ac
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @param widget
+     */
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+        Drag[] drags = null;
+        //If there are scroll (drags/drops) actions possible
+        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                actions.add(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
+                ));
 
-			}
-		}
-	}
+            }
+        }
+    }
 
 }
