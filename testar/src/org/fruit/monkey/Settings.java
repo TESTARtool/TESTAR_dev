@@ -395,6 +395,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ApplicationName = Buggy calculator" + Util.lineSep()
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
 					+"ActionSelectionAlgorithm =" + Util.lineSep()
+					+"StateModelStoreWidgets =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"
