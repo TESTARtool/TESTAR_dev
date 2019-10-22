@@ -1,11 +1,13 @@
 package nl.ou.testar.StateModel;
 
+import es.upv.staq.testar.NativeLinker;
+import es.upv.staq.testar.OperatingSystems;
 import es.upv.staq.testar.ProtocolUtil;
 import org.fruit.alayer.AWTCanvas;
 import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
-
+import org.fruit.alayer.webdriver.WdProtocolUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Set;
@@ -29,6 +31,10 @@ public abstract class ConcreteStateFactory {
         // get a screenshot for this concrete state
         ByteArrayOutputStream screenshotBytes = new ByteArrayOutputStream();
         ProtocolUtil protocolUtil = new ProtocolUtil();
+        
+        if(NativeLinker.getPLATFORM_OS().contains(OperatingSystems.WEBDRIVER))
+        	protocolUtil = new WdProtocolUtil();
+        
         AWTCanvas screenshot = protocolUtil.getStateshotBinary(newState);
         try {
             screenshot.saveAsPng(screenshotBytes);

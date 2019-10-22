@@ -10,4 +10,5 @@ doc/
 */.classpath
 .settings
 build.bat
-/graph
+*.sse
+*.class

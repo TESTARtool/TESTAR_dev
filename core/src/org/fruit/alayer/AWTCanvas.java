@@ -151,7 +151,7 @@ public class AWTCanvas implements Image, Canvas {
 	}
 
 	private static final long serialVersionUID = -5041497503329308870L;
-	private transient BufferedImage img;
+	protected transient BufferedImage img;
 	private StorageFormat format;
 	private double quality;
 	private double x, y;

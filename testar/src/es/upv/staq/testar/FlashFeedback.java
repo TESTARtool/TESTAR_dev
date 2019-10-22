@@ -61,8 +61,7 @@ public class FlashFeedback  extends JDialog implements Runnable {
 		msg.setForeground(Color.WHITE);
 		this.add(msg);
 		int dimW = (title.length() + 1) * 12;
-		this.setSize(new Dimension(dimW > 512 ? 512 : dimW, 32));
-		this.setEnabled(false);
+		this.setSize(new Dimension(Math.min(dimW, 512), 32));
 		this.setOpacity(0.75f);
 	}
 	
