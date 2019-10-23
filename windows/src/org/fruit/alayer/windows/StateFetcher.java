@@ -232,7 +232,15 @@ public class StateFetcher implements Callable<UIAState>{
 		buildTLCMap(uiaRoot);
 		markBlockedElements(uiaRoot);
 
-		markBlockedElements(uiaRoot,modalElement); // by urueda		
+		markBlockedElements(uiaRoot,modalElement);
+		
+		//Remove invisible borders from Windows 10 desktop apps
+		//https://stackoverflow.com/questions/34139450/getwindowrect-returns-a-size-including-invisible-borders
+		if(System.getProperty("os.name").contains("Windows 10")) {
+			UIAElement mainWindows = uiaRoot.children.get(0);
+			Rect r = mainWindows.rect;
+			mainWindows.rect = Rect.from(r.x()+7, r.y(), r.width()-14, r.height()-7);
+		}
 
 		return uiaRoot;
 	}
