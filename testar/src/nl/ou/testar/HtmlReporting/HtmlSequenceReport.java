@@ -85,15 +85,20 @@ public class HtmlSequenceReport {
     }
 
     public void addSequenceStep(State state, String actionImagePath){
-        String imagePath = state.get(Tags.ScreenshotPath);
-        // repairing the file paths:
-        if(imagePath.contains("./output")){
-            imagePath = imagePath.replace("./output","../");
-        }
-        write("<h4>State:</h4>");
-        write("<p><img src=\""+imagePath+"\"></p>");
-        write("<h4>Action:</h4>");
-        write("<p><img src=\""+actionImagePath+"\"></p>");
+    	try {
+    		String imagePath = state.get(Tags.ScreenshotPath);
+    		// repairing the file paths:
+    		if(imagePath.contains("./output")){
+    			imagePath = imagePath.replace("./output","../");
+    		}
+    		write("<h4>State:</h4>");
+    		write("<p><img src=\""+imagePath+"\"></p>");
+    		write("<h4>Action:</h4>");
+    		write("<p><img src=\""+actionImagePath+"\"></p>");
+    	}catch(Exception e) {
+    		System.out.println("ERROR: Adding the Sequence step " + innerLoopCounter + " in the HTML report");
+    		write("<h2>ERROR Adding current Sequence step " + innerLoopCounter + "</h2>");
+    	}
     }
 
     public void addState(State state){
@@ -110,23 +115,28 @@ public class HtmlSequenceReport {
     }
 
     private void writeStateIntoReport(State state){
-        String imagePath = state.get(Tags.ScreenshotPath);
-        if(imagePath.contains("./output")){
-        	int indexStart = imagePath.indexOf("./output");
-        	int indexScrn = imagePath.indexOf("scrshots");
-        	String replaceString = imagePath.substring(indexStart,indexScrn);
-            imagePath = imagePath.replace(replaceString,"../");
-        }
-        write("<h2>State "+innerLoopCounter+"</h2>");
-        write("<h4>concreteID="+state.get(Tags.ConcreteID, "NoConcreteIdAvailable")+"</h4>");
-        write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
-//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
-//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
-//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
-        write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
-        // file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
-        // statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
-        innerLoopCounter++;
+    	try {
+    		String imagePath = state.get(Tags.ScreenshotPath);
+    		if(imagePath.contains("./output")){
+    			int indexStart = imagePath.indexOf("./output");
+    			int indexScrn = imagePath.indexOf("scrshots");
+    			String replaceString = imagePath.substring(indexStart,indexScrn);
+    			imagePath = imagePath.replace(replaceString,"../");
+    		}
+    		write("<h2>State "+innerLoopCounter+"</h2>");
+    		write("<h4>concreteID="+state.get(Tags.ConcreteID, "NoConcreteIdAvailable")+"</h4>");
+    		write("<h4>abstractID="+state.get(Tags.AbstractID, "NoAbstractIdAvailable")+"</h4>");
+    		//        try{if(state.get(Tags.Abstract_R_ID)!=null) write("<h4>Abstract_R_ID="+state.get(Tags.Abstract_R_ID)+"</h4>");}catch(Exception e){}
+    		//        try{if(state.get(Tags.Abstract_R_T_ID)!=null) write("<h4>Abstract_R_T_ID="+state.get(Tags.Abstract_R_T_ID)+"</h4>");}catch(Exception e){}
+    		//        try{if(state.get(Tags.Abstract_R_T_P_ID)!=null) write("<h4>Abstract_R_T_P_ID="+state.get(Tags.Abstract_R_T_P_ID)+"</h4>");}catch(Exception e){}
+    		write("<p><img src=\""+imagePath+"\"></p>"); //<img src="smiley.gif" alt="Smiley face" height="42" width="42">
+    		// file:///E:/TESTAR/TESTAR_dev/testar/target/install/testar/bin/output/output/scrshots/sequence1/SC1padzu12af1193500371.png
+    		// statePath=./output\scrshots\sequence1\SC1y2bsuu2b02920826651.png
+    	}catch(Exception e) {
+    		System.out.println("ERROR: Adding the State number " + innerLoopCounter + " in the HTML report");
+    		write("<h2>ERROR Adding current State " + innerLoopCounter + "</h2>");
+    	}
+    	innerLoopCounter++;
     }
 
 

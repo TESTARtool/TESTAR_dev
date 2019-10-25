@@ -816,6 +816,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
+			for(Action a : actions)
+				if(a.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildEnvironmentActionIDs(state, a);
+			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
@@ -863,6 +867,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
+		for(Action a : actions)
+			if(a.get(Tags.AbstractIDCustom, null) == null)
+				CodingManager.buildEnvironmentActionIDs(state, a);
+		
 		stateModelManager.notifyNewStateReached(state, actions);
 
 		return getVerdict(state);
