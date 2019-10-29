@@ -91,6 +91,16 @@ public class WdProtocolUtil extends ProtocolUtil {
   
   @Override
   public AWTCanvas getStateshotBinary(State state) {
+	  //If these State Tags are not obtained, the State has an error, use full monitor screen
+	  if(state.get(WdTags.WebVerticallyScrollable, null) == null 
+			  && state.get(WdTags.WebHorizontallyScrollable, null) == null) {
+		  //Get a screenshot of all the screen, because SUT ended and we can't obtain the size
+		  Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+		  AWTCanvas scrshot = AWTCanvas.fromScreenshot(Rect.from(screenRect.getX(), screenRect.getY(),
+				  screenRect.getWidth(), screenRect.getHeight()), AWTCanvas.StorageFormat.PNG, 1);
+		  return scrshot;
+	  }
+	  
 	  double width = CanvasDimensions.getCanvasWidth() + (
 			  state.get(WdTags.WebVerticallyScrollable) ? scrollThick : 0);
 	  double height = CanvasDimensions.getCanvasHeight() + (
