@@ -122,17 +122,15 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
         // check the current depth of the tree
         int currentTreeDepth = tree.getMaxTreeDepth();
 
-        tree.getLeafNodes().forEach(node -> { // fetch all the outgoing transitions from this state
-            abstractStateModel.getOutgoingTransitionsForState(node.getAbstractState().getStateId()).forEach(
-                    transition -> { // for each transition, check if we have not yet visited the target state
-                        if  (!visitedStateIds.contains(transition.getTargetStateId())) {
-                            visitedStateIds.add(transition.getTargetStateId());
+        tree.getLeafNodes().forEach(node -> { // fetch all the outgoing transitions from this state where we have not visited the target state yet
+            abstractStateModel.getOutgoingTransitionsForState(node.getAbstractState().getStateId()).stream().filter(transition -> !visitedStateIds.contains(transition.getTargetStateId())).forEach(
+                    transition -> {
+                        visitedStateIds.add(transition.getTargetStateId());
 
-                            // create a new node and add it
-                            SelectorNode childNode = new SelectorNode(transition.getTargetState(), transition.getAction(), node.getDepth() + 1, node);
-                            node.addChild(childNode);
-                            childNode.setTree(node.getTree());
-                        }
+                        // create a new node and add it
+                        SelectorNode childNode = new SelectorNode(transition.getTargetState(), transition.getAction(), node.getDepth() + 1, node);
+                        node.addChild(childNode);
+                        childNode.setTree(node.getTree());
                     }
             );
         });
