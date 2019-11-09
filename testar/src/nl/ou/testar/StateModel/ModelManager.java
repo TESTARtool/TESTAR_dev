@@ -51,7 +51,7 @@ public class ModelManager implements StateModelManager {
     private int nrOfNonDeterministicActions;
 
     // should the widgets of concrete states be stored in the model?
-    boolean storeWidgets;
+    private boolean storeWidgets;
 
     /**
      * Constructor
