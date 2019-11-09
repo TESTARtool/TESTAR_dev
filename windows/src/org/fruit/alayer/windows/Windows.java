@@ -625,6 +625,7 @@ public final class Windows{
 	public static native boolean SetCursorPos(int x, int y);
 	public static native double[] GetCursorPos();
 	public static native long GetForegroundWindow();
+	public static native boolean SetForegroundWindow(long hwnd);
 	public static native int WindowFromPoint(int x, int y);
 	public static native int ChildWindowFromPoint(int parentHwnd, int x, int y);
 	public static native int GetWindowThreadId(int hwnd);

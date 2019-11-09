@@ -61,6 +61,10 @@ public final class WinProcess extends SUTBase {
 
 	private static final String EMPTY_STRING = ""; // by wcoux
 
+	public static boolean politelyToForeground(long hwnd) throws WinApiException{
+		return Windows.SetForegroundWindow(hwnd);
+	}
+	
 	public static void toForeground(long pid) throws WinApiException{
 		toForeground(pid, 0.3, 100);
 	}

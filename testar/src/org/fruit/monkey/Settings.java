@@ -60,10 +60,11 @@ public class Settings extends TaggableBase implements Serializable {
 
 	private static final long serialVersionUID = -1579293663489327737L;
 
-	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE",
-			 				   SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME",
-			 				   SUT_CONNECTOR_CMDLINE 	  = "COMMAND_LINE";
-	
+	public static final String SUT_CONNECTOR_WINDOW_TITLE = "SUT_WINDOW_TITLE";
+	public static final String SUT_CONNECTOR_PROCESS_NAME = "SUT_PROCESS_NAME";
+	public static final String SUT_CONNECTOR_CMDLINE = "COMMAND_LINE";
+	public static final String SUT_CONNECTOR_WEBDRIVER = "WEB_DRIVER";
+
 	private static String settingsPath;
 	
 	public static String getSettingsPath() {
