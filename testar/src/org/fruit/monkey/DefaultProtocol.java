@@ -1027,6 +1027,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
+		
+		//finishSequence() content, but SPY mode is not a sequence
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
