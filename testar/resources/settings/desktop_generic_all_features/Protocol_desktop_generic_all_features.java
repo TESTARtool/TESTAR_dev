@@ -115,8 +115,7 @@ public class Protocol_desktop_generic_all_features extends DesktopProtocol {
 	protected State getState(SUT system) throws StateBuildException{
 		State state = super.getState(system);
 		// Creating a JSON file with information about widgets and their location on the screenshot:
-		if(settings.get(ConfigTags.Mode) == Modes.Generate 
-				&& settings.get(ConfigTags.Mode) == Modes.Record)
+		if(settings.get(ConfigTags.Mode) == Modes.Generate)
 			JsonUtils.createWidgetInfoJsonFile(state);
 		
 		return state;
