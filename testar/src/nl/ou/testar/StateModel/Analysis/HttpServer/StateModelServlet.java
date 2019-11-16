@@ -1,5 +1,6 @@
-package nl.ou.testar.StateModel.Analysis;
+package nl.ou.testar.StateModel.Analysis.HttpServer;
 
+import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.ActionViz;
 

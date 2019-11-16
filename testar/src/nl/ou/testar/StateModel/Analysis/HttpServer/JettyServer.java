@@ -1,21 +1,15 @@
 package nl.ou.testar.StateModel.Analysis.HttpServer;
 
 import nl.ou.testar.StateModel.Analysis.AnalysisManager;
-import nl.ou.testar.StateModel.Analysis.GraphServlet;
-import nl.ou.testar.StateModel.Analysis.StateModelServlet;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.fruit.alayer.State;
 
 public class JettyServer {
     private Server server;

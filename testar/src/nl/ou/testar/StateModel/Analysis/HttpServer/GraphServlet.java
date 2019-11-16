@@ -1,4 +1,6 @@
-package nl.ou.testar.StateModel.Analysis;
+package nl.ou.testar.StateModel.Analysis.HttpServer;
+
+import nl.ou.testar.StateModel.Analysis.AnalysisManager;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
