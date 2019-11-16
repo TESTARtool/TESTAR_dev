@@ -40,7 +40,7 @@
             <div class="col-1"></div>
         </div>
         <!-- Collapse block -->
-        <div class="collapse" id="sequenceRow<%= i %>">
+        <div class="collapse sequence-row" id="sequenceRow<%= i %>">
             <div class="row">
                 <div class="col-6 mt-1"><h5>Sequences</h5></div>
             </div>

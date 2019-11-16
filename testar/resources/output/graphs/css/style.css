@@ -543,3 +543,7 @@ button.skip:active {
 .fa-question {
     color: #0c5460;
 }
+
+.sequence-row div.row:last-child {
+    margin-bottom: 15px;
+}
