@@ -1,5 +1,8 @@
 package nl.ou.testar.StateModel.Persistence.OrientDB;
 
+import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.sql.executor.OResult;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import nl.ou.testar.StateModel.*;
 import nl.ou.testar.StateModel.Event.StateModelEvent;
 import nl.ou.testar.StateModel.Event.StateModelEventListener;
@@ -83,7 +86,6 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // we need to make sure before operation that the required classes exist.
         HashSet<EntityClass> entityClassSet = new HashSet<>();
         for (EntityClassFactory.EntityClassName className : entityClassNames) {
-            EntityClass entityClass = EntityClassFactory.createEntityClass(className);
             entityClassSet.add(EntityClassFactory.createEntityClass(className));
         }
         // make sure the entityclasses are sorted by dependency on super classes first
@@ -190,6 +192,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.ConcreteState);
         VertexEntity concreteStateEntity = new VertexEntity(entityClass);
+        concreteStateEntity.enableUpdate(false);
 
         // hydrate the entity to a format the orient database can store
         try {
@@ -253,6 +256,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // we loop through the child widgets and for each widget, store the widget and then store the needed edges between them
         for (Widget childWidget : widget.getChildren()) {
             VertexEntity childWidgetEntity = persistWidget(childWidget);
+            if (childWidgetEntity == null) {
+                System.out.println("Encountered an error persisting the widget with id " + childWidget.getId());
+                return;
+            }
             childWidgetEntity.enableUpdate(false);
 
             // with the widget saved, we need to also store parent and child relationships between the two widgets
@@ -286,6 +293,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         // create an entity to persist to the database
         EntityClass entityClass = EntityClassFactory.createEntityClass(EntityClassFactory.EntityClassName.Widget);
         VertexEntity vertexEntity = new VertexEntity(entityClass);
+        vertexEntity.enableUpdate(false);
 
         // hydrate the widget entity
         try {
@@ -390,6 +398,37 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
         }
         actionEntity.enableUpdate(false);
         entityManager.saveEntity(actionEntity);
+    }
+
+    @Override
+    public boolean modelIsDeterministic(AbstractStateModel abstractStateModel) {
+        // we will use a custom query to search for states in which the same action occurs more than once, leading to
+        // different target states
+        String query = "SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1";
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            OResultSet resultSet = db.query(query);
+            boolean isDeterministic = !resultSet.hasNext(); // no states were found where the same action occurs twice
+            resultSet.close();
+            return isDeterministic;
+        }
+    }
+
+    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
+        // we will use a custom query to search for states in which the same action occurs more than once, leading to
+        // different target states
+        String query = "SELECT SUM(nrOfActions) as totalActionNr FROM (SELECT FROM (SELECT stateId, actionId, COUNT(*) as nrOfActions FROM (select @rid as stateId, oute(\"abstractaction\").actionId as actionId from abstractstate UNWIND actionId) group by stateId, actionId) WHERE nrOfActions > 1)";
+        try (ODatabaseSession db = entityManager.getConnection().getDatabaseSession()) {
+            OResultSet resultSet = db.query(query);
+            if (!resultSet.hasNext()) {
+                resultSet.close();
+                return 0;
+            }
+
+            OResult result = resultSet.next();
+            long nrOfActions = result.getProperty("totalActionNr");
+            resultSet.close();
+            return (int)nrOfActions;
+        }
     }
 
     @Override
@@ -622,6 +661,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case SEQUENCE_STARTED:
+            case SEQUENCE_ENDED:
                 persistSequence((Sequence) event.getPayload());
                 break;
 
@@ -630,6 +670,7 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
                 break;
 
             case SEQUENCE_NODE_ADDED:
+            case SEQUENCE_NODE_UPDATED:
                 persistSequenceNode((SequenceNode) event.getPayload());
                 break;
 

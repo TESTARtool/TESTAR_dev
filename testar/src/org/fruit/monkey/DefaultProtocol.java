@@ -88,7 +88,6 @@ import org.fruit.alayer.Shape;
 import org.fruit.alayer.State;
 import org.fruit.alayer.StateBuilder;
 import org.fruit.alayer.StrokePattern;
-import org.fruit.alayer.Taggable;
 import org.fruit.alayer.TaggableBase;
 import org.fruit.alayer.Tags;
 import org.fruit.alayer.Verdict;
@@ -107,6 +106,7 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
+import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -114,6 +114,7 @@ import es.upv.staq.testar.serialisation.ScreenshotSerialiser;
 import es.upv.staq.testar.serialisation.TestSerialiser;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
@@ -188,6 +189,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected boolean forceNextActionESC = false;
 	protected int testFailTimes = 0;
 	protected boolean nonSuitableAction = false;
+
+	protected boolean exceptionThrown = false;
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
@@ -282,7 +285,43 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println(msg);
 
 			this.mode = Modes.Quit;
+			
+		}catch(SessionNotCreatedException e) {
+			
+    		if(e.getMessage().contains("Chrome version")) {
+    			
+    			String msg = "*** Unsupported versions exception: Chrome browser and Selenium WebDriver versions *** \n"
+    					+ "Please verify your Chrome browser version: chrome://settings/help \n"
+    					+ "And download the appropiate ChromeDriver version: https://chromedriver.chromium.org/downloads \n"
+    					+ "\n"
+    					+ "Surely exists a residual process \"chromedriver.exe\" running. \n"
+    					+ "You can use Task Manager to finish it.";
+    			
+    			popupMessage(msg);
+    			
+    			System.out.println(msg);
+    			System.out.println(e.getMessage());
+    			
+    		}else {
+    			System.out.println("********** ERROR starting Selenium WebDriver ********");
+    			System.out.println(e.getMessage());
+    		}
+    		
+		}catch (IllegalStateException e) {
+			if (e.getMessage().contains("driver executable does not exist")) {
+				
+				String msg = "Exception: Check if chromedriver.exe path: \n"
+				+settings.get(ConfigTags.SUTConnectorValue)
+				+"\n exists or if is a correct definition";
 
+				popupMessage(msg);
+
+				System.out.println(msg);
+			
+			}else {
+				e.printStackTrace();
+			}
+		
 		}catch(SystemStartException SystemStartException) {
 			SystemStartException.printStackTrace();
 			//INDEXLOG.error("Exception: ",SystemStartException);
@@ -293,6 +332,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			this.mode = Modes.Quit;
 		}
 
+		//allowing close-up in the end of test session:
+		closeTestSession();
 		//Closing TESTAR EventHandler
 		closeTestarTestSession();
 	}
@@ -376,9 +417,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			popupMessage("ERROR: File is not a readable, please select a correct testar sequence file");
 
 			System.out.println("ERROR: File is not a readable, please select a correct file (output/sequences)");
-			//INDEXLOG.error("Exception: ",e);
 
-			return false;	
+			return false;
 		}
 
 		return true;
@@ -412,12 +452,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String path = settings.get(ConfigTags.PathToReplaySequence);
 		if(path.contains(".testar")) {
 			path = path.replace(".testar", ".html");
-			
+
 			int startIndex = path.indexOf(File.separator + "sequences");
 			int endIndex = path.indexOf(File.separator, startIndex+2);
-			
+
 			String replace = path.substring(startIndex, endIndex+1);
-			
+
 			path = path.replace(replace, File.separator + "HTMLreports" + File.separator);
 			if (new File(path).exists())
 				foundedHTML = path;
@@ -458,7 +498,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		String sequenceCountDir = "_sequence_" + OutputStructure.sequenceInnerLoopCount;
 
-		String generatedSequenceName = OutputStructure.sequencesOutputDir 
+		String generatedSequenceName = OutputStructure.sequencesOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".testar";
 
@@ -537,7 +577,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		return system;
 	}
 
-	private Taggable fragment; // Fragment is used for saving a replayable sequence:
+	private TaggableBase fragment; // Fragment is used for saving a replayable sequence:
 	private long tStart;
 
 	/**
@@ -579,8 +619,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
 
 	}
@@ -612,8 +652,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		//Delete the temporally testar file
 		try {
 			Util.delete(currentSeq);
-		} catch (IOException e2) {	
-			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);	
+		} catch (IOException e2) {
+			LogSerialiser.log("I/O exception deleting <" + currentSeq + ">\n", LogSerialiser.LogLevel.Critical);
 		}
 	}
 
@@ -638,6 +678,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		 ***** OUTER LOOP - STARTING A NEW SEQUENCE
 		 */
 		while (mode() != Modes.Quit && moreSequences()) {
+			exceptionThrown = false;
 
 			synchronized(this){
 				OutputStructure.calculateInnerLoopDateString();
@@ -711,18 +752,27 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				sequenceCount++;
 
 			} catch (Exception e) {
-				System.out.println("Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception");
+				String message = "Thread: name=" + Thread.currentThread().getName() + ",id=" + Thread.currentThread().getId() + ", TESTAR throws exception";
+				System.out.println(message);
+				StringJoiner stackTrace = new StringJoiner(System.lineSeparator());
+				stackTrace.add(message);
+				Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEach(stackTrace::add);
+				stateModelManager.notifyTestSequenceInterruptedBySystem(stackTrace.toString());
+				exceptionThrown = true;
 				e.printStackTrace();
-				//INDEXLOG.error("Exception: ",e);
 				emergencyTerminateTestSequence(system, e);
 			}
 		}
+
+		if (mode() == Modes.Quit && !exceptionThrown) {
+			// the user initiated the shutdown
+			stateModelManager.notifyTestSequenceInterruptedByUser();
+		}
+
+
 		// notify the statemodelmanager that the testing has finished
 		stateModelManager.notifyTestingEnded();
-		//allowing close-up in the end of test session:
-		closeTestSession();
-		//Closing TESTAR internal test session:
-		closeTestarTestSession();
+
 		mode = Modes.Quit;
 	}
 
@@ -751,7 +801,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		/*
 		 ***** INNER LOOP:
 		 */
-		while (mode() != Modes.Quit && moreActions(state = getState(system))) {
+		while (mode() != Modes.Quit && moreActions(state)) {
 
 			if (mode() == Modes.Record) {
 				runRecordLoop(system);
@@ -766,6 +816,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
+			for(Action a : actions)
+				if(a.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildEnvironmentActionIDs(state, a);
+			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
 
@@ -778,7 +832,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
 				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildIDs(state, escAction);
+				CodingManager.buildEnvironmentActionIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
 			} else
@@ -805,11 +859,18 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			// Resetting the visualization:
 			Util.clear(cv);
 			cv.end();
+
+			// fetch the new state
+            state = getState(system);
 		}
 
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
+		for(Action a : actions)
+			if(a.get(Tags.AbstractIDCustom, null) == null)
+				CodingManager.buildEnvironmentActionIDs(state, a);
+		
 		stateModelManager.notifyNewStateReached(state, actions);
 
 		return getVerdict(state);
@@ -834,15 +895,15 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	private void saveActionIntoFragmentForReplayableSequence(Action action, State state, Set<Action> actions) {
 		fragment.set(OracleVerdict, getVerdict(state).join(processVerdict));
-		fragment.set(ExecutedAction,action);
+		fragment.set(ExecutedAction, action);
 		fragment.set(ActionSet, actions);
 		fragment.set(ActionDuration, settings().get(ConfigTags.ActionDuration));
 		fragment.set(ActionDelay, settings().get(ConfigTags.TimeToWaitAfterAction));
 		fragment.set(SystemState, state);
-		LogSerialiser.log("Writing fragment to sequence file...\n",LogSerialiser.LogLevel.Debug);
+		LogSerialiser.log("Writing fragment to sequence file...\n", LogSerialiser.LogLevel.Debug);
 		TestSerialiser.write(fragment);
 		//resetting the fragment:
-		fragment =new TaggableBase();
+		fragment = new TaggableBase();
 	}
 
 
@@ -889,7 +950,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	/**
 	 * Saving the action information into the logs
-	 * 
+	 *
 	 * @param state
 	 * @param action
 	 * @param actionMode
@@ -914,7 +975,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				actionRepresentation[0]) + "\n",
 				LogSerialiser.LogLevel.Info);
 
-		//bin folder 
+		//bin folder
 		/*INDEXLOG.info(actionMode+" number {} Widget {} finished in {} ms",
 				actionCount,actionRepresentation[1],System.currentTimeMillis()-tStart);*/
 
@@ -932,13 +993,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		while(mode() == Modes.Spy && system.isRunning()) {
 
-			//Instead of use getState(SUT system) method, build our own State into Spy Mode
-			//This will prevent issues with other protocols and reports
-			Assert.notNull(system);
-			State state = builder.apply(system);
-			CodingManager.buildIDs(state);
-			calculateZIndices(state);
-			setStateForClickFilterLayerProtocol(state);
+			State state = getState(system);
 
 			cv.begin(); Util.clear(cv);
 
@@ -972,6 +1027,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		Util.clear(cv);
 		cv.end();
+		
+		//finishSequence() content, but SPY mode is not a sequence
+		SystemProcessHandling.killTestLaunchedProcesses(this.contextRunningProcesses);
 
 		//Stop and close the SUT before return to the detectModeLoop
 		stopSystem(system);
@@ -1044,7 +1102,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				//----------------------------------
 				// if we did not find any actions, then we just hit escape, maybe that works ;-)
 				Action escAction = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-				CodingManager.buildIDs(state, escAction);
+				CodingManager.buildEnvironmentActionIDs(state, escAction);
 				actions.add(escAction);
 				escAttempts++;
 			} else
@@ -1148,9 +1206,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			double rrt = settings.get(ConfigTags.ReplayRetryTime);
 
 			while(success && mode() != Modes.Quit){
-				Taggable fragment;
+				TaggableBase fragment;
 				try{
-					fragment = (Taggable) ois.readObject();
+					fragment = (TaggableBase) ois.readObject();
 				} catch(IOException ioe){
 					success = true;
 					break;
@@ -1327,6 +1385,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				enabledProcessListener = processListener.enableProcessListeners(settings);
 			}
 
+			// for most windows applications and most jar files, this is where the SUT gets created!
 			SUT sut = NativeLinker.getNativeSUT(settings().get(ConfigTags.SUTConnectorValue), enabledProcessListener);
 
 			//Print info to the user to know that TESTAR is NOT READY for its use :-(
@@ -1336,7 +1395,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 			//Refresh the flash information, to avoid that SUT hide the information
 			int countTimeFlash = 0;
-			while(countTimeFlash<timeFlash) {
+			while(countTimeFlash<timeFlash && !sut.isRunning()) {
 				FlashFeedback.flash(printSutInfo, 2000);
 				countTimeFlash += 2000;
 			}
@@ -1361,7 +1420,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 							printSutInfo = "Waiting for the SUT to be accessible ...";
 							FlashFeedback.flash(printSutInfo, 500);
 						}
-						Util.pauseMs(500);				
+						Util.pauseMs(500);
 					} while (mode() != Modes.Quit && System.currentTimeMillis() - now < ENGAGE_TIME);
 					if (sut.isRunning())
 						sut.stop();
@@ -1374,19 +1433,19 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 						System.out.println("Unable to start the SUT after <" + ENGAGE_TIME + "> ms");
 						return tryKillAndStartSystem(mustContain, sut, ENGAGE_TIME);
 					} else
-						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");							
+						throw new SystemStartException("SUT not running after <" + Math.round(ENGAGE_TIME * 2.0) + "> ms!");
 		}
 	}
 
 	private SUT tryKillAndStartSystem(String mustContain, SUT sut, long pendingEngageTime) throws SystemStartException{
 		// kill running SUT processes
-		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc) + ">");
+		System.out.println("Trying to kill potential running SUT: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 		if (SystemProcessHandling.killRunningProcesses(sut, Math.round(pendingEngageTime / 2.0))){ // All killed?
 			// retry start system
-			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc) + ">");
+			System.out.println("Retry SUT start: <" + sut.get(Tags.Desc, "No SUT Desc available") + ">");
 			return startSystem(mustContain, false, pendingEngageTime); // no more try to kill
 		} else // unable to kill SUT
-			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc) + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
+			throw new SystemStartException("Unable to kill SUT <" + sut.get(Tags.Desc, "No SUT Desc available") + "> while trying to rerun it after <" + pendingEngageTime + "> ms!");
 	}
 
 	private SUT getSUTByProcessName(String processName) throws SystemStartException{
@@ -1408,7 +1467,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");	
+		throw new SystemStartException("SUT Process Name not found!: -" + processName + "-");
 	}
 
 	private SUT getSUTByWindowTitle(String windowTitle) throws SystemStartException{
@@ -1438,7 +1497,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 				}
 			}
 		} while (System.currentTimeMillis() - now < MAX_ENGAGE_TIME);
-		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");			
+		throw new SystemStartException("SUT Window Title not found!: -" + windowTitle + "-");
 	}
 
 	protected State getStateByWindowTitle(SUT system) throws StateBuildException{
@@ -1473,7 +1532,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 		CodingManager.buildIDs(state);
 		calculateZIndices(state);
+		
+		setStateForClickFilterLayerProtocol(state);
 
+		if(settings.get(ConfigTags.Mode) == Modes.Spy)
+			return state;
+		
 		Verdict verdict = getVerdict(state);
 		state.set(Tags.OracleVerdict, verdict);
 
@@ -1492,7 +1556,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
 		}
-		setStateForClickFilterLayerProtocol(state);
+		
 		return state;
 	}
 
@@ -1511,7 +1575,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		Assert.notNull(state);
 		//-------------------
 		// ORACLES FOR FREE
-		//-------------------		
+		//-------------------
 
 		// if the SUT is not running, we assume it crashed
 		if(!state.get(IsRunning, false))
@@ -1568,10 +1632,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 */
 	protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException{
 		Assert.notNull(state);
-		Set<Action> actions = new HashSet<Action>();	
-
-		// create an action compiler, which helps us create actions, such as clicks, drag + drop, typing...
-		StdActionCompiler ac = new AnnotatingActionCompiler();
+		Set<Action> actions = new HashSet<Action>();
 
 		// If there is an unwanted process running, we need to kill it.
 		// This is an unwanted process that is defined in the filter.
@@ -1583,7 +1644,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			for(Pair<Long, String> process : state.get(Tags.RunningProcesses, Collections.<Pair<Long,String>>emptyList())){
 				if(process.left().longValue() != system.get(Tags.PID).longValue() &&
 						process.right() != null && process.right().matches(processRE)){ // pid x name
-					//actions.add(ac.killProcessByName(process.right(), 2));
 					this.forceKillProcess = process.right();
 					System.out.println("will kill unwanted process: " + process.left().longValue() + " (SYSTEM <" + system.get(Tags.PID).longValue() + ">)");
 					return actions;
@@ -1595,7 +1655,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// We set this.forceToForeground to true and selectAction will make sure that the next action we will select
 		// is putting the SUT back into the foreground.
 		if(!state.get(Tags.Foreground, true) && system.get(Tags.SystemActivator, null) != null){
-			//actions.add(ac.activateSystem());
 			this.forceToForeground = true;
 			return actions;
 		}
@@ -1625,7 +1684,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
 			Action a = KillProcess.byName(this.forceKillProcess, 0);
 			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceKillProcess = null;
 			return a;
 		}
@@ -1636,7 +1695,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
 			Action a = new ActivateSystem();
 			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceToForeground = false;
 			return a;
 		}
@@ -1647,7 +1706,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
 			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildIDs(state, a);
+			CodingManager.buildEnvironmentActionIDs(state, a);
 			this.forceNextActionESC = false;
 			return a;
 		} else
@@ -1811,7 +1870,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	 * @return
 	 */
 	protected boolean moreActions(State state) {
-		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) && 
+		return (!settings().get(ConfigTags.StopGenerationOnFault) || !faultySequence) &&
 				state.get(Tags.IsRunning, false) && !state.get(Tags.NotResponding, false) &&
 				//actionCount() < settings().get(ConfigTags.SequenceLength) &&
 				actionCount() <= lastSequenceActionNumber &&
@@ -1972,27 +2031,28 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	}
 
 	/**
-	 * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
-	 * @param actions
-	 * @param ac
-	 * @param scrollArrowSize
-	 * @param scrollThick
-	 * @param w
-	 */
-	protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget w, State state){
-		Drag[] drags = null;
-		//If there are scroll (drags/drops) actions possible
-		if((drags = w.scrollDrags(scrollArrowSize,scrollThick)) != null){
-			//For each possible drag, create an action and add it to the derived actions
-			for (Drag drag : drags){
-				//Create a slide action with the Action Compiler, and add it to the set of derived actions
-				actions.add(ac.slideFromTo(
-						new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
-						new AbsolutePosition(Point.from(drag.getToX(),drag.getToY()))
-						));
+     * Adds sliding actions (like scroll, drag and drop) to the given Set of Actions
+     * @param actions
+     * @param ac
+     * @param scrollArrowSize
+     * @param scrollThick
+     * @param widget
+     */
+    protected void addSlidingActions(Set<Action> actions, StdActionCompiler ac, double scrollArrowSize, double scrollThick, Widget widget, State state){
+        Drag[] drags = null;
+        //If there are scroll (drags/drops) actions possible
+        if((drags = widget.scrollDrags(scrollArrowSize,scrollThick)) != null){
+            //For each possible drag, create an action and add it to the derived actions
+            for (Drag drag : drags){
+                //Create a slide action with the Action Compiler, and add it to the set of derived actions
+                actions.add(ac.slideFromTo(
+                        new AbsolutePosition(Point.from(drag.getFromX(),drag.getFromY())),
+                        new AbsolutePosition(Point.from(drag.getToX(),drag.getToY())),
+                        widget
+                ));
 
-			}
-		}
-	}
+            }
+        }
+    }
 
 }

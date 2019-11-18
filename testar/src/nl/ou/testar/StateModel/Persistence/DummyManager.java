@@ -78,4 +78,14 @@ public class DummyManager implements PersistenceManager, StateModelEventListener
     public void persistSequenceStep(SequenceStep sequenceStep) {
 
     }
+
+    @Override
+    public boolean modelIsDeterministic(AbstractStateModel abstractStateModel) {
+        return true;
+    }
+
+    @Override
+    public int getNrOfNondeterministicActions(AbstractStateModel abstractStateModel) {
+        return 0;
+    }
 }

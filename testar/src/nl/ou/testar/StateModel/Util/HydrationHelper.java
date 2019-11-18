@@ -70,6 +70,10 @@ public abstract class HydrationHelper {
      */
     public static String createOrientDbActionId(String sourceId, String targetId, String actionId, String modelIdentifier) {
         // this creates a unique id that is needed for OrientDB storage
+        String id = sourceId + "-" + actionId + "-" + targetId;
+        if (modelIdentifier != null) {
+            id += "-" + modelIdentifier;
+        }
         return lowCollisionID(sourceId + "-" + actionId + "-" + targetId + "-" + modelIdentifier);
     }
 
