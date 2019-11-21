@@ -12,12 +12,15 @@ public class ActionViz {
 
     private int counterTarget;
 
-    public ActionViz(String screenshotSource, String screenshotTarget, String actionDescription, int counterSource, int counterTarget) {
+    private boolean deterministic;
+
+    public ActionViz(String screenshotSource, String screenshotTarget, String actionDescription, int counterSource, int counterTarget, boolean deterministic) {
         this.screenshotSource = screenshotSource;
         this.screenshotTarget = screenshotTarget;
         this.actionDescription = actionDescription;
         this.counterSource = counterSource;
         this.counterTarget = counterTarget;
+        this.deterministic = deterministic;
     }
 
     public String getScreenshotSource() {
@@ -38,5 +41,9 @@ public class ActionViz {
 
     public int getCounterTarget() {
         return counterTarget;
+    }
+
+    public boolean isDeterministic() {
+        return deterministic;
     }
 }

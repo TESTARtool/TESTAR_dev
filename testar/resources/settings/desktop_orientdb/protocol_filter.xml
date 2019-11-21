@@ -16,14 +16,20 @@
 		<filtering type="-134513313" desc="BASIC_WEBURL"/>
 	</filtering_types>
 	<filters>
-		<filter wid="WT1s4u7od142872028083" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="371455964" p.title="2245473" depth="3" children="0"/>
-		<filter wid="WT1k0pzz412734516100" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-1516199012" p.title="966944517" depth="3" children="0"/>
-		<filter wid="WT17v5f48b2887452797" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenu" p.role="UIAWindow" title="-826112051" p.title="-537390531" depth="2" children="7"/>
-		<filter wid="WT1mkt3k3184259406525" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-269421844" p.title="-826112051" depth="3" children="0"/>
-		<filter wid="WT1oq4bl7112817329876" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIATitleBar" title="1479752965" p.title="48" depth="3" children="0"/>
-		<filter wid="WT17v6m4tb671310529" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenu" p.role="UIAWindow" title="494888023" p.title="-537390531" depth="2" children="2"/>
-		<filter wid="WT6wuib191503483681" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-793320914" p.title="-826112051" depth="3" children="0"/>
-		<filter wid="WT1qe89j4f2180189081" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenuBar" title="2245473" p.title="-1072845520" depth="3" children="0"/>
-		<filter wid="WT1wv077z18170180715" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-1018540658" p.title="2245473" depth="3" children="0"/>
+		<filter wid="WT1s4u7od142872028083" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="1456728816" p.title="-1388344913" depth="3" children="0"/>
+		<filter wid="WT1k0pzz412734516100" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="32668182" p.title="2038833147" depth="3" children="0"/>
+		<filter wid="WT17v5f48b2887452797" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenu" p.role="UIAWindow" title="684972393" p.title="212306837" depth="2" children="7"/>
+		<filter wid="WT1p8ipti262045885642" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-172056843" p.title="2791411" depth="3" children="0"/>
+		<filter wid="WTy3ygp1e1031191529" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="916754936" p.title="2791411" depth="3" children="0"/>
+		<filter wid="WT6wuib191503483681" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-797182961" p.title="684972393" depth="3" children="0"/>
+		<filter wid="WT3dz2jl252072595598" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-751407870" p.title="2155050" depth="3" children="0"/>
+		<filter wid="WTts8vz223311468155" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="1079656510" p.title="2189724" depth="3" children="0"/>
+		<filter wid="WT1qejys2f1046425153" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="2791411" p.title="2666181" depth="3" children="0"/>
+		<filter wid="WT1mkt3k3184259406525" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-224596083" p.title="684972393" depth="3" children="0"/>
+		<filter wid="WT1oq4bl7112817329876" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAButton" p.role="UIATitleBar" title="1500907433" p.title="1668" depth="3" children="0"/>
+		<filter wid="WT17v6m4tb671310529" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenu" p.role="UIAWindow" title="1619806536" p.title="212306837" depth="2" children="2"/>
+		<filter wid="WT1g8gep01c2403462414" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="129173731" p.title="2791411" depth="3" children="0"/>
+		<filter wid="WT1qe89j4f2180189081" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenuBar" title="-1388344913" p.title="-1007409279" depth="3" children="0"/>
+		<filter wid="WT1wv077z18170180715" filtering="-2147483648" coding="Abs(R,T)ID" role="UIAMenuItem" p.role="UIAMenu" title="-1930317253" p.title="-1388344913" depth="3" children="0"/>
 	</filters>
 </TESTAR_uifilter>

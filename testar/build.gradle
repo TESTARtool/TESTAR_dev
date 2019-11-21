@@ -21,14 +21,35 @@ sourceSets {
 /**
  * Task to run TESTAR using gradle
  * This task set the working directory to the install folder and runs testar.bat
- * Note this version only works on Windows.
  */
 task runTestar(type: Exec) {
+    // Make sure temp dir exists on case-sensitive OSs
+    doFirst{
+        new File("${project.buildDir}/install/testar/bin/output/temp").mkdirs()
+    }
+
     group = 'custom_testar'
     description ='runTESTAR'
     workingDir 'target/install/testar/bin'
     commandLine 'cmd', '/c', 'testar.bat'
+
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+		environment "JAVA_TOOL_OPTIONS", "-Djava.awt.headless=false"
+		commandLine "./testar"
+	} else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+		commandLine "./testar"
+	} else {
+		commandLine 'cmd', '/c', 'testar.bat'
+	}
 }
+
+/*  There's error on Linux, crashing the JVM on unregistering the NativeHook
+    For now, use the old version, 2.1.1 should fix the issue
+    https://github.com/kwhat/jnativehook/issues/168
+ */
+def jnativehook = System.getProperty("os.name").toLowerCase() == "linux"
+        ? 'com.1stleg:jnativehook:2.0.2'
+        : 'com.1stleg:jnativehook:2.1.0'
 
 task customZipDistribution(type: Zip) {
 	doFirst{
@@ -52,7 +73,8 @@ dependencies {
     compile files('./lib/sikulixapi.jar')
     compile files('./lib/eye2.jar')
     compile files('./lib/gson-2.8.5.jar')
-    compile 'com.1stleg:jnativehook:2.1.0'
+    compile jnativehook
+    compile 'com.google.guava:guava:26.0-jre'
     compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.8.1'
     compile group: 'com.jgoodies', name: 'jgoodies-forms', version: '1.9.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
@@ -101,6 +123,10 @@ task prepareWindowsDLL(type: Copy) {
     from '../windows/target/resources/main'
     into 'target/scripts'
     include 'windows.dll'
+}
+
+applicationDistribution.from("../webdriver/resources/web-extension") {
+    into "web-extension"
 }
 
 prepareOracles.dependsOn(oracleClasses)

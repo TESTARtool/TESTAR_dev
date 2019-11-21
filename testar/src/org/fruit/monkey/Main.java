@@ -44,16 +44,20 @@ import org.fruit.Assert;
 import org.fruit.Pair;
 import org.fruit.UnProc;
 import org.fruit.Util;
+import org.fruit.alayer.State;
 import org.fruit.alayer.Tag;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.cert.CollectionCertStoreParameters;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import org.fruit.alayer.windows.UIATags;
+
+import static java.lang.System.exit;
 import static org.fruit.monkey.ConfigTags.*;
 
 public class Main {
@@ -150,9 +154,9 @@ public class Main {
 			if(!System.getenv("JAVA_HOME").contains("jdk"))
 				System.out.println("JAVA HOME is not properly aiming to the Java Development Kit");
 
-			if(!System.getenv("JAVA_HOME").contains("1.8"))
+			if(!(System.getenv("JAVA_HOME").contains("1.8") || (System.getenv("JAVA_HOME").contains("-8"))))
 				System.out.println("Java version is not JDK 1.8, please install ");
-		}catch(Exception e) {System.out.println("Exception: Something is wrong with ur JAVA_HOME \n"
+		}catch(Exception e) {System.out.println("Exception: Something is wrong with your JAVA_HOME \n"
 				+"Check if JAVA_HOME system variable is correctly defined \n \n"
 				+"GO TO: https://testar.org/faq/ to obtain more details \n \n");}
 
@@ -452,6 +456,7 @@ public class Main {
 			defaults.add(Pair.from(ApplicationName, ""));
 			defaults.add(Pair.from(ApplicationVersion, ""));
 			defaults.add(Pair.from(ActionSelectionAlgorithm, "random"));
+			defaults.add(Pair.from(StateModelStoreWidgets, true));
 			defaults.add(Pair.from(TemporalEnabled, false));
 			defaults.add(Pair.from(TemporalLTLChecker, ""));
 			defaults.add(Pair.from(TemporalLTLCheckerWSL, false));
@@ -681,6 +686,7 @@ public class Main {
 				CodingManager.setCustomTagsForConcreteId(stateManagementTags.toArray(new Tag<?>[0]));
 			}
 		}
+
         // then the attributes for the abstract state id
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
             Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
