@@ -87,7 +87,7 @@ public class TemporalController {
     }
 
     public void dbClose() {
-        if (!db.isClosed())  {db.close();tDBHelper.setDb(db);}
+        if (!db.isClosed())  {db.close();tDBHelper.setDb(db);orientDB.close();}
     }
     public void dbReopen() {
         if (db==null ||db.isClosed()) {
@@ -95,6 +95,7 @@ public class TemporalController {
         }
         tDBHelper.setDb(db);
         db.activateOnCurrentThread();
+
 
     }
     public void ConnectionClose() {
