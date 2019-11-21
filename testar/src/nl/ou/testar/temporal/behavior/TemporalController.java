@@ -294,9 +294,9 @@ public class TemporalController {
         }
     }
 
-    public boolean saveToGraphMLFile(String file) {
+    public boolean saveToGraphMLFile(String file,boolean excludeWidget) {
 
-    return tDBHelper.saveToGraphMLFile(dbConfig.getDatabase(),file);
+    return tDBHelper.saveToGraphMLFile(dbConfig.getDatabase(),file,excludeWidget);
     }
 
     public void saveModelAsJSON(String toFile) {
@@ -400,7 +400,8 @@ public class TemporalController {
 
 
             if (verbose) {
-               saveToGraphMLFile(outputDir + "GraphML.XML");
+               saveToGraphMLFile(outputDir + "GraphML.XML",false);
+               saveToGraphMLFile(outputDir + "GraphML_NoWidgets.XML",true);
                saveModelAsJSON(outputDir + "APEncodedModel.json");
             } else {
                 Files.delete(automatonFile.toPath());

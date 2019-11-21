@@ -495,7 +495,7 @@ public  class TemporalDBHelper {
 
     }
 
-    public boolean saveToGraphMLFile(String graphXMLID,String file) {
+    public boolean saveToGraphMLFile(String graphXMLID,String file,boolean excludeWidget) {
 
 
         //init
@@ -512,7 +512,8 @@ public  class TemporalDBHelper {
         params.put("identifier", abstractStateModel.getModelIdentifier());
         //!!!!!!!!!!!!!!!!!!!!!!get nodes , then get edges. this is required for postprocessing a graphml by python package networkx.
         List<String> stmtlist = new ArrayList<>();
-
+        String excludeWidgets="";
+        if (excludeWidget) excludeWidgets="WHERE NOT(@class= 'Widget' OR @class = 'isChildOf')";  // does not work prereuisite: relation isChildOf is exclusively for widgets !
 
         if (abstractStateModels.size() > 1) {// navigate from abstractstate to be able to apply the filter.
             System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
@@ -524,11 +525,11 @@ public  class TemporalDBHelper {
             // the "both()" in the next stmt is needed to invoke recursion.
             // apparently , the next result set contains first a list of all nodes, then of all edge: good !
             //stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
-            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) ");
+            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) "+excludeWidgets+"   ");
 
         } else {
             stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
-            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) ");
+            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) "+excludeWidgets+"   ");
             //stmtlist.add("SELECT  FROM V ");//  stmtlist.add("SELECT  FROM E ");
         }
 

@@ -364,7 +364,7 @@ private void setupMiner(){
 
 
             logCheckResult.append("\n");
-            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML",false);
             logCheckResult.append(" saving to  graphml file done with result:"+res+"\n");
 
             logCheckResult.append("\n");

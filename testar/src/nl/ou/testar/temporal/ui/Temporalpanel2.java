@@ -868,7 +868,9 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             textArea12.append("connecting to: db\n");
             tcontrol.dbReopen();
             textArea12.repaint();
-            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML");
+            boolean res = tcontrol.saveToGraphMLFile(outputDir + "GraphML.XML",false);
+            res = tcontrol.saveToGraphMLFile(outputDir + "GraphML_NoWidgets.XML",true);
+
             textArea12.append(" saving to  graphml file done with result:" + res + "\n\n");
             tcontrol.dbClose();
         } catch (Exception e) {
