@@ -353,15 +353,16 @@ public class TemporalController {
         try {
 
             loadApSelectorManager(ApFile);
-            String APCopy = "Copy_of_" + Paths.get(ApFile).getFileName().toString();
-            String OracleCopy = "Copy_of_" + Paths.get(oracleFile).getFileName().toString();
+            String strippedFile;
+            String APCopy =  "copy_"+Paths.get(ApFile).getFileName().toString();
+            String OracleCopy = "copy_"+ Paths.get(oracleFile).getFileName().toString();
             if (verbose) {
                 Files.copy((new File(ApFile).toPath()),
                         new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Files.copy((new File(oracleFile).toPath()),
                         new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-            String strippedFile;
+
             String filename = Paths.get(oracleFile).getFileName().toString();
             if (filename.contains(".")) strippedFile = filename.substring(0, filename.lastIndexOf("."));
             else strippedFile = filename;
@@ -377,7 +378,7 @@ public class TemporalController {
             List<TemporalOracle> fromcoll;
             fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
             if (fromcoll == null) {
-                System.err.println("verify the file at location '" + oracleFile + "'");
+                System.err.println("Error: verify the file at location '" + oracleFile + "'");
             } else {
                setOracleColl(fromcoll);
                saveFormulaFiles(fromcoll, formulaFile);
