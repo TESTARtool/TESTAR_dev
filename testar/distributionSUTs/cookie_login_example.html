@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Cookie overlay And Login example</title>
+    <style>
+        #overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .vertical-center {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .overlay-button {
+            background-color: #82B541;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            font-size: 14px;
+            width: 200px;
+            margin-left: -72px;
+            cursor: pointer;
+            padding: 14px 19px 14px 19px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="overlay">
+        <div class="vertical-center">
+            <center>
+                    <span id="closeButton" class="overlay-button">
+                        Close Overlay
+                    </span>
+            </center>
+        </div>
+    </div>
+
+    <center>
+        <div id="login">
+            <table bgcolor="white" cellpadding="12" border="1">
+                <tr>
+                    <td colspan="2">
+                        <center>
+                            <h1><b>Login</b></h1>
+                        </center>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h1><b>Username:</b></h1>
+                    </td>
+                    <td>
+                        <input id="username" type="text" placeholder="username">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h1><b>Password:</b></h1>
+                    </td>
+                    <td>
+                        <input id="password" type="password" placeholder="password">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <center>
+                            <input type="submit" value="Login" onclick="authenticate();">
+                        </center>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </center>
+
+    <script>
+        function authenticate() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            if (username === "ou_user" && password === "ou_pass") {
+                window.location.href = "http://www.ou.nl";
+            } else {
+                alert("Sorry, username and password are incorrect - please try again.")
+            }
+        }
+
+        function overlayOff() {
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        document.addEventListener("click", function (evnt) {
+            if (evnt.target.id === "closeButton") {
+                overlayOff();
+            }
+        });
+    </script>
+</body>
+</html>
