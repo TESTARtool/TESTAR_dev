@@ -42,6 +42,7 @@ import org.fruit.alayer.Tags;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.windows.UIATags;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +85,7 @@ public class JsonUtils {
 //				System.out.println("Tag:"+tag.toString()+"="+widget.get(tag));
 //			}
         }
+
 //        System.out.println("Widget size="+widgetJsonObjects.size());
         String screenshotPath = state.get(Tags.ScreenshotPath);
 //        System.out.println("ScreenshotPath="+screenshotPath);
@@ -91,6 +93,7 @@ public class JsonUtils {
 //        System.out.println("JSON:"+ gson.toJson(screenshotWidgetJsonObject));
         String filePath = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".json";
 //        System.out.println("FilePath="+filePath);
+
         try{
             FileWriter fileWriter = new FileWriter(filePath);
             gson.toJson(screenshotWidgetJsonObject, fileWriter);
@@ -99,5 +102,27 @@ public class JsonUtils {
         }catch(Exception e){
             System.out.println("ERROR: Writing JSON into file failed!");
         }
+
+        String csvFileName = screenshotPath.substring(0, screenshotPath.lastIndexOf("."))+".csv";
+
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName, true));
+            for(Widget widget:state){
+                Rect rect = (Rect) widget.get(Tags.Shape, null);
+                int upperLeftCornerX = (int) (rect.x()-sutRect.x());
+                int upperLeftCornerY = (int) (rect.y()-sutRect.y());
+                int lowerRightCornerX = (int) (rect.x()-sutRect.x()+rect.width());
+                int lowerRightCornerY = (int) (rect.y()-sutRect.y()+rect.height());
+                String title= widget.get(Tags.Title, "");
+                if(title.length()>0){
+                    // ignoring widgets that have no title:
+                    writer.append(upperLeftCornerX +","+upperLeftCornerY +","+lowerRightCornerX +","+lowerRightCornerY +","+title +"\n");
+                }
+            }
+            writer.close();
+        }catch(Exception e){
+            System.out.println("ERROR: Writing into CSV file failed!");
+        }
+
     }
 }
