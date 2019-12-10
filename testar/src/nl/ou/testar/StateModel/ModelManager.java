@@ -158,7 +158,7 @@ public class ModelManager implements StateModelManager {
         // check if non-determinism was introduced into the model
         // first the new way:
         System.out.println("Model check - deterministic: " + abstractStateModel.isDeterministic());
-        if (abstractStateModel.isDeterministic()) {
+        if (!abstractStateModel.isDeterministic()) {
             System.out.println("Model check - nr of non-deterministic actions: " + abstractStateModel.getNrOfNonDeterministicActions());
         }
 
