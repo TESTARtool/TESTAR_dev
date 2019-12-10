@@ -6,6 +6,7 @@ import org.fruit.alayer.Tag;
 import org.fruit.alayer.TaggableBase;
 
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.zip.CRC32;
 
 public abstract class HydrationHelper {
@@ -70,11 +71,12 @@ public abstract class HydrationHelper {
      */
     public static String createOrientDbActionId(String sourceId, String targetId, String actionId, String modelIdentifier) {
         // this creates a unique id that is needed for OrientDB storage
-        String id = sourceId + "-" + actionId + "-" + targetId;
-        if (modelIdentifier != null) {
-            id += "-" + modelIdentifier;
-        }
-        return lowCollisionID(sourceId + "-" + actionId + "-" + targetId + "-" + modelIdentifier);
+        StringJoiner joiner = new StringJoiner("-");
+        joiner.add(sourceId);
+        joiner.add(actionId);
+        joiner.add(targetId);
+        joiner.add(modelIdentifier);
+        return lowCollisionID(joiner.toString());
     }
 
 }

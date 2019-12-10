@@ -8,10 +8,8 @@ import nl.ou.testar.StateModel.Exception.StateModelException;
 import nl.ou.testar.StateModel.Exception.StateNotFoundException;
 import org.fruit.alayer.Tag;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AbstractStateModel {
 
@@ -300,5 +298,24 @@ public class AbstractStateModel {
      */
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+
+    /**
+     * This method will return true if the model is deterministic
+     * @return
+     */
+    public boolean isDeterministic() {
+        // we group all the transitions by source and action id and then see if the combination occurs more than once.
+        Map<String, List<AbstractStateTransition>> transitions = stateTransitions.stream().collect(Collectors.groupingBy(abstractStateTransition-> abstractStateTransition.getSourceStateId() + abstractStateTransition.getActionId()));
+        return transitions.keySet().stream().map(key -> transitions.get(key).size() == 1).reduce(true, (base, next) -> base && next);
+    }
+
+    /**
+     * If the model is non-deterministic, this will return the number of non-deterministic actions.
+     * @return
+     */
+    public int getNrOfNonDeterministicActions() {
+        Map<String, List<AbstractStateTransition>> transitions = stateTransitions.stream().collect(Collectors.groupingBy(abstractStateTransition-> abstractStateTransition.getSourceStateId() + abstractStateTransition.getActionId()));
+        return transitions.keySet().stream().map(key -> transitions.get(key).size()).filter(size -> size > 1).reduce(0, Integer::sum);
     }
 }
