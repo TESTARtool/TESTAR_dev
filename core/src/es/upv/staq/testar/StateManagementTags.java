@@ -309,6 +309,7 @@ public class StateManagementTags {
             add(WidgetSetPosition);
             add(WidgetSetSize);
             add(WidgetRotation);
+            add(WidgetZIndex);
 
             // patterns
             add(WidgetAnnotationPattern);
