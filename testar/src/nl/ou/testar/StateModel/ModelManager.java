@@ -208,6 +208,39 @@ public class ModelManager implements StateModelManager {
             errorMessages = new StringJoiner(", ");
         }
     }
+    
+    /**
+     * This method should be called when an action it was Recorded by Users.
+     * @param action
+     */
+    @Override
+    public void notifyRecordedAction(Action action) {
+        try {
+            actionUnderExecution = currentAbstractState.getAction(action.get(Tags.AbstractIDCustom));
+        }
+        catch (ActionNotFoundException ex) {
+            System.out.println("Action not found in state model");
+            errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
+            actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
+            System.out.println("User Interest SET to 1, first time we execute this Action");
+            actionUnderExecution.setUserInterest(1);
+            currentAbstractState.addNewAction(actionUnderExecution);
+        }
+        concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
+        actionUnderExecution.addConcreteActionId(concreteActionUnderExecution.getActionId());
+        actionUnderExecution.increaseUserInterest();
+        System.out.println("Executing action: " + action.get(Tags.Desc));
+        System.out.println("NEW User Interest is: " + actionUnderExecution.getUserInterest());
+        System.out.println("----------------------------------");
+        
+        persistenceManager.updateAbstractAction(actionUnderExecution);
+
+        // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
+        if (errorMessages.length() > 0) {
+            sequenceManager.notifyErrorInCurrentState(errorMessages.toString());
+            errorMessages = new StringJoiner(", ");
+        }
+    }
 
     @Override
     public void notifyTestingEnded() {

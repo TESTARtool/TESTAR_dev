@@ -1118,8 +1118,11 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 				CodingManager.buildIDs(state, actionStatus.getAction());
 
-				//notify the state model manager of the executed action
-				stateModelManager.notifyActionExecution(actionStatus.getAction());
+				if(actionStatus.getAction().get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildEnvironmentActionIDs(state, actionStatus.getAction());
+				
+				//notify the state model manager of the Recorded action
+				stateModelManager.notifyRecordedAction(actionStatus.getAction());
 
 				saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
 				lastExecutedAction = actionStatus.getAction();
@@ -1984,8 +1987,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	protected void waitUserActionLoop(Canvas cv, SUT system, State state, ActionStatus actionStatus){
 		while (mode() == Modes.Record && !actionStatus.isUserEventAction()){
 			if (userEvent != null){
-				actionStatus.setAction(mapUserEvent(state));
-				actionStatus.setUserEventAction((actionStatus.getAction() != null));
+				Action mapAction = mapUserEvent(state);
+				//Only set the Action if was found on widget tree map
+				if(mapAction != null) {
+					actionStatus.setAction(mapAction);
+					actionStatus.setUserEventAction((actionStatus.getAction() != null));
+				}
 				userEvent = null;
 			}
 			synchronized(this){
