@@ -3,6 +3,7 @@ package nl.ou.testar.StateModel;
 import org.fruit.alayer.Action;
 import org.fruit.alayer.State;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class DummyModelManager implements StateModelManager{
@@ -32,6 +33,11 @@ public class DummyModelManager implements StateModelManager{
         return null;
     }
 
+	@Override
+	public Set<Action> getInterestingActions(Set<Action> actions) {
+		return Collections.<Action>emptySet();
+	}
+    
     @Override
     public void notifyTestSequencedStarted() {
 

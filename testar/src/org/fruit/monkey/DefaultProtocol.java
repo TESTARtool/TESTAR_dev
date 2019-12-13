@@ -118,6 +118,8 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.slf4j.LoggerFactory;
 import org.testar.OutputStructure;
 
+import com.google.common.collect.Sets;
+
 public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	public static boolean faultySequence;
@@ -1116,8 +1118,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
 
-				CodingManager.buildIDs(state, actionStatus.getAction());
+				//This should create the AbstractIDCustom in the same way that Generate mode
+				CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
 
+				//This build the Id in a different way, maybe not the best option
 				if(actionStatus.getAction().get(Tags.AbstractIDCustom, null) == null)
 					CodingManager.buildEnvironmentActionIDs(state, actionStatus.getAction());
 				

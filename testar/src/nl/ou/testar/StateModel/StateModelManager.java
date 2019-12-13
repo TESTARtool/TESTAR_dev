@@ -15,6 +15,8 @@ public interface StateModelManager {
     void notifyTestingEnded();
 
     Action getAbstractActionToExecute(Set<Action> actions);
+    
+    Set<Action> getInterestingActions(Set<Action> actions);
 
     void notifyTestSequencedStarted();
 

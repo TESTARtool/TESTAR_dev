@@ -222,8 +222,6 @@ public class ModelManager implements StateModelManager {
             System.out.println("Action not found in state model");
             errorMessages.add("Action with id: " + action.get(Tags.AbstractIDCustom) + " was not found in the model.");
             actionUnderExecution = new AbstractAction(action.get(Tags.AbstractIDCustom));
-            System.out.println("User Interest SET to 1, first time we execute this Action");
-            actionUnderExecution.setUserInterest(1);
             currentAbstractState.addNewAction(actionUnderExecution);
         }
         concreteActionUnderExecution = ConcreteActionFactory.createConcreteAction(action, actionUnderExecution);
@@ -277,6 +275,42 @@ public class ModelManager implements StateModelManager {
             System.out.println("Could not find an action to execute for abstract state id : " + currentAbstractState.getStateId());
         }
         return null;
+    }
+   
+    /**
+     * This method obtains the existing derived actions of the surface
+     * to compare them with those in the model and see if any is interesting
+     * @return Collection of interesting actions
+     */
+    @Override
+    public Set<Action> getInterestingActions(Set<Action> actions) {
+
+    	HashMap<String, Action> surfaceActions = new HashMap<>();
+    	actions.forEach(a -> surfaceActions.put(a.get(Tags.ConcreteID), a));
+    	
+    	Set<Action> interestingActions = new HashSet<>();
+
+    	if (currentAbstractState == null) {
+    		return Collections.<Action>emptySet();
+    	}
+    	try {
+    		
+    		for (AbstractAction modelAbstractAction : currentAbstractState.getActions()) {
+    			if(modelAbstractAction.getUserInterest()>0) {
+    				for(String modelConcreteId : modelAbstractAction.getConcreteActionIds()) {
+    					if(surfaceActions.containsKey(modelConcreteId)) {
+    						Action ia = surfaceActions.get(modelConcreteId);
+    						ia.set(Tags.UserInterest, modelAbstractAction.getUserInterest());
+    						interestingActions.add(ia);
+    					}	
+    				}
+    			}
+    		}
+    	}catch(Exception e){
+    		System.out.println("ERROR obtaining interesting Actions from the State Model");
+    	}
+
+    	return interestingActions;
     }
 
     @Override
