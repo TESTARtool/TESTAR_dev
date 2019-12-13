@@ -818,9 +818,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Deriving actions from the state:
 			Set<Action> actions = deriveActions(system, state);
 			CodingManager.buildIDs(state, actions);
-			for(Action a : actions)
-				if(a.get(Tags.AbstractIDCustom, null) == null)
-					CodingManager.buildEnvironmentActionIDs(state, a);
 			
 			// notify to state model the current state
 			stateModelManager.notifyNewStateReached(state, actions);
@@ -869,9 +866,6 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		// notify to state model the last state
 		Set<Action> actions = deriveActions(system, state);
 		CodingManager.buildIDs(state, actions);
-		for(Action a : actions)
-			if(a.get(Tags.AbstractIDCustom, null) == null)
-				CodingManager.buildEnvironmentActionIDs(state, a);
 		
 		stateModelManager.notifyNewStateReached(state, actions);
 
@@ -1118,18 +1112,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			//Save the user action information into the logs
 			if (actionStatus.isUserEventAction()) {
 
-				//This should create the AbstractIDCustom in the same way that Generate mode
-				CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
-
-				//This build the Id in a different way, maybe not the best option
-				if(actionStatus.getAction().get(Tags.AbstractIDCustom, null) == null)
-					CodingManager.buildEnvironmentActionIDs(state, actionStatus.getAction());
+				Action recordedAction = actionStatus.getAction();
+				
+				// Search MapEventUser action on previous builded actions (To match AbstractIDCustom)
+				for(Action a : actions)
+					if(a.get(Tags.Desc, "Nothing").equals(actionStatus.getAction().get(Tags.Desc, "None")))
+						recordedAction = a;
+				
+				// If something went wrong trying to find the action, we need to create the AbstractIDCustom
+				if(recordedAction.get(Tags.AbstractIDCustom, null) == null)
+					CodingManager.buildIDs(state, Sets.newHashSet(actionStatus.getAction()));
 				
 				//notify the state model manager of the Recorded action
-				stateModelManager.notifyRecordedAction(actionStatus.getAction());
+				stateModelManager.notifyRecordedAction(recordedAction);
 
-				saveActionInfoInLogs(state, actionStatus.getAction(), "RecordedAction");
-				lastExecutedAction = actionStatus.getAction();
+				saveActionInfoInLogs(state, recordedAction, "RecordedAction");
+				lastExecutedAction = recordedAction;
 				actionCount++;
 			}
 
@@ -1689,22 +1687,22 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		if (this.forceKillProcess != null){
 			System.out.println("DEBUG: preActionSelection, forceKillProcess="+forceKillProcess);
 			LogSerialiser.log("Forcing kill-process <" + this.forceKillProcess + "> action\n", LogSerialiser.LogLevel.Info);
-			Action a = KillProcess.byName(this.forceKillProcess, 0);
-			a.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionKillProcess = KillProcess.byName(this.forceKillProcess, 0);
+			actionKillProcess.set(Tags.Desc, "Kill Process with name '" + this.forceKillProcess + "'");
+			CodingManager.buildEnvironmentActionIDs(state, actionKillProcess);
 			this.forceKillProcess = null;
-			return a;
+			return actionKillProcess;
 		}
 		//If deriveActions indicated that the SUT should be put back in the foreground
 		//Then here we will select the action to do that
 
 		else if (this.forceToForeground){
 			LogSerialiser.log("Forcing SUT activation (bring to foreground) action\n", LogSerialiser.LogLevel.Info);
-			Action a = new ActivateSystem();
-			a.set(Tags.Desc, "Bring the system to the foreground.");
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionActivateSystem = new ActivateSystem();
+			actionActivateSystem.set(Tags.Desc, "Bring the system to the foreground.");
+			CodingManager.buildEnvironmentActionIDs(state, actionActivateSystem);
 			this.forceToForeground = false;
-			return a;
+			return actionActivateSystem;
 		}
 
 		//TODO: This seems not to be used yet...
@@ -1712,10 +1710,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		else if (this.forceNextActionESC){
 			System.out.println("DEBUG: Forcing ESC action in preActionSelection");
 			LogSerialiser.log("Forcing ESC action\n", LogSerialiser.LogLevel.Info);
-			Action a = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
-			CodingManager.buildEnvironmentActionIDs(state, a);
+			Action actionEscape = new AnnotatingActionCompiler().hitKey(KBKeys.VK_ESCAPE);
+			CodingManager.buildEnvironmentActionIDs(state, actionEscape);
 			this.forceNextActionESC = false;
-			return a;
+			return actionEscape;
 		} else
 			return null;
 	}
@@ -1963,6 +1961,10 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 					return (new AnnotatingActionCompiler()).rightClickAt(w,x,y);
 			} catch (WidgetNotFoundException we){
 				System.out.println("Mapping user event ... widget not found @(" + x + "," + y + ")");
+				
+				//TODO: Here we have to update the current abstract state,
+				//because map fail and the State Model is not synchronized with the SUT
+				
 				return null;
 			}
 		} else if (userEvent[0] instanceof KBKeys) // key events

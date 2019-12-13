@@ -230,8 +230,6 @@ public class ModelManager implements StateModelManager {
         System.out.println("Executing action: " + action.get(Tags.Desc));
         System.out.println("NEW User Interest is: " + actionUnderExecution.getUserInterest());
         System.out.println("----------------------------------");
-        
-        persistenceManager.updateAbstractAction(actionUnderExecution);
 
         // if we have error messages, we tell the sequence manager about it now, right before we move to a new state
         if (errorMessages.length() > 0) {
@@ -286,7 +284,8 @@ public class ModelManager implements StateModelManager {
     public Set<Action> getInterestingActions(Set<Action> actions) {
 
     	HashMap<String, Action> surfaceActions = new HashMap<>();
-    	actions.forEach(a -> surfaceActions.put(a.get(Tags.ConcreteID), a));
+    	actions.forEach(a -> surfaceActions.put(a.get(Tags.AbstractIDCustom), a));
+    	//actions.forEach(a -> surfaceActions.put(a.get(Tags.ConcreteID), a));
     	
     	Set<Action> interestingActions = new HashSet<>();
 
@@ -296,6 +295,14 @@ public class ModelManager implements StateModelManager {
     	try {
     		
     		for (AbstractAction modelAbstractAction : currentAbstractState.getActions()) {
+    			if(modelAbstractAction.getUserInterest()>0 && surfaceActions.containsKey(modelAbstractAction.getActionId())) {
+    				Action ia = surfaceActions.get(modelAbstractAction.getActionId());
+    				ia.set(Tags.UserInterest, modelAbstractAction.getUserInterest());
+    				interestingActions.add(ia);
+    			}
+    		}
+    		
+    		/*for (AbstractAction modelAbstractAction : currentAbstractState.getActions()) {
     			if(modelAbstractAction.getUserInterest()>0) {
     				for(String modelConcreteId : modelAbstractAction.getConcreteActionIds()) {
     					if(surfaceActions.containsKey(modelConcreteId)) {
@@ -305,7 +312,8 @@ public class ModelManager implements StateModelManager {
     					}	
     				}
     			}
-    		}
+    		}*/
+    		
     	}catch(Exception e){
     		System.out.println("ERROR obtaining interesting Actions from the State Model");
     	}

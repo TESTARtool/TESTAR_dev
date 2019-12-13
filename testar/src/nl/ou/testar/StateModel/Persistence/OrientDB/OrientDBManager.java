@@ -367,6 +367,10 @@ public class OrientDBManager implements PersistenceManager, StateModelEventListe
             //@todo add some meaningful logging here as well
         }
         entityManager.saveEntity(actionEntity);
+        
+        //Update the User Interest for recorded actions
+        if(abstractStateTransition.getAction().getUserInterest() > 0)
+        	updateAbstractAction(abstractStateTransition.getAction());
     }
 
     @Override

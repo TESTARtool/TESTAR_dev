@@ -56,28 +56,6 @@ public class Protocol_desktop_listening_reward extends DesktopProtocol {
 
 	private double userInterestReward = 2.5;
 	
-    /**
-     * This method is used by TESTAR to determine the set of currently available actions.
-     * You can use the SUT's current state, analyze the widgets and their properties to create
-     * a set of sensible actions, such as: "Click every Button which is enabled" etc.
-     * The return value is supposed to be non-null. If the returned set is empty, TESTAR
-     * will stop generation of the current action and continue with the next one.
-     * @param system the SUT
-     * @param state the SUT's current state
-     * @return  a set of actions
-     */
-    @Override
-    protected Set<Action> deriveActions(SUT system, State state) throws ActionBuildException {
-
-    	Set<Action> actions = super.deriveActions(system,state);
-
-    	//TESTAR will save interesting user actions in the State Model 
-    	//without checking if these contains top level widgets or not
-    	actions = deriveClickTypeScrollActionsFromAllWidgetsOfState(actions, system, state);
-
-        return actions;
-    }
-	
 	/**
 	 * Select one of the available actions (e.g. at random)
 	 * @param state the SUT's current state
