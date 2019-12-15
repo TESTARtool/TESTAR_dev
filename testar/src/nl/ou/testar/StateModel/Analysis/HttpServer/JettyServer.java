@@ -38,6 +38,7 @@ public class JettyServer {
         webAppContext.setResourceBase(resourceBase);
         webAppContext.addServlet(new ServletHolder(new StateModelServlet()), "/models");
         webAppContext.addServlet(new ServletHolder(new GraphServlet()), "/graph");
+        webAppContext.addServlet(new ServletHolder(new FileServlet()), "/fetch-screenshot");
         webAppContext.setAttribute("analysisManager", analysisManager);
 
         Configuration.ClassList classlist = Configuration.ClassList

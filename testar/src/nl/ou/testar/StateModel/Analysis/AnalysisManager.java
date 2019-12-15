@@ -124,6 +124,7 @@ public class AnalysisManager {
         return abstractStateModels;
     }
 
+
     /**
      * This method fetches the test sequences for a given abstract state model.
      * @param modelIdentifier
@@ -216,6 +217,34 @@ public class AnalysisManager {
         resultSet.close();
         return sequenceList;
     }
+
+    public List<byte[]> fetchScreenShots(String abstractStateUid) {
+        startUp();
+        List<byte[]> results = new ArrayList<>();
+        try (ODatabaseSession db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword())) {
+            String query = "select from (traverse in('isAbstractedBy') from (select from abstractstate where uid = :uid)) where @class = 'ConcreteState'";
+            Map<String, Object> params = new HashMap<>();
+            params.put("uid", abstractStateUid);
+            OResultSet resultSet = db.query(query, params);
+
+            if (!resultSet.hasNext()) {
+                checkShutDown();
+                return results; // return the empty list
+            }
+
+            while (resultSet.hasNext()) {
+                OResult result = resultSet.next();
+                if (result.isVertex()) {
+                    OVertex vertex = result.getVertex().get();
+                    results.add(((ORecordBytes)vertex.getProperty("screenshot")).toStream());
+                }
+            }
+        }
+        checkShutDown();
+        return results;
+    }
+
+
 
     /**
      * This method fetches a single test sequence.
@@ -735,4 +764,5 @@ public class AnalysisManager {
         }
         return filename;
     }
+
 }

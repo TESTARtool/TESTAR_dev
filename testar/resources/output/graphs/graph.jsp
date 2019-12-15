@@ -512,6 +512,19 @@
         });
         contentPanelHeader.appendChild(closeButton);
 
+        // we provide a button to fetch all the screenshots for abstract state
+        if (targetNode.hasClass("AbstractState")) {
+            let fetchScreenshotButton = document.createElement("button");
+            fetchScreenshotButton.id = "fetch-screenshot";
+            fetchScreenshotButton.classList.add("skip");
+            fetchScreenshotButton.appendChild(document.createTextNode("Screenshots"));
+            fetchScreenshotButton.addEventListener("click", function () {
+                window.open("fetch-screenshot?uid=" + targetNode.data("uid"));
+            });
+
+            contentPanelHeader.appendChild(fetchScreenshotButton);
+        }
+
         // for concrete states we provide a button to retrieve the widget tree
         if (targetNode.hasClass("ConcreteState")) {
             let form = document.createElement("form");
