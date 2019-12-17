@@ -94,6 +94,7 @@ public class StateModelPanel extends JPanel {
     private JDialog analysisDialog;
     private JButton exportDBbutton = new JButton("Export DB");
     private JButton importDBbutton = new JButton("Import DB");
+    private JButton artefactStateModel = new JButton("Artefact");
     private Tag<?>[] allStateManagementTags;
     private Tag<?>[] selectedStateManagementTags;
 
@@ -138,6 +139,7 @@ public class StateModelPanel extends JPanel {
         components.add(stateModelWidgetStoreChkBox);
         components.add(exportDBbutton);
         components.add(importDBbutton);
+        components.add(artefactStateModel);
 
         // add the components to the panel
         setLayout(null);
@@ -273,6 +275,17 @@ public class StateModelPanel extends JPanel {
             }
         });
         add(importDBbutton);
+        
+        artefactStateModel.setBounds(500, 320, 75, 27);
+        artefactStateModel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	ArtifactStateModelDialog artefactDialog = new ArtifactStateModelDialog(
+            			dataStoreTypeBox.getSelectedItem().toString(), dataStoreServerTextfield.getText());
+            	artefactDialog.setVisible(true);
+            }
+        });
+        add(artefactStateModel);
 
     }
 
