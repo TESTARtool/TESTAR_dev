@@ -29,10 +29,16 @@
 *******************************************************************************************************/
 
 import nl.ou.testar.ScreenshotJsonFile.JsonUtils;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.fruit.alayer.*;
 import org.fruit.alayer.exceptions.*;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.RuntimeControlsProtocol.Modes;
+import org.testar.OutputStructure;
+import org.testar.json.object.JsonArtefactTestResults;
 import org.testar.protocols.DesktopProtocol;
 
 /**
@@ -43,6 +49,11 @@ import org.testar.protocols.DesktopProtocol;
  */
 public class Protocol_desktop_generic_json extends DesktopProtocol {
 
+	Set<String> sequencesOutputDir = new HashSet<>();
+	Set<String> htmlOutputDir = new HashSet<>();
+	Set<String> logsOutputDir = new HashSet<>();
+	Set<String> sequencesVerdicts = new HashSet<>();
+	
 	/**
 	 * This method is called when the TESTAR requests the state of the SUT.
 	 * Here you can add additional information to the SUT's state or write your
@@ -62,5 +73,27 @@ public class Protocol_desktop_generic_json extends DesktopProtocol {
 		
 		return state;
 	}
+	
+	/**
+	 * This methods is called after each test sequence, allowing for example using external profiling software on the SUT
+	 *
+	 * super.postSequenceProcessing() is adding test verdict into the HTML sequence report
+	 */
+	@Override
+	protected void postSequenceProcessing() {
+		super.postSequenceProcessing();
+		sequencesOutputDir.add(getGeneratedSequenceName());
+		logsOutputDir.add(getGeneratedLogName());
+		htmlOutputDir.add(htmlReport.getGeneratedHTMLName());
+		sequencesVerdicts.add(verdictInfo);
+	}
 
+	/**
+	 *  This methods is called after finishing the last sequence
+	 */
+	@Override
+	protected void closeTestSession() {
+		JsonArtefactTestResults.createTestResultsArtefact(settings, sequencesOutputDir,
+				logsOutputDir, htmlOutputDir, sequencesVerdicts);
+	}
 }

@@ -136,6 +136,12 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 	public String getGeneratedSequenceName() {
 		return generatedSequence;
 	}
+	
+	private String generatedLog;
+
+	public String getGeneratedLogName() {
+		return generatedLog;
+	}
 
 	private File currentSeq;
 
@@ -505,6 +511,7 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		String logFileName = OutputStructure.logsOutputDir
 				+ File.separator + OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir + ".log";
+		generatedLog = logFileName;
 
 		String screenshotsDirectory = OutputStructure.startInnerLoopDateString + "_"
 				+ OutputStructure.executedSUTname + sequenceCountDir;

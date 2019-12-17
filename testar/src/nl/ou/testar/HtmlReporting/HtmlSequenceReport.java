@@ -46,6 +46,12 @@ public class HtmlSequenceReport {
 
     private boolean firstStateAdded = false;
     private boolean firstActionsAdded = false;
+    
+    private String generatedHtml;
+    
+    public String getGeneratedHTMLName() {
+		return generatedHtml;
+	}
 
     private static final String[] HEADER = new String[] {
             "<!DOCTYPE html>",
@@ -69,6 +75,8 @@ public class HtmlSequenceReport {
             String filename = OutputStructure.htmlOutputDir + File.separator + OutputStructure.startInnerLoopDateString+"_"
             		+ OutputStructure.executedSUTname + REPORT_FILENAME_MID + OutputStructure.sequenceInnerLoopCount
             		+ REPORT_FILENAME_AFT;
+            
+            generatedHtml = filename;
             
             out = new PrintWriter(filename, HTMLReporter.CHARSET);
             for(String s:HEADER){
