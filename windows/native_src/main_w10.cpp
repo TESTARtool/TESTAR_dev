@@ -134,6 +134,11 @@ JNI_SIG(jlong, WINAPI_NS(GetForegroundWindow)) (JNIEnv * env, jclass cl) {
 	return (jlong)GetForegroundWindow();
 }
 
+/* SetForegroundWindow */
+JNI_SIG(jboolean, WINAPI_NS(SetForegroundWindow)) (JNIEnv * env, jclass cl, jlong hwnd) {
+	return SetForegroundWindow((HWND)hwnd);
+}
+
 /* WindowFromPoint */
 JNI_SIG(jint, WINAPI_NS(WindowFromPoint))(JNIEnv * env, jclass cl, jint x, jint y){
 	POINT p;

@@ -19,14 +19,34 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
     private LinkedList<AbstractAction> executionPath;
 
     /**
+     * The maximum nr of times that the flow can be altered.
+     */
+    private final int MAX_FLOW_ALTERATIONS = 1;
+
+    /**
+     * The number of times that the flow was altered.
+     */
+    private int nrOfFlowAlterations;
+
+    /**
      * Constructor
      */
     ImprovedUnvisitedActionSelector() {
         executionPath = new LinkedList<>();
+        nrOfFlowAlterations = 0;
     }
 
     @Override
     public AbstractAction selectAction(AbstractState currentState, AbstractStateModel abstractStateModel) throws ActionNotFoundException {
+        // if the flow was altered, this could be because of non-determinism in the model
+        // when that is the case, this action selector is not really useful anymore, because it can get stuck in a loop
+        // there are several smart ways to fix this, but we opt for an easy one for now:
+        // we throw an exception, so the random action selection algorithm can take over
+        if (nrOfFlowAlterations >= MAX_FLOW_ALTERATIONS) {
+            System.out.println("Too many alterations in the flow. Throwing exception.");
+            throw new ActionNotFoundException();
+        }
+
         // check if we currently have an active execution path that we are on
         if (!executionPath.isEmpty()) {
             // check if the first action is available in the current state
@@ -38,6 +58,7 @@ public class ImprovedUnvisitedActionSelector implements ActionSelector {
 
             // something went wrong, output a message
             System.out.println("Action selection expected to be able to return action with id: " + nextInLine.getActionId() + " , but the flow was altered");
+            nrOfFlowAlterations++;
             executionPath = new LinkedList<>();
         }
 

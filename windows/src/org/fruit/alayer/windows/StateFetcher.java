@@ -367,7 +367,10 @@ public class StateFetcher implements Callable<UIAState>{
 					if (patternPropertyTag.equals(UIATags.UIAValueValue)) {
 						// this property for some reason cannot be retrieved using the getCurrentPropertyValue method
 						// that is why we use the value that was directly received
-						uiaElement.set(UIATags.UIAValueValue, uiaElement.valuePattern);
+						if(uiaElement.valuePattern != null)
+							uiaElement.set(UIATags.UIAValueValue, uiaElement.valuePattern);
+						else
+							uiaElement.set(UIATags.UIAValueValue, "");
 					}
 					Object propertyObject = Windows.IUIAutomationElement_GetCurrentPropertyValue(uiaCachePointer, UIAMapping.getPatternPropertyIdentifier(patternPropertyTag), true);
 					if (propertyObject != null) {

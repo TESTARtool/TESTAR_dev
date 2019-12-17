@@ -43,6 +43,7 @@ public final class ActionRoles {
 	Action = Role.from("Action"),
 	MouseAction = Role.from("MouseAction", Action),
 	KeyboardAction = Role.from("KeyboardAction", Action),
+	CompoundAction = Role.from("CompoundAction", Action),
 	MouseMove = Role.from("MouseMove", MouseAction),
 	MouseDown = Role.from("MouseDown", MouseAction),
 	KeyDown = Role.from("KeyDown", KeyboardAction),

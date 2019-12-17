@@ -42,7 +42,10 @@ import org.fruit.alayer.State;
 import org.fruit.alayer.Verdict;
 import org.fruit.alayer.Widget;
 import org.fruit.alayer.actions.AnnotatingActionCompiler;
+import org.fruit.alayer.actions.CompoundAction;
+import org.fruit.alayer.actions.KeyDown;
 import org.fruit.alayer.actions.StdActionCompiler;
+import org.fruit.alayer.actions.Type;
 import org.fruit.alayer.devices.AWTKeyboard;
 import org.fruit.alayer.devices.KBKeys;
 import org.fruit.alayer.devices.Keyboard;
@@ -86,20 +89,15 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	}
 
 	/**
-	 * This method is called when TESTAR starts the System Under Test (SUT). The method should
-	 * take care of 
-	 *   1) starting the SUT (you can use TESTAR's settings obtainable from <code>settings()</code> to find
-	 *      out what executable to run)
-	 *   2) bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
-	 *      the SUT's configuratio files etc.)
-	 *   3) waiting until the system is fully loaded and ready to be tested (with large systems, you might have to wait several
-	 *      seconds until they have finished loading)
-	 * @return  a started SUT, ready to be tested.
+	 * This method is invoked each time the TESTAR starts the SUT to generate a new sequence.
+	 * This can be used for example for bypassing a login screen by filling the username and password
+	 * or bringing the system into a specific start state which is identical on each start (e.g. one has to delete or restore
+	 * the SUT's configuration files etc.)
 	 */
-	@Override
-	protected SUT startSystem() throws SystemStartException{
+	 @Override
+	protected void beginSequence(SUT system, State state){
 
-		SUT sut = super.startSystem();
+		super.beginSequence(system, state);
 
 		Keyboard kb = AWTKeyboard.build();
 
@@ -107,12 +105,13 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		 * START Option 1: 
 		 * read the widgets of the current state and execute action based on them
 		 */
-		State state = getState(sut);
+		/*state = getState(system);
 
 		for(Widget w :state) {
 			if(w.get(Tags.Title,"").contains("Email") && w.get(Tags.Title,"").contains("phone")) {
 				StdActionCompiler ac = new AnnotatingActionCompiler();
-				executeAction(sut, state, ac.clickTypeInto(w, "testarhandson", true));
+				Action a = ac.clickTypeInto(w, "testarhandson", true);
+				executeAction(system, state, a);
 
 				//Based on ENG Keyboard, Shift + 2 typing arroba character
 				kb.press(KBKeys.VK_SHIFT);
@@ -120,7 +119,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 				kb.release(KBKeys.VK_2);
 				kb.release(KBKeys.VK_SHIFT);
 
-				executeAction(sut, state, ac.clickTypeInto(w, "gmail.com", false));
+				executeAction(system, state, ac.clickTypeInto(w, "gmail.com", false));
 
 			}
 		}
@@ -130,7 +129,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(sut, state, ac.leftClickAt(w));
+					executeAction(system, state, ac.leftClickAt(w));
 				}
 			}
 		}
@@ -139,14 +138,14 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		Util.pause(5);
 
 		//Update state
-		state = getState(sut);
+		state = getState(system);
 
 		for(Widget w :state) {
 			if(w.get(Tags.Title,"").contains("Enter the password")) {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAEdit")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(sut, state, ac.clickTypeInto(w, "0neDrivetestar", true));
+					executeAction(system, state, ac.clickTypeInto(w, "0neDrivetestar", true));
 				}
 			}
 		}
@@ -156,13 +155,13 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 				Role role = w.get(Tags.Role, Roles.Widget);
 				if(Role.isOneOf(role, new Role[]{NativeLinker.getNativeRole("UIAButton")})) {
 					StdActionCompiler ac = new AnnotatingActionCompiler();
-					executeAction(sut, state, ac.leftClickAt(w));
+					executeAction(system, state, ac.leftClickAt(w));
 				}
 			}
 		}
 
 		//Wait a bit
-		Util.pause(2);
+		Util.pause(2);*/
 
 		/**
 		 * END Option 1
@@ -173,9 +172,9 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		 * START Option2:
 		 *  Work doing keyboard actions, without check the state and widgets
 		 */
-		/*new CompoundAction.Builder()   
+		new CompoundAction.Builder()   
 		.add(new Type("testarhandson"),0.5).build() //assume keyboard focus is on the user field   
-		.run(sut, null, 0.5);
+		.run(system, null, 0.5);
 
 		kb.press(KBKeys.VK_SHIFT);
 		kb.press(KBKeys.VK_2);
@@ -185,23 +184,21 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 		new CompoundAction.Builder()  
 		.add(new Type("gmail.com"),0.5)
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build()
-		.run(sut, null, 1);
+		.run(system, null, 1);
 
 		Util.pause(8);
 
 		new CompoundAction.Builder()
 		.add(new Type("0neDrivetestar"),0.5)   
 		.add(new KeyDown(KBKeys.VK_ENTER),0.5).build() //assume login is performed by ENTER 
-		.run(sut, null, 1);
+		.run(system, null, 1);
 
 		//Wait a bit
-		Util.pause(1);*/
+		Util.pause(1);
 
 		/**
 		 * END Option 2
 		 */
-
-		return sut;
 
 	}
 
@@ -289,7 +286,7 @@ public class Protocol_web_one_drive extends DesktopProtocol {
 	private Verdict getScrollsUsabilityVerdict(State state, Widget w, Shape shape){
 		final int MINIMUM_SCROLLABLE_UISIZE = 24; // px
 		try {
-			if (NativeLinker.getNativeBooleanProperty(w, "UIAScrollPattern")){
+			if (NativeLinker.getNativeBooleanProperty(w, "UIAIsScrollPatternAvailable")){
 				if (NativeLinker.getNativeBooleanProperty(w, "UIAVerticallyScrollable") && shape.height() < MINIMUM_SCROLLABLE_UISIZE)
 					return new Verdict(Verdict.SEVERITY_WARNING, "Not all vertical-scrollable UI elements are greater than " + MINIMUM_SCROLLABLE_UISIZE + "px",
 							new ShapeVisualizer(BluePen, w.get(Tags.Shape), "Too small vertical-scrollable UI element", 0.5, 0.5));												
