@@ -549,7 +549,10 @@ public class StateFetcher implements Callable<UIAState>{
 				parent.children.add(el);
 				el.rect = rect;
 
-				el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				//TODO: Check ISSUE with JDK 9,10,11,12
+				//el.windowHandle = Windows.GetHWNDFromAccessibleContext(vmidAC[0],vmidAC[1]);
+				el.windowHandle = Windows.IUIAutomationElement_get_NativeWindowHandle(uiaCacheWindowTree(hwnd), true);
+				
 				if (role.equals(AccessBridgeControlTypes.ACCESSIBLE_DIALOG)){
 					el.isTopLevelContainer = true;
 					modalElement = el;

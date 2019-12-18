@@ -614,7 +614,7 @@ public final class Windows{
 
 	/* Functions */
 	public static native boolean IsIconic(long hWnd);
-	public static native long GetProcessId(long hProcess) throws WinApiException;
+	public static native long GetProcessId(long hProcess);
 	public static native boolean TextOut(int hdc, int x, int y, String text);
 	public static native boolean InvalidateRect(int hwnd, int x, int y, int width, int height, boolean bErased);	
 	public static native int GetWindowDC(int hwnd);	
@@ -699,55 +699,51 @@ public final class Windows{
 	public static native long GetDC(long hWnd);
 	public static native long CreateCompatibleDC(long hdc);
 	public static native long CreateCompatibleBitmap(long hdc, long nWidth, long nHeight);	
-	public static native long[] EnumProcesses() throws WinApiException;
-	public static native long[] EnumProcessModules(long hProcess) throws WinApiException;
-	public static native String GetModuleBaseName(long hProcess, long hModule) throws WinApiException;
+	public static native long[] EnumProcesses();
+	public static native long[] EnumProcessModules(long hProcess);
+	public static native String GetModuleBaseName(long hProcess, long hModule);
 	public static native long GetWindowLong(long hwnd, long nIndex);
 
 	/* Gdiplus */
-	public static native long GdiplusStartup() throws GDIException;
-	public static native void GdiplusShutdown(long gdiplusToken) throws GDIException;
-	public static native long Gdiplus_Graphics_FromHDC(long hDC) throws GDIException;
-	public static native long Gdiplus_Graphics_Clear(long pGraphics, int alpha, int red, int green, int blue) throws GDIException;
-	public static native long Gdiplus_Graphics_DrawLine(long pGraphics, long pPen, double x1, double y1, double x2, double y2) throws GDIException;
-	public static native long Gdiplus_Graphics_DrawRectangle(long pGraphics, long pPen, double x, double y, double width, double height) throws GDIException;
-	public static native long Gdiplus_Graphics_FillRectangle(long pGraphics, long pBrush, double x, double y, double width, double height) throws GDIException;
-	public static native long Gdiplus_Graphics_DrawEllipse(long pGraphics, long pPen, double x, double y, double width, double height) throws GDIException;
-	public static native long Gdiplus_Graphics_FillEllipse(long pGraphics, long pBrush, double x, double y, double width, double height) throws GDIException;
-	public static native long Gdiplus_Graphics_DrawString(long pGraphics, String text, long pFont, double x, double y, long pBrush) throws GDIException;	
+	public static native long GdiplusStartup();
+	public static native void GdiplusShutdown(long gdiplusToken);
+	public static native long Gdiplus_Graphics_FromHDC(long hDC);
+	public static native long Gdiplus_Graphics_Clear(long pGraphics, int alpha, int red, int green, int blue);
+	public static native long Gdiplus_Graphics_DrawLine(long pGraphics, long pPen, double x1, double y1, double x2, double y2);
+	public static native long Gdiplus_Graphics_DrawRectangle(long pGraphics, long pPen, double x, double y, double width, double height);
+	public static native long Gdiplus_Graphics_FillRectangle(long pGraphics, long pBrush, double x, double y, double width, double height);
+	public static native long Gdiplus_Graphics_DrawEllipse(long pGraphics, long pPen, double x, double y, double width, double height);
+	public static native long Gdiplus_Graphics_FillEllipse(long pGraphics, long pBrush, double x, double y, double width, double height);
+	public static native long Gdiplus_Graphics_DrawString(long pGraphics, String text, long pFont, double x, double y, long pBrush);	
 
-	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long pImage, long x, long y) throws GDIException;
-	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long x, long y, long width, long height, long imgWidth, long imgHeight, long pixelFormat, int[] data) throws GDIException;
-	public static native long Gdiplus_Bitmap_Create(long width, long height, long stride, long pixelFormat, byte[] data) throws GDIException;
-	public static native void Gdiplus_Bitmap_Destroy(long pBitmap) throws GDIException;
+	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long pImage, long x, long y);
+	public static native void Gdiplus_Graphics_DrawImage(long pGraphics, long x, long y, long width, long height, long imgWidth, long imgHeight, long pixelFormat, int[] data);
+	public static native long Gdiplus_Bitmap_Create(long width, long height, long stride, long pixelFormat, byte[] data);
+	public static native void Gdiplus_Bitmap_Destroy(long pBitmap);
 
-	public static native long Gdiplus_Pen_Create(int alpha, int red, int green, int blue, double width) throws GDIException;
-	public static native long Gdiplus_Pen_SetColor(long pPen, int alpha, int red, int green, int blue) throws GDIException;
-	public static native long Gdiplus_Pen_SetWidth(long pPen, double width) throws GDIException;
-	public static native void Gdiplus_Pen_Destroy(long pPen) throws GDIException;
-	public static native long Gdiplus_SolidBrush_Create(int alpha, int red, int green, int blue) throws GDIException;
-	public static native long Gdiplus_SolidBrush_SetColor(long pBrush, int alpha, int red, int green, int blue) throws GDIException;
-	public static native void Gdiplus_SolidBrush_Destroy(long pBrush) throws GDIException;
-	public static native long Gdiplus_Font_Create(long pFontFamily, double size, int style, int unit) throws GDIException;
-	public static native void Gdiplus_Font_Destroy(long pFont) throws GDIException;
-	public static native long Gdiplus_FontFamily_Create(String name) throws GDIException;
-	public static native void Gdiplus_FontFamily_Destroy(long pFontFamily) throws GDIException;
+	public static native long Gdiplus_Pen_Create(int alpha, int red, int green, int blue, double width);
+	public static native long Gdiplus_Pen_SetColor(long pPen, int alpha, int red, int green, int blue);
+	public static native long Gdiplus_Pen_SetWidth(long pPen, double width);
+	public static native void Gdiplus_Pen_Destroy(long pPen);
+	public static native long Gdiplus_SolidBrush_Create(int alpha, int red, int green, int blue);
+	public static native long Gdiplus_SolidBrush_SetColor(long pBrush, int alpha, int red, int green, int blue);
+	public static native void Gdiplus_SolidBrush_Destroy(long pBrush);
+	public static native long Gdiplus_Font_Create(long pFontFamily, double size, int style, int unit);
+	public static native void Gdiplus_Font_Destroy(long pFont);
+	public static native long Gdiplus_FontFamily_Create(String name);
+	public static native void Gdiplus_FontFamily_Destroy(long pFontFamily);
 
-	// begin by urueda
 	public static native long   GetProcessMemoryInfo(long processID);
 	public static native long[] GetProcessTimes(long processID);
 	public static native String	GetProcessNameFromHWND(long hwnd);
-	// end by urueda
 
-	public static native boolean InitializeAccessBridge(); // by ferpasri & urueda
-	// begin by urueda
+	public static native boolean InitializeAccessBridge();
 	public static native long[]   GetAccessibleContext(long hwnd); // vmid x ac
 	public static native long 	  GetHWNDFromAccessibleContext(long vmid, long ac);
 	//public static native int	  GetVisibleChildrenCount(long vmid, long ac);
 	//public static native long[]   GetVisibleChildren(long vmid, long ac);
 	public static native long     GetAccessibleChildFromContext(long vmid, long ac, int i);
 	public static native Object[] GetAccessibleContextProperties(long vmid, long ac);
-	// end by urueda
 
 	public static String Gdiplus_Status2String(int statusCode){
 		switch(statusCode){
@@ -778,13 +774,13 @@ public final class Windows{
 	}
 
 
-	public static native long OpenProcess(long dwDesiredAccess, boolean bInheritHandle, long dwProcessId) throws WinApiException;
-	public static native long WaitForSingleObject(long hHandle, long dwMilliseconds) throws WinApiException;
-	public static native long WaitForInputIdle(long hProcess) throws WinApiException;
-	public static native long GetExitCodeProcess(long hProcess) throws WinApiException;
+	public static native long OpenProcess(long dwDesiredAccess, boolean bInheritHandle, long dwProcessId);
+	public static native long WaitForSingleObject(long hHandle, long dwMilliseconds);
+	public static native long WaitForInputIdle(long hProcess);
+	public static native long GetExitCodeProcess(long hProcess);
 
 	/* COM */
-	public static native long CoInitializeEx(long pvReserved, long dwCoInit) throws WinApiException;
+	public static native long CoInitializeEx(long pvReserved, long dwCoInit);
 	public static native long CoCreateInstance(long pClsid, long pUnkOuter, long dwClsContext, long pIId);
 	public static native long Get_CLSID_CUIAutomation_Ptr();
 	public static native long Get_IID_IUIAutomation_Ptr();
@@ -799,29 +795,29 @@ public final class Windows{
 
 
 	/* ApplicationActivationManager */
-	public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options) throws UIAException; // by wcoux
+	public static native long IApplicationActivationManager_ActivateApplication(long pAppActMngr, String appUserModelId, String arguments, int options); // by wcoux
 
 
 	/* UIAutomation */	
-	public static native long IUIAutomation_GetRootElement(long pAutomation) throws UIAException;
-	public static native long IUIAutomation_CreateCacheRequest(long pAutomation) throws UIAException;
+	public static native long IUIAutomation_GetRootElement(long pAutomation);
+	public static native long IUIAutomation_CreateCacheRequest(long pAutomation);
 	public static native long IUIAutomation_ElementFromPoint(long pAutomation, long x, long y);
 	public static native long IUIAutomation_ElementFromHandle(long pAutomation, long hwnd);
 	public static native long IUIAutomation_ElementFromHandleBuildCache(long pAutomation, long hwnd, long pCacheRequest);
-	public static native long IUIAutomation_CreateTrueCondition(long pAutomation) throws UIAException;
-	public static native long IUIAutomation_CreateAndCondition(long pAutomation, long pCond1, long pCond2) throws UIAException;	
-	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, String value) throws UIAException;
-	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, boolean value) throws UIAException;
-	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, int value) throws UIAException;
-	public static native long IUIAutomation_get_ControlViewCondition(long pAutomation) throws UIAException;	
-	public static native boolean IUIAutomation_CompareElements(long pAutomation, long pEl1, long pEl2) throws UIAException;
+	public static native long IUIAutomation_CreateTrueCondition(long pAutomation);
+	public static native long IUIAutomation_CreateAndCondition(long pAutomation, long pCond1, long pCond2);	
+	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, String value);
+	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, boolean value);
+	public static native long IUIAutomation_CreatePropertyCondition(long pAutomation, long propertyId, int value);
+	public static native long IUIAutomation_get_ControlViewCondition(long pAutomation);	
+	public static native boolean IUIAutomation_CompareElements(long pAutomation, long pEl1, long pEl2);
 
 
-	public static native void IUIAutomationCacheRequest_AddProperty(long pRequest, long propertyId) throws UIAException;
-	public static native void IUIAutomationCacheRequest_AddPattern(long pRequest, long patternId) throws UIAException;
-	public static native void IUIAutomationCacheRequest_put_TreeFilter(long pRequest, long pFilter) throws UIAException;
-	public static native void IUIAutomationCacheRequest_put_TreeScope(long pRequest, long treeScope) throws UIAException;
-	public static native void IUIAutomationCacheRequest_put_AutomationElementMode(long pRequest, long mode) throws UIAException;
+	public static native void IUIAutomationCacheRequest_AddProperty(long pRequest, long propertyId);
+	public static native void IUIAutomationCacheRequest_AddPattern(long pRequest, long patternId);
+	public static native void IUIAutomationCacheRequest_put_TreeFilter(long pRequest, long pFilter);
+	public static native void IUIAutomationCacheRequest_put_TreeScope(long pRequest, long treeScope);
+	public static native void IUIAutomationCacheRequest_put_AutomationElementMode(long pRequest, long mode);
 
 	public static native String IUIAutomationElement_get_AutomationId(long pElement, boolean fromCache);	
 	public static native long[] IUIAutomationElement_GetRuntimeId(long pElement);
@@ -848,11 +844,11 @@ public final class Windows{
 	public static native boolean IUIAutomationElement_get_IsOffscreen(long pElement, boolean fromCache);
 	public static native long[] IUIAutomationElement_get_BoundingRectangle(long pElement, boolean fromCache);	
 	public static native long IUIAutomationElement_GetPattern(long pElement, long patternId, boolean fromCache);
-	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache); // by urueda	
+	public static native Object IUIAutomationElement_GetCurrentPropertyValue(long pElement, long propertyId, boolean fromCache);
 	public static native Object IUIAutomationElement_GetPropertyValueEx(long pElement, long propertyId, boolean ignoreDefaultValue, boolean fromCache);
 	public static native long IUIAutomationElement_GetCachedChildren(long pElement);	
-	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition) throws UIAException;
-	public static native long IUIAutomationElement_FindAllBuildCache(long pElement, long treeScope, long pCondition, long pCacheRequest) throws UIAException;
+	public static native long IUIAutomationElement_FindAll(long pElement, long treeScope, long pCondition);
+	public static native long IUIAutomationElement_FindAllBuildCache(long pElement, long treeScope, long pCondition, long pCacheRequest);
 	public static native boolean IUIAutomationWindowPattern_get_CanMaximize(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationWindowPattern_get_CanMinimize(long pElement, boolean fromCache);
 	public static native boolean IUIAutomationWindowPattern_get_IsModal(long pElement, boolean fromCache);
@@ -861,13 +857,13 @@ public final class Windows{
 	public static native long IUIAutomationWindowPattern_get_WindowVisualState(long pElement, boolean fromCache);
 
 
-	public static native long IUIAutomationElementArray_get_Length(long pArray) throws UIAException;
-	public static native long IUIAutomationElementArray_GetElement(long pArray, int idx) throws UIAException;
+	public static native long IUIAutomationElementArray_get_Length(long pArray);
+	public static native long IUIAutomationElementArray_GetElement(long pArray, int idx);
 
 
-	public static native void SafeArrayDestroy(long pArray) throws WinApiException;
-	public static native long SafeArrayGetIntElement(long pArray, long idx) throws WinApiException;				// This is only for 1-dimensional arrays yet! (UIA only uses 1-dimensional ones!)
-	public static native long SafeArrayGetUBound(long pArray, long dim) throws WinApiException;
+	public static native void SafeArrayDestroy(long pArray);
+	public static native long SafeArrayGetIntElement(long pArray, long idx);				// This is only for 1-dimensional arrays yet! (UIA only uses 1-dimensional ones!)
+	public static native long SafeArrayGetUBound(long pArray, long dim);
 	public static native String IUIAutomationElement_get_ValuePattern(long pElement, long patternId);
 
 	public static boolean hitTest(long pAutomation, long pExpected, long x, long y){
@@ -903,7 +899,6 @@ public final class Windows{
 		}
 	}
 
-	// by urueda
 	private static void loadExternalLib(String name) throws IOException {
 		File f = new File(name);
 		if (f.exists()){
