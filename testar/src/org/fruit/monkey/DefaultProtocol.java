@@ -41,7 +41,6 @@ import static org.fruit.alayer.Tags.OracleVerdict;
 import static org.fruit.alayer.Tags.SystemState;
 import static org.fruit.alayer.Tags.Title;
 import static org.fruit.monkey.ConfigTags.LogLevel;
-import static org.fruit.monkey.ConfigTags.OutputDir;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -106,7 +105,6 @@ import org.fruit.alayer.exceptions.SystemStartException;
 import org.fruit.alayer.exceptions.WidgetNotFoundException;
 import org.fruit.alayer.visualizers.ShapeVisualizer;
 import org.fruit.alayer.windows.WinApiException;
-import org.fruit.monkey.RuntimeControlsProtocol.Modes;
 
 import es.upv.staq.testar.managers.DataManager;
 import es.upv.staq.testar.serialisation.LogSerialiser;
@@ -194,6 +192,9 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 
 	protected StateModelManager stateModelManager;
 	private String startOfSutDateString; //value set when SUT started, used for calculating the duration of test
+
+	// should TESTAR keep running if the model is non-deterministic?
+	private boolean exitOnNonDeterministicModel;
 
 	protected final static Pen RedPen = Pen.newPen().setColor(Color.Red).
 			setFillPattern(FillPattern.None).setStrokePattern(StrokePattern.Solid).build(),
@@ -394,6 +395,8 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 			LogSerialiser.log("Unable to install keyboard and mouse hooks!\n", LogSerialiser.LogLevel.Critical);
 			throw new RuntimeException("Unable to install keyboard and mouse hooks!", e);
 		}
+
+		exitOnNonDeterministicModel = settings.get(ConfigTags.ExitOnNonDeterminism);
 	}
 
 	/**
@@ -1544,6 +1547,14 @@ public class DefaultProtocol extends RuntimeControlsProtocol {
 		} else if (verdict.severity() != Verdict.SEVERITY_OK && verdict.severity() > passSeverity){
 			passSeverity = verdict.severity();
 			LogSerialiser.log("Detected warning: " + verdict + "\n", LogSerialiser.LogLevel.Critical);
+		}
+
+		// check if the model is non-deterministic and we should continue
+		if (!stateModelManager.modelIsDeterministic() && exitOnNonDeterministicModel) {
+			if (mode() != Modes.Quit) {
+				System.out.println("Quitting because the state model is non-deterministic.");
+				setMode(Modes.Quit);
+			}
 		}
 		
 		return state;

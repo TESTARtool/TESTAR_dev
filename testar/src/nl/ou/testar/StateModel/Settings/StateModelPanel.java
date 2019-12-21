@@ -70,6 +70,7 @@ public class StateModelPanel extends JPanel {
     private JLabel label14 = new JLabel();
     private JLabel label15 = new JLabel("Action selection");
     private JLabel label16 = new JLabel("Store Widgets");
+    private JLabel label17 = new JLabel("Exit on non-determinism");
 
 
     private JCheckBox stateModelEnabledChkBox = new JCheckBox();
@@ -92,6 +93,7 @@ public class StateModelPanel extends JPanel {
     private JButton analysisButton = new JButton("Analysis");
     private Tag<?>[] allStateManagementTags;
     private Tag<?>[] selectedStateManagementTags;
+    private JCheckBox nonDeterminismBox = new JCheckBox();
 
     private String outputDir;
 
@@ -219,7 +221,15 @@ public class StateModelPanel extends JPanel {
         resetDatabaseCheckbox.setToolTipText("This will reset the database. All stored information will be lost.");
         add(resetDatabaseCheckbox);
 
-        analysisButton.setBounds(330, 166, 150, 27);
+        label17.setBounds(330,166,150,27);
+        add(label17);
+        nonDeterminismBox.setBounds(480, 166, 50, 27);
+        nonDeterminismBox.setToolTipText("This will stop executing TESTAR if there is non-determinism detected in the state model.");
+        add(nonDeterminismBox);
+
+
+
+        analysisButton.setBounds(330, 204, 150, 27);
         analysisButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -229,7 +239,7 @@ public class StateModelPanel extends JPanel {
         });
         add(analysisButton);
 
-        stateTagsButton.setBounds(330, 204, 150, 27);
+        stateTagsButton.setBounds(330, 242, 150, 27);
         stateTagsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -238,12 +248,12 @@ public class StateModelPanel extends JPanel {
         });
         add(stateTagsButton);
 
-        label15.setBounds(330,242,100,27);
+        label15.setBounds(330,280,100,27);
         add(label15);
-        actionSelectionBox.setBounds(430, 242,175,27);
+        actionSelectionBox.setBounds(430, 280,175,27);
         add(actionSelectionBox);
 
-        label14.setBounds(330, 280, 300, 27);
+        label14.setBounds(330, 318, 300, 27);
         add(label14);
 
     }
@@ -262,6 +272,7 @@ public class StateModelPanel extends JPanel {
         dataStoreDBTextfield.setText(settings.get(ConfigTags.DataStoreDB));
         dataStoreUserTextfield.setText(settings.get(ConfigTags.DataStoreUser));
         dataStorePasswordfield.setText(settings.get(ConfigTags.DataStorePassword));
+        nonDeterminismBox.setSelected(settings.get(ConfigTags.ExitOnNonDeterminism));
         for (int i =0; i < dataStoreModeBox.getItemCount(); i++) {
             if (dataStoreModeBox.getItemAt(i).equals(settings.get(ConfigTags.DataStoreMode))) {
                 dataStoreModeBox.setSelectedIndex(i);
@@ -326,6 +337,7 @@ public class StateModelPanel extends JPanel {
         settings.set(ConfigTags.ResetDataStore, resetDatabaseCheckbox.isSelected());
         settings.set(ConfigTags.AccessBridgeEnabled, accessBridgeEnabledBox.isSelected());
         settings.set(ConfigTags.AbstractStateAttributes, Arrays.stream(selectedStateManagementTags).map(StateManagementTags::getSettingsStringFromTag).collect(Collectors.toList()));
+        settings.set(ConfigTags.ExitOnNonDeterminism, nonDeterminismBox.isSelected());
         switch ((String) actionSelectionBox.getSelectedItem()) {
             case "Unvisited actions first":
                 settings.set(ConfigTags.ActionSelectionAlgorithm, "unvisited");

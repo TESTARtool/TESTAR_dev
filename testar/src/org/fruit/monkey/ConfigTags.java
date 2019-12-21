@@ -120,6 +120,7 @@ public final class ConfigTags {
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
   @SuppressWarnings("unchecked")
   public static final Tag<List<String>> AbstractStateAttributes = Tag.from("AbstractStateAttributes", (Class<List<String>>) (Class<?>) List.class);
+  public static final Tag<Boolean> ExitOnNonDeterminism = Tag.from("ExitOnNonDeterminism", Boolean.class);
 
   public static final Tag<Boolean> AlwaysCompile = Tag.from("AlwaysCompile", Boolean.class);
 

@@ -396,6 +396,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"ApplicationVersion = 1.0.0" + Util.lineSep()
 					+"ActionSelectionAlgorithm =" + Util.lineSep()
 					+"StateModelStoreWidgets =" + Util.lineSep()
+					+"ExitOnNonDeterminism =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# State identifier attributes\n"

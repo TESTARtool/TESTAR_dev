@@ -276,4 +276,8 @@ public class ModelManager implements StateModelManager {
         sequenceManager.notifyInterruptionBySystem(message);
     }
 
+    @Override
+    public boolean modelIsDeterministic() {
+        return nrOfNonDeterministicActions > 0;
+    }
 }
