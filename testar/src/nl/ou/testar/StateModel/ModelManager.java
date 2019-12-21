@@ -278,6 +278,6 @@ public class ModelManager implements StateModelManager {
 
     @Override
     public boolean modelIsDeterministic() {
-        return nrOfNonDeterministicActions > 0;
+        return nrOfNonDeterministicActions == 0;
     }
 }
