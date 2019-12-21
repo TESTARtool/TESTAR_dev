@@ -4,7 +4,7 @@
 # Set the mode you want TESTAR to start in: Spy, Generate, Replay
 #################################################################
 
-Mode = Record
+Mode = Generate
 
 #################################################################
 # Connect to the System Under Test (SUT)
@@ -42,8 +42,8 @@ AccessBridgeEnabled = false
 # Number of sequences and the length of these sequences
 #################################################################
 
-Sequences = 3
-SequenceLength = 30
+Sequences = 1
+SequenceLength = 20
 
 #################################################################
 # Oracles based on suspicious titles
@@ -121,9 +121,12 @@ DataStoreDirectory = C:\\orientdb\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
-DataStoreMode = delayed
-ApplicationName = Buggy calculator
+DataStoreMode = instant
+ApplicationName = Notepad
 ApplicationVersion = 1.0.0
+ActionSelectionAlgorithm = unvisited
+StateModelStoreWidgets = true
+ExitOnNonDeterminism = true
 
 #################################################################
 # State identifier attributes
@@ -170,7 +173,7 @@ TimeToFreeze = 30.0
 StateScreenshotSimilarityThreshold = 1.4E-45
 ShowVisualSettingsDialogOnStartup = true
 ResetDataStore = false
-TimeToWaitAfterAction = 0.0
+TimeToWaitAfterAction = 0.4
 DrawWidgetUnderCursor = true
 AlwaysCompile = true
 PathToReplaySequence = ./output/temp
