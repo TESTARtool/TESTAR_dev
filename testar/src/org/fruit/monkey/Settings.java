@@ -48,6 +48,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -405,6 +406,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"TemporalLTLPatterns = LTLTemporalPatterns.csv" + Util.lineSep()
 					+"TemporalLTLAPSelectorManager = LTLAPSelectorManager.json"+ Util.lineSep()
 					+"TemporalDirectory = temporal" + Util.lineSep()
+					+"TemporalSubDirectories = true" + Util.lineSep()
 					+"TemporalSpotFormulaParser = ubuntu1804 run spotparse" + Util.lineSep()
 					+"TemporalPythonEnvironment = python.exe" + Util.lineSep()
 					+"TemporalVisualizerServer = run.py --port 8050"+ Util.lineSep()
@@ -418,6 +420,7 @@ public class Settings extends TaggableBase implements Serializable {
 					+"# the widget and state hash strings. Use a comma separated list.\n"
                     +"#################################################################\n"
 			        +"AbstractStateAttributes =" + Util.lineSep()
+					+"ConcreteStateAttributes =" + Util.lineSep()
 					+"\n"
 					+"#################################################################\n"
 					+"# Other more advanced settings\n"

@@ -16,6 +16,7 @@ import nl.ou.testar.temporal.util.*;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
+import org.fruit.monkey.ConfigTags;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +33,8 @@ public class TemporalController {
     // orient db instance that will create database sessions
     private OrientDB orientDB;
     private Config dbConfig;
+    private String ApplicationName;
+    private String ApplicationVersion;
     private String outputDir;
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
@@ -39,8 +42,10 @@ public class TemporalController {
     private TemporalDBHelper tDBHelper;
     private List<TemporalOracle> oracleColl;
 
-
-    public TemporalController(final Config config, String outputDir) {
+    public TemporalController(){}
+    public TemporalController(final String ApplicationName, final String ApplicationVersion, final Config config, String outputDir) {
+        this.ApplicationName=ApplicationName;
+        this.ApplicationVersion=ApplicationVersion;
         String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
                 config.getServer() : config.getDatabaseDirectory());// +"/";
         orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
@@ -54,6 +59,7 @@ public class TemporalController {
 
         //dbReopen();// check if the credentials are valid?
     }
+
 
     public TemporalModel gettModel() {
         return tModel;
@@ -114,7 +120,7 @@ public class TemporalController {
 
     //*********************************
     public void computeTemporalModel() {
-        AbstractStateModel abstractStateModel = getFirstAbstractStateModel();
+        AbstractStateModel abstractStateModel = getAbstractStateModel();
         String stmt;
         Map<String, Object> params = new HashMap<>();
 
@@ -246,6 +252,29 @@ public class TemporalController {
         }
         return abstractStateModel;
     }
+    private AbstractStateModel getAbstractStateModel() {
+        List<AbstractStateModel> abstractStateModels = tDBHelper.fetchAbstractModels();
+        AbstractStateModel abstractStateModel;
+        abstractStateModel = null;
+        if (abstractStateModels.size() == 0) {
+            System.out.println("ERROR: No Models in the graph database " + db.toString());
+            tModel.addLog("ERROR: No Models in the graph database " + db.toString());
+        } else {
+            for (AbstractStateModel absModel:abstractStateModels
+                 ) {
+                if (absModel.getApplicationName().equals(ApplicationName) && absModel.getApplicationVersion().equals(ApplicationVersion)){
+                    abstractStateModel=absModel;
+                    break;
+                }
+            }
+            if (abstractStateModel==null){
+                System.out.println("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.toString());
+                tModel.addLog("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.toString());
+            }
+        }
+        return abstractStateModel;
+    }
+
 
     @Deprecated
     private void testgraphmlexport(String file) {  // inferior css 20190713
@@ -349,15 +378,15 @@ public class TemporalController {
 
     }
 
-    public void ModelCheck(TemporalType tType,String command, String ApFile,String oracleFile,boolean verbose) {
+    public void ModelCheck(TemporalType tType,String pathToExecutable, String APSelectorFile,String oracleFile,boolean verbose) {
         try {
-
-            loadApSelectorManager(ApFile);
+            System.out.println(tType+" model-checking started \n");
+            loadApSelectorManager(APSelectorFile);
             String strippedFile;
-            String APCopy =  "copy_"+Paths.get(ApFile).getFileName().toString();
+            String APCopy =  "copy_"+Paths.get(APSelectorFile).getFileName().toString();
             String OracleCopy = "copy_"+ Paths.get(oracleFile).getFileName().toString();
             if (verbose) {
-                Files.copy((new File(ApFile).toPath()),
+                Files.copy((new File(APSelectorFile).toPath()),
                         new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Files.copy((new File(oracleFile).toPath()),
                         new File(outputDir + OracleCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -389,14 +418,14 @@ public class TemporalController {
             //if (tType==TemporalType.LTL){}
             exportModel(TemporalType.LTL, automatonFile.getAbsolutePath());
             String aliveprop = gettModel().getAliveProposition("!dead");
-            Helper.LTLModelCheck(command, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
+            Helper.LTLModelCheck(pathToExecutable, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
             Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), fromcoll);//decode results
             List<TemporalOracle> modelCheckedOracles = sParse.parse(resultsFile);
             if (modelCheckedOracles == null) {
-                System.err.println("Error detected in modelcheck results");
+                System.err.println("Error detected in obtained results from the model-checker");
             } else {
                 CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
-                System.out.println("Temporal model-checked results csv are saved: \n");
+                System.out.println(tType+" model-checking completed \n");
             }
             //above is LTL specific logic
 

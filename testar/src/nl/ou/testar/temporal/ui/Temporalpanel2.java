@@ -10,6 +10,7 @@ import nl.ou.testar.temporal.structure.TemporalConstraintedPattern;
 import nl.ou.testar.temporal.structure.TemporalOracle;
 import nl.ou.testar.temporal.structure.WidgetFilter;
 import nl.ou.testar.temporal.util.*;
+import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
 
@@ -41,6 +42,8 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
     private String VisualizerURLStop;
     private StreamConsumer webAnalyzerErr;
     private StreamConsumer webAnalyzerOut;
+    private String ApplicationName;
+    private String ApplicationVersion;
     TemporalController tcontrol;
     //**** custom
 
@@ -670,10 +673,11 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
             outputDir += File.separator;
         }
         outputDir = outputDir + settings.get(ConfigTags.TemporalDirectory);
-        //new File(outputDir).mkdirs();
-        String runFolder = Helper.CurrentDateToFolder();
-        outputDir = outputDir + File.separator;
-        outputDir = outputDir + runFolder;
+
+        if(settings.get(ConfigTags.TemporalSubDirectories)) {
+            String runFolder = Helper.CurrentDateToFolder();
+            outputDir = outputDir + File.separator + runFolder;
+        }
         new File(outputDir).mkdirs();
         outputDir = outputDir + File.separator;
 
@@ -698,16 +702,17 @@ public class Temporalpanel2 {  //"extends JPanel" was manually added
         dataStorePassword = settings.get(ConfigTags.DataStorePassword);
         dataStoreType = settings.get(ConfigTags.DataStoreType);
 
-        Config config = new Config();
-        config.setConnectionType(dataStoreType);
-        config.setServer(dataStoreServerDNS);
-        config.setDatabase(dataStoreDBText);
-        config.setUser(dataStoreUser);
-        config.setPassword(dataStorePassword);
-        config.setDatabaseDirectory(dataStoreDirectory);
 
-
-        tcontrol = new TemporalController(config, outputDir);
+        Config dbconfig = new Config();
+        dbconfig.setConnectionType(dataStoreType);
+        dbconfig.setServer(dataStoreServerDNS);
+        dbconfig.setDatabase(dataStoreDBText);
+        dbconfig.setUser(dataStoreUser);
+        dbconfig.setPassword(dataStorePassword);
+        dbconfig.setDatabaseDirectory(dataStoreDirectory);
+        ApplicationName= settings.get(ConfigTags.ApplicationName);
+        ApplicationVersion= settings.get(ConfigTags.ApplicationVersion);
+        tcontrol = new TemporalController(ApplicationName,ApplicationVersion,dbconfig, outputDir);
     }
 
 

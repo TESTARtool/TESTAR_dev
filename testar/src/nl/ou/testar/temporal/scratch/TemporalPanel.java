@@ -348,7 +348,7 @@ private void setupMiner(){
             logCheckResult.append("connecting to: db\n");
             logCheckResult.repaint();
             config.setDatabaseDirectory(tmp);
-            TemporalController tcontrol = new TemporalController(config,outputDir);
+            TemporalController tcontrol = new TemporalController("A","a", config,outputDir); // fake call
            //List<AbstractStateModel> models = tcontrol.fetchModels();
 
             //logCheckResult.append("model count: " + models.size()+"\n");

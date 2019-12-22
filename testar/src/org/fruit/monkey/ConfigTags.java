@@ -128,6 +128,7 @@ public final class ConfigTags {
   public static final Tag<String> TemporalLTLPatterns = Tag.from("TemporalLTLPatterns", String.class);
   public static final Tag<String> TemporalLTLAPSelectorManager = Tag.from("TemporalLTLAPSelectorManager", String.class);
   public static final Tag<String> TemporalDirectory = Tag.from("TemporalDirectory", String.class);
+  public static final Tag<Boolean> TemporalSubDirectories = Tag.from("TemporalSubDirectories", Boolean.class);
   public static final Tag<String> TemporalSpotFormulaParser = Tag.from("TemporalSpotFormulaParser", String.class);
   public static final Tag<String> TemporalPythonEnvironment = Tag.from("TemporalPythonEnvironment", String.class);
   public static final Tag<String> TemporalVisualizerServer = Tag.from("TemporalVisualizerServer", String.class);

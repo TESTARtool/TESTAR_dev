@@ -227,15 +227,17 @@ public  TemporalModel(){
     public String getAliveProposition(String alive){
         HashBiMap<Integer, String> aplookup = HashBiMap.create();
         aplookup.putAll(getSimpleModelMap());
+        String encodedAliveAP = "";
         // we encode alive as not dead "!dead"
         // so we strip the negation from the alive property, by default: "!dead"
-
-       if (aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
-           return APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
+        if (alive.startsWith("!") && aplookup.inverse().containsKey(alive.toLowerCase().substring(1))){
+            encodedAliveAP= "!"+APPrefix+aplookup.inverse().get(alive.toLowerCase().substring(1));
         }
-        else
-            return "";
-        };
+        if (!alive.startsWith("!") && aplookup.inverse().containsKey(alive.toLowerCase())){
+            encodedAliveAP= APPrefix+aplookup.inverse().get(alive.toLowerCase());
+        }
+         return  encodedAliveAP;
+    };
 
 
     public List<TemporalOracle> ReadModelCheckerResults(String results){

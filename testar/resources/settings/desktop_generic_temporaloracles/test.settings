@@ -136,6 +136,7 @@ TemporalLTLOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\tempor
 TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
 TemporalLTLAPSelectorManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
 TemporalDirectory = temporal
+TemporalSubDirectories = true
 TemporalSpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
 TemporalPythonEnvironment = C:\\Users\\c\\AppData\\Local\\Programs\\Python\\Python37\\python.exe
 TemporalVisualizerServer = C:\\Users\\c\\git\\Testar_viz\\run.py --port 8050
