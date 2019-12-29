@@ -1146,6 +1146,10 @@
             (w) => w.data("customLabel", "TS-" + w.data("counter"))
         );
 
+        cy.$(".Widget").forEach(
+            (w) => w.data("customLabel", (w.data("UIALocalizedControlType") || w.data("Role")) + "-" + (w.data("Title") || w.data("counter")))
+        );
+
         // add a mouseover event to the concrete actions
         cy.$(".ConcreteAction").on('mouseover', function(event) {
             event.target.addClass("mouse-over-concrete-action");
