@@ -97,7 +97,7 @@ public final class UIARoles {
 		return ret;
 	}
 		
-	public static Role fromTypeId(long typeId){
+	public static Role  fromTypeId(long typeId){
 		Role ret = typeIdToRole.get(typeId);
 		return (ret == null) ? UIAUnknown : ret; 
 	}

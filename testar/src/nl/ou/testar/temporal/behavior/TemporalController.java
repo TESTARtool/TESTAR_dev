@@ -2,21 +2,20 @@ package  nl.ou.testar.temporal.behavior;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
-import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.record.ODirection;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OVertex;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
-import org.apache.tinkerpop.gremlin.structure.util.GraphFactory;
+import org.fruit.alayer.Tag;
 import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
 //import org.apache.tinkerpop.gremlin.structure.Graph;
 //import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
@@ -35,6 +36,7 @@ public class TemporalController {
     private Config dbConfig;
     private String ApplicationName;
     private String ApplicationVersion;
+    private String Modelidentifier;
     private String outputDir;
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
@@ -42,22 +44,84 @@ public class TemporalController {
     private TemporalDBHelper tDBHelper;
     private List<TemporalOracle> oracleColl;
 
-    public TemporalController(){}
-    public TemporalController(final String ApplicationName, final String ApplicationVersion, final Config config, String outputDir) {
-        this.ApplicationName=ApplicationName;
-        this.ApplicationVersion=ApplicationVersion;
-        String connectionString = config.getConnectionType() + ":/" + (config.getConnectionType().equals("remote") ?
-                config.getServer() : config.getDatabaseDirectory());// +"/";
-        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+    public TemporalController(final Settings settings) {
+        this.ApplicationName= settings.get(ConfigTags.ApplicationName);
+        this.ApplicationVersion= settings.get(ConfigTags.ApplicationVersion);
+        setModelidentifier(settings);
+        dbConfig = makeConfig(settings);
+        String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
+                dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
+        //orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
-        dbConfig = config;
-        this.outputDir = outputDir;
-        tDBHelper = new TemporalDBHelper();
-        setDefaultAPSelectormanager();
+        this.outputDir = makeOutputDir(settings);
+        tDBHelper = new TemporalDBHelper(settings);
         tModel = new TemporalModel();
+        setDefaultAPSelectormanager();
+
+    }
+    public void setTemporalModelMetaData(AbstractStateModel abstractStateModel){
+        if (abstractStateModel != null) {
+            tModel.setApplicationName(abstractStateModel.getApplicationName());
+            tModel.setApplicationVersion(abstractStateModel.getApplicationVersion());
+            tModel.setApplication_ModelIdentifier(abstractStateModel.getModelIdentifier());
+            tModel.setApplication_AbstractionAttributes(abstractStateModel.getAbstractionAttributes());
+        }
 
 
-        //dbReopen();// check if the credentials are valid?
+    }
+    private void setModelidentifier(Settings settings){
+        //copied from Main.initcodingmanager
+        if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
+            Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
+            CodingManager.setCustomTagsForAbstractId(abstractTags);
+        }
+        //copied from StateModelManagerFactory
+        // get the abstraction level identifier that uniquely identifies the state model we are testing against.
+        this.Modelidentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
+                settings.get(ConfigTags.ApplicationVersion));
+
+    }
+    private Config makeConfig(final Settings settings){
+        // used here, but controlled on StateModelPanel
+
+        String dataStoreText;
+        String dataStoreServerDNS;
+        String dataStoreDirectory;
+        String dataStoreDBText;
+        String dataStoreUser;
+        String dataStorePassword;
+        String dataStoreType;
+        dataStoreText = settings.get(ConfigTags.DataStore); //assume orientdb
+        dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
+        dataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
+        dataStoreDBText = settings.get(ConfigTags.DataStoreDB);
+        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
+        dataStorePassword = settings.get(ConfigTags.DataStorePassword);
+        dataStoreType = settings.get(ConfigTags.DataStoreType);
+        Config dbconfig = new Config();
+        dbconfig.setConnectionType(dataStoreType);
+        dbconfig.setServer(dataStoreServerDNS);
+        dbconfig.setDatabase(dataStoreDBText);
+        dbconfig.setUser(dataStoreUser);
+        dbconfig.setPassword(dataStorePassword);
+        dbconfig.setDatabaseDirectory(dataStoreDirectory);
+        return dbconfig;
+    }
+    private String makeOutputDir(final Settings settings){
+        String outputDir = settings.get(ConfigTags.OutputDir);
+        // check if the output directory has a trailing line separator
+        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
+            outputDir += File.separator;
+        }
+        outputDir = outputDir + settings.get(ConfigTags.TemporalDirectory);
+
+        if(settings.get(ConfigTags.TemporalSubDirectories)) {
+            String runFolder = Helper.CurrentDateToFolder();
+            outputDir = outputDir + File.separator + runFolder;
+        }
+        new File(outputDir).mkdirs();
+        outputDir = outputDir + File.separator;
+        return outputDir;
     }
 
 
@@ -65,16 +129,14 @@ public class TemporalController {
         return tModel;
     }
 
-    private void settModel(TemporalModel tModel) {
-        this.tModel = tModel;
-    }
 
-    private void saveAPSelectorManager(String filename) {
+    public void saveAPSelectorManager(String filename) {
         JSONHandler.save(apSelectorManager, outputDir + filename, true);
     }
 
     public void loadApSelectorManager(String filename) {
         this.apSelectorManager = (APSelectorManager) JSONHandler.load( filename, apSelectorManager.getClass());
+        apSelectorManager.updateAPKey(tModel.getApplication_BackendAbstractionAttributes());
         tDBHelper.setApSelectorManager(apSelectorManager);
     }
 
@@ -88,54 +150,57 @@ public class TemporalController {
     }
 
     public void setDefaultAPSelectormanager() {
-        this.apSelectorManager = new APSelectorManager(true);
+        List<Tag<?>> taglist = new ArrayList<>();
+        List<String> APKey= new ArrayList<>();
+        if(tModel!=null){
+            APKey =tModel.getApplication_BackendAbstractionAttributes() ;}
+        if (APKey!=null && !APKey.isEmpty()){
+            this.apSelectorManager = new APSelectorManager(true, APKey);
+        }
+        else{
+            this.apSelectorManager = new APSelectorManager(true);}
         tDBHelper.setApSelectorManager(apSelectorManager);
     }
 
+
+
+
+    // @TODO: 2019-12-29 refactor db operations to dbhelper
     public void dbClose() {
-        if (!db.isClosed())  {db.close();tDBHelper.setDb(db);orientDB.close();}
+       tDBHelper.dbClose();
     }
     public void dbReopen() {
-        if (db==null ||db.isClosed()) {
-            db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
-        }
-        tDBHelper.setDb(db);
-        db.activateOnCurrentThread();
-
-
+      tDBHelper.dbReopen();
     }
-    public void ConnectionClose() {
-        orientDB.close();
-    }
+
 
     public String pingDB() {
+        tDBHelper.dbReopen();
         StringBuilder sb = new StringBuilder();
         List<AbstractStateModel> models = tDBHelper.fetchAbstractModels();
-        sb.append("model count: " + models.size() + "\n");
-        AbstractStateModel model = models.get(0);
-        sb.append("Model0 info:" + model.getApplicationName() + ", " + model.getModelIdentifier() + "\n");
+        if ( models.isEmpty()){
+             sb.append("model count: 0\n");
+        }
+        else {
+            sb.append("model count: " + models.size() + "\n");
+            sb.append("Model info:\n");
+            for (AbstractStateModel abs : models
+            ) {
+                sb.append("APP: " + abs.getApplicationName() + ", VERSION: " + abs.getApplicationVersion() + ", ID: " + abs.getModelIdentifier() + ", ABSTRACTION: " + abs.getAbstractionAttributes() + "\n");
+            }
+        }
+        tDBHelper.dbClose();
         return sb.toString();
     }
 
 
+
     //*********************************
-    public void computeTemporalModel() {
-        AbstractStateModel abstractStateModel = getAbstractStateModel();
-        String stmt;
-        Map<String, Object> params = new HashMap<>();
+    public void computeTemporalModel(AbstractStateModel abstractStateModel) {
 
-        params.put("identifier", abstractStateModel.getModelIdentifier());
-        // navigate from abstractstate to apply the filter.
-        // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-        stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
-
-        OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt);
+        OResultSet resultSet = tDBHelper.getConcreteStatesFromOrientDb(abstractStateModel);
 
         if (abstractStateModel != null) {
-            tModel.setApplicationName(abstractStateModel.getApplicationName());
-            tModel.setApplicationVersion(abstractStateModel.getApplicationVersion());
-            tModel.setApplication_ModelIdentifier(abstractStateModel.getModelIdentifier());
-            tModel.setApplication_AbstractionAttributes(abstractStateModel.getAbstractionAttributes());
 
             //Set selectedAttibutes = apSelectorManager.getSelectedSanitizedAttributeNames();
             boolean firstDeadState = true;
@@ -235,112 +300,46 @@ public class TemporalController {
         }
     }
 
-    private AbstractStateModel getFirstAbstractStateModel() {
-        List<AbstractStateModel> abstractStateModels = tDBHelper.fetchAbstractModels();
-        AbstractStateModel abstractStateModel;
-        if (abstractStateModels.size() == 0) {
-            System.out.println("ERROR: Number of Models in the graph database " + db.toString() + " is ZERO");
-            tModel.addLog("ERROR: Number of Models in the graph database " + db.toString() + " is ZERO");
-            abstractStateModel = null;
-        } else {
-            abstractStateModel = abstractStateModels.get(0);
-        }
 
-        if (abstractStateModels.size() > 1) {
-            System.out.println("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
-            tModel.addLog("WARNING: Number of Models in the graph database " + db.toString() + " is more than ONE. We try with the first model");
-        }
-        return abstractStateModel;
-    }
+
     private AbstractStateModel getAbstractStateModel() {
-        List<AbstractStateModel> abstractStateModels = tDBHelper.fetchAbstractModels();
         AbstractStateModel abstractStateModel;
-        abstractStateModel = null;
-        if (abstractStateModels.size() == 0) {
-            System.out.println("ERROR: No Models in the graph database " + db.toString());
-            tModel.addLog("ERROR: No Models in the graph database " + db.toString());
-        } else {
-            for (AbstractStateModel absModel:abstractStateModels
-                 ) {
-                if (absModel.getApplicationName().equals(ApplicationName) && absModel.getApplicationVersion().equals(ApplicationVersion)){
-                    abstractStateModel=absModel;
-                    break;
-                }
-            }
-            if (abstractStateModel==null){
-                System.out.println("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.toString());
-                tModel.addLog("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.toString());
-            }
+
+        //abstractStateModel = tDBHelper.selectAbstractStateModel(ApplicationName, ApplicationVersion);
+        abstractStateModel = tDBHelper.selectAbstractStateModelByModelId(Modelidentifier);
+
+        if (abstractStateModel == null) {
+            tModel.addLog("ERROR: Model with identifier : "+Modelidentifier+" was not found in the graph database " + dbConfig.getDatabase());
+
         }
         return abstractStateModel;
     }
 
 
-    @Deprecated
-    private void testgraphmlexport(String file) {  // inferior css 20190713
-        String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
-                dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
-        String dbconnectstring = connectionString + "\\" + dbConfig.getDatabase();
-        OrientGraph grap = new OrientGraph(dbconnectstring, dbConfig.getUser(), dbConfig.getPassword());
-        System.out.println("debug connectionstring: " + dbconnectstring + " \n");
 
-        //Graph graph = new OrientGraph(connectionString+"/"+dbConfig.getDatabase(),dbConfig.getUser(),dbConfig.getPassword());
-        Map<String, Object> conf = new HashMap<String, Object>();
-        conf.put("blueprints.graph", "com.tinkerpop.blueprints.impls.orient.OrientGraph");
-        conf.put("blueprints.orientdb.url", dbconnectstring);
-        conf.put("blueprints.orientdb.username", dbConfig.getUser());
-        conf.put("blueprints.orientdb.password", dbConfig.getPassword());
-
-        //Graph graph = GraphFactory.open(conf);
-        Graph graph = GraphFactory.open(conf);
-        //GraphTraversalSource gts = graph.traversal();
-        //final GraphWriter writer = graph.io(IoCore.graphson()).writer();
-        // final OutputStream os = new FileOutputStream("tinkerpop-modern.json");
-        // writer.writeObject(os, graph);
-
-
-        System.out.println("debug writing graphml file \n");
-        try {
-            try {
-                File output = new File(file);
-                FileOutputStream fos = new FileOutputStream(output.getAbsolutePath());
-                //GraphMLWriter writer = new GraphMLWriter(graph); //GraphMLWriter.outputGraph(grap,fos);
-                GraphMLWriter writer = GraphMLWriter.build().create();
-                writer.writeGraph(fos, graph);
-
-                //writer.outputGraph(fos);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-        } finally {
-            try {
-                grap.shutdown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     public boolean saveToGraphMLFile(String file,boolean excludeWidget) {
-
-    return tDBHelper.saveToGraphMLFile(dbConfig.getDatabase(),file,excludeWidget);
+        AbstractStateModel abstractStateModel = tDBHelper.selectAbstractStateModelByModelId(Modelidentifier);
+        if (abstractStateModel != null) {
+            return tDBHelper.saveToGraphMLFile(abstractStateModel,  outputDir +file, excludeWidget);
+        }
+        else return false;
     }
 
-    public void saveModelAsJSON(String toFile) {
-        JSONHandler.save(tModel, toFile);
+    private void saveModelAsJSON(String toFile) {
+        JSONHandler.save(tModel, outputDir +toFile);
     }
 
-    public boolean exportModel(TemporalType tmptype, String file) {
-        boolean b = true;
-        if (tmptype.equals(TemporalType.LTL)) saveModelAsHOA(file);
-        else b = false;
+    public boolean saveModelForChecker(TemporalType tmptype, String file) {
+        boolean b = false;
+        if (tmptype.equals(TemporalType.LTL)){
+            saveModelAsHOA(file);
+            b = true;
+        }
         return b;
 }
 
-    public void saveModelAsHOA(String file){
+    private void saveModelAsHOA(String file){
 
         String contents = tModel.makeHOAOutput();
         try {
@@ -381,6 +380,9 @@ public class TemporalController {
     public void ModelCheck(TemporalType tType,String pathToExecutable, String APSelectorFile,String oracleFile,boolean verbose) {
         try {
             System.out.println(tType+" model-checking started \n");
+            tDBHelper.dbReopen();
+            AbstractStateModel abstractStateModel = getAbstractStateModel();
+            setTemporalModelMetaData(abstractStateModel);
             loadApSelectorManager(APSelectorFile);
             String strippedFile;
             String APCopy =  "copy_"+Paths.get(APSelectorFile).getFileName().toString();
@@ -401,8 +403,8 @@ public class TemporalController {
             File resultsFile = new File(outputDir + "LTL_results.txt");
             File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
             File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-            dbReopen();
-            computeTemporalModel();
+
+            computeTemporalModel(abstractStateModel);
 
             List<TemporalOracle> fromcoll;
             fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
@@ -416,7 +418,7 @@ public class TemporalController {
 
             //from here on LTL specific logic
             //if (tType==TemporalType.LTL){}
-            exportModel(TemporalType.LTL, automatonFile.getAbsolutePath());
+            saveModelForChecker(TemporalType.LTL, automatonFile.getAbsolutePath());
             String aliveprop = gettModel().getAliveProposition("!dead");
             Helper.LTLModelCheck(pathToExecutable, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
             Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), fromcoll);//decode results
@@ -431,16 +433,42 @@ public class TemporalController {
 
 
             if (verbose) {
-               saveToGraphMLFile(outputDir + "GraphML.XML",false);
-               saveToGraphMLFile(outputDir + "GraphML_NoWidgets.XML",true);
-               saveModelAsJSON(outputDir + "APEncodedModel.json");
+               saveToGraphMLFile( "GraphML.XML",false);
+               saveToGraphMLFile( "GraphML_NoWidgets.XML",true);
+               saveModelAsJSON( "APEncodedModel.json");
             } else {
                 Files.delete(automatonFile.toPath());
                 Files.delete(resultsFile.toPath());
                 Files.delete(formulaFile.toPath());
                 Files.delete(inputvalidatedFile.toPath());
             }
-            dbClose();
+            tDBHelper.dbClose();
+        } catch (Exception f) {
+            f.printStackTrace();
+        }
+
+    }
+    public void dumpTemporalModel(String APSelectorFile) {
+        try {
+            System.out.println(" dumping temporal model started \n");
+            tDBHelper.dbReopen();
+            AbstractStateModel abstractStateModel = getAbstractStateModel();
+            setTemporalModelMetaData(abstractStateModel);
+            if (APSelectorFile.equals("")) {
+                setDefaultAPSelectormanager();
+                saveAPSelectorManager("default_APSelectorManager.json");
+            } else {
+                loadApSelectorManager(APSelectorFile);
+                String APCopy =  "copy_"+Paths.get(APSelectorFile).getFileName().toString();
+                Files.copy((new File(APSelectorFile).toPath()),
+                        new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+
+
+            computeTemporalModel(abstractStateModel);
+            saveModelAsJSON( "APEncodedModel.json");
+            tDBHelper.dbClose();
+            System.out.println(" dumping temporal model completed \n");
         } catch (Exception f) {
             f.printStackTrace();
         }

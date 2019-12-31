@@ -1,7 +1,10 @@
 package nl.ou.testar.temporal.structure;
 
+import es.upv.staq.testar.CodingManager;
 import nl.ou.testar.temporal.util.APEncodingSeparator;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.fruit.alayer.windows.UIAMapping;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -16,7 +19,6 @@ public class APSelectorManager {//extends APSelector{
 
     private  APSelector stateFilter;
     private  APSelector transitionFilter;
-
     private List<String> APKey= new ArrayList<>();
     private String apEncodingSeparator;
     private Set<WidgetFilter> widgetfilters;
@@ -32,19 +34,24 @@ public class APSelectorManager {//extends APSelector{
         comments.add(" !!!!ONLY EMPTY 'selectedattributes' or' valuedexpression' will be enriched with 'Enabled,Role,IsDeadState' attributes and 'exists__' and isblank__' expressions");
        comments.add(" second widget filter lists the default protperties");
        comments.add(" EMPTY widget <ROLE-PATH-TITLE> filters will result in acceptance of  <ALL ROLE- ALL PATH -ALL TITLE>");
-        comments.add("Consider when you are inspecting an APModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
-        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and NOT in the map");
+        comments.add("Consider when you are inspecting an APEncodedModel:  An entry in the map of modelAPs indicates that the property is at least somewhere true in the model. ");
+        comments.add("In other words: if a property is always FALSE( i.e. in all states/edges)  then it is NOT regarded as a modelAp and is NOT listed in the map of modelAp's");
         comments.add("Note that the map is not guaranteed in lexicographic order: some new (true) properties can be discovered 'late' in the model");
+       // comments.add(" Apkey is considered read-only and is a copy of Application_BackendAbstractionAttributes from the APEncodedmodel");
 
         comments.add("relpos expressions are the quadrants  based on the position of the widget  in the parent window");
         comments.add("this enables to distinguish 2 buttons with the same title in the relative window in 2 different states");
         comments.add("this is not functional yet. CSS 20190630");
     }
     public APSelectorManager(boolean initializeWithDefaults) {
+         this(initializeWithDefaults,null);
+    }
+
+    public APSelectorManager(boolean initializeWithDefaults,List<String> APKey) {
         this();
         if (initializeWithDefaults){
-           // setValuedExpressions(useStandardValuedExpressions());
-           // setSelectedAttributes(getEntireAttributes());
+            // setValuedExpressions(useStandardValuedExpressions());
+            // setSelectedAttributes(getEntireAttributes());
 
             stateFilter = new APSelector();
             transitionFilter = new APSelector();
@@ -60,14 +67,13 @@ public class APSelectorManager {//extends APSelector{
             wf1.setSelectedAttributes(APSelector.getEntireAttributes());
             wf1.setValuedExpressions(APSelector.useStandardValuedExpressions());
             widgetfilters.add(wf1);
-            setRoleTitlePathAsAPKey();
-            this.apEncodingSeparator= APEncodingSeparator.DOUBLEDAGGER.symbol;
+            //setRoleTitlePathAsAPKey();
+            if (APKey==null){          setRoleTitlePathAsAPKey();            }
+            else{         this.APKey=APKey;}
+            this.apEncodingSeparator= APEncodingSeparator.CUSTOM.symbol;
         }
 
     }
-
-
-
     //*********************
 
 
@@ -101,9 +107,23 @@ public class APSelectorManager {//extends APSelector{
         return APKey;
     }
 
-    public void setAPKey(List<String> APKey) {
+    public void updateAPKey(List<String> APKey) {
         this.APKey = APKey;
     }
+    @Deprecated
+    private void computeAPKey() {
+        // lookup real abstrationattributes from current model. 'real' means : used in orientdb
+        APKey.clear();
+        for (Tag<?> t : CodingManager.getCustomTagsForConcreteId()
+        ) {
+            Tag<?> stateManagementTag = UIAMapping.getMappedStateTag(t);
+            if (stateManagementTag != null) {
+                APKey.add(stateManagementTag.name());
+            }
+        }
+        //this.APKey = APKey;
+    }
+
     public List<String> getComments() {
         return comments;
     }
@@ -131,17 +151,12 @@ public class APSelectorManager {//extends APSelector{
 
     public void setRoleTitlePathAsAPKey(){
         APKey.clear();
-
         APKey.add(Tags.Role.name());
         APKey.add(Tags.Title.name());
         APKey.add(Tags.Path.name());
+
     }
 
-    public void setRoleTitleAsAPKey(){
-        APKey.clear();
-        APKey.add(Tags.Role.name());
-        APKey.add(Tags.Title.name());
-    }
 
     public void addWidgetFilter(WidgetFilter w){
         widgetfilters.add(w);

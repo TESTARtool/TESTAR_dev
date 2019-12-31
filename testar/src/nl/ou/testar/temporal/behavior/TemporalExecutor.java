@@ -28,48 +28,13 @@ public class TemporalExecutor {
 
     public TemporalExecutor(final Settings settings) {
         this.settings = settings;
-        tcontrol = new TemporalController();
-        init();
+        tcontrol = new TemporalController( settings);
     }
-    private void init(){
-        outputDir = settings.get(ConfigTags.OutputDir);
-        // check if the output directory has a trailing line separator
-        if (!outputDir.substring(outputDir.length() - 1).equals(File.separator)) {
-            outputDir += File.separator;
-        }
-        outputDir = outputDir + settings.get(ConfigTags.TemporalDirectory);
-
-        if(settings.get(ConfigTags.TemporalSubDirectories)) {
-            String runFolder = Helper.CurrentDateToFolder();
-            outputDir = outputDir + File.separator + runFolder;
-        }
-        new File(outputDir).mkdirs();
-        outputDir = outputDir + File.separator;
-
-        // used here, but controlled on StateModelPanel
-        dataStoreText = settings.get(ConfigTags.DataStore);
-        dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
-        dataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
-        dataStoreDBText = settings.get(ConfigTags.DataStoreDB);
-        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
-        dataStorePassword = settings.get(ConfigTags.DataStorePassword);
-        dataStoreType = settings.get(ConfigTags.DataStoreType);
 
 
-        Config dbconfig = new Config();
-        dbconfig.setConnectionType(dataStoreType);
-        dbconfig.setServer(dataStoreServerDNS);
-        dbconfig.setDatabase(dataStoreDBText);
-        dbconfig.setUser(dataStoreUser);
-        dbconfig.setPassword(dataStorePassword);
-        dbconfig.setDatabaseDirectory(dataStoreDirectory);
-        ApplicationName= settings.get(ConfigTags.ApplicationName);
-        ApplicationVersion= settings.get(ConfigTags.ApplicationVersion);
-        tcontrol = new TemporalController(ApplicationName,ApplicationVersion,dbconfig, outputDir);
-    }
     public void LTLModelCheck() {
         if (settings.get(ConfigTags.TemporalEnabled)) {
-           // tcontrol.setDefaultAPSelectormanager();
+            // tcontrol.setDefaultAPSelectormanager();
             tcontrol.ModelCheck(TemporalType.LTL,
                     settings.get(ConfigTags.TemporalLTLChecker),
                     settings.get(ConfigTags.TemporalLTLAPSelectorManager),

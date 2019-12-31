@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class JSONHandler {
@@ -31,12 +32,11 @@ public class JSONHandler {
             File output = new File(toFile);
             ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
-
+            objectMapper.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true); //
             String result = objectMapper.writeValueAsString(content);
-
             // let's write the resulting json to a file
             if (output.exists() || output.createNewFile()) {
-                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()))); //, StandardCharsets.UTF_8));
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
                 writer.append(result);
                 writer.close();
             }
@@ -52,7 +52,7 @@ public class JSONHandler {
     public static ArrayList<String> peek(String target, String inFile) {
         ArrayList<String>  tmp = new ArrayList<String>();
         try (JsonParser jParser = new JsonFactory()
-                .createParser(new File(inFile));) {
+                .createParser(new File(inFile))) {
 
             // loop until token equal to "}"
             while (jParser.nextToken() != JsonToken.END_OBJECT) {

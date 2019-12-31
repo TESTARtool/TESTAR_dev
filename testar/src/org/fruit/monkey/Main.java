@@ -464,7 +464,7 @@ public class Main {
 			defaults.add(Pair.from(TemporalLTLOracles, ""));
 			defaults.add(Pair.from(TemporalLTLPatterns, ""));
 			defaults.add(Pair.from(TemporalLTLAPSelectorManager, ""));
-			defaults.add(Pair.from(TemporalDirectory, ""));
+			defaults.add(Pair.from(TemporalDirectory, "temporal"));
 			defaults.add(Pair.from(TemporalSubDirectories, true));
 			defaults.add(Pair.from(TemporalSpotFormulaParser, ""));
 			defaults.add(Pair.from(TemporalPythonEnvironment, ""));

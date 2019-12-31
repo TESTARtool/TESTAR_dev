@@ -117,7 +117,7 @@ StateModelEnabled = true
 DataStore = OrientDB
 DataStoreType = plocal
 DataStoreServer = localhost
-DataStoreDirectory = C:\\orientdb-tp3-3.0.18\\databases
+DataStoreDirectory = C:\\orientdb-3.0.25\\databases
 DataStoreDB = testar
 DataStoreUser = testar
 DataStorePassword = testar
@@ -129,19 +129,26 @@ DataStoreMode = instant
 # Temporal Oracle settings
 #################################################################
 TemporalEnabled = false
-TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker
+#TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker
+TemporalLTLChecker = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
 TemporalLTLCheckerWSL = true
 TemporalLTLVerbose = true
-TemporalLTLOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
+#TemporalLTLOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
+#TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
+#TemporalLTLAPSelectorManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
+TemporalLTLOracles = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
 TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
-TemporalLTLAPSelectorManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
+TemporalLTLAPSelectorManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
 TemporalDirectory = temporal
 TemporalSubDirectories = true
-TemporalSpotFormulaParser = ubuntu1804 run /mnt/c/Users/c/OneDrive/OU/AF/Ubuntu/spotparse
-TemporalPythonEnvironment = C:\\Users\\c\\AppData\\Local\\Programs\\Python\\Python37\\python.exe
-TemporalVisualizerServer = C:\\Users\\c\\git\\Testar_viz\\run.py --port 8050
+TemporalSpotFormulaParser = wsl --distribution Ubuntu1804 --user css  /mnt/c/Users/cseng/OneDrive/OU/AF/Ubuntu/spotparse
+#TemporalPythonEnvironment = C:\\Users\\c\\AppData\\Local\\Programs\\Python\\Python37\\python.exe
+TemporalPythonEnvironment = C:\\Program Files (x86)\\Python38-32\\python.exe
+#TemporalVisualizerServer = C:\\Users\\c\\git\\Testar_viz\\run.py --port 8050
+TemporalVisualizerServer = C:\\Users\\cseng\\git\\Testar_viz\\run.py --port 8050
 TemporalVisualizerURL = http://localhost:8050
 TemporalVisualizerURLStop = http://localhost:8050/shutdown
+
 
 #################################################################
 # State identifier attributes
@@ -156,7 +163,8 @@ TemporalVisualizerURLStop = http://localhost:8050/shutdown
 #ConcreteStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 #AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 #AbstractStateAttributes = WidgetControlType
-AbstractStateAttributes = WidgetClassName,WidgetIsEnabled,WidgetControlType
+#AbstractStateAttributes = WidgetClassName,WidgetIsEnabled,WidgetControlType
+AbstractStateAttributes = WidgetPath,WidgetControlType,WidgetTitle
 
 
 

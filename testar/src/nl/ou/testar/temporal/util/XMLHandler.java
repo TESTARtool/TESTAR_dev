@@ -38,6 +38,7 @@ public class XMLHandler {
                 XmlMapper xmlMapper = new XmlMapper();
                 xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
                 xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, failOnEmptyBean);
+
                 //xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 //xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
                 xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
@@ -58,7 +59,7 @@ public class XMLHandler {
                 sw.close();
                 */
                 String result = xmlMapper.writeValueAsString(content);
-                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath()), StandardCharsets.UTF_8));
+                BufferedWriter writer =new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output.getAbsolutePath())));//, StandardCharsets.UTF_8));
                 writer.append(result);
                 writer.close();
 

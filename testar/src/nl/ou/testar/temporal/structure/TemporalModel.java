@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
 import nl.ou.testar.temporal.util.ValStatus;
+import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -31,11 +33,6 @@ public  TemporalModel(){
     this.modelAPs = new LinkedHashSet<>();  //must maintain order
 }
 
-    public TemporalModel(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
-        super(applicationName, applicationVersion, modelIdentifier, abstractionAttributes);
-        this.stateEncodings = new ArrayList<>();
-        this.modelAPs = new LinkedHashSet<>();  //must maintain order
-    }
 
     public List<String> getInitialStates() {
         return InitialStates;
@@ -100,17 +97,6 @@ public  TemporalModel(){
 
 
 
-    public void fetchDBModel(String filter){
-        //loop through model ,
-        //  query db model and set in header properties
-        // query concret states and moke stat encoding per state
-        //===> define properties to collect strategies,
-        //per state get outbound edges and make transition encodings
-        //  collect AP's make a listentry : [Statexxx, list of AP's] apply filters
-        //   state list, +ap's
-
-
-    }
 
     public String makeHOAOutput(){
         //see http://adl.github.io/hoaf/
@@ -175,11 +161,9 @@ public  TemporalModel(){
             String formula;
             List<String> sortedparameters = candidateOracle.getPattern_Parameters();
             Collections.sort(sortedparameters);
-            //List<String> sortedsubstitionkeys = new ArrayList<>( candidateOracle.getPattern_Substitutions().keySet());
-            List<String> sortedsubstitionvalues =  candidateOracle.getPattern_Substitutions();
+            List<String> sortedsubstitionvalues =  new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
 
             boolean importStatus;
-
                 importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
             if (!importStatus) {
                 candidateOracle.addLog("inconsistent number of parameter <-> substitutions");
@@ -188,15 +172,12 @@ public  TemporalModel(){
             if (importStatus)
                 importStatus = getModelAPs().containsAll(sortedsubstitionvalues);
 
-
             if (!importStatus) {
-                //System.out.println("debug substitutions: "+sortedsubstitionvalues);
                 candidateOracle.addLog("not all propositions (parameter-substitutions) are found in the Model:");
                 for (String subst:sortedsubstitionvalues
                      ) {
                     if (!getModelAPs().contains(subst))  candidateOracle.addLog("not found: "+ subst);
                 }
-
                 candidateOracle.setOracle_validationstatus(ValStatus.ERROR);
             }
             HashBiMap<Integer, String> aplookup = HashBiMap.create();
@@ -205,7 +186,6 @@ public  TemporalModel(){
 
             for (String v:sortedsubstitionvalues
                  ) {
-
                 if(aplookup.inverse().containsKey(v)){
                     apindex.add(APPrefix+aplookup.inverse().get(v));
                 }else

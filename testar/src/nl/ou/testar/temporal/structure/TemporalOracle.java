@@ -1,17 +1,24 @@
 package nl.ou.testar.temporal.structure;
 
+import com.opencsv.bean.CsvBindAndJoinByName;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
 import nl.ou.testar.temporal.util.*;
+import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 
 import java.util.*;
 
 public class TemporalOracle extends TemporalPattern{
 
    // @CsvCustomBindByName( converter = CSVConvertMap.class)
-   @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"=+"+csvsep, writeDelimiter = csvsep+"====="+csvsep)
-    private List<String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
+//   @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"=+"+csvsep, writeDelimiter = csvsep+"====="+csvsep)
+//    private List<String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
+    @CsvBindAndJoinByName(column = "(?i)pattern_Substitutions[0-9]+", elementType = String.class)
+    private MultiValuedMap<String,String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
+
 
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
@@ -74,11 +81,19 @@ public class TemporalOracle extends TemporalPattern{
         this.exampleRun_Cycle_Transitions = exampleRun_Cycle_Transitions;
     }
 
-    public List<String> getPattern_Substitutions() {
+    public MultiValuedMap getPattern_Substitutions() {
         return pattern_Substitutions;
     }
+    public TreeMap<String,String> getSortedPattern_Substitutions(){
+        TreeMap<String, String> treeMap = new TreeMap<>();
+        for(String str : pattern_Substitutions.keySet()){
+            treeMap.put(str, ((List<String>) pattern_Substitutions.get(str)).get(0));
+        }
+      return treeMap;
+    }
 
-    public void setPattern_Substitutions(List<String> pattern_Substitutions) {
+    public void setPattern_Substitutions(MultiValuedMap pattern_Substitutions) {
+
         this.pattern_Substitutions = pattern_Substitutions;
     }
     public ValStatus getOracle_validationstatus() {
@@ -150,34 +165,6 @@ public class TemporalOracle extends TemporalPattern{
     {
         return (TemporalOracle)super.clone();
     }
-public static TemporalOracle getSampleOracle(){
-    TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
-    Set attrib = new HashSet<String>();
-    attrib.add("R");
-    attrib.add("T");
-    attrib.add("P");
-    attrib.add("E");
-    to.setApplicationName("my app");
-    to.setApplicationVersion("my version");
-    to.setApplication_ModelIdentifier("my modelidentifier");
-    to.setApplication_AbstractionAttributes(attrib);
-    to.setPattern_TemporalFormalism(TemporalType.LTL);
-    to.setOracle_validationstatus(ValStatus.ACCEPTED);
-    to.setPattern_Description("a precedes b");
-    to.setPattern_Scope("globally");
-    to.setPattern_Class("precedence");
-    to.setPattern_Formula("!b U a");
-    to.setPattern_Parameters(Arrays.asList("a", "b"));
-    //List<String> mappie = new HashMap<String,String>() {{put("a", "UIButton_OK");put("b", "UIWindow_Title_main_exists");}};
-    List<String> mappie = new ArrayList<String>(){{add("UIButton_OK");add("UIWindow_Title_main_exists");}};
-    to.setPattern_Substitutions(mappie);
-    List<String> comments= new ArrayList<String>();
-    comments.add("this is a sample oracle. for valid substitutions, please see the APSelectorManager.JSON");
-    comments.add("avoid using 'X,F,G,U,W,R,M' as parameters, as they are used in LTL syntax");
-    comments.add("the separator for substitutions is hardcoded set as regex ';=+;'  so ;===========; is considered a valid separator");
-    //comments.add("Excel does not quote common text fields during export. Try MS Access as alternative");
-    to.set_comments(comments);
-    return to;
-}
+
 
 }

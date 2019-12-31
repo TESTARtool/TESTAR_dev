@@ -41,6 +41,7 @@ public class CSVHandler {
                 //BufferedWriter writer = new BufferedWriter(new FileWriter(output.getAbsolutePath()));
                 //StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(writer).build();
                 StatefulBeanToCsv beanToCsv = new StatefulBeanToCsvBuilder(osw).withSeparator(';').build();
+
                 beanToCsv.write(content);
                 //writer.close();
                 osw.close();

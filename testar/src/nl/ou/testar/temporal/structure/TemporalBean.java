@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
+import es.upv.staq.testar.StateManagementTags;
+import org.fruit.alayer.Tag;
+import org.fruit.alayer.windows.UIAMapping;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +24,13 @@ protected static final String csvsep=";";
     private String application_ModelIdentifier;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = HashSet.class)
     private Set<String> application_AbstractionAttributes;
-   //@CsvCustomBindByName( converter = CSVConvertMultiLine.class)
+
+
+
+    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = HashSet.class)
+    private List<String> application_BackendAbstractionAttributes;
+
+    //@CsvCustomBindByName( converter = CSVConvertMultiLine.class)
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> application_log;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
@@ -37,16 +46,16 @@ protected static final String csvsep=";";
     public TemporalBean() {
         this.application_log = new ArrayList<String>();
         this._comments = new ArrayList<String>();
+        this._modifieddate = LocalDateTime.now().toString();
         _formatVersion ="20190629";
     }
 
-    public TemporalBean(String applicationName, String applicationVersion, String modelIdentifier, Set abstractionAttributes) {
+    public TemporalBean(String applicationName, String applicationVersion, String modelIdentifier, Set<String> abstractionAttributes) {
         this();
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
         this.application_ModelIdentifier = modelIdentifier;
         this.application_AbstractionAttributes = abstractionAttributes;
-        this._modifieddate = LocalDateTime.now().toString();
 
 
     }
@@ -75,12 +84,55 @@ protected static final String csvsep=";";
             this.application_ModelIdentifier = application_ModelIdentifier;
         }
 
-        public Set getApplication_AbstractionAttributes() {
+        public Set<String> getApplication_AbstractionAttributes() {
             return application_AbstractionAttributes;
         }
 
-        public void setApplication_AbstractionAttributes(Set application_AbstractionAttributes){
+        public void setApplication_AbstractionAttributes(Set<String> application_AbstractionAttributes){
             this.application_AbstractionAttributes = application_AbstractionAttributes;
+            setApplication_BackendAbstractionAttributes();
+        }
+
+        public List<String> getApplication_BackendAbstractionAttributes() {
+            return application_BackendAbstractionAttributes;
+        }
+
+        private void setApplication_BackendAbstractionAttributes() {
+            List<Tag<?>> taglist = new ArrayList<>();
+            List<String> APKey = new ArrayList<>();
+            Set<String> abstractionattributes = getApplication_AbstractionAttributes();
+            if (abstractionattributes != null) { // no proper model found
+                for (String attrib : abstractionattributes
+                ) {
+                    for (Tag<?> t : StateManagementTags.getAllTags()
+                    ) {
+                        if (t.name().equals(attrib)) {
+                                taglist.add(t);
+                            break;
+                        }
+                    }
+                }
+                //mapp once more
+                for (Tag<?> t : taglist
+                ) {
+                    Tag<?> tempTag;
+                    tempTag=StateManagementTags.getMappedTag(t,true);
+                    //boolean is not used in implementation of getMappedTag
+                    //converts  testar classic tags like WidgetControlType to Role:
+                    if (tempTag!=null){
+                        APKey.add(tempTag.name());
+                    }
+                    else{
+                        tempTag = UIAMapping.getMappedStateTag(t);
+                        if (tempTag != null) {
+                            APKey.add(tempTag.name());
+                        }
+                    }
+
+                }
+            }
+            application_BackendAbstractionAttributes = APKey;
+
         }
 
 

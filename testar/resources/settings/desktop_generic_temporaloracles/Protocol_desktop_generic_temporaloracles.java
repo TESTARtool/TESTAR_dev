@@ -74,6 +74,7 @@ public class Protocol_desktop_generic_temporaloracles extends DesktopProtocol {
 	@Override
 	protected void closeTestSession() {
 		temporalExecutor.LTLModelCheck();
+		super.closeTestSession();
 	}
 
 }

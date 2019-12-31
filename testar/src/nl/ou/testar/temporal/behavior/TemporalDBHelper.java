@@ -1,6 +1,8 @@
 package nl.ou.testar.temporal.behavior;
 
 import com.orientechnologies.orient.core.db.ODatabaseSession;
+import com.orientechnologies.orient.core.db.OrientDB;
+import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.OEdge;
 import com.orientechnologies.orient.core.record.OElement;
@@ -9,11 +11,17 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
+import es.upv.staq.testar.CodingManager;
+import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
+import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
+import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
+import org.fruit.monkey.ConfigTags;
+import org.fruit.monkey.Settings;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,17 +29,33 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
+
 //import org.apache.tinkerpop.gremlin.structure.Graph;
 //import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
 
 public  class TemporalDBHelper {
-
+    private Config dbConfig;
+    private OrientDB orientDB;
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;  // used by computeProps
 
 
 
     public TemporalDBHelper() {
+    }
+
+    public TemporalDBHelper(final Settings settings) {
+        dbConfig = makeConfig(settings);
+        initOrientDb();
+    }
+
+    private void initOrientDb() {
+        String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
+                dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
+        orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
+        // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
+        this.orientDB = orientDB;
     }
 
     public void setDb(ODatabaseSession db) {
@@ -42,8 +66,47 @@ public  class TemporalDBHelper {
 
     }
 
+    private Config makeConfig(final Settings settings) {
+        // used here, but controlled on StateModelPanel
+
+        String dataStoreText;
+        String dataStoreServerDNS;
+        String dataStoreDirectory;
+        String dataStoreDBText;
+        String dataStoreUser;
+        String dataStorePassword;
+        String dataStoreType;
+        dataStoreText = settings.get(ConfigTags.DataStore); //assume orientdb
+        dataStoreServerDNS = settings.get(ConfigTags.DataStoreServer);
+        dataStoreDirectory = settings.get(ConfigTags.DataStoreDirectory);
+        dataStoreDBText = settings.get(ConfigTags.DataStoreDB);
+        dataStoreUser = settings.get(ConfigTags.DataStoreUser);
+        dataStorePassword = settings.get(ConfigTags.DataStorePassword);
+        dataStoreType = settings.get(ConfigTags.DataStoreType);
+        Config dbconfig = new Config();
+        dbconfig.setConnectionType(dataStoreType);
+        dbconfig.setServer(dataStoreServerDNS);
+        dbconfig.setDatabase(dataStoreDBText);
+        dbconfig.setUser(dataStoreUser);
+        dbconfig.setPassword(dataStorePassword);
+        dbconfig.setDatabaseDirectory(dataStoreDirectory);
+        return dbconfig;
+    }
+
+    public void dbClose() {
+        if (!db.isClosed())  {
+            db.close();
+            orientDB.close();}
+    }
+    public void dbReopen() {
+        if (db==null ||db.isClosed()) {
+            initOrientDb();
+            db = orientDB.open(dbConfig.getDatabase(), dbConfig.getUser(), dbConfig.getPassword());
+        }
+        db.activateOnCurrentThread();
 
 
+    }
 
     /**
      * This method fetches a list of the abstract state models in the current OrientDB data store.
@@ -65,7 +128,7 @@ public  class TemporalDBHelper {
                 String applicationName = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationName"));
                 String applicationVersion = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("applicationVersion"));
                 String modelIdentifier = (String) getConvertedValue(OType.STRING, modelVertex.getProperty("modelIdentifier"));
-                Set abstractionAttributes = (Set) getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes"));
+                Set<String> abstractionAttributes = (Set)getConvertedValue(OType.EMBEDDEDSET, modelVertex.getProperty("abstractionAttributes")); //@todo set or list?
                 // fetch the test sequences
                 List<TestSequence> sequenceList = new ArrayList<>(); // css, trace are fetched in our own way.just for reuse of AbstractStateModel
 
@@ -79,7 +142,58 @@ public  class TemporalDBHelper {
         return abstractStateModels;
     }
 
+    public AbstractStateModel selectAbstractStateModel(String ApplicationName, String ApplicationVersion) {
 
+        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
+        AbstractStateModel abstractStateModel = null;
+        if (abstractStateModels.size() == 0) {
+            System.out.println("ERROR: No Models in the graph database " + db.toString());
+        } else {
+            for (AbstractStateModel absModel:abstractStateModels
+            ) {
+                if (absModel.getApplicationName().equals(ApplicationName) && absModel.getApplicationVersion().equals(ApplicationVersion)){
+                    abstractStateModel=absModel;
+                    break;
+                }
+            }
+            if (abstractStateModel==null){
+                System.out.println("ERROR: Model with App. name : "+ApplicationName+" and version : "+ApplicationVersion+" was not found in the graph database " + db.getName());
+            }
+        }
+        return abstractStateModel;
+    }
+    public AbstractStateModel selectAbstractStateModelByModelId(String ModelIdentifier) {
+        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
+        AbstractStateModel abstractStateModel = null;
+        if (abstractStateModels.size() == 0) {
+            System.out.println("ERROR: No Models in the graph database " + db.toString());
+        } else {
+            for (AbstractStateModel absModel:abstractStateModels
+            ) {
+                if (absModel.getModelIdentifier().equals(ModelIdentifier)){
+                    abstractStateModel=absModel;
+                    break;
+                }
+            }
+            if (abstractStateModel==null){
+                System.out.println("ERROR: Model with identifier : "+ModelIdentifier+" was not found in the graph database " + db.getName());
+            }
+        }
+        return abstractStateModel;
+    }
+
+
+    public OResultSet getConcreteStatesFromOrientDb(AbstractStateModel abstractStateModel){
+        String stmt;
+        Map<String, Object> params = new HashMap<>();
+        params.put("identifier", abstractStateModel.getModelIdentifier());
+        // navigate from abstractstate to apply the filter.
+        // stmt =  "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+        stmt = "SELECT FROM (TRAVERSE in() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) WHERE @class = 'ConcreteState'";
+
+        OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
+        return resultSet;
+    }
     public Set<String> getWidgetPropositions(String state) {
 
 
@@ -495,43 +609,20 @@ public  class TemporalDBHelper {
 
     }
 
-    public boolean saveToGraphMLFile(String graphXMLID,String file,boolean excludeWidget) {
-
-
+    public boolean saveToGraphMLFile(AbstractStateModel abstractStateModel,String file,boolean excludeWidget) {
         //init
-
-        List<AbstractStateModel> abstractStateModels = fetchAbstractModels();
-        AbstractStateModel abstractStateModel;
-        if (abstractStateModels.size() == 0) {
-            System.out.println("ERROR: Number of Models in the graph database is ZERO");
-            return false;
-        }
-        abstractStateModel = abstractStateModels.get(0);
-        String stmt;
+        String graphXMLID=dbConfig.getDatabase();
         Map<String, Object> params = new HashMap<>();
         params.put("identifier", abstractStateModel.getModelIdentifier());
         //!!!!!!!!!!!!!!!!!!!!!!get nodes , then get edges. this is required for postprocessing a graphml by python package networkx.
         List<String> stmtlist = new ArrayList<>();
         String excludeWidgets="";
-        if (excludeWidget) excludeWidgets="WHERE NOT(@class= 'Widget' OR @class = 'isChildOf')";  // does not work prereuisite: relation isChildOf is exclusively for widgets !
-
-        if (abstractStateModels.size() > 1) {// navigate from abstractstate to be able to apply the filter.
-            System.out.println("WARNING: Number of Models in the graph database is more than ONE. We try with the first model");
-            // stmtlist.add("SELECT  FROM  (TRAVERSE both() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier))");
-            //stmtlist.add("SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier"); // select abstractstate themselves
-            //stmtlist.add("SELECT FROM AbstractStateModel WHERE abstractionLevelIdentifier = :identifier OR modelIdentifier = :identifier" ); // select abstractstatemodel , this is an unconnected node
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
-
-            // the "both()" in the next stmt is needed to invoke recursion.
-            // apparently , the next result set contains first a list of all nodes, then of all edge: good !
-            //stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE abstractionLevelIdentifier = :identifier)) ");
-            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) "+excludeWidgets+"   ");
-
-        } else {
-            stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
-            stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState)) "+excludeWidgets+"   ");
-            //stmtlist.add("SELECT  FROM V ");//  stmtlist.add("SELECT  FROM E ");
-        }
+        if (excludeWidget)
+        {excludeWidgets = "WHERE NOT(@class= 'Widget' OR @class = 'isChildOf')";}  //  relation isChildOf is exclusively for widgets !
+        stmtlist.add("SELECT FROM AbstractStateModel WHERE  modelIdentifier = :identifier"); // select abstractstatemodel , this is an unconnected node
+        // the "both()" in the next stmt is needed to invoke recursion.
+        // apparently , the next result set contains first a list of all nodes, then of all edge: good !
+        stmtlist.add("SELECT  FROM (TRAVERSE both(), bothE() FROM (SELECT FROM AbstractState WHERE modelIdentifier = :identifier)) " + excludeWidgets + "   ");
 
 
         Set<GraphML_DocKey> docnodekeys = new HashSet<>();

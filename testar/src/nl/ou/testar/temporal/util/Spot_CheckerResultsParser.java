@@ -118,9 +118,10 @@ public class Spot_CheckerResultsParser {
                     if (prefixResults.length == 2) {
                         String cleanprefix = prefixResults[1];
                         if (prefixResults[1].contains("Cycle:")) {
-                            cleanprefix = prefixResults[1].split("\\s*Cycle:")[0];
+                            cleanprefix = prefixResults[1].split("\\s*Cycle:")[0]; //[1]: also cutoff 'witness' or counterexample'
                         }
                         String[] prefixLines = cleanprefix.split("\\n");
+                        if (prefixLines.length>=2){  // only when there is  content in the prefix section
                         for (int j = 0; j < prefixLines.length; j = j + 2) {
                             StateEncoding sEnc = stateEncodings.get(Integer.parseInt(prefixLines[j].trim()));
                             prefixStateList.add(sEnc.getState());
@@ -129,17 +130,18 @@ public class Spot_CheckerResultsParser {
                                     split("\\s*\\|\\s*")[1].    //cutoff leading pipe symbol
                                     split("\\s*\\{\\s*")[0];  //cutoff acceptanceset
                             prefixAPConjunctList.add(conjunctStr.replaceAll("\\s", "").replaceAll("ap", ""));
-
+                        }
 
                         }
                     } // else : noprefix?
                     if (cycleResults.length == 2) {
                         String cleancycle = cycleResults[1];
                         if (cycleResults[1].contains("Prefix:")) {
-                            cleancycle = cycleResults[1].split("Prefix:\\s*")[1];
+                            cleancycle = cycleResults[1].split("Prefix:\\s*")[1]; //[1]: also cutoff 'witness' or counterexample'
                         }
 
                         String[] cycleLines = cleancycle.split("\\n");
+                        if (cycleLines.length>=2){  // only when there is  content in the cycle section
                         for (int j = 0; j < cycleLines.length; j = j + 2) {
 
                             StateEncoding sEnc = stateEncodings.get(Integer.parseInt(cycleLines[j].trim()));
@@ -149,7 +151,7 @@ public class Spot_CheckerResultsParser {
                                     split("\\s*\\|\\s*")[1].    //cutoff leading pipe symbol
                                     split("\\s*\\{\\s*")[0];  //cutoff acceptanceset
                             cycleAPConjunctList.add(conjunctStr.replaceAll("\\s", "").replaceAll("ap", ""));
-
+                        }
 
                         }
                     } // else: nocycle?

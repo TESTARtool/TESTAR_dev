@@ -279,6 +279,7 @@ public class SettingsDialog extends JFrame implements Observer {
     temporalPanel = Temporalpanel2.createTemporalPanel();
     jTabsPane.addTab("Temporal Oracles", temporalPanel.$$$getRootComponent$$$());
 
+
     setLayout(jTabsPane);
     pack();
     setCentreScreen();
