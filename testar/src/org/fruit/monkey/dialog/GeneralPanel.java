@@ -248,6 +248,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     this.settings = settings;
 
@@ -269,6 +270,7 @@ public class GeneralPanel extends SettingsPanel implements Observer {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.SUTConnector, (String) cboxSUTconnector.getSelectedItem());
     settings.set(ConfigTags.SUTConnectorValue, txtSutPath.getText());

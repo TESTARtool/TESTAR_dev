@@ -144,6 +144,7 @@ public class TimingPanel extends SettingsPanel {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     checkUseRecordedTimes.setSelected(settings.get(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay));
     spnActionWaitTime.setValue(settings.get(ConfigTags.TimeToWaitAfterAction));
@@ -157,6 +158,7 @@ public class TimingPanel extends SettingsPanel {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.UseRecordedActionDurationAndWaitTimeDuringReplay, checkUseRecordedTimes.isSelected());
     settings.set(ConfigTags.ActionDuration, (Double) spnActionDuration.getValue());

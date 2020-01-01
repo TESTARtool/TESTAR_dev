@@ -39,6 +39,7 @@ import javax.swing.*;
 import static javax.swing.GroupLayout.DEFAULT_SIZE;
 import static javax.swing.GroupLayout.PREFERRED_SIZE;
 import static javax.swing.LayoutStyle.ComponentPlacement.RELATED;
+import static org.fruit.monkey.dialog.ToolTipTexts.enableVisualValidationTTT;
 import static org.fruit.monkey.dialog.ToolTipTexts.suspiciousTitlesTTT;
 
 public class OraclePanel extends SettingsPanel {
@@ -49,6 +50,7 @@ public class OraclePanel extends SettingsPanel {
 	private JCheckBox processCheckBox;
 	private JTextArea txtProcTitles;
 	private JSpinner spnFreezeTime;
+	private JCheckBox enableVisualValidationCheckBox;
 
 	public OraclePanel() {
 		txtSuspTitles = new JTextArea();
@@ -76,6 +78,10 @@ public class OraclePanel extends SettingsPanel {
 		JLabel freezeTimeLabel = new JLabel("Freeze Time:");
 		JLabel secondsLabel = new JLabel("seconds");
 
+		enableVisualValidationCheckBox = new JCheckBox("Enable visual validation");
+		enableVisualValidationCheckBox.setBounds(10, 280, 150, 20);
+		enableVisualValidationCheckBox.setToolTipText(enableVisualValidationTTT);
+
 		GroupLayout gl_jPanelOracles = new GroupLayout(this);
 		this.setLayout(gl_jPanelOracles);
 		gl_jPanelOracles.setHorizontalGroup(
@@ -85,6 +91,9 @@ public class OraclePanel extends SettingsPanel {
 						.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING, false)
 								.addGroup(gl_jPanelOracles.createSequentialGroup()
 										.addGroup(gl_jPanelOracles.createParallelGroup(GroupLayout.Alignment.LEADING)
+												.addGroup(GroupLayout.Alignment.LEADING, gl_jPanelOracles.createSequentialGroup()
+														.addComponent(enableVisualValidationCheckBox, PREFERRED_SIZE, 150, PREFERRED_SIZE)
+														.addGap(121))
 												.addGroup(gl_jPanelOracles.createSequentialGroup()
 														.addComponent(freezeTimeLabel, PREFERRED_SIZE, 92, PREFERRED_SIZE)
 														.addGap(10)
@@ -117,6 +126,8 @@ public class OraclePanel extends SettingsPanel {
 								.addComponent(spnFreezeTime, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
 								.addComponent(secondsLabel)
 								.addComponent(freezeTimeLabel))
+						.addGap(20)
+						.addComponent(enableVisualValidationCheckBox)
 						.addContainerGap(120, Short.MAX_VALUE))
 				.addGroup(gl_jPanelOracles.createSequentialGroup()
 						.addGap(160)
@@ -135,21 +146,25 @@ public class OraclePanel extends SettingsPanel {
 	 * Populate Oracle Fields from Settings structure.
 	 * @param settings The settings to load.
 	 */
+	@Override
 	public void populateFrom(final Settings settings) {
 		txtSuspTitles.setText(settings.get(ConfigTags.SuspiciousTitles));
 		processCheckBox.setSelected(settings.get(ConfigTags.ProcessListenerEnabled));
 		txtProcTitles.setText(settings.get(ConfigTags.SuspiciousProcessOutput));
 		spnFreezeTime.setValue(settings.get(ConfigTags.TimeToFreeze));
+		//enableVisualValidationCheckBox.setSelected(settings.get(ConfigTags.UseOCR));
 	}
 
 	/**
 	 * Retrieve information from the Oracle GUI.
 	 * @param settings reference to the object where the settings will be stored.
 	 */
+	@Override
 	public void extractInformation(final Settings settings) {
 		settings.set(ConfigTags.SuspiciousTitles, txtSuspTitles.getText());
 		settings.set(ConfigTags.ProcessListenerEnabled, processCheckBox.isSelected());
 		settings.set(ConfigTags.SuspiciousProcessOutput, txtProcTitles.getText());
 		settings.set(ConfigTags.TimeToFreeze, (Double) spnFreezeTime.getValue());
+		//settings.set(ConfigTags.UseOCR, enableVisualValidationCheckBox.isSelected());
 	}
 }

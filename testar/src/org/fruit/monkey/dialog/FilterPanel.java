@@ -106,6 +106,7 @@ public class FilterPanel extends SettingsPanel {
    * Populate Filter Fields from Settings structure.
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     txtClickFilter.setText(settings.get(ConfigTags.ClickFilter));
     txtProcessFilter.setText(settings.get(ConfigTags.ProcessesToKillDuringTest));
@@ -115,6 +116,7 @@ public class FilterPanel extends SettingsPanel {
    * Retrieve information from the Filter  GUI.
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.ClickFilter, txtClickFilter.getText());
     settings.set(ConfigTags.ProcessesToKillDuringTest, txtProcessFilter.getText());

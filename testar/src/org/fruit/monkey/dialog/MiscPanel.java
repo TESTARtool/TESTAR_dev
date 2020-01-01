@@ -244,6 +244,7 @@ public class MiscPanel extends SettingsPanel {
    *
    * @param settings The settings to load.
    */
+  @Override
   public void populateFrom(final Settings settings) {
     currentDirectory = new File(settings.get(ConfigTags.OutputDir)).getParentFile();
 
@@ -278,6 +279,7 @@ public class MiscPanel extends SettingsPanel {
    *
    * @param settings reference to the object where the settings will be stored.
    */
+  @Override
   public void extractInformation(final Settings settings) {
     settings.set(ConfigTags.OutputDir, txtOutputDir.getText());
     settings.set(ConfigTags.TempDir, txtTempDir.getText());
@@ -303,6 +305,7 @@ public class MiscPanel extends SettingsPanel {
     settings.set(ConfigTags.Delete, delete);
   }
 
+  @Override
   public void checkSettings() throws IllegalStateException {
     for (int i = 0; i < tblCopyFromTo.getRowCount(); i++) {
       String left = (String) tblCopyFromTo.getValueAt(i, 0);
