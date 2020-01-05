@@ -1,10 +1,11 @@
-package nl.ou.testar.temporal.structure;
+package nl.ou.testar.temporal.scratch;
 
 import nl.ou.testar.StateModel.Persistence.OrientDB.Util.Validation;
-import nl.ou.testar.temporal.util.CachedRegexPatterns;
+import nl.ou.testar.temporal.structure.WidgetFilter;
 import nl.ou.testar.temporal.util.InferrableExpression;
 import nl.ou.testar.temporal.util.PairBean;
 import nl.ou.testar.temporal.util.TagBean;
+import org.fruit.alayer.Roles;
 import org.fruit.alayer.Shape;
 import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
@@ -15,63 +16,36 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class APSelector {
-    private Set<String> selectedAttributes;
-    private Set<PairBean<InferrableExpression,String>> selectedExpressions;
+    private Set<TagBean<?>> selectedAttributes;
+    private Set<PairBean<InferrableExpression,String>> valuedExpressions;
 
 
 
     public APSelector() {
 
         selectedAttributes=new LinkedHashSet<>();
-        selectedExpressions =new LinkedHashSet<>();
+        valuedExpressions =new LinkedHashSet<>();
 
     }
+    public static final String reflectFieldSelectedAttributes(){
+        String name= APSelector.class.getDeclaredFields()[0].getName();
+        return name;
+    }
+    public static final String reflectFieldvaluedExpressions(){
+        String name= APSelector.class.getDeclaredFields()[1].getName();
+        return name;
+    }
 
-    public static final String deadStateTag() {
+    public static final TagBean<?> deadStateTag() {
         //TagBean<?> dtag = new TagBean<>("IsDeadState", Boolean.class); // refactoring candidate
-        String dtag = TagBean.IsDeadState.getName();
+        TagBean<?> dtag = TagBean.IsDeadState;
+
         return dtag;
     }
 
-    public static final Set<String> getEntireAttributes(){
-        // WORKAROUND CSS 20190629
-        // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
-        // both classes Tags and UIATags inherit from abstract class TagBase
-        //without this initialization, the call to .tagset() from either class collides into the same tagset content.
-        // symptom: UIATags appears to have the same tags as Tags and we're missing out on the real UIATags.
-        Tag<?> dummy = UIATags.UIAItemType;
-        dummy= Tags.Enabled;
-        Set<Tag<?>> tags = new HashSet<Tag<?>>();
-        tags.addAll(Tags.tagSet());
-        tags.addAll(UIATags.tagSet());//alternative for platform independent is : getNativetags ??
-        Set<String> tmptagset=new LinkedHashSet<>();
-        Iterator<Tag<?>> iterator;
-        for (iterator = tags.iterator(); iterator.hasNext(); ) {
-            Tag<?> t = iterator.next();
-            String t1 = Validation.sanitizeAttributeName(t.name()); //orientdb style tags
-            tmptagset.add(t1);
-        }
-        tmptagset.addAll(useMinimalAttributes());
-
-        return  tmptagset;
-    }
-    public static final Set<String> getAllAttributeNames(){
-        Set<TagBean<?>> tags = getAllAttributeTags();
-        Set<String> tmptagset=new LinkedHashSet<>();
-        Iterator<TagBean<?>> iterator;
-        for (iterator = tags.iterator(); iterator.hasNext(); ) {
-            TagBean<?> t = iterator.next();
-            tmptagset.add(t.name());
-        }
-        tmptagset.addAll(useMinimalAttributes());
-        return  tmptagset;
-    }
-
-    public static final Set<TagBean<?>> getAllAttributeTags(){
+    public static final Set<TagBean<?>> getEntireAttributes(){
         // WORKAROUND CSS 20190629
         // the 2 dummy reads are required to ensure properly initialization of the classes: static method/property is used!
         // both classes Tags and UIATags inherit from abstract class TagBase
@@ -89,72 +63,73 @@ public class APSelector {
             TagBean<?> t1 = TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type()); //orientdb style tags
             tmptagset.add(t1);
         }
-        tmptagset.add(TagBean.IsDeadState);
+        tmptagset.addAll(getMinimalAttributes());
         return  tmptagset;
     }
-
-    public static final Set<String> useMinimalAttributes(){
+    public static final Set<TagBean<?>> getMinimalAttributes(){
         // to prevent that edges are totally filtered away.
-        Set<String> tmptagset=new LinkedHashSet<>();
-        Tag<?> t = Tags.Role;
-        tmptagset.add(Validation.sanitizeAttributeName(t.name())); //orientdb style tags
+        Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
+        Tag<?> t= Tags.Enabled;
+        tmptagset.add(TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type())); //orientdb style tags
+        t = Tags.Role;
+        tmptagset.add(TagBean.from(Validation.sanitizeAttributeName(t.name()), t.type())); //orientdb style tags
+        tmptagset.add(deadStateTag());  // actually only of interest for states
         return  tmptagset;
     }
 
-
-    public static final Set<String> useBasicAttributes() {
-        Set<String> tmptagset=new LinkedHashSet<>();
+    public static final Set<TagBean<?>> getBasicAttributes() {
+        Set<TagBean<?>> tmptagset=new LinkedHashSet<>();
         Set<String> basicset = new HashSet<>();
-        basicset.add(Tags.Title.name());
-        basicset.add(Tags.Path.name());
-        basicset.add(Tags.Desc.name());
-        basicset.add(Tags.ZIndex.name());
-        basicset.add(Tags.Blocked.name());
-        basicset.add(Tags.Shape.name());
+        //basicset.add("Role");
+        basicset.add("Title");
+        basicset.add("Path");
+        basicset.add("Desc");
+        basicset.add("ZIndex");
+        basicset.add("Blocked");
+        basicset.add("Shape");
 
-        for (String tag : getAllAttributeNames()
+        for (TagBean<?> tag : getEntireAttributes()
         ) {
-            if (basicset.contains(tag)) {
+            if (basicset.contains(tag.name())) {
                 tmptagset.add(tag);
             }
         }
-        tmptagset.addAll(useMinimalAttributes());
+        tmptagset.addAll(getMinimalAttributes());
         return tmptagset;
     }
 
+    public static final Set<PairBean<InferrableExpression,String>> useBasicValuedExpressions() {
+        Set<PairBean<InferrableExpression,String>> simve = new LinkedHashSet<>();
+        simve.addAll(useMinimalValuedExpressions());
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CANCEL)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:YES)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:NO)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RUN)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SAVE)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:EXIT)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:CLOSE)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:ERROR)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:SUBMIT)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OPEN)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:IGNORE)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:VIEW)"));
+        simve.add(new PairBean<>(InferrableExpression.textmatch_, "")); //no title
+        simve.add(new PairBean<>(InferrableExpression.width_lt_, "100"));
+        simve.add(new PairBean<>(InferrableExpression.textlength_lt_, "20"));
+        return simve;
 
-    public static final Set<PairBean<InferrableExpression,String>> useMinimalSelectedExpressions() {
+    };
+    public static final Set<PairBean<InferrableExpression,String>>  useMinimalValuedExpressions() {
         Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
+        minve.add(new PairBean<>(InferrableExpression.is_blank_, ""));  // use always
         minve.add(new PairBean<>(InferrableExpression.exists_, ""));// use always
         return minve;
     }
-    public static final Set<PairBean<InferrableExpression,String>> useRoleConditionalExpressions() {
-        Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, UIARoles.UIAButton.name()+"|"+
-                UIARoles.UIAMenu.name()+"|"+ UIARoles.UIAMenuItem.name()+"|"+ UIARoles.UIACheckBox.name()+"|"+
-                UIARoles.UIARadioButton.name()+"|"+ UIARoles.UIAWindow.name()));  // use always
-        return minve;
-    }
-    public static final Set<PairBean<InferrableExpression,String>> usePathConditionalExpressions() {
-        Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
-       minve.add(new PairBean<>(InferrableExpression.textmatch_, ".*\\[(\\d+, )*\\d+\\]"));// use always
-        return minve;
 
-    }
-
-    public static final Set<PairBean<InferrableExpression, String>> useTitleConditionalExpressions() {
-        Set<PairBean<InferrableExpression, String>> minve = new LinkedHashSet<>();
-        minve.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:OK)|(?i:CANCEL)|(?i:YES)|(?i:NO)|" +
-                "(?i:RUN)|(?i:SAVE)|(?i:EXIT)|(?i:CLOSE)|(?i:REMOVE)|(?i:ERROR)|" +
-                "(?i:SUBMIT)|(?i:OPEN)|(?i:IGNORE)|(?i:PROCEED)|(?i:PRINT)|(?i:VIEW)|" +
-                "(?i:UP)|(?i:DOWN)|(?i:LEFT)|(?i:RIGHT)"));
-        return minve;
-    }
-    //
-
-    public static final Set<PairBean<InferrableExpression,String>> useBasicSelectedExpressions() {
+    public static final Set<PairBean<InferrableExpression,String>>  useStandardValuedExpressions() {
         Set<PairBean<InferrableExpression,String>> defve = new LinkedHashSet<>();
-        defve.addAll(useMinimalSelectedExpressions());
+        defve.addAll(useMinimalValuedExpressions());
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "0"));
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "1"));
         defve.add(new PairBean<>(InferrableExpression.value_eq_, "2"));
@@ -203,35 +178,64 @@ public class APSelector {
         defve.add(new PairBean<>(InferrableExpression.textlength_lt_, "50"));
         defve.add(new PairBean<>(InferrableExpression.textlength_lt_, "100"));
         defve.add(new PairBean<>(InferrableExpression.textlength_lt_, "200"));
-        defve.add(new PairBean<>(InferrableExpression.is_blank_, ""));
+//        defve.add(new PairBean<>(InferrableExpression.relpos_upleft_, ""));
+//        defve.add(new PairBean<>(InferrableExpression.relpos_upright_, ""));
+//        defve.add(new PairBean<>(InferrableExpression.relpos_downleft_, ""));
+//        defve.add(new PairBean<>(InferrableExpression.relpos_downright_, ""));
         return defve;
     }
 
-    public Set<String> getSelectedAttributes() {
+    public Set<TagBean<?>> getSelectedAttributes() {
         return selectedAttributes;
     }
 
-    public void setSelectedAttributes(Set<String> selectedAttributes) {
+    public void setSelectedAttributes(Set<TagBean<?>> selectedAttributes) {
         if (selectedAttributes.size()==0){
-            this.selectedAttributes.addAll(useMinimalAttributes());
-        }else {
-            this.selectedAttributes = selectedAttributes; //responsibility of the test manager
-        }
-    }
-    public void setSelectedStateAttributes(Set<String> selectedAttributes) {
-        if (selectedAttributes.size()==0){
-            this.selectedAttributes.addAll(useMinimalAttributes());
+            this.selectedAttributes.addAll(getMinimalAttributes());
         }else {
             this.selectedAttributes = selectedAttributes; //responsibility of the test manager
             this.selectedAttributes.add(deadStateTag());
         }
     }
 
-    public String getTag(String attrib){
-        String ret=null;
-        for (String tag : selectedAttributes  // consider to pass if selected atributes = empty?
+    public void setDefaultOnlyBooleanAttributes() {
+        for (TagBean<?> tag : getEntireAttributes()
         ) {
-            if ( tag.equals(attrib)){
+            if (tag.type() == Boolean.class) {
+                selectedAttributes.add(tag);
+            }
+        }
+        selectedAttributes.add(deadStateTag());
+    }
+
+    public void addAttribute(String attrib){
+
+        for (TagBean<?> tag : getEntireAttributes()
+        ) {
+            if ( tag.name().equals(attrib)) {
+                selectedAttributes.add(tag);
+                break;
+            }
+        }
+    }
+
+    public TagBean<?> getTag(String attrib){
+        TagBean<?> ret=null;
+        for (TagBean<?> tag : selectedAttributes  // consider to pass if selected atributes = emp ty?
+        ) {
+            if ( tag.name().equals(attrib)){
+                ret=tag;
+                break;
+            }
+        }
+        return  ret;
+    }
+
+    public  TagBean<?> getTag(String attrib,WidgetFilter wf){
+        TagBean<?> ret=null;
+        for (TagBean<?> tag : selectedAttributes
+        ) {
+            if ( tag.name().equals(attrib)){
                 ret=tag;
                 break;
             }
@@ -240,42 +244,36 @@ public class APSelector {
     }
 
     public boolean contains(String attrib){
+
         if(getTag(attrib)!=null){
             return true;
         }
         return false;
     }
 
-    public Set<PairBean<InferrableExpression, String>> getSelectedExpressions() {
-        return selectedExpressions;
+    public Set<PairBean<InferrableExpression, String>> getValuedExpressions() {
+        return valuedExpressions;
     }
 
-    public void setSelectedExpressions(Set<PairBean<InferrableExpression, String>> selectedExpressions) {
-        if (selectedExpressions.size()==0){
-            this.selectedExpressions.addAll(useMinimalSelectedExpressions());
+    public void setValuedExpressions(Set<PairBean<InferrableExpression, String>> valuedExpressions) {
+        if (valuedExpressions.size()==0){
+            this.valuedExpressions.addAll(useMinimalValuedExpressions());
         }else{
-            this.selectedExpressions = selectedExpressions; //responsibility of the test manager
+            this.valuedExpressions = valuedExpressions; //responsibility of the test manager
         }
+
     }
+
+
 
     //custom
 
     public Set<String> getAPsOfAttribute(String widgetkey, String attrib, String value) {
+        //System.out.println("debug getAPOfAttributes entered with apkey: "+ widgetkey+ " attrib: "+attrib+" value: "+ value);
         Set<String> apset = new LinkedHashSet<>();
-        String stag = getTag(attrib);
+        TagBean<?> tag = getTag(attrib);
 
-
-        if (stag != null) {   //this attribute is required as a(n) (set of) AP .. result is dependent on selectedattributes
-            //lookup type
-            TagBean<?> tag=null;  //refactor candidate
-            for (TagBean<?> tg: getAllAttributeTags()
-                 ) {
-                if(tg.getName().equals(stag)){
-                    tag=tg;
-                    break;
-                }
-            }
-
+        if (tag != null) {   //this attribute is required as a(n) (set of) AP .. result is dependent on selectedattributes
 
             if (tag.type() == Boolean.class ) {
                 // apset.add(widgetkey +  attrib + "_"+Boolean.parseBoolean(value)+"__"); //encode both TRUE  FALSE for genuine booleans
@@ -284,7 +282,7 @@ public class APSelector {
                 }
             } else
 
-                for (PairBean<InferrableExpression, String> iap : getSelectedExpressions()
+                for (PairBean<InferrableExpression, String> iap : getValuedExpressions()
                 ) {
                     if (iap.left().typ == "number" && (tag.type() == Double.class || tag.type() == Long.class || tag.type() == Integer.class)) {
                         int intVal = (int) Double.parseDouble(value);
@@ -293,19 +291,13 @@ public class APSelector {
                             apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");// just encode the TRUE/existence  and FALSE is then considered absence
                         }
                     }
-                    if (iap.left().typ == "text" ){ // && (tag.type() == String.class)) { // now also handles specific classes
+                    if (iap.left().typ == "text" && (tag.type() == String.class)) {
 
-                        if (((iap.left() == InferrableExpression.textlength_eq_) && (value.length() == Integer.parseInt(iap.right()))) ||
-                                ((iap.left() == InferrableExpression.textlength_lt_) && (value.length() < Integer.parseInt(iap.right())))) {
+                        if (((iap.left() == InferrableExpression.textmatch_) && value.matches(iap.right())) ||
+                                ((iap.left() == InferrableExpression.textlength_eq_) && (value.length() == Integer.parseInt(iap.right()))) ||
+                                ((iap.left() == InferrableExpression.textlength_lt_) && (value.length() < Integer.parseInt(iap.right())))
+                        ) {
                             apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
-                        }
-
-                        if (((iap.left() == InferrableExpression.textmatch_) )) {
-                            Pattern pat = CachedRegexPatterns.addAndGet(iap.right());
-                            Matcher m=pat.matcher(value);
-                            if (m.matches()){
-                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
-                        }
                         }
 
                     }
@@ -323,10 +315,15 @@ public class APSelector {
                             apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
                         }
                     }
-
+//                    if (iap.left().typ == "path" && (tag.type() == String.class)) {
+//                        //format:     <data key="Path">[0, 0, 8]</data>
+//                        if ((iap.left() == InferrableExpression.pathmatch_) && value.matches(iap.right())) {
+//                            apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "__");
+//                        }
+//                    }
                     if (iap.left().typ == "boolean") {   //add these regardless of the tag-type
                         //format:     <data key="Abc"></data>
-                        if ((iap.left() == InferrableExpression.is_blank_) && value.equals("")) {
+                        if ((iap.left() == InferrableExpression.is_blank_) && value.matches("")) {
                             apset.add(widgetkey +  attrib + "_" + iap.left().name() + iap.right() + "_"); //note : 1 space only
                         }
                         if ((iap.left() == InferrableExpression.exists_) ) {
@@ -339,8 +336,11 @@ public class APSelector {
         return apset;
     }
 
+
+
+
     public void addExpressionPattern(InferrableExpression ip, String value) {
-        selectedExpressions.add(new PairBean<>(ip,value));
+        valuedExpressions.add(new PairBean<>(ip,value));
     }
 
     public boolean addExpressionPattern(String patternStr) {
@@ -351,7 +351,7 @@ public class APSelector {
                 String value = patternStr.substring(iapSize);
                 try {
                     double dbl = Double.parseDouble(value); //test if it is a number
-                    selectedExpressions.add(new PairBean<>(iap, value));
+                    valuedExpressions.add(new PairBean<>(iap, value));
                     succes = true;
                     break;
                 } catch (NumberFormatException e) {

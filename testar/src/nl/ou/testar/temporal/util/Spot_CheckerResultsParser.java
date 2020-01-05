@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -208,11 +209,13 @@ public class Spot_CheckerResultsParser {
                         }
                     }
                     Oracle.setExampleRun_Cycle_States(cycleStateList);
-                    Oracle.setExampleRun_Cycle_Transitions(cycleTransitionList);  //test only
+                    Oracle.setExampleRun_Cycle_Transitions(cycleTransitionList);
+
                     if (formulaStatus.equals(Verdict.FAIL.toString()))  Oracle.setOracle_verdict(Verdict.FAIL);
                     if (formulaStatus.equals(Verdict.PASS.toString()))  Oracle.setOracle_verdict(Verdict.PASS);
 
                 }
+                Oracle.setLog_RunDate(LocalDateTime.now().toString());
                 i++;
             }
         }

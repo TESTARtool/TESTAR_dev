@@ -1,99 +1,61 @@
 package nl.ou.testar.temporal.structure;
 
-import com.opencsv.bean.CsvBindAndSplitByName;
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvCustomBindByName;
-import nl.ou.testar.temporal.util.CSVConvertMap;
-import nl.ou.testar.temporal.util.CSVConvertTemporalType;
+import com.opencsv.bean.CsvIgnore;
+import com.opencsv.bean.CsvRecurse;
 import nl.ou.testar.temporal.util.TemporalType;
 
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
-public class TemporalPattern extends TemporalBean implements Cloneable{
+public class TemporalPattern extends TemporalPatternBase {
 
-
-    @CsvCustomBindByName(converter = CSVConvertTemporalType.class)
-    private TemporalType pattern_TemporalFormalism;
-    @CsvBindByName
-    private String pattern_Description; //short pattern_Description e.g. spec pattern_Formula name
-
-    @CsvBindByName
-    private String pattern_Scope;  // see spec pattern_Formula http://patterns.projects.cs.ksu.edu
-    @CsvBindByName
-    private String pattern_Class; // see taxonomy http://patterns.projects.cs.ksu.edu
-    @CsvBindByName
-    private String pattern_Formula;  // e.g. G(b0->Fb1)
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> pattern_Parameters; //b0,b1,b2,bn
-
-
+    @CsvIgnore
+    private  static String version = "20200104";
+    @CsvRecurse
+    private TemporalMeta metaData;
 
     public TemporalPattern() {
-    super();
-    this.set_formatVersion("20190629");
+        super();
+        metaData = new TemporalMeta();
     }
 
-    public TemporalType getPattern_TemporalFormalism() {
-        return pattern_TemporalFormalism;
+    public void set_comments(List< String > _comments) {
+        metaData.set_comments(_comments);
+    }
+    public void addComments ( String  comment) {
+        metaData.addComments( comment);
     }
 
-    public void setPattern_TemporalFormalism(TemporalType pattern_TemporalFormalism) {
-        this.pattern_TemporalFormalism = pattern_TemporalFormalism;
+    public void set_modifieddate(String _modifieddate){
+        metaData.set_modifieddate( _modifieddate);
     }
 
-    public String getPattern_Scope() {
-        return pattern_Scope;
+    public void set_log(List < String > _log) {
+        metaData.set_log(_log);
+    }
+    public void addLog ( String  log) {
+        metaData.addLog(log);
     }
 
-    public void setPattern_Scope(String pattern_Scope) {
-        this.pattern_Scope = pattern_Scope;
+    @Override
+    public  String getVersion() {
+        return version;
     }
 
-    public String getPattern_Class() {
-        return pattern_Class;
+    public static TemporalPattern getSamplePattern(){
+        TemporalPattern pat = new TemporalPattern(); //new TemporalOracle("notepad","v10","34d23", attrib);
+
+        pat.setPattern_TemporalFormalism(TemporalType.LTL);
+        pat.setPattern_Description("p0 precedes p1");
+        pat.setPattern_Scope("globally");
+        pat.setPattern_Class("precedence");
+        pat.setPattern_Formula("!p1 U p0");
+        pat.setPattern_Parameters(Arrays.asList("p0", "p1"));
+        pat.addComments("Format version: "+version);
+        pat.addComments("This is a sample temporal pattern. Formula,parameters and formalism are the key elements. parameter syntax: p[0-9]+");
+        pat.addComments("AVOID using literals 'X,F,G,U,W,R,M' as  substitutions, as they are used in LTL syntax");
+        pat.addComments("Column order is not important. Header names are case insensitive but structure is important");
+
+        return   pat;
     }
-
-    public void setPattern_Class(String pattern_Class) {
-        this.pattern_Class = pattern_Class;
-    }
-
-
-    public String getPattern_Description() {
-        return pattern_Description;
-    }
-
-    public void setPattern_Description(String pattern_Description) {
-        this.pattern_Description = pattern_Description;
-    }
-
-    public String getPattern_Formula() {
-        return pattern_Formula;
-    }
-
-    public void setPattern_Formula(String pattern_Formula) {
-        this.pattern_Formula = pattern_Formula;
-    }
-
-    public List<String> getPattern_Parameters() {
-        return pattern_Parameters;
-    }
-
-
-    public int getParamcount() {
-        return pattern_Parameters.size();
-    }
-
-
-
-    public void setPattern_Parameters(List<String> pattern_Parameters) {
-        this.pattern_Parameters = pattern_Parameters;
-    }
-
-
-    public Object clone() throws            CloneNotSupportedException
-    {
-        return super.clone();
-    }
-
 }

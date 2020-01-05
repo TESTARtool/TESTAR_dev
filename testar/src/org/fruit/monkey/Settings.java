@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.fruit.monkey.ConfigTags.ConcreteStateAttributes;
+import static org.fruit.monkey.ConfigTags.TemporalConcreteEqualsAbstract;
 
 public class Settings extends TaggableBase implements Serializable {
 
@@ -398,7 +399,8 @@ public class Settings extends TaggableBase implements Serializable {
 					+"#################################################################\n"
 					+"# Temporal Oracle settings\n"
 					+"#################################################################\n"
-					+"TemporalEnabled = false" + Util.lineSep()
+					+"TemporalOffLineEnabled = false" + Util.lineSep()
+					+"TemporalConcreteEqualsAbstract = true" + Util.lineSep()
 					+"TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker" + Util.lineSep()
 					+"TemporalLTLCheckerWSL = true" + Util.lineSep()
 					+"TemporalLTLVerbose = true" + Util.lineSep()

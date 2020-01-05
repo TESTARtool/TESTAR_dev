@@ -1,5 +1,7 @@
 package nl.ou.testar.temporal.behavior;
 
+import com.orientechnologies.orient.core.config.OContextConfiguration;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
@@ -11,14 +13,11 @@ import com.orientechnologies.orient.core.record.impl.ORecordBytes;
 import com.orientechnologies.orient.core.record.impl.OVertexDocument;
 import com.orientechnologies.orient.core.sql.executor.OResult;
 import com.orientechnologies.orient.core.sql.executor.OResultSet;
-import es.upv.staq.testar.CodingManager;
-import es.upv.staq.testar.StateManagementTags;
 import nl.ou.testar.StateModel.Analysis.Representation.AbstractStateModel;
 import nl.ou.testar.StateModel.Analysis.Representation.TestSequence;
 import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
 import nl.ou.testar.temporal.structure.*;
 import nl.ou.testar.temporal.util.*;
-import org.fruit.alayer.Tag;
 import org.fruit.alayer.Tags;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
@@ -28,8 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-
-import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
 //import org.apache.tinkerpop.gremlin.structure.Graph;
 //import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
@@ -194,7 +191,7 @@ public  class TemporalDBHelper {
         OResultSet resultSet = db.query(stmt, params);  //OResultSet resultSet = db.query(stmt); @todo refactor db to dbhelper
         return resultSet;
     }
-    public Set<String> getWidgetPropositions(String state) {
+    public Set<String> getWidgetPropositions(String state, List<String> abstractionAttributes) {
 
 
         // concrete widgets
@@ -214,12 +211,34 @@ public  class TemporalDBHelper {
                 Optional<OVertex> op = result.getVertex();
                 if (!op.isPresent()) continue;
                 OVertex stateVertex = op.get();
+                List<WidgetFilter> passedWidgetFilters=getPassingWidgetFilters(stateVertex,abstractionAttributes);
                 for (String propertyName : stateVertex.getPropertyNames()) {
-                    computeProps( propertyName, stateVertex, propositions, true, false);
+                    computeProps( propertyName, stateVertex, propositions,  passedWidgetFilters,true, false);
                 }
             }
         }
         return propositions;
+    }
+    private List<WidgetFilter> getPassingWidgetFilters(OElement graphElement,  List<String> abstractionAttributes){
+        List<WidgetFilter> passedWidgetFilters;
+        Map<String,String> attribmap=new HashMap<>();
+        passedWidgetFilters=null;
+        for (String attrib:abstractionAttributes
+        ) {
+            Object prop = graphElement.getProperty(attrib);
+            if (prop == null) {
+                System.out.println("Abstraction attribute: " + attrib + " not part of graphelement: " + graphElement.toString());
+                //passedWidgetFilters=null;
+                break;
+            } else {
+                attribmap.put(attrib, graphElement.getProperty(attrib));
+            }
+        }
+//        System.out.println("DEBUG: checking widgetfilters for graphelement: " + graphElement.getIdentity().toString()+"     time: "+System.nanoTime());
+        passedWidgetFilters = apSelectorManager.passWidgetFilters(attribmap);//
+//        System.out.println("DEBUG: check done      time: "+System.nanoTime());
+
+        return passedWidgetFilters;
     }
 
     public List<TransitionEncoding> getTransitions(String state) {
@@ -249,7 +268,7 @@ public  class TemporalDBHelper {
                 trenc.setTargetState(target.getIdentity().toString());
                 Set<String> propositions = new LinkedHashSet<>();
                 for (String propertyName : actionEdge.getPropertyNames()) {
-                    computeProps( propertyName, actionEdge, propositions, false, true);
+                    computeProps( propertyName, actionEdge, propositions, null,false, true);
                 }
                 trenc.setTransitionAPs(propositions);
 
@@ -554,14 +573,16 @@ public  class TemporalDBHelper {
         return convertedValue;
     }
 
-    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isEdge) {
-        computeProps(propertyName, graphElement, globalPropositions, isWidget, isEdge, false);
+    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge) {
+        computeProps(propertyName, graphElement, globalPropositions, passedWidgetFilters,isWidget, isEdge, false);
     }
 
-    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, boolean isWidget, boolean isEdge, boolean isDeadState) {
+
+    public  void computeProps(String propertyName, OElement graphElement, Set<String> globalPropositions, List<WidgetFilter> passedWidgetFilters, boolean isWidget, boolean isEdge, boolean isDeadState) {
         // isdeadstate is not used
         StringBuilder apkey = new StringBuilder();
-        List<WidgetFilter> passedWidgetFilters;
+        //List<WidgetFilter> passedWidgetFilters;
+
         //compose APkey
         for (String k : apSelectorManager.getAPKey()
         ) {
@@ -586,17 +607,32 @@ public  class TemporalDBHelper {
             }
         }
         if (isWidget) {
-            passedWidgetFilters = apSelectorManager.passWidgetFilters(
-                    graphElement.getProperty(Tags.Role.name().toString()),
-                    graphElement.getProperty(Tags.Title.name().toString()),
-                    graphElement.getProperty(Tags.Path.name().toString())
-                    //graphElement.getProperty(Tags.Path.name().toString() // dummy, parenttitle is not implemented yet
-            );
+     /*       Map<String,String> attribmap=new HashMap<>();
+            passedWidgetFilters=null;
+            for (String attrib:abstractionAttributes
+                 ) {
+                Object prop = graphElement.getProperty(attrib);
+                if (prop == null) {
+                    System.out.println("Abstraction attribute: " + attrib + " not part of graphelement: " + graphElement.toString());
+                    //passedWidgetFilters=null;
+                    break;
+                } else {
+                    attribmap.put(attrib, graphElement.getProperty(attrib));
+                }
+            }
+                System.out.println("DEBUG: checking widgetfilters for graphelement: " + graphElement.getIdentity().toString()+"     time: "+System.nanoTime());
+                passedWidgetFilters = apSelectorManager.passWidgetFilters(attribmap);//
+                System.out.println("DEBUG: check done      time: "+System.nanoTime());
+*/
+
+
 
             if (passedWidgetFilters != null && passedWidgetFilters.size() > 0) {
                 for (WidgetFilter wf : passedWidgetFilters) // add the filter specific elected attributes and expressions
                 {// candidate for refactoring as this requires a double iteration of widget filter
-                    globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+                    //globalPropositions.addAll(wf.getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+                    globalPropositions.addAll(wf.getWidgetSelectorPart().getAPsOfAttribute(apkey.toString(), propertyName, graphElement.getProperty(propertyName).toString()));
+
                 }
             }
         }

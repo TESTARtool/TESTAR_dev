@@ -34,6 +34,7 @@
 package nl.ou.testar.temporal.util;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import org.fruit.Assert;
 import org.fruit.Util;
@@ -58,7 +59,7 @@ public final class TagBean<T> implements Serializable{  // copy of TAg class, bu
 	 * @return A tag object.
 	 */
 
-
+	@JsonIgnore  // not interested in clazz.  name of the tag is unique.
 	private  Class<?> clazz;
 	private  String name;
 	private int hashcode;

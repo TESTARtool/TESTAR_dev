@@ -2,12 +2,16 @@ package nl.ou.testar.temporal.util;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class JSONHandler {
     public static Object load(String fromFile, Class cls) { // CLASS method
@@ -91,6 +95,62 @@ public class JSONHandler {
 return tmp;//either empty of filed was found
     }
 
+    //=============not used ??
+    public Map<String, Object> peekNode (String inFile) {
+        return peekNode(inFile, "", true, "");
+    }
+    public Map<String, Object> peekNode (String inFile, String nodeStartsWith) {
+        return peekNode(inFile, nodeStartsWith, true, "");
+    }
+    public Map<String, Object> peekNode (String inFile, Boolean primitvesOnly) {
+        return peekNode(inFile, "", primitvesOnly, "");
+    }
+    public Map<String, Object> peekNode (String inFile, String nodeStartsWith, Boolean primitvesOnly) {
+        return peekNode(inFile, nodeStartsWith, primitvesOnly, "");
+    }
+
+    private Map<String, Object> peekNode (String inFile, String nodeStartsWith,
+                                          Boolean primitvesOnly, String subnode){
+        // actually need proper error  handling... throws Exception {
+        // peeks only one level deep from the root
+
+        File jsonFile = new File(inFile).getAbsoluteFile();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = null;
+        try {
+            root = mapper.readTree(jsonFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (subnode != "") root = root.get(subnode);
+        return getFields(root, nodeStartsWith, primitvesOnly);
+    }
+    private static Map<String, Object> getFields (JsonNode data, String nodeStartsWith, Boolean primitivesonly){
+        Map<String, Object> attributes = new HashMap<>();
+        for (Iterator<Map.Entry<String, JsonNode>> it = data.fields(); it.hasNext(); ) {
+            Map.Entry<String, JsonNode> field = it.next();
+            String key = field.getKey();
+            if (key.startsWith(nodeStartsWith)) {
+                JsonNode value = field.getValue();
+                if (value.isBoolean()) {
+                    attributes.put(key, value.asBoolean());
+                } else if (value.isLong()) {
+                    attributes.put(key, value.asLong());
+                } else if (value.isDouble()) {
+                    attributes.put(key, value.asDouble());
+                } else if (!primitivesonly && value.isArray()) {
+                    attributes.put(key, value.toString());
+                } else if (!primitivesonly && value.isObject()) {
+                    attributes.put(key, value.toString());
+
+                } else
+                    attributes.put(key, value.asText());
+            }
+        }
+        return attributes;
+    }
+    //=============not used??
 }
+
 
 

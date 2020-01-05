@@ -1,68 +1,59 @@
 package nl.ou.testar.temporal.structure;
 
-import com.opencsv.bean.CsvBindAndJoinByName;
-import com.opencsv.bean.CsvBindAndSplitByName;
-import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvCustomBindByName;
+import com.opencsv.bean.*;
 import nl.ou.testar.temporal.util.*;
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.MapIterator;
+import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import java.util.*;
 
-public class TemporalOracle extends TemporalPattern{
+public class TemporalOracle extends TemporalBean implements Cloneable{
+    @CsvIgnore
+    private static String version = "20200104";
 
-   // @CsvCustomBindByName( converter = CSVConvertMap.class)
-//   @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"=+"+csvsep, writeDelimiter = csvsep+"====="+csvsep)
-//    private List<String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
-    @CsvBindAndJoinByName(column = "(?i)pattern_Substitutions[0-9]+", elementType = String.class)
-    private MultiValuedMap<String,String> pattern_Substitutions; //b0:Button_OK_IsWindowsModel,b1:<>,b2:<>,bn:'Button_OK_ParentTitle'
-
-
+    @CsvBindAndJoinByName(column = "(?i)PATTERN_SUBSTITUTION_P[0-9]+", elementType = String.class)
+    private MultiValuedMap<String,String> pattern_Substitutions;
+    @CsvBindByName
+    private int pattern_ConstraintSet;  // based on which set of constraints
     @CsvCustomBindByName(converter = CSVConvertValStatus.class)
     private ValStatus oracle_validationstatus;  //strange case sensitivity problem with CSV converter: leave all lowercase
     @CsvCustomBindByName(converter = CSVConvertVerdict.class )
     private Verdict oracle_verdict;         //strange case sensitivity problem with CSV converter: leave all lowercase
-    @CsvBindByName
-    private double log_TraceSupport;
-    @CsvBindByName
-    private double log_TraceConfidence;
-    @CsvBindByName
-    private double log_TraceLift;
-    @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
-    private List<String> log_TestsequenceIDs;
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> exampleRun_Prefix_States; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> exampleRun_Prefix_Transitions; //state -> edge->state-> etc,  encoding is "S<node id>" or "T<edge id>"
-
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> exampleRun_Cycle_States;  // idem
-
-
-
     @CsvBindAndSplitByName(elementType = String.class, splitOn = csvsep+"+", writeDelimiter = csvsep)//, collectionType = LinkedList.class)
     private List<String> exampleRun_Cycle_Transitions;  // idem
     @CsvBindByName
     private String log_RunDate;
 
+    @CsvRecurse
+    private TemporalPatternBase patternBase;
 
 
     public TemporalOracle() {
-
         super();
-        this.set_formatVersion("20190629");
+    }
+
+    public static String getVersion() {
+        return version;
+    }
+
+    public TemporalPatternBase getPatternBase() {
+        return patternBase;
+    }
+    public TemporalType getPatternTemporalType() {
+        return patternBase.getPattern_TemporalFormalism();
     }
 
 
-
-    public List<String> getLog_TestsequenceIDs() {
-        return log_TestsequenceIDs;
-    }
-
-    public void setLog_TestsequenceIDs(List<String> log_TestsequenceIDs) {
-        this.log_TestsequenceIDs = log_TestsequenceIDs;
+    public void setPatternBase(TemporalPatternBase patternBase) {
+        this.patternBase = patternBase;
     }
 
     public List<String> getExampleRun_Prefix_Transitions() {
@@ -81,9 +72,10 @@ public class TemporalOracle extends TemporalPattern{
         this.exampleRun_Cycle_Transitions = exampleRun_Cycle_Transitions;
     }
 
-    public MultiValuedMap getPattern_Substitutions() {
+    public MultiValuedMap<String,String> getPattern_Substitutions() {
         return pattern_Substitutions;
     }
+
     public TreeMap<String,String> getSortedPattern_Substitutions(){
         TreeMap<String, String> treeMap = new TreeMap<>();
         for(String str : pattern_Substitutions.keySet()){
@@ -92,9 +84,16 @@ public class TemporalOracle extends TemporalPattern{
       return treeMap;
     }
 
-    public void setPattern_Substitutions(MultiValuedMap pattern_Substitutions) {
+    public void setPattern_Substitutions(MultiValuedMap<String,String> pattern_Substitutions) {
 
         this.pattern_Substitutions = pattern_Substitutions;
+    }
+    public int getPattern_ConstraintSet() {
+        return pattern_ConstraintSet;
+    }
+
+    public void setPattern_ConstraintSet(int pattern_ConstraintSet) {
+        this.pattern_ConstraintSet = pattern_ConstraintSet;
     }
     public ValStatus getOracle_validationstatus() {
         return oracle_validationstatus;
@@ -111,30 +110,6 @@ public class TemporalOracle extends TemporalPattern{
 
     public void setOracle_verdict(Verdict oracle_verdict) {
         this.oracle_verdict = oracle_verdict;
-    }
-
-    public double getLog_TraceSupport() {
-        return log_TraceSupport;
-    }
-
-    public void setLog_TraceSupport(double log_TraceSupport) {
-        this.log_TraceSupport = log_TraceSupport;
-    }
-
-    public double getLog_TraceConfidence() {
-        return log_TraceConfidence;
-    }
-
-    public void setLog_TraceConfidence(double log_TraceConfidence) {
-        this.log_TraceConfidence = log_TraceConfidence;
-    }
-
-    public double getLog_TraceLift() {
-        return log_TraceLift;
-    }
-
-    public void setLog_TraceLift(double log_TraceLift) {
-        this.log_TraceLift = log_TraceLift;
     }
 
     public List<String> getExampleRun_Prefix_States() {
@@ -166,5 +141,49 @@ public class TemporalOracle extends TemporalPattern{
         return (TemporalOracle)super.clone();
     }
 
+    public static TemporalOracle getSampleLTLOracle(){
+        TemporalOracle to = new TemporalOracle(); //new TemporalOracle("notepad","v10","34d23", attrib);
+        Set<String> dummyset = new HashSet<>();
+        List<String> dummylist= new ArrayList<>();
 
+        dummyset.add("(populated by TESTAR)");
+        dummylist.add("(populated by TESTAR)");
+        to.setApplication_AbstractionAttributes(dummyset);
+        to.setApplicationName("(populated by TESTAR)");
+        to.setApplicationVersion("(populated by TESTAR)");
+        to.setApplication_ModelIdentifier("(populated by TESTAR)");
+        to.setExampleRun_Cycle_States(dummylist);
+        to.setExampleRun_Prefix_States(dummylist);
+        to.setExampleRun_Cycle_Transitions(dummylist);
+        to.setExampleRun_Prefix_Transitions(dummylist);
+        to.setLog_RunDate("(populated by TESTAR)");
+        to.setOracle_verdict(Verdict.UNDEF);
+        TemporalPatternBase p = new TemporalPatternBase();
+        p.setPattern_TemporalFormalism(TemporalType.LTL);
+        p.setPattern_Description("(p0 and p2) precedes p1");
+        p.setPattern_Scope("globally");
+        p.setPattern_Class("precedence");
+        p.setPattern_Formula("!p1 W (p0 & p2)");
+        p.setPattern_Parameters(Arrays.asList("p0", "p1","p2"));
+        to.setPatternBase(p);
+        to.setPattern_ConstraintSet(1);
+
+
+        to.setOracle_validationstatus(ValStatus.ACCEPTED);
+        MultiValuedMap<String,String> pattern_Substitutions = new HashSetValuedHashMap<>();
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P0","UIButton"+APEncodingSeparator.CUSTOM.symbol+"Title_Match_OK");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P1","UIWindow_Title_main"+APEncodingSeparator.CUSTOM.symbol+"exists");
+        pattern_Substitutions.put("PATTERN_SUBSTITUTION_P2","UIWindow_Title_closure"+APEncodingSeparator.CUSTOM.symbol+"exists");
+        to.setPattern_Substitutions(pattern_Substitutions);
+
+        List<String> comments= new ArrayList<String>();
+        comments.add("Format version: "+version);
+        comments.add("This is a sample oracle. for valid substitutions, please see the APEncodedModel.json");
+        comments.add("Formula, parameter and substitutions are the key elements. parameter syntax: 'p[0-9]+'");
+        comments.add("Substitution must match a parameter. Header syntax: 'pattern_Substitution_P[0-9]+'");
+        comments.add("AVOID using literals 'X,F,G,U,W,R,M' as substitutions, as they are used in LTL syntax");
+        comments.add("Column order is not important. Header names are case insensitive but structure is important");
+        to.set_comments(comments);
+        return to;
+    }
 }

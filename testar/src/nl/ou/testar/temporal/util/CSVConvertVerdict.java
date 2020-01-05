@@ -2,7 +2,7 @@ package nl.ou.testar.temporal.util;
 
 import com.opencsv.bean.AbstractBeanField;
 
-public  class CSVConvertVerdict<T> extends AbstractBeanField<T> {
+public  class CSVConvertVerdict<T,I> extends AbstractBeanField<T,I> {
 
     @Override
     protected Object convert( String value)

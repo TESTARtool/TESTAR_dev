@@ -22,12 +22,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.fruit.monkey.ConfigTags.AbstractStateAttributes;
 
-//import org.apache.tinkerpop.gremlin.structure.Graph;
-//import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLWriter;
 
 public class TemporalController {
 
@@ -38,6 +37,7 @@ public class TemporalController {
     private String ApplicationVersion;
     private String Modelidentifier;
     private String outputDir;
+    private boolean toWSLPath;
     private ODatabaseSession db;
     private APSelectorManager apSelectorManager;
     private TemporalModel tModel;
@@ -51,12 +51,13 @@ public class TemporalController {
         dbConfig = makeConfig(settings);
         String connectionString = dbConfig.getConnectionType() + ":/" + (dbConfig.getConnectionType().equals("remote") ?
                 dbConfig.getServer() : dbConfig.getDatabaseDirectory());// +"/";
-        //orientDB = new OrientDB(connectionString, OrientDBConfig.defaultConfig());
         // orientDB = new OrientDB("plocal:C:\\orientdb-tp3-3.0.18\\databases", OrientDBConfig.defaultConfig());
         this.outputDir = makeOutputDir(settings);
         tDBHelper = new TemporalDBHelper(settings);
         tModel = new TemporalModel();
+        toWSLPath=settings.get(ConfigTags.TemporalLTLCheckerWSL);
         setDefaultAPSelectormanager();
+
 
     }
     public void setTemporalModelMetaData(AbstractStateModel abstractStateModel){
@@ -70,15 +71,19 @@ public class TemporalController {
 
     }
     private void setModelidentifier(Settings settings){
-        //copied from Main.initcodingmanager
+
+        //assumption is that the model is created with the same abstraction as the abstract layer.
+        // we can inspect the graphmodel for the abstract layer,
+        // but we cannot inspect the graphmodel for the abstraction that used on the concretelayer.
+        // for new models we enforce this by setting "TemporalConcreteEqualsAbstract = true" in the test.settings file
+        // copied from Main.initcodingmanager
         if (!settings.get(ConfigTags.AbstractStateAttributes).isEmpty()) {
             Tag<?>[] abstractTags = settings.get(AbstractStateAttributes).stream().map(StateManagementTags::getTagFromSettingsString).filter(tag -> tag != null).toArray(Tag<?>[]::new);
             CodingManager.setCustomTagsForAbstractId(abstractTags);
         }
         //copied from StateModelManagerFactory
         // get the abstraction level identifier that uniquely identifies the state model we are testing against.
-        this.Modelidentifier = CodingManager.getAbstractStateModelHash(settings.get(ConfigTags.ApplicationName),
-                settings.get(ConfigTags.ApplicationVersion));
+        this.Modelidentifier = CodingManager.getAbstractStateModelHash(ApplicationName,ApplicationVersion);
 
     }
     private Config makeConfig(final Settings settings){
@@ -146,12 +151,24 @@ public class TemporalController {
 
     public void setOracleColl(List<TemporalOracle> oracleColl) {
         this.oracleColl = oracleColl;
-        this.oracleColl.sort(Comparator.comparing(TemporalOracle::getPattern_TemporalFormalism)); //sort by type
+        this.oracleColl.sort(Comparator.comparing(TemporalOracle::getPatternTemporalType)); //sort by type
     }
 
+    public void updateOracleCollMetaData(boolean onlyModifiedDate){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        for (TemporalOracle ora:oracleColl
+             ) {
+            if (!onlyModifiedDate) {
+                ora.setApplicationName(tModel.getApplicationName());
+                ora.setApplicationVersion(tModel.getApplicationVersion());
+                ora.setApplication_ModelIdentifier(tModel.getApplication_ModelIdentifier());
+                ora.setApplication_AbstractionAttributes(tModel.getApplication_AbstractionAttributes());
+            }
+            ora.set_modifieddate(localDateTime.toString());
+        }
+    }
     public void setDefaultAPSelectormanager() {
-        List<Tag<?>> taglist = new ArrayList<>();
-        List<String> APKey= new ArrayList<>();
+         List<String> APKey= new ArrayList<>();
         if(tModel!=null){
             APKey =tModel.getApplication_BackendAbstractionAttributes() ;}
         if (APKey!=null && !APKey.isEmpty()){
@@ -161,8 +178,6 @@ public class TemporalController {
             this.apSelectorManager = new APSelectorManager(true);}
         tDBHelper.setApSelectorManager(apSelectorManager);
     }
-
-
 
 
     // @TODO: 2019-12-29 refactor db operations to dbhelper
@@ -249,9 +264,9 @@ public class TemporalController {
                         tModel.addLog("State: " + stateVertex.getIdentity().toString() + " has no outgoing transition. \n");
                     }
                     for (String propertyName : stateVertex.getPropertyNames()) {
-                        tDBHelper.computeProps(propertyName, stateVertex, propositions, false, false);
+                        tDBHelper.computeProps(propertyName, stateVertex, propositions, null, false, false);
                     }
-                    propositions.addAll(tDBHelper.getWidgetPropositions(senc.getState()));// concrete widgets
+                    propositions.addAll(tDBHelper.getWidgetPropositions(senc.getState(),tModel.getApplication_BackendAbstractionAttributes()));// concrete widgets
                     senc.setStateAPs(propositions); // to be decided:  whether to include current AP's on a deadstate
                     if (deadstate) {
                         TransitionEncoding deadTrenc = new TransitionEncoding();
@@ -288,6 +303,7 @@ public class TemporalController {
                 initStates.add(traceevent.getState());
             }
             tModel.setInitialStates(initStates);
+            tModel.setAPSeperator(apSelectorManager.getApEncodingSeparator());
 
             for (String ap : tModel.getModelAPs()    // check the resulting model for DeadStates
             ) {
@@ -362,7 +378,7 @@ public class TemporalController {
     }
     public void saveFormulaFiles(List<TemporalOracle> oracleColl, File output){
 
-        String contents = tModel.makeFormulaOutput(oracleColl);
+        String contents = tModel.validateAndMakeFormulas(oracleColl);
         try {
 
             if (output.exists() || output.createNewFile()) {
@@ -385,8 +401,8 @@ public class TemporalController {
             setTemporalModelMetaData(abstractStateModel);
             loadApSelectorManager(APSelectorFile);
             String strippedFile;
-            String APCopy =  "copy_"+Paths.get(APSelectorFile).getFileName().toString();
-            String OracleCopy = "copy_"+ Paths.get(oracleFile).getFileName().toString();
+            String APCopy =  "copy_of_used_"+Paths.get(APSelectorFile).getFileName().toString();
+            String OracleCopy = "copy_of_used_"+ Paths.get(oracleFile).getFileName().toString();
             if (verbose) {
                 Files.copy((new File(APSelectorFile).toPath()),
                         new File(outputDir + APCopy).toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -403,15 +419,16 @@ public class TemporalController {
             File resultsFile = new File(outputDir + "LTL_results.txt");
             File inputvalidatedFile = new File(outputDir + strippedFile + "_inputvalidation.csv");
             File modelCheckedFile = new File(outputDir + strippedFile + "_modelchecked.csv");
-
+            System.out.println(tType+" starting to  compute the temporal model \n");
             computeTemporalModel(abstractStateModel);
-
+            System.out.println(tType+" completed computing the temporal model \n");
             List<TemporalOracle> fromcoll;
             fromcoll = CSVHandler.load(oracleFile, TemporalOracle.class);
             if (fromcoll == null) {
                 System.err.println("Error: verify the file at location '" + oracleFile + "'");
             } else {
                setOracleColl(fromcoll);
+               updateOracleCollMetaData(false);
                saveFormulaFiles(fromcoll, formulaFile);
                 CSVHandler.save(fromcoll, inputvalidatedFile.getAbsolutePath());
             }
@@ -420,18 +437,21 @@ public class TemporalController {
             //if (tType==TemporalType.LTL){}
             saveModelForChecker(TemporalType.LTL, automatonFile.getAbsolutePath());
             String aliveprop = gettModel().getAliveProposition("!dead");
-            Helper.LTLModelCheck(pathToExecutable, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
+            System.out.println(tType+" invoking the backend model-checker \n");
+            Helper.LTLModelCheck(pathToExecutable, toWSLPath, automatonFile.getAbsolutePath(), formulaFile.getAbsolutePath(), aliveprop, resultsFile.getAbsolutePath());
+            System.out.println(tType+" starting to verify the results form the backend model-checker \n");
             Spot_CheckerResultsParser sParse = new Spot_CheckerResultsParser(gettModel(), fromcoll);//decode results
             List<TemporalOracle> modelCheckedOracles = sParse.parse(resultsFile);
             if (modelCheckedOracles == null) {
                 System.err.println("Error detected in obtained results from the model-checker");
             } else {
+                updateOracleCollMetaData(true);
                 CSVHandler.save(modelCheckedOracles, modelCheckedFile.getAbsolutePath());
-                System.out.println(tType+" model-checking completed \n");
+
             }
             //above is LTL specific logic
 
-
+            System.out.println(tType+" starting post processing output files \n");
             if (verbose) {
                saveToGraphMLFile( "GraphML.XML",false);
                saveToGraphMLFile( "GraphML_NoWidgets.XML",true);
@@ -443,6 +463,7 @@ public class TemporalController {
                 Files.delete(inputvalidatedFile.toPath());
             }
             tDBHelper.dbClose();
+            System.out.println(tType+" model-checking completed \n");
         } catch (Exception f) {
             f.printStackTrace();
         }
@@ -473,5 +494,13 @@ public class TemporalController {
             f.printStackTrace();
         }
 
+    }
+    public List<TemporalOracle> generatepotentialoracles(TemporalModel tModel,TemporalPattern pattern, TemporalPatternConstraint patternConstraint,int tactic_oraclesPerPattern){
+        List<TemporalOracle> potentialOracleColl = new ArrayList<>();
+        Set<String> modelAPs;
+
+
+
+        return potentialOracleColl;
     }
 }

@@ -36,6 +36,7 @@ import org.fruit.monkey.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -107,7 +108,7 @@ public class GeneralPanel extends JPanel {
     Arrays.sort(sutSettings);
     comboBoxProtocol.setModel(new DefaultComboBoxModel<>(sutSettings));
     comboBoxProtocol.setMaximumRowCount(sutSettings.length > 16 ? 16 : sutSettings.length);
-    
+
     // Pass button click to settings dialog
     MyItemListener myItemListener = new MyItemListener();
     myItemListener.addObserver(settingsDialog);
@@ -134,6 +135,18 @@ public class GeneralPanel extends JPanel {
     add(labelAppVersion);
     applicationVersionField.setBounds(480, 280, 125, 27);
     add(applicationVersionField);
+    //css Q&D 20200102
+    JButton btnSave = new JButton("Save");
+    btnSave .setBounds(510, 325, 100, 25);
+    btnSave .addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) { settingsDialog.saveCurrentSettings();}});
+    btnSave .setToolTipText(" Save to Test.settings file");
+    btnSave .setMaximumSize(new Dimension(160, 35));
+    btnSave .setMinimumSize(new Dimension(160, 35));
+    btnSave .setPreferredSize(new Dimension(160, 35));
+    add(btnSave );
+    //css
   }
 
   private void addGeneralControlsLocal() {

@@ -1,15 +1,8 @@
 package nl.ou.testar.temporal.behavior;
 
-import nl.ou.testar.StateModel.Persistence.OrientDB.Entity.Config;
-import nl.ou.testar.temporal.util.Helper;
-import nl.ou.testar.temporal.util.StreamConsumer;
 import nl.ou.testar.temporal.util.TemporalType;
 import org.fruit.monkey.ConfigTags;
 import org.fruit.monkey.Settings;
-
-import java.io.File;
-
-import static org.fruit.monkey.Main.outputDir;
 
 public class TemporalExecutor {
     private TemporalController tcontrol;
@@ -33,7 +26,7 @@ public class TemporalExecutor {
 
 
     public void LTLModelCheck() {
-        if (settings.get(ConfigTags.TemporalEnabled)) {
+        if (settings.get(ConfigTags.TemporalOffLineEnabled)) {
             // tcontrol.setDefaultAPSelectormanager();
             tcontrol.ModelCheck(TemporalType.LTL,
                     settings.get(ConfigTags.TemporalLTLChecker),

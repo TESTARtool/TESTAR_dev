@@ -53,7 +53,7 @@ class InferrableValuedExpressions {
         APPatterns.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:DOWN)"));
         APPatterns.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:LEFT)"));
         APPatterns.add(new PairBean<>(InferrableExpression.textmatch_, "(?i:RIGHT)"));
-        APPatterns.add(new PairBean<>(InferrableExpression.pathmatch_, ".\\[(\\d+,)*\\d+\\]"));
+        APPatterns.add(new PairBean<>(InferrableExpression.textmatch_, ".\\[(\\d+,)*\\d+\\]"));
         APPatterns.add(new PairBean<>(InferrableExpression.heigth_lt_, "50"));
         APPatterns.add(new PairBean<>(InferrableExpression.heigth_lt_, "250"));
         APPatterns.add(new PairBean<>(InferrableExpression.heigth_lt_, "500"));

@@ -1,130 +1,88 @@
 package nl.ou.testar.temporal.structure;
 
-import nl.ou.testar.temporal.util.InferrableExpression;
-import nl.ou.testar.temporal.util.PairBean;
-import org.fruit.alayer.Role;
-import org.fruit.alayer.windows.UIARoles;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.fruit.alayer.Tags;
+import org.fruit.alayer.windows.UIATags;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class WidgetFilter extends APSelector{
-    private Set<String> widgetRolesMatches;
-    private Set<String> widgetTitleMatches;
-    private Set<String> widgetPathMatches;
-    private Set<String> widgetParentTitleMatches;
+import static nl.ou.testar.temporal.structure.APSelector.*;
+
+public class WidgetFilter {//extends APSelector {
+
+
+    private  String freeFormatText;
+    private List<WidgetFilterPart> widgetFilterParts;
+    private APSelector widgetSelectorPart;
+
 
 
 
     public WidgetFilter() {
         super();
-        widgetRolesMatches = new LinkedHashSet<>();
-        widgetTitleMatches= new LinkedHashSet<>();
-        widgetPathMatches= new LinkedHashSet<>();
-        widgetParentTitleMatches= new LinkedHashSet<>();
-
+        widgetFilterParts = new ArrayList<WidgetFilterPart>();
+        widgetSelectorPart = new APSelector();
     }
-   public void setDefaultWidgetFilter() {  //candidate fo refactoring: valueexpression
-                   setDefaultRoleMatches(useStandardValuedExpressions());
-            setDefaultTitleMatches(useStandardValuedExpressions());
-            setDefaultPathMatches(useStandardValuedExpressions());
-            setDefaultParentTitleMatches(useStandardValuedExpressions());
-            setSelectedAttributes(getBasicAttributes());
-            setValuedExpressions(useBasicValuedExpressions());
-
+    @JsonIgnore
+    public void updateFreeFormatText(String freeFormatText) {
+        this.freeFormatText = freeFormatText;
+    }
+    public String getFreeFormatText() {
+        return freeFormatText;
+    }
+    public List<WidgetFilterPart> getWidgetFilterParts() {
+        return widgetFilterParts;
     }
 
-    public Set<String> getWidgetRolesMatches() {
-        return widgetRolesMatches;
+    public void setWidgetFilterParts(List<WidgetFilterPart> widgetFilterParts) {
+        this.widgetFilterParts = widgetFilterParts;
+    }
+    public APSelector getWidgetSelectorPart() {
+        return widgetSelectorPart;
     }
 
-
-    public void setWidgetRolesMatches(Set<String> widgetRolesMatches) {
-        this.widgetRolesMatches = widgetRolesMatches;
+    public void setWidgetSelectorPart(APSelector widgetSelectorPart) {
+        this.widgetSelectorPart = widgetSelectorPart;
     }
 
-    public Set<String> getWidgetTitleMatches() {
-        return widgetTitleMatches;
+    public void  setDefaultWidgetFilter() {
+        updateFreeFormatText("==================This is a Sample WidgetFilter, with 3 filter requirements");
+        WidgetFilterPart wfp = new WidgetFilterPart();
+        Set<String> temp= new  HashSet<String>();
+        temp.add(Tags.Role.name());
+        wfp.setSelectedAttributes(temp);
+        wfp.setSelectedExpressions(useRoleConditionalExpressions());
+        widgetFilterParts.add(wfp);
+
+        WidgetFilterPart wfp1 = new WidgetFilterPart();
+        temp= new  HashSet<String>(){{add(Tags.Path.name());}};
+        wfp1.setSelectedAttributes(temp);
+        wfp1.setSelectedExpressions(usePathConditionalExpressions());
+        widgetFilterParts.add(wfp1);
+
+        WidgetFilterPart wfp2 = new WidgetFilterPart();
+        temp= new  HashSet<String>(){{add(Tags.Title.name());}};
+        wfp2.setSelectedAttributes(temp);
+        wfp2.setSelectedExpressions(useTitleConditionalExpressions());
+        widgetFilterParts.add(wfp2);
+
+        widgetSelectorPart.setSelectedAttributes(useBasicAttributes());
+        widgetSelectorPart.setSelectedExpressions(useBasicSelectedExpressions());
     }
 
-    public void setWidgetTitleMatches(Set<String> widgetTitleMatches) {
-        this.widgetTitleMatches = widgetTitleMatches;
-    }
+    public void setMinimalWidgetFilter() {
+        updateFreeFormatText("==================This is a Sample WidgetFilter, with 1 filter requirements");
+        WidgetFilterPart wfp2 = new WidgetFilterPart();
+        Set<String>   temp= new  HashSet<String>(){{add(UIATags.UIAControlType.name());}};
+        wfp2.setSelectedAttributes(temp);
+        wfp2.setSelectedExpressions(useMinimalSelectedExpressions());
+        widgetFilterParts.add(wfp2);
 
-    public Set<String> getWidgetPathMatches() {
-        return widgetPathMatches;
+        widgetSelectorPart.setSelectedAttributes(useMinimalAttributes());
+        widgetSelectorPart.setSelectedExpressions(useMinimalSelectedExpressions());
     }
-
-    public void setWidgetPathMatches(Set<String> widgetPathMatches) {
-        this.widgetPathMatches = widgetPathMatches;
-    }
-
-    public Set<String> getWidgetParentTitleMatches() {
-        return widgetParentTitleMatches;
-    }
-
-    public void setWidgetParentTitleMatches(Set<String> widgetParentTitleMatches) {
-        this.widgetParentTitleMatches = widgetParentTitleMatches;
-    }
-
-    public void addWidgetRoleMatch(String expr){
-        this.widgetRolesMatches.add(expr);
-    }
-    public void addWidgetTitleMatch(String expr){
-        this.widgetTitleMatches.add(expr);
-    }
-    public void addWidgetPathMatch(String expr){
-        this.widgetPathMatches.add(expr);
-    }
-    public void addWidgetParentTitleMatch(String expr){
-        this.widgetParentTitleMatches.add(expr);
-    }
-
-
-    //custom
-    public void setAllAvailableWidgetRoles(){
-        for (Role r:UIARoles.rolesSet()
-             ) {
-            this.widgetRolesMatches.add(r.toString());
-        }
-    }
-
-    public void setDefaultRoleMatches(Set<PairBean<InferrableExpression,String>> valuedExpressions){
-        widgetRolesMatches.clear();
-        for (PairBean<InferrableExpression,String> iap: valuedExpressions
-        )        {
-            if (iap.left()==InferrableExpression.rolematch_){
-                widgetRolesMatches.add(iap.right());
-            }
-        }
-    }
-    public void setDefaultTitleMatches(Set<PairBean<InferrableExpression,String>> valuedExpressions){
-        widgetTitleMatches.clear();
-        for (PairBean<InferrableExpression,String> iap: valuedExpressions
-             )        {
-           if (iap.left()==InferrableExpression.textmatch_){
-               widgetTitleMatches.add(iap.right());
-           }
-        }
-    }
-    public void setDefaultParentTitleMatches(Set<PairBean<InferrableExpression,String>> valuedExpressions){
-        widgetParentTitleMatches.clear();
-        for (PairBean<InferrableExpression,String> iap: valuedExpressions
-        )        {
-            if (iap.left()==InferrableExpression.textmatch_){
-                widgetParentTitleMatches.add(iap.right());
-            }
-        }
-    }
-    public void setDefaultPathMatches(Set<PairBean<InferrableExpression,String>> valuedExpressions){
-        widgetPathMatches.clear();
-        for (PairBean<InferrableExpression,String> iap: valuedExpressions
-        )        {
-            if (iap.left()==InferrableExpression.pathmatch_){
-                widgetPathMatches.add(iap.right());
-            }
-        }
-    }
-
 }
 

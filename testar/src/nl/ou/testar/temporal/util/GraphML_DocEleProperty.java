@@ -8,7 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GraphML_DocEleProperty {
-    static Pattern p = Pattern.compile("[\\p{Graph}\\p{Space}]");// do once
+    // remove non printable low ascii codes. observed during excel test at the Ideasbutton: Ideas.
+    //negative matches were problematic [^\p{Graph}\p{Space}] or (".*(?![\\p{Graph}\\p{Space}]).*");
+    static Pattern p = Pattern.compile("[\\p{Graph}\\p{Space}]");
+
     @JacksonXmlProperty( isAttribute = true )
         private String key;
     @JacksonXmlText
@@ -28,13 +31,11 @@ public class GraphML_DocEleProperty {
     }
 
     public String getValue() {
-        // remove non printable low ascii codes. observed during excel test at the Ideasbutton: Ideas.
         // and escape XMl meta tags in the content as well
-        //negative matches were problematic [^\p{Graph}\p{Space}] or (".*(?![\\p{Graph}\\p{Space}]).*");
-        String val = StringEscapeUtils.escapeXml(value);
+        //String val = StringEscapeUtils.escapeXml(value);
+        String val= value;
         Matcher m;
         StringBuilder result = new StringBuilder();
-        //Pattern p = Pattern.compile("[\\p{Graph}\\p{Space}]");//
         String[] ary = val.split("");
         for (String ch : ary) {
             m = p.matcher(ch);

@@ -120,7 +120,8 @@ public final class ConfigTags {
   public static final Tag<Boolean> StateModelStoreWidgets = Tag.from("StateModelStoreWidgets", Boolean.class);
 
   // temporal oracles config tags
-  public static final Tag<Boolean> TemporalEnabled = Tag.from("TemporalEnabled", Boolean.class);
+  public static final Tag<Boolean> TemporalOffLineEnabled = Tag.from("TemporalOffLineEnabled", Boolean.class);
+  public static final Tag<Boolean> TemporalConcreteEqualsAbstract= Tag.from("TemporalConcreteEqualsAbstract", Boolean.class);
   public static final Tag<String> TemporalLTLChecker = Tag.from("TemporalLTLChecker", String.class);
   public static final Tag<Boolean> TemporalLTLCheckerWSL = Tag.from("TemporalLTLCheckerWSL", Boolean.class);
   public static final Tag<Boolean> TemporalLTLVerbose = Tag.from("TemporalLTLVerbose", Boolean.class);

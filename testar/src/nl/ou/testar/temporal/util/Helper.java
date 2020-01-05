@@ -91,12 +91,18 @@ public class Helper {
             e.printStackTrace();
         }
     }
-    public static  void LTLModelCheck(String pathToExecutable, String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
+    public static  void LTLModelCheck(String pathToExecutable, boolean toWslPath, String automatonFile, String formulaFile, String alivePropositionLTLF, String resultsFile) {
         //String cli = "ubuntu1804 run ~/testar/spot_checker --a automaton4.txt --ff formulas-abc-100.txt --ltlf !dead --o results.txt";
-        String  cli = pathToExecutable + " --a " + toWSLPath(automatonFile) + " --ff " + toWSLPath(formulaFile);
-
-        if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
-        if (!resultsFile.equals("")) cli = cli + " --o " + toWSLPath(resultsFile);
+        String  cli = pathToExecutable;
+        if(toWslPath) {
+            cli = cli + " --a " + toWSLPath(automatonFile) + " --ff " + toWSLPath(formulaFile);
+            if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
+            if (!resultsFile.equals("")) cli = cli + " --o " + toWSLPath(resultsFile);
+        }else{
+            cli = cli + " --a " + (automatonFile) + " --ff " + (formulaFile);
+            if (!alivePropositionLTLF.equals("")) cli = cli + " --ltlf " + alivePropositionLTLF;
+            if (!resultsFile.equals("")) cli = cli + " --o " + (resultsFile);
+        }
 
         Helper.RunOSChildProcess(cli);
     }

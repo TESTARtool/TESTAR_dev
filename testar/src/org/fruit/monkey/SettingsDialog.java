@@ -196,13 +196,29 @@ public class SettingsDialog extends JFrame implements Observer {
 
     miscPanel.checkSettings();
   }
+/*  private void aveCurrentSettings() {
 
-  private void saveCurrentSettings() {
     extractInformation(settings);
     try {
       Util.saveToFile(settings.toFileString(), settingsFile);
       Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
       System.out.println("Saved current settings to <" + settingsFile + ">");
+    } catch (IOException e1) {
+      LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
+    }
+  }*/
+
+
+  // css: it was annoying to constantly toggle the protocol combobox to enforce a save
+  // interactive testing for temporal oracles, requires altering settings
+  // i added a save button on the general panel, made this method public and invoke a refresh of the temporal panel.
+    public  void saveCurrentSettings() {
+    extractInformation(settings);
+    try {
+      Util.saveToFile(settings.toFileString(), settingsFile);
+      Settings.setSettingsPath(settingsFile.substring(0,settingsFile.indexOf("test.settings")-1));
+      System.out.println("Saved current settings to <" + settingsFile + ">");
+      temporalPanel.populateFrom(settings);//refresh panel
     } catch (IOException e1) {
       LogSerialiser.log("Unable to save current settings to <" + settingsFile + ">: " + e1.toString() + "\n");
     }

@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.HashBiMap;
 import nl.ou.testar.temporal.util.ValStatus;
-import org.apache.commons.collections.map.MultiValueMap;
-import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -15,19 +13,18 @@ import java.util.*;
 public class TemporalModel extends TemporalBean{
 
     private List<StateEncoding> stateEncodings; //Integer:  to concretstateID
-
-
-
     private  List<String> InitialStates;
     private List<TemporalTrace> traces; //
 
     @JsonIgnore
     private Set<String> modelAPs; //AP<digits> to widget property map:
-    private String formatVersion="20190721";
+    private String formatVersion="20200104";
     private static String APPrefix = "ap";
+    private  String APSeparator;
 
 
-public  TemporalModel(){
+
+    public  TemporalModel(){
     super(); // needed ?
     this.stateEncodings = new ArrayList<>();
     this.modelAPs = new LinkedHashSet<>();  //must maintain order
@@ -48,6 +45,14 @@ public  TemporalModel(){
 
     public void setModelAPs(Set<String> modelAPs) {
         this.modelAPs = modelAPs;
+    }
+
+    public  String getAPSeperator() {
+        return APSeparator;
+    }
+
+    public void setAPSeperator(String APSeperator) {
+        APSeparator = APSeperator;
     }
 
     public List<TemporalTrace> getTraces() {
@@ -154,14 +159,16 @@ public  TemporalModel(){
         return result.toString();
     }
 
-    public String makeFormulaOutput(List<TemporalOracle> oracleColl) {
+    public String validateAndMakeFormulas(List<TemporalOracle> oracleColl) {
 
         StringBuilder Formulas=new StringBuilder();
         for (TemporalOracle candidateOracle : oracleColl) {
             String formula;
-            List<String> sortedparameters = candidateOracle.getPattern_Parameters();
+            List<String> sortedparameters = candidateOracle.getPatternBase().getPattern_Parameters();
             Collections.sort(sortedparameters);
             List<String> sortedsubstitionvalues =  new ArrayList<>(candidateOracle.getSortedPattern_Substitutions().values());
+            sortedsubstitionvalues.removeAll(Arrays.asList(""));  // discard empty substitutions
+
 
             boolean importStatus;
                 importStatus = sortedparameters.size()==sortedsubstitionvalues.size();
@@ -192,10 +199,14 @@ public  TemporalModel(){
                     apindex.add(APPrefix+"_indexNotFound");
 
             }
-
-            formula= StringUtils.replaceEach(candidateOracle.getPattern_Formula(),
-                    sortedparameters.stream().toArray(String[]::new),
-                    apindex.stream().toArray(String[]::new));
+            if (!importStatus) {
+                formula= candidateOracle.getPatternBase().getPattern_Formula();
+                // will certainly fail during model-check, because parameters are not prefixed with 'ap'
+            }else{
+                formula= StringUtils.replaceEach(candidateOracle.getPatternBase().getPattern_Formula(),
+                        sortedparameters.stream().toArray(String[]::new),
+                        apindex.stream().toArray(String[]::new));
+            }
 
             Formulas.append(formula);
             Formulas.append("\n");

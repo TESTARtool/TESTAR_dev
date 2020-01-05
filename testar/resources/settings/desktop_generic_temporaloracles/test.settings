@@ -128,17 +128,18 @@ DataStoreMode = instant
 #################################################################
 # Temporal Oracle settings
 #################################################################
-TemporalEnabled = false
-#TemporalLTLChecker = ubuntu1804 run ~/testar/spot_checker
+TemporalOffLineEnabled = false
+# TemporalConcreteEqualsAbstract overrides setting: ConcreteStateAttributes
+TemporalConcreteEqualsAbstract = true
 TemporalLTLChecker = wsl --distribution Ubuntu1804 --user css  ~/testar/spot_checker
 TemporalLTLCheckerWSL = true
 TemporalLTLVerbose = true
 #TemporalLTLOracles = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
 #TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
 #TemporalLTLAPSelectorManager = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
-TemporalLTLOracles = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalOracle20190928c.csv
+TemporalLTLOracles = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\temporalOracleSample_for_TEST.csv
 TemporalLTLPatterns = C:\\Users\\c\\OneDrive\\OU\\AF\\temporal test files\\temporalPatternSample.csv
-TemporalLTLAPSelectorManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManagerTEST.json
+TemporalLTLAPSelectorManager = C:\\Users\\cseng\\OneDrive\\OU\\AF\\temporal test files\\APSelectorManager_for_TEST.json
 TemporalDirectory = temporal
 TemporalSubDirectories = true
 TemporalSpotFormulaParser = wsl --distribution Ubuntu1804 --user css  /mnt/c/Users/cseng/OneDrive/OU/AF/Ubuntu/spotparse
