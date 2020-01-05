@@ -1,4 +1,3 @@
-package desktop_qlearning;
 /**
  Copyright (c) 2018, 2019 Universitat Politecnica de Valencia - www.upv.es
  Copyright (c) 2018, 2019 Open Universiteit - www.ou.nl
@@ -47,7 +46,7 @@ import java.util.Set;
  *
  *  It changes the initialize() and selectAction() methods.
  */
-public class Protocol_desktop_reinforcementLearning extends DesktopProtocol {
+public class Protocol_desktop_reinforcement_learning extends DesktopProtocol {
 	private ActionSelector actionSelector;
 
 	/**

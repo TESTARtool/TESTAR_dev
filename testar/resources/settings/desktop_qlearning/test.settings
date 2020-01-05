@@ -93,7 +93,7 @@ SUTProcesses =
 # Indicate the location of the protocol class for your specific SUT.
 #################################################################
 
-ProtocolClass = desktop_qlearning/Protocol_desktop_qlearning
+ProtocolClass = desktop_qlearning/Protocol_desktop_reinforcement_learning
 
 #################################################################
 # Graphdatabase settings (experimental)
